@@ -8,6 +8,7 @@ testSerializeDesirialize(){
   Map root = bson.deserialize(buffer);    
   Expect.equals(root['a'],4);
   Expect.equals(root['_id'],5);
+  Expect.mapEquals(map,root);
   var doc1 = {'a': [15]};
   buffer = bson.serialize(doc1);
   Expect.stringEquals('140000000461000c0000001030000f0000000000',buffer.toHexString());

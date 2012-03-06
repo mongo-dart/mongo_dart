@@ -11,6 +11,11 @@ class ObjectId extends BsonObject{
     id.writeInt(Statics.nextIncrement,3,forceBigEndian:true);
   }  
   String toString()=>"ObjectId(${id.toHexString()})";
-  get value() => id;
+  get value() => this;
   int byteLength() => 12;
+  unpackValue(Binary buffer){
+     id.bytes.setRange(0,12,buffer.bytes,buffer.offset);
+     buffer.offset += 12;
+  }
+
 }

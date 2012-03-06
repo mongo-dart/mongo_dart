@@ -5,3 +5,7 @@
 #source("networking/mongo_message.dart");
 #source("networking/mongo_query_message.dart");
 #source("networking/mongo_reply_message.dart");
+#source("networking/server_config.dart");
+#source("db.dart");
+#source("collection.dart");
+#source("cursor.dart");

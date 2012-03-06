@@ -19,13 +19,13 @@ class MongoMessage{
   int responseTo;
   int opcode = MongoMessage.Reply;
   int get messageLength(){
-    throw ("Must be implemented");
+    throw "Must be implemented";
   }
   Binary serialize(){
-    throw Exception("Must be implemented");    
+    throw "Must be implemented";    
   }  
   MongoMessage deserialize(Binary buffer){
-    throw Exception("Must be implemented");    
+    throw "Must be implemented";    
   }  
   readMessageHeaderFrom(Binary buffer)
   {

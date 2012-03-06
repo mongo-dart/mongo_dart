@@ -9,7 +9,7 @@ class Binary extends BsonObject{
   //static final minBits = [1,2,3,4];
   ByteArray bytes;
   int offset;
-  Binary(int length): bytes = new ByteArray(length),offset=0;
+  Binary(int length): bytes = new ByteArray(length),offset=0;  
   String toHexString(){
     StringBuffer stringBuffer = new StringBuffer();
     for (final byte in bytes)

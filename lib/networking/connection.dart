@@ -1,19 +1,16 @@
-class SocketOptions{
-  String host;
-  int port;  
-  SocketOptions([this.host='127.0.0.1', this.port=27017]);
-}
 class Connection{
   Binary lengthBuffer;
-  SocketOptions socketOptions;
+  ServerConfig serverConfig;
   Binary messageBuffer;
   Socket socket;
-  var completeCallback;
-  Connection(){
-    socketOptions = new SocketOptions();
+  Completer replyCompleter;
+  Connection([this.serverConfig]){
+    if (serverConfig === null){
+      serverConfig = new ServerConfig();
+    }    
   }
   connect(){
-    socket = new Socket(socketOptions.host, socketOptions.port);
+    socket = new Socket(serverConfig.host, serverConfig.port);
     if (socket == null) {
       throw "can't get send socket";
     }
@@ -33,7 +30,6 @@ class Connection{
         return;
       }
       int messageLength = lengthBuffer.readInt32();      
-      print(messageLength);
       messageBuffer = new Binary(messageLength);
       messageBuffer.writeInt(messageLength);
     }
@@ -44,14 +40,14 @@ class Connection{
       MongoReplyMessage reply = new MongoReplyMessage();
       messageBuffer.rewind();
       reply.deserialize(messageBuffer);
-      completeCallback(reply);
+      replyCompleter.complete(reply);
     }   
   }
-  query(MongoQueryMessage queryMessage, callback){
-    completeCallback = callback;
-    Binary buffer = queryMessage.serialize();  
-    socket.onError = ()=>print("Socket error");  
+  Future<Map> query(MongoQueryMessage queryMessage){
+    replyCompleter = new Completer();    
+    Binary buffer = queryMessage.serialize();      
     socket.onData = receiveData;
     sendData(buffer);
+    return replyCompleter.future;
   }
 }

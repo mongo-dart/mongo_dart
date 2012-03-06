@@ -69,6 +69,9 @@ BsonObject bsonObjectFromTypeByte(int typeByte){
       return new BsonArray([]);
     case BSON.BSON_DATA_OBJECT:
       return new BsonMap({});
+    case BSON.BSON_DATA_OID:
+      return new ObjectId();
+
     default:
       throw new Exception("Not implemented for BSON TYPE $typeByte");           
   }  
