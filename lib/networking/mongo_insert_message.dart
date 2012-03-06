@@ -1,28 +1,24 @@
 class MongoInsertMessage extends MongoMessage{
   BsonCString _collectionFullName;
-  int flags;
-  int numberToSkip;
-  int numberToReturn;
-  BsonMap _query;
-  BsonMap _fields;
-  MongoInsertMessage(String collectionFullName,
-            this.flags,
-            this.numberToSkip,
-            this.numberToReturn,
-            Map query,
-            Map fields){
+  int flags;  
+  List<BSonMap> _documents;
+  MongoInsertMessage(String collectionFullName,            
+            List<Map> documents,
+            [this.flags = 0]
+            ){
     _collectionFullName = new BsonCString(collectionFullName);
-    _query = new BsonMap(query);
-    if (fields !== null){
-      _fields = new BsonMap(fields);
-    }
-    opcode = MongoMessage.Query;    
+    _documents = new List();
+    for (var document in documents){
+      _documents.add(new BsonMap(document));
+    }      
+    opcode = MongoMessage.Insert;
   }
   int get messageLength(){
-    int result = 16+4+_collectionFullName.byteLength()+4+4+_query.byteLength();
-    if (_fields !== null){
-      result += _fields.byteLength();
-    }
+    int docsSize = 0;
+    for (var _doc in _documents){
+      docsSize += _doc.byteLength();
+    }   
+    int result = 16+4+_collectionFullName.byteLength()+docsSize;
     return result;
   }
   Binary serialize(){
@@ -30,9 +26,9 @@ class MongoInsertMessage extends MongoMessage{
     writeMessageHeaderTo(buffer);
     buffer.writeInt(flags);
     _collectionFullName.packValue(buffer);
-    buffer.writeInt(numberToSkip);
-    buffer.writeInt(numberToReturn);
-    _query.packValue(buffer);
+    for (var _doc in _documents){
+      _doc.packValue(buffer);
+    }       
     buffer.offset = 0;
     return buffer;
   }

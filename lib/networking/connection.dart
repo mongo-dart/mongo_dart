@@ -1,6 +1,8 @@
 class Connection{
   Binary lengthBuffer;
   ServerConfig serverConfig;
+  Binary bufferToSend;
+  Queue<Binary> sendQueue;
   Binary messageBuffer;
   Socket socket;
   Completer replyCompleter;
@@ -10,6 +12,7 @@ class Connection{
     }    
   }
   connect(){
+    sendQueue = new Queue();
     socket = new Socket(serverConfig.host, serverConfig.port);
     if (socket == null) {
       throw "can't get send socket";
@@ -17,10 +20,40 @@ class Connection{
     lengthBuffer = new Binary(4);
   }
   int sendData(Binary msg){
-    while (msg.offset != msg.bytes.length){
-      msg.offset += socket.writeList(msg.bytes,msg.offset,msg.bytes.length-msg.offset);
+    while (msg.offset != msg.bytes.length){      
+      msg.offset += socket.writeList(msg.bytes,
+        msg.offset,msg.bytes.length-msg.offset);      
     }    
     return msg.offset;
+  }
+  getNextBufferToSend(){
+    if (bufferToSend === null || bufferToSend.atEnd()){
+      if(!sendQueue.isEmpty()){
+        bufferToSend = sendQueue.removeFirst();
+      } else {
+        bufferToSend = null;  
+      } 
+    }
+  }
+  sendBufferFromTimer() => sendBuffer("from Timer");
+  sendBufferFromOnWrite() => sendBuffer("from OnWrite");
+  sendBuffer(String origin){
+//    print(origin);
+    getNextBufferToSend();
+    if (bufferToSend !== null){
+      bufferToSend.offset += socket.writeList(bufferToSend.bytes,
+        bufferToSend.offset,bufferToSend.bytes.length-bufferToSend.offset);
+      if (!bufferToSend.atEnd()){
+        print("${bufferToSend.offset}");
+      }      
+      new Timer((t)=>sendBufferFromTimer(),0);
+    }        
+    else {
+      print(sendQueue);
+      socket.onWrite = null;        
+      socket.onClosed = null;        
+      socket.onError = null;        
+    }    
   }
   
    void receiveData() {
@@ -49,5 +82,9 @@ class Connection{
     socket.onData = receiveData;
     sendData(buffer);
     return replyCompleter.future;
+  }
+  execute(MongoMessage message){    
+    sendQueue.addLast(message.serialize());    
+    socket.onWrite = sendBufferFromOnWrite;  
   }
 }

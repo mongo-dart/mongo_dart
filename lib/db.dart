@@ -18,9 +18,12 @@ class Db{
   MCollection collection(String collectionName){
       return new MCollection(this,collectionName);
   }
-  Future<Map> _executeQueryMessage(MongoQueryMessage queryMessage){
+  Future<Map> executeQueryMessage(MongoQueryMessage queryMessage){
     return connection.query(queryMessage);
   }  
+  executeMessage(MongoMessage message){
+    connection.execute(message);
+  }    
   open(){
     connection.connect();
   }

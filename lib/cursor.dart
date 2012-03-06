@@ -35,8 +35,7 @@ static final CLOSED = 2;
   var eachCallback;
   var eachComplete;
   bool explain;
-  int flags = 0;
-  String collectionName() => "${db.databaseName}.${collection.collectionName}";
+  int flags = 0;  
   Cursor(this.db, this.collection, [this.selector, this.fields, this.skip=0, this.limit=1
   , this.sort, this.hint, this.explain]){
     if (selector === null){
@@ -44,9 +43,8 @@ static final CLOSED = 2;
     }
     items = [];
   }
-
   MongoQueryMessage generateQueryMessage(){
-    return new  MongoQueryMessage(collectionName(),
+    return new  MongoQueryMessage(collection.fullName(),
             flags,
             skip,
             limit,
@@ -60,7 +58,7 @@ static final CLOSED = 2;
     if (state == INIT){
       Completer nextItem = new Completer();
       MongoQueryMessage qm = generateQueryMessage();
-      Future<MongoReplyMessage> reply = db._executeQueryMessage(qm);
+      Future<MongoReplyMessage> reply = db.executeQueryMessage(qm);
       reply.then((replyMessage){
         state = OPEN;
         items.addAll(replyMessage.documents);
@@ -88,14 +86,16 @@ static final CLOSED = 2;
          eachComplete.complete(true);
       } else {
             eachCallback(val);
-            new Timer(nextTick,0);
+            nextTick(null);
+//            new Timer(nextTick,0);
       }            
     });
   }
   Future<bool> each(callback){
-     eachCallback = callback; 
-     eachComplete = new Completer();
-     new Timer(nextTick,0);
-     return eachComplete.future;
+    eachCallback = callback; 
+    eachComplete = new Completer();
+//     new Timer(nextTick,0);
+    nextTick(null);
+    return eachComplete.future;
   }
 }
