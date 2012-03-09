@@ -46,7 +46,7 @@ class Connection{
       if (!bufferToSend.atEnd()){
         print("${bufferToSend.offset}");
       }      
-      new Timer((t)=>sendBufferFromTimer(),0);
+      new Timer(0,(t)=>sendBufferFromTimer());
     }        
     else {
       print(sendQueue);
@@ -76,7 +76,7 @@ class Connection{
       replyCompleter.complete(reply);
     }   
   }
-  Future<Map> query(MongoQueryMessage queryMessage){
+  Future<Map> query(MongoMessage queryMessage){
     replyCompleter = new Completer();    
     Binary buffer = queryMessage.serialize();      
     socket.onData = receiveData;

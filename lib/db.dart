@@ -22,9 +22,33 @@ class Db{
     return connection.query(queryMessage);
   }  
   executeMessage(MongoMessage message){
-    connection.execute(message);
+    return connection.execute(message);
   }    
   open(){
     connection.connect();
   }
+  Future<bool> executeDbCommand(MongoMessage message){
+      Completer<bool> result = new Completer();
+      connection.query(message).then((replyMessage){
+        if (replyMessage.documents[0]["ok"] == 1.0){
+          print(replyMessage.documents[0]);
+          result.complete(true);
+        } else {
+          String errMsg = "Error executing Db command";
+          if (replyMessage.documents[0].containsKey("errmsg")){
+            errMsg = replyMessage.documents[0]["errmsg"];
+          }
+          print(errMsg);
+          result.complete(false);
+        }         
+      });
+    return result.future;        
+  }  
+  Future<bool> dropCollection(String collectionName){    
+    return executeDbCommand(DbCommand.createDropCollectionCommand(this,collectionName));
+  }  
+  Future<bool> getLastError(){    
+    return executeDbCommand(DbCommand.createGetLastErrorCommand(this));
+  }  
+
 }

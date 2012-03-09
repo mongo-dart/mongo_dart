@@ -22,7 +22,7 @@ class BsonObject {
     result.value = value;
     return result;
   }
-  uppackValue(var buffer){ throw const Exception("must be implemented");}
+  unpackValue(var buffer){ throw const Exception("must be implemented");}
   get value()=>null;
 }
 
@@ -54,6 +54,9 @@ BsonObject bsonObjectFrom(var value){
   if (value is List){
     return new BsonArray(value);
   }        
+  if (value === null){
+    return new BsonNull();
+  }        
   throw new Exception("Not implemented for $value");           
 }  
 
@@ -71,6 +74,8 @@ BsonObject bsonObjectFromTypeByte(int typeByte){
       return new BsonMap({});
     case BSON.BSON_DATA_OID:
       return new ObjectId();
+    case BSON.BSON_DATA_NULL:
+      return new BsonNull();
 
     default:
       throw new Exception("Not implemented for BSON TYPE $typeByte");           

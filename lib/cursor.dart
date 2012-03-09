@@ -36,7 +36,7 @@ static final CLOSED = 2;
   var eachComplete;
   bool explain;
   int flags = 0;  
-  Cursor(this.db, this.collection, [this.selector, this.fields, this.skip=0, this.limit=1
+  Cursor(this.db, this.collection, [this.selector, this.fields, this.skip=0, this.limit=50
   , this.sort, this.hint, this.explain]){
     if (selector === null){
       selector = {};
@@ -61,6 +61,7 @@ static final CLOSED = 2;
       Future<MongoReplyMessage> reply = db.executeQueryMessage(qm);
       reply.then((replyMessage){
         state = OPEN;
+        cursorId = replyMessage.cursorId;
         items.addAll(replyMessage.documents);
         if (items.length > 0){
           nextItem.complete(getNextItem());
@@ -79,23 +80,21 @@ static final CLOSED = 2;
       return new Future.immediate(null);
     }
   }
-  nextTick(Timer timer){
+  nextEach(){
     nextObject().then((val){
       if (val === null){
-          eachCallback = null;
-         eachComplete.complete(true);
+        eachCallback = null;
+        eachComplete.complete(true);
       } else {
-            eachCallback(val);
-            nextTick(null);
-//            new Timer(nextTick,0);
+        eachCallback(val);
+        nextEach();
       }            
     });
   }
   Future<bool> each(callback){
     eachCallback = callback; 
     eachComplete = new Completer();
-//     new Timer(nextTick,0);
-    nextTick(null);
+    nextEach();
     return eachComplete.future;
   }
 }

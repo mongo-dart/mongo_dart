@@ -13,7 +13,7 @@ class BsonString extends BsonObject{
   unpackValue(Binary buffer){
      int size = buffer.readInt32()-1; 
      List<int> utf8Bytes = buffer.bytes.getRange(buffer.offset,size);
-     data = new String.fromCharCodes(Utf8Decoder.decodeUtf8(utf8Bytes));
+     data = decodeUtf8(utf8Bytes);
      buffer.offset += size+1;
   }
 

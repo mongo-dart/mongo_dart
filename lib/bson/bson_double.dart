@@ -1,5 +1,5 @@
 class BsonDouble extends BsonObject{
-  num data;
+  double data;
   BsonDouble(this.data);
   get value()=>data;
   byteLength()=>8;

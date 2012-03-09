@@ -1,6 +1,6 @@
 #library("bson.dart");
 //#import("../../../../../../dartrepo/dart-read-only/dart/utils/string_encoding/utf8.dart");
-#import("dart:utf8");
+#import("dart:utf");
 #source("bson_type.dart");
 #source("objectid.dart");
 #source("timestamp.dart");
@@ -13,5 +13,6 @@
 #source("bson_array.dart");
 #source("bson_impl.dart");
 #source("bson_double.dart");
+#source("bson_null.dart");
 
 

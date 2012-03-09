@@ -1,10 +1,20 @@
 class MongoQueryMessage extends MongoMessage{
+static final OPTS_NONE = 0;
+static final OPTS_TAILABLE_CURSOR = 2;
+static final OPTS_SLAVE = 4;
+static final OPTS_OPLOG_REPLY = 8;
+static final OPTS_NO_CURSOR_TIMEOUT = 16;
+static final OPTS_AWAIT_DATA = 32;
+static final OPTS_EXHAUST = 64;
+
+
   BsonCString _collectionFullName;
   int flags;
   int numberToSkip;
   int numberToReturn;
   BsonMap _query;
   BsonMap _fields;
+  BsonCString get collectionNameBson() => _collectionFullName;
   MongoQueryMessage(String collectionFullName,
             this.flags,
             this.numberToSkip,

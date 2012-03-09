@@ -3,8 +3,8 @@ class BSON {
   static final BSON_INT32_MAX = 0x7FFFFFFF;
   static final BSON_INT32_MIN = -0x80000000;
 
-  static final BSON_INT64_MAX = Math.pow(2, 63) - 1;
-  static final BSON_INT64_MIN = -Math.pow(2, 63);
+  //static final BSON_INT64_MAX = Math.pow(2, 63) - 1;
+  //static final BSON_INT64_MIN = -Math.pow(2, 63);
 
   // JS MAX PRECISE VALUES
   static final JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.

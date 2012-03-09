@@ -79,12 +79,12 @@ class Binary extends BsonObject{
     encodeInt(offset,value, 1,false,false);
     offset += 1;
   }
-  int writeDouble(){    
-    bytes.setFloat64(offset);
+  int writeDouble(double value){    
+    bytes.setFloat64(offset, value);
     offset+=8;
   } 
-  int writeInt64(){    
-    bytes.setInt64(offset);
+  int writeInt64(int value){    
+    bytes.setInt64(offset, value);
     offset+=8;
   } 
   int readByte(){    
@@ -111,9 +111,6 @@ class Binary extends BsonObject{
     return new String.fromCharCodes(stringBytes);
   }  
 
-  warn(String msg){
-    print("Warning!!! $msg");
-  }
   int byteLength() => bytes.length;
   bool atEnd() => offset == bytes.length;
   rewind(){

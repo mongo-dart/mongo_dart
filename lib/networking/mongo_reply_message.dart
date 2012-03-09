@@ -19,22 +19,4 @@ class MongoReplyMessage extends MongoMessage{
       documents[n] = doc.value;
     }
   }
-  int get messageLength(){
-    int result = 16+4+_collectionFullName.byteLength()+4+4+_query.byteLength();
-    if (_fields !== null){
-      result += _fields.byteLength();
-    }
-    return result;
-  }
-  Binary serialize(){
-    Binary buffer = new Binary(messageLength);
-    writeMessageHeaderTo(buffer);
-    buffer.writeInt(flags);
-    _collectionFullName.packValue(buffer);
-    buffer.writeInt(numberToSkip);
-    buffer.writeInt(numberToReturn);
-    _query.packValue(buffer);
-    buffer.offset = 0;
-    return buffer;
-  }
 }
