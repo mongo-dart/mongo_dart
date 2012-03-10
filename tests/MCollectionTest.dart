@@ -1,5 +1,6 @@
 #import("../lib/mongo.dart");
 #import("dart:io");
+#import("dart:builtin");
 testCollectionCreation(){
   Db db = new Db('db');
   MCollection collection = db.collection('student');
@@ -25,7 +26,7 @@ testSave(){
     newColl.save({"a":i});
   }
 }
-testFindEach(){
+testEach(){
   Db db = new Db('test');
   db.open();  
   MCollection newColl = db.collection('newColl1');
@@ -35,21 +36,66 @@ testFindEach(){
     {sum += v["a"]; count++;
   }).then((v)=>print("Completed. Sum = $sum, count = $count"));
 }
-testFindEachStudent(){
+testFindEachWithThenClause(){
   Db db = new Db('test');
   db.open();  
-  MCollection newColl = db.collection('student');
+  MCollection students = db.collection('students');
+  students.drop();
+  students.insertAll(
+    [
+     {"name":"Vadim","score":4},
+     {"name": "Daniil","score":4},
+     {"name": "Nick", "score": 5}
+    ]
+  );
   int count = 0;
   int sum = 0;
-  newColl.find().each((v)
+  students.find().each((v)
     {sum += v["score"]; count++;
-  }).then((v)=>print("Students Completed. Sum = $sum, count = $count"));
+  }).then((v){
+    print("Students Completed. Sum = $sum, count = $count average score = ${sum/count}");    
+    db.close();
+  });
 }
-
+testFindEach(){
+  Db db = new Db('test');
+  db.open();  
+  MCollection students = db.collection('students');
+  students.drop();
+  students.insertAll(
+    [
+     {"name":"Vadim","score":4},
+     {"name": "Daniil","score":4},
+     {"name": "Nick", "score": 5}
+    ]
+  );
+  db.getLastError().then((v){
+  print(v);
+  print("there");  
+  int count = 0;
+  int sum = 0;
+  students.find().each((v) => print("student: $v")).then((v){
+    db.close();
+   });
+  });
+}
+testDrop(){
+  Db db = new Db('test');
+  db.open();
+  db.dropCollection("students").then((v)=>print("deleted"));
+  db.dropCollection("students").then((v){
+    db.close();
+  });  
+}
 main(){
+  //testFindEachWithThenClause();
+  testDrop();
+  testFindEach();
+//  testDrop();
+/*  
   testFindEach();
   testFindEachStudent();
-/*  testCollectionCreation();
+  testCollectionCreation();
   testSave();
   testSaveAll();  
 */  

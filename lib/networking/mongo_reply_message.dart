@@ -1,8 +1,7 @@
 class MongoReplyMessage extends MongoMessage{
   BsonCString _collectionFullName;
   int responseFlags;
-  // 64bit integer
-  int cursorId =-1; 
+  int cursorId =-1; // 64bit integer 
   int startingFrom;
   int numberReturned = -1;
   List documents;  

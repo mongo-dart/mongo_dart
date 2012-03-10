@@ -1,8 +1,8 @@
-class MongoGetmoreMessage extends MongoMessage{
+class MongoGetMoreMessage extends MongoMessage{
   BsonCString _collectionFullName;
   int cursorId;    
   int numberToReturn;
-  MongoGetmoreMessage(String collectionFullName,
+  MongoGetMoreMessage(String collectionFullName,
             this.cursorId,
             [this.numberToReturn = 20]
             ){
@@ -18,7 +18,7 @@ class MongoGetmoreMessage extends MongoMessage{
     buffer.writeInt(0);
     _collectionFullName.packValue(buffer);
     buffer.writeInt(numberToReturn);
-    buffer.write64(cursorId);
+    buffer.writeInt64(cursorId);
     buffer.offset = 0;
     return buffer;
   }

@@ -11,13 +11,12 @@ testPingRaw(){
   db.open();
   MCollection collection = db.collection('\$cmd');
   Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);  
-  Connection conn = new Connection();
-  conn.connect();  
   MongoQueryMessage queryMessage = cursor.generateQueryMessage();
-  Future<Map> mapFuture = conn.query(queryMessage);
+  Future mapFuture = db.connection.query(queryMessage);
   mapFuture.then((msg) {
- //   print(msg.documents);
+//    print(msg.documents);
     Expect.mapEquals({'ok': 1.0},msg.documents[0]);
+    db.close();
   });
 }
 testNextObject(){
@@ -127,25 +126,51 @@ collection.saveAll([{"name":"Daniil","score":4},{"name":"Nick","score":5}]);
   });  
 */  
 }
-testEachWithGetMore(){
+testCursorWithOpenServerCursor(){
   var res;
   Db db = new Db('test');
   db.open();
-  MCollection collection = db.collection('newColl1');
+  MCollection collection = db.collection('new_big_collection');
+  collection.remove();
+  for (int n=0;n < 1000; n++){
+    collection.insert({"a":n});
+  }
   Cursor cursor = new Cursor(db,collection,limit:10);  
-  cursor.each((v) => print(v)).then((v){
-    Expect.isTrue(v);
-    Expect.isTrue(cursor.state == Cursor.CLOSED);
+  cursor.nextObject().then((v){
+    print(v);
+    Expect.isTrue(cursor.state == Cursor.OPEN);
     print("CursorId = ${cursor.cursorId}");
+    Expect.isTrue(cursor.cursorId > 0);
+    db.close();
     });
-  Expect.isTrue(cursor.state == Cursor.INIT);
+}
+testCursorGetMore(){
+  var res;
+  Db db = new Db('test');
+  db.open();
+  MCollection collection = db.collection('new_big_collection');
+  collection.remove();
+  for (int n=0;n < 1000; n++){
+    collection.insert({"a":n});
+  }
+  int count = 0;
+  Cursor cursor = new Cursor(db,collection,limit:10);  
+  cursor.each((v)=>count++).then((v){
+    print(count);
+    Expect.equals(1000, count);
+    Expect.equals(0,cursor.cursorId);
+    Expect.equals(Cursor.CLOSED,cursor.state);
+    db.close();
+    });
 }
 
 main(){
   testCursorCreation();
   testPingRaw();
-  testNextObject();
-  testNextObjectToEnd();
-  testEach();
+  testCursorWithOpenServerCursor();
+  testCursorGetMore();
+//  testNextObject();
+//  testNextObjectToEnd();
+//  testEach();
 //  testEachWithGetMore();
 }
