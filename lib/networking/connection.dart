@@ -25,7 +25,6 @@ class Connection{
     socket.onWrite = null;
     socket.onError = null;
     socket.close();
-//    print(replyCompleters);
     replyCompleters.clear();    
   }
   int sendData(Binary msg){
@@ -47,16 +46,15 @@ class Connection{
   sendBufferFromTimer() => sendBuffer("from Timer");
   sendBufferFromOnWrite() => sendBuffer("from OnWrite");
   sendBuffer(String origin){
-//    print(origin);
     getNextBufferToSend();
-    if (bufferToSend !== null){
+    if (bufferToSend !== null){      
       bufferToSend.offset += socket.writeList(bufferToSend.bytes,
         bufferToSend.offset,bufferToSend.bytes.length-bufferToSend.offset);
       if (!bufferToSend.atEnd()){
-//        print("${bufferToSend.offset}");
-      }      
-//      new Timer(0,(t)=>sendBufferFromTimer());
-      sendBuffer("Recursevly");
+//        print("Buffer not send fully, offset: ${bufferToSend.offset}");
+      }
+      new Timer(0,(t)=>sendBufferFromTimer());
+      //sendBuffer("Recursevly");              
     }        
     else {
       socket.onWrite = null;        
@@ -101,8 +99,11 @@ class Connection{
     sendBuffer("From query");
     return completer.future;
   }
-  execute(MongoMessage message){    
+  execute(MongoMessage message){
+//    print(message.messageLength);
     sendQueue.addLast(message.serialize());    
-    socket.onWrite = sendBufferFromOnWrite;  
+    socket.onWrite = sendBufferFromOnWrite;
+//    socket.onError = ()=>print("Error");
+//    socket.onError = ()=>print("Close");
   }
 }

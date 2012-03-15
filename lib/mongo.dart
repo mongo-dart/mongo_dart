@@ -8,6 +8,7 @@
 #source("networking/mongo_insert_message.dart");
 #source("networking/mongo_remove_message.dart");
 #source("networking/mongo_getmore_message.dart");
+#source("networking/mongo_update_message.dart");
 #source("networking/server_config.dart");
 #source("networking/dbcommand.dart");
 #source("db.dart");

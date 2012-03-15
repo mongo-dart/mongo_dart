@@ -56,7 +56,10 @@ BsonObject bsonObjectFrom(var value){
   }        
   if (value === null){
     return new BsonNull();
-  }        
+  }
+  if (value === true || value === false){
+    return new BsonBoolean(value);
+  }
   throw new Exception("Not implemented for $value");           
 }  
 
@@ -76,6 +79,8 @@ BsonObject bsonObjectFromTypeByte(int typeByte){
       return new ObjectId();
     case BSON.BSON_DATA_NULL:
       return new BsonNull();
+    case BSON.BSON_DATA_BOOLEAN:
+      return new BsonBoolean(false);
 
     default:
       throw new Exception("Not implemented for BSON TYPE $typeByte");           

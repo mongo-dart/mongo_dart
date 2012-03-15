@@ -26,20 +26,20 @@ class Db{
   }    
   open(){
     connection.connect();
+    return this;
   }
-  Future<bool> executeDbCommand(MongoMessage message){
+  Future<Map> executeDbCommand(MongoMessage message){
       Completer<bool> result = new Completer();
       connection.query(message).then((replyMessage){
         if (replyMessage.documents[0]["ok"] == 1.0){
-          print(replyMessage.documents[0]);
-          result.complete(true);
+          result.complete(replyMessage.documents[0]);
         } else {
           String errMsg = "Error executing Db command";
           if (replyMessage.documents[0].containsKey("errmsg")){
             errMsg = replyMessage.documents[0]["errmsg"];
           }
           print("Error: $errMsg");
-          result.complete(false);
+          result.complete(replyMessage.documents[0]);
         }         
       });
     return result.future;        
@@ -48,7 +48,6 @@ class Db{
     Completer completer = new Completer();
     collectionsInfoCursor(collectionName).toList().then((v){
       if (v.length == 1){
-//        print("drop collection");
         executeDbCommand(DbCommand.createDropCollectionCommand(this,collectionName))
           .then((res)=>completer.complete(res));
         } else{
@@ -63,7 +62,10 @@ class Db{
   
   Future<bool> getLastError(){    
     return executeDbCommand(DbCommand.createGetLastErrorCommand(this));
-  }  
+  }
+  Future<bool> wait(){
+    return getLastError();
+  }
   close(){
     connection.close();
   }

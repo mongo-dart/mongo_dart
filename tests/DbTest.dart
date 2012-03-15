@@ -1,5 +1,7 @@
+#library("dbtest");
 #import("../lib/mongo.dart");
 #import('dart:builtin');
+#import('../third_party/testing/unittest/unittest_vm.dart');
 testDatabaseName(){
   Db db = new Db('db');
   String dbName;
@@ -40,7 +42,10 @@ testRemove(){
 }
 
 main(){
-  testDatabaseName();
-  testCollectionInfoCursor();
-  testRemove();
+  group("DBCommand tests:", (){
+    test("testDatabaseName",testDatabaseName);
+    test("testCollectionInfoCursor",testCollectionInfoCursor);
+    test("testRemove",testRemove);
+  });  
+  
 }

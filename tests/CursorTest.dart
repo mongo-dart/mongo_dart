@@ -1,6 +1,8 @@
+#library("cursor_tests");
 #import("../lib/mongo.dart");
 #import("dart:io");
-#import('dart:builtin'); 
+#import('dart:builtin');
+#import('../third_party/testing/unittest/unittest_vm.dart');
 testCursorCreation(){
   Db db = new Db('db');
   MCollection collection = db.collection('student');
@@ -28,6 +30,7 @@ testNextObject(){
   res.then((v){
 //    print(v);
     Expect.mapEquals({'ok': 1.0},v);
+    db.close();
   });
 }
 testNextObjectToEnd(){
@@ -132,14 +135,12 @@ testCursorWithOpenServerCursor(){
   db.open();
   MCollection collection = db.collection('new_big_collection');
   collection.remove();
-  for (int n=0;n < 1000; n++){
+  for (int n=0;n < 100; n++){
     collection.insert({"a":n});
   }
   Cursor cursor = new Cursor(db,collection,limit:10);  
-  cursor.nextObject().then((v){
-    print(v);
-    Expect.isTrue(cursor.state == Cursor.OPEN);
-    print("CursorId = ${cursor.cursorId}");
+  cursor.nextObject().then((v){  
+    Expect.isTrue(cursor.state == Cursor.OPEN);  
     Expect.isTrue(cursor.cursorId > 0);
     db.close();
     });
@@ -148,29 +149,37 @@ testCursorGetMore(){
   var res;
   Db db = new Db('test');
   db.open();
-  MCollection collection = db.collection('new_big_collection');
+  MCollection collection = db.collection('new_big_collection1');
   collection.remove();
-  for (int n=0;n < 1000; n++){
-    collection.insert({"a":n});
-  }
+  db.getLastError().then((dummy){
+    List toInsert = new List();
+    for (int n=0;n < 1000; n++){
+      toInsert.add({"a":n});
+    }
+    collection.insertAll(toInsert);
+  });
   int count = 0;
-  Cursor cursor = new Cursor(db,collection,limit:10);  
-  cursor.each((v)=>count++).then((v){
+  db.getLastError().then((dummy){
+    Cursor cursor = new Cursor(db,collection,limit:10);  
+      cursor.each((v){
+            count++;
+//            print(v);
+      }).then((v){
     print(count);
     Expect.equals(1000, count);
     Expect.equals(0,cursor.cursorId);
     Expect.equals(Cursor.CLOSED,cursor.state);
     db.close();
     });
+  });  
 }
 
 main(){
-  testCursorCreation();
-  testPingRaw();
-  testCursorWithOpenServerCursor();
-  testCursorGetMore();
-//  testNextObject();
-//  testNextObjectToEnd();
-//  testEach();
-//  testEachWithGetMore();
+  group("Cursor tests:", (){
+    test("testCursorCreation",testCursorCreation);
+    test("testPingRaw",testPingRaw);    
+    test("testNextObject",testNextObject);    
+    test("testCursorWithOpenServerCursor",testCursorWithOpenServerCursor);
+    test("testCursorGetMore",testCursorGetMore);    
+  });
 }

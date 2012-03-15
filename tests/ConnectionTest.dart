@@ -1,7 +1,9 @@
+#library("connection_test");
 #import("../lib/mongo.dart");
 #import("../lib/bson/bson.dart");
 #import("dart:io");
 #import('dart:builtin');
+#import('../third_party/testing/unittest/unittest_vm.dart');
 testPing(){
   Connection conn = new Connection();
   conn.connect();
@@ -28,6 +30,8 @@ testGetMore(){
 
 }
 main(){
-  testPing();
-  testStudent();
+  group("Connection tests:", (){
+    test("Test ping",testPing);
+    test("Test testStudent",testStudent);
+  });
 }

@@ -3,36 +3,29 @@ class MongoUpdateMessage extends MongoMessage{
   int flags;
   int numberToSkip;
   int numberToReturn;
-  BsonMap _query;
-  BsonMap _fields;
+  BsonMap _selector;
+  BsonMap _document;
   MongoUpdateMessage(String collectionFullName,
-            this.flags,
-            this.numberToSkip,
-            this.numberToReturn,
-            Map query,
-            Map fields){
+            Map selector,
+            Map document,
+            this.flags            
+            ){
     _collectionFullName = new BsonCString(collectionFullName);
-    _query = new BsonMap(query);
-    if (fields !== null){
-      _fields = new BsonMap(fields);
-    }
-    opcode = MongoMessage.Query;    
+    _selector = new BsonMap(selector);
+    _document = new BsonMap(document);    
+    opcode = MongoMessage.Update;    
   }
   int get messageLength(){
-    int result = 16+4+_collectionFullName.byteLength()+4+4+_query.byteLength();
-    if (_fields !== null){
-      result += _fields.byteLength();
-    }
-    return result;
+    return 16+4+_collectionFullName.byteLength()+4+_selector.byteLength()+_document.byteLength();
   }
   Binary serialize(){
     Binary buffer = new Binary(messageLength);
     writeMessageHeaderTo(buffer);
-    buffer.writeInt(flags);
+    buffer.writeInt(0);
     _collectionFullName.packValue(buffer);
-    buffer.writeInt(numberToSkip);
-    buffer.writeInt(numberToReturn);
-    _query.packValue(buffer);
+    buffer.writeInt(flags);
+    _selector.packValue(buffer);
+    _document.packValue(buffer);
     buffer.offset = 0;
     return buffer;
   }

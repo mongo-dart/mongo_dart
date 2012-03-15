@@ -15,5 +15,6 @@
 #source("bson_impl.dart");
 #source("bson_double.dart");
 #source("bson_null.dart");
+#source("bson_boolean.dart");
 
 

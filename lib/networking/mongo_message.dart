@@ -44,6 +44,9 @@ class MongoMessage{
       buffer.writeInt(requestId);
       buffer.writeInt(0); // responseTo not used in requests sent by client
       buffer.writeInt(opcode);
+      if (messageLength < 0){
+        throw "Error in message length";
+      }
   }
 
 }

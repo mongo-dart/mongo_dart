@@ -3,16 +3,23 @@ class MCollection{
   String collectionName;
   MCollection(this.db, this.collectionName){}  
   String fullName() => "${db.databaseName}.$collectionName";
-  saveAll(List<Map> documents){
-    insertAll(documents);
-  } 
   save(Map document){
-    return saveAll([document]);  
+    if (document.containsKey("_id")){
+      update({"_id": document["_id"]}, document);
+    } 
+    else{
+      insert(document);
+    }
   }
   insertAll(List<Map> documents){
     MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
     return db.executeDbCommand(insertMessage);   
   }
+  update(Map selector, Map document){
+    MongoUpdateMessage message = new MongoUpdateMessage(fullName(),selector, document, 0);
+    return db.executeMessage(message);   
+  }
+  
   insert(Map document){
     return insertAll([document]);
   } 
