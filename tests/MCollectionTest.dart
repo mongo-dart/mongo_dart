@@ -36,6 +36,7 @@ testFindEachWithThenClause(){
   }).then((v){
     info("Students Completed. Sum = $sum, count = $count average score = ${sum/count}");    
     db.close();
+    callbackDone();
   });
 }
 testFindEach(){
@@ -139,32 +140,50 @@ testCount(){
   coll.count().then((v){
     expect(v).equals(1067);
     db.close();
+    callbackDone();
+  });
+}
+testSkip(){
+  Db db = new Db('mongo-dart-test');
+  db.open();  
+  MCollection coll = db.collection('testSkip');
+  coll.remove();
+  for(int n=0;n<600;n++){
+    coll.insert({"a":n});
+  }    
+  coll.findOne(skip:300, orderBy: {"a":1}).then((v){    
+    expect(v["a"]).equals(300);
+    db.close();
+    callbackDone();
+  });
+}
+testLimit(){
+  Db db = new Db('mongo-dart-test');
+  db.open();  
+  MCollection coll = db.collection('testLimit');
+  coll.remove();
+  for(int n=0;n<600;n++){
+    coll.insert({"a":n});
+  }
+  int counter = 0;
+  Cursor cursor = coll.find(skip:300, limit: 10, orderBy: {"a":1}); 
+  cursor.each((e){
+    counter++;
+    }).then((v){    
+    expect(counter).equals(10);
+    expect(cursor.state).equals(Cursor.CLOSED);
+    expect(cursor.cursorId).equals(0);
+    db.close();
+    callbackDone();
   });
 }
 
-
-runAll([bool asTestSuite = false]){
-  if (asTestSuite){
-    group("MCollection tests:", (){
-      asyncTest("testFindEach",1,testFindEach);
-      asyncTest("testDrop",1,testDrop);
-      asyncTest("testSaveWithIntegerId",1,testSaveWithIntegerId);
-      asyncTest("testSaveWithObjectId",1,testSaveWithObjectId);    
-    });
-  }
-  else{
-    testFindEach();    
-    testDrop();
-    testSaveWithIntegerId();
-    testSaveWithObjectId();
-  }
-    
-}
 main(){
   setVerboseState();
-  testCount();
-  return;
   group("MCollection tests:", (){
+    asyncTest("testSkip",1,testLimit);
+    asyncTest("testSkip",1,testSkip);    
+    asyncTest("testFindEachWithThenClause",1,testFindEachWithThenClause);    
     asyncTest("testCount",1,testCount);    
     asyncTest("testFindEach",1,testFindEach);
     asyncTest("testDrop",1,testDrop);

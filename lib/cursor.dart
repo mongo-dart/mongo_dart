@@ -37,14 +37,17 @@ static final CLOSED = 2;
   var eachComplete;
   bool explain;
   int flags = 0;  
-  Cursor(this.db, this.collection, [this.selector, this.fields, this.skip=0, this.limit=50
+  Cursor(this.db, this.collection, [this.selector, this.fields, this.skip=0, this.limit=0
   , this.sort, this.hint, this.explain]){
     if (selector === null){
       selector = {};
     } else{
-      if (!selector.containsKey("\$query")){
-        selector = {"\$query": selector};
+      if (!selector.containsKey("query")){
+        selector = {"query": selector};
       }          
+    }
+    if (sort !== null){
+      selector["orderby"] = sort;
     }
     items = new Queue();
   }
@@ -132,5 +135,14 @@ static final CLOSED = 2;
     Completer completer = new Completer();
     this.each((v)=>result.addLast(v)).then((v)=>completer.complete(result));
     return completer.future;    
+  }
+  close(){
+    debug("Closing cursor, cursorId = $cursorId");
+    if (cursorId != 0){      
+      MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);
+      db.executeMessage(msg);
+      cursorId = 0;
+    } 
+    state = CLOSED;
   }
 }

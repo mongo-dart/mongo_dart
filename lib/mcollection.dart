@@ -23,11 +23,14 @@ class MCollection{
   insert(Map document){
     return insertAll([document]);
   } 
-  Cursor find([Map selector = const {}, Map fields = null, Map sort, int skip = 0,int limit = 30, bool hint = false, bool explain = false] ){
-    return new Cursor(db, this, selector);//, [selector, skip, limit,sort, hint, explain]);
+  Cursor find([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
+    return new Cursor(db, this, selector: selector, fields: fields, skip: skip, limit: limit, sort: orderBy);//, [selector, skip, limit,sort, hint, explain]);
   }
-  findOne([Map selector = const {}, Map fields = null, Map sort, int skip = 0,int limit = 30, bool hint = false, bool explain = false] ){
-    return find(selector,fields,sort,skip,limit,hint,explain).nextObject();
+  findOne([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
+    Cursor cursor = find(selector,fields,orderBy,skip,limit,hint,explain);
+    Future result = cursor.nextObject();
+    cursor.close();
+    return result;
   }
   drop() => db.dropCollection(collectionName);
   remove([Map selector = const {}]) => db.removeFromCollection(collectionName, selector);

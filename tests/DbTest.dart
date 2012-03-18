@@ -3,15 +3,15 @@
 #import('dart:builtin');
 #import('../third_party/testing/unittest/unittest_vm.dart');
 testDatabaseName(){
-  Db db = new Db('db');
+  Db db = new Db('mongo-dart-test');
   String dbName;
-  dbName = 'db';
+  dbName = 'mongo-dart-test';
   db.validateDatabaseName(dbName);
-  dbName = 'db';
+  dbName = 'mongo-dart-test';
   db.validateDatabaseName(dbName);  
 }
 testCollectionInfoCursor(){
-  Db db = new Db('test');
+  Db db = new Db('mongo-dart-test');
   db.open();
   MCollection newColl = db.collection("new_collecion");
   newColl.drop();
@@ -21,10 +21,11 @@ testCollectionInfoCursor(){
     Expect.isTrue(v.length == 1);
 //    newColl.drop();
     db.close();
+    callbackDone();
   });
 }
 testRemove(){
-  Db db = new Db('test');
+  Db db = new Db('mongo-dart-test');
   db.open();  
   db.removeFromCollection("new_collecion_to_remove");
   MCollection newColl = db.collection("new_collecion_to_remove");  
@@ -33,19 +34,29 @@ testRemove(){
     Expect.isTrue(v.length == 1);
     db.removeFromCollection("new_collecion_to_remove");
     //db.getLastError().then((v)=>print("remove result: $v"));
-    newColl.find().toList().then((v){
-      Expect.isTrue(v.isEmpty());
+    newColl.find().toList().then((v1){
+      Expect.isTrue(v1.isEmpty());
       newColl.drop();
       db.close();
+      callbackDone();
    });
   });
 }
-
+testDropDatabase(){
+  Db db = new Db('mongo-dart-test');
+  db.open();
+  db.drop().then((v){
+    print(v);
+      db.close();
+      callbackDone();
+  });
+}
 main(){
-  group("DBCommand tests:", (){
+  group("DBCommand:", (){
+    asyncTest("testDropDatabase",1,testDropDatabase);
     test("testDatabaseName",testDatabaseName);
-    test("testCollectionInfoCursor",testCollectionInfoCursor);
-    test("testRemove",testRemove);
+    asyncTest("testCollectionInfoCursor",1,testCollectionInfoCursor);
+    asyncTest("testRemove",1,testRemove);
   });  
   
 }

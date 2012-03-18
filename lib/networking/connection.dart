@@ -21,6 +21,9 @@ class Connection{
     lengthBuffer = new Binary(4);
   }
   close(){
+    while (!sendQueue.isEmpty()){
+      sendBuffer("From close");
+    }
     socket.onData = null;
     socket.onWrite = null;
     socket.onError = null;
@@ -31,7 +34,7 @@ class Connection{
     if (bufferToSend === null || bufferToSend.atEnd()){
       if(!sendQueue.isEmpty()){
         MongoMessage message = sendQueue.removeFirst();
-        debug(message);
+        debug(message.toString());
         bufferToSend = message.serialize();
       } else {
         bufferToSend = null;  
@@ -69,7 +72,7 @@ class Connection{
       MongoReplyMessage reply = new MongoReplyMessage();
       messageBuffer.rewind();
       reply.deserialize(messageBuffer);
-      debug(reply);
+      debug(reply.toString());
       messageBuffer = null;
       lengthBuffer.rewind();
       Completer completer = replyCompleters.remove(reply.responseTo);      

@@ -47,5 +47,8 @@ class MongoMessage{
         throw "Error in message length";
       }
   }
+  String toString(){
+    throw "must be implemented";
+  }
 
 }

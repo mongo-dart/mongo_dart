@@ -22,7 +22,7 @@ class Db{
     return connection.query(queryMessage);
   }  
   executeMessage(MongoMessage message){
-    return connection.execute(message);
+    connection.execute(message);
   }    
   open(){
     connection.connect();
@@ -56,6 +56,13 @@ class Db{
     });    
     return completer.future;    
   }
+  Future<Map> drop(){
+    Completer completer = new Completer();
+    executeDbCommand(DbCommand.createDropDatabaseCommand(this))
+      .then((res)=>completer.complete(res));
+    return completer.future;    
+  }
+  
   removeFromCollection(String collectionName, [Map selector = const {}]){
     connection.execute(new MongoRemoveMessage("$databaseName.$collectionName", selector));    
   }    

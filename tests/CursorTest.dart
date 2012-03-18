@@ -4,12 +4,12 @@
 #import('dart:builtin');
 #import('../third_party/testing/unittest/unittest_vm.dart');
 testCursorCreation(){
-  Db db = new Db('db');
+  Db db = new Db('mongo-dart-test');
   MCollection collection = db.collection('student');
   Cursor cursor = new Cursor(db,collection);
 }
 testPingRaw(){
-  Db db = new Db('db');
+  Db db = new Db('mongo-dart-test');
   db.open();
   MCollection collection = db.collection('\$cmd');
   Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);  
@@ -19,10 +19,11 @@ testPingRaw(){
 //    print(msg.documents);
     Expect.mapEquals({'ok': 1.0},msg.documents[0]);
     db.close();
+    callbackDone();
   });
 }
 testNextObject(){
-  Db db = new Db('db');
+  Db db = new Db('mongo-dart-test');
   db.open();
   MCollection collection = db.collection('\$cmd');
   Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);
@@ -31,26 +32,33 @@ testNextObject(){
 //    print(v);
     Expect.mapEquals({'ok': 1.0},v);
     db.close();
+    callbackDone();
   });
 }
 testNextObjectToEnd(){
   var res;
-  Db db = new Db('test');
+  Db db = new Db('mongo-dart-test');
   db.open();
-  MCollection collection = db.collection('student');
+  MCollection collection = db.collection('testNextObjectToEnd');
+  collection.remove();
+  collection.insert({"a":1});
+  collection.insert({"a":2});
+  collection.insert({"a":3});
   Cursor cursor = new Cursor(db,collection,limit:10);  
   res = cursor.nextObject();  
   res.then((v){
-//    print(v);    
+    expect(v).isNotNull();
     res = cursor.nextObject();
-    res.then((v){
-//      print(v);    
+    res.then((v1){
+      expect(v1).isNotNull();
       res = cursor.nextObject();
-      res.then((v){
-//        print(v);
+      res.then((v2){
+        expect(v2).isNotNull();
         res = cursor.nextObject();
-        res.then((v){
-//          print(v);    
+        res.then((v3){
+          expect(v3).isNull();
+          db.close();
+          callbackDone();
         });  
       });  
     });  
@@ -58,80 +66,9 @@ testNextObjectToEnd(){
 
 }
 
-testEach(){
-  var res;
-  int sumScore = 0;
-  int count = 0;
-  var futures = new List();
-  Db db = new Db('test');
-  db.open();
-  
-  MCollection collection = db.collection('student');  
-  //collection.drop().chain((v){
-/*  new Future.immediate(true).chain((v){    
-  print("there");  
-  return db.getLastError();}).then((v){
-  print("here");
-  collection.saveAll([{"name":"Daniil","score":4},{"name":"Nick","score":5}]);
-  db.getLastError().then((m)
-  {
-    print(m);
-  });
-  });  
-*/
-collection.saveAll([{"name":"Daniil","score":4},{"name":"Nick","score":5}]);
-  db.getLastError().then((m)
-  {
-    print(m);
-    print(db.connection.sendQueue);
-  });
-  
-/*  MCollection newColl = db.collection('student');
-
-  int sum = 0;
-  newColl.find().each((v)
-    { count++; print(v);
-  }).then((v)=>print("Completed. Sum = $sum, count = $count"));
-
-*/  
-
-/*  
-  collection.save({"name":"Daniil","score":4}).then((v)=>print(v));
-  collection.save({"name":"Nick","score":5}).then((v)=>print(v));   
-*/
-/*
-  new Timer((timer){
-      Cursor cursor = new Cursor(db,collection,limit:50);  
-      cursor.each((e){
-          print(e);//;count++;sumScore += e["score"];
-      }).then((v){
-      Expect.isTrue(v);
-      Expect.isTrue(cursor.state == Cursor.CLOSED);
-//      Expect.equals((4+4+5)/3, sumScore/count);
-      print("CursorId = ${cursor.cursorId}");    
-      
-  });        
-}, 0);
-*/
-/*  var f = Futures.wait(futures);
-  print(f);
-  f.then((v){ 
-      print("there");
-      Cursor cursor = new Cursor(db,collection,limit:10);  
-      cursor.each((e){
-          print(e);count++;sumScore += v["score"];
-      }).then((v){
-      Expect.isTrue(v);
-      Expect.isTrue(cursor.state == Cursor.CLOSED);
-      Expect.equals((4+4+5)/3, sumScore/count);
-      print("CursorId = ${cursor.cursorId}");    
-      
-  });  
-*/  
-}
 testCursorWithOpenServerCursor(){
   var res;
-  Db db = new Db('test');
+  Db db = new Db('mongo-dart-test');
   db.open();
   MCollection collection = db.collection('new_big_collection');
   collection.remove();
@@ -143,11 +80,12 @@ testCursorWithOpenServerCursor(){
     Expect.isTrue(cursor.state == Cursor.OPEN);  
     Expect.isTrue(cursor.cursorId > 0);
     db.close();
+    callbackDone();
     });
 }
 testCursorGetMore(){
   var res;
-  Db db = new Db('test');
+  Db db = new Db('mongo-dart-test');
   db.open();
   MCollection collection = db.collection('new_big_collection1');
   collection.remove();
@@ -163,23 +101,51 @@ testCursorGetMore(){
     Cursor cursor = new Cursor(db,collection,limit:10);  
       cursor.each((v){
             count++;
-//            print(v);
       }).then((v){
-    print(count);
     Expect.equals(1000, count);
     Expect.equals(0,cursor.cursorId);
     Expect.equals(Cursor.CLOSED,cursor.state);
     db.close();
+    callbackDone();
     });
   });  
 }
+testCursorClosing(){
+  var res;
+  Db db = new Db('mongo-dart-test');
+  db.open();
+  MCollection collection = db.collection('new_big_collection1');
+  collection.remove();  
+  for (int n=0;n < 1000; n++){  
+    collection.insert({"a":n});
+  }
+  int count = 0;
+  Cursor cursor = collection.find();
+  expect(Cursor.INIT).equals(cursor.state);
+  cursor.nextObject().then((v){    
+    expect(Cursor.OPEN).equals(cursor.state);
+    expect(0 == cursor.cursorId).isFalse();
+    cursor.close();
+    expect(Cursor.CLOSED).equals(cursor.state);
+    expect(0).equals(cursor.cursorId);
+    collection.findOne().then((v1){
+      expect(v).isNotNull();
+      db.close();
+      callbackDone();  
+    });
+  });
+}
 
 main(){
+  setVerboseState();
   group("Cursor tests:", (){
-    test("testCursorCreation",testCursorCreation);
-    test("testPingRaw",testPingRaw);    
-    test("testNextObject",testNextObject);    
-    test("testCursorWithOpenServerCursor",testCursorWithOpenServerCursor);
-    test("testCursorGetMore",testCursorGetMore);    
+    test("testCursorCreation",testCursorCreation);    
+    asyncTest("testCursorClosing",1,testCursorClosing);
+    asyncTest("testNextObjectToEnd",1,testNextObjectToEnd);    
+    asyncTest("testPingRaw",1,testPingRaw);    
+    asyncTest("testNextObject",1,testNextObject);    
+    asyncTest("testCursorWithOpenServerCursor",1,testCursorWithOpenServerCursor);
+    asyncTest("testCursorGetMore",1,testCursorGetMore);
+        
   });
 }
