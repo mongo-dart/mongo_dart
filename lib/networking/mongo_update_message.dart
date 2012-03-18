@@ -9,7 +9,7 @@ class MongoUpdateMessage extends MongoMessage{
             Map selector,
             Map document,
             this.flags            
-            ){
+            ){    
     _collectionFullName = new BsonCString(collectionFullName);
     _selector = new BsonMap(selector);
     _document = new BsonMap(document);    
@@ -29,4 +29,8 @@ class MongoUpdateMessage extends MongoMessage{
     buffer.offset = 0;
     return buffer;
   }
+  String toString(){
+    return "MongoUpdateMessage($requestId, ${_collectionFullName.value}, ${_selector.value}, ${_document.value})";
+  }
+
 }

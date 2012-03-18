@@ -22,4 +22,8 @@ class MongoGetMoreMessage extends MongoMessage{
     buffer.offset = 0;
     return buffer;
   }
+  String toString(){
+    return "MongoGetMoreMessage($requestId, ${_collectionFullName.value}, ${cursorId.toString()})";
+  }
+
 }

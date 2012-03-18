@@ -3,7 +3,7 @@ class Connection{
   Binary lengthBuffer;
   ServerConfig serverConfig;
   Binary bufferToSend;
-  Queue<Binary> sendQueue;
+  Queue<MongoMessage> sendQueue;
   Binary messageBuffer;
   Socket socket;  
   Connection([this.serverConfig]){
@@ -27,17 +27,12 @@ class Connection{
     socket.close();
     replyCompleters.clear();    
   }
-  int sendData(Binary msg){
-    while (msg.offset != msg.bytes.length){      
-      msg.offset += socket.writeList(msg.bytes,
-        msg.offset,msg.bytes.length-msg.offset);      
-    }    
-    return msg.offset;
-  }
   getNextBufferToSend(){
     if (bufferToSend === null || bufferToSend.atEnd()){
       if(!sendQueue.isEmpty()){
-        bufferToSend = sendQueue.removeFirst();
+        MongoMessage message = sendQueue.removeFirst();
+        debug(message);
+        bufferToSend = message.serialize();
       } else {
         bufferToSend = null;  
       } 
@@ -53,14 +48,12 @@ class Connection{
       if (!bufferToSend.atEnd()){
 //        print("Buffer not send fully, offset: ${bufferToSend.offset}");
       }
-      new Timer(0,(t)=>sendBufferFromTimer());
-      //sendBuffer("Recursevly");              
+      new Timer(0,(t)=>sendBufferFromTimer());              
     }        
     else {
       socket.onWrite = null;        
     }    
-  }
-  
+  }  
    void receiveData() {
     if (messageBuffer === null){
       int numBytes = socket.readList(lengthBuffer.bytes, 0, 4);
@@ -73,37 +66,31 @@ class Connection{
     }
     messageBuffer.offset += socket.readList(messageBuffer.bytes,messageBuffer.offset,messageBuffer.bytes.length-messageBuffer.offset);
     if (messageBuffer.atEnd()){
-//      socket.onData = null;
-//      socket.onError = null;
       MongoReplyMessage reply = new MongoReplyMessage();
       messageBuffer.rewind();
       reply.deserialize(messageBuffer);
+      debug(reply);
       messageBuffer = null;
       lengthBuffer.rewind();
       Completer completer = replyCompleters.remove(reply.responseTo);      
-      if (completer !== null){
+      if (completer !== null){        
         completer.complete(reply);       
       }
       else {
-        print("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
+        warn("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
       }  
     }   
   }
   Future<MongoReplyMessage> query(MongoMessage queryMessage){
     Completer completer = new Completer();
-    replyCompleters[queryMessage.requestId] = completer;    
-    Binary buffer = queryMessage.serialize();      
+    replyCompleters[queryMessage.requestId] = completer;
     socket.onData = receiveData;
-//    sendData(buffer);
-    sendQueue.addLast(buffer);
+    sendQueue.addLast(queryMessage);
     sendBuffer("From query");
     return completer.future;
   }
   execute(MongoMessage message){
-//    print(message.messageLength);
-    sendQueue.addLast(message.serialize());    
+    sendQueue.addLast(message);    
     socket.onWrite = sendBufferFromOnWrite;
-//    socket.onError = ()=>print("Error");
-//    socket.onError = ()=>print("Close");
   }
 }

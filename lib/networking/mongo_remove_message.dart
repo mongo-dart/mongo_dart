@@ -23,4 +23,7 @@ class MongoRemoveMessage extends MongoMessage{
     buffer.offset = 0;
     return buffer;
   }
+  String toString(){
+    return "MongoRemoveMessage($requestId, ${_collectionFullName.value}, ${_selector.value})";
+  }  
 }

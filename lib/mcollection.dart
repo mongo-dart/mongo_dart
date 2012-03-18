@@ -31,4 +31,11 @@ class MCollection{
   }
   drop() => db.dropCollection(collectionName);
   remove([Map selector = const {}]) => db.removeFromCollection(collectionName, selector);
+  count([Map selector = const {}]){
+    Completer completer = new Completer();
+    db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,selector)).then((reply){       
+      completer.complete(reply["n"]);      
+    });
+    return completer.future;
+  }
 }

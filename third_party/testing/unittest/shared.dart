@@ -62,7 +62,7 @@ void expectThrow(function) {
  * description will include the descriptions of any surrounding group()
  * calls.
  */
-void test(String spec, TestFunction body) {
+void test(String spec, TestFunction body) {  
   _ensureInitialized();
 
   _tests.add(new TestCase(_tests.length + 1, _fullSpec(spec), body, 0));

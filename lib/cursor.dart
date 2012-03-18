@@ -84,6 +84,9 @@ static final CLOSED = 2;
       return nextItem.future;
     }  
     else if (state == OPEN && items.length > 0){
+      return new Future.immediate(getNextItem());
+    }
+    else if (state == OPEN && cursorId > 0){
       Completer nextItem = new Completer();
       var qm = generateGetMoreMessage();
       Future<MongoReplyMessage> reply = db.executeQueryMessage(qm);
@@ -95,15 +98,12 @@ static final CLOSED = 2;
           nextItem.complete(getNextItem());
         }
         else{
+          state = CLOSED;          
           nextItem.complete(null);
         }
       });
       return nextItem.future;
-    }
-    else if (state == OPEN && cursorId > 0){
-      return new Future.immediate(getNextItem());
-    }
-    
+    }    
     else {
       state = CLOSED;
       return new Future.immediate(null);

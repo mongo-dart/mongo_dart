@@ -60,10 +60,10 @@ class Db{
     connection.execute(new MongoRemoveMessage("$databaseName.$collectionName", selector));    
   }    
   
-  Future<bool> getLastError(){    
+  Future<Map> getLastError(){    
     return executeDbCommand(DbCommand.createGetLastErrorCommand(this));
   }
-  Future<bool> wait(){
+  Future<Map> wait(){
     return getLastError();
   }
   close(){

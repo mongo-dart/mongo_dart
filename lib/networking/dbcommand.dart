@@ -11,14 +11,23 @@ class DbCommand extends MongoQueryMessage{
     :super(collectionName,flags, numberToSkip, numberToReturn, query, fields){      
     _collectionFullName = new BsonCString("${db.databaseName}.$collectionName");      
   }
-  static createDropCollectionCommand(Db db, String collectionName) {
+  static DbCommand createDropCollectionCommand(Db db, String collectionName) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'drop':collectionName}, null);
   }
-  static createPingCommand(Db db) {
+  static DbCommand createPingCommand(Db db) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, {'ping':1}, null);
   }  
-  static createGetLastErrorCommand(Db db) {
+  static DbCommand createGetLastErrorCommand(Db db) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, {"getlasterror":1}, null);
   }  
+  static DbCommand createCountCommand(Db db, String collectionName, [Map selector = const {}]) {
+    var finalQuery = new Map();
+//    finalQuery["count"] = "${db.databaseName}.$collectionName";
+    finalQuery["count"] = collectionName;    
+    finalQuery["query"] = selector;
+    finalQuery["fields"] = null;                      
+
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, finalQuery, null);
+  }
 
 }

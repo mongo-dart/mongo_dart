@@ -18,4 +18,12 @@ class MongoReplyMessage extends MongoMessage{
       documents[n] = doc.value;
     }
   }
+  String toString(){
+    if (documents.length == 1)
+    {
+      return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, ${documents[0]})"; 
+    }        
+    return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned)";
+  }  
+  
 }

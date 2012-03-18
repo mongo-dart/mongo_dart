@@ -32,4 +32,10 @@ class MongoInsertMessage extends MongoMessage{
     buffer.offset = 0;
     return buffer;
   }
+  String toString(){
+    if (_documents.length == 1)      
+      return "MongoInserMessage($requestId, ${_collectionFullName.value}, ${_documents[0].value})";    
+    return "MongoInserMessage($requestId, ${_collectionFullName.value}, ${_documents.length} documents)";
+  }  
+  
 }

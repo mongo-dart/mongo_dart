@@ -6,8 +6,7 @@ class MongoMessage{
   static final Query = 2004;
   static final GetMore = 2005;
   static final Delete = 2006;
-  static final KillCursors = 2007;
-
+  static final KillCursors = 2007;   
   int _messageLength;
   int _requestId;
   int get requestId(){
