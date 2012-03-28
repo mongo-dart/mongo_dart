@@ -11,14 +11,29 @@ class Connection{
       serverConfig = new ServerConfig();
     }    
   }
-  connect(){
+  Future<bool> connect([Function onOpen]){
     replyCompleters = new Map();
     sendQueue = new Queue();
     socket = new Socket(serverConfig.host, serverConfig.port);
-    if (socket == null) {
-      throw "can't get send socket";
+    Completer completer = new Completer();
+    if (socket is! Socket) {
+      completer.completeException(new Exception( "can't get send socket"));
+    } else {
+      lengthBuffer = new Binary(4);
+      socket.onError = (e) {  
+        print("connect exception ${e}");
+        completer.completeException(e);
+      };
+      socket.onConnect = () { 
+        if (onOpen is Function) {
+          onOpen();
+        }
+        
+        completer.complete(true);
+      };
+      return completer.future;
     }
-    lengthBuffer = new Binary(4);
+    
   }
   close(){
     while (!sendQueue.isEmpty()){
@@ -35,6 +50,7 @@ class Connection{
       if(!sendQueue.isEmpty()){
         MongoMessage message = sendQueue.removeFirst();
         debug(message.toString());
+        //print(message.toString());
         bufferToSend = message.serialize();
       } else {
         bufferToSend = null;  
@@ -49,11 +65,12 @@ class Connection{
       bufferToSend.offset += socket.writeList(bufferToSend.bytes,
         bufferToSend.offset,bufferToSend.bytes.length-bufferToSend.offset);
       if (!bufferToSend.atEnd()){
-//        print("Buffer not send fully, offset: ${bufferToSend.offset}");
+       print("Buffer not send fully, offset: ${bufferToSend.offset}");
       }
       new Timer(0,(t)=>sendBufferFromTimer());              
     }        
     else {
+      //print("setting onwrite to null");
       socket.onWrite = null;        
     }    
   }  
@@ -68,15 +85,20 @@ class Connection{
       messageBuffer.writeInt(messageLength);
     }
     messageBuffer.offset += socket.readList(messageBuffer.bytes,messageBuffer.offset,messageBuffer.bytes.length-messageBuffer.offset);
+    //print("messageBuffer = ${messageBuffer}");
     if (messageBuffer.atEnd()){
       MongoReplyMessage reply = new MongoReplyMessage();
       messageBuffer.rewind();
+      //print("messageBuffer = ${messageBuffer.bytes}");
       reply.deserialize(messageBuffer);
       debug(reply.toString());
+      //print(reply.toString());
+      //print("messageBuffer = ${messageBuffer}");
       messageBuffer = null;
       lengthBuffer.rewind();
       Completer completer = replyCompleters.remove(reply.responseTo);      
-      if (completer !== null){        
+      if (completer !== null){
+        //print("messageBuffer = ${messageBuffer}");
         completer.complete(reply);       
       }
       else {

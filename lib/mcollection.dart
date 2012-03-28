@@ -32,11 +32,12 @@ class MCollection{
     cursor.close();
     return result;
   }
-  drop() => db.dropCollection(collectionName);
+  Future drop() => db.dropCollection(collectionName);
   remove([Map selector = const {}]) => db.removeFromCollection(collectionName, selector);
-  count([Map selector = const {}]){
+  Future count([Map selector = const {}]){
     Completer completer = new Completer();
     db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,selector)).then((reply){       
+      //print("reply = ${reply}");
       completer.complete(reply["n"]);      
     });
     return completer.future;

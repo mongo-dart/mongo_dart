@@ -1,4 +1,8 @@
-logger() => Utils.getLogger();
+logger() { 
+  Utils.setVerboseState(); 
+  Utils.getLogger();
+  
+}
 setVerboseState(){
   Utils.setVerboseState();  
 }

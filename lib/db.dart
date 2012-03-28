@@ -24,17 +24,28 @@ class Db{
   executeMessage(MongoMessage message){
     connection.execute(message);
   }    
-  open(){
-    connection.connect();
-    return this;
+  Future <bool> open([Function onOpen]){
+    return connection.connect(onOpen);
+    //return this;
   }
   Future<Map> executeDbCommand(MongoMessage message){
       Completer<bool> result = new Completer();
+      //print("executeDbCommand.message = ${message}");
       connection.query(message).then((replyMessage){
-        if (replyMessage.documents[0]["ok"] == 1.0){
+        //print("replyMessage = ${replyMessage}");
+        //print("replyMessage.documents = ${replyMessage.documents}");
+        
+        String errMsg;
+        if (replyMessage.documents.length == 0) {
+          errMsg = "Error executing Db command, Document length 0";
+          print("Error: $errMsg");
+          var m = new Map();
+          m["errmsg"]=errMsg;
+          result.complete(m);
+        } else  if (replyMessage.documents[0]["ok"] == 1.0){
           result.complete(replyMessage.documents[0]);
         } else {
-          String errMsg = "Error executing Db command";
+          errMsg = "Error executing Db command";
           if (replyMessage.documents[0].containsKey("errmsg")){
             errMsg = replyMessage.documents[0]["errmsg"];
           }
