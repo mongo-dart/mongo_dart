@@ -18,7 +18,12 @@ class BsonString extends BsonObject{
   }
 
 }
-
+class BsonCode extends BsonString{
+  get value()=>this;
+  int get typeByte() => BSON.BSON_DATA_CODE;
+  BsonCode(String data):super(data);
+  String toString()=>"BsonCode($data)";  
+}
 class BsonCString extends BsonObject{
   String data;
   BsonCString(this.data);

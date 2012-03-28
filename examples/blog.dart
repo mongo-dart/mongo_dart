@@ -34,7 +34,8 @@ main(){
   }).chain((v){
     print("===================================================================================");
     print(">> Users ordered by login ascending");
-    return usersCollection.find(orderBy:{"login":1}).each((user)=>print("[${user['login']}]:[${user['name']}]:[${user['email']}]"));      
+    return usersCollection.find(orderBy:{"login":1}).each(
+      (user)=>print("[${user['login']}]:[${user['name']}]:[${user['email']}]"));      
   }).chain((v){
     print("===================================================================================");
     print(">> Adding articles");

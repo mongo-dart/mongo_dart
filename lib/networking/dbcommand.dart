@@ -29,7 +29,7 @@ class DbCommand extends MongoQueryMessage{
 //    finalQuery["count"] = "${db.databaseName}.$collectionName";
     finalQuery["count"] = collectionName;    
     finalQuery["query"] = selector;
-    finalQuery["fields"] = null;                      
+//    finalQuery["fields"] = null;                      
 
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, finalQuery, null);
   }

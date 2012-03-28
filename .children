@@ -1,3 +1,4 @@
+examples/types.dart
 tests/allTests.dart
 tests/CursorTest.dart
 tests/DbCommandTest.dart
