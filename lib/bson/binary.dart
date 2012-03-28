@@ -9,7 +9,12 @@ class Binary extends BsonObject{
   //static final minBits = [1,2,3,4];
   ByteArray bytes;
   int offset;
-  Binary(int length): bytes = new ByteArray(length),offset=0;  
+  int subType;
+  Binary(int length): bytes = new ByteArray(length),offset=0, subType=0;
+  Binary.from(List from): bytes = new ByteArray(from.length),offset=0, subType=0{
+    bytes.setRange(0, from.length, from);
+  }  
+  int get typeByte() => BSON.BSON_DATA_BINARY;  
   String toHexString(){
     StringBuffer stringBuffer = new StringBuffer();
     for (final byte in bytes)
@@ -111,9 +116,24 @@ class Binary extends BsonObject{
     return new String.fromCharCodes(stringBytes);
   }  
 
-  int byteLength() => bytes.length;
+  int byteLength() => bytes.length+4+1;
   bool atEnd() => offset == bytes.length;
   rewind(){
     offset = 0;
   }
+  packValue(Binary buffer){
+    buffer.writeInt(bytes.length);
+    buffer.writeByte(subType);
+    buffer.bytes.setRange(buffer.offset,bytes.length,bytes);
+    buffer.offset += bytes.length;        
+  }  
+  unpackValue(Binary buffer){
+    int size = buffer.readInt32();
+    subType = buffer.readByte();
+    bytes = new ByteArray(size);
+    bytes.setRange(0,size,buffer.bytes,buffer.offset);
+    buffer.offset += size;  
+  }
+  get value()=>this;
+  String toString()=>"Binary(${toHexString()})";
 }

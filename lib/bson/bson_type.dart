@@ -57,6 +57,9 @@ BsonObject bsonObjectFrom(var value){
   if (value === null){
     return new BsonNull();
   }
+  if (value is Date){
+    return new BsonDate(value);
+  }  
   if (value === true || value === false){
     return new BsonBoolean(value);
   }
@@ -81,7 +84,12 @@ BsonObject bsonObjectFromTypeByte(int typeByte){
       return new BsonNull();
     case BSON.BSON_DATA_BOOLEAN:
       return new BsonBoolean(false);
-
+    case BSON.BSON_DATA_BINARY:
+      return new Binary(0);
+    case BSON.BSON_DATA_DATE:
+      return new BsonDate(null);
+    case BSON.BSON_DATA_CODE:
+      return new BsonCode(null);
     default:
       throw new Exception("Not implemented for BSON TYPE $typeByte");           
   }  

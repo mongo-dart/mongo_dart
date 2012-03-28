@@ -181,7 +181,7 @@ testLimit(){
 main(){
   setVerboseState();
   group("MCollection tests:", (){
-    asyncTest("testSkip",1,testLimit);
+    asyncTest("testLimit",1,testLimit);
     asyncTest("testSkip",1,testSkip);    
     asyncTest("testFindEachWithThenClause",1,testFindEachWithThenClause);    
     asyncTest("testCount",1,testCount);    
