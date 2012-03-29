@@ -1,0 +1,11 @@
+#library("all_bson_tests");
+#import("BsonBinaryTest.dart",prefix:"binary");
+#import("BsonImplTest.dart",prefix:"impl");
+#import("BsonObjectIdTest.dart",prefix:"objectid");
+#import("BsonTypesTest.dart",prefix:"types");
+main(){  
+  binary.main();
+  impl.main();
+  objectid.main();
+  types.main();  
+}

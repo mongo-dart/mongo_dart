@@ -1,3 +1,5 @@
+#library("bsonimpltest");
+#import('../../third_party/testing/unittest/unittest_vm.dart');
 #import("../../lib/bson/bson.dart");
 testSerializeDesirialize(){
   var bson = new BSON();
@@ -29,5 +31,7 @@ testSerializeDesirialize(){
   Expect.equals(buffer.byteLength(),buffer.offset);
 }
 main(){
- testSerializeDesirialize();
+  group("BsonImpl:", (){
+    test("testSerializeDesirialize",testSerializeDesirialize);    
+  });
 }

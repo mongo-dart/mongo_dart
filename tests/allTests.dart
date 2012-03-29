@@ -4,7 +4,9 @@
 #import("DbCommandTest.dart",prefix:"dbcommand");
 #import("MCollectionTest.dart",prefix:"mcollection");
 #import("DbTest.dart",prefix:"dbtest");
-main(){  
+#import("bson/allBsonTests.dart",prefix:"bson");
+main(){
+  bson.main();
   connection.main();
   cursor.main();
   dbcommand.main();

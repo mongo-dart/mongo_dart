@@ -21,7 +21,6 @@ testStudent(){
   Future<MongoReplyMessage> replyFuture = conn.query(queryMessage);
   replyFuture.then((msg) {
     for (var each in msg.documents){
-//      print(each);
     }
     conn.close();
   });

@@ -1,3 +1,5 @@
+#library("BsonObjectId");
+#import('../../third_party/testing/unittest/unittest_vm.dart');
 #import("../../lib/bson/bson.dart");
 testObjectId(){
   var id1 = new ObjectId();
@@ -11,5 +13,7 @@ testObjectId(){
 }
 
 main(){
-   testObjectId();
+  group("BsonObjectId:", (){
+    test("testObjectId",testObjectId);    
+  });
 }

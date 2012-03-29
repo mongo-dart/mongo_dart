@@ -21,9 +21,9 @@ class MongoReplyMessage extends MongoMessage{
   String toString(){
     if (documents.length == 1)
     {
-      return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, ${documents[0]})"; 
+      return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags, ${documents[0]})"; 
     }        
-    return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned)";
+    return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags)";
   }  
   
 }

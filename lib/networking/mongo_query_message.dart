@@ -47,6 +47,6 @@ static final OPTS_EXHAUST = 64;
     return buffer;
   }
   String toString(){
-    return "MongoQueryMessage($requestId, ${_collectionFullName.value}, ${_query.value})";
+    return "MongoQueryMessage($requestId, ${_collectionFullName.value},numberToReturn:$numberToReturn, ${_query.value})";
   }
 }

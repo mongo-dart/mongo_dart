@@ -12,25 +12,27 @@ testDatabaseName(){
 }
 testCollectionInfoCursor(){
   Db db = new Db('mongo-dart-test');
-  db.open();
-  MCollection newColl = db.collection("new_collecion");
-  newColl.drop();
-  newColl.insertAll([{"a":1}]);
-  bool found = false;
-  db.collectionsInfoCursor("new_collecion").toList().then((v){
+  db.open().chain((c){
+    MCollection newColl = db.collection("new_collecion");
+    newColl.drop();
+    newColl.insertAll([{"a":1}]);
+    bool found = false;
+    return db.collectionsInfoCursor("new_collecion").toList();
+  }).then((v){
     Expect.isTrue(v.length == 1);
-//    newColl.drop();
     db.close();
     callbackDone();
   });
 }
 testRemove(){
   Db db = new Db('mongo-dart-test');
-  db.open();  
-  db.removeFromCollection("new_collecion_to_remove");
-  MCollection newColl = db.collection("new_collecion_to_remove");  
-  newColl.insertAll([{"a":1}]);
-  db.collectionsInfoCursor("new_collecion_to_remove").toList().then((v){    
+  MCollection newColl;
+  db.open().chain((c){  
+    db.removeFromCollection("new_collecion_to_remove");
+    newColl = db.collection("new_collecion_to_remove");  
+    newColl.insertAll([{"a":1}]);
+  return db.collectionsInfoCursor("new_collecion_to_remove").toList();
+  }).then((v){    
     Expect.isTrue(v.length == 1);
     db.removeFromCollection("new_collecion_to_remove");
     //db.getLastError().then((v)=>print("remove result: $v"));
@@ -44,9 +46,9 @@ testRemove(){
 }
 testDropDatabase(){
   Db db = new Db('mongo-dart-test');
-  db.open();
-  db.drop().then((v){
-    print(v);
+  db.open().chain((c){
+    return db.drop();
+  }).then((v){
       db.close();
       callbackDone();
   });

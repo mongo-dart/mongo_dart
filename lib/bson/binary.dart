@@ -57,8 +57,13 @@ class Binary extends BsonObject{
       throw new Exception("encodeInt::overflow");      
     }
     switch(bits) {
-      case 32: 
-        bytes.setInt32(position,value);
+      case 32:
+        bytes.setInt32(position,value);        
+        if (value == -1){   
+        // That is temporary workaround on ByteArray broken functionality on negative ints
+        //TODO Remove this, when ByteArray will be repaired         
+          bytes.setRange(position, 4, [255,255,255,255]);          
+        }           
         break;
       case 16: 
         bytes.setInt16(position,value);

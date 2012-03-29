@@ -2,24 +2,26 @@
 #import("dart:builtin");
 
 main(){
+  setVerboseState();
   Db db = new Db("mongo-dart-blog");
   print("Connecting to ${db.serverConfig.host}:${db.serverConfig.port}");
-  db.open();
-  db.drop();
-  print("===================================================================================");
-  print(">> Adding Authors");
-  MCollection collection = db.collection("authors");
-  collection.insertAll(
-    [{'name':'William Shakespeare', 'email':'william@shakespeare.com', 'age':587},
-     {'name':'Jorge Luis Borges', 'email':'jorge@borges.com', 'age':123}]
-    );
-  Map<String,Map> authors = new Map<String,Map>();
-  Map<String,Map> users = new Map<String,Map>();
+  MCollection collection;
   MCollection usersCollection;
   MCollection articlesCollection;
-  collection.find().each((v){
-    authors[v["name"]] = v;
-  }).chain((v){
+  Map<String,Map> authors = new Map<String,Map>();
+  Map<String,Map> users = new Map<String,Map>();  
+  db.open().chain((o){
+    print(">> Dropping mongo-dart-blog db");
+    db.drop();
+    print("===================================================================================");
+    print(">> Adding Authors");
+    collection = db.collection("authors");
+    collection.insertAll(
+      [{'name':'William Shakespeare', 'email':'william@shakespeare.com', 'age':587},
+      {'name':'Jorge Luis Borges', 'email':'jorge@borges.com', 'age':123}]
+    );
+    return collection.find().each((v){authors[v["name"]] = v;});
+  }).chain((v){  
     print("===================================================================================");
     print(">> Authors ordered by age ascending");
     return collection.find(orderBy:{'age':1}).each(
@@ -39,7 +41,7 @@ main(){
   }).chain((v){
     print("===================================================================================");
     print(">> Adding articles");
-    articlesCollection = db.collection("articles");
+    articlesCollection = db.collection("articles");        
     articlesCollection.insertAll([
                                   { 'title':'Caminando por Buenos Aires', 
                                     'body':'Las callecitas de Buenos Aires tienen ese no se que...', 

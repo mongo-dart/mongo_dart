@@ -11,7 +11,7 @@ class Connection{
       serverConfig = new ServerConfig();
     }    
   }
-  Future<bool> connect([Function onOpen]){
+  Future<bool> connect(){
     replyCompleters = new Map();
     sendQueue = new Queue();
     socket = new Socket(serverConfig.host, serverConfig.port);
@@ -24,11 +24,7 @@ class Connection{
         print("connect exception ${e}");
         completer.completeException(e);
       };
-      socket.onConnect = () { 
-        if (onOpen is Function) {
-          onOpen();
-        }
-        
+      socket.onConnect = () {        
         completer.complete(true);
       };
       return completer.future;
@@ -52,6 +48,7 @@ class Connection{
         debug(message.toString());
         //print(message.toString());
         bufferToSend = message.serialize();
+        debug(bufferToSend.toHexString());
       } else {
         bufferToSend = null;  
       } 
@@ -60,12 +57,13 @@ class Connection{
   sendBufferFromTimer() => sendBuffer("from Timer");
   sendBufferFromOnWrite() => sendBuffer("from OnWrite");
   sendBuffer(String origin){
+    debug("sendBuffer($origin)");
     getNextBufferToSend();
     if (bufferToSend !== null){      
       bufferToSend.offset += socket.writeList(bufferToSend.bytes,
         bufferToSend.offset,bufferToSend.bytes.length-bufferToSend.offset);
-      if (!bufferToSend.atEnd()){
-       print("Buffer not send fully, offset: ${bufferToSend.offset}");
+      if (!bufferToSend.atEnd()){        
+       debug("Buffer not send fully, offset: ${bufferToSend.offset}");
       }
       new Timer(0,(t)=>sendBufferFromTimer());              
     }        
@@ -111,7 +109,8 @@ class Connection{
     replyCompleters[queryMessage.requestId] = completer;
     socket.onData = receiveData;
     sendQueue.addLast(queryMessage);
-    sendBuffer("From query");
+//    sendBuffer("From query");
+    socket.onWrite = sendBufferFromOnWrite;    
     return completer.future;
   }
   execute(MongoMessage message){

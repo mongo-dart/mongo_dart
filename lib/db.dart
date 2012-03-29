@@ -24,9 +24,8 @@ class Db{
   executeMessage(MongoMessage message){
     connection.execute(message);
   }    
-  Future <bool> open([Function onOpen]){
-    return connection.connect(onOpen);
-    //return this;
+  Future <bool> open(){
+    return connection.connect();
   }
   Future<Map> executeDbCommand(MongoMessage message){
       Completer<bool> result = new Completer();
@@ -37,7 +36,7 @@ class Db{
         
         String errMsg;
         if (replyMessage.documents.length == 0) {
-          errMsg = "Error executing Db command, Document length 0";
+          errMsg = "Error executing Db command, Document length 0 $replyMessage";
           print("Error: $errMsg");
           var m = new Map();
           m["errmsg"]=errMsg;

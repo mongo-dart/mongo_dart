@@ -8,18 +8,32 @@ testDbCommandCreation(){
 }
 testPingDbCommand(){
   Db db = new Db('mongo-dart-test');
-  db.open();
-  DbCommand pingCommand = DbCommand.createPingCommand(db);
-  Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(pingCommand);
-  mapFuture.then((msg) {
-    Expect.mapEquals({'ok': 1},msg.documents[0]);
-    db.close();
+  db.open().then((d){
+    DbCommand pingCommand = DbCommand.createPingCommand(db);
+    Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(pingCommand);
+    mapFuture.then((msg) {
+      Expect.mapEquals({'ok': 1},msg.documents[0]);
+      db.close();
+    });
+  });
+}
+testDropDbCommand(){
+  Db db = new Db('mongo-dart-test');
+  db.open().then((d){
+    DbCommand command = DbCommand.createDropDatabaseCommand(db);
+    Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(command);
+    mapFuture.then((msg) {
+      expect(msg.documents[0]["ok"]).equals(1);      
+      db.close();  
+    });
   });
 }
 
 main(){
+  setVerboseState();
   group("DBCommand tests:", (){
     test("testDbCommandCreation",testDbCommandCreation);
     test("testPingDbCommand",testPingDbCommand);
+    test("testDropDbCommand",testDropDbCommand);    
   });
 }

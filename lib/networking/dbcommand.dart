@@ -12,7 +12,7 @@ class DbCommand extends MongoQueryMessage{
     _collectionFullName = new BsonCString("${db.databaseName}.$collectionName");      
   }
   static DbCommand createDropCollectionCommand(Db db, String collectionName) {
-    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'drop':collectionName}, null);
+    return new DbCommand(db,SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'drop':collectionName}, null);
   }
   static DbCommand createDropDatabaseCommand(Db db) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'dropDatabase':1}, null);
@@ -26,12 +26,9 @@ class DbCommand extends MongoQueryMessage{
   }  
   static DbCommand createCountCommand(Db db, String collectionName, [Map selector = const {}]) {
     var finalQuery = new Map();
-//    finalQuery["count"] = "${db.databaseName}.$collectionName";
-    finalQuery["count"] = collectionName; 
-    finalQuery["fields"] = {}; 
-    finalQuery["query"] = selector;
-                         
-
+    finalQuery["query"] = selector;    
+    finalQuery["count"] = collectionName;
+//    finalQuery["fields"] = {};
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, finalQuery, null);
   }
 

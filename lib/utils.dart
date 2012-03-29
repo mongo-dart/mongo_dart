@@ -1,7 +1,6 @@
 logger() { 
   Utils.setVerboseState(); 
-  Utils.getLogger();
-  
+  Utils.getLogger();  
 }
 setVerboseState(){
   Utils.setVerboseState();  
