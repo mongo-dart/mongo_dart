@@ -26,7 +26,7 @@ static final CLOSED = 2;
   int cursorId = 0;
   Db db;
   Queue items;
-  MCollection collection;
+  DbCollection collection;
   Map selector;
   Map fields;
   int skip;

@@ -5,14 +5,14 @@
 #import('../third_party/testing/unittest/unittest_vm.dart');
 testCollectionCreation(){
   Db db = new Db('db');
-  MCollection collection = db.collection('student');
+  DbCollection collection = db.collection('student');
 }
 testEach(){
   Db db = new Db('mongo-dart-test');
   int count = 0;
   int sum = 0;  
   db.open().chain((c){  
-    MCollection newColl = db.collection('newColl1');
+    DbCollection newColl = db.collection('newColl1');
     return newColl.find().each((v)
       {sum += v["a"]; count++;});
   }).then((v)=>info("Completed. Sum = $sum, count = $count"));
@@ -22,7 +22,7 @@ testFindEachWithThenClause(){
   int count = 0;
   int sum = 0;  
   db.open().chain((c){  
-    MCollection students = db.collection('students');
+    DbCollection students = db.collection('students');
     students.drop();
     students.insertAll(
       [
@@ -44,7 +44,7 @@ testFindEach(){
   int count = 0;
   int sum = 0;  
   db.open().chain((c){  
-    MCollection students = db.collection('students');
+    DbCollection students = db.collection('students');
     students.remove();
     students.insertAll(
     [
@@ -76,7 +76,7 @@ testDrop(){
 
 testSaveWithIntegerId(){
   Db db = new Db('mongo-dart-test');
-  MCollection coll;
+  DbCollection coll;
   var id;
   db.open().chain((c){  
     coll = db.collection('testSaveWithIntegerId');
@@ -104,7 +104,7 @@ testSaveWithIntegerId(){
 }
 testSaveWithObjectId(){
   Db db = new Db('mongo-dart-test');
-  MCollection coll;
+  DbCollection coll;
   var id;
   db.open().chain((c){  
     coll = db.collection('testSaveWithObjectId');
@@ -136,7 +136,7 @@ testSaveWithObjectId(){
 testCount(){
   Db db = new Db('mongo-dart-test');
   db.open().chain((c){
-    MCollection coll = db.collection('testCount');
+    DbCollection coll = db.collection('testCount');
     coll.remove();
     for(int n=0;n<167;n++){
       coll.insert({"a":n});
@@ -151,7 +151,7 @@ testCount(){
 testSkip(){
   Db db = new Db('mongo-dart-test');
   db.open().chain((c){  
-    MCollection coll = db.collection('testSkip');
+    DbCollection coll = db.collection('testSkip');
     coll.remove();
     for(int n=0;n<600;n++){
       coll.insert({"a":n});
@@ -168,7 +168,7 @@ testLimit(){
   int counter = 0;
   Cursor cursor;
   db.open().chain((c){  
-    MCollection coll = db.collection('testLimit');
+    DbCollection coll = db.collection('testLimit');
     coll.remove();
     for(int n=0;n<600;n++){
       coll.insert({"a":n});
@@ -186,14 +186,14 @@ testLimit(){
 
 main(){
   setVerboseState();
-  group("MCollection tests:", (){
+  group("DbCollection tests:", (){
     asyncTest("testLimit",1,testLimit);
     asyncTest("testSkip",1,testSkip);    
     asyncTest("testFindEachWithThenClause",1,testFindEachWithThenClause);    
     asyncTest("testCount",1,testCount);    
-//    asyncTest("testFindEach",1,testFindEach);
-//    asyncTest("testDrop",1,testDrop);
-//    asyncTest("testSaveWithIntegerId",1,testSaveWithIntegerId);
-//    asyncTest("testSaveWithObjectId",1,testSaveWithObjectId);    
+    asyncTest("testFindEach",1,testFindEach);
+    asyncTest("testDrop",1,testDrop);
+    asyncTest("testSaveWithIntegerId",1,testSaveWithIntegerId);
+    asyncTest("testSaveWithObjectId",1,testSaveWithObjectId);    
   });
 }

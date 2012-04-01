@@ -5,9 +5,9 @@ main(){
   setVerboseState();
   Db db = new Db("mongo-dart-blog");
   print("Connecting to ${db.serverConfig.host}:${db.serverConfig.port}");
-  MCollection collection;
-  MCollection usersCollection;
-  MCollection articlesCollection;
+  DbCollection collection;
+  DbCollection usersCollection;
+  DbCollection articlesCollection;
   Map<String,Map> authors = new Map<String,Map>();
   Map<String,Map> users = new Map<String,Map>();  
   db.open().chain((o){

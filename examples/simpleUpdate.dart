@@ -4,7 +4,7 @@ main(){
   Db db = new Db('mongo-dart-test');
  
   simpleUpdate() {
-    MCollection coll = db.collection('collection-for-save');
+    DbCollection coll = db.collection('collection-for-save');
     coll.remove();  
     List toInsert = [
                      {"name":"a", "value": 10},

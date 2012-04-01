@@ -15,8 +15,8 @@ class Db{
      }
     connection = new Connection(serverConfig);
   }      
-  MCollection collection(String collectionName){
-      return new MCollection(this,collectionName);
+  DbCollection collection(String collectionName){
+      return new DbCollection(this,collectionName);
   }
   Future<MongoReplyMessage> executeQueryMessage(MongoMessage queryMessage){
     return connection.query(queryMessage);
@@ -94,6 +94,6 @@ class Db{
       selector["name"] = this.databaseName + "." + collectionName;
     }  
     // Return Cursor
-      return new Cursor(this, new MCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);      
+      return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);      
   }    
 }

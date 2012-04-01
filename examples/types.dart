@@ -6,7 +6,7 @@ main(){
   Db db = new Db("mongo-dart-blog");
   print("Connecting to ${db.serverConfig.host}:${db.serverConfig.port}");
   db.open().chain((c){  
-    MCollection collection = db.collection('test-types');
+    DbCollection collection = db.collection('test-types');
     collection.remove();  
     collection.insert({
       'array':[1,2,3], 

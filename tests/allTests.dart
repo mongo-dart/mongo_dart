@@ -2,7 +2,7 @@
 #import("ConnectionTest.dart",prefix:"connection");
 #import("CursorTest.dart",prefix:"cursor");
 #import("DbCommandTest.dart",prefix:"dbcommand");
-#import("MCollectionTest.dart",prefix:"mcollection");
+#import("DbCollectionTest.dart",prefix:"dbcollection");
 #import("DbTest.dart",prefix:"dbtest");
 #import("bson/allBsonTests.dart",prefix:"bson");
 main(){
@@ -10,6 +10,6 @@ main(){
   connection.main();
   cursor.main();
   dbcommand.main();
-  mcollection.main();
+  dbcollection.main();
   dbtest.main();
 }

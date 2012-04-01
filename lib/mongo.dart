@@ -14,7 +14,7 @@
 #source("networking/server_config.dart");
 #source("networking/dbcommand.dart");
 #source("db.dart");
-#source("mcollection.dart");
+#source("dbcollection.dart");
 #source("cursor.dart");
 #source("utils.dart");
 #source("map_proxy.dart");

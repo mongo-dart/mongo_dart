@@ -3,7 +3,7 @@
 #import("dart:builtin");
 main(){
   Db db = new Db("mongo-dart-test");
-  MCollection coll;
+  DbCollection coll;
   db.open().chain((c){
     print('connection open');
     coll = db.collection("simple_data");

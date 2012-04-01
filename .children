@@ -2,14 +2,14 @@ examples/types.dart
 tests/allTests.dart
 tests/CursorTest.dart
 tests/DbCommandTest.dart
-tests/MCollectionTest.dart
 lib/bson/bson.dart
+examples/queries.dart
 tests/bson/BSonTypesTest.dart
 third_party/testing/unittest/unittest_html.dart
 third_party/testing/unittest/unittest_dartest.dart
 tests/bson/allBsonTests.dart
 examples/blog.dart
-examples/simple.dart
+tests/DbCollectionTest.dart
 third_party/log4dart/LogLib.dart
 tests/DbTest.dart
 tests/bson/BsonObjectIdTest.dart
@@ -19,7 +19,9 @@ third_party/testing/unittest/unittest_node.dart
 tests/ConnectionTest.dart
 third_party/log4dart/test/TestRunner.dart
 third_party/testing/unittest/unittest_dom.dart
+examples/raw_queries.dart
 lib/networking/logger.dart
 third_party/testing/unittest/unittest_vm.dart
 lib/mongo.dart
 tests/bson/BsonBinaryTest.dart
+tests/SelectorBuilderTest.dart

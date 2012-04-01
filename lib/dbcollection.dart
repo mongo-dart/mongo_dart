@@ -1,7 +1,7 @@
-class MCollection{
+class DbCollection{
   Db db;
   String collectionName;
-  MCollection(this.db, this.collectionName){}  
+  DbCollection(this.db, this.collectionName){}  
   String fullName() => "${db.databaseName}.$collectionName";
   save(Map document){
     if (document.containsKey("_id")){

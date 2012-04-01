@@ -5,13 +5,13 @@
 #import('../third_party/testing/unittest/unittest_vm.dart');
 testCursorCreation(){
   Db db = new Db('mongo-dart-test');
-  MCollection collection = db.collection('student');
+  DbCollection collection = db.collection('student');
   Cursor cursor = new Cursor(db,collection);
 }
 testPingRaw(){
   Db db = new Db('mongo-dart-test');
   db.open().chain((c){
-    MCollection collection = db.collection('\$cmd');
+    DbCollection collection = db.collection('\$cmd');
     Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);  
     MongoQueryMessage queryMessage = cursor.generateQueryMessage();
     Future mapFuture = db.connection.query(queryMessage);
@@ -25,7 +25,7 @@ testPingRaw(){
 testNextObject(){
   Db db = new Db('mongo-dart-test');
   db.open().chain((c){
-    MCollection collection = db.collection('\$cmd');
+    DbCollection collection = db.collection('\$cmd');
     Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);
     return cursor.nextObject();
   }).then((v){
@@ -39,7 +39,7 @@ testNextObjectToEnd(){
   Db db = new Db('mongo-dart-test');
   Cursor cursor;
   db.open().chain((c){
-    MCollection collection = db.collection('testNextObjectToEnd');
+    DbCollection collection = db.collection('testNextObjectToEnd');
     collection.remove();
     collection.insert({"a":1});
     collection.insert({"a":2});
@@ -70,7 +70,7 @@ testCursorWithOpenServerCursor(){
   Db db = new Db('mongo-dart-test');
   Cursor cursor;
   db.open().chain((c){
-    MCollection collection = db.collection('new_big_collection');
+    DbCollection collection = db.collection('new_big_collection');
     collection.remove();
     for (int n=0;n < 100; n++){
       collection.insert({"a":n});
@@ -87,7 +87,7 @@ testCursorWithOpenServerCursor(){
 testCursorGetMore(){
   var res;
   Db db = new Db('mongo-dart-test');
-  MCollection collection;
+  DbCollection collection;
   db.open().chain((c){
     collection = db.collection('new_big_collection1');
     collection.remove();
@@ -116,7 +116,7 @@ testCursorGetMore(){
 testCursorClosing(){
   var res;
   Db db = new Db('mongo-dart-test');
-  MCollection collection;
+  DbCollection collection;
   Cursor cursor;
   db.open().chain((c){
     collection = db.collection('new_big_collection1');

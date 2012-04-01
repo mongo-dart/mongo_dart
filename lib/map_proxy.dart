@@ -1,5 +1,6 @@
 class _MapProxy<K,V> implements Map<K,V>{
-  Map map;
+  LinkedHashMap map;
+  Queue keys;
   _MapProxy(): map = {};
   bool containsValue(V value)=>map.containsValue(value);
   
@@ -25,6 +26,5 @@ class _MapProxy<K,V> implements Map<K,V>{
   
   int get length() => map.length;
 
-  bool isEmpty()=>map.isEmpty();
-  
+  bool isEmpty()=>map.isEmpty();  
 }

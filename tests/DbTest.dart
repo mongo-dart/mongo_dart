@@ -13,7 +13,7 @@ testDatabaseName(){
 testCollectionInfoCursor(){
   Db db = new Db('mongo-dart-test');
   db.open().chain((c){
-    MCollection newColl = db.collection("new_collecion");
+    DbCollection newColl = db.collection("new_collecion");
     newColl.drop();
     newColl.insertAll([{"a":1}]);
     bool found = false;
@@ -26,7 +26,7 @@ testCollectionInfoCursor(){
 }
 testRemove(){
   Db db = new Db('mongo-dart-test');
-  MCollection newColl;
+  DbCollection newColl;
   db.open().chain((c){  
     db.removeFromCollection("new_collecion_to_remove");
     newColl = db.collection("new_collecion_to_remove");  
