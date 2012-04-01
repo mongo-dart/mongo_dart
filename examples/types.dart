@@ -17,17 +17,15 @@ main(){
       'binary':new Binary.from([0x23,0x24,0x25]),
       'int':42,
       'float':33.3333,
-//    'regexp':/foobar/i,
+      'regexp': new BsonRegexp(".?dim"),
 //    'regexp2':/foobar2/,
       'boolean':true,
       'where':new BsonCode('this.x == 3'),
-//    'dbref':new BSON.DBRef(collection.collectionName, new BSON.ObjectID()),
       'null':null
     });
     return collection.findOne();
   }).then((v){    
     print(v);  
     db.close();  
-  }); 
-  
+  });  
 }  

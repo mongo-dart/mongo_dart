@@ -63,6 +63,9 @@ BsonObject bsonObjectFrom(var value){
   if (value === true || value === false){
     return new BsonBoolean(value);
   }
+  if (value is BsonRegexp){
+    return value;
+  }  
   throw new Exception("Not implemented for $value");           
 }  
 
@@ -90,6 +93,8 @@ BsonObject bsonObjectFromTypeByte(int typeByte){
       return new BsonDate(null);
     case BSON.BSON_DATA_CODE:
       return new BsonCode(null);
+    case BSON.BSON_DATA_REGEXP:
+      return new BsonRegexp(null);      
     default:
       throw new Exception("Not implemented for BSON TYPE $typeByte");           
   }  

@@ -119,7 +119,12 @@ class Binary extends BsonObject{
        stringBytes.add(bytes[offset-1]);
     }
     return new String.fromCharCodes(stringBytes);
-  }  
+  }
+  writeCString(List<int> charCodes){
+    bytes.setRange(offset,charCodes.length,charCodes);
+    offset += charCodes.length;
+    writeByte(0);    
+ }
 
   int byteLength() => bytes.length+4+1;
   bool atEnd() => offset == bytes.length;

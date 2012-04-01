@@ -17,5 +17,6 @@
 #source("bson_null.dart");
 #source("bson_boolean.dart");
 #source("bson_date.dart");
+#source("bson_regexp.dart");
 
 

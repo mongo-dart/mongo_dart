@@ -17,3 +17,5 @@
 #source("mcollection.dart");
 #source("cursor.dart");
 #source("utils.dart");
+#source("map_proxy.dart");
+#source("selector_builder.dart");
