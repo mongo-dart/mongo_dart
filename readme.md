@@ -1,6 +1,6 @@
 #Mongo-dart - MongoDB driver for Dart programming language.
 
-It is server-side library with minimalistic support of MongoDb. At the moment supported basic CRUD operations.
+It is a server-side library with minimalistic support of MongoDb. At the moment driver supports basic CRUD operations.
 
 Some samples are in directory **examples**. Also Chris Buckett gave a realistic use case scenario in two part blog post:
 
