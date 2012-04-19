@@ -65,12 +65,12 @@ static final CLOSED = 2;
   }
   
   
-  getNextItem(){
+  Map getNextItem(){
     return items.removeFirst();
   }
-  Future nextObject(){
+  Future<Map> nextObject(){
     if (state == INIT){
-      Completer nextItem = new Completer();
+      Completer<Map> nextItem = new Completer<Map>();
       MongoQueryMessage qm = generateQueryMessage();
       Future<MongoReplyMessage> reply = db.executeQueryMessage(qm);
       reply.then((replyMessage){
@@ -79,7 +79,9 @@ static final CLOSED = 2;
         cursorId = replyMessage.cursorId;
         items.addAll(replyMessage.documents);
         if (items.length > 0){
-          nextItem.complete(getNextItem());
+          Map nextDoc = getNextItem();
+          debug("Cursor getNextItem $nextDoc");
+          nextItem.complete(nextDoc);
         }
         else{
           nextItem.complete(null);

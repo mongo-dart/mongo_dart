@@ -66,6 +66,7 @@ class Connection{
        debug("Buffer not send fully, offset: ${bufferToSend.offset}");
       }
       new Timer(0,(t)=>sendBufferFromTimer());              
+//      sendBuffer("From sendBuffer");
     }        
     else {
       //print("setting onwrite to null");

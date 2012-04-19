@@ -3,7 +3,7 @@
  *
  * Note to use this appender you must import dart:io
  */
-class FileAppender {
+class FileAppender implements Appender{
   final String _path;
   
   FileAppender(this._path);

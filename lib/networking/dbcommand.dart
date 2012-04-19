@@ -17,12 +17,18 @@ class DbCommand extends MongoQueryMessage{
   static DbCommand createDropDatabaseCommand(Db db) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'dropDatabase':1}, null);
   }
+  static DbCommand createQueryDBCommand(Db db, Map command) {
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, command, null);
+  }
+  static DbCommand createDBSlaveOKCommand(Db db, Map command) {
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT | MongoQueryMessage.OPTS_SLAVE, 0, -1, command, null);
+  }
   
   static DbCommand createPingCommand(Db db) {
-    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, {'ping':1}, null);
-  }  
+    return createQueryDBCommand(db, {'ping':1});
+  }
   static DbCommand createGetLastErrorCommand(Db db) {
-    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, {"getlasterror":1}, null);
+    return createQueryDBCommand(db, {"getlasterror":1});
   }  
   static DbCommand createCountCommand(Db db, String collectionName, [Map selector = const {}]) {
     var finalQuery = new Map();

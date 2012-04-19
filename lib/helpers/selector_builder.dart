@@ -3,27 +3,31 @@ SelectorBuilder query(){
 }
 class SelectorBuilder<K,V> extends _MapProxy<K,V>{
   toString()=>"SelectorBuilder($map)";
-  SelectorBuilder eq(String fieldName,Comparable value){
+  SelectorBuilder eq(String fieldName,value){
     map[fieldName] = value;
     return this;
   }
-  SelectorBuilder ne(String fieldName, Comparable value){
+  SelectorBuilder id(value){
+    map["_id"] = value;
+    return this;
+  }
+  SelectorBuilder ne(String fieldName, value){
     map[fieldName] = {"\$ne":value};
     return this;
   }
-  SelectorBuilder gt(String fieldName,Comparable value){
+  SelectorBuilder gt(String fieldName,value){
     map[fieldName] = {"\$gt":value};
     return this;
   }
-  SelectorBuilder lt(String fieldName,Comparable value){
+  SelectorBuilder lt(String fieldName,value){
     map[fieldName] = {"\$lt":value};
     return this;
   }
-  SelectorBuilder gte(String fieldName,Comparable value){
+  SelectorBuilder gte(String fieldName,value){
     map[fieldName] = {"\$gte":value};
     return this;
   }
-  SelectorBuilder lte(String fieldName,Comparable value){    
+  SelectorBuilder lte(String fieldName,value){    
     map[fieldName] = {"\$lte":value};
     return this;
   }
@@ -56,7 +60,7 @@ class SelectorBuilder<K,V> extends _MapProxy<K,V>{
         verbose:verbose, dotAll:dotAll,unicodeMode:unicodeMode,localeDependent:localeDependent)};
     return this;    
   }
-  SelectorBuilder range(String fieldName, Comparable min, Comparable max, [bool minInclude=true, bool maxInclude=true]){
+  SelectorBuilder range(String fieldName, min, max, [bool minInclude=true, bool maxInclude=true]){
     Map rangeMap = {};
     if (minInclude){
       rangeMap["\$gte"] = min;
@@ -116,6 +120,5 @@ class SelectorBuilder<K,V> extends _MapProxy<K,V>{
     _internQueryMap();  
     map["\$sreturnKey"] = true;      
     return this;    
-  }
-  
+  }  
 }

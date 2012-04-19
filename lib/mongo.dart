@@ -16,6 +16,6 @@
 #source("db.dart");
 #source("dbcollection.dart");
 #source("cursor.dart");
-#source("utils.dart");
-#source("map_proxy.dart");
-#source("selector_builder.dart");
+#source("helpers/utils.dart");
+#source("helpers/map_proxy.dart");
+#source("helpers/selector_builder.dart");

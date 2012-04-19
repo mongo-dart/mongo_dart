@@ -18,7 +18,6 @@ main(){
       'int':42,
       'float':33.3333,
       'regexp': new BsonRegexp(".?dim"),
-//    'regexp2':/foobar2/,
       'boolean':true,
       'where':new BsonCode('this.x == 3'),
       'null':null

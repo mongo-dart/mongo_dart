@@ -1,7 +1,7 @@
-class ElementPair{
+class _ElementPair{
   String name;
   var value;
-  ElementPair([this.name,this.value]);
+  _ElementPair([this.name,this.value]);
 }
 class BsonObject {  
   int get typeByte(){ throw const Exception("must be implemented");}
@@ -15,8 +15,8 @@ class BsonObject {
   } 
   packValue(var buffer){ throw const Exception("must be implemented");}
 
-  ElementPair unpackElement(buffer){
-    ElementPair result = new ElementPair();
+  _ElementPair unpackElement(buffer){
+    _ElementPair result = new _ElementPair();
     result.name = buffer.readCString();    
     unpackValue(buffer);
     result.value = value;
@@ -25,15 +25,14 @@ class BsonObject {
   unpackValue(var buffer){ throw const Exception("must be implemented");}
   get value()=>null;
 }
-
- int elementSize(name, value) {
-    int size = 1;
-    if (name !== null){
-      size += name.length + 1;
-    } 
-    size += bsonObjectFrom(value).byteLength();
-    return size;
-  }
+int elementSize(name, value) {
+  int size = 1;
+  if (name !== null){
+    size += name.length + 1;
+  } 
+  size += bsonObjectFrom(value).byteLength();
+  return size;
+}
 BsonObject bsonObjectFrom(var value){
   if (value is BsonObject){
     return value;
