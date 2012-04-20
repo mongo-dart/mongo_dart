@@ -1,27 +1,46 @@
 class BsonRegexp extends BsonObject{
   String pattern;
   String options;
+  BsonCString bsonPattern;
+  BsonCString bsonOptions;
+
   bool multiLine;
   bool caseInsensitive;
   bool verbose;
   bool dotAll;
-  bool unicodeMode;
-  bool localeDependent;
-  BsonRegexp(this.pattern,[this.multiLine,this.caseInsensitive,this.verbose,this.dotAll,this.unicodeMode,this.localeDependent]):options="";
+  bool extended;
+  BsonRegexp(this.pattern,[this.multiLine=false,this.caseInsensitive=false,this.dotAll=false,this.extended=false]):options=""{
+    createOptionsString();    
+    bsonPattern = new BsonCString(pattern,false);
+    bsonOptions = new BsonCString(options,false);
+  }
+  
   get value()=>this;
   int get typeByte() => BSON.BSON_DATA_REGEXP;  
-  byteLength()=>pattern.length+1+options.length+1;
+  byteLength()=>bsonPattern.byteLength()+bsonOptions.byteLength();
   unpackValue(Binary buffer){
     pattern = buffer.readCString();
     options = buffer.readCString();     
   }   
   createOptionsString(){
-    options = "";  
+    var buffer = new StringBuffer();
+    if (caseInsensitive === true){
+      buffer.add("i");
+    }
+    if (multiLine === true){
+      buffer.add("m");
+    }    
+    if (dotAll === true){
+      buffer.add("s");
+    }    
+    if (extended === true){
+      buffer.add("x");
+    }    
+    options = buffer.toString();
   }
   toString()=>"BsonRegexp('$pattern',options:'$options')";
-  packValue(Binary buffer){
-     createOptionsString();
-     buffer.writeCString(pattern.charCodes());
-     buffer.writeCString(options.charCodes());     
+  packValue(Binary buffer){     
+     bsonPattern.packValue(buffer);
+     bsonOptions.packValue(buffer);
   }  
 }

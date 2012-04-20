@@ -14,7 +14,6 @@ class BsonObject {
     packValue(buffer);
   } 
   packValue(var buffer){ throw const Exception("must be implemented");}
-
   _ElementPair unpackElement(buffer){
     _ElementPair result = new _ElementPair();
     result.name = buffer.readCString();    
@@ -25,10 +24,10 @@ class BsonObject {
   unpackValue(var buffer){ throw const Exception("must be implemented");}
   get value()=>null;
 }
-int elementSize(name, value) {
+int elementSize(String name, value) {
   int size = 1;
   if (name !== null){
-    size += name.length + 1;
+    size += Statics.getKeyUtf8(name).length + 1;
   } 
   size += bsonObjectFrom(value).byteLength();
   return size;

@@ -1,7 +1,7 @@
 #library("bsonimpltest");
 #import('../../third_party/testing/unittest/unittest_vm.dart');
 #import("../../lib/bson/bson.dart");
-testSerializeDesirialize(){
+testSerializeDeserialize(){
   var bson = new BSON();
   var map = {'_id':5, 'a':4};
   Binary buffer = bson.serialize(map);
@@ -27,11 +27,10 @@ testSerializeDesirialize(){
   Expect.equals(5,buffer.offset);
   buffer.offset = 0;
   root = bson.deserialize(buffer);  
-  Expect.equals(doc1['a'][2],root['a'][2]);
-  Expect.equals(buffer.byteLength(),buffer.offset);
+  Expect.equals(doc1['a'][2],root['a'][2], "doc1['a']");
 }
 main(){
   group("BsonImpl:", (){
-    test("testSerializeDesirialize",testSerializeDesirialize);    
+    test("testSerializeDeserialize",testSerializeDeserialize);    
   });
 }

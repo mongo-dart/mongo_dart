@@ -55,9 +55,9 @@ class SelectorBuilder<K,V> extends _MapProxy<K,V>{
     map[fieldName] = {"\$mod":[value,0]};
     return this;    
   }
-  SelectorBuilder match(String fieldName, String pattern,[bool multiLine, bool caseInsensitive, bool verbose, bool dotAll, bool unicodeMode, bool localeDependent]){    
-    map[fieldName] = {'\$regex': new BsonRegexp('^str_(5|7|8)17\$',multiLine:multiLine, caseInsensitive:caseInsensitive,
-        verbose:verbose, dotAll:dotAll,unicodeMode:unicodeMode,localeDependent:localeDependent)};
+  SelectorBuilder match(String fieldName, String pattern,[bool multiLine, bool caseInsensitive, bool dotAll, bool extended]){    
+    map[fieldName] = {'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
+        dotAll:dotAll,extended:extended)};
     return this;    
   }
   SelectorBuilder range(String fieldName, min, max, [bool minInclude=true, bool maxInclude=true]){

@@ -43,5 +43,18 @@ class Statics{
        _Pid = (Math.random() * 0xFFFF).floor().toInt();
     }
     return _Pid;
-  }  
+  }
+  static Map<String,List<int>> _keys;
+  static Map<String,List<int>> get keys(){
+    if (_keys === null){
+       _keys = new Map<String,List<int>>();
+    }
+    return _keys;
+  }
+  static getKeyUtf8(String key){
+    if (!keys.containsKey(key)){      
+      keys[key] = encodeUtf8(key);    
+    }
+    return keys[key];
+  }
 }

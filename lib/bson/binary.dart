@@ -118,11 +118,12 @@ class Binary extends BsonObject{
     while (bytes[offset++]!= 0){
        stringBytes.add(bytes[offset-1]);
     }
-    return new String.fromCharCodes(stringBytes);
+    return decodeUtf8(stringBytes);
   }
-  writeCString(List<int> charCodes){
-    bytes.setRange(offset,charCodes.length,charCodes);
-    offset += charCodes.length;
+  writeCString(String val){
+    final utfData = encodeUtf8(val);
+    bytes.setRange(offset,utfData.length,utfData);
+    offset += utfData.length;
     writeByte(0);    
  }
 

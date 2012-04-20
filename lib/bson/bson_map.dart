@@ -1,10 +1,11 @@
 class BsonMap extends BsonObject{
   Map data;
+  Map utfKeys;
   int _dataSize;
   int dataSize(){
     if (_dataSize === null){
       _dataSize = 0;
-      data.forEach((var key, var value)
+      data.forEach((String key, var value)
         {
            _dataSize += elementSize(key, value);
         });

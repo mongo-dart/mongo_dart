@@ -143,7 +143,6 @@ testCursorClosing(){
 }
 
 main(){
-  setVerboseState();
   group("Cursor tests:", (){
     test("testCursorCreation",testCursorCreation);    
     asyncTest("testCursorClosing",1,testCursorClosing);

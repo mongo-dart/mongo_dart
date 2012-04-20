@@ -30,7 +30,6 @@ testDropDbCommand(){
 }
 
 main(){
-  setVerboseState();
   group("DBCommand tests:", (){
     test("testDbCommandCreation",testDbCommandCreation);
     test("testPingDbCommand",testPingDbCommand);

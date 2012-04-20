@@ -2,7 +2,6 @@
 #import("dart:builtin");
 
 main(){
-  setVerboseState();
   Db db = new Db("mongo-dart-blog");
   print("Connecting to ${db.serverConfig.host}:${db.serverConfig.port}");
   DbCollection collection;

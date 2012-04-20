@@ -185,7 +185,6 @@ testLimit(){
 }
 
 main(){
-  setVerboseState();
   group("DbCollection tests:", (){
     asyncTest("testLimit",1,testLimit);
     asyncTest("testSkip",1,testSkip);    
