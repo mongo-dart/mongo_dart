@@ -121,4 +121,8 @@ class SelectorBuilder<K,V> extends _MapProxy<K,V>{
     map["\$sreturnKey"] = true;      
     return this;    
   }  
+  SelectorBuilder where(String javaScriptCode){
+    map["\$where"] = new BsonCode(javaScriptCode);
+    return this;
+  }
 }

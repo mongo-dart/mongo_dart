@@ -39,8 +39,12 @@ main(){
   }).chain((val){
     return coll.findOne(
       query().match('str_field', 'str_(5|7|8)17\$').sortBy("str_field",descending:true).sortBy("my_field").explain());
-  }).then((explanation){
-     print("Query explained: $explanation");
+  }).chain((explanation){
+    print("Query explained: $explanation");
+    print('Now where clause with jscript code: where("this.my_field % 100 == 35")');
+    print(query().where("this.my_field == 517"));
+    return coll.find(query().where("this.my_field % 100 == 35")).each((v)=>print(v));
+  }).then((v){
      db.close();        
   });
 }
