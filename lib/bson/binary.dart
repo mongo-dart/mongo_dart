@@ -64,11 +64,6 @@ class Binary extends BsonObject{
     switch(bits) {
       case 32:
         byteArray.setInt32(position,value);        
-        if (value == -1){   
-        // That is temporary workaround on Uint8List broken functionality on negative ints
-        //TODO Remove this, when Uint8List will be repaired         
-          byteList.setRange(position, 4, [255,255,255,255]);          
-        }           
         break;
       case 16: 
         byteArray.setInt16(position,value);

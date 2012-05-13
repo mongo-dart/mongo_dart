@@ -8,7 +8,6 @@
 #import("bson/allBsonTests.dart",prefix:"bson");
 #import("SelectorBuilderTest.dart",prefix:"helper");
 main(){
-  Statics.startStopwatch();
   bson.main();
   connection.main();
   cursor.main();

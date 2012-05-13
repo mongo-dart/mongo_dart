@@ -12,7 +12,6 @@ testSelectorBuilderOnObjectId(){
   ObjectId id = new ObjectId();
   SelectorBuilder selector = query().id(id);
   expect(selector is Map && selector.isEmpty()).isFalse();
-  print('Time elapsed: ${Statics.getElapsedTime()}');    
 }
 main(){  
   group("DbCollection tests:", (){
