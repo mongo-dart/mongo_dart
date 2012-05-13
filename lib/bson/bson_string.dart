@@ -13,13 +13,13 @@ class BsonString extends BsonObject{
   int get typeByte() => BSON.BSON_DATA_STRING;  
   packValue(Binary buffer){
      buffer.writeInt(utfData.length+1);
-     buffer.bytes.setRange(buffer.offset,utfData.length,utfData);
+     buffer.byteList.setRange(buffer.offset,utfData.length,utfData);
      buffer.offset += utfData.length;
      buffer.writeByte(0);
   }
   unpackValue(Binary buffer){
      int size = buffer.readInt32()-1; 
-     data = decodeUtf8(buffer.bytes,buffer.offset,size);
+     data = decodeUtf8(buffer.byteList,buffer.offset,size);
      buffer.offset += size+1;
   }
 }
@@ -46,7 +46,7 @@ class BsonCString extends BsonString{
 
   byteLength()=>utfData.length+1;
   packValue(Binary buffer){
-     buffer.bytes.setRange(buffer.offset,utfData.length,utfData);
+     buffer.byteList.setRange(buffer.offset,utfData.length,utfData);
      buffer.offset += utfData.length;
      buffer.writeByte(0);
   }  

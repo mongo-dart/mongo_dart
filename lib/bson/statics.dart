@@ -1,4 +1,11 @@
 class Statics{
+  static Stopwatch _stopwatch;  
+  static startStopwatch() => _stopwatch = new Stopwatch.start();
+  static stopStopwatch() => _stopwatch.stop();
+  static Duration getElapsedTime(){
+    _stopwatch.stop();
+    return new Duration(milliseconds: _stopwatch.elapsedInMs());        
+  }
   static int _current_increment;
   static int get nextIncrement()
   {

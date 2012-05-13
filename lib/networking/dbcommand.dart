@@ -27,6 +27,10 @@ class DbCommand extends MongoQueryMessage{
   static DbCommand createPingCommand(Db db) {
     return createQueryDBCommand(db, {'ping':1});
   }
+  static DbCommand createGetNonceCommand(Db db) {
+    return createQueryDBCommand(db, {'getnonce':1});
+  }
+
   static DbCommand createGetLastErrorCommand(Db db) {
     return createQueryDBCommand(db, {"getlasterror":1});
   }  
@@ -34,7 +38,6 @@ class DbCommand extends MongoQueryMessage{
     var finalQuery = new Map();
     finalQuery["query"] = selector;    
     finalQuery["count"] = collectionName;
-//    finalQuery["fields"] = {};
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, finalQuery, null);
   }
 

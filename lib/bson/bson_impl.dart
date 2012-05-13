@@ -172,7 +172,7 @@ class BSON {
     return buffer;  
   }
   deserialize(Binary buffer){
-    if(buffer.bytes.length < 5){
+    if(buffer.byteList.length < 5){
       throw new Exception("corrupt bson message < 5 bytes long");
     }    
     var bsonMap = new BsonMap(null);

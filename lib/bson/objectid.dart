@@ -15,11 +15,11 @@ class ObjectId extends BsonObject{
   get value() => this;
   int byteLength() => 12;
   unpackValue(Binary buffer){
-     id.bytes.setRange(0,12,buffer.bytes,buffer.offset);
+     id.byteList.setRange(0,12,buffer.byteList,buffer.offset);
      buffer.offset += 12;
   }
   packValue(Binary buffer){
-    buffer.bytes.setRange(buffer.offset,12,id.bytes);
+    buffer.byteList.setRange(buffer.offset,12,id.byteList);
     buffer.offset += 12;
   } 
 }

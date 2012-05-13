@@ -53,12 +53,37 @@ testDropDatabase(){
       callbackDone();
   });
 }
+testGetNonce(){
+  Db db = new Db('mongo-dart-test');
+  db.open().chain((c){
+    return db.getNonce();
+  }).then((v){
+      print(v);
+      Expect.isTrue(v["ok"] == 1);
+      db.close();
+      callbackDone();
+  }); 
+}
+testPwd(){
+  Db db = new Db('mongo-dart-test');
+  DbCollection coll;
+  db.open().chain((c){
+    coll = db.collection("system.users");
+    return coll.find().each((user)=>print(user));
+  }).then((v){
+      db.close();
+      callbackDone();
+  }); 
+}
+
 main(){
   group("DBCommand:", (){
     asyncTest("testDropDatabase",1,testDropDatabase);
     test("testDatabaseName",testDatabaseName);
     asyncTest("testCollectionInfoCursor",1,testCollectionInfoCursor);
     asyncTest("testRemove",1,testRemove);
+    asyncTest("testGetNonce",1,testGetNonce);    
+    asyncTest("testPwd",1,testPwd);        
   });  
   
 }

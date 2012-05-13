@@ -60,8 +60,8 @@ class Connection{
     debug("sendBuffer($origin)");
     getNextBufferToSend();
     if (bufferToSend !== null){      
-      bufferToSend.offset += socket.writeList(bufferToSend.bytes,
-        bufferToSend.offset,bufferToSend.bytes.length-bufferToSend.offset);
+      bufferToSend.offset += socket.writeList(bufferToSend.byteList,
+        bufferToSend.offset,bufferToSend.byteList.length-bufferToSend.offset);
       if (!bufferToSend.atEnd()){        
        debug("Buffer not send fully, offset: ${bufferToSend.offset}");
       }
@@ -75,7 +75,7 @@ class Connection{
   }  
    void receiveData() {
     if (messageBuffer === null){
-      int numBytes = socket.readList(lengthBuffer.bytes, 0, 4);
+      int numBytes = socket.readList(lengthBuffer.byteList, 0, 4);
       if (numBytes == 0) {
         return;
       }
@@ -83,12 +83,12 @@ class Connection{
       messageBuffer = new Binary(messageLength);
       messageBuffer.writeInt(messageLength);
     }
-    messageBuffer.offset += socket.readList(messageBuffer.bytes,messageBuffer.offset,messageBuffer.bytes.length-messageBuffer.offset);
+    messageBuffer.offset += socket.readList(messageBuffer.byteList,messageBuffer.offset,messageBuffer.byteList.length-messageBuffer.offset);
     //print("messageBuffer = ${messageBuffer}");
     if (messageBuffer.atEnd()){
       MongoReplyMessage reply = new MongoReplyMessage();
       messageBuffer.rewind();
-      //print("messageBuffer = ${messageBuffer.bytes}");
+      //print("messageBuffer = ${messageBuffer.byteList}");
       reply.deserialize(messageBuffer);
       debug(reply.toString());
       //print(reply.toString());

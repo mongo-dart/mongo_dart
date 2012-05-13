@@ -80,6 +80,10 @@ class Db{
   Future<Map> getLastError(){    
     return executeDbCommand(DbCommand.createGetLastErrorCommand(this));
   }
+  Future<Map> getNonce(){    
+    return executeDbCommand(DbCommand.createGetNonceCommand(this));
+  }
+
   Future<Map> wait(){
     return getLastError();
   }

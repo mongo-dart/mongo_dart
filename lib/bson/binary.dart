@@ -7,17 +7,21 @@ class Binary extends BsonObject{
   static final SUBTYPE_MD5 = 4;
   static final SUBTYPE_USER_DEFINED = 128;
   //static final minBits = [1,2,3,4];
-  ByteArray bytes;
+  ByteArray byteArray;
+  Uint8List byteList;
   int offset;
   int subType;
-  Binary(int length): bytes = new ByteArray(length),offset=0, subType=0;
-  Binary.from(List from): bytes = new ByteArray(from.length),offset=0, subType=0{
-    bytes.setRange(0, from.length, from);
+  Binary(int length): byteList = new Uint8List(length), offset=0, subType=0{
+    byteArray = byteList.asByteArray();    
+  }
+  Binary.from(List from): byteList = new Uint8List(from.length),offset=0, subType=0 {    
+    byteList.setRange(0, from.length, from);
+    byteArray = byteList.asByteArray();    
   }  
   int get typeByte() => BSON.BSON_DATA_BINARY;  
   String toHexString(){
     StringBuffer stringBuffer = new StringBuffer();
-    for (final byte in bytes)
+    for (final byte in byteList)
     {      
        if (byte < 16){
         stringBuffer.add("0");
@@ -27,23 +31,24 @@ class Binary extends BsonObject{
     return stringBuffer.toString().toLowerCase();
   }  
   setIntExtended(int value, int numOfBytes){
-    ByteArray bytesTmp = new ByteArray(8);
+    Uint8List byteListTmp = new Uint8List(8);    
+    ByteArray byteArrayTmp = byteListTmp.asByteArray();
     if (numOfBytes == 3){
-      bytesTmp.setInt32(0,value);
+      byteArrayTmp.setInt32(0,value);
     }
     else if (numOfBytes > 4 && numOfBytes < 8){
-      bytesTmp.setInt64(0,value);
+      byteArrayTmp.setInt64(0,value);
     }
     else {
         throw new Exception("Unsupported num of bits: ${numOfBytes*8}");
     }
-    bytes.setRange(offset,numOfBytes,bytesTmp);
+    byteList.setRange(offset,numOfBytes,byteListTmp);
   }
   reverse(int numOfBytes){
     swap(int x, int y){
-      int t = bytes[x+offset];
-      bytes[x+offset] = bytes[y+offset];
-      bytes[y+offset] = t;
+      int t = byteList[x+offset];
+      byteList[x+offset] = byteList[y+offset];
+      byteList[y+offset] = t;
     }
     for(int i=0;i<=(numOfBytes-1)%2;i++){
       swap(i,numOfBytes-1-i);
@@ -58,18 +63,18 @@ class Binary extends BsonObject{
     }
     switch(bits) {
       case 32:
-        bytes.setInt32(position,value);        
+        byteArray.setInt32(position,value);        
         if (value == -1){   
-        // That is temporary workaround on ByteArray broken functionality on negative ints
-        //TODO Remove this, when ByteArray will be repaired         
-          bytes.setRange(position, 4, [255,255,255,255]);          
+        // That is temporary workaround on Uint8List broken functionality on negative ints
+        //TODO Remove this, when Uint8List will be repaired         
+          byteList.setRange(position, 4, [255,255,255,255]);          
         }           
         break;
       case 16: 
-        bytes.setInt16(position,value);
+        byteArray.setInt16(position,value);
         break;
       case 8: 
-        bytes.setInt8(position,value);        
+        byteArray.setInt8(position,value);        
         break;
       case 24:        
         setIntExtended(value,numOfBytes);
@@ -90,59 +95,60 @@ class Binary extends BsonObject{
     offset += 1;
   }
   int writeDouble(double value){    
-    bytes.setFloat64(offset, value);
+    byteList.setFloat64(offset, value);
     offset+=8;
   } 
   int writeInt64(int value){    
-    bytes.setInt64(offset, value);
+    byteArray.setInt64(offset, value);
     offset+=8;
   } 
   int readByte(){    
-    return bytes[offset++];
+    return byteList[offset++];
   }
   int readInt32(){    
     offset+=4;
-    return bytes.getInt32(offset-4);    
+    return byteArray.getInt32(offset-4);    
   }  
   int readInt64(){    
     offset+=8;
-    return bytes.getInt64(offset-8);
+    return byteArray.getInt64(offset-8);
   }    
   num readDouble(){    
     offset+=8;
-    return bytes.getFloat64(offset-8);
+    return byteArray.getFloat64(offset-8);
   }    
 
   String readCString(){ 
     List<int> stringBytes = [];
-    while (bytes[offset++]!= 0){
-       stringBytes.add(bytes[offset-1]);
+    while (byteList[offset++]!= 0){
+       stringBytes.add(byteList[offset-1]);
     }
     return decodeUtf8(stringBytes);
   }
   writeCString(String val){
     final utfData = encodeUtf8(val);
-    bytes.setRange(offset,utfData.length,utfData);
+    byteList.setRange(offset,utfData.length,utfData);
     offset += utfData.length;
     writeByte(0);    
  }
 
-  int byteLength() => bytes.length+4+1;
-  bool atEnd() => offset == bytes.length;
+  int byteLength() => byteList.length+4+1;
+  bool atEnd() => offset == byteList.length;
   rewind(){
     offset = 0;
   }
   packValue(Binary buffer){
-    buffer.writeInt(bytes.length);
+    buffer.writeInt(byteList.length);
     buffer.writeByte(subType);
-    buffer.bytes.setRange(buffer.offset,bytes.length,bytes);
-    buffer.offset += bytes.length;        
+    buffer.byteList.setRange(buffer.offset,byteList.length,byteList);
+    buffer.offset += byteList.length;        
   }  
   unpackValue(Binary buffer){
     int size = buffer.readInt32();
     subType = buffer.readByte();
-    bytes = new ByteArray(size);
-    bytes.setRange(0,size,buffer.bytes,buffer.offset);
+    byteList = new Uint8List(size);
+    byteArray = byteList.asByteArray();
+    byteList.setRange(0,size,buffer.byteList,buffer.offset);
     buffer.offset += size;  
   }
   get value()=>this;

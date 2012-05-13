@@ -26,7 +26,7 @@ testFindEachWithThenClause(){
     students.drop();
     students.insertAll(
       [
-            {"name":"Vadim","score":4},
+      {"name":"Vadim","score":4},
       {"name": "Daniil","score":4},
       {"name": "Nick", "score": 5}
       ]

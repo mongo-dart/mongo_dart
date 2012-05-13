@@ -1,11 +1,11 @@
 #library("bsonbinarytest");
 #import('../../third_party/testing/unittest/unittest_vm.dart');
 #import("../../lib/bson/bson.dart");
-testByteArrayNegativeWrite(){
-  ByteArray ba = new ByteArray(4);
+testUint8ListNegativeWrite(){
+  Uint8List bl = new Uint8List(4);
+  ByteArray ba = bl.asByteArray();
   ba.setInt32(0,-1);
-  Expect.listEquals(ba,[255,255,255,255]);
-  expect(ba).equalsCollection([255,255,255,255]);
+  expect(bl).equalsCollection([255,255,255,255]);
 }
 testBinaryWithNegativeOne(){
   Binary b = new Binary(4);
@@ -48,7 +48,7 @@ testBinary(){
 
 main(){
   group("BSonBinary:", (){
-    test("testByteArrayNegativeWrite",testByteArrayNegativeWrite);
+    test("testUint8ListNegativeWrite",testUint8ListNegativeWrite);
     test("testBinary",testBinary);
     test("testBinaryWithNegativeOne",testBinaryWithNegativeOne);    
   });

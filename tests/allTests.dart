@@ -1,4 +1,5 @@
 #library("all_tests");
+#import("../lib/bson/bson.dart");
 #import("ConnectionTest.dart",prefix:"connection");
 #import("CursorTest.dart",prefix:"cursor");
 #import("DbCommandTest.dart",prefix:"dbcommand");
@@ -7,11 +8,12 @@
 #import("bson/allBsonTests.dart",prefix:"bson");
 #import("SelectorBuilderTest.dart",prefix:"helper");
 main(){
+  Statics.startStopwatch();
   bson.main();
   connection.main();
   cursor.main();
   dbcommand.main();
   dbcollection.main();
   dbtest.main();
-  helper.main();  
+  helper.main();        
 }
