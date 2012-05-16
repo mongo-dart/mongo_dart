@@ -26,9 +26,9 @@ class DbCollection{
   Cursor find([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
     return new Cursor(db, this, selector: selector, fields: fields, skip: skip, limit: limit, sort: orderBy);//, [selector, skip, limit,sort, hint, explain]);
   }
-  findOne([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
+  Future<Map> findOne([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
     Cursor cursor = find(selector,fields,orderBy,skip,limit,hint,explain);
-    Future result = cursor.nextObject();
+    Future<Map> result = cursor.nextObject();
     cursor.close();
     return result;
   }

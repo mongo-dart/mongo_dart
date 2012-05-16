@@ -24,7 +24,7 @@ class Db{
   executeMessage(MongoMessage message){
     connection.execute(message);
   }    
-  Future <bool> open(){
+  Future<bool> open(){
     return connection.connect();
   }
   Future<Map> executeDbCommand(MongoMessage message){

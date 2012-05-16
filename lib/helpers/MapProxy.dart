@@ -1,7 +1,7 @@
 class _MapProxy<K,V> implements Map<K,V>{
   LinkedHashMap map;
   Queue keys;
-  _MapProxy(): map = {};
+  _MapProxy(): map = new LinkedHashMap();
   bool containsValue(V value)=>map.containsValue(value);
   
   bool containsKey(K key)=>map.containsKey(key);
