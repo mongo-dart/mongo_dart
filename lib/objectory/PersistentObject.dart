@@ -10,19 +10,12 @@ interface PersistentObject{
 abstract class PersistentObjectBase extends MapProxy implements PersistentObject{  
   bool setupMode;
   Set<String> dirtyFields;
-  Set<String> _properties;
-  void setPropertyList(List<String> propertyList){
-    _properties = new Set<String>.from(propertyList);
-  }  
   PersistentObjectBase(){        
     if (isRoot()){
       map["_id"] = null;
     }                
     init();
     dirtyFields = new Set<String>();
-    if (_properties === null){
-      throw "$type: Properties list must be set in method init()";
-    }
   }  
   void setDirty(String fieldName){
     if (dirtyFields === null){
@@ -40,10 +33,14 @@ void clearDirtyStatus(){
     return !dirtyFields.isEmpty();
   }
   noSuchMethod(String function_name, List args) {
+    ClassSchema schema = objectory.getSchema(type);
+    if (schema === null){
+      throw "Class $type have not been registered in Objectory";
+    }
     if (args.length == 0 && function_name.startsWith("get:")) {
       //synthetic getter
       var property = function_name.replaceFirst("get:", "");
-      if (_properties.contains(property)) {
+      if (schema.properties.contains(property)) {
         return this[property];
       }
       else{
@@ -54,7 +51,7 @@ void clearDirtyStatus(){
       //synthetic setter
       var value = args[0];
       var property = function_name.replaceFirst("set:", "");      
-      if (_properties.contains(property)) {
+      if (schema.properties.contains(property)) {
         onValueChanging(property, value);
         this[property] = value;
         if (value is InnerPersistentObject){
@@ -88,8 +85,5 @@ abstract class RootPersistentObject extends PersistentObjectBase{
 abstract class InnerPersistentObject extends PersistentObjectBase{
   PersistentObject parent;
   String pathToMe;
-  InnerPersistentObject():super(){
-    map["_pt"] = type;
-  }  
   bool isRoot()=>false;
 }

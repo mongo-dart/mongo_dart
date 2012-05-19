@@ -18,9 +18,6 @@ interface IAddress{
 
 class Author extends RootPersistentObject implements IAuthor{  
   String get type()=>'Author';
-  init(){
-    setPropertyList(["name","age","email"]);
-  }
   set name(String value){
     if (value is String){
       value = value.toUpperCase();
@@ -31,13 +28,22 @@ class Author extends RootPersistentObject implements IAuthor{
 class Person extends RootPersistentObject implements IPerson{  
   String get type()=>"Person";
   init(){    
-    setPropertyList(["firstName","lastName","birthday","address"]);
     address = new Address();
   }
 }  
 class Address extends InnerPersistentObject implements IAddress{  
   String get type()=>"Address";
-  init(){
-    setPropertyList(["cityName","zipCode","streetName"]);
-  }
+}
+
+void registerClasses(){
+  objectory.registerClass(new ClassSchema('Author',
+      ()=>new Author(),
+      ["name","age","email"]));
+  objectory.registerClass(new ClassSchema('Address',
+    ()=>new Address(),
+    ["cityName","zipCode","streetName"]));
+  objectory.registerClass(new ClassSchema('Person',
+    ()=>new Person(),
+    ["firstName","lastName","birthday","address"],
+    links: {"address": "Address"}));
 }

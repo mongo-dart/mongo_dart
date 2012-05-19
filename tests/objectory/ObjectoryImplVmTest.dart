@@ -6,12 +6,10 @@
 #source("../../lib/helpers/MapProxy.dart");
 Future<bool> setUpObjectory(){
   var res = new Completer();
-  objectory.clearFactories();
+//  objectory.clearFactories();
   objectory.open("ObjectoryTest").then((_){    
     objectory.dropDb();
-    objectory.registerClass('Author',()=>new Author());    
-    objectory.registerClass('Person',()=>new Person());
-    objectory.registerClass('Address',()=>new Address());
+    registerClasses();
     res.complete(true);
   });    
   return res.future;

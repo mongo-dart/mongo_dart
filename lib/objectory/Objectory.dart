@@ -1,6 +1,17 @@
 typedef PersistentObject FactoryMethod();
+class ClassSchema{
+  String className;
+  FactoryMethod factoryMethod;
+  Set<String> properties;
+  Map<String,String> links;  
+  ClassSchema(this.className,this.factoryMethod,List<String> propertyList,
+    [this.links]){
+    properties = new Set<String>.from(propertyList);
+  }
+    
+}
 interface Objectory{  
-  void registerClass(String className, FactoryMethod fm);
+  void registerClass(ClassSchema schema);
   PersistentObject newInstance(String className);
   Future<PersistentObject> findOne(String className,[Map selector]);
   Future<List<PersistentObject>> find(String className,[Map selector]);
@@ -8,15 +19,19 @@ interface Objectory{
   void remove(PersistentObject persistentObject);
   Future<bool> open(String database, [String url]);
   Future<bool> dropDb();
+  ClassSchema getSchema(String className);
 }
 abstract class ObjectoryBaseImpl implements Objectory{
-  Map<String,FactoryMethod> factories;
+  Map<String,ClassSchema> schemata;
   ObjectoryBaseImpl(){
-    factories = new  Map<String,FactoryMethod>();
+    schemata = new  Map<String,ClassSchema>();
+  }
+  ClassSchema getSchema(String className){
+    return schemata[className];
   }
   PersistentObject newInstance(String className){
-    if (factories.containsKey(className)){
-      return factories[className]();
+    if (schemata.containsKey(className)){
+      return schemata[className].factoryMethod();
     }
     throw "Class $className have not been registered in Objectory";
   }
@@ -26,22 +41,20 @@ abstract class ObjectoryBaseImpl implements Objectory{
     if (result.isRoot()){
       result.id = map["_id"];    
     }      
-    for (var key in map.getKeys()){
-      var value = map[key];
-      if (value is Map){
-        if (value.containsKey("_pt")){
-          PersistentObject subComponent = map2Object(value["_pt"],value);
-          result.setProperty(key,subComponent);  
-          result.clearDirtyStatus();
-        }
-      }
+    ClassSchema classSchema = schemata[className];
+    if (classSchema.links !== null){      
+      classSchema.links.forEach((property,linkClass){
+        PersistentObject linkObject = map2Object(linkClass,map[property]);
+        result.setProperty(property,linkObject);  
+        result.clearDirtyStatus();
+      });
     }
     return result;
   }
-  void clearFactories(){
-    factories.clear();
+  void clearSchemata(){
+    schemata.clear();
   }
-  void registerClass(String className, FactoryMethod fm){
-    factories[className] = fm;
+  void registerClass(ClassSchema schema){
+    schemata[schema.className] = schema;
   }
 }
