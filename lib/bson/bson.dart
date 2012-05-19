@@ -1,5 +1,4 @@
 #library("bson.dart");
-//#import("../../../../../../dartrepo/dart-read-only/dart/utils/string_encoding/utf8.dart");
 #import("dart:utf");
 #import("dart:uri");
 #source("bson_type.dart");

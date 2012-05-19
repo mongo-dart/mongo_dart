@@ -1,50 +1,72 @@
 // noSuchMethod() borrowed from Chris Buckett (chrisbuckett@gmail.com)
 // http://github.com/chrisbu/dartwatch-JsonObject
-class PersistentObject extends _MapProxy{  
-  PersistentObject.fromMap(Map map): super.fromMap(map);
+interface PersistentObject{
+  noSuchMethod(String function_name, List args);
+  void setProperty(String property, value);
+  void init();
+  String get type();
+  void clearDirtyStatus();
+}
+abstract class PersistentObjectBase extends MapProxy implements PersistentObject{  
+  bool setupMode;
   Set<String> dirtyFields;
-  ObjectId id;
-  PersistentObject(){        
-    map = null;
-    dirtyFields = new Set<String>();      
+  Set<String> _properties;
+  void setPropertyList(List<String> propertyList){
+    _properties = new Set<String>.from(propertyList);
+  }  
+  PersistentObjectBase(){        
+    if (isRoot()){
+      map["_id"] = null;
+    }                
     init();
-//    abstract bool isRoot();
-  }
-  PersistentObject.makeTransient(){
-
-  }
-  setDirty(String fieldName){
+    dirtyFields = new Set<String>();
+    if (_properties === null){
+      throw "$type: Properties list must be set in method init()";
+    }
+  }  
+  void setDirty(String fieldName){
+    if (dirtyFields === null){
+      return;
+    }
     dirtyFields.add(fieldName);
-  }
+  }  
+void clearDirtyStatus(){
+  dirtyFields.clear();
+}
   onValueChanging(String fieldName, newValue){
     setDirty(fieldName);
   }
   isDirty(){
     return !dirtyFields.isEmpty();
   }
-
   noSuchMethod(String function_name, List args) {
-    if (map === null){
-       map =  new LinkedHashMap();
-    }
     if (args.length == 0 && function_name.startsWith("get:")) {
       //synthetic getter
       var property = function_name.replaceFirst("get:", "");
-      if (this.containsKey(property)) {
+      if (_properties.contains(property)) {
         return this[property];
       }
       else{
-        return null;
+        super.noSuchMethod(function_name, args);
       }
     }
     else if (args.length == 1 && function_name.startsWith("set:")) {
       //synthetic setter
-      var property = function_name.replaceFirst("set:", "");
-      onValueChanging(property, args[0]);
-      this[property] = args[0];
-      return this[property];
-    }
-    
+      var value = args[0];
+      var property = function_name.replaceFirst("set:", "");      
+      if (_properties.contains(property)) {
+        onValueChanging(property, value);
+        this[property] = value;
+        if (value is InnerPersistentObject){
+          value.pathToMe = property;
+          value.parent = this;
+        } 
+        return this[property];
+      }
+      else {       
+        super.noSuchMethod(function_name, args);
+      }        
+    }    
     //if we get here, then we've not found it - throw.
     super.noSuchMethod(function_name, args);
   }
@@ -55,11 +77,19 @@ class PersistentObject extends _MapProxy{
     return noSuchMethod('get:$property');
   }  
   String toString()=>"$type($map)";
-  void init(){
-  }  
+  void init(){}  
   abstract String get type();
-  static Future<List<PersistentObject>>find(Map query){
-  }
-  static Future<PersistentObject>findOne(Map query){
+  abstract bool isRoot();
+}
+abstract class RootPersistentObject extends PersistentObjectBase{
+   ObjectId id;
+   bool isRoot()=>true;
+}
+abstract class InnerPersistentObject extends PersistentObjectBase{
+  PersistentObject parent;
+  String pathToMe;
+  InnerPersistentObject():super(){
+    map["_pt"] = type;
   }  
+  bool isRoot()=>false;
 }

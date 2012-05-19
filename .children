@@ -1,8 +1,9 @@
 examples/types.dart
+lib/objectory/ObjectoryLib_vm.dart
 tests/allTests.dart
 tests/CursorTest.dart
 tests/DbCommandTest.dart
-tests/bson/clientTest/clientTest.dart
+tests/objectory/PersistentObjectTest.dart
 lib/bson/bson.dart
 examples/queries.dart
 third_party/dart-crypto-lib/test/vm/tests.dart
@@ -21,6 +22,8 @@ tests/bson/BsonObjectIdTest.dart
 examples/simpleUpdate.dart
 third_party/dart-crypto-lib/src/md5.dart
 tests/bson/BsonImplTest.dart
+tests/bson/ClientTest/ClientTest.dart
+tests/objectory/ObjectoryBaseImplTest.dart
 third_party/testing/unittest/unittest_node.dart
 tests/ConnectionTest.dart
 third_party/dart-crypto-lib/test/browser/test.dart
@@ -30,5 +33,6 @@ examples/raw_queries.dart
 lib/networking/logger.dart
 third_party/testing/unittest/unittest_vm.dart
 lib/mongo.dart
+tests/objectory/ObjectoryImplVmTest.dart
 tests/bson/BsonBinaryTest.dart
 tests/SelectorBuilderTest.dart

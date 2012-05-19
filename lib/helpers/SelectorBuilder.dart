@@ -1,7 +1,7 @@
 SelectorBuilder query(){
   return new SelectorBuilder();
 }
-class SelectorBuilder<K,V> extends _MapProxy<K,V>{
+class SelectorBuilder<K,V> extends MapProxy<K,V>{
   toString()=>"SelectorBuilder($map)";
   SelectorBuilder eq(String fieldName,value){
     map[fieldName] = value;

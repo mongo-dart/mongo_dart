@@ -193,6 +193,6 @@ main(){
     asyncTest("testFindEach",1,testFindEach);
     asyncTest("testDrop",1,testDrop);
     asyncTest("testSaveWithIntegerId",1,testSaveWithIntegerId);
-    asyncTest("testSaveWithObjectId",1,testSaveWithObjectId);    
+/*    asyncTest("testSaveWithObjectId",1,testSaveWithObjectId);    */
   });
 }

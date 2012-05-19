@@ -6,6 +6,7 @@
 #import("DbCollectionTest.dart",prefix:"dbcollection");
 #import("DbTest.dart",prefix:"dbtest");
 #import("bson/allBsonTests.dart",prefix:"bson");
+#import("objectory/allobjectoryTests.dart",prefix:"objectory");
 #import("SelectorBuilderTest.dart",prefix:"helper");
 main(){
   bson.main();
@@ -15,4 +16,5 @@ main(){
   dbcollection.main();
   dbtest.main();
   helper.main();        
+  objectory.main();
 }

@@ -6,8 +6,12 @@ class ObjectId extends BsonObject{
   }
   ObjectId.fromSeconds(int seconds): id=new Binary(12){
     id.writeInt(seconds,4,forceBigEndian:true);
+    /* Todo - restore whan Math.random would work
     id.writeInt(Statics.MachineId,3);
     id.writeInt(Statics.Pid,2);    
+    */
+    id.writeInt((seconds & 0xFFFFFF).floor().toInt(),3);
+    id.writeInt((seconds & 0xFFFF).floor().toInt(),2);
     id.writeInt(Statics.nextIncrement,3,forceBigEndian:true);
   }  
   String toString()=>"ObjectId(${id.toHexString()})";

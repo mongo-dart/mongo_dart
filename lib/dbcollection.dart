@@ -4,10 +4,21 @@ class DbCollection{
   DbCollection(this.db, this.collectionName){}  
   String fullName() => "${db.databaseName}.$collectionName";
   save(Map document){
+    var id;
+    bool createId = false;
     if (document.containsKey("_id")){
-      update({"_id": document["_id"]}, document);
+      id = document["_id"];      
+      if (id === null){
+        createId = true;
+      }
+    }
+    if (id !== null){
+      update({"_id": id}, document);
     } 
     else{
+      if (createId) {
+        document["_id"] = new ObjectId();
+      }     
       insert(document);
     }
   }
