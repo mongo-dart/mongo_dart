@@ -12,15 +12,15 @@ abstract class ObjectorySingleton extends ObjectoryBaseImpl{
 class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
   ObjectoryDirectConnectionImpl._internal():super._internal();
   Db db;
-  Future<bool> open(String database, [String url]){
+  Future<bool> open([String database, String url]){
     db = new Db(database);
     return db.open();
   }
-  void save(PersistentObject persistentObject){
-    db.collection(persistentObject.type).save(persistentObject);
+  void save(RootPersistentObject persistentObject){
+    db.collection(persistentObject.type).save(persistentObject.map);
     persistentObject.id = persistentObject["_id"];
   }
-  void remove(PersistentObject persistentObject){
+  void remove(RootPersistentObject persistentObject){
     if (persistentObject.id === null){
       return;
     }
@@ -32,7 +32,7 @@ class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
     db.collection(className)
       .find(selector)
       .each((map){
-        PersistentObject obj = objectory.map2Object(className,map);
+        RootPersistentObject obj = objectory.map2Object(className,map);
         result.add(obj);
       }).then((_) => completer.complete(result));
     return completer.future;  

@@ -21,11 +21,12 @@ class ClassSchema{
 interface Objectory{  
   void registerClass(ClassSchema schema);
   PersistentObject newInstance(String className);
+  PersistentObject map2Object(String className, Map map);  
   Future<PersistentObject> findOne(String className,[Map selector]);
   Future<List<PersistentObject>> find(String className,[Map selector]);
   void save(PersistentObject persistentObject);
   void remove(PersistentObject persistentObject);
-  Future<bool> open(String database, [String url]);
+  Future<bool> open([String database, String url]);
   Future<bool> dropDb();
   ClassSchema getSchema(String className);
 }
@@ -44,7 +45,7 @@ abstract class ObjectoryBaseImpl implements Objectory{
     throw "Class $className have not been registered in Objectory";
   }
   PersistentObject map2Object(String className, Map map){
-    PersistentObject result = newInstance(className);
+    var result = newInstance(className);
     result.map = map;
     if (result.isRoot()){
       result.id = map["_id"];    
@@ -62,7 +63,7 @@ abstract class ObjectoryBaseImpl implements Objectory{
       //  print(property);
         ObjectId linkId = map[property];
         if (linkId !== null){
-          PersistentObject link = newInstance(linkClass);
+          RootPersistentObject link = newInstance(linkClass);
           link.id = linkId;
           result.setProperty(property,link);
           result.clearDirtyStatus();

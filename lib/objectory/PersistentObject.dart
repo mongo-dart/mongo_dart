@@ -8,6 +8,8 @@ interface PersistentObject{
   void clearDirtyStatus();
   Future fetchLink(String property);
   Future fetchLinks();
+  bool isRoot();
+  Map map;
 }
 abstract class PersistentObjectBase extends MapProxy implements PersistentObject{  
   bool setupMode;
@@ -81,12 +83,11 @@ void clearDirtyStatus(){
     noSuchMethod('set:$property',[value]);
   }
   Dynamic get(String property){
-    return noSuchMethod('get:$property');
+    return noSuchMethod('get:$property',[]);
   }  
   String toString()=>"$type($map)";
   void init(){}  
-  abstract String get type();
-  abstract bool isRoot();
+  abstract String get type();  
   Future<PersistentObject> fetchLink(String property, [Map links]){
     var completer = new Completer<PersistentObject>();
     if (links === null){
