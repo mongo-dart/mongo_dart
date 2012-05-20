@@ -6,6 +6,8 @@ interface PersistentObject{
   void init();
   String get type();
   void clearDirtyStatus();
+  Future fetchLink(String property);
+  Future fetchLinks();
 }
 abstract class PersistentObjectBase extends MapProxy implements PersistentObject{  
   bool setupMode;
@@ -52,6 +54,14 @@ void clearDirtyStatus(){
       var value = args[0];
       var property = function_name.replaceFirst("set:", "");      
       if (schema.properties.contains(property)) {
+        if (schema.links !== null){
+          if (schema.links.containsKey(property)){
+            if (value.id === null){
+              throw "Error setting link property $property. Link object must have not null id";
+            }            
+            value = value.id;
+          }
+        }
         onValueChanging(property, value);
         this[property] = value;
         if (value is InnerPersistentObject){
@@ -77,6 +87,39 @@ void clearDirtyStatus(){
   void init(){}  
   abstract String get type();
   abstract bool isRoot();
+  Future<PersistentObject> fetchLink(String property, [Map links]){
+    var completer = new Completer<PersistentObject>();
+    if (links === null){
+      links = objectory.getSchema(type).links;
+    }          
+    if (links === null || !links.containsKey(property)){
+      throw "Link $property is not registered on class $type";
+    }
+    var value = map[property];    
+    if (value !== null){
+      objectory.findOne(links[property],{"_id":value}).then((res){
+        map[property] = res;
+        completer.complete(res);
+      });
+    }
+    else
+    {
+      completer.complete(null);
+    }      
+    return completer.future;
+  }
+  Future fetchLinks(){
+    var links = objectory.getSchema(type).links;
+    if (links === null ){
+      throw "Links are not registered on class $type";
+    }
+    var futures = new List<Future>();
+    for (var link in links.getKeys()){
+      futures.add(fetchLink(link,links));
+    }
+    return Futures.wait(futures);
+  }
+
 }
 abstract class RootPersistentObject extends PersistentObjectBase{
    ObjectId id;

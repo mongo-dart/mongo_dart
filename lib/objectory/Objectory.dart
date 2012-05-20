@@ -3,10 +3,18 @@ class ClassSchema{
   String className;
   FactoryMethod factoryMethod;
   Set<String> properties;
+  Map<String,String> components;
   Map<String,String> links;  
-  ClassSchema(this.className,this.factoryMethod,List<String> propertyList,
-    [this.links]){
+  ClassSchema(this.className,this.factoryMethod,List<String> propertyList,    
+    [this.components,this.links]){
     properties = new Set<String>.from(propertyList);
+    if (components !== null){
+      properties.addAll(components.getKeys());
+    }
+    if (links !== null){
+      properties.addAll(links.getKeys());
+    }
+
   }
     
 }
@@ -42,11 +50,23 @@ abstract class ObjectoryBaseImpl implements Objectory{
       result.id = map["_id"];    
     }      
     ClassSchema classSchema = schemata[className];
+    if (classSchema.components !== null){      
+      classSchema.components.forEach((property,componentClass){
+        PersistentObject component = map2Object(componentClass,map[property]);
+        result.setProperty(property,component);
+        result.clearDirtyStatus();
+      });
+    }
     if (classSchema.links !== null){      
       classSchema.links.forEach((property,linkClass){
-        PersistentObject linkObject = map2Object(linkClass,map[property]);
-        result.setProperty(property,linkObject);  
-        result.clearDirtyStatus();
+      //  print(property);
+        ObjectId linkId = map[property];
+        if (linkId !== null){
+          PersistentObject link = newInstance(linkClass);
+          link.id = linkId;
+          result.setProperty(property,link);
+          result.clearDirtyStatus();
+        }          
       });
     }
     return result;

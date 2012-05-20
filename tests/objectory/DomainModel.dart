@@ -8,6 +8,8 @@ interface IPerson{
   String lastName;
   Date birthday;
   Address address;  
+  Person father;
+  Person mother;
 }
 interface IAddress{
   String cityName;
@@ -44,6 +46,7 @@ void registerClasses(){
     ["cityName","zipCode","streetName"]));
   objectory.registerClass(new ClassSchema('Person',
     ()=>new Person(),
-    ["firstName","lastName","birthday","address"],
-    links: {"address": "Address"}));
+    ["firstName","lastName","birthday"],
+    components: {"address": "Address"},
+    links: {"father": "Person", "mother": "Person"}));
 }

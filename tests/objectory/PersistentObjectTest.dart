@@ -1,5 +1,6 @@
 #library("PersistenObjectTests");
 #import("../../lib/objectory/ObjectoryLib_vm.dart");
+#import("../../lib/bson/bson.dart");
 #import('../../third_party/testing/unittest/unittest_vm.dart');
 #source("DomainModel.dart");
 testAuthorCreation(){
@@ -33,17 +34,25 @@ testCompoundObject(){
   expect(person.isDirty()).isTrue();
   expect(person.address.isDirty()).isTrue();
 }
+testFailOnSettingUnsavedLinkObject(){
+  Person son = new Person();  
+  Person father = new Person();  
+  ;
+  Expect.throws(()=>son.father = father,reason:"Link object must be saved (have ObjectId)");
+}  
 testFailOnAbsentProperty(){
   IAuthor author = new Author();
   Expect.throws(()=>author.sdfsdfsdfgdfgdf,reason:"Must fail on missing property getter");
 }
 
 main(){
+  registerClasses();  
   group("PersistenObjectTests", ()  {
     test("testAuthorCreation",testAuthorCreation);
     test("testSetDirty",testSetDirty);
     test("testCompoundObject",testCompoundObject);
     test("testFailOnAbsentProperty",testFailOnAbsentProperty);
+    test("testFailOnSettingUnsavedLinkObject",testFailOnSettingUnsavedLinkObject);    
   });  
 
 }

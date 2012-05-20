@@ -63,13 +63,31 @@ testCompoundObject(){
     callbackDone();
   });
 }
-
-
+testObjectWithLinks(){
+  Person father = new Person();  
+  father.firstName = 'Father';
+  objectory.save(father);
+  Person son = new Person();  
+  son.firstName = 'Son';
+  son.father = father;
+  objectory.save(son);  
+  objectory.findOne('Person',query().id(son.id)).then((sonFromObjectory){
+    // Links must be fetched before use.
+    Expect.throws(()=>sonFromObjectory.father.firstName);
+    expect(sonFromObjectory.mother).equals(null);
+    sonFromObjectory.fetchLinks().then((_){
+      expect(sonFromObjectory.father.firstName).equals("Father");
+      expect(sonFromObjectory.mother).equals(null);
+      callbackDone();
+    });    
+  });
+}
 main(){  
   setUpObjectory().then((_) {    
     group("ObjectoryVM", ()  {
       asyncTest("testCompoundObject",1,testCompoundObject);   
       asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);         
+      asyncTest("testObjectWithLinks",1,testObjectWithLinks);               
       test("testNewInstanceMethod",testNewInstanceMethod);   
       test("testMap2ObjectMethod",testMap2ObjectMethod);       
     });  
