@@ -73,6 +73,7 @@ void clearDirtyStatus(){
         return this[property];
       }
       else {       
+        print("Not registered property $property on for class $type");
         super.noSuchMethod(function_name, args);
       }        
     }    

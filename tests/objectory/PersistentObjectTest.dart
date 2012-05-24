@@ -1,7 +1,7 @@
 #library("PersistenObjectTests");
 #import("../../lib/objectory/ObjectoryLib_vm.dart");
 #import("../../lib/bson/bson.dart");
-#import('../../third_party/testing/unittest/unittest_vm.dart');
+#import('../../../../dart/dart-sdk/lib/unittest/unittest.dart');
 #source("DomainModel.dart");
 testAuthorCreation(){
   Author author = new Author();

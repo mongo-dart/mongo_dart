@@ -1,9 +1,10 @@
 #library("ObjectoryVM");
 #import("../../lib/objectory/ObjectoryLib_vm.dart");
-#import('../../third_party/testing/unittest/unittest_vm.dart');
+#import('../../../../dart/dart-sdk/lib/unittest/unittest.dart');
 #source("DomainModel.dart");
 #source("../../lib/helpers/SelectorBuilder.dart");
 #source("../../lib/helpers/MapProxy.dart");
+List futures;
 Future<bool> setUpObjectory(){
   var res = new Completer();
 //  objectory.clearFactories();
@@ -15,6 +16,8 @@ Future<bool> setUpObjectory(){
   return res.future;
 }
 void testInsertionAndUpdate(){
+  Completer completer = new Completer();
+  futures.add(completer.future);  
   Author author = new Author();  
   author.name = 'Dan';
   author.age = 3;
@@ -26,6 +29,7 @@ void testInsertionAndUpdate(){
     expect(coll.length).equals(1);
     Author authFromMongo = coll[0];
     expect(authFromMongo.age).equals(4);    
+    completer.complete(true);
     callbackDone();
   });
 }
@@ -51,19 +55,24 @@ testMap2ObjectMethod(){
   expect(address.cityName).equals("44444");   
 }
 testCompoundObject(){
+  Completer completer = new Completer();
+  futures.add(completer.future);
   Person person = new Person();  
   person.address.cityName = 'Tyumen';
   person.address.streetName = 'Elm';  
   person.firstName = 'Dick';
-  objectory.save(person); ;
+  objectory.save(person);
   objectory.findOne('Person',query().id(person.id)).then((savedPerson){
     expect(savedPerson.firstName).equals('Dick');
     expect(savedPerson.address.streetName).equals('Elm');
     expect(savedPerson.address.cityName).equals('Tyumen');
+    completer.complete(true);
     callbackDone();
   });
 }
 testObjectWithLinks(){
+  Completer completer = new Completer();
+  futures.add(completer.future);  
   Person father = new Person();  
   father.firstName = 'Father';
   objectory.save(father);
@@ -78,18 +87,21 @@ testObjectWithLinks(){
     sonFromObjectory.fetchLinks().then((_){
       expect(sonFromObjectory.father.firstName).equals("Father");
       expect(sonFromObjectory.mother).equals(null);
+      completer.complete(true);      
       callbackDone();
     });    
   });
 }
 main(){  
+  futures = new List();  
   setUpObjectory().then((_) {    
-    group("ObjectoryVM", ()  {
+    group("ObjectoryVM", () {      
       asyncTest("testCompoundObject",1,testCompoundObject);   
       asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);         
       asyncTest("testObjectWithLinks",1,testObjectWithLinks);               
       test("testNewInstanceMethod",testNewInstanceMethod);   
-      test("testMap2ObjectMethod",testMap2ObjectMethod);       
+      test("testMap2ObjectMethod",testMap2ObjectMethod);      
+      //Futures.wait(futures).then((_)=>objectory.close());
     });  
   });    
 }

@@ -2,7 +2,7 @@
 #import("../lib/mongo.dart");
 #import("dart:io");
 #import("dart:builtin");
-#import('../third_party/testing/unittest/unittest_vm.dart');
+#import('../../../dart/dart-sdk/lib/unittest/unittest.dart');
 testCollectionCreation(){
   Db db = new Db('db');
   DbCollection collection = db.collection('student');

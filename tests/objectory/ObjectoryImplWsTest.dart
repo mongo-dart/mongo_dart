@@ -1,20 +1,21 @@
 #library("ObjectoryWS");
 #import("../../lib/objectory/ObjectoryLib_ws.dart");
 #import("../../lib/bson/bson.dart");
-#import('../../third_party/testing/unittest/unittest_vm.dart');
+//#import('../../../../dart/dart-sdk/lib/unittest/unittest.dart');
 #source("DomainModel.dart");
 Future<bool> setUpObjectory(){
   var res = new Completer();
 //  objectory.clearFactories();
-  objectory.open(url:"ws://localhost:8080").then((_){    
+  objectory.open(url:"ws://localhost:8080").then((_){
+//  new Future.immediate(true).then((_){    
 //    objectory.dropDb();
     print("I'm here");
-    registerClasses();
-    res.complete(true);
+//    registerClasses();
+//    res.complete(true);
   });    
   return res.future;
 }
-void testInsertionAndUpdate(){
+/*void testInsertionAndUpdate(){
   Author author = new Author();  
   author.name = 'Dan';
   author.age = 3;
@@ -80,28 +81,33 @@ testObjectWithLinks(){
       expect(sonFromObjectory.mother).equals(null);
       callbackDone();
     });    
-  });
+  });  
 }
+*/
 main(){  
   setUpObjectory().then((_) {    
-    objectory.onMessageFuture.then((_){
-      print("Now here ${objectory.socketId}");
-      objectory.save(new Person());    
-      Person person = new Person();
-      person.id = new ObjectId();
-      objectory.remove(person);
-//    print("End ${objectory.webSocket.bufferedAmount}");
-      objectory.webSocket.send("closing");
-      objectory.webSocket.close(123,"Normal closing");      
-      return;
-      });
+//    objectory.onMessageFuture.then((_){
+//      print("Now here ${objectory.socketId}");      
+//      Person person = new Person();
+//      print(person);
+//      person.firstName1 = "asdfasdf";
+//      print(person);
+//      person.fistName = 'Vadim';
+//      objectory.save(person);                
+      1.foo();
+      print("Before closing");
+      objectory.close();      
+//      return;
+//      });
     return;
-    group("ObjectoryVM", ()  {
+  /* 
+   group("ObjectoryVM", ()  {
       asyncTest("testCompoundObject",1,testCompoundObject);   
       asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);         
       asyncTest("testObjectWithLinks",1,testObjectWithLinks);               
       test("testNewInstanceMethod",testNewInstanceMethod);   
       test("testMap2ObjectMethod",testMap2ObjectMethod);       
     });  
+*/    
   });    
 }

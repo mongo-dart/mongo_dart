@@ -51,4 +51,7 @@ class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
   Future<bool> dropDb(){
     db.drop();
   }
+  void close(){
+    db.close();
+  }
 }

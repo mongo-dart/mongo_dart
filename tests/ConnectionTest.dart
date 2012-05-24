@@ -3,7 +3,7 @@
 #import("../lib/bson/bson.dart");
 #import("dart:io");
 #import('dart:builtin');
-#import('../third_party/testing/unittest/unittest_vm.dart');
+#import('../../../dart/dart-sdk/lib/unittest/unittest.dart');
 testPing(){
   Connection conn = new Connection();
   conn.connect();

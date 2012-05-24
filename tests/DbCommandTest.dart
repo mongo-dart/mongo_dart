@@ -1,6 +1,6 @@
 #library("dbcommand");
 #import("../lib/mongo.dart");
-#import('../third_party/testing/unittest/unittest_vm.dart');
+#import('../../../dart/dart-sdk/lib/unittest/unittest.dart');
 testDbCommandCreation(){
   Db db = new Db('mongo-dart-test');
   DbCommand dbCommand = new DbCommand(db,"student",0,0,1,{},{});

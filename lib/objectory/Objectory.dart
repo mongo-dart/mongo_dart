@@ -1,10 +1,13 @@
 typedef PersistentObject FactoryMethod();
 class ClassSchema{
+  static final SimpleProperty = 0;
+  static final InternalObject = 1;
+  static final ExternalObject = 2;
   String className;
   FactoryMethod factoryMethod;
   Set<String> properties;
   Map<String,String> components;
-  Map<String,String> links;  
+  Map<String,String> links;
   ClassSchema(this.className,this.factoryMethod,List<String> propertyList,    
     [this.components,this.links]){
     properties = new Set<String>.from(propertyList);
@@ -14,9 +17,10 @@ class ClassSchema{
     if (links !== null){
       properties.addAll(links.getKeys());
     }
-
-  }
+  }    
+  void property(String propertyName, String className, [int type = SimpleProperty]){
     
+  }
 }
 interface Objectory{  
   void registerClass(ClassSchema schema);
@@ -29,6 +33,7 @@ interface Objectory{
   Future<bool> open([String database, String url]);
   Future<bool> dropDb();
   ClassSchema getSchema(String className);
+  void close();
 }
 abstract class ObjectoryBaseImpl implements Objectory{
   Map<String,ClassSchema> schemata;

@@ -1,5 +1,5 @@
 #library("BsonTypesTest");
-#import('../../third_party/testing/unittest/unittest_vm.dart');
+#import('../../../../dart/dart-sdk/lib/unittest/unittest.dart');
 #import("../../lib/bson/bson.dart");
 typeTest(){
   Expect.isTrue(bsonObjectFrom(1234) is BsonInt);

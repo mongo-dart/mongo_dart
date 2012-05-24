@@ -1,7 +1,7 @@
 #library("dbtest");
 #import("../lib/mongo.dart");
 #import('dart:builtin');
-#import('../third_party/testing/unittest/unittest_vm.dart');
+#import('../../../dart/dart-sdk/lib/unittest/unittest.dart');
 testDatabaseName(){
   Db db = new Db('mongo-dart-test');
   String dbName;

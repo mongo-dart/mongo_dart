@@ -1,0 +1,4 @@
+allObjectoryTests.dart
+ObjectoryImplVmTest.dart
+ObjectoryImplWsTest.dart
+PersistentObjectTest.dart

@@ -1,5 +1,5 @@
 #library("bsonimpltest");
-#import('../../third_party/testing/unittest/unittest_vm.dart');
+#import('../../../../dart/dart-sdk/lib/unittest/unittest.dart');
 #import("../../lib/bson/bson.dart");
 testSerializeDeserialize(){
   var bson = new BSON();

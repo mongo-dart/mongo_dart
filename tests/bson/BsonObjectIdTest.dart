@@ -1,5 +1,5 @@
 #library("BsonObjectId");
-#import('../../third_party/testing/unittest/unittest_vm.dart');
+#import('../../../../dart/dart-sdk/lib/unittest/unittest.dart');
 #import("../../lib/bson/bson.dart");
 testObjectId(){
   var id1 = new ObjectId();
