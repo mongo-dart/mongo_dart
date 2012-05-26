@@ -13,8 +13,7 @@ class BsonRegexp extends BsonObject{
     createOptionsString();    
     bsonPattern = new BsonCString(pattern,false);
     bsonOptions = new BsonCString(options,false);
-  }
-  
+  }  
   get value()=>this;
   int get typeByte() => BSON.BSON_DATA_REGEXP;  
   byteLength()=>bsonPattern.byteLength()+bsonOptions.byteLength();

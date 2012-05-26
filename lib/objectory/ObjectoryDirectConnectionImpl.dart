@@ -13,6 +13,9 @@ class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
   ObjectoryDirectConnectionImpl._internal():super._internal();
   Db db;
   Future<bool> open([String database, String url]){
+    if (db !== null){
+      db.close();
+    }
     db = new Db(database);
     return db.open();
   }
@@ -26,9 +29,9 @@ class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
     }
     db.collection(persistentObject.type).remove({"_id":persistentObject.id});
   }
-  Future<List<PersistentObject>> find(String className,[Map selector]){
+  Future<List<IPersistent>> find(String className,[Map selector]){
     Completer completer = new Completer();
-    List<PersistentObject> result = new List<PersistentObject>();
+    List<IPersistent> result = new List<IPersistent>();
     db.collection(className)
       .find(selector)
       .each((map){
@@ -37,12 +40,12 @@ class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
       }).then((_) => completer.complete(result));
     return completer.future;  
   }
-  Future<PersistentObject> findOne(String className,[Map selector]){
+  Future<IPersistent> findOne(String className,[Map selector]){
     Completer completer = new Completer();    
     db.collection(className)
       .findOne(selector)
       .then((map){              
-        PersistentObject obj = objectory.map2Object(className,map);
+        IPersistent obj = objectory.map2Object(className,map);
         completer.complete(obj);
       });
     return completer.future;  

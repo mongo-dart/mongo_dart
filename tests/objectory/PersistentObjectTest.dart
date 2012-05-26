@@ -1,18 +1,18 @@
 #library("PersistenObjectTests");
 #import("../../lib/objectory/ObjectoryLib_vm.dart");
 #import("../../lib/bson/bson.dart");
-#import('../../../../dart/dart-sdk/lib/unittest/unittest.dart');
+#import('../../third_party/unittest/unittest.dart');
 #source("DomainModel.dart");
 testAuthorCreation(){
   Author author = new Author();
   author.name = 'vadim';
   author.age = 99;
   author.email = 'sdf';
-  expect(author.getKeys()[0]).equals("_id");
-  expect(author.getKeys()[1]).equals("name");
-  expect(author.getKeys()[2]).equals("age");
-  expect(author.getKeys().last()).equals("email");
-  expect(author.getKeys().length).equals(4);
+  expect(author.map.getKeys()[0]).equals("_id");
+  expect(author.map.getKeys()[1]).equals("name");
+  expect(author.map.getKeys()[2]).equals("age");
+  expect(author.map.getKeys().last()).equals("email");
+  expect(author.map.getKeys().length).equals(4);
   expect(author.name).equals('VADIM'); // converted to uppercase by custom  setter;
 }
 
@@ -26,7 +26,7 @@ testCompoundObject(){
   Person person = new Person();  
   person.address.cityName = 'Tyumen';
   person.address.streetName = 'Elm';  
-  person.firstName = 'Dick';
+  person.firstName = 'Dick';  
   Map map = person.map;
   expect(map["address"]["streetName"]).equals("Elm");
   expect(person.address.parent).equals(person);
@@ -41,7 +41,7 @@ testFailOnSettingUnsavedLinkObject(){
   Expect.throws(()=>son.father = father,reason:"Link object must be saved (have ObjectId)");
 }  
 testFailOnAbsentProperty(){
-  IAuthor author = new Author();
+  Author author = new Author();
   Expect.throws(()=>author.sdfsdfsdfgdfgdf,reason:"Must fail on missing property getter");
 }
 

@@ -55,7 +55,7 @@ class SelectorBuilder<K,V> extends MapProxy<K,V>{
     map[fieldName] = {"\$mod":[value,0]};
     return this;    
   }
-  SelectorBuilder match(String fieldName, String pattern,[bool multiLine, bool caseInsensitive, bool dotAll, bool extended]){    
+  SelectorBuilder match(String fieldName, String pattern,[bool multiLine, bool caseInsensitive, bool dotAll, bool extended]){        
     map[fieldName] = {'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
         dotAll:dotAll,extended:extended)};
     return this;    

@@ -1,5 +1,5 @@
 #library("bsonbinarytest");
-#import('../../../../dart/dart-sdk/lib/unittest/unittest.dart');
+#import('../../third_party/unittest/unittest.dart');
 #import("../../lib/bson/bson.dart");
 testUint8ListNegativeWrite(){
   Uint8List bl = new Uint8List(4);

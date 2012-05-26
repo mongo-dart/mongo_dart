@@ -1,9 +1,11 @@
-interface IAuthor{
+interface Author extends IPersistent default ObjectoryFactory{
+  Author();
   String name;
   int age;
   String email;
 }
-interface IPerson{
+interface Person extends IPersistent default ObjectoryFactory{
+  Person();
   String firstName;
   String lastName;
   Date birthday;
@@ -11,14 +13,15 @@ interface IPerson{
   Person father;
   Person mother;
 }
-interface IAddress{
+interface Address extends IPersistent default ObjectoryFactory{
+  Address();
   String cityName;
   String zipcode;
   String streetName;
 }
 
 
-class Author extends RootPersistentObject implements IAuthor{  
+class AuthorImpl extends RootPersistentObject implements Author{  
   String get type()=>'Author';
   set name(String value){
     if (value is String){
@@ -26,17 +29,23 @@ class Author extends RootPersistentObject implements IAuthor{
     }      
     setProperty('name', value);
   }
+  String get name()=>getProperty('name');
 }
-class Person extends RootPersistentObject implements IPerson{  
+class PersonImpl extends RootPersistentObject implements Person{  
   String get type()=>"Person";
-  init(){    
+  init(){
     address = new Address();
+//    setProperty("address",new Address());
   }
 }  
-class Address extends InnerPersistentObject implements IAddress{  
+class AddressImpl extends InnerPersistentObject implements Address{  
   String get type()=>"Address";
 }
-
+class ObjectoryFactory{
+  factory Author()=>new AuthorImpl();
+  factory Person()=>new PersonImpl();
+  factory Address()=>new AddressImpl();
+}
 void registerClasses(){
   objectory.registerClass(new ClassSchema('Author',
       ()=>new Author(),
@@ -50,3 +59,6 @@ void registerClasses(){
     components: {"address": "Address"},
     links: {"father": "Person", "mother": "Person"}));
 }
+final PERSON = 'Person';
+final AUTHOR = 'Author';
+final ADDRESS = 'Address';

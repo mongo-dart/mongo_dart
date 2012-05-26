@@ -1,5 +1,5 @@
 #library("bsonimpltest");
-#import('../../../../dart/dart-sdk/lib/unittest/unittest.dart');
+#import('../../third_party/unittest/unittest.dart');
 #import("../../lib/bson/bson.dart");
 testSerializeDeserialize(){
   var bson = new BSON();
@@ -15,6 +15,7 @@ testSerializeDeserialize(){
   buffer = bson.serialize(doc1);
   Expect.stringEquals('140000000461000c0000001030000f0000000000',buffer.toHexString());
   buffer.offset = 0;
+  
   root = bson.deserialize(buffer);  
   Expect.equals(15, root['a'][0]);
   doc1 = {'_id':5, 'a': [2,3,5]};    

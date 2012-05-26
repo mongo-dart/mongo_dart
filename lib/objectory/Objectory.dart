@@ -1,4 +1,4 @@
-typedef PersistentObject FactoryMethod();
+typedef IPersistent FactoryMethod();
 class ClassSchema{
   static final SimpleProperty = 0;
   static final InternalObject = 1;
@@ -18,18 +18,18 @@ class ClassSchema{
       properties.addAll(links.getKeys());
     }
   }    
-  void property(String propertyName, String className, [int type = SimpleProperty]){
+  void property(String propertyName, String propertyClass){
     
   }
 }
 interface Objectory{  
   void registerClass(ClassSchema schema);
-  PersistentObject newInstance(String className);
-  PersistentObject map2Object(String className, Map map);  
-  Future<PersistentObject> findOne(String className,[Map selector]);
-  Future<List<PersistentObject>> find(String className,[Map selector]);
-  void save(PersistentObject persistentObject);
-  void remove(PersistentObject persistentObject);
+  IPersistent newInstance(String className);
+  IPersistent map2Object(String className, Map map);  
+  Future<IPersistent> findOne(String className,[Map selector]);
+  Future<List<IPersistent>> find(String className,[Map selector]);
+  void save(IPersistent persistentObject);
+  void remove(IPersistent persistentObject);
   Future<bool> open([String database, String url]);
   Future<bool> dropDb();
   ClassSchema getSchema(String className);
@@ -43,13 +43,13 @@ abstract class ObjectoryBaseImpl implements Objectory{
   ClassSchema getSchema(String className){
     return schemata[className];
   }
-  PersistentObject newInstance(String className){
+  IPersistent newInstance(String className){
     if (schemata.containsKey(className)){
       return schemata[className].factoryMethod();
     }
     throw "Class $className have not been registered in Objectory";
   }
-  PersistentObject map2Object(String className, Map map){
+  IPersistent map2Object(String className, Map map){
     var result = newInstance(className);
     result.map = map;
     if (result.isRoot()){
@@ -58,7 +58,7 @@ abstract class ObjectoryBaseImpl implements Objectory{
     ClassSchema classSchema = schemata[className];
     if (classSchema.components !== null){      
       classSchema.components.forEach((property,componentClass){
-        PersistentObject component = map2Object(componentClass,map[property]);
+        IPersistent component = map2Object(componentClass,map[property]);
         result.setProperty(property,component);
         result.clearDirtyStatus();
       });

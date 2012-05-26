@@ -5,7 +5,8 @@ class Connection{
   Binary bufferToSend;
   Queue<MongoMessage> sendQueue;
   Binary messageBuffer;
-  Socket socket;  
+  Socket socket;
+  bool connected = false;
   Connection([this.serverConfig]){
     if (serverConfig === null){
       serverConfig = new ServerConfig();
@@ -24,7 +25,8 @@ class Connection{
         print("connect exception ${e}");
         completer.completeException(e);
       };
-      socket.onConnect = () {        
+      socket.onConnect = () {
+        connected = true;
         completer.complete(true);
       };
       return completer.future;

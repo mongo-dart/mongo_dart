@@ -2,7 +2,6 @@
 #import("ObjectoryImplVmTest.dart",prefix:"impl");
 #import("PersistentObjectTest.dart",prefix:"persistentObject");
 main(){  
-//  impl.main();
+  impl.main();
   persistentObject.main();
-  impl.main();  
 }

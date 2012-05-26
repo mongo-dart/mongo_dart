@@ -3,7 +3,7 @@
 #import("../lib/bson/bson.dart");
 #import("dart:io");
 #import("dart:builtin");
-#import('../../../dart/dart-sdk/lib/unittest/unittest.dart');
+#import('../third_party/unittest/unittest.dart');
 testSelectorBuilderCreation(){
   SelectorBuilder selector = query();
   expect(selector is Map && selector.isEmpty()).isTrue();

@@ -1,17 +1,26 @@
 // noSuchMethod() borrowed from Chris Buckett (chrisbuckett@gmail.com)
 // http://github.com/chrisbu/dartwatch-JsonObject
-interface PersistentObject{
+interface IPersistent{  
   noSuchMethod(String function_name, List args);
   void setProperty(String property, value);
   void init();
   String get type();
   void clearDirtyStatus();
+  bool isDirty();
   Future fetchLink(String property);
   Future fetchLinks();
   bool isRoot();
   Map map;
 }
-abstract class PersistentObjectBase extends MapProxy implements PersistentObject{  
+/*interface IPersistentRoot extends IPersistent{
+  var id;
+}
+interface IPersistentInner extends IPersistent{
+  IPersistent parent;
+  String pathToMe;  
+}
+*/
+abstract class PersistentObjectBase extends MapProxy implements IPersistent{  
   bool setupMode;
   Set<String> dirtyFields;
   PersistentObjectBase(){        
@@ -74,6 +83,7 @@ void clearDirtyStatus(){
       }
       else {       
         print("Not registered property $property on for class $type");
+        print(schema.properties);
         super.noSuchMethod(function_name, args);
       }        
     }    
@@ -83,14 +93,14 @@ void clearDirtyStatus(){
   void setProperty(String property, value){
     noSuchMethod('set:$property',[value]);
   }
-  Dynamic get(String property){
+  Dynamic getProperty(String property){
     return noSuchMethod('get:$property',[]);
   }  
   String toString()=>"$type($map)";
   void init(){}  
   abstract String get type();  
-  Future<PersistentObject> fetchLink(String property, [Map links]){
-    var completer = new Completer<PersistentObject>();
+  Future<IPersistent> fetchLink(String property, [Map links]){
+    var completer = new Completer<IPersistent>();
     if (links === null){
       links = objectory.getSchema(type).links;
     }          
@@ -128,7 +138,7 @@ abstract class RootPersistentObject extends PersistentObjectBase{
    bool isRoot()=>true;
 }
 abstract class InnerPersistentObject extends PersistentObjectBase{
-  PersistentObject parent;
+  IPersistent parent;
   String pathToMe;
   bool isRoot()=>false;
 }

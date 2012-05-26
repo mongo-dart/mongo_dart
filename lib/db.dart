@@ -25,6 +25,11 @@ class Db{
     connection.execute(message);
   }    
   Future<bool> open(){
+//    print("opening db");
+    if (connection.connected){
+      connection.close();
+      connection = new Connection(serverConfig);
+    }
     return connection.connect();
   }
   Future<Map> executeDbCommand(MongoMessage message){
@@ -88,6 +93,7 @@ class Db{
     return getLastError();
   }
   close(){
+//    print("closing db");
     connection.close();
   }
   

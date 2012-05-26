@@ -90,7 +90,7 @@ class Binary extends BsonObject{
     offset += 1;
   }
   int writeDouble(double value){    
-    byteList.setFloat64(offset, value);
+    byteArray.setFloat64(offset, value);
     offset+=8;
   } 
   int writeInt64(int value){    
