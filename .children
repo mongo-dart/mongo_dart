@@ -20,7 +20,6 @@ tests/DbCollectionTest.dart
 third_party/log4dart/LogLib.dart
 tests/DbTest.dart
 tests/bson/BsonObjectIdTest.dart
-tests/objectory/ObjectoryImplWsTest.dart
 third_party/unittest/html_config.dart
 examples/simpleUpdate.dart
 third_party/dart-crypto-lib/src/md5.dart
