@@ -3,7 +3,6 @@ lib/objectory/ObjectoryLib_vm.dart
 tests/allTests.dart
 tests/CursorTest.dart
 tests/DbCommandTest.dart
-lib/objectory/WebsocketClient.dart
 tests/objectory/allObjectoryTests.dart
 tests/objectory/PersistentObjectTest.dart
 lib/objectory/objectory_server.dart

@@ -35,7 +35,6 @@ class PersonImpl extends RootPersistentObject implements Person{
   String get type()=>"Person";
   init(){
     address = new Address();
-//    setProperty("address",new Address());
   }
 }  
 class AddressImpl extends InnerPersistentObject implements Address{  

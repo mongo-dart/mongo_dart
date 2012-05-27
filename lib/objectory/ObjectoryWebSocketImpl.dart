@@ -1,4 +1,4 @@
-Objectory get objectory() => new ObjectorySingleton._singleton();
+/*Objectory get objectory() => new ObjectorySingleton._singleton();
 abstract class ObjectorySingleton extends ObjectoryBaseImpl{
   static Objectory _objectory;
   ObjectorySingleton._internal();
@@ -114,7 +114,7 @@ class ObjectoryWebSocketImpl extends ObjectorySingleton{
     print("Closing objectory");
     webSocket.close(null,"Normal closing, socketId: $socketId");
   }
-/*  Future<List<PersistentObject>> find(String className,[Map selector]){
+  Future<List<PersistentObject>> find(String className,[Map selector]){
     Completer completer = new Completer();
     List<PersistentObject> result = new List<PersistentObject>();
     db.collection(className)
@@ -126,5 +126,6 @@ class ObjectoryWebSocketImpl extends ObjectorySingleton{
     return completer.future;  
   }
   
-*/  
+  
 }
+*/

@@ -99,7 +99,7 @@ testCursorGetMore(){
     }
     collection.insertAll(toInsert);  
     int count = 0;
-    db.getLastError().then((dummy){
+    db.getLastError().then((_){
     Cursor cursor = new Cursor(db,collection,limit:10);  
       cursor.each((v){
             count++;

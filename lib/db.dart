@@ -33,7 +33,7 @@ class Db{
     return connection.connect();
   }
   Future<Map> executeDbCommand(MongoMessage message){
-      Completer<bool> result = new Completer();
+      Completer<Map> result = new Completer();
       //print("executeDbCommand.message = ${message}");
       connection.query(message).then((replyMessage){
         //print("replyMessage = ${replyMessage}");

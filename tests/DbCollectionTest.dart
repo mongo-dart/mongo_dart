@@ -65,9 +65,9 @@ testFindEach(){
 }
 testDrop(){
   Db db = new Db('mongo-dart-test');
-  db.open().then((v){
+  db.open().then((_){
   db.dropCollection("testDrop").then((v)=>v);
-  db.dropCollection("testDrop").then((v){    
+  db.dropCollection("testDrop").then((__){    
     db.close();
     callbackDone();    
   });

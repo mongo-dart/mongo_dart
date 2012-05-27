@@ -50,7 +50,7 @@ class ObjectoryServer {
       db.drop();
     }  
     if (command == "update"){
-      db.collection(collection).update(obj);
+      db.collection(collection).update({"_id":obj["_id"]},obj);
     }
     if (command == "findOne"){
       db.collection(collection).findOne(obj).then((val)=>sendObject(connection,val));
