@@ -88,29 +88,28 @@ testCursorGetMore(){
   var res;
   Db db = new Db('mongo-dart-test');
   DbCollection collection;
+  int count = 0;
+  Cursor cursor;  
   db.open().chain((c){
     collection = db.collection('new_big_collection1');
     collection.remove();
     return db.getLastError();
-  }).then((dummy){
+  }).chain((dummy){
     List toInsert = new List();
     for (int n=0;n < 1000; n++){
       toInsert.add({"a":n});
     }
-    collection.insertAll(toInsert);  
-    int count = 0;
-    db.getLastError().then((_){
-    Cursor cursor = new Cursor(db,collection,limit:10);  
-      cursor.each((v){
-            count++;
-      }).then((v){
-        Expect.equals(1000, count);
-        Expect.equals(0,cursor.cursorId);
-        Expect.equals(Cursor.CLOSED,cursor.state);
-        db.close();
-        callbackDone();
-        });
-      });
+    collection.insertAll(toInsert);
+    return db.getLastError();
+  }).chain((_){
+    cursor = new Cursor(db,collection,limit:10);  
+    return cursor.each((v)=>count++);
+  }).then((v){
+    Expect.equals(1000, count);
+    Expect.equals(0,cursor.cursorId);
+    Expect.equals(Cursor.CLOSED,cursor.state);
+    db.close();
+    callbackDone();  
   });    
 }
 testCursorClosing(){
