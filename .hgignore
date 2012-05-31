@@ -1,2 +1,4 @@
 syntax: glob
 *.txt
+.children
+.project

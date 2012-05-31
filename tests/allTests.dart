@@ -6,7 +6,7 @@
 #import("DbCollectionTest.dart",prefix:"dbcollection");
 #import("DbTest.dart",prefix:"dbtest");
 #import("bson/allBsonTests.dart",prefix:"bson");
-#import("objectory/allobjectoryTests.dart",prefix:"objectory");
+#import("objectory/allObjectoryTests.dart",prefix:"objectory");
 #import("SelectorBuilderTest.dart",prefix:"helper");
 main(){
   bson.main();
