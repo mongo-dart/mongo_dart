@@ -2,6 +2,6 @@
 #import("../mongo.dart");
 #import("../bson/bson.dart");
 //#source("../helpers/MapProxy.dart");
-#source("PersistentObject.dart");
+#source("persistent_object.dart");
 #source("Objectory.dart");
-#source("ObjectoryDirectConnectionImpl.dart");
+#source("objectory_direct_connection_impl.dart");

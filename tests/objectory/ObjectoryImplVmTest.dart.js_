@@ -1,1 +1,0 @@
-throw 'Sorry, but I could not generate reasonable code to run.\n';
