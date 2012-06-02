@@ -3,7 +3,7 @@ class DbCollection{
   String collectionName;
   DbCollection(this.db, this.collectionName){}  
   String fullName() => "${db.databaseName}.$collectionName";
-  save(Map document){
+  void save(Map document){
     var id;
     bool createId = false;
     if (document.containsKey("_id")){
@@ -22,16 +22,16 @@ class DbCollection{
       insert(document);
     }
   }
-  insertAll(List<Map> documents){
+ void insertAll(List<Map> documents){
     MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
-    return db.executeDbCommand(insertMessage);   
+    db.executeMessage(insertMessage);   
   }
-  update(Map selector, Map document){
+  void update(Map selector, Map document){
     MongoUpdateMessage message = new MongoUpdateMessage(fullName(),selector, document, 0);
     return db.executeMessage(message);   
   }
   
-  insert(Map document){
+  void insert(Map document){
     return insertAll([document]);
   } 
   Cursor find([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
@@ -44,7 +44,7 @@ class DbCollection{
     return result;
   }
   Future drop() => db.dropCollection(collectionName);
-  remove([Map selector = const {}]) => db.removeFromCollection(collectionName, selector);
+  void remove([Map selector = const {}]) => db.removeFromCollection(collectionName, selector);
   Future count([Map selector = const {}]){
     Completer completer = new Completer();
     db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,selector)).then((reply){       

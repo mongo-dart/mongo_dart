@@ -92,7 +92,7 @@ class Db{
   Future<Map> wait(){
     return getLastError();
   }
-  close(){
+  void close(){
 //    print("closing db");
     connection.close();
   }

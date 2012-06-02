@@ -115,7 +115,7 @@ static final CLOSED = 2;
       return new Future.immediate(null);
     }
   }
-  nextEach(){
+  void nextEach(){
     nextObject().then((val){
       if (val === null){
         eachCallback = null;
@@ -139,7 +139,7 @@ static final CLOSED = 2;
     this.each((v)=>result.addLast(v)).then((v)=>completer.complete(result));
     return completer.future;    
   }
-  close(){
+  void close(){
     debug("Closing cursor, cursorId = $cursorId");
     if (cursorId != 0){      
       MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);
