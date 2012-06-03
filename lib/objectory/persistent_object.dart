@@ -80,8 +80,9 @@ void clearDirtyStatus() {
           if (value !== null) {            
             if (value.id === null){        
               throw "Error setting link property $property. Link object must have not null id";
-            }            
-            value = value.id;
+            }
+            refs[value.id.toHexString()] = value;
+            value = value.id;             
           }          
         }
         onValueChanging(property, value);
@@ -116,8 +117,8 @@ void clearDirtyStatus() {
   
   abstract String get type();
   
-  Future<bool> fetchLink(String property, [PropertySchema propertySchema, ObjectId id]) {    
-    var completer = new Completer<bool>();
+  Future<IPersistent> fetchLink(String property, [PropertySchema propertySchema, ObjectId id]) {    
+    var completer = new Completer<IPersistent>();
     if (propertySchema === null) {
       propertySchema = objectory.getSchema(type).properties[property];
     }          
@@ -137,13 +138,13 @@ void clearDirtyStatus() {
     }
     
     if (value === null) {
-      completer.complete(false);
+      completer.complete(this);
     }
     else {     
       if (value is ObjectId){
         objectory.findOne(propertySchema.type,{"_id":value}).then((res){
           refs[value.toHexString()] = res;        
-          completer.complete(true);
+          completer.complete(this);
         });
       }     
       else {
@@ -151,7 +152,7 @@ void clearDirtyStatus() {
         for (var _id in value) {
           futures.add(fetchLink(property,propertySchema,_id));          
         }
-        return Futures.wait(futures);
+        Futures.wait(futures).then((_) => completer.complete(this));
       }          
     }      
     return completer.future;

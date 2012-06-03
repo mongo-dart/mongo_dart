@@ -1,8 +1,10 @@
 tests/bson/bson_binary_test.dart
 tests/bson/bson_types_test.dart
+examples/objectory_blog/objectory_blog.dart
 tests/dbcollection_test.dart
 examples/types.dart
 lib/objectory/objectorylib_ws.dart
+examples/objectory_blog/domain_model.dart
 examples/simple_update.dart
 lib/objectory/objectory_server.dart
 lib/bson/bson.dart
