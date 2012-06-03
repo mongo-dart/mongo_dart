@@ -15,7 +15,8 @@ class ObjectId extends BsonObject{
     id.writeInt(Statics.nextIncrement,3,forceBigEndian:true);
   }
   int hashCode() => id.toHexString().hashCode();
-  String toString()=>"ObjectId(${id.toHexString()})";
+  String toString() => "ObjectId(${id.toHexString()})";
+  String toHexString() => id.toHexString();
   int get typeByte() => BSON.BSON_DATA_OID;
   get value() => this;
   int byteLength() => 12;

@@ -54,14 +54,12 @@ testObjectWithExternalRefs(){
     Person son = new Person();  
     son.firstName = 'Son';
     son.father = father;
-    objectory.save(son);  
+    objectory.save(son);
     objectory.findOne(PERSON, {"_id": son.id}).then((sonFromObjectory){
       // Links must be fetched before use.
-      Expect.throws(()=>sonFromObjectory.father.firstName);
-//      print(sonFromObjectory);
+      Expect.throws(()=>sonFromObjectory.father.firstName);      
       expect(sonFromObjectory.mother).equals(null);
-      sonFromObjectory.fetchLinks().then((_){
-//        print(sonFromObjectory);
+      sonFromObjectory.fetchLinks().then((_){  
         expect(sonFromObjectory.father.firstName).equals("Father");
         expect(sonFromObjectory.mother).equals(null);
         objectory.close();
@@ -76,7 +74,6 @@ testObjectWithCollectionOfExternalRefs(){
   Person daughter;
   Person sonFromObjectory;
   setUpObjectory().chain((_) {
-    print("1");
     father = new Person();  
     father.firstName = 'Father';
     objectory.save(father);
@@ -91,22 +88,17 @@ testObjectWithCollectionOfExternalRefs(){
     father.children.add(son);
     father.children.add(daughter);
     objectory.save(father);
-    print("2");
     return objectory.findOne(PERSON, {"_id": father.id});
   }).chain((fatherFromObjectory){
-      // Links must be fetched before use.
-    print("3");
-    print(fatherFromObjectory);
-    expect(fatherFromObjectory.children.length).equals(2);    
-    print("4");
+      // Links must be fetched before use.   
+    expect(fatherFromObjectory.children.length).equals(2);
     sonFromObjectory = father.children[0];
     Expect.throws(()=>sonFromObjectory.father);      
     return father.fetchLinks();
   }).chain((_) {
-    print("4");
-    sonFromObjectory = father.children[0];
+    sonFromObjectory = father.children[0];  
     expect(sonFromObjectory.mother).equals(null);
-    expect(sonFromObjectory.father.id).equals(father.id);
+    Expect.throws(() => sonFromObjectory.father.id);
     return sonFromObjectory.fetchLinks();
   }).then((_){
     expect(sonFromObjectory.father.firstName).equals("Father");
@@ -119,9 +111,8 @@ testObjectWithCollectionOfExternalRefs(){
 main(){    
   group("ObjectoryVM", () {        
     asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);
-    asyncTest("testCompoundObject",1,testCompoundObject);                   
-//    asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);
-    asyncTest("testObjectWithExternalRefs",1,testObjectWithExternalRefs);
-//    asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);    
+    asyncTest("testCompoundObject",1,testCompoundObject);                  
+    asyncTest("testObjectWithExternalRefs",1,testObjectWithExternalRefs);    
+    asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);
   });
 }

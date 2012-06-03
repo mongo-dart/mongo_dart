@@ -13,11 +13,11 @@ interface IPersistent{
   Map map;
 }
 abstract class PersistentObjectBase extends MapProxy implements IPersistent{
-  Map<String,RootPersistentObject> objectCache;  
+  Map<String,RootPersistentObject> refs;  
   bool setupMode;
   Set<String> dirtyFields;
   PersistentObjectBase() {
-    objectCache = new Map<String,RootPersistentObject>();
+    refs = new Map<String,RootPersistentObject>();
     if (isRoot()){
       map["_id"] = null;
     }                
@@ -46,9 +46,25 @@ void clearDirtyStatus() {
     }
     if (args.length == 0 && function_name.startsWith("get:")) {
       //synthetic getter
-      var property = function_name.replaceFirst("get:", "");      
-      if (schema.properties.containsKey(property)) {
-        return this[property];
+      var property = function_name.replaceFirst("get:", "");
+      PropertySchema propertySchema = schema.properties[property];      
+      if (propertySchema !== null) {
+        if (!propertySchema.externalRef || propertySchema.collection) {
+          return this[property];
+        }
+        else {
+          var result = this[property];
+          if (result === null) {
+            return result;
+          }
+          else {
+            result = refs[result.toHexString()];
+            if (result === null) {
+              throw "External ref ${propertySchema.name} has not been fetched yet";
+            }
+            return result;
+          }
+        }
       }
       else{
         super.noSuchMethod(function_name, args);
@@ -85,38 +101,58 @@ void clearDirtyStatus() {
     //if we get here, then we've not found it - throw.
     super.noSuchMethod(function_name, args);
   }
+  
   void setProperty(String property, value){
     noSuchMethod('set:$property',[value]);
   }
+  
   Dynamic getProperty(String property){
     return noSuchMethod('get:$property',[]);
-  }  
+  }
+  
   String toString()=>"$type($map)";
-  void init(){}  
-  abstract String get type();  
-  Future<IPersistent> fetchLink(String property, [PropertySchema propertySchema]){
-    
-    var completer = new Completer<IPersistent>();
-    if (propertySchema === null){
+  
+  void init(){}
+  
+  abstract String get type();
+  
+  Future<bool> fetchLink(String property, [PropertySchema propertySchema, ObjectId id]) {    
+    var completer = new Completer<bool>();
+    if (propertySchema === null) {
       propertySchema = objectory.getSchema(type).properties[property];
     }          
-    if (propertySchema === null){
+    if (propertySchema === null) {
       throw "Property $property is not registered on class $type";
     }
     if (!propertySchema.externalRef){
       print(propertySchema);
       throw "Property $property is not of external ref type on class $type";
-    }    
-    var value = map[property];    
-    if (value !== null){
-      objectory.findOne(propertySchema.type,{"_id":value}).then((res){
-        map[property] = res;
-        completer.complete(res);
-      });
     }
-    else
-    {
-      completer.complete(null);
+    var value;
+    if (id === null) { 
+     value = map[property];
+    }
+    else {
+     value = id;
+    }
+    
+    if (value === null) {
+      completer.complete(false);
+    }
+    else {     
+      if (value is ObjectId){
+        objectory.findOne(propertySchema.type,{"_id":value}).then((res){
+          refs[value.toHexString()] = res;        
+          completer.complete(true);
+        });
+      }     
+      else {
+        var futures = new List<Future>();
+        for (var _id in value) {
+          futures.add(fetchLink(property,propertySchema,_id));          
+        }
+        return Futures.wait(futures);
+      }          
     }      
     return completer.future;
   }
@@ -126,10 +162,9 @@ void clearDirtyStatus() {
       if (propertySchema.externalRef) {
         futures.add(fetchLink(propertySchema.name, propertySchema));
       }          
-    }
+    }              
     return Futures.wait(futures);
   }
-
 }
 abstract class RootPersistentObject extends PersistentObjectBase{
    ObjectId id;

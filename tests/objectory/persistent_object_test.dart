@@ -88,7 +88,34 @@ testMap2ObjectWithListOfInternalObjects() {
   expect(customer.addresses[1].cityName).equals("Moscow");
   expect(customer.addresses[0].cityName).equals("Mexico");
 }
-
+testObjectWithListtOfExternalRefs2Map() {
+  Person father;
+  Person son;
+  Person daughter;
+  Person sonFromObjectory;
+  father = new Person();  
+  father.firstName = 'Father';
+  father.id = new ObjectId();
+  father.map["_id"] = father.id;
+  son = new Person();  
+  son.firstName = 'Son';
+  son.father = father;
+  son.id = new ObjectId();
+  son.map["_id"] = son.id;
+  daughter = new Person();
+  daughter.father = father;
+  daughter.firstName = 'daughter';
+  daughter.id = new ObjectId();
+  daughter.map["_id"] = daughter.id;
+  father.children.add(son);  
+  father.children.add(null);
+  father.children[1] = daughter;
+  father.refs[son.id.toHexString()] = son;
+  father.refs[daughter.id.toHexString()] = daughter;
+  expect(father.map["children"][0]).equals(son);
+  expect(father.map["children"][1]).equals(daughter);  
+  print(father);    
+}
 main(){
   registerClasses();  
   group("PersistenObjectTests", ()  {
@@ -100,6 +127,7 @@ main(){
     test("testMap2ObjectMethod",testMap2ObjectMethod);
     test("testNewInstanceMethod",testNewInstanceMethod);
     test("testObjectWithListOfInternalObjects2Map",testObjectWithListOfInternalObjects2Map);
-    test("testMap2ObjectWithListOfInternalObjects",testMap2ObjectWithListOfInternalObjects);        
+    test("testMap2ObjectWithListOfInternalObjects",testMap2ObjectWithListOfInternalObjects);
+    test("testObjectWithListtOfExternalRefs2Map",testObjectWithListtOfExternalRefs2Map);
   });
 }

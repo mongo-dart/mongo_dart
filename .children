@@ -30,6 +30,7 @@ tests/objectory/all_objectory_tests.dart
 tests/bson/bson_impl_test.dart
 third_party/unittest/html_enhanced_config.dart
 third_party/dart-crypto-lib/test/browser/test.dart
+tests/objectory/domain_model.dart
 third_party/log4dart/test/TestRunner.dart
 third_party/unittest/unittest.dart
 examples/raw_queries.dart

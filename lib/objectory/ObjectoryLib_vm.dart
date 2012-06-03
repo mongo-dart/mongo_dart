@@ -5,4 +5,5 @@
 #source("objectory.dart");
 #source("schema.dart");
 #source("persistent_list.dart");
+#source("externalref.dart");
 #source("objectory_direct_connection_impl.dart");

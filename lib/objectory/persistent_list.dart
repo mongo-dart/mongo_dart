@@ -1,20 +1,28 @@
 class PersistentList<T> implements List<T>{
   IPersistent parent;
   String pathToMe;  
-  final List<T> _list;
+  final List _list;
   
   PersistentList(this._list);
+  
+  toString() => "PersistentList($_list)";
   
   void setDirty(String propertyName) {
     parent.setDirty(pathToMe);    
   }
-  
-  void operator[]=(int index, T value){
-    _list[index] = value;
+  internValue(T value) {
+    var result = value;
     if (value is InnerPersistentObject) {
       value.parent = parent;
       value.pathToMe = pathToMe;
     }
+    if (value is RootPersistentObject) {
+      result = value.id;
+    }
+    return result;
+  }
+  void operator[]=(int index, T value){
+    _list[index] = internValue(value);
     setDirty(null);
   }
   
@@ -24,7 +32,12 @@ class PersistentList<T> implements List<T>{
       PropertySchema propertySchema = objectory.getSchema(parent.type).properties[pathToMe];
       if (propertySchema.internalObject) {
         result = objectory.map2Object(propertySchema.type, result);
-      }          
+      }
+      if (propertySchema.externalRef) {
+        if (result !== null) {
+          result = parent.refs[result.toHexString()];
+        }            
+      }
     }
     return result;
   }
@@ -51,7 +64,7 @@ class PersistentList<T> implements List<T>{
   List getRange(int start, int length) => _list.getRange(start, length);
   
   void add(T element){
-    _list.add(element);
+    _list.add(internValue(element));
     setDirty(null);
   }
   
