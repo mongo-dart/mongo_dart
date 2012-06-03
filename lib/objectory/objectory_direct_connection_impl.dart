@@ -44,8 +44,11 @@ class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
     Completer completer = new Completer();    
     db.collection(className)
       .findOne(selector)
-      .then((map){              
-        IPersistent obj = objectory.map2Object(className,map);
+      .then((map){
+        IPersistent obj;
+        if (map !== null) {
+          obj = objectory.map2Object(className,map);
+        }  
         completer.complete(obj);
       });
     return completer.future;  

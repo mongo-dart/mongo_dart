@@ -1,27 +1,3 @@
-typedef IPersistent FactoryMethod();
-class ClassSchema{
-  static final SimpleProperty = 0;
-  static final InternalObject = 1;
-  static final ExternalObject = 2;
-  String className;
-  FactoryMethod factoryMethod;
-  Set<String> properties;
-  Map<String,String> components;
-  Map<String,String> links;
-  ClassSchema(this.className,this.factoryMethod,List<String> propertyList,    
-    [this.components,this.links]){
-    properties = new Set<String>.from(propertyList);
-    if (components !== null){
-      properties.addAll(components.getKeys());
-    }
-    if (links !== null){
-      properties.addAll(links.getKeys());
-    }
-  }    
-  void property(String propertyName, String propertyClass){
-    
-  }
-}
 interface Objectory{  
   void registerClass(ClassSchema schema);
   IPersistent newInstance(String className);
@@ -54,29 +30,35 @@ abstract class ObjectoryBaseImpl implements Objectory{
     result.map = map;
     if (result.isRoot()){
       result.id = map["_id"];    
-    }      
-    ClassSchema classSchema = schemata[className];
-    if (classSchema.components !== null){      
-      classSchema.components.forEach((property,componentClass){
-        IPersistent component = map2Object(componentClass,map[property]);
-        result.setProperty(property,component);
-        result.clearDirtyStatus();
-      });
     }
-    if (classSchema.links !== null){      
-      classSchema.links.forEach((property,linkClass){
-      //  print(property);
-        ObjectId linkId = map[property];
-        if (linkId !== null){
-          RootPersistentObject link = newInstance(linkClass);
-          link.id = linkId;
-          result.setProperty(property,link);
-          result.clearDirtyStatus();
-        }          
-      });
+    var propertyValue;
+    for (var propertySchema in schemata[className].properties.getValues()) {
+      bool b = false;
+      if (propertySchema.collection) {        
+        propertyValue = new PersistentList<IPersistent>(map[propertySchema.name]);
+        result.setProperty(propertySchema.name,propertyValue);
+      }
+      else {
+        if (propertySchema.internalObject) {
+          propertyValue = map2Object(propertySchema.type,map[propertySchema.name]);
+          propertyValue.parent = result;
+          propertyValue.pathToMe = propertySchema.name;
+          result.setProperty(propertySchema.name,propertyValue);          
+        }
+        if (propertySchema.externalRef) {
+          ObjectId linkId = map[propertySchema.name];
+          if (linkId !== null){
+            propertyValue = newInstance(propertySchema.type);
+            propertyValue.id = linkId;
+            result.setProperty(propertySchema.name,propertyValue);            
+          } 
+        }        
+      }            
+      result.clearDirtyStatus();      
     }
     return result;
   }
+  List<IPersistent> list2listOfObjects(){}
   void clearSchemata(){
     schemata.clear();
   }

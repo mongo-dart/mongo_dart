@@ -1,13 +1,9 @@
 #library("ObjectoryVM");
 #import("../../lib/objectory/ObjectoryLib_vm.dart");
 #import('../../third_party/unittest/unittest.dart');
-#source("domain_model.dart");
-#source("../../lib/helpers/selector_builder.dart");
-#source("../../lib/helpers/map_proxy.dart");
-List futures;
+#import("domain_model.dart");
 Future<bool> setUpObjectory(){
   var res = new Completer();
-//  objectory.clearFactories();
   objectory.open("ObjectoryTest").then((_){    
     objectory.dropDb();
     registerClasses();
@@ -15,6 +11,7 @@ Future<bool> setUpObjectory(){
   });    
   return res.future;
 }
+
 void testInsertionAndUpdate(){
   setUpObjectory().then((_) {
     Author author = new Author();  
@@ -33,33 +30,6 @@ void testInsertionAndUpdate(){
     });
   });
 }
-testNewInstanceMethod(){
-  setUpObjectory().then((_) {  
-    Author author = objectory.newInstance('Author');
-    expect(author is Author).isTrue();
-    objectory.close();
-  });       
-}
-testMap2ObjectMethod(){
-  setUpObjectory().then((_) {  
-    Map map = {
-      "name": "Vadim",
-      "age": 300,
-      "email": "nobody@know.it"};
-    Author author = objectory.map2Object("Author",map);
-    //Not converted to upperCase because setter has not been invoked
-    expect(author.name).equals("Vadim"); 
-    expect(author.age).equals(300);
-    expect(author.email).equals("nobody@know.it");
-    map = {
-      "streetName": "333",
-      "cityName": "44444"
-        };
-    Address address = objectory.map2Object("Address",map);  
-    expect(address.cityName).equals("44444");
-    objectory.close();
-  });  
-}
 testCompoundObject(){
   setUpObjectory().then((_) {  
     Person person = new Person();  
@@ -67,7 +37,7 @@ testCompoundObject(){
     person.address.streetName = 'Elm';  
     person.firstName = 'Dick';
     objectory.save(person);
-    objectory.findOne(PERSON,query().id(person.id)).then((savedPerson){
+    objectory.findOne(PERSON, {"_id": person.id}).then((savedPerson){
       expect(savedPerson.firstName).equals('Dick');
       expect(savedPerson.address.streetName).equals('Elm');
       expect(savedPerson.address.cityName).equals('Tyumen');
@@ -76,7 +46,7 @@ testCompoundObject(){
     });        
   });
 }
-testObjectWithLinks(){
+testObjectWithExternalRefs(){
   setUpObjectory().then((_) {
     Person father = new Person();  
     father.firstName = 'Father';
@@ -85,11 +55,13 @@ testObjectWithLinks(){
     son.firstName = 'Son';
     son.father = father;
     objectory.save(son);  
-    objectory.findOne(PERSON,query().id(son.id)).then((sonFromObjectory){
+    objectory.findOne(PERSON, {"_id": son.id}).then((sonFromObjectory){
       // Links must be fetched before use.
       Expect.throws(()=>sonFromObjectory.father.firstName);
+//      print(sonFromObjectory);
       expect(sonFromObjectory.mother).equals(null);
       sonFromObjectory.fetchLinks().then((_){
+//        print(sonFromObjectory);
         expect(sonFromObjectory.father.firstName).equals("Father");
         expect(sonFromObjectory.mother).equals(null);
         objectory.close();
@@ -98,12 +70,58 @@ testObjectWithLinks(){
     });
   });  
 }
+testObjectWithCollectionOfExternalRefs(){
+  Person father;
+  Person son;
+  Person daughter;
+  Person sonFromObjectory;
+  setUpObjectory().chain((_) {
+    print("1");
+    father = new Person();  
+    father.firstName = 'Father';
+    objectory.save(father);
+    son = new Person();  
+    son.firstName = 'Son';
+    son.father = father;
+    objectory.save(son);
+    daughter = new Person();
+    daughter.father = father;
+    daughter.firstName = 'daughter';
+    objectory.save(daughter);
+    father.children.add(son);
+    father.children.add(daughter);
+    objectory.save(father);
+    print("2");
+    return objectory.findOne(PERSON, {"_id": father.id});
+  }).chain((fatherFromObjectory){
+      // Links must be fetched before use.
+    print("3");
+    print(fatherFromObjectory);
+    expect(fatherFromObjectory.children.length).equals(2);    
+    print("4");
+    sonFromObjectory = father.children[0];
+    Expect.throws(()=>sonFromObjectory.father);      
+    return father.fetchLinks();
+  }).chain((_) {
+    print("4");
+    sonFromObjectory = father.children[0];
+    expect(sonFromObjectory.mother).equals(null);
+    expect(sonFromObjectory.father.id).equals(father.id);
+    return sonFromObjectory.fetchLinks();
+  }).then((_){
+    expect(sonFromObjectory.father.firstName).equals("Father");
+    expect(sonFromObjectory.mother).equals(null);
+    objectory.close();
+    callbackDone();
+  });
+}
+
 main(){    
-  group("ObjectoryVM", () { 
-    asyncTest("testCompoundObject",1,testCompoundObject);   
-    asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);         
-    asyncTest("testObjectWithLinks",1,testObjectWithLinks);               
-    test("testNewInstanceMethod",testNewInstanceMethod);   
-    test("testMap2ObjectMethod",testMap2ObjectMethod);
+  group("ObjectoryVM", () {        
+    asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);
+    asyncTest("testCompoundObject",1,testCompoundObject);                   
+//    asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);
+    asyncTest("testObjectWithExternalRefs",1,testObjectWithExternalRefs);
+//    asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);    
   });
 }

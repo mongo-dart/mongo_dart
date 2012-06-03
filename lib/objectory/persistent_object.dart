@@ -12,37 +12,31 @@ interface IPersistent{
   bool isRoot();
   Map map;
 }
-/*interface IPersistentRoot extends IPersistent{
-  var id;
-}
-interface IPersistentInner extends IPersistent{
-  IPersistent parent;
-  String pathToMe;  
-}
-*/
-abstract class PersistentObjectBase extends MapProxy implements IPersistent{  
+abstract class PersistentObjectBase extends MapProxy implements IPersistent{
+  Map<String,RootPersistentObject> objectCache;  
   bool setupMode;
   Set<String> dirtyFields;
-  PersistentObjectBase(){        
+  PersistentObjectBase() {
+    objectCache = new Map<String,RootPersistentObject>();
     if (isRoot()){
       map["_id"] = null;
     }                
     init();
     dirtyFields = new Set<String>();
   }  
-  void setDirty(String fieldName){
+  void setDirty(String fieldName) {
     if (dirtyFields === null){
       return;
     }
     dirtyFields.add(fieldName);
   }  
-void clearDirtyStatus(){
+void clearDirtyStatus() {
   dirtyFields.clear();
 }
-  onValueChanging(String fieldName, newValue){
+  onValueChanging(String fieldName, newValue) {
     setDirty(fieldName);
   }
-  isDirty(){
+  isDirty() {
     return !dirtyFields.isEmpty();
   }
   noSuchMethod(String function_name, List args) {
@@ -52,8 +46,8 @@ void clearDirtyStatus(){
     }
     if (args.length == 0 && function_name.startsWith("get:")) {
       //synthetic getter
-      var property = function_name.replaceFirst("get:", "");
-      if (schema.properties.contains(property)) {
+      var property = function_name.replaceFirst("get:", "");      
+      if (schema.properties.containsKey(property)) {
         return this[property];
       }
       else{
@@ -63,19 +57,20 @@ void clearDirtyStatus(){
     else if (args.length == 1 && function_name.startsWith("set:")) {
       //synthetic setter
       var value = args[0];
-      var property = function_name.replaceFirst("set:", "");      
-      if (schema.properties.contains(property)) {
-        if (schema.links !== null){
-          if (schema.links.containsKey(property)){
-            if (value.id === null){
+      var property = function_name.replaceFirst("set:", "");
+      PropertySchema propertySchema = schema.properties[property];
+      if (propertySchema !== null) {
+        if (propertySchema.externalRef && !propertySchema.collection){
+          if (value !== null) {            
+            if (value.id === null){        
               throw "Error setting link property $property. Link object must have not null id";
             }            
             value = value.id;
-          }
+          }          
         }
         onValueChanging(property, value);
         this[property] = value;
-        if (value is InnerPersistentObject){
+        if (value is InnerPersistentObject || value is PersistentList){
           value.pathToMe = property;
           value.parent = this;
         } 
@@ -99,17 +94,22 @@ void clearDirtyStatus(){
   String toString()=>"$type($map)";
   void init(){}  
   abstract String get type();  
-  Future<IPersistent> fetchLink(String property, [Map links]){
+  Future<IPersistent> fetchLink(String property, [PropertySchema propertySchema]){
+    
     var completer = new Completer<IPersistent>();
-    if (links === null){
-      links = objectory.getSchema(type).links;
+    if (propertySchema === null){
+      propertySchema = objectory.getSchema(type).properties[property];
     }          
-    if (links === null || !links.containsKey(property)){
-      throw "Link $property is not registered on class $type";
+    if (propertySchema === null){
+      throw "Property $property is not registered on class $type";
     }
+    if (!propertySchema.externalRef){
+      print(propertySchema);
+      throw "Property $property is not of external ref type on class $type";
+    }    
     var value = map[property];    
     if (value !== null){
-      objectory.findOne(links[property],{"_id":value}).then((res){
+      objectory.findOne(propertySchema.type,{"_id":value}).then((res){
         map[property] = res;
         completer.complete(res);
       });
@@ -121,13 +121,11 @@ void clearDirtyStatus(){
     return completer.future;
   }
   Future fetchLinks(){
-    var links = objectory.getSchema(type).links;
-    if (links === null ){
-      throw "Links are not registered on class $type";
-    }
-    var futures = new List<Future>();
-    for (var link in links.getKeys()){
-      futures.add(fetchLink(link,links));
+    var futures = new List();
+    for (var propertySchema in objectory.getSchema(type).properties.getValues()) {
+      if (propertySchema.externalRef) {
+        futures.add(fetchLink(propertySchema.name, propertySchema));
+      }          
     }
     return Futures.wait(futures);
   }
@@ -141,4 +139,10 @@ abstract class InnerPersistentObject extends PersistentObjectBase{
   IPersistent parent;
   String pathToMe;
   bool isRoot()=>false;
+  void setDirty(String fieldName){
+    super.setDirty(fieldName);
+    if (parent !== null) {
+      parent.setDirty(pathToMe);
+    }
+  }  
 }
