@@ -32,7 +32,7 @@ testCompoundObject(){
   expect(person.address.parent).equals(person);
   expect(person.address.pathToMe).equals("address");
   expect(person.isDirty()).isTrue();
-  expect(person.address.isDirty()).isTrue();
+//  expect(person.address.isDirty()).isTrue();
 }
 testFailOnSettingUnsavedLinkObject(){
   Person son = new Person();  
@@ -77,8 +77,10 @@ testObjectWithListOfInternalObjects2Map() {
   var map = customer.map;
   expect(map["name"]).equals("Tequila corporation");  
   expect(map["addresses"].length).equals(2);
+  expect(map["addresses"][0] is! IPersistent).isTrue();
   expect(map["addresses"][0]["cityName"]).equals("Mexico");
   expect(map["addresses"][1]["cityName"]).equals("Moscow");
+  
 }
 testMap2ObjectWithListOfInternalObjects() {
   var map = {"_id": null, "name": "Tequila corporation", "addresses": [{"cityName": "Mexico"}, {"cityName": "Moscow"}]};
@@ -97,25 +99,41 @@ testObjectWithListtOfExternalRefs2Map() {
   father.firstName = 'Father';
   father.id = new ObjectId();
   father.map["_id"] = father.id;
+  objectory.cache[father.id.toHexString()] = father;
   son = new Person();  
   son.firstName = 'Son';
   son.father = father;
   son.id = new ObjectId();
   son.map["_id"] = son.id;
+  objectory.cache[son.id.toHexString()] = son;
   daughter = new Person();
   daughter.father = father;
   daughter.firstName = 'daughter';
   daughter.id = new ObjectId();
   daughter.map["_id"] = daughter.id;
+  objectory.cache[daughter.id.toHexString()] = daughter;
   father.children.add(son);  
   father.children.add(null);
   father.children[1] = daughter;
   father.refs[son.id.toHexString()] = son;
   father.refs[daughter.id.toHexString()] = daughter;
-  expect(father.map["children"][0]).equals(son);
-  expect(father.map["children"][1]).equals(daughter);  
-  print(father);    
+  expect(father.map["children"][0]).equals(son.id);
+  expect(father.map["children"][1]).equals(daughter.id);
 }
+testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
+  User user = new User();
+  user.login = 'testLogin';
+  user.name = 'TestUser';  
+  user.id = new ObjectId();
+  user.map["_id"] = user.id;
+  objectory.cache[user.id.toHexString()] = user;
+  Map articleMap = {"title": "test article", "body": "sasdfasdfasdf", 
+                    "comments": [{"body": "Excellent", "user": user.id}]};               
+  Article article = objectory.map2Object(ARTICLE,articleMap);
+  expect(article.map["comments"][0]["user"]).equals(user.id);
+  expect(article.comments[0].user).equals(user);
+}
+
 main(){
   registerClasses();  
   group("PersistenObjectTests", ()  {
@@ -129,5 +147,6 @@ main(){
     test("testObjectWithListOfInternalObjects2Map",testObjectWithListOfInternalObjects2Map);
     test("testMap2ObjectWithListOfInternalObjects",testMap2ObjectWithListOfInternalObjects);
     test("testObjectWithListtOfExternalRefs2Map",testObjectWithListtOfExternalRefs2Map);
+    test("testMap2ObjectWithListtOfInternalObjectsWithExternalRefs",testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);    
   });
 }

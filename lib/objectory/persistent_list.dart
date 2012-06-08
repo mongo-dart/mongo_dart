@@ -1,46 +1,82 @@
+class _ValueConverter{
+  IPersistent parent;
+  String pathToMe;
+  
+  _ValueConverter(this.parent,this.pathToMe);
+  
+   IPersistent convertValue(value) {
+    var result;
+    PropertySchema propertySchema = objectory.getSchema(parent.type).properties[pathToMe];
+    if (propertySchema.internalObject) {
+      if (value is IPersistent) {
+        result = value;
+      } else {
+        result = objectory.map2Object(propertySchema.type, value);
+      }          
+    }
+    else if (propertySchema.containExternalRef) {      
+      if (value !== null) {
+        result = objectory.cache[value.toHexString()];
+      }
+      if (result === null) {
+        throw "Object $value of class ${propertySchema.type} has not been fetched from objectory yet";
+      }
+    }
+    else {
+      throw "Wrong property schema $propertySchema";
+    }
+    return result;
+  }
+}
+class PersistentIterator<T> implements Iterator<T> {
+  Iterator _it;
+  _ValueConverter valueConverter;  
+  PersistentIterator(this._it, this.valueConverter);  
+  T next() => valueConverter.convertValue(_it.next());
+  bool hasNext() => _it.hasNext();
+}
+
 class PersistentList<T> implements List<T>{
   IPersistent parent;
   String pathToMe;  
   final List _list;
-  
-  PersistentList(this._list);
+  List get internalList() => _list;
+  _ValueConverter _valueConverter;
+  PersistentList(this._list,[this.parent, this.pathToMe]);
   
   toString() => "PersistentList($_list)";
   
   void setDirty(String propertyName) {
     parent.setDirty(pathToMe);    
   }
-  internValue(T value) {
-    var result = value;
+  
+  _ValueConverter get valueConverter(){
+    if (_valueConverter === null) {
+      _valueConverter = new _ValueConverter(parent,pathToMe);
+    }
+    return _valueConverter;
+  }  
+  
+  internValue(T value) {  
     if (value is InnerPersistentObject) {
       value.parent = parent;
       value.pathToMe = pathToMe;
+      return value.map;
     }
     if (value is RootPersistentObject) {
-      result = value.id;
+      return value.id;
     }
-    return result;
+    return value;
   }
+    
   void operator[]=(int index, T value){
     _list[index] = internValue(value);
     setDirty(null);
   }
   
   T operator[](int index) {
-    var result = _list[index];
-    if (result is !IPersistent) {
-      PropertySchema propertySchema = objectory.getSchema(parent.type).properties[pathToMe];
-      if (propertySchema.internalObject) {
-        result = objectory.map2Object(propertySchema.type, result);
-      }
-      if (propertySchema.externalRef) {
-        if (result !== null) {
-          result = parent.refs[result.toHexString()];
-        }            
-      }
-    }
-    return result;
-  }
+    return valueConverter.convertValue(_list[index]);
+  }  
   bool isEmpty() => _list.isEmpty();
   
   void forEach(void f(element)) => _list.forEach(f);
@@ -53,7 +89,7 @@ class PersistentList<T> implements List<T>{
   
   bool some(bool f(T element)) => _list.some(f);
   
-  Iterator<T> iterator() => _list.iterator();
+  Iterator<T> iterator() => new PersistentIterator(_list.iterator(),valueConverter);
   
   int indexOf(T element, [int start = 0]) => _list.indexOf(element, start);
   

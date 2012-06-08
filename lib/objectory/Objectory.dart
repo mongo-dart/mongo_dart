@@ -1,7 +1,9 @@
 interface Objectory{  
   void registerClass(ClassSchema schema);
   IPersistent newInstance(String className);
-  IPersistent map2Object(String className, Map map);  
+  IPersistent map2Object(String className, Map map);
+  void addToCache(IPersistent obj);
+  IPersistent findInCache(ObjectId id);
   Future<IPersistent> findOne(String className,[Map selector]);
   Future<List<IPersistent>> find(String className,[Map selector]);
   void save(IPersistent persistentObject);
@@ -12,13 +14,25 @@ interface Objectory{
   void close();
 }
 abstract class ObjectoryBaseImpl implements Objectory{
+  Map<String,IPersistent> cache;
   Map<String,ClassSchema> schemata;
   ObjectoryBaseImpl(){
     schemata = new  Map<String,ClassSchema>();
+    cache = new Map<String,IPersistent>();
   }
+  
   ClassSchema getSchema(String className){
     return schemata[className];
   }
+  
+  void addToCache(IPersistent obj) {
+    cache[obj.id.toHexString()] = obj;
+  }
+  
+  IPersistent findInCache(ObjectId id) {
+    return cache[id.toHexString()];
+  }
+  
   IPersistent newInstance(String className){
     if (schemata.containsKey(className)){
       return schemata[className].factoryMethod();
@@ -26,6 +40,17 @@ abstract class ObjectoryBaseImpl implements Objectory{
     throw "Class $className have not been registered in Objectory";
   }
   IPersistent map2Object(String className, Map map){
+    if (map.containsKey("_id")) {
+      var id = map["_id"];
+      if (id !== null) {
+        var res = cache[id.toHexString()];
+        if (res !== null) {
+          print("Object from cache:  $res");
+          return res;
+        }
+      }        
+    }
+    
     var result = newInstance(className);
     result.map = map;
     if (result.isRoot()){
@@ -45,17 +70,14 @@ abstract class ObjectoryBaseImpl implements Objectory{
           propertyValue.pathToMe = propertySchema.name;
           result.setProperty(propertySchema.name,propertyValue);          
         }
-        if (propertySchema.externalRef) {
-          ObjectId linkId = map[propertySchema.name];
-          if (linkId !== null){
-            propertyValue = newInstance(propertySchema.type);
-            propertyValue.id = linkId;
-            result.setProperty(propertySchema.name,propertyValue);            
-          } 
-        }        
       }            
       result.clearDirtyStatus();      
-    }
+    }    
+    if (result.isRoot()) {
+      if (result.id !== null) {
+        objectory.addToCache(result);
+      }          
+    }        
     return result;
   }
   List<IPersistent> list2listOfObjects(){}

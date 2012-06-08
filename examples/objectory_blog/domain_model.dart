@@ -41,7 +41,7 @@ class ArticleImpl extends RootPersistentObject implements Article {
   }
 }
 
-class CommentImpl extends RootPersistentObject implements Comment {
+class CommentImpl extends InnerPersistentObject implements Comment {
   String get type() => "Comment";
 }
 
@@ -69,7 +69,7 @@ void registerClasses() {
   schema.addProperty(new PropertySchema("title", "String"));
   schema.addProperty(new PropertySchema("body", "String"));
   schema.addProperty(new PropertySchema("author", "Author",externalRef: true));
-  schema.addProperty(new PropertySchema("comments", "Comment",internalObject: true, collection: true));
+  schema.addProperty(new PropertySchema("comments", "Comment",internalObject: true, collection: true, containExternalRef: true));
   objectory.registerClass(schema); 
 
   schema = new ClassSchema('Comment',()=>new Comment());

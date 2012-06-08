@@ -55,6 +55,7 @@ testObjectWithExternalRefs(){
     son.firstName = 'Son';
     son.father = father;
     objectory.save(son);
+    
     objectory.findOne(PERSON, {"_id": son.id}).then((sonFromObjectory){
       // Links must be fetched before use.
       Expect.throws(()=>sonFromObjectory.father.firstName);      
@@ -91,14 +92,12 @@ testObjectWithCollectionOfExternalRefs(){
     return objectory.findOne(PERSON, {"_id": father.id});
   }).chain((fatherFromObjectory){
       // Links must be fetched before use.   
-    expect(fatherFromObjectory.children.length).equals(2);
-    sonFromObjectory = father.children[0];
-    Expect.throws(()=>sonFromObjectory.father);      
+    expect(fatherFromObjectory.children.length).equals(2);    
+    Expect.throws(()=>father.children[0]);      
     return father.fetchLinks();
   }).chain((_) {
     sonFromObjectory = father.children[0];  
     expect(sonFromObjectory.mother).equals(null);
-    Expect.throws(() => sonFromObjectory.father.id);
     return sonFromObjectory.fetchLinks();
   }).then((_){
     expect(sonFromObjectory.father.firstName).equals("Father");
@@ -108,11 +107,62 @@ testObjectWithCollectionOfExternalRefs(){
   });
 }
 
+testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {  
+  User joe;
+  User lisa;
+  Author author;
+  setUpObjectory().chain((_) {
+    author = new Author();
+    author.name = 'Vadim';
+    objectory.save(author);
+    joe = new User();
+    joe.login = 'joe';
+    joe.name = 'Joe Great';
+    objectory.save(joe);
+    lisa = new User();
+    lisa.login = 'lisa';
+    lisa.name = 'Lisa Fine';
+    objectory.save(lisa);
+    var article = new Article();
+    article.title = 'My first article';
+    article.body = "It's been a hard days night";
+    var comment = new Comment();
+    comment.body = 'great article, dude';
+    comment.user = joe;    
+    article.comments.add(comment);
+    article.author = author;
+    comment = new Comment();
+    comment.body = 'It is lame, sweety';
+    comment.user = lisa;    
+    article.comments.add(comment);
+    objectory.save(article);
+    return objectory.findOne(ARTICLE);
+  }).chain((artcl) {
+    expect(artcl.comments[0] is IPersistent).isTrue();    
+    for (var each in artcl.comments) {
+      expect(each is IPersistent).isTrue();     
+    }
+    Expect.throws(()=>artcl.comments[0].user);
+    print(objectory.cache);
+    return artcl.fetchLinks();
+    
+  }).then((artcl) {
+    print(objectory.cache);
+    expect(artcl.comments[0].user.name).equals('Joe Great');
+    expect(artcl.comments[1].user.name).equals('Lisa Fine');
+    expect(artcl.author.name).equals('VADIM');
+    objectory.close();
+    callbackDone();
+  });
+}
+
+
 main(){    
   group("ObjectoryVM", () {        
-    asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);
-    asyncTest("testCompoundObject",1,testCompoundObject);                  
-    asyncTest("testObjectWithExternalRefs",1,testObjectWithExternalRefs);    
-    asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);
+//    asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);
+//    asyncTest("testCompoundObject",1,testCompoundObject);                  
+//    asyncTest("testObjectWithExternalRefs",1,testObjectWithExternalRefs);    
+//    asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);
+    asyncTest("testMap2ObjectWithListtOfInternalObjectsWithExternalRefs",1,testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
   });
 }

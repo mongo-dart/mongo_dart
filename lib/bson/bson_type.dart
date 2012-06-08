@@ -80,7 +80,7 @@ BsonObject bsonObjectFromTypeByte(int typeByte){
     case BSON.BSON_DATA_OBJECT:
       return new BsonMap({});
     case BSON.BSON_DATA_OID:
-      return new ObjectId();
+      return new BsonObjectId();
     case BSON.BSON_DATA_NULL:
       return new BsonNull();
     case BSON.BSON_DATA_BOOLEAN:
