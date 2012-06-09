@@ -73,9 +73,10 @@ void registerClasses() {
   objectory.registerClass(schema); 
 
   schema = new ClassSchema('Comment',()=>new Comment());
+  schema.addProperty(new PropertySchema("date", "Date"));
+  schema.addProperty(new PropertySchema("user", "User",externalRef: true));  
   schema.addProperty(new PropertySchema("title", "String"));
   schema.addProperty(new PropertySchema("body", "String"));
-  schema.addProperty(new PropertySchema("user", "User",externalRef: true));
   objectory.registerClass(schema); 
   
 }

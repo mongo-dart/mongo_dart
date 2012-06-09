@@ -101,11 +101,6 @@ void clearDirtyStatus() {
         onValueChanging(property, value);
         this.map[property] = value;
         return;
-//        if (value is InnerPersistentObject || value is PersistentList){
-//          value.pathToMe = property;
-//          value.parent = this;
-//        } 
-//        return this.map[property];
       }
       else {       
         print("Not registered property $property on for class $type");
@@ -131,8 +126,7 @@ void clearDirtyStatus() {
   
   String get type() => "PersistentObjectBase";
   
-  Future<IPersistent> fetchLink(String property, [PropertySchema propertySchema, ObjectId id]) {
-    print("fetchLink(String $property, [PropertySchema propertySchema, ObjectId $id]) {");  
+  Future<IPersistent> fetchLink(String property, [PropertySchema propertySchema, ObjectId objecId]) {  
     var completer = new Completer<IPersistent>();
     if (propertySchema === null) {
       propertySchema = objectory.getSchema(type).properties[property];
@@ -145,8 +139,8 @@ void clearDirtyStatus() {
       throw "Property $property is not of external ref type on class $type";
     }    
     var value;
-    if (id !== null) {
-      value = id;
+    if (objecId !== null) {
+      value = objecId;
     }    
     if (value === null) {
       value = map[property];

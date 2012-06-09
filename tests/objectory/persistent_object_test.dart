@@ -99,19 +99,19 @@ testObjectWithListtOfExternalRefs2Map() {
   father.firstName = 'Father';
   father.id = new ObjectId();
   father.map["_id"] = father.id;
-  objectory.cache[father.id.toHexString()] = father;
+  objectory.addToCache(father);
   son = new Person();  
   son.firstName = 'Son';
   son.father = father;
   son.id = new ObjectId();
   son.map["_id"] = son.id;
-  objectory.cache[son.id.toHexString()] = son;
+  objectory.addToCache(son);
   daughter = new Person();
   daughter.father = father;
   daughter.firstName = 'daughter';
   daughter.id = new ObjectId();
   daughter.map["_id"] = daughter.id;
-  objectory.cache[daughter.id.toHexString()] = daughter;
+  objectory.addToCache(daughter);
   father.children.add(son);  
   father.children.add(null);
   father.children[1] = daughter;
@@ -126,7 +126,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   user.name = 'TestUser';  
   user.id = new ObjectId();
   user.map["_id"] = user.id;
-  objectory.cache[user.id.toHexString()] = user;
+  objectory.addToCache(user);
   Map articleMap = {"title": "test article", "body": "sasdfasdfasdf", 
                     "comments": [{"body": "Excellent", "user": user.id}]};               
   Article article = objectory.map2Object(ARTICLE,articleMap);

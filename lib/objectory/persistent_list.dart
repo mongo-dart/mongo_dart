@@ -4,7 +4,7 @@ class _ValueConverter{
   
   _ValueConverter(this.parent,this.pathToMe);
   
-   IPersistent convertValue(value) {
+   convertValue(value) {
     var result;
     PropertySchema propertySchema = objectory.getSchema(parent.type).properties[pathToMe];
     if (propertySchema.internalObject) {

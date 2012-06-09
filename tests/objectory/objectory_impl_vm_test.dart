@@ -143,11 +143,9 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
       expect(each is IPersistent).isTrue();     
     }
     Expect.throws(()=>artcl.comments[0].user);
-    print(objectory.cache);
     return artcl.fetchLinks();
     
   }).then((artcl) {
-    print(objectory.cache);
     expect(artcl.comments[0].user.name).equals('Joe Great');
     expect(artcl.comments[1].user.name).equals('Lisa Fine');
     expect(artcl.author.name).equals('VADIM');
