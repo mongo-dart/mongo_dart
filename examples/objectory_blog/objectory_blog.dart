@@ -21,12 +21,12 @@ main(){
     author.name = 'William Shakespeare';
     author.email = 'william@shakespeare.com';
     author.age = 587;
-    objectory.save(author);
+    author.save();
     author = new Author();
     author.name = 'Jorge Luis Borges';
     author.email = 'jorge@borges.com';
     author.age = 123;
-    objectory.save(author);    
+    author.save();    
     return objectory.find(AUTHOR);
   }).chain((auths){  
     print("===================================================================================");
@@ -41,12 +41,12 @@ main(){
     user.name = 'John Doe';
     user.login = 'jdoe';
     user.email = 'john@doe.com';
-    objectory.save(user);
+    user.save();
     user = new User();
     user.name = 'Lucy Smith';
     user.login = 'lsmith';
     user.email = 'lucy@smith.com';
-    objectory.save(user);
+    user.save();
     return objectory.find(USER);
   }).chain((usrs){  
     print("===================================================================================");
@@ -73,7 +73,7 @@ main(){
     comment.body = "I love this article!";
     comment.user = users['jdoe'];
     article.comments.add(comment);    
-    objectory.save(article);
+    article.save();
     
     article = new Article();
     article.title = 'I must have seen thy face before';
@@ -84,7 +84,7 @@ main(){
     comment.body = "great article!";
     comment.user = users['jdoe'];
     article.comments.add(comment);
-    objectory.save(article);
+    article.save();
     return objectory.find(ARTICLE);  
   }).chain((articles){    
     var futures = new List();

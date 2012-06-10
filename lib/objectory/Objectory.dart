@@ -1,12 +1,12 @@
 interface Objectory{  
   void registerClass(ClassSchema schema);
-  PersistentObject newInstance(String className);
-  PersistentObject map2Object(String className, Map map);
-  void addToCache(PersistentObject obj);
-  PersistentObject findInCache(ObjectId id);
-  Future<PersistentObject> findOne(String className,[Map selector]);
-  Future<List<PersistentObject>> find(String className,[Map selector]);
-  void save(PersistentObject persistentObject);
+  BasePersistentObject newInstance(String className);
+  BasePersistentObject map2Object(String className, Map map);
+  void addToCache(RootPersistentObject obj);
+  RootPersistentObject findInCache(ObjectId id);
+  Future<RootPersistentObject> findOne(String className,[Map selector]);
+  Future<List<RootPersistentObject>> find(String className,[Map selector]);
+  void save(RootPersistentObject persistentObject);
   void remove(PersistentObject persistentObject);
   Future<bool> open([String database, String url]);
   Future<bool> dropDb();

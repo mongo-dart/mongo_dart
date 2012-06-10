@@ -33,9 +33,9 @@ class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
     db.collection(persistentObject.type).remove({"_id":persistentObject.id});
   }
   
-  Future<List<PersistentObject>> find(String className,[Map selector]){
+  Future<List<RootPersistentObject>> find(String className,[Map selector]){
     Completer completer = new Completer();
-    List<PersistentObject> result = new List<PersistentObject>();
+    var result = new List<RootPersistentObject>();
     db.collection(className)
       .find(selector)
       .each((map){
@@ -45,7 +45,7 @@ class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
     return completer.future;  
   }
   
-  Future<PersistentObject> findOne(String className,[Map selector]){
+  Future<RootPersistentObject> findOne(String className,[Map selector]){
     Completer completer = new Completer();
     var obj;
     if (selector !== null && selector.containsKey("_id")) {
@@ -58,11 +58,11 @@ class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
       db.collection(className)
         .findOne(selector)
         .then((map){
-          obj = cache[map["_id"].toHexString()];          
+          obj = findInCache(map["_id"]);          
           if (obj === null) {
             if (map !== null) {
               obj = objectory.map2Object(className,map);
-              cache[obj.id.toHexString()] = obj;
+              addToCache(obj);
             }
           }
           completer.complete(obj);

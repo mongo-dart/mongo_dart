@@ -1,13 +1,4 @@
 interface PersistentObject{
-//  bool isRoot();
-//  Map map;  
-//  ObjectId id;
-//  noSuchMethod(String function_name, List args);
-//  void setProperty(String property, value);
-//  void init();
-//  String get type();
-//  void clearDirtyStatus();
-//  bool isDirty();
   Future fetchLink(String property);
   Future fetchLinks();
   void save();
@@ -20,12 +11,12 @@ abstract class BasePersistentObject implements PersistentObject{
   
   BasePersistentObject() {
     map = new LinkedHashMap();
-    if (isRoot()){
-      map["_id"] = null;
-    }                
+    _initMap();
     init();
     dirtyFields = new Set<String>();
   }
+  
+  abstract _initMap();
   
   void setDirty(String fieldName) {
     if (dirtyFields === null){
@@ -125,8 +116,6 @@ abstract class BasePersistentObject implements PersistentObject{
     return noSuchMethod('get:$property',[]);
   }
   
-  bool isRoot()=>false;
-  
   String toString()=>"$type($map)";
   
   void init(){}
@@ -197,12 +186,24 @@ abstract class BasePersistentObject implements PersistentObject{
 }
 abstract class RootPersistentObject extends BasePersistentObject{
    ObjectId id;
-   bool isRoot()=>true;
+   
+   void _initMap() {
+     map["_id"] = null;
+   }
+   void remove() {
+     objectory.remove(this);
+   }
+   
+   void save() {
+     objectory.save(this);
+   }
 }
 abstract class InternalPersistentObject extends BasePersistentObject{
   BasePersistentObject parent;
   String pathToMe;
-  bool isRoot()=>false;
+  
+  void _initMap() {}
+  
   void setDirty(String fieldName){
     super.setDirty(fieldName);
     if (parent !== null) {
