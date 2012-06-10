@@ -160,7 +160,7 @@ abstract class BasePersistentObject implements PersistentObject{
     }
     else {      
       if (value is ObjectId){
-        objectory.findOne(propertySchema.type,{"_id":value}).then((res){        
+        objectory.findOne(new ObjectoryQueryBuilder(propertySchema.type).id(value)).then((res){        
           completer.complete(this);
         });
       }     

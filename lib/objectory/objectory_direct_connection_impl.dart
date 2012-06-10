@@ -33,39 +33,44 @@ class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
     db.collection(persistentObject.type).remove({"_id":persistentObject.id});
   }
   
-  Future<List<RootPersistentObject>> find(String className,[Map selector]){
+  Future<List<RootPersistentObject>> find(ObjectoryQueryBuilder selector){    
     Completer completer = new Completer();
     var result = new List<RootPersistentObject>();
-    db.collection(className)
-      .find(selector)
+    db.collection(selector.className)
+      .find(selector.map)
       .each((map){
-        RootPersistentObject obj = objectory.map2Object(className,map);
+        RootPersistentObject obj = objectory.map2Object(selector.className,map);
         result.add(obj);
       }).then((_) => completer.complete(result));
     return completer.future;  
   }
   
-  Future<RootPersistentObject> findOne(String className,[Map selector]){
+  Future<RootPersistentObject> findOne(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
     var obj;
-    if (selector !== null && selector.containsKey("_id")) {
-      obj = cache[selector["_id"].toHexString()];
+    if (selector.map.containsKey("_id")) {
+      obj = findInCache(selector.map["_id"]);
     }
     if (obj !== null) {
       completer.complete(obj);
     }  
     else {
-      db.collection(className)
-        .findOne(selector)
+      db.collection(selector.className)
+        .findOne(selector.map)
         .then((map){
-          obj = findInCache(map["_id"]);          
-          if (obj === null) {
-            if (map !== null) {
-              obj = objectory.map2Object(className,map);
-              addToCache(obj);
-            }
+          if (map === null) {
+           completer.complete(null); 
           }
-          completer.complete(obj);
+          else {
+            obj = findInCache(map["_id"]);          
+            if (obj === null) {
+              if (map !== null) {
+                obj = objectory.map2Object(selector.className,map);
+                addToCache(obj);
+                }              
+              }
+            completer.complete(obj);
+          }              
         });
       }    
     return completer.future;  

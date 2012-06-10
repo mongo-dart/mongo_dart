@@ -5,7 +5,7 @@ Future<bool> setUpObjectory(){
   var res = new Completer();
   objectory.open("ObjectoryBlog").then((_){    
     objectory.dropDb();
-    registerClasses();
+    registerClasses();        
     res.complete(true);
   });    
   return res.future;
@@ -27,7 +27,7 @@ main(){
     author.email = 'jorge@borges.com';
     author.age = 123;
     author.save();    
-    return objectory.find(AUTHOR);
+    return objectory.find($Author.sortBy('age'));
   }).chain((auths){  
     print("===================================================================================");
     print(">> Authors ordered by age ascending");
@@ -47,7 +47,7 @@ main(){
     user.login = 'lsmith';
     user.email = 'lucy@smith.com';
     user.save();
-    return objectory.find(USER);
+    return objectory.find($User.sortBy('login'));
   }).chain((usrs){  
     print("===================================================================================");
     print(">> >> Users ordered by login ascending");
@@ -85,7 +85,7 @@ main(){
     comment.user = users['jdoe'];
     article.comments.add(comment);
     article.save();
-    return objectory.find(ARTICLE);  
+    return objectory.find($Article);  
   }).chain((articles){    
     var futures = new List();
     print("===================================================================================");
@@ -102,7 +102,7 @@ main(){
       });
     }
     return Futures.wait(futures);
-  }).then((_) {
+  }).then((_) { 
    objectory.close();
   });      
 }

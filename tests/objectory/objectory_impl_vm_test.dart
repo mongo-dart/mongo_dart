@@ -17,11 +17,11 @@ void testInsertionAndUpdate(){
     Author author = new Author();  
     author.name = 'Dan';
     author.age = 3;
-    author.email = 'who@cares.net';  
-    objectory.save(author); // First insert;
+    author.email = 'who@cares.net';
+    author.save();
     author.age = 4;
-    objectory.save(author); // Then update;
-    objectory.find(AUTHOR).then((coll){
+    author.save();
+    objectory.find($Author).then((coll){
       expect(coll.length).equals(1);
       Author authFromMongo = coll[0];
       expect(authFromMongo.age).equals(4);
@@ -32,12 +32,12 @@ void testInsertionAndUpdate(){
 }
 testCompoundObject(){
   setUpObjectory().then((_) {  
-    Person person = new Person();  
+    var person = new Person();
     person.address.cityName = 'Tyumen';
     person.address.streetName = 'Elm';  
     person.firstName = 'Dick';
-    objectory.save(person);
-    objectory.findOne(PERSON, {"_id": person.id}).then((savedPerson){
+    person.save();
+    objectory.findOne($Person.id(person.id)).then((savedPerson){
       expect(savedPerson.firstName).equals('Dick');
       expect(savedPerson.address.streetName).equals('Elm');
       expect(savedPerson.address.cityName).equals('Tyumen');
@@ -50,13 +50,12 @@ testObjectWithExternalRefs(){
   setUpObjectory().then((_) {
     Person father = new Person();  
     father.firstName = 'Father';
-    objectory.save(father);
+    father.save();    
     Person son = new Person();  
     son.firstName = 'Son';
     son.father = father;
-    objectory.save(son);
-    
-    objectory.findOne(PERSON, {"_id": son.id}).then((sonFromObjectory){
+    son.save();    
+    objectory.findOne($Person.id(son.id)).then((sonFromObjectory){
       // Links must be fetched before use.
       Expect.throws(()=>sonFromObjectory.father.firstName);      
       expect(sonFromObjectory.mother).equals(null);
@@ -77,19 +76,19 @@ testObjectWithCollectionOfExternalRefs(){
   setUpObjectory().chain((_) {
     father = new Person();  
     father.firstName = 'Father';
-    objectory.save(father);
+    father.save();
     son = new Person();  
     son.firstName = 'Son';
     son.father = father;
-    objectory.save(son);
+    son.save();
     daughter = new Person();
     daughter.father = father;
     daughter.firstName = 'daughter';
-    objectory.save(daughter);
+    daughter.save();
     father.children.add(son);
     father.children.add(daughter);
-    objectory.save(father);
-    return objectory.findOne(PERSON, {"_id": father.id});
+    father.save();
+    return objectory.findOne($Person.id(father.id));
   }).chain((fatherFromObjectory){
       // Links must be fetched before use.   
     expect(fatherFromObjectory.children.length).equals(2);    
@@ -111,18 +110,18 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   User joe;
   User lisa;
   Author author;
-  setUpObjectory().chain((_) {
+  setUpObjectory().chain((_) {    
     author = new Author();
     author.name = 'Vadim';
-    objectory.save(author);
+    author.save();
     joe = new User();
     joe.login = 'joe';
     joe.name = 'Joe Great';
-    objectory.save(joe);
+    joe.save();
     lisa = new User();
     lisa.login = 'lisa';
     lisa.name = 'Lisa Fine';
-    objectory.save(lisa);
+    lisa.save();    
     var article = new Article();
     article.title = 'My first article';
     article.body = "It's been a hard days night";
@@ -136,7 +135,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
     comment.user = lisa;    
     article.comments.add(comment);
     objectory.save(article);
-    return objectory.findOne(ARTICLE);
+    return objectory.findOne($Article.sortBy('title'));
   }).chain((artcl) {
     expect(artcl.comments[0] is PersistentObject).isTrue();    
     for (var each in artcl.comments) {

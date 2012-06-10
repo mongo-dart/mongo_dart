@@ -140,10 +140,9 @@ void registerClasses() {
   objectory.registerClass(schema);  
   
 }
-final PERSON = 'Person';
-final AUTHOR = 'Author';
-final ADDRESS = 'Address';
-final CUSTOMER = 'Customer';
-final USER = 'User';
-final ARTICLE = 'Article';
-final COMMENT = 'Comment';
+
+ObjectoryQueryBuilder get $Person() => new ObjectoryQueryBuilder('Person');
+ObjectoryQueryBuilder get $Author() => new ObjectoryQueryBuilder('Author');
+ObjectoryQueryBuilder get $Customer() => new ObjectoryQueryBuilder('Customer');
+ObjectoryQueryBuilder get $User() => new ObjectoryQueryBuilder('User');
+ObjectoryQueryBuilder get $Article() => new ObjectoryQueryBuilder('Article');

@@ -17,13 +17,13 @@ testAuthorCreation(){
 }
 
 testSetDirty(){
-  Author author = new Author();
+  var author = new Author();
   author.name = "Vadim";
   expect(author.dirtyFields.length).equals(1);
   expect(author.isDirty()).isTrue();  
 }
 testCompoundObject(){
-  Person person = new Person();  
+  var person = new Person();  
   person.address.cityName = 'Tyumen';
   person.address.streetName = 'Elm';  
   person.firstName = 'Dick';  
@@ -35,8 +35,8 @@ testCompoundObject(){
 //  expect(person.address.isDirty()).isTrue();
 }
 testFailOnSettingUnsavedLinkObject(){
-  Person son = new Person();  
-  Person father = new Person();  
+  var son = new Person();  
+  var father = new Person();  
   ;
   Expect.throws(()=>son.father = father,reason:"Link object must be saved (have ObjectId)");
 }  
@@ -75,16 +75,16 @@ testObjectWithListOfInternalObjects2Map() {
   address.cityName = "Moscow";
   customer.addresses.add(address);
   var map = customer.map;
+  
   expect(map["name"]).equals("Tequila corporation");  
   expect(map["addresses"].length).equals(2);
   expect(map["addresses"][0] is! PersistentObject).isTrue();
   expect(map["addresses"][0]["cityName"]).equals("Mexico");
-  expect(map["addresses"][1]["cityName"]).equals("Moscow");
-  
+  expect(map["addresses"][1]["cityName"]).equals("Moscow");  
 }
 testMap2ObjectWithListOfInternalObjects() {
   var map = {"_id": null, "name": "Tequila corporation", "addresses": [{"cityName": "Mexico"}, {"cityName": "Moscow"}]};
-  Customer customer = objectory.map2Object(CUSTOMER, map);
+  var customer = objectory.map2Object($Customer.className, map);
   expect(customer.name).equals("Tequila corporation");
   expect(customer.addresses.length).equals(2);
   expect(customer.addresses[1].cityName).equals("Moscow");
@@ -127,7 +127,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   objectory.addToCache(user);
   Map articleMap = {"title": "test article", "body": "sasdfasdfasdf", 
                     "comments": [{"body": "Excellent", "user": user.id}]};               
-  Article article = objectory.map2Object(ARTICLE,articleMap);
+  Article article = objectory.map2Object($Article.className,articleMap);
   expect(article.map["comments"][0]["user"]).equals(user.id);
   expect(article.comments[0].user).equals(user);
 }

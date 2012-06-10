@@ -78,7 +78,7 @@ void registerClasses() {
   objectory.registerClass(schema); 
   
 }
-final USER = 'User';
-final AUTHOR = 'Author';
-final ARTICLE = 'Article';
-final COMMENT = 'Comment';
+
+ObjectoryQueryBuilder get $Author() => new ObjectoryQueryBuilder('Author');
+ObjectoryQueryBuilder get $User() => new ObjectoryQueryBuilder('User');
+ObjectoryQueryBuilder get $Article() => new ObjectoryQueryBuilder('Article');

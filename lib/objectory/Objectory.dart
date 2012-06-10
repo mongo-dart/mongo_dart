@@ -4,8 +4,8 @@ interface Objectory{
   BasePersistentObject map2Object(String className, Map map);
   void addToCache(RootPersistentObject obj);
   RootPersistentObject findInCache(ObjectId id);
-  Future<RootPersistentObject> findOne(String className,[Map selector]);
-  Future<List<RootPersistentObject>> find(String className,[Map selector]);
+  Future<RootPersistentObject> findOne(ObjectoryQueryBuilder selector);
+  Future<List<RootPersistentObject>> find(ObjectoryQueryBuilder selector);
   void save(RootPersistentObject persistentObject);
   void remove(PersistentObject persistentObject);
   Future<bool> open([String database, String url]);
@@ -22,6 +22,9 @@ abstract class ObjectoryBaseImpl implements Objectory{
   }
   
   ClassSchema getSchema(String className){
+    if (!schemata.containsKey(className)) {
+      throw "Class $className not registered in Objectory";
+    }
     return schemata[className];
   }
   
@@ -30,6 +33,9 @@ abstract class ObjectoryBaseImpl implements Objectory{
   }
   
   RootPersistentObject findInCache(ObjectId id) {
+    if (id === null) {
+      return null;
+    }
     return cache[id.toHexString()];
   }
   
