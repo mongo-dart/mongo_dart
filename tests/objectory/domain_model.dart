@@ -56,9 +56,6 @@ class UserImpl extends RootPersistentObject implements User {
 
 class ArticleImpl extends RootPersistentObject implements Article {
   String get type() => "Article";
-  init(){
-    comments = new PersistentList([]);
-  }
 }
 
 class CommentImpl extends InternalPersistentObject implements Comment {
@@ -77,16 +74,9 @@ class AuthorImpl extends RootPersistentObject implements Author {
 }
 class PersonImpl extends RootPersistentObject implements Person {  
   String get type()=>"Person";
-  init(){
-    address = new Address();
-    children = new PersistentList([]);
-  }
 }
 class CustomerImpl extends RootPersistentObject implements Customer {  
   String get type()=>"Customer";
-  init(){
-    addresses = new PersistentList([]);    
-  }
 }  
 
 class AddressImpl extends InternalPersistentObject implements Address {  

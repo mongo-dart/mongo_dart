@@ -41,6 +41,9 @@ abstract class ObjectoryBaseImpl implements Objectory{
   }
   
   BasePersistentObject map2Object(String className, Map map){
+    if (map === null) {
+      map = new LinkedHashMap();
+    }
     if (map.containsKey("_id")) {
       var id = map["_id"];
       if (id !== null) {

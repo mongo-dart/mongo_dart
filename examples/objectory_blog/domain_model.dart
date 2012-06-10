@@ -21,7 +21,7 @@ interface Article extends PersistentObject default ObjectoryFactory {
   List<Comment> comments;
 }
 
-interface Comment extends PersistentObject default ObjectoryFactory {
+interface Comment extends PersistentObject default ObjectoryFactory{
   Comment();
   User user;  
   String body;
@@ -36,9 +36,6 @@ class UserImpl extends RootPersistentObject implements User {
 }
 class ArticleImpl extends RootPersistentObject implements Article {
   String get type() => "Article";
-  init(){
-    comments = new PersistentList([]);
-  }
 }
 
 class CommentImpl extends InternalPersistentObject implements Comment {
@@ -49,30 +46,31 @@ class ObjectoryFactory{
   factory Author() => new AuthorImpl();
   factory User() => new UserImpl();
   factory Article() => new ArticleImpl();
-  factory Comment() => new CommentImpl();
+  factory Comment() => new CommentImpl();  
 }
+
 void registerClasses() {
   ClassSchema schema;
-  schema = new ClassSchema('Author',()=>new Author());
+  schema = new ClassSchema('Author',() => new Author());
   schema.addProperty(new PropertySchema("name", "String"));
   schema.addProperty(new PropertySchema("age", "String"));
   schema.addProperty(new PropertySchema("email", "String"));
   objectory.registerClass(schema);
   
-  schema = new ClassSchema('User',()=>new User());
+  schema = new ClassSchema('User',() => new User());
   schema.addProperty(new PropertySchema("name", "String"));
   schema.addProperty(new PropertySchema("login", "String"));
   schema.addProperty(new PropertySchema("email", "String"));
   objectory.registerClass(schema);
 
-  schema = new ClassSchema('Article',()=>new Article());
+  schema = new ClassSchema('Article',() => new Article());
   schema.addProperty(new PropertySchema("title", "String"));
   schema.addProperty(new PropertySchema("body", "String"));
   schema.addProperty(new PropertySchema("author", "Author",externalRef: true));
   schema.addProperty(new PropertySchema("comments", "Comment",internalObject: true, collection: true, containExternalRef: true));
   objectory.registerClass(schema); 
 
-  schema = new ClassSchema('Comment',()=>new Comment());
+  schema = new ClassSchema('Comment',() => new Comment());
   schema.addProperty(new PropertySchema("date", "Date"));
   schema.addProperty(new PropertySchema("user", "User",externalRef: true));  
   schema.addProperty(new PropertySchema("title", "String"));

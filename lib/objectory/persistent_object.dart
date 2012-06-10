@@ -16,7 +16,21 @@ abstract class BasePersistentObject implements PersistentObject{
     dirtyFields = new Set<String>();
   }
   
-  abstract _initMap();
+  void _initMap() {
+    var schema = objectory.getSchema(type);
+    schema.properties.forEach((property,propertySchema) {
+      if (propertySchema.collection) {
+        map[property] = [];
+      } else if (propertySchema.internalObject){
+        map[property] = {};  
+      }
+      else {
+        if (schema.preserveFieldsOrder) {
+          map[property] = null;
+        }
+      }
+    });      
+  }  
   
   void setDirty(String fieldName) {
     if (dirtyFields === null){
@@ -189,6 +203,7 @@ abstract class RootPersistentObject extends BasePersistentObject{
    
    void _initMap() {
      map["_id"] = null;
+     super._initMap();
    }
    void remove() {
      objectory.remove(this);
@@ -201,8 +216,6 @@ abstract class RootPersistentObject extends BasePersistentObject{
 abstract class InternalPersistentObject extends BasePersistentObject{
   BasePersistentObject parent;
   String pathToMe;
-  
-  void _initMap() {}
   
   void setDirty(String fieldName){
     super.setDirty(fieldName);

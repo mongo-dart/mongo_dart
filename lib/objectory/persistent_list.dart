@@ -91,9 +91,9 @@ class PersistentList<T> implements List<T>{
   
   Iterator<T> iterator() => new PersistentIterator(_list.iterator(),valueConverter);
   
-  int indexOf(T element, [int start = 0]) => _list.indexOf(element, start);
+  int indexOf(T element, [int start]) => _list.indexOf(element, start);
   
-  int lastIndexOf(T element, [int start = 0]) => _list.lastIndexOf(element, start);
+  int lastIndexOf(T element, [int start]) => _list.lastIndexOf(element, start);
   
   int get length() => _list.length;
   
@@ -132,7 +132,7 @@ class PersistentList<T> implements List<T>{
   
   void sort(int compare(a, b)) => _list.sort(compare);
   
-  void insertRange(int start, int length, [T initialValue = null]){
+  void insertRange(int start, int length, [T initialValue]){
     _list.insertRange(start, length, initialValue);
     setDirty(null);
   }
@@ -144,7 +144,7 @@ class PersistentList<T> implements List<T>{
     setDirty(null);
   }
   
-  void setRange(int start, int length, List<T> from, [int startFrom = 0]){    
+  void setRange(int start, int length, List<T> from, [int startFrom]){    
     _list.setRange(start, length, from, startFrom);    
     setDirty(null);
   } 

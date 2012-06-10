@@ -12,9 +12,10 @@ class PropertySchema {
 class ClassSchema{
   String className;
   FactoryMethod factoryMethod;
+  bool preserveFieldsOrder;
   Map<String,PropertySchema> properties;
-  ClassSchema(this.className,this.factoryMethod) {
-    properties = new Map<String,PropertySchema>();
+  ClassSchema(this.className,this.factoryMethod, [this.preserveFieldsOrder = false]) {
+    properties = new LinkedHashMap<String,PropertySchema>();
   }
   addProperty(PropertySchema propertySchema) {
     properties[propertySchema.name] = propertySchema;    
