@@ -13,6 +13,7 @@ interface Objectory{
   ClassSchema getSchema(String className);
   void close();
 }
+
 abstract class ObjectoryBaseImpl implements Objectory{
   Map<String,PersistentObject> cache;
   Map<String,ClassSchema> schemata;
