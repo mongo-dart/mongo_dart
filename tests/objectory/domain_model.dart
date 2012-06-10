@@ -1,5 +1,5 @@
 #library("domain_model");
-#import("../../lib/objectory/ObjectoryLib_vm.dart");
+#import("../../lib/objectory/objectory_vm.dart");
 interface Author extends PersistentObject default ObjectoryFactory {
   Author();
   String name;

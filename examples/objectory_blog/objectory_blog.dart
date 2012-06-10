@@ -1,4 +1,4 @@
-#import("../../lib/objectory/ObjectoryLib_vm.dart");
+#import("../../lib/objectory/objectory_vm.dart");
 #import("domain_model.dart");
 
 Future<bool> setUpObjectory(){

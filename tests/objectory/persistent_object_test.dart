@@ -1,5 +1,5 @@
 #library("PersistenObjectTests");
-#import("../../lib/objectory/ObjectoryLib_vm.dart");
+#import("../../lib/objectory/objectory_vm.dart");
 #import("../../lib/bson/bson.dart");
 #import('../../third_party/unittest/unittest.dart');
 #import("domain_model.dart");
