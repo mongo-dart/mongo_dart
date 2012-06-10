@@ -1,19 +1,19 @@
 #library("domain_model");
 #import("../../lib/objectory/ObjectoryLib_vm.dart");
-interface Author extends IPersistent default ObjectoryFactory {
+interface Author extends PersistentObject default ObjectoryFactory {
   Author();
   String name;
   int age;
   String email;
 }
-interface User extends IPersistent default ObjectoryFactory {
+interface User extends PersistentObject default ObjectoryFactory {
   User();
   String name;
   String login;
   String email;
 }
 
-interface Article extends IPersistent default ObjectoryFactory {
+interface Article extends PersistentObject default ObjectoryFactory {
   Article();
   String title;
   String body;
@@ -21,7 +21,7 @@ interface Article extends IPersistent default ObjectoryFactory {
   List<Comment> comments;
 }
 
-interface Comment extends IPersistent default ObjectoryFactory {
+interface Comment extends PersistentObject default ObjectoryFactory {
   Comment();
   User user;  
   String body;
@@ -41,7 +41,7 @@ class ArticleImpl extends RootPersistentObject implements Article {
   }
 }
 
-class CommentImpl extends InnerPersistentObject implements Comment {
+class CommentImpl extends InternalPersistentObject implements Comment {
   String get type() => "Comment";
 }
 

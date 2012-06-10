@@ -1,4 +1,4 @@
-typedef IPersistent FactoryMethod();
+typedef PersistentObject FactoryMethod();
 class PropertySchema {
   String name;
   String type;
@@ -10,9 +10,6 @@ class PropertySchema {
   String toString() => "PropertySchema(${this.name},${this.type},this.collection = ${this.collection}, this.internalObject = ${this.internalObject}, this.externalRef = ${this.externalRef} this.containExternalRef = ${this.containExternalRef})";
 }
 class ClassSchema{
-  static final SimpleProperty = 0;
-  static final InternalObject = 1;
-  static final ExternalObject = 2;
   String className;
   FactoryMethod factoryMethod;
   Map<String,PropertySchema> properties;

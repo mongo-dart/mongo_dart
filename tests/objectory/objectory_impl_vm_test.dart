@@ -60,7 +60,7 @@ testObjectWithExternalRefs(){
       // Links must be fetched before use.
       Expect.throws(()=>sonFromObjectory.father.firstName);      
       expect(sonFromObjectory.mother).equals(null);
-      sonFromObjectory.fetchLinks().then((_){  
+      sonFromObjectory.fetchLinks().then((__){  
         expect(sonFromObjectory.father.firstName).equals("Father");
         expect(sonFromObjectory.mother).equals(null);
         objectory.close();
@@ -138,9 +138,9 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
     objectory.save(article);
     return objectory.findOne(ARTICLE);
   }).chain((artcl) {
-    expect(artcl.comments[0] is IPersistent).isTrue();    
+    expect(artcl.comments[0] is PersistentObject).isTrue();    
     for (var each in artcl.comments) {
-      expect(each is IPersistent).isTrue();     
+      expect(each is PersistentObject).isTrue();     
     }
     Expect.throws(()=>artcl.comments[0].user);
     return artcl.fetchLinks();
@@ -157,10 +157,10 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
 
 main(){    
   group("ObjectoryVM", () {        
-//    asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);
-//    asyncTest("testCompoundObject",1,testCompoundObject);                  
-//    asyncTest("testObjectWithExternalRefs",1,testObjectWithExternalRefs);    
-//    asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);
+    asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);
+    asyncTest("testCompoundObject",1,testCompoundObject);                  
+    asyncTest("testObjectWithExternalRefs",1,testObjectWithExternalRefs);    
+    asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);
     asyncTest("testMap2ObjectWithListtOfInternalObjectsWithExternalRefs",1,testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
   });
 }

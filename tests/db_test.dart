@@ -59,7 +59,6 @@ testGetNonce(){
   db.open().chain((c){
     return db.getNonce();
   }).then((v){
-      print(v);
       Expect.isTrue(v["ok"] == 1);
       db.close();
       callbackDone();

@@ -77,7 +77,7 @@ testObjectWithListOfInternalObjects2Map() {
   var map = customer.map;
   expect(map["name"]).equals("Tequila corporation");  
   expect(map["addresses"].length).equals(2);
-  expect(map["addresses"][0] is! IPersistent).isTrue();
+  expect(map["addresses"][0] is! PersistentObject).isTrue();
   expect(map["addresses"][0]["cityName"]).equals("Mexico");
   expect(map["addresses"][1]["cityName"]).equals("Moscow");
   
@@ -115,8 +115,6 @@ testObjectWithListtOfExternalRefs2Map() {
   father.children.add(son);  
   father.children.add(null);
   father.children[1] = daughter;
-  father.refs[son.id.toHexString()] = son;
-  father.refs[daughter.id.toHexString()] = daughter;
   expect(father.map["children"][0]).equals(son.id);
   expect(father.map["children"][1]).equals(daughter.id);
 }

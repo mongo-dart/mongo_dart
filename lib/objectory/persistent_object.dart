@@ -1,45 +1,51 @@
-interface IPersistent{
-  ObjectId id;
-  noSuchMethod(String function_name, List args);
-  void setProperty(String property, value);
-  void init();
-  String get type();
-  void clearDirtyStatus();
-  bool isDirty();
+interface PersistentObject{
+//  bool isRoot();
+//  Map map;  
+//  ObjectId id;
+//  noSuchMethod(String function_name, List args);
+//  void setProperty(String property, value);
+//  void init();
+//  String get type();
+//  void clearDirtyStatus();
+//  bool isDirty();
   Future fetchLink(String property);
   Future fetchLinks();
-  bool isRoot();
-  Map map;
+  void save();
+  void remove();
 }
-abstract class PersistentObjectBase implements IPersistent{
-  LinkedHashMap map;
-  Map<String,RootPersistentObject> refs;  
+abstract class BasePersistentObject implements PersistentObject{
+  LinkedHashMap map;  
   bool setupMode;
   Set<String> dirtyFields;
-  PersistentObjectBase() {
-    refs = new Map<String,RootPersistentObject>();
+  
+  BasePersistentObject() {
     map = new LinkedHashMap();
     if (isRoot()){
       map["_id"] = null;
     }                
     init();
     dirtyFields = new Set<String>();
-  }  
+  }
+  
   void setDirty(String fieldName) {
     if (dirtyFields === null){
       return;
     }
     dirtyFields.add(fieldName);
-  }  
-void clearDirtyStatus() {
-  dirtyFields.clear();
-}
-  onValueChanging(String fieldName, newValue) {
+  }
+  
+  void clearDirtyStatus() {
+    dirtyFields.clear();
+  }
+  
+  void onValueChanging(String fieldName, newValue) {
     setDirty(fieldName);
   }
+  
   isDirty() {
     return !dirtyFields.isEmpty();
   }
+  
   noSuchMethod(String function_name, List args) {
     ClassSchema schema = objectory.getSchema(type);
     if (schema === null){
@@ -58,7 +64,7 @@ void clearDirtyStatus() {
         return new PersistentList(value, parent: this, pathToMe: property);
       }
       if (propertySchema.internalObject) {
-        var result =  objectory.map2Object(propertySchema.type, value);
+        InternalPersistentObject result =  objectory.map2Object(propertySchema.type, value);
         result.parent = this;
         result.pathToMe = property;
         return result;
@@ -68,7 +74,7 @@ void clearDirtyStatus() {
           return null;
         }
         else {
-          var result = objectory.cache[value.toHexString()];
+          var result = objectory.findInCache(value);
           if (result === null) {
             throw "External ref ${propertySchema.name} has not been fetched yet";
           }
@@ -83,16 +89,15 @@ void clearDirtyStatus() {
       var property = function_name.replaceFirst("set:", "");
       propertySchema = schema.properties[property];
       if (propertySchema !== null) {
-        if (propertySchema.externalRef && !propertySchema.collection && value is IPersistent){
+        if (propertySchema.externalRef && !propertySchema.collection && value is RootPersistentObject){
           if (value !== null) {            
             if (value.id === null){        
               throw "Error setting link property $property. Link object must have not null id";
             }
-            refs[value.id.toHexString()] = value;
             value = value.id;             
           }          
         }
-        if (value is IPersistent) {
+        if (value is BasePersistentObject) {
           value = value.map;
         }
         if (value is PersistentList) {
@@ -120,14 +125,16 @@ void clearDirtyStatus() {
     return noSuchMethod('get:$property',[]);
   }
   
+  bool isRoot()=>false;
+  
   String toString()=>"$type($map)";
   
   void init(){}
   
   String get type() => "PersistentObjectBase";
   
-  Future<IPersistent> fetchLink(String property, [PropertySchema propertySchema, ObjectId objecId]) {  
-    var completer = new Completer<IPersistent>();
+  Future<PersistentObject> fetchLink(String property, [PropertySchema propertySchema, ObjectId objecId]) {  
+    var completer = new Completer<PersistentObject>();
     if (propertySchema === null) {
       propertySchema = objectory.getSchema(type).properties[property];
     }          
@@ -150,8 +157,7 @@ void clearDirtyStatus() {
     }
     else {      
       if (value is ObjectId){
-        objectory.findOne(propertySchema.type,{"_id":value}).then((res){
-          refs[value.toHexString()] = res;        
+        objectory.findOne(propertySchema.type,{"_id":value}).then((res){        
           completer.complete(this);
         });
       }     
@@ -177,24 +183,24 @@ void clearDirtyStatus() {
     return Futures.wait(futures);
   }
  
-  Future<IPersistent> fetchLinks(){
+  Future<RootPersistentObject> fetchLinks(){
     var futures = new List();
     for (var propertySchema in objectory.getSchema(type).properties.getValues()) {
       if (propertySchema.externalRef || propertySchema.containExternalRef) {
         futures.add(fetchLink(propertySchema.name, propertySchema));
       }          
     }
-    Completer completer = new Completer<IPersistent>();
+    Completer completer = new Completer<PersistentObject>();
     Futures.wait(futures).then((_) => completer.complete(this));
     return completer.future;    
   }  
 }
-abstract class RootPersistentObject extends PersistentObjectBase{
+abstract class RootPersistentObject extends BasePersistentObject{
    ObjectId id;
    bool isRoot()=>true;
 }
-abstract class InnerPersistentObject extends PersistentObjectBase{
-  IPersistent parent;
+abstract class InternalPersistentObject extends BasePersistentObject{
+  BasePersistentObject parent;
   String pathToMe;
   bool isRoot()=>false;
   void setDirty(String fieldName){

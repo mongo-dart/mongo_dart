@@ -1,5 +1,5 @@
 class _ValueConverter{
-  IPersistent parent;
+  BasePersistentObject parent;
   String pathToMe;
   
   _ValueConverter(this.parent,this.pathToMe);
@@ -8,7 +8,7 @@ class _ValueConverter{
     var result;
     PropertySchema propertySchema = objectory.getSchema(parent.type).properties[pathToMe];
     if (propertySchema.internalObject) {
-      if (value is IPersistent) {
+      if (value is PersistentObject) {
         result = value;
       } else {
         result = objectory.map2Object(propertySchema.type, value);
@@ -16,7 +16,7 @@ class _ValueConverter{
     }
     else if (propertySchema.containExternalRef) {      
       if (value !== null) {
-        result = objectory.cache[value.toHexString()];
+        result = objectory.findInCache(value);
       }
       if (result === null) {
         throw "Object $value of class ${propertySchema.type} has not been fetched from objectory yet";
@@ -37,7 +37,7 @@ class PersistentIterator<T> implements Iterator<T> {
 }
 
 class PersistentList<T> implements List<T>{
-  IPersistent parent;
+  BasePersistentObject parent;
   String pathToMe;  
   final List _list;
   List get internalList() => _list;
@@ -58,7 +58,7 @@ class PersistentList<T> implements List<T>{
   }  
   
   internValue(T value) {  
-    if (value is InnerPersistentObject) {
+    if (value is InternalPersistentObject) {
       value.parent = parent;
       value.pathToMe = pathToMe;
       return value.map;

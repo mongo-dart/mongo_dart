@@ -6,7 +6,7 @@ class Db{
     if(dbName.length === 0) throw "database name cannot be the empty string";  
     var invalidChars = [" ", ".", "\$", "/", "\\"];
     for(var i = 0; i < invalidChars.length; i++) {
-      if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '" + invalidChars[i] + "'");
+      if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
     }
   }    
   Db(this.databaseName, [this.serverConfig]){
@@ -101,7 +101,7 @@ class Db{
     Map selector = {};
     // If we are limiting the access to a specific collection name
     if(collectionName !== null){
-      selector["name"] = this.databaseName + "." + collectionName;
+      selector["name"] = "${this.databaseName}.$collectionName";
     }  
     // Return Cursor
       return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);      
