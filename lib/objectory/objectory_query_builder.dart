@@ -1,5 +1,9 @@
-class ObjectoryQueryBuilder {
-  
+#library("objectory_query");
+#import("schema.dart");
+#import("../bson/bson.dart");
+#import("objectory_direct_connection_impl.dart");
+
+class ObjectoryQueryBuilder {  
   ClassSchema schema;
   Map map;
   ObjectoryQueryBuilder(String className){

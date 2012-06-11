@@ -1,3 +1,9 @@
+#library("persistent_object");
+#import("schema.dart");
+#import("objectory_query_builder.dart");
+#import("../bson/bson.dart");
+#import("objectory_direct_connection_impl.dart");
+#source("persistent_list.dart");
 interface PersistentObject{
   Future fetchLink(String property);
   Future fetchLinks();

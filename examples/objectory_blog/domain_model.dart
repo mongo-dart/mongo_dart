@@ -1,5 +1,10 @@
 #library("domain_model");
-#import("../../lib/objectory/objectory_vm.dart");
+#import("../../lib/objectory/objectory_direct_connection_impl.dart");
+#import("../../lib/objectory/persistent_object.dart");
+#import("../../lib/objectory/objectory_query_builder.dart");
+#import("../../lib/objectory/schema.dart");
+#import("../../lib/bson/bson.dart");
+
 interface Author extends PersistentObject default ObjectoryFactory {
   Author();
   String name;
@@ -77,6 +82,16 @@ void registerClasses() {
   schema.addProperty(new PropertySchema("body", "String"));
   objectory.registerClass(schema); 
   
+}
+
+Future<bool> setUpObjectory(){
+  var res = new Completer();
+  objectory.open("ObjectoryBlog").then((_){    
+    objectory.dropDb();
+    registerClasses();        
+    res.complete(true);
+  });    
+  return res.future;
 }
 
 ObjectoryQueryBuilder get $Author() => new ObjectoryQueryBuilder('Author');

@@ -1,9 +1,12 @@
 tests/bson/bson_binary_test.dart
 tests/bson/bson_types_test.dart
 examples/objectory_blog/objectory_blog.dart
+lib/objectory/schema.dart
 tests/dbcollection_test.dart
 examples/types.dart
 tests/objectory/objectory_query_test.dart
+lib/objectory/objectory_query_builder.dart
+lib/objectory/objectory_direct_connection_impl.dart
 examples/objectory_blog/domain_model.dart
 examples/simple_update.dart
 lib/objectory/objectory_server.dart
@@ -20,6 +23,7 @@ tests/objectory/persistent_object_test.dart
 tests/all_tests.dart
 lib/objectory/objectory_vm.dart
 third_party/unittest/html_config.dart
+lib/objectory/persistent_object.dart
 tests/selector_builder_test.dart
 third_party/log4dart/file/FileAppender.dart
 tests/bson/all_bson_tests.dart

@@ -1,15 +1,6 @@
 #import("../../lib/objectory/objectory_vm.dart");
 #import("domain_model.dart");
-
-Future<bool> setUpObjectory(){
-  var res = new Completer();
-  objectory.open("ObjectoryBlog").then((_){    
-    objectory.dropDb();
-    registerClasses();        
-    res.complete(true);
-  });    
-  return res.future;
-}
+#import("../../lib/objectory/objectory_direct_connection_impl.dart");
 
 main(){
   var authors = new Map<String,Author>();

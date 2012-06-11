@@ -1,3 +1,10 @@
+#library("objectory_direct_connection");
+#import("schema.dart");
+#import("../mongo.dart");
+#import("../bson/bson.dart");
+#import("persistent_object.dart");
+#import("objectory_query_builder.dart");
+#source("objectory_base.dart");
 Objectory get objectory() => new ObjectorySingleton._singleton();
 abstract class ObjectorySingleton extends ObjectoryBaseImpl{
   static Objectory _objectory;

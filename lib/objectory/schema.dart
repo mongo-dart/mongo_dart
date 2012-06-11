@@ -1,4 +1,5 @@
-typedef PersistentObject FactoryMethod();
+#library("persistent_schema");
+typedef Object FactoryMethod();
 class PropertySchema {
   String name;
   String type;
