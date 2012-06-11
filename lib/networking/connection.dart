@@ -21,7 +21,7 @@ class Connection{
       completer.completeException(new Exception( "can't get send socket"));
     } else {
       lengthBuffer = new Binary(4);
-      socket.onError = (e) {  
+      socket.onError = (e) {
         print("connect exception ${e}");
         completer.completeException(e);
       };

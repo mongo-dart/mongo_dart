@@ -4,7 +4,7 @@
 #import('../../third_party/unittest/unittest.dart');
 #import("domain_model.dart");
 testAuthorCreation(){
-  Author author = new Author();
+  var author = new Author();
   author.name = 'vadim';
   author.age = 99;
   author.email = 'sdf';

@@ -11,15 +11,27 @@ class ObjectoryQueryBuilder {
   
   String get className() => schema.className;
   
-  void testFieldName(String fieldName) {
-    if (!schema.properties.containsKey(fieldName)) {
-      throw "Unknown property $fieldName in class ${schema.className}";
+  void testPropertyName(String propertyName) {
+    var propertyChain = propertyName.split('.');
+    var currentProperty = propertyChain[0]; 
+    var propertySchema = schema.properties[currentProperty];
+    if (propertySchema === null) {
+      throw "Unknown property $currentProperty in class ${schema.className}";
+    }
+    if (propertyChain.length > 1) {
+      if (!propertySchema.embeddedObject)
+      {  
+        throw "$currentProperty is not an embedded object in class ${schema.className}. Dot notation of $propertyName is not applicable";
+      }
+      propertyChain.removeRange(0, 1);
+      currentProperty = Strings.join(propertyChain,'.');
+      new ObjectoryQueryBuilder(propertySchema.type).testPropertyName(currentProperty);
     }
   }
   
-  ObjectoryQueryBuilder eq(String fieldName,value){
-    testFieldName(fieldName);
-    map[fieldName] = value;
+  ObjectoryQueryBuilder eq(String propertyName,value){
+    testPropertyName(propertyName);
+    map[propertyName] = value;
     return this;
   }
   
@@ -28,81 +40,81 @@ class ObjectoryQueryBuilder {
     return this;
   }
   
-  ObjectoryQueryBuilder ne(String fieldName, value){
-    testFieldName(fieldName);
-    map[fieldName] = {"\$ne":value};
+  ObjectoryQueryBuilder ne(String propertyName, value){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$ne":value};
     return this;
   }
   
-  ObjectoryQueryBuilder gt(String fieldName,value){
-    testFieldName(fieldName);
-    map[fieldName] = {"\$gt":value};
+  ObjectoryQueryBuilder gt(String propertyName,value){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$gt":value};
     return this;
   }
   
-  ObjectoryQueryBuilder lt(String fieldName,value){
-    testFieldName(fieldName);
-    map[fieldName] = {"\$lt":value};
+  ObjectoryQueryBuilder lt(String propertyName,value){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$lt":value};
     return this;
   }
   
-  ObjectoryQueryBuilder gte(String fieldName,value){
-    testFieldName(fieldName);
-    map[fieldName] = {"\$gte":value};
+  ObjectoryQueryBuilder gte(String propertyName,value){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$gte":value};
     return this;
   }
   
-  ObjectoryQueryBuilder lte(String fieldName,value){
-    testFieldName(fieldName);
-    map[fieldName] = {"\$lte":value};
+  ObjectoryQueryBuilder lte(String propertyName,value){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$lte":value};
     return this;
   }
   
-  ObjectoryQueryBuilder all(String fieldName, List values){
-    testFieldName(fieldName);
-    map[fieldName] = {"\$all":values};
+  ObjectoryQueryBuilder all(String propertyName, List values){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$all":values};
     return this;
   }
   
-  ObjectoryQueryBuilder nin(String fieldName, List values){
-    testFieldName(fieldName);
-    map[fieldName] = {"\$nin":values};
+  ObjectoryQueryBuilder nin(String propertyName, List values){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$nin":values};
     return this;
   }
   
-  ObjectoryQueryBuilder oneFrom(String fieldName, List values){
-    testFieldName(fieldName);
-    map[fieldName] = {"\$in":values};
+  ObjectoryQueryBuilder oneFrom(String propertyName, List values){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$in":values};
     return this;
   }
   
-  ObjectoryQueryBuilder exists(String fieldName){
-    testFieldName(fieldName);
-    map[fieldName] = {"\$exists":true};
+  ObjectoryQueryBuilder exists(String propertyName){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$exists":true};
     return this;    
   }
   
-  ObjectoryQueryBuilder notExists(String fieldName){
-    testFieldName(fieldName);
-    map[fieldName] = {"\$exists":false};
+  ObjectoryQueryBuilder notExists(String propertyName){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$exists":false};
     return this;    
   }
   
-  ObjectoryQueryBuilder mod(String fieldName, int value){
-    testFieldName(fieldName);
-    map[fieldName] = {"\$mod":[value,0]};
+  ObjectoryQueryBuilder mod(String propertyName, int value){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$mod":[value,0]};
     return this;    
   }
   
-  ObjectoryQueryBuilder match(String fieldName, String pattern,[bool multiLine, bool caseInsensitive, bool dotAll, bool extended]){
-    testFieldName(fieldName);
-    map[fieldName] = {'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
+  ObjectoryQueryBuilder match(String propertyName, String pattern,[bool multiLine, bool caseInsensitive, bool dotAll, bool extended]){
+    testPropertyName(propertyName);
+    map[propertyName] = {'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
         dotAll:dotAll,extended:extended)};
     return this;    
   }
   
-  ObjectoryQueryBuilder range(String fieldName, min, max, [bool minInclude=true, bool maxInclude=true]){
-    testFieldName(fieldName);
+  ObjectoryQueryBuilder range(String propertyName, min, max, [bool minInclude=true, bool maxInclude=true]){
+    testPropertyName(propertyName);
     Map rangeMap = {};
     if (minInclude){
       rangeMap["\$gte"] = min;
@@ -116,7 +128,7 @@ class ObjectoryQueryBuilder {
     else{
       rangeMap["\$gt"] = max;
     }
-    map[fieldName] = rangeMap;
+    map[propertyName] = rangeMap;
     return this;    
   }
   
@@ -128,8 +140,8 @@ class ObjectoryQueryBuilder {
     }    
   }
   
-  ObjectoryQueryBuilder sortBy(String fieldName, [bool descending=false]){
-    testFieldName(fieldName);  
+  ObjectoryQueryBuilder sortBy(String propertyName, [bool descending=false]){
+    testPropertyName(propertyName);  
     _internQueryMap();
     if (!map.containsKey("orderby")){
       map["orderby"] = new LinkedHashMap();  
@@ -138,7 +150,7 @@ class ObjectoryQueryBuilder {
     if (descending){
       order = -1;
     }
-    map["orderby"][fieldName] = order;      
+    map["orderby"][propertyName] = order;      
     return this;    
   }
   

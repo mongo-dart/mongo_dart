@@ -1,7 +1,8 @@
 #library("mongo");
 #import("dart:io");
 #import("bson/bson.dart");
-#import("../third_party/log4dart/LogLib.dart");
+#import("../third_party/log4dart/Lib.dart");
+#import("../third_party/log4dart/file/FileAppender.dart");
 #source("networking/connection.dart");
 #source("networking/mongo_message.dart");
 #source("networking/mongo_query_message.dart");

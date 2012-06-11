@@ -21,7 +21,7 @@ abstract class BasePersistentObject implements PersistentObject{
     schema.properties.forEach((property,propertySchema) {
       if (propertySchema.collection) {
         map[property] = [];
-      } else if (propertySchema.internalObject){
+      } else if (propertySchema.embeddedObject){
         map[property] = {};  
       }
       else {
@@ -68,13 +68,13 @@ abstract class BasePersistentObject implements PersistentObject{
       if (propertySchema.collection) {
         return new PersistentList(value, parent: this, pathToMe: property);
       }
-      if (propertySchema.internalObject) {
-        InternalPersistentObject result =  objectory.map2Object(propertySchema.type, value);
+      if (propertySchema.embeddedObject) {
+        EmbeddedPersistentObject result =  objectory.map2Object(propertySchema.type, value);
         result.parent = this;
         result.pathToMe = property;
         return result;
       }
-      if (propertySchema.externalRef)  {      
+      if (propertySchema.link)  {      
         if (value === null) {
           return null;
         }
@@ -94,7 +94,7 @@ abstract class BasePersistentObject implements PersistentObject{
       var property = function_name.replaceFirst("set:", "");
       propertySchema = schema.properties[property];
       if (propertySchema !== null) {
-        if (propertySchema.externalRef && !propertySchema.collection && value is RootPersistentObject){
+        if (propertySchema.link && !propertySchema.collection && value is RootPersistentObject){
           if (value !== null) {            
             if (value.id === null){        
               throw "Error setting link property $property. Link object must have not null id";
@@ -144,7 +144,7 @@ abstract class BasePersistentObject implements PersistentObject{
     if (propertySchema === null) {
       throw "Property $property is not registered on class $type";
     }
-    if (!propertySchema.externalRef && !propertySchema.containExternalRef){
+    if (!propertySchema.link && !propertySchema.hasLinks){
       print(propertySchema);
       throw "Property $property is not of external ref type on class $type";
     }    
@@ -173,7 +173,7 @@ abstract class BasePersistentObject implements PersistentObject{
   
   Future fetchRefsForListProperty(String property, PropertySchema propertySchema, list) {  
     var futures = new List<Future>();
-    if (propertySchema.internalObject) {  
+    if (propertySchema.embeddedObject) {  
       for (var each in new PersistentList(list, parent:this, pathToMe: property)) {
         futures.add(each.fetchLinks());
       }  
@@ -189,7 +189,7 @@ abstract class BasePersistentObject implements PersistentObject{
   Future<RootPersistentObject> fetchLinks(){
     var futures = new List();
     for (var propertySchema in objectory.getSchema(type).properties.getValues()) {
-      if (propertySchema.externalRef || propertySchema.containExternalRef) {
+      if (propertySchema.link || propertySchema.hasLinks) {
         futures.add(fetchLink(propertySchema.name, propertySchema));
       }          
     }
@@ -213,7 +213,7 @@ abstract class RootPersistentObject extends BasePersistentObject{
      objectory.save(this);
    }
 }
-abstract class InternalPersistentObject extends BasePersistentObject{
+abstract class EmbeddedPersistentObject extends BasePersistentObject{
   BasePersistentObject parent;
   String pathToMe;
   

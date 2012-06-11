@@ -58,7 +58,7 @@ class ArticleImpl extends RootPersistentObject implements Article {
   String get type() => "Article";
 }
 
-class CommentImpl extends InternalPersistentObject implements Comment {
+class CommentImpl extends EmbeddedPersistentObject implements Comment {
   String get type() => "Comment";
 }
 
@@ -79,7 +79,7 @@ class CustomerImpl extends RootPersistentObject implements Customer {
   String get type()=>"Customer";
 }  
 
-class AddressImpl extends InternalPersistentObject implements Address {  
+class AddressImpl extends EmbeddedPersistentObject implements Address {  
   String get type()=>"Address";
 }
 class ObjectoryFactory{
@@ -109,15 +109,15 @@ void registerClasses() {
   schema.addProperty(new PropertySchema("firstName", "String"));
   schema.addProperty(new PropertySchema("lastName", "String"));
   schema.addProperty(new PropertySchema("birthday", "Date"));
-  schema.addProperty(new PropertySchema("address", "Address",internalObject: true));  
-  schema.addProperty(new PropertySchema("father", "Person",externalRef: true));
-  schema.addProperty(new PropertySchema("mother", "Person",externalRef: true));
-  schema.addProperty(new PropertySchema("children", "Person",containExternalRef: true, collection: true));
+  schema.addProperty(new PropertySchema("address", "Address",embeddedObject: true));  
+  schema.addProperty(new PropertySchema("father", "Person",link: true));
+  schema.addProperty(new PropertySchema("mother", "Person",link: true));
+  schema.addProperty(new PropertySchema("children", "Person",hasLinks: true, collection: true));
   objectory.registerClass(schema); 
 
   schema = new ClassSchema('Customer',()=>new Customer());
   schema.addProperty(new PropertySchema("name", "String"));
-  schema.addProperty(new PropertySchema("addresses", "Address",internalObject: true, collection: true));  
+  schema.addProperty(new PropertySchema("addresses", "Address",embeddedObject: true, collection: true));  
   objectory.registerClass(schema); 
   
   schema = new ClassSchema('User',()=>new User());
@@ -129,14 +129,14 @@ void registerClasses() {
   schema = new ClassSchema('Article',()=>new Article());
   schema.addProperty(new PropertySchema("title", "String"));
   schema.addProperty(new PropertySchema("body", "String"));
-  schema.addProperty(new PropertySchema("author", "Author",externalRef: true));
-  schema.addProperty(new PropertySchema("comments", "Comment",internalObject: true, collection: true, containExternalRef: true));
+  schema.addProperty(new PropertySchema("author", "Author",link: true));
+  schema.addProperty(new PropertySchema("comments", "Comment",embeddedObject: true, collection: true, hasLinks: true));
   objectory.registerClass(schema); 
 
   schema = new ClassSchema('Comment',()=>new Comment());
   schema.addProperty(new PropertySchema("title", "String"));
   schema.addProperty(new PropertySchema("body", "String"));
-  schema.addProperty(new PropertySchema("user", "User",externalRef: true));
+  schema.addProperty(new PropertySchema("user", "User",link: true));
   objectory.registerClass(schema);  
   
 }

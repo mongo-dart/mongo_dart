@@ -38,7 +38,7 @@ class ArticleImpl extends RootPersistentObject implements Article {
   String get type() => "Article";
 }
 
-class CommentImpl extends InternalPersistentObject implements Comment {
+class CommentImpl extends EmbeddedPersistentObject implements Comment {
   String get type() => "Comment";
 }
 
@@ -66,13 +66,13 @@ void registerClasses() {
   schema = new ClassSchema('Article',() => new Article());
   schema.addProperty(new PropertySchema("title", "String"));
   schema.addProperty(new PropertySchema("body", "String"));
-  schema.addProperty(new PropertySchema("author", "Author",externalRef: true));
-  schema.addProperty(new PropertySchema("comments", "Comment",internalObject: true, collection: true, containExternalRef: true));
+  schema.addProperty(new PropertySchema("author", "Author",link: true));
+  schema.addProperty(new PropertySchema("comments", "Comment",embeddedObject: true, collection: true, hasLinks: true));
   objectory.registerClass(schema); 
 
   schema = new ClassSchema('Comment',() => new Comment());
   schema.addProperty(new PropertySchema("date", "Date"));
-  schema.addProperty(new PropertySchema("user", "User",externalRef: true));  
+  schema.addProperty(new PropertySchema("user", "User",link: true));  
   schema.addProperty(new PropertySchema("title", "String"));
   schema.addProperty(new PropertySchema("body", "String"));
   objectory.registerClass(schema); 

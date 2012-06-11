@@ -140,7 +140,6 @@ testCursorClosing(){
     });
   });
 }
-
 main(){
   group("Cursor tests:", (){
     test("testCursorCreation",testCursorCreation);    
@@ -149,7 +148,6 @@ main(){
     asyncTest("testPingRaw",1,testPingRaw);    
     asyncTest("testNextObject",1,testNextObject);    
     asyncTest("testCursorWithOpenServerCursor",1,testCursorWithOpenServerCursor);
-    asyncTest("testCursorGetMore",1,testCursorGetMore);
-        
+    asyncTest("testCursorGetMore",1,testCursorGetMore);        
   });
 }

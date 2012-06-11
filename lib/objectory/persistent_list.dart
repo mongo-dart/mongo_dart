@@ -7,14 +7,14 @@ class _ValueConverter{
    convertValue(value) {
     var result;
     PropertySchema propertySchema = objectory.getSchema(parent.type).properties[pathToMe];
-    if (propertySchema.internalObject) {
+    if (propertySchema.embeddedObject) {
       if (value is PersistentObject) {
         result = value;
       } else {
         result = objectory.map2Object(propertySchema.type, value);
       }          
     }
-    else if (propertySchema.containExternalRef) {      
+    else if (propertySchema.hasLinks) {      
       if (value !== null) {
         result = objectory.findInCache(value);
       }
@@ -58,7 +58,7 @@ class PersistentList<T> implements List<T>{
   }  
   
   internValue(T value) {  
-    if (value is InternalPersistentObject) {
+    if (value is EmbeddedPersistentObject) {
       value.parent = parent;
       value.pathToMe = pathToMe;
       return value.map;

@@ -3,11 +3,11 @@ class PropertySchema {
   String name;
   String type;
   bool collection;
-  bool internalObject;
-  bool externalRef;
-  bool containExternalRef;
-  PropertySchema(this.name,this.type,[this.collection = false, this.internalObject = false, this.externalRef = false, this.containExternalRef = false]);
-  String toString() => "PropertySchema(${this.name},${this.type},this.collection = ${this.collection}, this.internalObject = ${this.internalObject}, this.externalRef = ${this.externalRef} this.containExternalRef = ${this.containExternalRef})";
+  bool embeddedObject;
+  bool link;
+  bool hasLinks;
+  PropertySchema(this.name,this.type,[this.collection = false, this.embeddedObject = false, this.link = false, this.hasLinks = false]);
+  String toString() => "PropertySchema(${this.name},${this.type},this.collection = ${this.collection}, this.embeddedObject = ${this.embeddedObject}, this.link = ${this.link} this.hasLinks = ${this.hasLinks})";
 }
 class ClassSchema{
   String className;
