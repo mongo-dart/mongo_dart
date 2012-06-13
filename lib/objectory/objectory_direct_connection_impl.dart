@@ -4,20 +4,9 @@
 #import("../bson/bson.dart");
 #import("persistent_object.dart");
 #import("objectory_query_builder.dart");
-#source("objectory_base.dart");
-Objectory get objectory() => new ObjectorySingleton._singleton();
-abstract class ObjectorySingleton extends ObjectoryBaseImpl{
-  static Objectory _objectory;
-  ObjectorySingleton._internal();
-  factory ObjectorySingleton._singleton(){
-    if (_objectory === null){
-      _objectory = new ObjectoryDirectConnectionImpl._internal();
-    }
-    return _objectory;
-  }
-}
-class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
-  ObjectoryDirectConnectionImpl._internal():super._internal();
+#import("objectory_base.dart");
+
+class ObjectoryDirectConnectionImpl extends ObjectoryBaseImpl{  
   Db db;
   
   Future<bool> open([String database, String url]){
@@ -91,4 +80,18 @@ class ObjectoryDirectConnectionImpl extends ObjectorySingleton{
     db.close();
   }
   
+}
+
+
+Future<bool> setUpObjectory(String dbName, Function registerClassCallback, [bool dropDb = false, String url]){  
+  var res = new Completer();
+  objectory = new ObjectoryDirectConnectionImpl();
+  objectory.open("dbName",url).then((_){
+    if (dropDb) { 
+      objectory.dropDb();
+    }        
+    registerClassCallback();
+    res.complete(true);
+  });    
+  return res.future;
 }

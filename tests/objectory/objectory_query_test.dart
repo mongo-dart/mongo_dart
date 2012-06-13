@@ -1,4 +1,5 @@
 #library("PersistenObjectTests");
+#import("../../lib/objectory/objectory_base.dart");
 #import("../../lib/objectory/objectory_direct_connection_impl.dart");
 #import("../../lib/objectory/persistent_object.dart");
 #import("../../lib/objectory/objectory_query_builder.dart");
@@ -16,6 +17,7 @@ testPropertyNameChecks() {
   Expect.throws(() => $Person.eq('address.cityName1', 'Tyumen'));
 }
 main(){
+  objectory = new ObjectoryDirectConnectionImpl();
   registerClasses();  
   group("ObjectoryQuery", ()  {    
     test("testPropertyNameChecks",testPropertyNameChecks);

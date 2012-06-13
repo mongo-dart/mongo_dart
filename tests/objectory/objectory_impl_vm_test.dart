@@ -1,23 +1,15 @@
 #library("ObjectoryVM");
 #import("../../lib/objectory/objectory_direct_connection_impl.dart");
+#import("../../lib/objectory/objectory_base.dart");
 #import("../../lib/objectory/persistent_object.dart");
 #import("../../lib/objectory/objectory_query_builder.dart");
 #import("../../lib/objectory/schema.dart");
 #import("../../lib/bson/bson.dart");
 #import('../../third_party/unittest/unittest.dart');
 #import("domain_model.dart");
-Future<bool> setUpObjectory(){
-  var res = new Completer();
-  objectory.open("ObjectoryTest").then((_){    
-    objectory.dropDb();
-    registerClasses();
-    res.complete(true);
-  });    
-  return res.future;
-}
 
 void testInsertionAndUpdate(){
-  setUpObjectory().then((_) {
+  initDomainModel().then((_) {
     Author author = new Author();  
     author.name = 'Dan';
     author.age = 3;
@@ -35,7 +27,7 @@ void testInsertionAndUpdate(){
   });
 }
 testCompoundObject(){
-  setUpObjectory().then((_) {  
+  initDomainModel().then((_) {  
     var person = new Person();
     person.address.cityName = 'Tyumen';
     person.address.streetName = 'Elm';  
@@ -51,7 +43,7 @@ testCompoundObject(){
   });
 }
 testObjectWithExternalRefs(){
-  setUpObjectory().then((_) {
+  initDomainModel().then((_) {
     Person father = new Person();  
     father.firstName = 'Father';
     father.save();    
@@ -77,7 +69,7 @@ testObjectWithCollectionOfExternalRefs(){
   Person son;
   Person daughter;
   Person sonFromObjectory;
-  setUpObjectory().chain((_) {
+  initDomainModel().chain((_) {
     father = new Person();  
     father.firstName = 'Father';
     father.save();
@@ -114,7 +106,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   User joe;
   User lisa;
   Author author;
-  setUpObjectory().chain((_) {    
+  initDomainModel().chain((_) {    
     author = new Author();
     author.name = 'Vadim';
     author.save();

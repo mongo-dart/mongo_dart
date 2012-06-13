@@ -1,3 +1,10 @@
+#library("objectory_base");
+#import("schema.dart");
+//#import("../mongo.dart");
+#import("../bson/bson.dart");
+#import("persistent_object.dart");
+#import("objectory_query_builder.dart");
+
 interface Objectory{  
   void registerClass(ClassSchema schema);
   BasePersistentObject newInstance(String className);
@@ -14,9 +21,15 @@ interface Objectory{
   void close();
 }
 
+set objectory(Objectory impl) => ObjectoryBaseImpl.objectoryImpl = impl; 
+Objectory get objectory() => ObjectoryBaseImpl.objectoryImpl; 
+
 abstract class ObjectoryBaseImpl implements Objectory{
+    
+  static Objectory objectoryImpl;  
   Map<String,PersistentObject> cache;
-  Map<String,ClassSchema> schemata;
+  Map<String,ClassSchema> schemata;    
+
   ObjectoryBaseImpl(){
     schemata = new  Map<String,ClassSchema>();
     cache = new Map<String,PersistentObject>();

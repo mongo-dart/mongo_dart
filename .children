@@ -1,6 +1,7 @@
 tests/bson/bson_binary_test.dart
 tests/bson/bson_types_test.dart
 examples/objectory_blog/objectory_blog.dart
+lib/objectory/objectory_base.dart
 lib/objectory/schema.dart
 tests/dbcollection_test.dart
 examples/types.dart

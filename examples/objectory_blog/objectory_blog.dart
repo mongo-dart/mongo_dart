@@ -1,11 +1,11 @@
 #import("../../lib/objectory/objectory_vm.dart");
 #import("domain_model.dart");
 #import("../../lib/objectory/objectory_direct_connection_impl.dart");
-
+#import("../../lib/objectory/objectory_base.dart");
 main(){
   var authors = new Map<String,Author>();
   var users = new Map<String,User>();  
-  setUpObjectory().chain((_) {
+  initDomainModel().chain((_) {
     print("===================================================================================");
     print(">> Adding Authors");
     var author = new Author();

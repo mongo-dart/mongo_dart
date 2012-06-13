@@ -1,4 +1,5 @@
 #library("domain_model");
+#import("../../lib/objectory/objectory_base.dart");
 #import("../../lib/objectory/objectory_direct_connection_impl.dart");
 #import("../../lib/objectory/persistent_object.dart");
 #import("../../lib/objectory/objectory_query_builder.dart");
@@ -84,14 +85,8 @@ void registerClasses() {
   
 }
 
-Future<bool> setUpObjectory(){
-  var res = new Completer();
-  objectory.open("ObjectoryBlog").then((_){    
-    objectory.dropDb();
-    registerClasses();        
-    res.complete(true);
-  });    
-  return res.future;
+Future<bool> initDomainModel(){
+  return setUpObjectory('ObjectoryBlog', registerClasses, dropDb: true);
 }
 
 ObjectoryQueryBuilder get $Author() => new ObjectoryQueryBuilder('Author');

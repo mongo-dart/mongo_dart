@@ -1,5 +1,6 @@
 #library("domain_model");
 #import("../../lib/objectory/objectory_direct_connection_impl.dart");
+#import("../../lib/objectory/objectory_base.dart");
 #import("../../lib/objectory/persistent_object.dart");
 #import("../../lib/objectory/objectory_query_builder.dart");
 #import("../../lib/objectory/schema.dart");
@@ -143,6 +144,9 @@ void registerClasses() {
   schema.addProperty(new PropertySchema("user", "User",link: true));
   objectory.registerClass(schema);  
   
+}
+Future<bool> initDomainModel(){
+  return setUpObjectory('ObjectoryTests', registerClasses, dropDb: true);
 }
 
 ObjectoryQueryBuilder get $Person() => new ObjectoryQueryBuilder('Person');

@@ -72,7 +72,7 @@ class LoggerImpl implements Logger {
    
    void _append(String level, String message) {
      String ctx = "";
-     _context.forEach(f(k,v) => ctx += "$v:");
+     _context.forEach(f(k,v) => ctx = "$ctx$v:");
      // TODO support formating
      String date = (new Date.now()).toString();
      String logMessage = "$level [$date] $name${ctx.isEmpty() ? ':' : ' [$ctx]'} $message";
