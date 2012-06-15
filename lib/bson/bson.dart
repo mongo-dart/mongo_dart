@@ -1,4 +1,4 @@
-#library("bson.dart");
+#library("bson");
 #import("dart:utf");
 #import("dart:uri");
 #source("objectid.dart");
@@ -18,3 +18,5 @@
 #source("bson_boolean.dart");
 #source("bson_date.dart");
 #source("bson_regexp.dart");
+#source("bson_platform.dart");
+

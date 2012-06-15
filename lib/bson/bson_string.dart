@@ -18,7 +18,7 @@ class BsonString extends BsonObject{
      buffer.writeByte(0);
   }
   unpackValue(Binary buffer){
-     int size = buffer.readInt32()-1; 
+     int size = buffer.readInt32()-1;     
      data = decodeUtf8(buffer.byteList,buffer.offset,size);
      buffer.offset += size+1;
   }

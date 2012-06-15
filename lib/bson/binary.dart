@@ -7,16 +7,16 @@ class Binary extends BsonObject{
   static final SUBTYPE_MD5 = 4;
   static final SUBTYPE_USER_DEFINED = 128;
   //static final minBits = [1,2,3,4];
-  ByteArray byteArray;
-  Uint8List byteList;
+  var byteArray;
+  List<int> byteList;
   int offset;
   int subType;
-  Binary(int length): byteList = new Uint8List(length), offset=0, subType=0{
-    byteArray = byteList.asByteArray();    
+  Binary(int length): byteList = makeUint8List(length), offset=0, subType=0{
+    byteArray = makeByteArray(byteList);    
   }
-  Binary.from(List from): byteList = new Uint8List(from.length),offset=0, subType=0 {    
+  Binary.from(List from): byteList = makeUint8List(from.length),offset=0, subType=0 {    
     byteList.setRange(0, from.length, from);
-    byteArray = byteList.asByteArray();    
+    byteArray = makeByteArray(byteList);    
   }  
   int get typeByte() => BSON.BSON_DATA_BINARY;  
   String toHexString(){
@@ -31,8 +31,8 @@ class Binary extends BsonObject{
     return stringBuffer.toString().toLowerCase();
   }  
   setIntExtended(int value, int numOfBytes){
-    Uint8List byteListTmp = new Uint8List(8);    
-    ByteArray byteArrayTmp = byteListTmp.asByteArray();
+    List<int> byteListTmp = makeUint8List(8);    
+    var byteArrayTmp = makeByteArray(byteListTmp);
     if (numOfBytes == 3){
       byteArrayTmp.setInt32(0,value);
     }
@@ -141,8 +141,8 @@ class Binary extends BsonObject{
   unpackValue(Binary buffer){
     int size = buffer.readInt32();
     subType = buffer.readByte();
-    byteList = new Uint8List(size);
-    byteArray = byteList.asByteArray();
+    byteList = makeUint8List(size);
+    byteArray = makeByteArray(byteList);
     byteList.setRange(0,size,buffer.byteList,buffer.offset);
     buffer.offset += size;  
   }

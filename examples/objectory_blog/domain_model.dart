@@ -14,7 +14,7 @@ interface Author extends PersistentObject default ObjectoryFactory {
 }
 interface User extends PersistentObject default ObjectoryFactory {
   User();
-  String name;
+  String name;  
   String login;
   String email;
 }

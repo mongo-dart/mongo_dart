@@ -1,11 +1,12 @@
-tests/bson/bson_binary_test.dart
-tests/bson/bson_types_test.dart
+lib/bson/test.dart
 examples/objectory_blog/objectory_blog.dart
 lib/objectory/objectory_base.dart
 lib/objectory/schema.dart
 tests/dbcollection_test.dart
 examples/types.dart
 tests/objectory/objectory_query_test.dart
+lib/bson/bson_browser.dart
+tests/bson/bson_tests.dart
 lib/objectory/objectory_query_builder.dart
 lib/objectory/objectory_direct_connection_impl.dart
 examples/objectory_blog/domain_model.dart
@@ -27,7 +28,6 @@ third_party/unittest/html_config.dart
 lib/objectory/persistent_object.dart
 tests/selector_builder_test.dart
 third_party/log4dart/file/FileAppender.dart
-tests/bson/all_bson_tests.dart
 tests/dbcommand_test.dart
 third_party/unittest/vm_config.dart
 tests/objectory/all_objectory_tests.dart
@@ -39,4 +39,7 @@ third_party/unittest/unittest.dart
 examples/raw_queries.dart
 tests/connection_test.dart
 lib/mongo.dart
+tests/bson/bson_tests_browser.dart
+tests/bson/bson_tests_vm.dart
+lib/bson/bson_vm.dart
 tests/cursor_test.dart
