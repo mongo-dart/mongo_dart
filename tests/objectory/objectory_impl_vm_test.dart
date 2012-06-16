@@ -18,9 +18,9 @@ void testInsertionAndUpdate(){
     author.age = 4;
     author.save();
     objectory.find($Author).then((coll){
-      expect(coll.length).equals(1);
+      expect(coll.length,1);
       Author authFromMongo = coll[0];
-      expect(authFromMongo.age).equals(4);
+      expect(authFromMongo.age,4);
       objectory.close();      
       callbackDone();
     });
@@ -34,9 +34,9 @@ testCompoundObject(){
     person.firstName = 'Dick';
     person.save();
     objectory.findOne($Person.id(person.id)).then((savedPerson){
-      expect(savedPerson.firstName).equals('Dick');
-      expect(savedPerson.address.streetName).equals('Elm');
-      expect(savedPerson.address.cityName).equals('Tyumen');
+      expect(savedPerson.firstName,'Dick');
+      expect(savedPerson.address.streetName,'Elm');
+      expect(savedPerson.address.cityName,'Tyumen');
       objectory.close();
       callbackDone();
     });        
@@ -54,10 +54,10 @@ testObjectWithExternalRefs(){
     objectory.findOne($Person.id(son.id)).then((sonFromObjectory){
       // Links must be fetched before use.
       Expect.throws(()=>sonFromObjectory.father.firstName);      
-      expect(sonFromObjectory.mother).equals(null);
+      expect(sonFromObjectory.mother,isNull);
       sonFromObjectory.fetchLinks().then((__){  
-        expect(sonFromObjectory.father.firstName).equals("Father");
-        expect(sonFromObjectory.mother).equals(null);
+        expect(sonFromObjectory.father.firstName,"Father");
+        expect(sonFromObjectory.mother,isNull);
         objectory.close();
         callbackDone();
       });    
@@ -87,16 +87,16 @@ testObjectWithCollectionOfExternalRefs(){
     return objectory.findOne($Person.id(father.id));
   }).chain((fatherFromObjectory){
       // Links must be fetched before use.   
-    expect(fatherFromObjectory.children.length).equals(2);    
-    Expect.throws(()=>father.children[0]);      
+    expect(fatherFromObjectory.children.length,2);    
+    expect(()=>father.children[0],throws);      
     return father.fetchLinks();
   }).chain((_) {
     sonFromObjectory = father.children[0];  
-    expect(sonFromObjectory.mother).equals(null);
+    expect(sonFromObjectory.mother,isNull);
     return sonFromObjectory.fetchLinks();
   }).then((_){
-    expect(sonFromObjectory.father.firstName).equals("Father");
-    expect(sonFromObjectory.mother).equals(null);
+    expect(sonFromObjectory.father.firstName,"Father");
+    expect(sonFromObjectory.mother,isNull);
     objectory.close();
     callbackDone();
   });
@@ -133,22 +133,30 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
     objectory.save(article);
     return objectory.findOne($Article.sortBy('title'));
   }).chain((artcl) {
-    expect(artcl.comments[0] is PersistentObject).isTrue();    
+    expect(artcl.comments[0] is PersistentObject);    
     for (var each in artcl.comments) {
-      expect(each is PersistentObject).isTrue();     
+      expect(each is PersistentObject);     
     }
-    Expect.throws(()=>artcl.comments[0].user);
+    expect(()=>artcl.comments[0].user,throws);
     return artcl.fetchLinks();
     
   }).then((artcl) {
-    expect(artcl.comments[0].user.name).equals('Joe Great');
-    expect(artcl.comments[1].user.name).equals('Lisa Fine');
-    expect(artcl.author.name).equals('VADIM');
+    expect(artcl.comments[0].user.name,'Joe Great');
+    expect(artcl.comments[1].user.name,'Lisa Fine');
+    expect(artcl.author.name,'VADIM');
     objectory.close();
     callbackDone();
   });
 }
 
+testPropertyNameChecks() {
+  var query = $Person.eq('firstName', 'Vadim');
+  expect({'firstName': 'Vadim'},recursivelyMatches(query.map));
+  expect(() => $Person.eq('unkwnownProperty', null),throws);
+  query = $Person.eq('address.cityName', 'Tyumen');
+  expect({'address.cityName': 'Tyumen'},recursivelyMatches(query.map));
+  expect(() => $Person.eq('address.cityName1', 'Tyumen'),throws);
+}
 
 main(){    
   group("ObjectoryVM", () {        
@@ -158,4 +166,7 @@ main(){
     asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);
     asyncTest("testMap2ObjectWithListtOfInternalObjectsWithExternalRefs",1,testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
   });
+  group("ObjectoryQuery", ()  {    
+    test("testPropertyNameChecks",testPropertyNameChecks);
+  });  
 }

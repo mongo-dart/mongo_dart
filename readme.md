@@ -14,5 +14,4 @@ Sample project is in directory **sample/objectory_blog**. There are also some te
 
 **Used external libraries:**
 
- - unittest_vm - Bygone version from dart repository
  - [log4dart](https://github.com/Qalqo/log4dart)

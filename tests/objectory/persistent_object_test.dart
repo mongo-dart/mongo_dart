@@ -5,6 +5,7 @@
 #import("../../lib/objectory/objectory_query_builder.dart");
 #import("../../lib/objectory/schema.dart");
 #import("../../lib/bson/bson.dart");
+#import("../../lib/bson/bson_vm.dart");
 #import('../../third_party/unittest/unittest.dart');
 #import("domain_model.dart");
 testAuthorCreation(){
@@ -12,19 +13,19 @@ testAuthorCreation(){
   author.name = 'vadim';
   author.age = 99;
   author.email = 'sdf';
-  expect(author.map.getKeys()[0]).equals("_id");
-  expect(author.map.getKeys()[1]).equals("name");
-  expect(author.map.getKeys()[2]).equals("age");
-  expect(author.map.getKeys().last()).equals("email");
-  expect(author.map.getKeys().length).equals(4);
-  expect(author.name).equals('VADIM'); // converted to uppercase by custom  setter;
+  expect(author.map.getKeys()[0],"_id");
+  expect(author.map.getKeys()[1],"name");
+  expect(author.map.getKeys()[2],"age");
+  expect(author.map.getKeys().last(),"email");
+  expect(author.map.getKeys().length,4);
+  expect(author.name,'VADIM'); // converted to uppercase by custom  setter;
 }
 
 testSetDirty(){
   var author = new Author();
   author.name = "Vadim";
-  expect(author.dirtyFields.length).equals(1);
-  expect(author.isDirty()).isTrue();  
+  expect(author.dirtyFields.length,1);
+  expect(author.isDirty());  
 }
 testCompoundObject(){
   var person = new Person();  
@@ -32,11 +33,11 @@ testCompoundObject(){
   person.address.streetName = 'Elm';  
   person.firstName = 'Dick';  
   Map map = person.map;
-  expect(map["address"]["streetName"]).equals("Elm");
-  expect(person.address.parent).equals(person);
-  expect(person.address.pathToMe).equals("address");
-  expect(person.isDirty()).isTrue();
-//  expect(person.address.isDirty()).isTrue();
+  expect(map["address"]["streetName"],"Elm");
+  expect(person.address.parent,person);
+  expect(person.address.pathToMe,"address");
+  expect(person.isDirty());
+//  expect(person.address.isDirty());
 }
 testFailOnSettingUnsavedLinkObject(){
   var son = new Person();  
@@ -50,7 +51,7 @@ testFailOnAbsentProperty(){
 }
 testNewInstanceMethod(){
   Author author = objectory.newInstance('Author');
-  expect(author is Author).isTrue();       
+  expect(author is Author);       
 }
 testMap2ObjectMethod() {
   Map map = {
@@ -59,15 +60,15 @@ testMap2ObjectMethod() {
     "email": "nobody@know.it"};
   Author author = objectory.map2Object("Author",map);
   //Not converted to upperCase because setter has not been invoked
-  expect(author.name).equals("Vadim"); 
-  expect(author.age).equals(300);
-  expect(author.email).equals("nobody@know.it");
+  expect(author.name,"Vadim"); 
+  expect(author.age,300);
+  expect(author.email,"nobody@know.it");
   map = {
     "streetName": "333",
     "cityName": "44444"
       };
   Address address = objectory.map2Object("Address",map);  
-  expect(address.cityName).equals("44444");
+  expect(address.cityName,"44444");
 }
 testObjectWithListOfInternalObjects2Map() {
   var customer = new Customer();
@@ -80,19 +81,19 @@ testObjectWithListOfInternalObjects2Map() {
   customer.addresses.add(address);
   var map = customer.map;
   
-  expect(map["name"]).equals("Tequila corporation");  
-  expect(map["addresses"].length).equals(2);
-  expect(map["addresses"][0] is! PersistentObject).isTrue();
-  expect(map["addresses"][0]["cityName"]).equals("Mexico");
-  expect(map["addresses"][1]["cityName"]).equals("Moscow");  
+  expect(map["name"],"Tequila corporation");  
+  expect(map["addresses"].length,2);
+  expect(map["addresses"][0] is! PersistentObject);
+  expect(map["addresses"][0]["cityName"],"Mexico");
+  expect(map["addresses"][1]["cityName"],"Moscow");  
 }
 testMap2ObjectWithListOfInternalObjects() {
   var map = {"_id": null, "name": "Tequila corporation", "addresses": [{"cityName": "Mexico"}, {"cityName": "Moscow"}]};
   var customer = objectory.map2Object($Customer.className, map);
-  expect(customer.name).equals("Tequila corporation");
-  expect(customer.addresses.length).equals(2);
-  expect(customer.addresses[1].cityName).equals("Moscow");
-  expect(customer.addresses[0].cityName).equals("Mexico");
+  expect(customer.name,"Tequila corporation");
+  expect(customer.addresses.length,2);
+  expect(customer.addresses[1].cityName,"Moscow");
+  expect(customer.addresses[0].cityName,"Mexico");
 }
 testObjectWithListtOfExternalRefs2Map() {
   Person father;
@@ -119,8 +120,8 @@ testObjectWithListtOfExternalRefs2Map() {
   father.children.add(son);  
   father.children.add(null);
   father.children[1] = daughter;
-  expect(father.map["children"][0]).equals(son.id);
-  expect(father.map["children"][1]).equals(daughter.id);
+  expect(father.map["children"][0],son.id);
+  expect(father.map["children"][1],daughter.id);
 }
 testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   User user = new User();
@@ -132,12 +133,13 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   Map articleMap = {"title": "test article", "body": "sasdfasdfasdf", 
                     "comments": [{"body": "Excellent", "user": user.id}]};               
   Article article = objectory.map2Object($Article.className,articleMap);
-  expect(article.map["comments"][0]["user"]).equals(user.id);
-  expect(article.comments[0].user).equals(user);
+  expect(article.map["comments"][0]["user"],user.id);
+  expect(article.comments[0].user,user);
 }
 
 main(){
   objectory = new ObjectoryDirectConnectionImpl();
+  initBsonPlatform();
   registerClasses();  
   group("PersistenObjectTests", ()  {
     test("testAuthorCreation",testAuthorCreation);

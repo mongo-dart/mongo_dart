@@ -5,19 +5,20 @@
 /**
  * A library for writing dart unit tests.
  *
- * To import this library, specify the relative path to 
+ * To import this library, specify the relative path to
  * lib/unittest/unittest.dart.
  *
  * ##Concepts##
  *
  *  * Tests: Tests are specified via the top-level function [test], they can be
  *    organized together using [group].
- *  * Checks: Test expectations can be specified via [expect] (see methods in
- *    [Expectation]), [expectThrow], or using assertions with the [Expect]
- *    class.
+ *  * Checks: Test expectations can be specified via [expect]
+ *  * Matchers: [expect] assertions are written declaratively using [Matcher]s
  *  * Configuration: The framework can be adapted by calling [configure] with a
  *    [Configuration].  Common configurations can be found in this package
- *    under: 'dom\_config.dart', 'html\_config.dart', and 'vm\_config.dart'.
+ *    under: 'dom\_config.dart' (deprecated), 'html\_config.dart' (for running
+ *    tests compiled to Javascript in a browser), and 'vm\_config.dart' (for
+ *    running native Dart tests on the VM).
  *
  * ##Examples##
  *
@@ -27,7 +28,7 @@
  *     main() {
  *       test('this is a test', () {
  *         int x = 2 + 3;
- *         expect(x).equals(5);
+ *         expect(x, equals(5));
  *       });
  *     }
  *
@@ -37,11 +38,11 @@
  *     main() {
  *       test('this is a test', () {
  *         int x = 2 + 3;
- *         expect(x).equals(5);
+ *         expect(x, equals(5));
  *       });
  *       test('this is another test', () {
  *         int x = 2 + 3;
- *         expect(x).equals(5);
+ *         expect(x, equals(5));
  *       });
  *     }
  *
@@ -52,22 +53,26 @@
  *       group('group A', () {
  *         test('test A.1', () {
  *           int x = 2 + 3;
- *           expect(x).equals(5);
+ *           expect(x, equals(5));
  *         });
  *         test('test A.2', () {
  *           int x = 2 + 3;
- *           expect(x).equals(5);
+ *           expect(x, equals(5));
  *         });
  *       });
  *       group('group B', () {
  *         test('this B.1', () {
  *           int x = 2 + 3;
- *           expect(x).equals(5);
+ *           expect(x, equals(5));
  *         });
  *       });
  *     }
  *
- * Asynchronous tests: if callbacks expect between 0 and 2 positional arguments.
+ * Asynchronous tests: if callbacks expect between 0 and 2 positional arguments,
+ * depending on the suffix of expectAsyncX(). expectAsyncX() will wrap a
+ * function into a new callback and will not consider the test complete until
+ * that callback is run. A count argument can be provided to specify the number
+ * of times the callback should be called (the default is 1).
  *
  *     #import('path-to-dart/lib/unittest/unitest.dart');
  *     #import('dart:dom_deprecated');
@@ -77,19 +82,27 @@
  *         // the callback takes 0 arguments...
  *         window.setTimeout(expectAsync0(() {
  *           int x = 2 + 3;
- *           expect(x).equals(5);
+ *           expect(x, equals(5));
  *         }), 0);
  *       });
  *
  *       test('calllback is executed twice', () {
  *         var callback = expectAsync0(() {
  *           int x = 2 + 3;
- *           expect(x).equals(5);
+ *           expect(x, equals(5));
  *         }, count: 2); // <-- we can indicate multiplicity to [expectAsync0]
  *         window.setTimeout(callback, 0);
  *         window.setTimeout(callback, 0);
  *       });
  *     }
+ *
+ * expectAsyncX() will wrap the callback code in a try/catch handler to handle
+ * exceptions (treated as test failures). There may be times when the number of
+ * times a callback should be called is non-deterministic. In this case a dummy
+ * callback can be created with expectAsync0((){}) and this can be called from
+ * the real callback when it is finally complete. In this case the body of the
+ * callback should be protected within a call to guardAsync(); this will ensure
+ * that exceptions are properly handled.
  *
  * Note: due to some language limitations we have to use different functions
  * depending on the number of positional arguments of the callback. In the
@@ -113,7 +126,7 @@
  *           // correctly
  *           guardAsync(() {
  *             int x = 2 + 3;
- *             expect(x).equals(5);
+ *             expect(x, equals(5));
  *           });
  *           // indicate that the asynchronous callback was invoked.
  *           async.complete();
@@ -125,8 +138,18 @@
 
 #import('dart:isolate');
 
+#source('collection_matchers.dart');
 #source('config.dart');
-#source('expectation.dart');
+#source('core_matchers.dart');
+#source('description.dart');
+#source('expect.dart');
+#source('future_matchers.dart');
+#source('interfaces.dart');
+#source('map_matchers.dart');
+#source('matcher.dart');
+#source('numeric_matchers.dart');
+#source('operator_matchers.dart');
+#source('string_matchers.dart');
 #source('test_case.dart');
 
 /** [Configuration] used by the unittest library. */
@@ -179,14 +202,11 @@ final _ERROR = 'error';
 /** If set, then all other test cases will be ignored. */
 TestCase _soloTest;
 
-/** Creates an expectation for the given value. */
-Expectation expect(value) => new Expectation(value);
-
 /**
- * Evaluates the [function] and validates that it throws an exception. If
- * [callback] is provided, then it will be invoked with the thrown exception.
- * The callback may do any validation it wants. In addition, if it returns
- * `false`, that also indicates an expectation failure.
+ * (Deprecated) Evaluates the [function] and validates that it throws an
+ * exception. If [callback] is provided, then it will be invoked with the
+ * thrown exception. The callback may do any validation it wants. In addition,
+ * if it returns `false`, that also indicates an expectation failure.
  */
 void expectThrow(function, [bool callback(exception)]) {
   bool threw = false;
@@ -222,9 +242,9 @@ void test(String spec, TestFunction body) {
 }
 
 /**
- * Creates a new async test case with the given description and body. The
- * description will include the descriptions of any surrounding group()
- * calls.
+ * (Deprecated) Creates a new async test case with the given description
+ * and body. The description will include the descriptions of any surrounding
+ * group() calls.
  */
 // TODO(sigmund): deprecate this API
 void asyncTest(String spec, int callbacks, TestFunction body) {
@@ -274,68 +294,127 @@ final _sentinel = const _Sentinel();
 
 /** Simulates spread arguments using named arguments. */
 // TODO(sigmund): remove this class and simply use a closure with named
-// arguments inside [_expectAsync], once bug 282 is fixed or frog is replaced by
-// dart2js.
+// arguments (if still applicable).
 class _SpreadArgsHelper {
-  Function callback;
-  int expectedCalls;
-  int calls = 0;
-  TestCase testCase;
-  _SpreadArgsHelper(this.callback, this.expectedCalls) {
-    Expect.isTrue(_currentTest < _tests.length);
-    testCase = _tests[_currentTest];
-    testCase.callbacks++;
+  Function _callback;
+  int _expectedCalls;
+  int _calls = 0;
+  TestCase _testCase;
+  Function _shouldCallBack;
+  Function _isDone;
+
+  _init(Function callback, Function shouldCallBack, Function isDone,
+       [expectedCalls = 0]) {
+    assert(_currentTest < _tests.length);
+    _callback = callback;
+    _shouldCallBack = shouldCallBack;
+    _isDone = isDone;
+    _expectedCalls = expectedCalls;
+    _testCase = _tests[_currentTest];
+    if (expectedCalls > 0) {
+      _testCase.callbacks++;
+    }
+  }
+
+  _SpreadArgsHelper(callback, shouldCallBack, isDone) {
+    _init(callback, shouldCallBack, isDone);
+  }
+
+  _SpreadArgsHelper.fixedCallCount(callback, expectedCalls) {
+    _init(callback, _checkCallCount, _allCallsDone, expectedCalls);
+  }
+
+  _SpreadArgsHelper.variableCallCount(callback, isDone) {
+    _init(callback, _always, isDone);
+  }
+
+  _after() {
+    if (_isDone()) {
+      _handleAllCallbacksDone();
+    }
+  }
+
+  _allCallsDone() => _calls == _expectedCalls;
+
+  _always() {
+    // Always run except if the test is done.
+    if (_testCase.isComplete) {
+      _testCase.error(
+          'Callback called after already being marked as done ($_calls)',
+          '');
+      _state = _UNCAUGHT_ERROR;
+      return false;
+    } else {
+      return true;
+    }
   }
 
   invoke([arg0 = _sentinel, arg1 = _sentinel, arg2 = _sentinel,
           arg3 = _sentinel, arg4 = _sentinel]) {
     return guardAsync(() {
-      if (!_incrementCall()) {
+      ++_calls;
+      if (!_shouldCallBack()) {
         return;
       } else if (arg0 == _sentinel) {
-        return callback();
+        return _callback();
       } else if (arg1 == _sentinel) {
-        return callback(arg0);
+        return _callback(arg0);
       } else if (arg2 == _sentinel) {
-        return callback(arg0, arg1);
+        return _callback(arg0, arg1);
       } else if (arg3 == _sentinel) {
-        return callback(arg0, arg1, arg2);
+        return _callback(arg0, arg1, arg2);
       } else if (arg4 == _sentinel) {
-        return callback(arg0, arg1, arg2, arg3);
+        return _callback(arg0, arg1, arg2, arg3);
       } else {
-        testCase.error(
+        _testCase.error(
            'unittest lib does not support callbacks with more than 4 arguments',
            '');
         _state = _UNCAUGHT_ERROR;
       }
-    }, () { if (calls == expectedCalls) callbackDone(); });
+    },
+    _after);
   }
 
   invoke0() {
     return guardAsync(
-        () => _incrementCall() ? callback() : null,
-        () { if (calls == expectedCalls) callbackDone(); });
+        () {
+          ++_calls;
+          if (_shouldCallBack()) {
+            return _callback();
+          }
+        },
+        _after);
   }
 
   invoke1(arg1) {
     return guardAsync(
-        () => _incrementCall() ? callback(arg1) : null,
-        () { if (calls == expectedCalls) callbackDone(); });
+        () {
+          ++_calls;
+          if (_shouldCallBack()) {
+            return _callback(arg1);
+          }
+        },
+        _after);
   }
 
   invoke2(arg1, arg2) {
     return guardAsync(
-        () => _incrementCall() ? callback(arg1, arg2) : null,
-        () { if (calls == expectedCalls) callbackDone(); });
+        () {
+          ++_calls;
+          if (_shouldCallBack()) {
+            return _callback(arg1, arg2);
+          }
+        },
+        _after);
   }
 
   /** Returns false if we exceded the number of expected calls. */
-  bool _incrementCall() {
-    calls++;
-    if (calls > expectedCalls) {
-      testCase.error(
-         'Callback called more times than expected ($expectedCalls)',
-         '');
+  bool _checkCallCount() {
+    if (_calls > _expectedCalls) {
+      _testCase.error(
+          'Callback called more times than expected '
+             '($_calls > $_expectedCalls)',
+          '');
       _state = _UNCAUGHT_ERROR;
       return false;
     }
@@ -352,7 +431,7 @@ class _SpreadArgsHelper {
  * arguments (named arguments are not supported here).
  */
 Function _expectAsync(Function callback, [int count = 1]) {
-  return new _SpreadArgsHelper(callback, count).invoke;
+  return new _SpreadArgsHelper.fixedCallCount(callback, count).invoke;
 }
 
 /**
@@ -365,19 +444,60 @@ Function _expectAsync(Function callback, [int count = 1]) {
  */
 // TODO(sigmund): deprecate this API when issue 2706 is fixed.
 Function expectAsync0(Function callback, [int count = 1]) {
-  return new _SpreadArgsHelper(callback, count).invoke0;
+  return new _SpreadArgsHelper.fixedCallCount(callback, count).invoke0;
 }
 
 /** Like [expectAsync0] but [callback] should take 1 positional argument. */
 // TODO(sigmund): deprecate this API when issue 2706 is fixed.
 Function expectAsync1(Function callback, [int count = 1]) {
-  return new _SpreadArgsHelper(callback, count).invoke1;
+  return new _SpreadArgsHelper.fixedCallCount(callback, count).invoke1;
 }
 
 /** Like [expectAsync0] but [callback] should take 2 positional arguments. */
 // TODO(sigmund): deprecate this API when issue 2706 is fixed.
 Function expectAsync2(Function callback, [int count = 1]) {
-  return new _SpreadArgsHelper(callback, count).invoke2;
+  return new _SpreadArgsHelper.fixedCallCount(callback, count).invoke2;
+}
+
+/**
+ * Indicate that [callback] is expected to be called until [isDone] returns
+ * true. The unittest framework checks [isDone] after each callback and only
+ * when it returns true will it continue with the following test. Using
+ * [expectAsyncUntil] will also ensure that errors that occur within
+ * [callback] are tracked and reported. [callback] should take between 0 and
+ * 4 positional arguments (named arguments are not supported).
+ */
+Function _expectAsyncUntil(Function callback, Function isDone) {
+  return new _SpreadArgsHelper.variableCallCount(callback, isDone).invoke;
+}
+
+/**
+ * Indicate that [callback] is expected to be called until [isDone] returns
+ * true. The unittest framework check [isDone] after each callback and only
+ * when it returns true will it continue with the following test. Using
+ * [expectAsyncUntil0] will also ensure that errors that occur within
+ * [callback] are tracked and reported. [callback] should take 0 positional
+ * arguments (named arguments are not supported).
+ */
+// TODO(sigmund): deprecate this API when issue 2706 is fixed.
+Function expectAsyncUntil0(Function callback, Function isDone) {
+  return new _SpreadArgsHelper.variableCallCount(callback, isDone).invoke0;
+}
+
+/**
+ * Like [expectAsyncUntil0] but [callback] should take 1 positional argument.
+ */
+// TODO(sigmund): deprecate this API when issue 2706 is fixed.
+Function expectAsyncUntil1(Function callback, Function isDone) {
+  return new _SpreadArgsHelper.variableCallCount(callback, isDone).invoke1;
+}
+
+/**
+ * Like [expectAsyncUntil0] but [callback] should take 2 positional arguments.
+ */
+// TODO(sigmund): deprecate this API when issue 2706 is fixed.
+Function expectAsyncUntil2(Function callback, Function isDone) {
+  return new _SpreadArgsHelper.variableCallCount(callback, isDone).invoke2;
 }
 
 /**
@@ -406,10 +526,10 @@ void group(String description, void body()) {
 }
 
 /** Called by subclasses to indicate that an asynchronous test completed. */
-void callbackDone() {
+void _handleAllCallbacksDone() {
   // TODO (gram): we defer this to give the nextBatch recursive
-  // stack a chance to unwind. This is a temporary hack but 
-  // really a bunch of code here needs to be fixed. We have a 
+  // stack a chance to unwind. This is a temporary hack but
+  // really a bunch of code here needs to be fixed. We have a
   // single array that is being iterated through by nextBatch(),
   // which is recursively invoked in the case of async tests that
   // run synchronously. Bad things can then happen.
@@ -425,7 +545,9 @@ void callbackDone() {
         _state = _UNCAUGHT_ERROR;
       } else if ((_callbacksCalled == testCase.callbacks) &&
           (_state != _RUNNING_TEST)) {
-        if (testCase.result == null) testCase.pass();
+        if (testCase.result == null) {
+          testCase.pass();
+        }
         _currentTest++;
         _testRunner();
       }
@@ -433,7 +555,16 @@ void callbackDone() {
   });
 }
 
-/** Menchanism to notify that an error was caught outside of this library. */
+/**
+ * Temporary hack: expose old API.
+ * TODO(gram) remove this when WebKit tests are working with new framework
+ */
+void callbackDone() { _handleAllCallbacksDone(); }
+
+/**
+ * Utility function that can be used to notify the test framework that an
+ *  error was caught outside of this library.
+ */
 void reportTestError(String msg, String trace) {
  if (_currentTest < _tests.length) {
     final testCase = _tests[_currentTest];
@@ -517,7 +648,6 @@ _nextBatch() {
     guardAsync(() {
       _callbacksCalled = 0;
       _state = _RUNNING_TEST;
-
       testCase.test();
 
       if (_state != _UNCAUGHT_ERROR) {
@@ -571,6 +701,8 @@ ensureInitialized() {
   if (_state != _UNINITIALIZED) return;
 
   _tests = <TestCase>[];
+  _uncaughtErrorMessage = null;
+  _currentTest = 0;
   _currentGroup = '';
   _state = _READY;
   _testRunner = _nextBatch;
@@ -587,3 +719,4 @@ ensureInitialized() {
 
 /** Signature for a test function. */
 typedef void TestFunction();
+

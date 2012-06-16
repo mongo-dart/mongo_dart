@@ -1,20 +1,10 @@
 #library("all_tests");
 #import("../lib/bson/bson.dart");
-#import("connection_test.dart",prefix:"connection");
-#import("cursor_test.dart",prefix:"cursor");
-#import("dbcommand_test.dart",prefix:"dbcommand");
-#import("dbcollection_test.dart",prefix:"dbcollection");
-#import("db_test.dart",prefix:"dbtest");
 #import("bson/bson_tests_vm.dart",prefix:"bson");
 #import("objectory/all_objectory_tests.dart",prefix:"objectory");
-#import("selector_builder_test.dart",prefix:"helper");
+#import("database_tests.dart",prefix:"database");
 main(){
   bson.main();
-  connection.main();
-  cursor.main();
-  dbcommand.main();
-  dbcollection.main();
-  dbtest.main();
-  helper.main();        
+  database.main();          
   objectory.main();
 }

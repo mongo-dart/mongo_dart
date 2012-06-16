@@ -2,7 +2,6 @@
 #import("schema.dart");
 #import("../mongo.dart");
 #import("../bson/bson.dart");
-#import("../bson/bson_vm.dart");
 #import("persistent_object.dart");
 #import("objectory_query_builder.dart");
 #import("objectory_base.dart");
@@ -87,8 +86,6 @@ class ObjectoryDirectConnectionImpl extends ObjectoryBaseImpl{
 Future<bool> setUpObjectory(String dbName, Function registerClassCallback, [bool dropDb = false, String url]){  
   var res = new Completer();
   objectory = new ObjectoryDirectConnectionImpl();
-  
-  initBsonPlatform();
   objectory.open("dbName",url).then((_){
     if (dropDb) { 
       objectory.dropDb();

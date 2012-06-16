@@ -65,7 +65,8 @@ String _toHtml(TestCase test_) {
       </tr>''';
 
   if (test_.stackTrace != null) {
-    html = '$html<tr><td></td><td colspan="2"><pre>${_htmlEscape(test_.stackTrace)}</pre></td></tr>';
+    html +=
+        '<tr><td></td><td colspan="2"><pre>${_htmlEscape(test_.stackTrace)}</pre></td></tr>';
   }
 
   return html;
