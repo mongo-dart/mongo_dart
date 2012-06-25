@@ -8,6 +8,6 @@ class BsonDate extends BsonObject{
      buffer.writeInt64(data.value);
   }
   unpackValue(Binary buffer){
-     data = new Date.fromEpoch(buffer.readInt64());
+     data = new Date.fromMillisecondsSinceEpoch(buffer.readInt64());
   }
 }

@@ -3,7 +3,7 @@ class Timestamp extends BsonObject{
   int increment;  
   Timestamp([this.seconds,this.increment]){
     if (seconds === null){
-      seconds = (new Date.now().value / 1000).toInt();
+      seconds = (new Date.now().millisecondsSinceEpoch / 1000).toInt();
     }
     if (increment === null){
       increment = Statics.nextIncrement;

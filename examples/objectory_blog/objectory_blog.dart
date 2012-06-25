@@ -54,13 +54,13 @@ main(){
     article.body = 'Las callecitas de Buenos Aires tienen ese no se que...';
     article.author = authors['Jorge Luis Borges'];
     var comment = new Comment();
-    comment.date = new Date.fromEpoch(new Date.now().value - 780987497);
+    comment.date = new Date.fromMillisecondsSinceEpoch(new Date.now().value - 780987497);
     comment.body = "Well, you may do better...";
     comment.user = users['lsmith'];
     article.comments.add(comment);
     objectory.save(article);            
     comment = new Comment();
-    comment.date = new Date.fromEpoch(new Date.now().value - 90987497);
+    comment.date = new Date.fromMillisecondsSinceEpoch(new Date.now().value - 90987497);
     comment.body = "I love this article!";
     comment.user = users['jdoe'];
     article.comments.add(comment);    
@@ -71,7 +71,7 @@ main(){
     article.body = 'Thine eyes call me in a new way';
     article.author = authors['William Shakespeare'];
     comment = new Comment();
-    comment.date = new Date.fromEpoch(new Date.now().value - 20987497);
+    comment.date = new Date.fromMillisecondsSinceEpoch(new Date.now().value - 20987497);
     comment.body = "great article!";
     comment.user = users['jdoe'];
     article.comments.add(comment);
