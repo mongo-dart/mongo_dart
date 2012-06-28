@@ -1,4 +1,5 @@
 #library("mongo");
+#import("dart:isolate");
 #import("dart:io");
 #import("bson/bson.dart");
 #import("bson/bson_vm.dart");
