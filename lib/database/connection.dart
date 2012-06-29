@@ -31,7 +31,6 @@ class Connection{
       };
       return completer.future;
     }
-    
   }
   close(){
     while (!sendQueue.isEmpty()){
@@ -67,6 +66,7 @@ class Connection{
       if (!bufferToSend.atEnd()){        
        debug("Buffer not send fully, offset: ${bufferToSend.offset}");
       }
+      
       new Timer(0,(t)=>sendBufferFromTimer());              
 //      sendBuffer("From sendBuffer");
     }        

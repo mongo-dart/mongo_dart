@@ -4,7 +4,7 @@
 
 class BsonPlatformBrowser extends BsonPlatform {  
   List<int> makeUint8List(int size) => new Uint8Array(size);
-  makeByteArray(List<int> from) => new DataView(from.buffer);   
+  makeByteArray(from) => new DataView(from.buffer);   
 }
 
 initBsonPlatform() {

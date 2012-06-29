@@ -4,7 +4,7 @@
 class BsonPlatformVm extends BsonPlatform {
   
   List<int> makeUint8List(int size) => new Uint8List(size);
-  makeByteArray(List<int> from) => from.asByteArray();
+  makeByteArray(from) => from.asByteArray();
 }
 
 initBsonPlatform() {
