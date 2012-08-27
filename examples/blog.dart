@@ -1,6 +1,4 @@
 #import("../lib/mongo.dart");
-#import("dart:builtin");
-
 main(){
   Db db = new Db("mongo-dart-blog");
   print("Connecting to ${db.serverConfig.host}:${db.serverConfig.port}");

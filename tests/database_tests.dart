@@ -3,7 +3,6 @@
 #import("../lib/bson/bson.dart");
 #import("../lib/bson/bson_vm.dart");
 #import("dart:io");
-#import("dart:builtin");
 #import('../third_party/unittest/unittest.dart');
 testSelectorBuilderCreation(){
   SelectorBuilder selector = query();
@@ -428,7 +427,7 @@ testPingDbCommand(){
   });
 }
 testDropDbCommand(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('mongo-dart-test1');
   db.open().then((d){
     DbCommand command = DbCommand.createDropDatabaseCommand(db);
     Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(command);

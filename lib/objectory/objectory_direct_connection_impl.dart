@@ -72,8 +72,8 @@ class ObjectoryDirectConnectionImpl extends ObjectoryBaseImpl{
     return completer.future;  
   }
   
-  Future<bool> dropDb(){
-    db.drop();
+  Future<Map> dropDb(){
+    return db.drop();
   }
   
   void close(){
@@ -86,12 +86,11 @@ class ObjectoryDirectConnectionImpl extends ObjectoryBaseImpl{
 Future<bool> setUpObjectory(String dbName, Function registerClassCallback, [bool dropDb = false, String url]){  
   var res = new Completer();
   objectory = new ObjectoryDirectConnectionImpl();
-  objectory.open("dbName",url).then((_){
-    if (dropDb) { 
-      objectory.dropDb();
-    }        
-    registerClassCallback();
-    res.complete(true);
+  objectory.open(dbName,url).then((_){  
+    objectory.dropDb().then((_)  {          
+      registerClassCallback();
+      res.complete(true);
+    });
   });    
   return res.future;
 }

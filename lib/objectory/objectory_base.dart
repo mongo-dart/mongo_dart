@@ -16,7 +16,7 @@ interface Objectory{
   void save(RootPersistentObject persistentObject);
   void remove(PersistentObject persistentObject);
   Future<bool> open([String database, String url]);
-  Future<bool> dropDb();
+  Future<Map> dropDb();
   ClassSchema getSchema(String className);
   void close();
 }
