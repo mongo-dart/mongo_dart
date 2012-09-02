@@ -1,5 +1,6 @@
 #library("Database_tests");
 #import("../lib/mongo.dart");
+#import("dart:uri");
 #import("../lib/bson/bson.dart");
 #import("../lib/bson/bson_vm.dart");
 #import("dart:io");
@@ -478,6 +479,15 @@ testAuthentication(){
     callbackDone();
   });
 }
+testMongoDbUri(){
+  var connStr = 'mongodb://dart:test@ds031477.mongolab.com:31477/dart';
+  var db = new Db.fromUri(connStr);
+  expect(db.userName,'dart');
+  expect(db.databaseName,'dart');
+  expect(db.host,'ds031477.mongolab.com');
+  expect(db.port,31477);
+  expect(db.password,'test');
+}
 main(){
 // some tests do not open db, when bson initialize
   initBsonPlatform(); 
@@ -485,6 +495,7 @@ main(){
     test("testSelectorBuilderCreation",testSelectorBuilderCreation);
     test("testSelectorBuilderOnObjectId",testSelectorBuilderOnObjectId);
     test("testAuthComponents",testAuthComponents);
+    solo_test("testMongoDbUri",testMongoDbUri);
   });
   group("DBCommand:", (){
     asyncTest("testAuthentication",1,testAuthentication);

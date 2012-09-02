@@ -1,5 +1,10 @@
 class Db{
   String databaseName;
+  String userName;
+  String password;
+  String host;
+  int port;
+
   ServerConfig serverConfig;
   Connection connection;
   validateDatabaseName(String dbName) {
@@ -14,7 +19,24 @@ class Db{
       serverConfig = new ServerConfig();
      }
     connection = new Connection(serverConfig);
-  }      
+  }
+  Db.fromUri(String uriString){
+    var uri = new Uri.fromString(uriString);
+    print(uri);
+    host = uri.domain;
+    if (uri.userInfo != '') {
+      var userInfo = uri.userInfo.split(':');
+      if (userInfo.length != 2) {
+        throw 'Неверный формат поля userInfo: $uri.userInfo';
+      }
+      userName = userInfo[0];
+      password = userInfo[1];
+    }
+    if (uri.path != '') {
+      databaseName = uri.path.replaceAll('/','');
+    }
+    port = uri.port;
+  }
   DbCollection collection(String collectionName){
       return new DbCollection(this,collectionName);
   }

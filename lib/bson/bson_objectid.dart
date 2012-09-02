@@ -5,7 +5,7 @@ class BsonObjectId extends BsonObject implements ObjectId{
     int seconds = new Timestamp(null,0).seconds;    
     id = new Binary(12);
     id.writeInt(seconds,4,forceBigEndian:true);
-    /* Todo - restore whan Math.random would work
+    /* Todo - restore when Math.random would work
     id.writeInt(Statics.MachineId,3);
     id.writeInt(Statics.Pid,2);    
     */
@@ -18,7 +18,7 @@ class BsonObjectId extends BsonObject implements ObjectId{
   BsonObjectId.fromSeconds(int seconds){
     id = new Binary(12);
     id.writeInt(seconds,4,forceBigEndian:true);
-    /* Todo - restore whan Math.random would work
+    /* Todo - restore when Math.random would work
     id.writeInt(Statics.MachineId,3);
     id.writeInt(Statics.Pid,2);    
     */
