@@ -56,36 +56,36 @@ interface Comment extends PersistentObject default ObjectoryFactory {
 }
 
 class UserImpl extends RootPersistentObject implements User {  
-  String get type() => "User";
+  String get type => "User";
 }
 
 class ArticleImpl extends RootPersistentObject implements Article {
-  String get type() => "Article";
+  String get type => "Article";
 }
 
 class CommentImpl extends EmbeddedPersistentObject implements Comment {
-  String get type() => "Comment";
+  String get type => "Comment";
 }
 
 class AuthorImpl extends RootPersistentObject implements Author {  
-  String get type()=>'Author';
+  String get type=>'Author';
   set name(String value){
     if (value is String){
       value = value.toUpperCase();
     }      
     setProperty('name', value);
   }
-  String get name()=>getProperty('name');
+  String get name=>getProperty('name');
 }
 class PersonImpl extends RootPersistentObject implements Person {  
-  String get type()=>"Person";
+  String get type=>"Person";
 }
 class CustomerImpl extends RootPersistentObject implements Customer {  
-  String get type()=>"Customer";
+  String get type=>"Customer";
 }  
 
 class AddressImpl extends EmbeddedPersistentObject implements Address {  
-  String get type()=>"Address";
+  String get type=>"Address";
 }
 class ObjectoryFactory{
   factory Author() => new AuthorImpl();
@@ -149,8 +149,8 @@ Future<bool> initDomainModel(){
   return setUpObjectory('ObjectoryTests', registerClasses, dropDb: true);
 }
 
-ObjectoryQueryBuilder get $Person() => new ObjectoryQueryBuilder('Person');
-ObjectoryQueryBuilder get $Author() => new ObjectoryQueryBuilder('Author');
-ObjectoryQueryBuilder get $Customer() => new ObjectoryQueryBuilder('Customer');
-ObjectoryQueryBuilder get $User() => new ObjectoryQueryBuilder('User');
-ObjectoryQueryBuilder get $Article() => new ObjectoryQueryBuilder('Article');
+ObjectoryQueryBuilder get $Person => new ObjectoryQueryBuilder('Person');
+ObjectoryQueryBuilder get $Author => new ObjectoryQueryBuilder('Author');
+ObjectoryQueryBuilder get $Customer => new ObjectoryQueryBuilder('Customer');
+ObjectoryQueryBuilder get $User => new ObjectoryQueryBuilder('User');
+ObjectoryQueryBuilder get $Article => new ObjectoryQueryBuilder('Article');

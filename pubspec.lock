@@ -1,0 +1,1 @@
+{"packages":{"log4dart":{"version":"1.0.0","source":"git","description":{"url":"git://github.com/Solvr/log4dart.git","ref":null,"resolved-ref":"224bbd7d735e646c1e39c3dbb24e013a6951908a"}},"unittest":{"version":"0.0.0-r.11743","source":"sdk","description":"unittest"}}}

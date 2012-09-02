@@ -10,7 +10,7 @@ class MongoRemoveMessage extends MongoMessage{
     _selector = new BsonMap(selector);      
     opcode = MongoMessage.Delete;
   }
-  int get messageLength(){
+  int get messageLength{
     return 16+4+_collectionFullName.byteLength()+4+_selector.byteLength();
   }
   Binary serialize(){

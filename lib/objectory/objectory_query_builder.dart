@@ -13,7 +13,7 @@ class ObjectoryQueryBuilder {
   
   toString() => "ObjectoryQueryBuilder($map)";
   
-  String get className() => schema.className;
+  String get className => schema.className;
   
   void testPropertyName(String propertyName) {
     var propertyChain = propertyName.split('.');

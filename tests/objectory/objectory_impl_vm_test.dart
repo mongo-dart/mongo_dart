@@ -5,7 +5,7 @@
 #import("../../lib/objectory/objectory_query_builder.dart");
 #import("../../lib/objectory/schema.dart");
 #import("../../lib/bson/bson.dart");
-#import('../../third_party/unittest/unittest.dart');
+#import('../../packages/unittest/unittest.dart');
 #import("domain_model.dart");
 
 void testInsertionAndUpdate(){
@@ -151,10 +151,10 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
 
 testPropertyNameChecks() {
   var query = $Person.eq('firstName', 'Vadim');
-  expect({'firstName': 'Vadim'},recursivelyMatches(query.map));
+  expect(query.map,containsPair('firstName', 'Vadim'));
   expect(() => $Person.eq('unkwnownProperty', null),throws);
   query = $Person.eq('address.cityName', 'Tyumen');
-  expect({'address.cityName': 'Tyumen'},recursivelyMatches(query.map));
+  expect(query.map,containsPair('address.cityName','Tyumen'));
   expect(() => $Person.eq('address.cityName1', 'Tyumen'),throws);
 }
 

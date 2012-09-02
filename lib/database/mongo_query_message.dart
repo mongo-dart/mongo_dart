@@ -14,7 +14,7 @@ static final OPTS_EXHAUST = 64;
   int numberToReturn;
   BsonMap _query;
   BsonMap _fields;
-  BsonCString get collectionNameBson() => _collectionFullName;
+  BsonCString get collectionNameBson => _collectionFullName;
   MongoQueryMessage(String collectionFullName,
             this.flags,
             this.numberToSkip,
@@ -28,7 +28,7 @@ static final OPTS_EXHAUST = 64;
     }
     opcode = MongoMessage.Query;    
   }
-  int get messageLength(){
+  int get messageLength{
     int result = 16+4+_collectionFullName.byteLength()+4+4+_query.byteLength();
     if (_fields !== null){
       result += _fields.byteLength();

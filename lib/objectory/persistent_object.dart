@@ -140,7 +140,7 @@ abstract class BasePersistentObject implements PersistentObject{
   
   void init(){}
   
-  String get type() => "PersistentObjectBase";
+  String get type => "PersistentObjectBase";
   
   Future<PersistentObject> fetchLink(String property, [PropertySchema propertySchema, ObjectId objecId]) {  
     var completer = new Completer<PersistentObject>();

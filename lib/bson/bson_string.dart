@@ -1,16 +1,16 @@
 class BsonString extends BsonObject{
   String data;
   List<int> _utfData;  
-  List<int> get utfData(){
+  List<int> get utfData{
     if (_utfData === null){
       _utfData = encodeUtf8(data);
     }
     return _utfData;
   }  
   BsonString(this.data);
-  get value()=>data;
+  get value=>data;
   byteLength()=>utfData.length+1+4;
-  int get typeByte() => BSON.BSON_DATA_STRING;  
+  int get typeByte => BSON.BSON_DATA_STRING;  
   packValue(Binary buffer){
      buffer.writeInt(utfData.length+1);
      buffer.byteList.setRange(buffer.offset,utfData.length,utfData);
@@ -24,18 +24,18 @@ class BsonString extends BsonObject{
   }
 }
 class BsonCode extends BsonString{
-  get value()=>this;
-  int get typeByte() => BSON.BSON_DATA_CODE;
+  get value=>this;
+  int get typeByte => BSON.BSON_DATA_CODE;
   BsonCode(String data):super(data);
   String toString()=>"BsonCode('$data')";  
 }
 class BsonCString extends BsonString{
   bool useKeyCash;
-  int get typeByte(){
+  int get typeByte{
    throw "Function typeByte of BsonCString must not be called";
   }   
   BsonCString(String data, [this.useKeyCash = true]): super(data);
-  List<int> get utfData(){
+  List<int> get utfData{
     if (useKeyCash){
       return Statics.getKeyUtf8(data);
     }

@@ -6,7 +6,7 @@
 #import("../../lib/objectory/schema.dart");
 #import("../../lib/bson/bson.dart");
 #import("../../lib/bson/bson_vm.dart");
-#import('../../third_party/unittest/unittest.dart');
+#import('../../packages/unittest/unittest.dart');
 #import("domain_model.dart");
 testAuthorCreation(){
   var author = new Author();

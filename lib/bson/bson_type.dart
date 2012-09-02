@@ -4,7 +4,7 @@ class _ElementPair{
   _ElementPair([this.name,this.value]);
 }
 class BsonObject {  
-  int get typeByte(){ throw const Exception("must be implemented");}
+  int get typeByte{ throw const Exception("must be implemented");}
   int byteLength() => 0;
   packElement(String name, var buffer){
     buffer.writeByte(typeByte);
@@ -22,7 +22,7 @@ class BsonObject {
     return result;
   }
   unpackValue(var buffer){ throw const Exception("must be implemented");}
-  get value()=>null;
+  get value=>null;
 }
 int elementSize(String name, value) {
   int size = 1;

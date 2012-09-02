@@ -18,7 +18,7 @@ class Binary extends BsonObject{
     byteList.setRange(0, from.length, from);
     byteArray = makeByteArray(byteList);    
   }  
-  int get typeByte() => BSON.BSON_DATA_BINARY;  
+  int get typeByte => BSON.BSON_DATA_BINARY;  
   String toHexString(){
     StringBuffer stringBuffer = new StringBuffer();
     for (final byte in byteList)
@@ -146,6 +146,6 @@ class Binary extends BsonObject{
     byteList.setRange(0,size,buffer.byteList,buffer.offset);
     buffer.offset += size;  
   }
-  get value()=>this;
+  get value=>this;
   String toString()=>"Binary(${toHexString()})";
 }

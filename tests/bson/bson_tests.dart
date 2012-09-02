@@ -1,12 +1,12 @@
 #library("tests");
-#import('../../third_party/unittest/unittest.dart');
+#import('../../packages/unittest/unittest.dart');
 #import("../../lib/bson/bson.dart");
 
 testUint8ListNegativeWrite(){
   Uint8List bl = new Uint8List(4);
   ByteArray ba = bl.asByteArray();
   ba.setInt32(0,-1);
-  expect(bl,recursivelyMatches([255,255,255,255]));
+  expect(bl,orderedEquals([255,255,255,255]));
 }
 testBinaryWithNegativeOne(){
   Binary b = new Binary(4);
@@ -74,7 +74,7 @@ testSerializeDeserialize(){
   Map root = bson.deserialize(buffer);    
   expect(root['a'],4);
   expect(root['_id'],5);
-  expect(map,recursivelyMatches(root));
+//  expect(map,recursivelyMatches(root));
   var doc1 = {'a': [15]};
   buffer = bson.serialize(doc1);
   expect('140000000461000c0000001030000f0000000000',buffer.toHexString());

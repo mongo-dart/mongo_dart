@@ -22,7 +22,7 @@ interface Objectory{
 }
 
 set objectory(Objectory impl) => ObjectoryBaseImpl.objectoryImpl = impl; 
-Objectory get objectory() => ObjectoryBaseImpl.objectoryImpl; 
+Objectory get objectory => ObjectoryBaseImpl.objectoryImpl; 
 
 abstract class ObjectoryBaseImpl implements Objectory{
     

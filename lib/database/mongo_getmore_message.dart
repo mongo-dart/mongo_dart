@@ -9,7 +9,7 @@ class MongoGetMoreMessage extends MongoMessage{
     _collectionFullName = new BsonCString(collectionFullName);    
     opcode = MongoMessage.GetMore;
   }
-  int get messageLength(){
+  int get messageLength{
     return 16+4+_collectionFullName.byteLength()+4+8;
   }
   Binary serialize(){

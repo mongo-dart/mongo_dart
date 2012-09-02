@@ -3,8 +3,8 @@
 #import("dart:io");
 #import("bson/bson.dart");
 #import("bson/bson_vm.dart");
-#import("../third_party/log4dart/Lib.dart");
-#import("../third_party/log4dart/file/FileAppender.dart");
+#import("../packages/log4dart/log4dart.dart");
+#import("../packages/log4dart/file_appender.dart");
 #source("database/connection.dart");
 #source("database/mongo_message.dart");
 #source("database/mongo_query_message.dart");

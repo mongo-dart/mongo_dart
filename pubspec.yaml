@@ -1,0 +1,8 @@
+name: mongodart
+description: MongoDB driver for Dart
+version: 0.0.1
+dependencies:
+  unittest:
+    sdk: unittest  
+  log4dart:		    
+    git: git://github.com/Solvr/log4dart.git

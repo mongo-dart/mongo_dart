@@ -35,17 +35,17 @@ interface Comment extends PersistentObject default ObjectoryFactory{
 }
 
 class AuthorImpl extends RootPersistentObject implements Author {  
-  String get type() => 'Author';  
+  String get type => 'Author';  
 }
 class UserImpl extends RootPersistentObject implements User {  
-  String get type() => "User";
+  String get type => "User";
 }
 class ArticleImpl extends RootPersistentObject implements Article {
-  String get type() => "Article";
+  String get type => "Article";
 }
 
 class CommentImpl extends EmbeddedPersistentObject implements Comment {
-  String get type() => "Comment";
+  String get type => "Comment";
 }
 
 class ObjectoryFactory{
@@ -89,6 +89,6 @@ Future<bool> initDomainModel(){
   return setUpObjectory('ObjectoryBlog', registerClasses, dropDb: true);
 }
 
-ObjectoryQueryBuilder get $Author() => new ObjectoryQueryBuilder('Author');
-ObjectoryQueryBuilder get $User() => new ObjectoryQueryBuilder('User');
-ObjectoryQueryBuilder get $Article() => new ObjectoryQueryBuilder('Article');
+ObjectoryQueryBuilder get $Author => new ObjectoryQueryBuilder('Author');
+ObjectoryQueryBuilder get $User => new ObjectoryQueryBuilder('User');
+ObjectoryQueryBuilder get $Article => new ObjectoryQueryBuilder('Article');

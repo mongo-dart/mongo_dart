@@ -1,7 +1,3 @@
-logger() { 
-  Utils.setVerboseState(); 
-  Utils.getLogger();  
-}
 setVerboseState(){
   Utils.setVerboseState();  
 }
@@ -17,28 +13,24 @@ error(String s){
 debug(String s){
   Utils.getLogger().debug(s);
 }
-_loggerBuilder(name) {
-  if(name == "Verbose"){
-    File file = new File("log.txt");
-    if (file.existsSync()){
-      file.deleteSync();  
-    }      
-    return new LoggerImpl(name, debugEnabled: true, errorEnabled:true, infoEnabled:true, warnEnabled:true,appenders:[new FileAppender("log.txt")]); 
-  }         
-  // default logger for the rest
-  return new LoggerImpl(name, debugEnabled: false, errorEnabled:true, infoEnabled:false, warnEnabled:true);
-}
 class Utils{
   static Logger logger;
   static Logger getLogger(){
     if (logger === null){
-      LoggerFactory.builder = _loggerBuilder;      
+      LoggerFactory.config["Runtime"].infoEnabled = false;
+      LoggerFactory.config["Runtime"].debugEnabled = false;      
       logger = LoggerFactory.getLogger("Runtime");
     } 
     return logger;
   }
   static setVerboseState(){
-    LoggerFactory.builder = _loggerBuilder;    
+    File file = new File("log.txt");
+    if (file.existsSync()){
+      file.deleteSync();  
+    }
+    LoggerFactory.config["Verbose"].appenders =  [new FileAppender("log.txt")];
+    LoggerFactory.config["Verbose"].infoEnabled = true;
+    LoggerFactory.config["Verbose"].debugEnabled = true;
     logger = LoggerFactory.getLogger("Verbose");    
   }
 }

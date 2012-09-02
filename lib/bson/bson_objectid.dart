@@ -38,8 +38,8 @@ class BsonObjectId extends BsonObject implements ObjectId{
   int hashCode() => id.toHexString().hashCode();
   String toString() => "ObjectId(${id.toHexString()})";
   String toHexString() => id.toHexString();
-  int get typeByte() => BSON.BSON_DATA_OID;
-  get value() => this;
+  int get typeByte => BSON.BSON_DATA_OID;
+  get value => this;
   int byteLength() => 12;
   unpackValue(Binary buffer){
      id.byteList.setRange(0,12,buffer.byteList,buffer.offset);

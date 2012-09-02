@@ -13,7 +13,7 @@ class MongoInsertMessage extends MongoMessage{
     }      
     opcode = MongoMessage.Insert;
   }
-  int get messageLength(){
+  int get messageLength{
     int docsSize = 0;
     for (var _doc in _documents){
       docsSize += _doc.byteLength();

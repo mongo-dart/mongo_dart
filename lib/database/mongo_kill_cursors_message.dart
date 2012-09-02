@@ -5,7 +5,7 @@ class MongoKillCursorsMessage extends MongoMessage{
             ){    
     opcode = MongoMessage.KillCursors;
   }
-  int get messageLength(){
+  int get messageLength{
     return 16+4+4+8;
   }
   Binary serialize(){

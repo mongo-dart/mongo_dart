@@ -40,7 +40,7 @@ class PersistentList<T> implements List<T>{
   BasePersistentObject parent;
   String pathToMe;  
   final List _list;
-  List get internalList() => _list;
+  List get internalList => _list;
   _ValueConverter _valueConverter;
   PersistentList(this._list,[this.parent, this.pathToMe]);
   
@@ -50,7 +50,7 @@ class PersistentList<T> implements List<T>{
     parent.setDirty(pathToMe);    
   }
   
-  _ValueConverter get valueConverter(){
+  _ValueConverter get valueConverter{
     if (_valueConverter === null) {
       _valueConverter = new _ValueConverter(parent,pathToMe);
     }
@@ -95,7 +95,7 @@ class PersistentList<T> implements List<T>{
   
   int lastIndexOf(T element, [int start]) => _list.lastIndexOf(element, start);
   
-  int get length() => _list.length;
+  int get length => _list.length;
   
   List getRange(int start, int length) => _list.getRange(start, length);
   

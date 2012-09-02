@@ -24,7 +24,7 @@ class MapProxy<K,V> implements Map<K,V>{
   
   Collection<V> getValues()=>map.getValues();
   
-  int get length() => map.length;
+  int get length => map.length;
 
   bool isEmpty()=>map.isEmpty();  
 }

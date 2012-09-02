@@ -1,9 +1,10 @@
-#library("Database tests");
+#library("Database_tests");
 #import("../lib/mongo.dart");
 #import("../lib/bson/bson.dart");
 #import("../lib/bson/bson_vm.dart");
 #import("dart:io");
-#import('../third_party/unittest/unittest.dart');
+#import('../packages/unittest/unittest.dart');
+
 testSelectorBuilderCreation(){
   SelectorBuilder selector = query();
   expect(selector is Map);
@@ -286,7 +287,7 @@ testPingRaw(){
     Future mapFuture = db.connection.query(queryMessage);
     return mapFuture;
   }).then((msg) {
-    expect({'ok': 1.0},recursivelyMatches(msg.documents[0]));
+    expect(msg.documents[0],containsPair('ok', 1));
     db.close();
     callbackDone();
   });
@@ -298,7 +299,7 @@ testNextObject(){
     Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);
     return cursor.nextObject();
   }).then((v){
-    expect({'ok': 1.0},recursivelyMatches(v));
+    expect(v,containsPair('ok', 1));
     db.close();
     callbackDone();
   });
@@ -374,9 +375,9 @@ testCursorGetMore(){
     cursor = new Cursor(db,collection,limit:10);  
     return cursor.each((v)=>count++);
   }).then((v){
-    expect(1000, count);
-    expect(0,cursor.cursorId);
-    expect(Cursor.CLOSED,cursor.state);
+    expect(count,1000);
+    expect(cursor.cursorId,0);
+    expect(cursor.state,Cursor.CLOSED);
     db.close();
     callbackDone();  
   });    
@@ -394,14 +395,14 @@ testCursorClosing(){
       }
     int count = 0;
     cursor = collection.find();
-    expect(Cursor.INIT,cursor.state);
+    expect(cursor.state,Cursor.INIT);
     return cursor.nextObject();
   }).then((v){    
-    expect(Cursor.OPEN,cursor.state);
+    expect(cursor.state,Cursor.OPEN);
     expect(cursor.cursorId,isPositive);
     cursor.close();
-    expect(Cursor.CLOSED,cursor.state);
-    expect(0,cursor.cursorId);
+    expect(cursor.state,Cursor.CLOSED);
+    expect(cursor.cursorId,0);
     collection.findOne().then((v1){
       expect(v,isNotNull);
       db.close();
@@ -421,7 +422,7 @@ testPingDbCommand(){
     DbCommand pingCommand = DbCommand.createPingCommand(db);
     Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(pingCommand);
     mapFuture.then((msg) {
-      expect({'ok': 1},recursivelyMatches(msg.documents[0]));
+      expect(msg.documents[0],containsPair('ok', 1));
       db.close();      
     });
   });

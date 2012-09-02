@@ -7,7 +7,7 @@ class Statics{
     return new Duration(milliseconds: _stopwatch.elapsedInMs());        
   }
   static int _current_increment;
-  static int get nextIncrement()
+  static int get nextIncrement
   {
     if (_current_increment === null)
     {
@@ -16,7 +16,7 @@ class Statics{
     return _current_increment++;
   }   
   static int _requestId;
-  static int get nextRequestId()
+  static int get nextRequestId
   {
     if (_requestId === null)
     {
@@ -38,21 +38,21 @@ class Statics{
     return _maxBits[bits];
   }
   static num _MashineId;
-  static num get MachineId(){
+  static num get MachineId{
     if (_MashineId === null){
        _MashineId = (Math.random() * 0xFFFFFFFF).floor().toInt();
     }
     return _MashineId;
   }
   static num _Pid;
-  static num get Pid(){
+  static num get Pid{
     if (_Pid === null){
        _Pid = (Math.random() * 0xFFFF).floor().toInt();
     }
     return _Pid;
   }
   static Map<String,List<int>> _keys;
-  static Map<String,List<int>> get keys(){
+  static Map<String,List<int>> get keys{
     if (_keys === null){
        _keys = new Map<String,List<int>>();
     }

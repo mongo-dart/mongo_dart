@@ -15,7 +15,7 @@ class MongoUpdateMessage extends MongoMessage{
     _document = new BsonMap(document);    
     opcode = MongoMessage.Update;    
   }
-  int get messageLength(){
+  int get messageLength{
     return 16+4+_collectionFullName.byteLength()+4+_selector.byteLength()+_document.byteLength();
   }
   Binary serialize(){

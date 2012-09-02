@@ -1,9 +1,9 @@
 class BsonBoolean extends BsonObject{
   bool data;
   BsonBoolean(this.data);
-  get value()=>data;
+  get value=>data;
   byteLength()=>1;
-  int get typeByte() => BSON.BSON_DATA_BOOLEAN;
+  int get typeByte => BSON.BSON_DATA_BOOLEAN;
   packValue(Binary buffer){
      buffer.writeByte(data?1:0);
   }

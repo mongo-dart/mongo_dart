@@ -9,7 +9,7 @@ class MongoMessage{
   static final KillCursors = 2007;   
   int _messageLength;
   int _requestId;
-  int get requestId(){
+  int get requestId{
     if (_requestId === null){
       _requestId = Statics.nextRequestId;    
     }
@@ -17,7 +17,7 @@ class MongoMessage{
   }
   int responseTo;
   int opcode = MongoMessage.Reply;
-  int get messageLength(){
+  int get messageLength{
     throw "Must be implemented";
   }
   Binary serialize(){
