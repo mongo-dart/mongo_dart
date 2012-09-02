@@ -3,6 +3,7 @@
 #import("../lib/bson/bson.dart");
 #import("../lib/bson/bson_vm.dart");
 #import("dart:io");
+#import("dart:crypto");
 #import('../packages/unittest/unittest.dart');
 
 testSelectorBuilderCreation(){
@@ -438,14 +439,55 @@ testDropDbCommand(){
     });
   });
 }
+
+testAuthComponents(){
+  var hash;
+  var digest;
+  hash = new MD5();
+  hash.update(''.charCodes());
+  digest = new Binary.from(hash.digest()).toHexString();
+  expect(digest,'d41d8cd98f00b204e9800998ecf8427e');
+  hash = new MD5();
+  hash.update('md4'.charCodes());
+  digest = new Binary.from(hash.digest()).toHexString();
+  expect(digest,'c93d3bf7a7c4afe94b64e30c2ce39f4f');
+  hash = new MD5();
+  hash.update('md5'.charCodes());
+  digest = new Binary.from(hash.digest()).toHexString();
+  expect(digest,'1bc29b36f623ba82aaf6724fd3b16718');
+  var nonce = '94505e7196beb570';
+  var test_key = 'aea09fb38775830306c5ff6de964ff04';
+  var userName = 'dart';
+  var password = 'test';
+  var md5 = new MD5();
+  md5.update("${userName}:mongo:${password}".charCodes());
+  var hashed_password = new Binary.from(md5.digest()).toHexString();
+  md5 = new MD5();
+  md5.update("${nonce}${userName}${hashed_password}".charCodes());
+  var key = new Binary.from(md5.digest()).toHexString();
+  expect(key,test_key);
+}
+
+testAuthentication(){
+  var config = new ServerConfig('ds031477.mongolab.com',31477);
+  var db = new Db('dart',config);
+  db.open().chain((c){
+    return db.authenticate('dart','test');
+  }).then((v){
+    db.close();
+    callbackDone();
+  });
+}
 main(){
 // some tests do not open db, when bson initialize
   initBsonPlatform(); 
   group("DbCollection tests:", (){
     test("testSelectorBuilderCreation",testSelectorBuilderCreation);
-    test("testSelectorBuilderOnObjectId",testSelectorBuilderOnObjectId);    
+    test("testSelectorBuilderOnObjectId",testSelectorBuilderOnObjectId);
+    test("testAuthComponents",testAuthComponents);
   });
   group("DBCommand:", (){
+    asyncTest("testAuthentication",1,testAuthentication);
     asyncTest("testDropDatabase",1,testDropDatabase);
     test("testDatabaseName",testDatabaseName);
     asyncTest("testCollectionInfoCursor",1,testCollectionInfoCursor);

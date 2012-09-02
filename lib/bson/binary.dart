@@ -146,6 +146,6 @@ class Binary extends BsonObject{
     byteList.setRange(0,size,buffer.byteList,buffer.offset);
     buffer.offset += size;  
   }
-  get value=>this;
+  get value => this;
   String toString()=>"Binary(${toHexString()})";
 }

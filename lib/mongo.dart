@@ -5,6 +5,7 @@
 #import("bson/bson_vm.dart");
 #import("../packages/log4dart/log4dart.dart");
 #import("../packages/log4dart/file_appender.dart");
+#import("dart:crypto");
 #source("database/connection.dart");
 #source("database/mongo_message.dart");
 #source("database/mongo_query_message.dart");

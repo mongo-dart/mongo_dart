@@ -106,5 +106,15 @@ class Db{
     }  
     // Return Cursor
       return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);      
-  }    
+  }
+
+  Future<Map> authenticate(String userName, String password){
+    Completer completer = new Completer();
+    getNonce().chain((msg) {
+      var nonce = msg["nonce"];
+      return executeDbCommand(DbCommand.createAuthenticationCommand(this,userName,password,nonce));
+    }).
+    then((res)=>completer.complete(res));
+    return completer.future;
+  }
 }
