@@ -22,7 +22,6 @@ class Db{
   }
   Db.fromUri(String uriString){
     var uri = new Uri.fromString(uriString);
-    print(uri);
     host = uri.domain;
     if (uri.userInfo != '') {
       var userInfo = uri.userInfo.split(':');

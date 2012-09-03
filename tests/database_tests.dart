@@ -495,7 +495,7 @@ main(){
     test("testSelectorBuilderCreation",testSelectorBuilderCreation);
     test("testSelectorBuilderOnObjectId",testSelectorBuilderOnObjectId);
     test("testAuthComponents",testAuthComponents);
-    solo_test("testMongoDbUri",testMongoDbUri);
+    test("testMongoDbUri",testMongoDbUri);
   });
   group("DBCommand:", (){
     asyncTest("testAuthentication",1,testAuthentication);
