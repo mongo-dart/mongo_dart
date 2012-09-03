@@ -142,7 +142,7 @@ abstract class BasePersistentObject implements PersistentObject{
   
   String get type => "PersistentObjectBase";
   
-  Future<PersistentObject> fetchLink(String property, [PropertySchema propertySchema, ObjectId objecId]) {  
+  Future<PersistentObject> fetchLink(String property, [PropertySchema propertySchema, ObjectId objectId]) {
     var completer = new Completer<PersistentObject>();
     if (propertySchema === null) {
       propertySchema = objectory.getSchema(type).properties[property];
@@ -155,8 +155,8 @@ abstract class BasePersistentObject implements PersistentObject{
       throw "Property $property is not of external ref type on class $type";
     }    
     var value;
-    if (objecId !== null) {
-      value = objecId;
+    if (objectId !== null) {
+      value = objectId;
     }    
     if (value === null) {
       value = map[property];
