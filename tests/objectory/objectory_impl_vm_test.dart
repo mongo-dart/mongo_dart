@@ -17,12 +17,14 @@ void testInsertionAndUpdate(){
     author.save();
     author.age = 4;
     author.save();
-    objectory.find($Author).then((coll){
-      expect(coll.length,1);
-      Author authFromMongo = coll[0];
-      expect(authFromMongo.age,4);
-      objectory.close();      
-      callbackDone();
+    objectory.wait().then((_) {
+      objectory.find($Author).then((coll){
+        expect(coll.length,1);
+        Author authFromMongo = coll[0];
+        expect(authFromMongo.age,4);
+        objectory.close();
+        callbackDone();
+      });
     });
   });
 }

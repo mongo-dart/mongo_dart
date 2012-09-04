@@ -363,10 +363,17 @@ testCursorGetMore(){
   int count = 0;
   Cursor cursor;  
   db.open().chain((c){
-    collection = db.collection('new_big_collection1');
+    collection = db.collection('new_big_collection2');
     collection.remove();
     return db.getLastError();
+  }).chain((_){
+    cursor = new Cursor(db,collection,limit:10);
+    return cursor.each((v){
+     print(v);
+     count++;
+    });
   }).chain((dummy){
+    expect(count,0);
     List toInsert = new List();
     for (int n=0;n < 1000; n++){
       toInsert.add({"a":n});
@@ -380,6 +387,7 @@ testCursorGetMore(){
     expect(count,1000);
     expect(cursor.cursorId,0);
     expect(cursor.state,Cursor.CLOSED);
+    collection.remove();
     db.close();
     callbackDone();  
   });    
@@ -457,9 +465,9 @@ testAuthComponents(){
   digest = new Binary.from(hash.digest()).toHexString();
   expect(digest,'1bc29b36f623ba82aaf6724fd3b16718');
   var nonce = '94505e7196beb570';
-  var test_key = 'aea09fb38775830306c5ff6de964ff04';
   var userName = 'dart';
   var password = 'test';
+  var test_key = 'aea09fb38775830306c5ff6de964ff04';
   var md5 = new MD5();
   md5.update("${userName}:mongo:${password}".charCodes());
   var hashed_password = new Binary.from(md5.digest()).toHexString();
@@ -487,6 +495,13 @@ testMongoDbUri(){
   expect(db.host,'ds031477.mongolab.com');
   expect(db.port,31477);
   expect(db.password,'test');
+//  connStr = "127.0.0.1/DartTest";
+//  db = new Db.fromUri(connStr);
+//  expect(db.userName,isNull);
+//  expect(db.host,'127.0.0.1');
+//  expect(db.port,27017);
+//  expect(db.databaseName,'DartTest');
+//  expect(db.password,isNull);
 }
 main(){
 // some tests do not open db, when bson initialize

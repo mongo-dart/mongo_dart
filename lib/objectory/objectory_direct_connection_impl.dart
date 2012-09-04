@@ -75,7 +75,12 @@ class ObjectoryDirectConnectionImpl extends ObjectoryBaseImpl{
   Future<Map> dropDb(){
     return db.drop();
   }
-  
+
+  Future<Map> wait(){
+    return db.wait();
+  }
+
+
   void close(){
     db.close();
   }
