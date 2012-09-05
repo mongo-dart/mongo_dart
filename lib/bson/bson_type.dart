@@ -71,6 +71,8 @@ BsonObject bsonObjectFromTypeByte(int typeByte){
   switch(typeByte){
     case BSON.BSON_DATA_INT:
       return new BsonInt(null);
+    case BSON.BSON_DATA_LONG:
+      return new BsonLong(null);
     case BSON.BSON_DATA_NUMBER:
       return new BsonDouble(null);
     case BSON.BSON_DATA_STRING:

@@ -1,10 +1,5 @@
 class Db{
   String databaseName;
-  String userName;
-  String password;
-  String host;
-  int port;
-
   ServerConfig serverConfig;
   Connection connection;
   validateDatabaseName(String dbName) {
@@ -22,19 +17,27 @@ class Db{
   }
   Db.fromUri(String uriString){
     var uri = new Uri.fromString(uriString);
-    host = uri.domain;
+    if (uri.scheme != 'mongodb') {
+      throw 'Invalid scheme in uri: $uriString';
+    }
+    serverConfig = new ServerConfig();
+    serverConfig.host = uri.domain;
+    serverConfig.port = uri.port;
+    if (serverConfig.port == null || serverConfig.port == 0){
+      serverConfig.port = 27017;
+    }
     if (uri.userInfo != '') {
       var userInfo = uri.userInfo.split(':');
       if (userInfo.length != 2) {
         throw 'Неверный формат поля userInfo: $uri.userInfo';
       }
-      userName = userInfo[0];
-      password = userInfo[1];
+      serverConfig.userName = userInfo[0];
+      serverConfig.password = userInfo[1];
     }
     if (uri.path != '') {
       databaseName = uri.path.replaceAll('/','');
     }
-    port = uri.port;
+    connection = new Connection(serverConfig);
   }
   DbCollection collection(String collectionName){
       return new DbCollection(this,collectionName);
@@ -133,7 +136,10 @@ class Db{
     Completer completer = new Completer();
     getNonce().chain((msg) {
       var nonce = msg["nonce"];
-      return executeDbCommand(DbCommand.createAuthenticationCommand(this,userName,password,nonce));
+      var command = DbCommand.createAuthenticationCommand(this,userName,password,nonce);
+      serverConfig.password = null;
+      serverConfig.userName = null;
+      return executeDbCommand(command);
     }).
     then((res)=>completer.complete(res));
     return completer.future;

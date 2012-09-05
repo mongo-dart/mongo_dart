@@ -30,7 +30,7 @@ testDatabaseName(){
 }
 
 testCollectionInfoCursor(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db.fromUri('mongodb://127.0.0.1/mongo-dart-test');
   db.open().chain((c){
     DbCollection newColl = db.collection("new_collecion");
     newColl.drop();
@@ -487,21 +487,38 @@ testAuthentication(){
     callbackDone();
   });
 }
+testAuthenticationWithUri(){
+  var db = new Db.fromUri('mongodb://dart:test@ds031477.mongolab.com:31477/dart');
+  db.open().chain((c){
+    DbCollection collection = db.collection('testAuthenticationWithUri');
+    collection.remove();
+    collection.insert({"a":1});
+    collection.insert({"a":2});
+    collection.insert({"a":3});
+    return collection.findOne();
+  }).then((v){
+    print(v);
+    expect(v['a'],isNotNull);
+    db.close();
+    callbackDone();
+  });
+}
+
 testMongoDbUri(){
   var connStr = 'mongodb://dart:test@ds031477.mongolab.com:31477/dart';
   var db = new Db.fromUri(connStr);
-  expect(db.userName,'dart');
+  expect(db.serverConfig.userName,'dart');
   expect(db.databaseName,'dart');
-  expect(db.host,'ds031477.mongolab.com');
-  expect(db.port,31477);
-  expect(db.password,'test');
-//  connStr = "127.0.0.1/DartTest";
-//  db = new Db.fromUri(connStr);
-//  expect(db.userName,isNull);
-//  expect(db.host,'127.0.0.1');
-//  expect(db.port,27017);
-//  expect(db.databaseName,'DartTest');
-//  expect(db.password,isNull);
+  expect(db.serverConfig.host,'ds031477.mongolab.com');
+  expect(db.serverConfig.port,31477);
+  expect(db.serverConfig.password,'test');
+  connStr = "mongodb://127.0.0.1/DartTest";
+  db = new Db.fromUri(connStr);
+  expect(db.serverConfig.userName,isNull);
+  expect(db.serverConfig.host,'127.0.0.1');
+  expect(db.serverConfig.port,27017);
+  expect(db.databaseName,'DartTest');
+  expect(db.serverConfig.password,isNull);
 }
 main(){
 // some tests do not open db, when bson initialize
@@ -514,6 +531,7 @@ main(){
   });
   group("DBCommand:", (){
     asyncTest("testAuthentication",1,testAuthentication);
+    asyncTest("testAuthenticationWithUri",1,testAuthenticationWithUri);
     asyncTest("testDropDatabase",1,testDropDatabase);
     test("testDatabaseName",testDatabaseName);
     asyncTest("testCollectionInfoCursor",1,testCollectionInfoCursor);
