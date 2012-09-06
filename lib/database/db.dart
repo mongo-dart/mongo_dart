@@ -9,13 +9,13 @@ class Db{
       if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
     }
   }    
-  Db(this.databaseName, [this.serverConfig]){
+  Db.local(this.databaseName){
      if (serverConfig === null) {
       serverConfig = new ServerConfig();
      }
     connection = new Connection(serverConfig);
   }
-  Db.fromUri(String uriString){
+  Db(String uriString){
     var uri = new Uri.fromString(uriString);
     if (uri.scheme != 'mongodb') {
       throw 'Invalid scheme in uri: $uriString';
@@ -49,13 +49,24 @@ class Db{
     connection.execute(message);
   }    
   Future<bool> open(){
-//    print("opening db");
+    Completer completer = new Completer();
     initBsonPlatform();
     if (connection.connected){
       connection.close();
       connection = new Connection(serverConfig);
     }
-    return connection.connect();
+//    print("${serverConfig.host} ${serverConfig.port} ${serverConfig.userName} ${serverConfig.password}" );
+    connection.connect().then((v) {
+      if (serverConfig.userName === null) {
+        completer.complete(v);
+      }
+      else {
+        authenticate(serverConfig.userName,serverConfig.password).then((v) {
+          completer.complete(v);
+        });
+      }
+    });
+    return completer.future;
   }
   Future<Map> executeDbCommand(MongoMessage message){
       Completer<Map> result = new Completer();
@@ -132,16 +143,15 @@ class Db{
       return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);      
   }
 
-  Future<Map> authenticate(String userName, String password){
+  Future<bool> authenticate(String userName, String password){
     Completer completer = new Completer();
     getNonce().chain((msg) {
       var nonce = msg["nonce"];
       var command = DbCommand.createAuthenticationCommand(this,userName,password,nonce);
-      serverConfig.password = null;
-      serverConfig.userName = null;
+      serverConfig.password = '***********';
       return executeDbCommand(command);
     }).
-    then((res)=>completer.complete(res));
+    then((res)=>completer.complete(res["ok"] == 1));
     return completer.future;
   }
 }

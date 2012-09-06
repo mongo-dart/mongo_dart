@@ -4,7 +4,7 @@
 #import("../../lib/objectory/persistent_object.dart");
 #import("../../lib/objectory/objectory_query_builder.dart");
 #import("../../lib/objectory/schema.dart");
-
+const DefaultUri = 'mongodb://127.0.0.1/';
 interface Author extends PersistentObject default ObjectoryFactory {
   Author();
   String name;
@@ -146,7 +146,7 @@ void registerClasses() {
   
 }
 Future<bool> initDomainModel(){
-  return setUpObjectory('ObjectoryTests', registerClasses, dropDb: true);
+  return setUpObjectory('${DefaultUri}ObjectoryTests', registerClasses, dropDb: true);
 }
 
 ObjectoryQueryBuilder get $Person => new ObjectoryQueryBuilder('Person');

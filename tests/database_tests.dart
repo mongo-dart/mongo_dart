@@ -6,7 +6,7 @@
 #import("dart:io");
 #import("dart:crypto");
 #import('../packages/unittest/unittest.dart');
-
+const DefaultUri = 'mongodb://127.0.0.1/';
 testSelectorBuilderCreation(){
   SelectorBuilder selector = query();
   expect(selector is Map);
@@ -21,7 +21,7 @@ testSelectorBuilderOnObjectId(){
 
 
 testDatabaseName(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   String dbName;
   dbName = 'mongo-dart-test';
   db.validateDatabaseName(dbName);
@@ -30,7 +30,7 @@ testDatabaseName(){
 }
 
 testCollectionInfoCursor(){
-  Db db = new Db.fromUri('mongodb://127.0.0.1/mongo-dart-test');
+  Db db = new Db('mongodb://127.0.0.1/mongo-dart-test');
   db.open().chain((c){
     DbCollection newColl = db.collection("new_collecion");
     newColl.drop();
@@ -44,7 +44,7 @@ testCollectionInfoCursor(){
   });
 }
 testRemove(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   DbCollection newColl;
   db.open().chain((c){  
     db.removeFromCollection("new_collecion_to_remove");
@@ -64,7 +64,7 @@ testRemove(){
   });
 }
 testDropDatabase(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   db.open().chain((c){
     return db.drop();
   }).then((v){
@@ -73,7 +73,7 @@ testDropDatabase(){
   });
 }
 testGetNonce(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   db.open().chain((c){
     return db.getNonce();
   }).then((v){
@@ -83,7 +83,7 @@ testGetNonce(){
   }); 
 }
 testPwd(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   DbCollection coll;
   db.open().chain((c){
     coll = db.collection("system.users");
@@ -95,11 +95,11 @@ testPwd(){
 }
 
 testCollectionCreation(){
-  Db db = new Db('db');
+  Db db = new Db('${DefaultUri}db');
   DbCollection collection = db.collection('student');
 }
 testEach(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   int count = 0;
   int sum = 0;  
   db.open().chain((c){  
@@ -109,7 +109,7 @@ testEach(){
   }).then((v)=>info("Completed. Sum = $sum, count = $count"));
 }
 testFindEachWithThenClause(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   int count = 0;
   int sum = 0;  
   db.open().chain((c){  
@@ -131,7 +131,7 @@ testFindEachWithThenClause(){
   });
 }
 testFindEach(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   int count = 0;
   int sum = 0;  
   db.open().chain((c){  
@@ -155,7 +155,7 @@ testFindEach(){
   
 }
 testDrop(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   db.open().then((_){
   db.dropCollection("testDrop").then((v)=>v);
   db.dropCollection("testDrop").then((__){    
@@ -166,7 +166,7 @@ testDrop(){
 }  
 
 testSaveWithIntegerId(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   DbCollection coll;
   var id;
   db.open().chain((c){  
@@ -194,7 +194,7 @@ testSaveWithIntegerId(){
   });      
 }
 testSaveWithObjectId(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   DbCollection coll;
   var id;
   db.open().chain((c){  
@@ -225,7 +225,7 @@ testSaveWithObjectId(){
 }
 
 testCount(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   db.open().chain((c){
     DbCollection coll = db.collection('testCount');
     coll.remove();
@@ -240,7 +240,7 @@ testCount(){
   });
 }
 testSkip(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   db.open().chain((c){  
     DbCollection coll = db.collection('testSkip');
     coll.remove();
@@ -255,7 +255,7 @@ testSkip(){
   });
 }
 testLimit(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   int counter = 0;
   Cursor cursor;
   db.open().chain((c){  
@@ -276,12 +276,12 @@ testLimit(){
 }
 
 testCursorCreation(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   DbCollection collection = db.collection('student');
   Cursor cursor = new Cursor(db,collection);
 }
 testPingRaw(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   db.open().chain((c){
     DbCollection collection = db.collection('\$cmd');
     Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);  
@@ -295,7 +295,7 @@ testPingRaw(){
   });
 }
 testNextObject(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   db.open().chain((c){
     DbCollection collection = db.collection('\$cmd');
     Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);
@@ -308,7 +308,7 @@ testNextObject(){
 }
 testNextObjectToEnd(){
   var res;
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   Cursor cursor;
   db.open().chain((c){
     DbCollection collection = db.collection('testNextObjectToEnd');
@@ -339,7 +339,7 @@ testNextObjectToEnd(){
 }
 
 testCursorWithOpenServerCursor(){  
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   Cursor cursor;
   db.open().chain((c){
     DbCollection collection = db.collection('new_big_collection');
@@ -358,7 +358,7 @@ testCursorWithOpenServerCursor(){
 }
 testCursorGetMore(){
   var res;
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   DbCollection collection;
   int count = 0;
   Cursor cursor;  
@@ -394,7 +394,7 @@ testCursorGetMore(){
 }
 testCursorClosing(){
   var res;
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   DbCollection collection;
   Cursor cursor;
   db.open().chain((c){
@@ -422,12 +422,12 @@ testCursorClosing(){
 }
 
 testDbCommandCreation(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   DbCommand dbCommand = new DbCommand(db,"student",0,0,1,{},{});
   expect('mongo-dart-test.student',dbCommand.collectionNameBson.value);
 }
 testPingDbCommand(){
-  Db db = new Db('mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo-dart-test');
   db.open().then((d){
     DbCommand pingCommand = DbCommand.createPingCommand(db);
     Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(pingCommand);
@@ -438,7 +438,7 @@ testPingDbCommand(){
   });
 }
 testDropDbCommand(){
-  Db db = new Db('mongo-dart-test1');
+  Db db = new Db('${DefaultUri}mongo-dart-test1');
   db.open().then((d){
     DbCommand command = DbCommand.createDropDatabaseCommand(db);
     Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(command);
@@ -478,18 +478,20 @@ testAuthComponents(){
 }
 
 testAuthentication(){
-  var config = new ServerConfig('ds031477.mongolab.com',31477);
-  var db = new Db('dart',config);
+  var db = new Db('mongodb://ds031477.mongolab.com:31477/dart');
   db.open().chain((c){
+    print(c);
     return db.authenticate('dart','test');
   }).then((v){
+    print("testAuthentication $v");
     db.close();
     callbackDone();
   });
 }
 testAuthenticationWithUri(){
-  var db = new Db.fromUri('mongodb://dart:test@ds031477.mongolab.com:31477/dart');
+  var db = new Db('mongodb://dart:test@ds031477.mongolab.com:31477/dart');
   db.open().chain((c){
+    print("testAuthenticationWithUri $c");
     DbCollection collection = db.collection('testAuthenticationWithUri');
     collection.remove();
     collection.insert({"a":1});
@@ -506,14 +508,14 @@ testAuthenticationWithUri(){
 
 testMongoDbUri(){
   var connStr = 'mongodb://dart:test@ds031477.mongolab.com:31477/dart';
-  var db = new Db.fromUri(connStr);
+  var db = new Db(connStr);
   expect(db.serverConfig.userName,'dart');
   expect(db.databaseName,'dart');
   expect(db.serverConfig.host,'ds031477.mongolab.com');
   expect(db.serverConfig.port,31477);
   expect(db.serverConfig.password,'test');
   connStr = "mongodb://127.0.0.1/DartTest";
-  db = new Db.fromUri(connStr);
+  db = new Db(connStr);
   expect(db.serverConfig.userName,isNull);
   expect(db.serverConfig.host,'127.0.0.1');
   expect(db.serverConfig.port,27017);
@@ -536,31 +538,31 @@ main(){
     test("testDatabaseName",testDatabaseName);
     asyncTest("testCollectionInfoCursor",1,testCollectionInfoCursor);
     asyncTest("testRemove",1,testRemove);
-    asyncTest("testGetNonce",1,testGetNonce);    
-    asyncTest("testPwd",1,testPwd);        
-  });  
+    asyncTest("testGetNonce",1,testGetNonce);
+    asyncTest("testPwd",1,testPwd);
+  });
   group("DbCollection tests:", (){
     asyncTest("testLimit",1,testLimit);
-    asyncTest("testSkip",1,testSkip);    
-    asyncTest("testFindEachWithThenClause",1,testFindEachWithThenClause);    
-    asyncTest("testCount",1,testCount);    
+    asyncTest("testSkip",1,testSkip);
+    asyncTest("testFindEachWithThenClause",1,testFindEachWithThenClause);
+    asyncTest("testCount",1,testCount);
     asyncTest("testFindEach",1,testFindEach);
     asyncTest("testDrop",1,testDrop);
     asyncTest("testSaveWithIntegerId",1,testSaveWithIntegerId);
-    asyncTest("testSaveWithObjectId",1,testSaveWithObjectId);    
-  }); 
+    asyncTest("testSaveWithObjectId",1,testSaveWithObjectId);
+  });
   group("Cursor tests:", (){
-    test("testCursorCreation",testCursorCreation);    
+    test("testCursorCreation",testCursorCreation);
     asyncTest("testCursorClosing",1,testCursorClosing);
-    asyncTest("testNextObjectToEnd",1,testNextObjectToEnd);    
-    asyncTest("testPingRaw",1,testPingRaw);    
-    asyncTest("testNextObject",1,testNextObject);    
+    asyncTest("testNextObjectToEnd",1,testNextObjectToEnd);
+    asyncTest("testPingRaw",1,testPingRaw);
+    asyncTest("testNextObject",1,testNextObject);
     asyncTest("testCursorWithOpenServerCursor",1,testCursorWithOpenServerCursor);
-    asyncTest("testCursorGetMore",1,testCursorGetMore);        
+    asyncTest("testCursorGetMore",1,testCursorGetMore);
   });
   group("DBCommand tests:", (){
     test("testDbCommandCreation",testDbCommandCreation);
     test("testPingDbCommand",testPingDbCommand);
-    test("testDropDbCommand",testDropDbCommand);    
-  }); 
+    test("testDropDbCommand",testDropDbCommand);
+  });
 }

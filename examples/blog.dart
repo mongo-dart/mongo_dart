@@ -1,6 +1,6 @@
 #import("../lib/mongo.dart");
 main(){
-  Db db = new Db("mongo-dart-blog");
+  Db db = new Db("mongodb://127.0.0.1/mongo-dart-blog");
   print("Connecting to ${db.serverConfig.host}:${db.serverConfig.port}");
   DbCollection collection;
   DbCollection usersCollection;
@@ -54,6 +54,8 @@ main(){
     return articlesCollection.find(orderBy:{"title":1}).each((article){
       print("[${article['title']}]:[${article['body']}]:[author_id: ${article['author_id']}]");
     });      
+  }).chain((v){
+    return db.collectionsInfoCursor().each((col) => print(col));
   }).then((dummy){
     db.close();
   });      

@@ -86,7 +86,7 @@ void registerClasses() {
 }
 
 Future<bool> initDomainModel(){
-  return setUpObjectory('ObjectoryBlog', registerClasses, dropDb: true);
+  return setUpObjectory('mongodb://127.0.0.1/ObjectoryBlog', registerClasses, dropDb: true);
 }
 
 ObjectoryQueryBuilder get $Author => new ObjectoryQueryBuilder('Author');

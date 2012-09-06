@@ -2,7 +2,7 @@
 #import("../lib/bson/bson.dart");
 
 main(){
-  Db db = new Db("mongo-dart-blog");
+  Db db = new Db("mongodb://127.0.0.1/mongo-dart-blog");
   print("Connecting to ${db.serverConfig.host}:${db.serverConfig.port}");
   db.open().chain((c){  
     DbCollection collection = db.collection('test-types');
