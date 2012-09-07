@@ -93,7 +93,9 @@ main(){
       });
     }
     return Futures.wait(futures);
-  }).then((_) { 
+  }).chain((_) {
+    return objectory.dropCollections();
+  }).then((_) {
    objectory.close();
   });      
 }

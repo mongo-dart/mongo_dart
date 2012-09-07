@@ -9,11 +9,11 @@
 class ObjectoryDirectConnectionImpl extends ObjectoryBaseImpl{  
   Db db;
   
-  Future<bool> open([String database, String url]){
+  Future<bool> open(String uri){
     if (db !== null){
       db.close();
     }    
-    db = new Db(database);
+    db = new Db(uri);
     return db.open();
   }
   
@@ -84,18 +84,30 @@ class ObjectoryDirectConnectionImpl extends ObjectoryBaseImpl{
   void close(){
     db.close();
   }
-  
+  Future dropCollections() {
+    List futures = [];
+    schemata.forEach( (key, value) {
+       if (value.isRoot) {
+        futures.add(db.collection(key).drop());
+       }
+    });
+    return Futures.wait(futures);
+  }
 }
 
 
-Future<bool> setUpObjectory(String dbName, Function registerClassCallback, [bool dropDb = false, String url]){  
+Future<bool> setUpObjectory(String uri, Function registerClassCallback, [bool dropCollections = false]){
   var res = new Completer();
   objectory = new ObjectoryDirectConnectionImpl();
-  objectory.open(dbName,url).then((_){  
-    objectory.dropDb().then((_)  {          
+  objectory.open(uri).then((_){
       registerClassCallback();
-      res.complete(true);
-    });
+      if (dropCollections) {
+        objectory.dropCollections().then((_) =>  res.complete(true));
+      }
+      else
+      {
+        res.complete(true);
+      }
   });    
   return res.future;
 }

@@ -146,7 +146,7 @@ void registerClasses() {
   
 }
 Future<bool> initDomainModel(){
-  return setUpObjectory('${DefaultUri}ObjectoryTests', registerClasses, dropDb: true);
+  return setUpObjectory('${DefaultUri}ObjectoryTests', registerClasses,true);
 }
 
 ObjectoryQueryBuilder get $Person => new ObjectoryQueryBuilder('Person');

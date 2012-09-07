@@ -16,6 +16,7 @@ interface Objectory{
   void save(RootPersistentObject persistentObject);
   void remove(PersistentObject persistentObject);
   Future<bool> open([String database, String url]);
+  Future dropCollections();
   Future<Map> dropDb();
   Future<Map> wait();
   ClassSchema getSchema(String className);
@@ -113,5 +114,6 @@ abstract class ObjectoryBaseImpl implements Objectory{
   
   void registerClass(ClassSchema schema){
     schemata[schema.className] = schema;
+    schema.isRoot = schema.factoryMethod() is RootPersistentObject;
   }
 }

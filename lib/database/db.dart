@@ -18,7 +18,7 @@ class Db{
   Db(String uriString){
     var uri = new Uri.fromString(uriString);
     if (uri.scheme != 'mongodb') {
-      throw 'Invalid scheme in uri: $uriString';
+      throw 'Invalid scheme in uri: $uriString ${uri.scheme}';
     }
     serverConfig = new ServerConfig();
     serverConfig.host = uri.domain;

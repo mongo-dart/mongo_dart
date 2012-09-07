@@ -14,6 +14,7 @@ class ClassSchema{
   String className;
   FactoryMethod factoryMethod;
   bool preserveFieldsOrder;
+  bool isRoot;
   Map<String,PropertySchema> properties;
   ClassSchema(this.className,this.factoryMethod, [this.preserveFieldsOrder = false]) {
     properties = new LinkedHashMap<String,PropertySchema>();
