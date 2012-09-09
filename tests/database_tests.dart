@@ -369,7 +369,6 @@ testCursorGetMore(){
   }).chain((_){
     cursor = new Cursor(db,collection,limit:10);
     return cursor.each((v){
-     print(v);
      count++;
     });
   }).chain((dummy){
@@ -480,10 +479,8 @@ testAuthComponents(){
 testAuthentication(){
   var db = new Db('mongodb://ds031477.mongolab.com:31477/dart');
   db.open().chain((c){
-    print(c);
     return db.authenticate('dart','test');
   }).then((v){
-    print("testAuthentication $v");
     db.close();
     callbackDone();
   });
@@ -491,7 +488,6 @@ testAuthentication(){
 testAuthenticationWithUri(){
   var db = new Db('mongodb://dart:test@ds031477.mongolab.com:31477/dart');
   db.open().chain((c){
-    print("testAuthenticationWithUri $c");
     DbCollection collection = db.collection('testAuthenticationWithUri');
     collection.remove();
     collection.insert({"a":1});
@@ -499,7 +495,6 @@ testAuthenticationWithUri(){
     collection.insert({"a":3});
     return collection.findOne();
   }).then((v){
-    print(v);
     expect(v['a'],isNotNull);
     db.close();
     callbackDone();

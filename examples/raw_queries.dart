@@ -1,7 +1,7 @@
 #import("../lib/mongo.dart");
 #import("../lib/bson/bson.dart");
 main(){
-  Db db = new Db("mongo-dart-test");
+  Db db = new Db("mongodb://127.0.0.7/mongo-dart-test");
   DbCollection coll;
   ObjectId id;
   db.open().chain((c){

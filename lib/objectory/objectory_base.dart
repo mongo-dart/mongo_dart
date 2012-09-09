@@ -15,7 +15,7 @@ interface Objectory{
   Future<List<RootPersistentObject>> find(ObjectoryQueryBuilder selector);
   void save(RootPersistentObject persistentObject);
   void remove(PersistentObject persistentObject);
-  Future<bool> open([String database, String url]);
+  Future<bool> open(String uri);
   Future dropCollections();
   Future<Map> dropDb();
   Future<Map> wait();

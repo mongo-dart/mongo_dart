@@ -15,6 +15,13 @@ class Db{
      }
     connection = new Connection(serverConfig);
   }
+/**
+* Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections)
+*     var db = new Db('mongodb://127.0.0.1/testdb');
+*  Points to local mongodb server on default mongodb port, database *testdb*
+*     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
+* Points to local MongoLab server on 37637 port, database *testdb*, username dart, password test
+*/
   Db(String uriString){
     var uri = new Uri.fromString(uriString);
     if (uri.scheme != 'mongodb') {
@@ -47,7 +54,7 @@ class Db{
   }  
   executeMessage(MongoMessage message){
     connection.execute(message);
-  }    
+  }
   Future<bool> open(){
     Completer completer = new Completer();
     initBsonPlatform();
@@ -107,6 +114,9 @@ class Db{
     });    
     return completer.future;    
   }
+/**
+*   Drop current database
+*/
   Future<Map> drop(){
     Completer completer = new Completer();
     executeDbCommand(DbCommand.createDropDatabaseCommand(this))
