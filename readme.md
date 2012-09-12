@@ -12,6 +12,4 @@ Some samples are in directory **examples**. Also Chris Buckett gave a realistic 
 **Objectory** is a library that provide typed, checked environment to model, save and query data persisted on MongoDb.    
 Sample project is in directory **sample/objectory_blog**. There are also some tests in directory **tests/objectory**
 
-**Used external libraries:**
-
- - [log4dart](https://github.com/Qalqo/log4dart)
+[API Doc] (http://vadimtsushko.github.com/mongo-dart/)

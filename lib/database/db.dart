@@ -15,12 +15,13 @@ class Db{
      }
     connection = new Connection(serverConfig);
   }
-/**
-* Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections)
+
+/**  
+* Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections). 
+* For example next code points to local mongodb server on default mongodb port, database *testdb*   
 *     var db = new Db('mongodb://127.0.0.1/testdb');
-*  Points to local mongodb server on default mongodb port, database *testdb*
+* And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
 *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
-* Points to local MongoLab server on 37637 port, database *testdb*, username dart, password test
 */
   Db(String uriString){
     var uri = new Uri.fromString(uriString);
@@ -62,7 +63,6 @@ class Db{
       connection.close();
       connection = new Connection(serverConfig);
     }
-//    print("${serverConfig.host} ${serverConfig.port} ${serverConfig.userName} ${serverConfig.password}" );
     connection.connect().then((v) {
       if (serverConfig.userName === null) {
         completer.complete(v);
