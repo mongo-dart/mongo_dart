@@ -1,0 +1,490 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>ObjectoryQueryBuilder Class / objectory_query Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="objectory_query" data-type="ObjectoryQueryBuilder">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../objectory_query.html">objectory_query</a> &rsaquo; <a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo.html">mongo</a></h2><h2><div class="icon-library"></div><a href="../objectory.html">objectory</a></h2><h2><div class="icon-library"></div><a href="../objectory_base.html">objectory_base</a></h2><h2><div class="icon-library"></div><a href="../objectory_direct_connection.html">objectory_direct_connection</a></h2><h2><div class="icon-library"></div><a href="../objectory_query.html">objectory_query</a></h2><ul class="icon">
+<li><div class="icon-class"></div><strong>ObjectoryQueryBuilder</strong></li>
+</ul>
+<h2><div class="icon-library"></div><a href="../persistent_object.html">persistent_object</a></h2><h2><div class="icon-library"></div><a href="../persistent_schema.html">persistent_schema</a></h2></div>
+<div class="content">
+        <h2><strong>ObjectoryQueryBuilder</strong>
+          Class
+        </h2>
+        
+<div class="doc">
+
+</div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="ObjectoryQueryBuilder">
+<span class="show-code">Code</span>
+new <strong>ObjectoryQueryBuilder</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> className) <a class="anchor-link" href="#ObjectoryQueryBuilder"
+              title="Permalink to ObjectoryQueryBuilder.ObjectoryQueryBuilder">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder(String className){
+  schema = objectory.getSchema(className);
+  map = new LinkedHashMap();
+}
+</pre>
+</div>
+</div>
+<h3>Methods</h3>
+<div class="method"><h4 id="all">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>all</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, <a href="http://api.dartlang.org/dart_core/List.html">List</a> values) <a class="anchor-link" href="#all"
+              title="Permalink to ObjectoryQueryBuilder.all">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder all(String propertyName, List values){
+  testPropertyName(propertyName);
+  map[propertyName] = {"\$all":values};
+  return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="className">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>get className</strong>() <a class="anchor-link" href="#className"
+              title="Permalink to ObjectoryQueryBuilder.get className">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+String get className =&gt; schema.className;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="comment">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>comment</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> commentStr) <a class="anchor-link" href="#comment"
+              title="Permalink to ObjectoryQueryBuilder.comment">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder comment(String commentStr){
+  _internQueryMap();  
+  map["\$comment"] = commentStr;      
+  return this;    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="eq">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>eq</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, value) <a class="anchor-link" href="#eq"
+              title="Permalink to ObjectoryQueryBuilder.eq">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder eq(String propertyName,value){
+  testPropertyName(propertyName);
+  map[propertyName] = value;
+  return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="exists">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>exists</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName) <a class="anchor-link" href="#exists"
+              title="Permalink to ObjectoryQueryBuilder.exists">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder exists(String propertyName){
+  testPropertyName(propertyName);
+  map[propertyName] = {"\$exists":true};
+  return this;    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="explain">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>explain</strong>() <a class="anchor-link" href="#explain"
+              title="Permalink to ObjectoryQueryBuilder.explain">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder explain(){
+  _internQueryMap();  
+  map["\$explain"] = true;      
+  return this;    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="gt">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>gt</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, value) <a class="anchor-link" href="#gt"
+              title="Permalink to ObjectoryQueryBuilder.gt">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder gt(String propertyName,value){
+  testPropertyName(propertyName);
+  map[propertyName] = {"\$gt":value};
+  return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="gte">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>gte</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, value) <a class="anchor-link" href="#gte"
+              title="Permalink to ObjectoryQueryBuilder.gte">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder gte(String propertyName,value){
+  testPropertyName(propertyName);
+  map[propertyName] = {"\$gte":value};
+  return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="id">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>id</strong>(value) <a class="anchor-link" href="#id"
+              title="Permalink to ObjectoryQueryBuilder.id">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder id(value){    
+  map["_id"] = value;
+  return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="lt">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>lt</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, value) <a class="anchor-link" href="#lt"
+              title="Permalink to ObjectoryQueryBuilder.lt">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder lt(String propertyName,value){
+  testPropertyName(propertyName);
+  map[propertyName] = {"\$lt":value};
+  return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="lte">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>lte</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, value) <a class="anchor-link" href="#lte"
+              title="Permalink to ObjectoryQueryBuilder.lte">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder lte(String propertyName,value){
+  testPropertyName(propertyName);
+  map[propertyName] = {"\$lte":value};
+  return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="match">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>match</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, <a href="http://api.dartlang.org/dart_core/String.html">String</a> pattern, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> multiLine, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> caseInsensitive, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> dotAll, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> extended]) <a class="anchor-link" href="#match"
+              title="Permalink to ObjectoryQueryBuilder.match">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder match(String propertyName, String pattern,[bool multiLine, bool caseInsensitive, bool dotAll, bool extended]){
+  testPropertyName(propertyName);
+  map[propertyName] = {'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
+      dotAll:dotAll,extended:extended)};
+  return this;    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="mod">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>mod</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, <a href="http://api.dartlang.org/dart_core/int.html">int</a> value) <a class="anchor-link" href="#mod"
+              title="Permalink to ObjectoryQueryBuilder.mod">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder mod(String propertyName, int value){
+  testPropertyName(propertyName);
+  map[propertyName] = {"\$mod":[value,0]};
+  return this;    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="ne">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>ne</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, value) <a class="anchor-link" href="#ne"
+              title="Permalink to ObjectoryQueryBuilder.ne">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder ne(String propertyName, value){
+  testPropertyName(propertyName);
+  map[propertyName] = {"\$ne":value};
+  return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="nin">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>nin</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, <a href="http://api.dartlang.org/dart_core/List.html">List</a> values) <a class="anchor-link" href="#nin"
+              title="Permalink to ObjectoryQueryBuilder.nin">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder nin(String propertyName, List values){
+  testPropertyName(propertyName);
+  map[propertyName] = {"\$nin":values};
+  return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="notExists">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>notExists</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName) <a class="anchor-link" href="#notExists"
+              title="Permalink to ObjectoryQueryBuilder.notExists">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder notExists(String propertyName){
+  testPropertyName(propertyName);
+  map[propertyName] = {"\$exists":false};
+  return this;    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="oneFrom">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>oneFrom</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, <a href="http://api.dartlang.org/dart_core/List.html">List</a> values) <a class="anchor-link" href="#oneFrom"
+              title="Permalink to ObjectoryQueryBuilder.oneFrom">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder oneFrom(String propertyName, List values){
+  testPropertyName(propertyName);
+  map[propertyName] = {"\$in":values};
+  return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="range">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>range</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, min, max, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> minInclude = true, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> maxInclude = true]) <a class="anchor-link" href="#range"
+              title="Permalink to ObjectoryQueryBuilder.range">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder range(String propertyName, min, max, [bool minInclude=true, bool maxInclude=true]){
+  testPropertyName(propertyName);
+  Map rangeMap = {};
+  if (minInclude){
+    rangeMap["\$gte"] = min;
+  }
+  else{
+    rangeMap["\$gt"] = min;
+  }
+  if (maxInclude){
+    rangeMap["\$lte"] = max;
+  }
+  else{
+    rangeMap["\$gt"] = max;
+  }
+  map[propertyName] = rangeMap;
+  return this;    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="returnKey">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>returnKey</strong>() <a class="anchor-link" href="#returnKey"
+              title="Permalink to ObjectoryQueryBuilder.returnKey">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder returnKey(){
+  _internQueryMap();  
+  map["\$sreturnKey"] = true;      
+  return this;    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="showDiskLoc">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>showDiskLoc</strong>() <a class="anchor-link" href="#showDiskLoc"
+              title="Permalink to ObjectoryQueryBuilder.showDiskLoc">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder showDiskLoc(){
+  _internQueryMap();  
+  map["\$showDiskLoc"] = true;      
+  return this;    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="snapshot">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>snapshot</strong>() <a class="anchor-link" href="#snapshot"
+              title="Permalink to ObjectoryQueryBuilder.snapshot">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder snapshot(){
+  _internQueryMap();  
+  map["\$snapshot"] = true;      
+  return this;    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="sortBy">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>sortBy</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> descending = false]) <a class="anchor-link" href="#sortBy"
+              title="Permalink to ObjectoryQueryBuilder.sortBy">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder sortBy(String propertyName, [bool descending=false]){
+  testPropertyName(propertyName);  
+  _internQueryMap();
+  if (!map.containsKey("orderby")){
+    map["orderby"] = new LinkedHashMap();  
+  }
+  int order = 1;
+  if (descending){
+    order = -1;
+  }
+  map["orderby"][propertyName] = order;      
+  return this;    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="testPropertyName">
+<span class="show-code">Code</span>
+void <strong>testPropertyName</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName) <a class="anchor-link" href="#testPropertyName"
+              title="Permalink to ObjectoryQueryBuilder.testPropertyName">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void testPropertyName(String propertyName) {
+  var propertyChain = propertyName.split('.');
+  var currentProperty = propertyChain[0]; 
+  var propertySchema = schema.properties[currentProperty];
+  if (propertySchema === null) {
+    throw "Unknown property $currentProperty in class ${schema.className}";
+  }
+  if (propertyChain.length &gt; 1) {
+    if (!propertySchema.embeddedObject)
+    {  
+      throw "$currentProperty is not an embedded object in class ${schema.className}. Dot notation of $propertyName is not applicable";
+    }
+    propertyChain.removeRange(0, 1);
+    currentProperty = Strings.join(propertyChain,'.');
+    new ObjectoryQueryBuilder(propertySchema.type).testPropertyName(currentProperty);
+  }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<span class="show-code">Code</span>
+<strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to ObjectoryQueryBuilder.toString">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+toString() =&gt; "ObjectoryQueryBuilder($map)";
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="where">
+<span class="show-code">Code</span>
+<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> <strong>where</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> javaScriptCode) <a class="anchor-link" href="#where"
+              title="Permalink to ObjectoryQueryBuilder.where">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ObjectoryQueryBuilder where(String javaScriptCode){
+  map["\$where"] = new BsonCode(javaScriptCode);
+  return this;
+}
+</pre>
+</div>
+</div>
+<h3>Fields</h3>
+<div class="field"><h4 id="map">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>         <strong>map</strong> <a class="anchor-link"
+            href="#map"
+            title="Permalink to ObjectoryQueryBuilder.map">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+Map map;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="schema">
+<span class="show-code">Code</span>
+<a href="../persistent_schema/ClassSchema.html">ClassSchema</a>         <strong>schema</strong> <a class="anchor-link"
+            href="#schema"
+            title="Permalink to ObjectoryQueryBuilder.schema">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+ClassSchema schema;
+</pre>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-09-12 16:03:43.323</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

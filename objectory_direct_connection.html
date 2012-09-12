@@ -1,0 +1,76 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>objectory_direct_connection Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="favicon.ico">
+        
+        </head>
+        <body data-library="objectory_direct_connection">
+        <div class="page">
+        <div class="header">
+          <a href="index.html"><div class="logo"></div></a>
+          <a href="index.html">Dart Documentation</a>
+         &rsaquo; <a href="objectory_direct_connection.html">objectory_direct_connection</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="mongo.html">mongo</a></h2><h2><div class="icon-library"></div><a href="objectory.html">objectory</a></h2><h2><div class="icon-library"></div><a href="objectory_base.html">objectory_base</a></h2><h2><div class="icon-library"></div><strong>objectory_direct_connection</strong></h2><ul class="icon">
+<li><a href="objectory_direct_connection/ObjectoryDirectConnectionImpl.html"><div class="icon-class"></div>ObjectoryDirectConnectionImpl</a></li>
+</ul>
+<h2><div class="icon-library"></div><a href="objectory_query.html">objectory_query</a></h2><h2><div class="icon-library"></div><a href="persistent_object.html">persistent_object</a></h2><h2><div class="icon-library"></div><a href="persistent_schema.html">persistent_schema</a></h2></div>
+<div class="content">
+<h2><strong>objectory_direct_connection</strong> library</h2>
+<div class="doc"></div>
+<h3>Methods</h3>
+<div class="method"><h4 id="setUpObjectory">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/bool.html">bool</a>&gt; <strong>setUpObjectory</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> uri, <a href="http://api.dartlang.org/dart_core/Function.html">Function</a> registerClassCallback, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> dropCollections = false]) <a class="anchor-link" href="#setUpObjectory"
+              title="Permalink to setUpObjectory">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Future&lt;bool&gt; setUpObjectory(String uri, Function registerClassCallback, [bool dropCollections = false]){
+  var res = new Completer();
+  objectory = new ObjectoryDirectConnectionImpl();
+  objectory.open(uri).then((_){
+      registerClassCallback();
+      if (dropCollections) {
+        objectory.dropCollections().then((_) =&gt;  res.complete(true));
+      }
+      else
+      {
+        res.complete(true);
+      }
+  });    
+  return res.future;
+}
+</pre>
+</div>
+</div>
+<h3>Classes</h3>
+          <div class="type">
+          <h4>
+            <a href="objectory_direct_connection/ObjectoryDirectConnectionImpl.html"><strong>ObjectoryDirectConnectionImpl</strong></a>
+          </h4>
+          </div>
+          
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-09-12 16:03:43.301</div>
+        </div>
+        <script async src="client-static.js"></script>
+        </body></html>
+        

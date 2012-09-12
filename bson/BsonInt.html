@@ -1,0 +1,159 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>BsonInt Class / bson Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="bson" data-type="BsonInt">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../bson.html">bson</a> &rsaquo; <a href="../bson/BsonInt.html">BsonInt</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><ul class="icon">
+<li><a href="../bson/BSON.html"><div class="icon-class"></div>BSON</a></li>
+<li><a href="../bson/Binary.html"><div class="icon-class"></div>Binary</a></li>
+<li><a href="../bson/BsonArray.html"><div class="icon-class"></div>BsonArray</a></li>
+<li><a href="../bson/BsonBoolean.html"><div class="icon-class"></div>BsonBoolean</a></li>
+<li><a href="../bson/BsonByteArray.html"><div class="icon-interface"></div>BsonByteArray</a></li>
+<li><a href="../bson/BsonCString.html"><div class="icon-class"></div>BsonCString</a></li>
+<li><a href="../bson/BsonCode.html"><div class="icon-class"></div>BsonCode</a></li>
+<li><a href="../bson/BsonDate.html"><div class="icon-class"></div>BsonDate</a></li>
+<li><a href="../bson/BsonDouble.html"><div class="icon-class"></div>BsonDouble</a></li>
+<li><div class="icon-class"></div><strong>BsonInt</strong></li>
+<li><a href="../bson/BsonLong.html"><div class="icon-class"></div>BsonLong</a></li>
+<li><a href="../bson/BsonMap.html"><div class="icon-class"></div>BsonMap</a></li>
+<li><a href="../bson/BsonNull.html"><div class="icon-class"></div>BsonNull</a></li>
+<li><a href="../bson/BsonObject.html"><div class="icon-class"></div>BsonObject</a></li>
+<li><a href="../bson/BsonObjectId.html"><div class="icon-class"></div>BsonObjectId</a></li>
+<li><a href="../bson/BsonPlatform.html"><div class="icon-class"></div>BsonPlatform</a></li>
+<li><a href="../bson/BsonRegexp.html"><div class="icon-class"></div>BsonRegexp</a></li>
+<li><a href="../bson/BsonString.html"><div class="icon-class"></div>BsonString</a></li>
+<li><a href="../bson/MaxKey.html"><div class="icon-class"></div>MaxKey</a></li>
+<li><a href="../bson/MinKey.html"><div class="icon-class"></div>MinKey</a></li>
+<li><a href="../bson/ObjectId.html"><div class="icon-interface"></div>ObjectId</a></li>
+<li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
+<li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
+</ul>
+<h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo.html">mongo</a></h2><h2><div class="icon-library"></div><a href="../objectory.html">objectory</a></h2><h2><div class="icon-library"></div><a href="../objectory_base.html">objectory_base</a></h2><h2><div class="icon-library"></div><a href="../objectory_direct_connection.html">objectory_direct_connection</a></h2><h2><div class="icon-library"></div><a href="../objectory_query.html">objectory_query</a></h2><h2><div class="icon-library"></div><a href="../persistent_object.html">persistent_object</a></h2><h2><div class="icon-library"></div><a href="../persistent_schema.html">persistent_schema</a></h2></div>
+<div class="content">
+        <h2><strong>BsonInt</strong>
+          Class
+        </h2>
+        
+<div class="doc">
+
+</div>
+<h3>Extends</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../bson/BsonObject.html">BsonObject</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>BsonInt</strong></span></p>
+<h3>Constructors</h3>
+<div class="method"><h4 id="BsonInt">
+<span class="show-code">Code</span>
+new <strong>BsonInt</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> data) <a class="anchor-link" href="#BsonInt"
+              title="Permalink to BsonInt.BsonInt">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+BsonInt(this.data);
+</pre>
+</div>
+</div>
+<h3>Methods</h3>
+<div class="method"><h4 id="byteLength">
+<span class="show-code">Code</span>
+<strong>byteLength</strong>() <a class="anchor-link" href="#byteLength"
+              title="Permalink to BsonInt.byteLength">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+byteLength()=&gt;4;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="packValue">
+<span class="show-code">Code</span>
+<strong>packValue</strong>(<a href="../bson/Binary.html">Binary</a> buffer) <a class="anchor-link" href="#packValue"
+              title="Permalink to BsonInt.packValue">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+packValue(Binary buffer){
+   buffer.writeInt(data);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="typeByte">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>get typeByte</strong>() <a class="anchor-link" href="#typeByte"
+              title="Permalink to BsonInt.get typeByte">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+int get typeByte =&gt; BSON.BSON_DATA_INT;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="unpackValue">
+<span class="show-code">Code</span>
+<strong>unpackValue</strong>(<a href="../bson/Binary.html">Binary</a> buffer) <a class="anchor-link" href="#unpackValue"
+              title="Permalink to BsonInt.unpackValue">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+unpackValue(Binary buffer){
+   data = buffer.readInt32();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="value">
+<span class="show-code">Code</span>
+<strong>get value</strong>() <a class="anchor-link" href="#value"
+              title="Permalink to BsonInt.get value">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+get value=&gt;data;
+</pre>
+</div>
+</div>
+<h3>Fields</h3>
+<div class="field"><h4 id="data">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>data</strong> <a class="anchor-link"
+            href="#data"
+            title="Permalink to BsonInt.data">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+int data;
+</pre>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-09-12 16:03:42.969</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

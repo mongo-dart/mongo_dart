@@ -1,0 +1,249 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>mongo Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="favicon.ico">
+        
+        </head>
+        <body data-library="mongo">
+        <div class="page">
+        <div class="header">
+          <a href="index.html"><div class="logo"></div></a>
+          <a href="index.html">Dart Documentation</a>
+         &rsaquo; <a href="mongo.html">mongo</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><strong>mongo</strong></h2><ul class="icon">
+<li><a href="mongo/Connection.html"><div class="icon-class"></div>Connection</a></li>
+<li><a href="mongo/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
+<li><a href="mongo/Db.html"><div class="icon-class"></div>Db</a></li>
+<li><a href="mongo/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
+<li><a href="mongo/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><a href="mongo/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="mongo/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
+<li><a href="mongo/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
+<li><a href="mongo/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
+<li><a href="mongo/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
+<li><a href="mongo/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
+<li><a href="mongo/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
+<li><a href="mongo/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
+<li><a href="mongo/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
+<li><a href="mongo/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
+<li><a href="mongo/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder&lt;K, V&gt;</a></li>
+<li><a href="mongo/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
+<li><a href="mongo/Utils.html"><div class="icon-class"></div>Utils</a></li>
+</ul>
+<h2><div class="icon-library"></div><a href="objectory.html">objectory</a></h2><h2><div class="icon-library"></div><a href="objectory_base.html">objectory_base</a></h2><h2><div class="icon-library"></div><a href="objectory_direct_connection.html">objectory_direct_connection</a></h2><h2><div class="icon-library"></div><a href="objectory_query.html">objectory_query</a></h2><h2><div class="icon-library"></div><a href="persistent_object.html">persistent_object</a></h2><h2><div class="icon-library"></div><a href="persistent_schema.html">persistent_schema</a></h2></div>
+<div class="content">
+<h2><strong>mongo</strong> library</h2>
+<div class="doc"></div>
+<h3>Methods</h3>
+<div class="method"><h4 id="debug">
+<span class="show-code">Code</span>
+<strong>debug</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> s) <a class="anchor-link" href="#debug"
+              title="Permalink to debug">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+debug(String s){
+  Utils.getLogger().debug(s);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="error">
+<span class="show-code">Code</span>
+<strong>error</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> s) <a class="anchor-link" href="#error"
+              title="Permalink to error">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+error(String s){
+  Utils.getLogger().error(s);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="info">
+<span class="show-code">Code</span>
+<strong>info</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> s) <a class="anchor-link" href="#info"
+              title="Permalink to info">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+info(String s){
+  Utils.getLogger().info(s);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="query">
+<span class="show-code">Code</span>
+<a href="mongo/SelectorBuilder.html">SelectorBuilder</a> <strong>query</strong>() <a class="anchor-link" href="#query"
+              title="Permalink to query">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+SelectorBuilder query(){
+  return new SelectorBuilder();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="setVerboseState">
+<span class="show-code">Code</span>
+<strong>setVerboseState</strong>() <a class="anchor-link" href="#setVerboseState"
+              title="Permalink to setVerboseState">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+setVerboseState(){
+  Utils.setVerboseState();  
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="warn">
+<span class="show-code">Code</span>
+<strong>warn</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> s) <a class="anchor-link" href="#warn"
+              title="Permalink to warn">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+warn(String s){
+  Utils.getLogger().warn(s);
+}
+</pre>
+</div>
+</div>
+<h3>Classes</h3>
+          <div class="type">
+          <h4>
+            <a href="mongo/Connection.html"><strong>Connection</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/Cursor.html"><strong>Cursor</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/Db.html"><strong>Db</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/DbCollection.html"><strong>DbCollection</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/DbCommand.html"><strong>DbCommand</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/MapProxy.html"><strong>MapProxy&lt;K, V&gt;</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/MongoGetMoreMessage.html"><strong>MongoGetMoreMessage</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/MongoInsertMessage.html"><strong>MongoInsertMessage</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/MongoKillCursorsMessage.html"><strong>MongoKillCursorsMessage</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/MongoMessage.html"><strong>MongoMessage</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/MongoQueryMessage.html"><strong>MongoQueryMessage</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/MongoRemoveMessage.html"><strong>MongoRemoveMessage</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/MongoReplyMessage.html"><strong>MongoReplyMessage</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/MongoUpdateMessage.html"><strong>MongoUpdateMessage</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/SelectorBuilder.html"><strong>SelectorBuilder&lt;K, V&gt;</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/ServerConfig.html"><strong>ServerConfig</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo/Utils.html"><strong>Utils</strong></a>
+          </h4>
+          </div>
+          
+<h3>Typedefs</h3>
+          <div class="type">
+          <h4>
+            <a href="mongo/MonadicBlock.html"><strong>MonadicBlock</strong></a>
+          </h4>
+          </div>
+          
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-09-12 16:03:43.109</div>
+        </div>
+        <script async src="client-static.js"></script>
+        </body></html>
+        

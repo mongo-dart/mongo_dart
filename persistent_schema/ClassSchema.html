@@ -1,0 +1,144 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>ClassSchema Class / persistent_schema Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="persistent_schema" data-type="ClassSchema">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../persistent_schema.html">persistent_schema</a> &rsaquo; <a href="../persistent_schema/ClassSchema.html">ClassSchema</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo.html">mongo</a></h2><h2><div class="icon-library"></div><a href="../objectory.html">objectory</a></h2><h2><div class="icon-library"></div><a href="../objectory_base.html">objectory_base</a></h2><h2><div class="icon-library"></div><a href="../objectory_direct_connection.html">objectory_direct_connection</a></h2><h2><div class="icon-library"></div><a href="../objectory_query.html">objectory_query</a></h2><h2><div class="icon-library"></div><a href="../persistent_object.html">persistent_object</a></h2><h2><div class="icon-library"></div><a href="../persistent_schema.html">persistent_schema</a></h2><ul class="icon">
+<li><div class="icon-class"></div><strong>ClassSchema</strong></li>
+<li><a href="../persistent_schema/FactoryMethod.html"><div class="icon-interface"></div>FactoryMethod</a></li>
+<li><a href="../persistent_schema/PropertySchema.html"><div class="icon-class"></div>PropertySchema</a></li>
+</ul>
+</div>
+<div class="content">
+        <h2><strong>ClassSchema</strong>
+          Class
+        </h2>
+        
+<div class="doc">
+
+</div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="ClassSchema">
+<span class="show-code">Code</span>
+new <strong>ClassSchema</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> className, <a href="../persistent_schema/FactoryMethod.html">FactoryMethod</a> factoryMethod, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> preserveFieldsOrder = false]) <a class="anchor-link" href="#ClassSchema"
+              title="Permalink to ClassSchema.ClassSchema">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ClassSchema(this.className,this.factoryMethod, [this.preserveFieldsOrder = false]) {
+  properties = new LinkedHashMap&lt;String,PropertySchema&gt;();
+}
+</pre>
+</div>
+</div>
+<h3>Methods</h3>
+<div class="method"><h4 id="addProperty">
+<span class="show-code">Code</span>
+<strong>addProperty</strong>(<a href="../persistent_schema/PropertySchema.html">PropertySchema</a> propertySchema) <a class="anchor-link" href="#addProperty"
+              title="Permalink to ClassSchema.addProperty">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+addProperty(PropertySchema propertySchema) {
+  properties[propertySchema.name] = propertySchema;    
+}
+</pre>
+</div>
+</div>
+<h3>Fields</h3>
+<div class="field"><h4 id="className">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>className</strong> <a class="anchor-link"
+            href="#className"
+            title="Permalink to ClassSchema.className">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+String className;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="factoryMethod">
+<span class="show-code">Code</span>
+<a href="../persistent_schema/FactoryMethod.html">FactoryMethod</a>         <strong>factoryMethod</strong> <a class="anchor-link"
+            href="#factoryMethod"
+            title="Permalink to ClassSchema.factoryMethod">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+FactoryMethod factoryMethod;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="isRoot">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a>         <strong>isRoot</strong> <a class="anchor-link"
+            href="#isRoot"
+            title="Permalink to ClassSchema.isRoot">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+bool isRoot;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="preserveFieldsOrder">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a>         <strong>preserveFieldsOrder</strong> <a class="anchor-link"
+            href="#preserveFieldsOrder"
+            title="Permalink to ClassSchema.preserveFieldsOrder">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+bool preserveFieldsOrder;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="properties">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="../persistent_schema/PropertySchema.html">PropertySchema</a>&gt;         <strong>properties</strong> <a class="anchor-link"
+            href="#properties"
+            title="Permalink to ClassSchema.properties">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+Map&lt;String,PropertySchema&gt; properties;
+</pre>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-09-12 16:03:43.397</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

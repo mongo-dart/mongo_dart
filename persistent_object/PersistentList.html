@@ -1,0 +1,465 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>PersistentList&lt;T&gt; Class / persistent_object Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="persistent_object" data-type="PersistentList&amp;lt;T&amp;gt;">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../persistent_object.html">persistent_object</a> &rsaquo; <a href="../persistent_object/PersistentList.html">PersistentList&lt;T&gt;</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo.html">mongo</a></h2><h2><div class="icon-library"></div><a href="../objectory.html">objectory</a></h2><h2><div class="icon-library"></div><a href="../objectory_base.html">objectory_base</a></h2><h2><div class="icon-library"></div><a href="../objectory_direct_connection.html">objectory_direct_connection</a></h2><h2><div class="icon-library"></div><a href="../objectory_query.html">objectory_query</a></h2><h2><div class="icon-library"></div><a href="../persistent_object.html">persistent_object</a></h2><ul class="icon">
+<li><a href="../persistent_object/BasePersistentObject.html"><div class="icon-class"></div>BasePersistentObject</a></li>
+<li><a href="../persistent_object/EmbeddedPersistentObject.html"><div class="icon-class"></div>EmbeddedPersistentObject</a></li>
+<li><a href="../persistent_object/PersistentIterator.html"><div class="icon-class"></div>PersistentIterator&lt;T&gt;</a></li>
+<li><div class="icon-class"></div><strong>PersistentList&lt;T&gt;</strong></li>
+<li><a href="../persistent_object/PersistentObject.html"><div class="icon-interface"></div>PersistentObject</a></li>
+<li><a href="../persistent_object/RootPersistentObject.html"><div class="icon-class"></div>RootPersistentObject</a></li>
+</ul>
+<h2><div class="icon-library"></div><a href="../persistent_schema.html">persistent_schema</a></h2></div>
+<div class="content">
+        <h2><strong>PersistentList&lt;T&gt;</strong>
+          Class
+        </h2>
+        
+<div class="doc">
+
+</div>
+<h3>Implements</h3>
+<p>
+<span class="type-box"><span class="icon-interface"></span><a href="../dart_core/List.html">List&lt;E&gt;</a></span></p>
+<h3>Constructors</h3>
+<div class="method"><h4 id="PersistentList">
+<span class="show-code">Code</span>
+new <strong>PersistentList</strong>(<a href="http://api.dartlang.org/dart_core/List.html">List</a> _list, [<a href="../persistent_object/BasePersistentObject.html">BasePersistentObject</a> parent, <a href="http://api.dartlang.org/dart_core/String.html">String</a> pathToMe]) <a class="anchor-link" href="#PersistentList"
+              title="Permalink to PersistentList&lt;T&gt;.PersistentList">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+PersistentList(this._list,[this.parent, this.pathToMe]);
+</pre>
+</div>
+</div>
+<h3>Methods</h3>
+<div class="method"><h4 id="add">
+<span class="show-code">Code</span>
+void <strong>add</strong>(<a href="../persistent_object/PersistentList.html">T</a> element) <a class="anchor-link" href="#add"
+              title="Permalink to PersistentList&lt;T&gt;.add">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void add(T element){
+  _list.add(internValue(element));
+  setDirty(null);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="addAll">
+<span class="show-code">Code</span>
+void <strong>addAll</strong>(<a href="http://api.dartlang.org/dart_core/Collection.html">Collection</a>&lt;<a href="../persistent_object/PersistentList.html">T</a>&gt; elements) <a class="anchor-link" href="#addAll"
+              title="Permalink to PersistentList&lt;T&gt;.addAll">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void addAll(Collection&lt;T&gt; elements){
+  _list.addAll(elements);
+  setDirty(null);    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="addLast">
+<span class="show-code">Code</span>
+void <strong>addLast</strong>(<a href="../persistent_object/PersistentList.html">T</a> value) <a class="anchor-link" href="#addLast"
+              title="Permalink to PersistentList&lt;T&gt;.addLast">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void addLast(T value) =&gt; _list.addLast(value);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="clear">
+<span class="show-code">Code</span>
+void <strong>clear</strong>() <a class="anchor-link" href="#clear"
+              title="Permalink to PersistentList&lt;T&gt;.clear">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void clear(){
+  Collection&lt;T&gt; c = _list;
+  _list.clear();
+  setDirty(null);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="every">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>every</strong>(<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> f(<a href="../persistent_object/PersistentList.html">T</a> element)) <a class="anchor-link" href="#every"
+              title="Permalink to PersistentList&lt;T&gt;.every">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+bool every(bool f(T element)) =&gt; _list.every(f);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="filter">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Collection.html">Collection</a>&lt;<a href="../persistent_object/PersistentList.html">T</a>&gt; <strong>filter</strong>(<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> f(<a href="../persistent_object/PersistentList.html">T</a> element)) <a class="anchor-link" href="#filter"
+              title="Permalink to PersistentList&lt;T&gt;.filter">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Collection&lt;T&gt; filter(bool f(T element)) =&gt; _list.filter(f);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="forEach">
+<span class="show-code">Code</span>
+void <strong>forEach</strong>(void f(element)) <a class="anchor-link" href="#forEach"
+              title="Permalink to PersistentList&lt;T&gt;.forEach">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void forEach(void f(element)) =&gt; _list.forEach(f);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="getRange">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/List.html">List</a> <strong>getRange</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> start, <a href="http://api.dartlang.org/dart_core/int.html">int</a> length) <a class="anchor-link" href="#getRange"
+              title="Permalink to PersistentList&lt;T&gt;.getRange">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+List getRange(int start, int length) =&gt; _list.getRange(start, length);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="indexOf">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>indexOf</strong>(<a href="../persistent_object/PersistentList.html">T</a> element, [<a href="http://api.dartlang.org/dart_core/int.html">int</a> start]) <a class="anchor-link" href="#indexOf"
+              title="Permalink to PersistentList&lt;T&gt;.indexOf">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+int indexOf(T element, [int start]) =&gt; _list.indexOf(element, start);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="insertRange">
+<span class="show-code">Code</span>
+void <strong>insertRange</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> start, <a href="http://api.dartlang.org/dart_core/int.html">int</a> length, [<a href="../persistent_object/PersistentList.html">T</a> initialValue]) <a class="anchor-link" href="#insertRange"
+              title="Permalink to PersistentList&lt;T&gt;.insertRange">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void insertRange(int start, int length, [T initialValue]){
+  _list.insertRange(start, length, initialValue);
+  setDirty(null);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="internValue">
+<span class="show-code">Code</span>
+<strong>internValue</strong>(<a href="../persistent_object/PersistentList.html">T</a> value) <a class="anchor-link" href="#internValue"
+              title="Permalink to PersistentList&lt;T&gt;.internValue">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+internValue(T value) {  
+  if (value is EmbeddedPersistentObject) {
+    value.parent = parent;
+    value.pathToMe = pathToMe;
+    return value.map;
+  }
+  if (value is RootPersistentObject) {
+    return value.id;
+  }
+  return value;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="internalList">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/List.html">List</a> <strong>get internalList</strong>() <a class="anchor-link" href="#internalList"
+              title="Permalink to PersistentList&lt;T&gt;.get internalList">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+List get internalList =&gt; _list;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="isEmpty">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>isEmpty</strong>() <a class="anchor-link" href="#isEmpty"
+              title="Permalink to PersistentList&lt;T&gt;.isEmpty">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+bool isEmpty() =&gt; _list.isEmpty();
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="iterator">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Iterator.html">Iterator</a>&lt;<a href="../persistent_object/PersistentList.html">T</a>&gt; <strong>iterator</strong>() <a class="anchor-link" href="#iterator"
+              title="Permalink to PersistentList&lt;T&gt;.iterator">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Iterator&lt;T&gt; iterator() =&gt; new PersistentIterator(_list.iterator(),valueConverter);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="last">
+<span class="show-code">Code</span>
+<a href="../persistent_object/PersistentList.html">T</a> <strong>last</strong>() <a class="anchor-link" href="#last"
+              title="Permalink to PersistentList&lt;T&gt;.last">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+T last() =&gt; _list.last();
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="lastIndexOf">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>lastIndexOf</strong>(<a href="../persistent_object/PersistentList.html">T</a> element, [<a href="http://api.dartlang.org/dart_core/int.html">int</a> start]) <a class="anchor-link" href="#lastIndexOf"
+              title="Permalink to PersistentList&lt;T&gt;.lastIndexOf">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+int lastIndexOf(T element, [int start]) =&gt; _list.lastIndexOf(element, start);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="length">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>get length</strong>() <a class="anchor-link" href="#length"
+              title="Permalink to PersistentList&lt;T&gt;.get length">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+int get length =&gt; _list.length;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="map">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Collection.html">Collection</a> <strong>map</strong>(f(<a href="../persistent_object/PersistentList.html">T</a> element)) <a class="anchor-link" href="#map"
+              title="Permalink to PersistentList&lt;T&gt;.map">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Collection map(f(T element)) =&gt; _list.map(f);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="operator []">
+<span class="show-code">Code</span>
+<a href="../persistent_object/PersistentList.html">T</a> <strong>operator []</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> index) <a class="anchor-link" href="#operator []"
+              title="Permalink to PersistentList&lt;T&gt;.operator []">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+T operator[](int index) {
+  return valueConverter.convertValue(_list[index]);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="operator []=">
+<span class="show-code">Code</span>
+void <strong>operator []=</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> index, <a href="../persistent_object/PersistentList.html">T</a> value) <a class="anchor-link" href="#operator []="
+              title="Permalink to PersistentList&lt;T&gt;.operator []=">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void operator[]=(int index, T value){
+  _list[index] = internValue(value);
+  setDirty(null);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="remove">
+<span class="show-code">Code</span>
+void <strong>remove</strong>(<a href="../persistent_object/PersistentList.html">T</a> element) <a class="anchor-link" href="#remove"
+              title="Permalink to PersistentList&lt;T&gt;.remove">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void remove(T element){
+  if (_list.indexOf(element) == -1) return;
+  _list.removeRange(_list.indexOf(element), 1);
+  setDirty(null);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="removeLast">
+<span class="show-code">Code</span>
+<a href="../persistent_object/PersistentList.html">T</a> <strong>removeLast</strong>() <a class="anchor-link" href="#removeLast"
+              title="Permalink to PersistentList&lt;T&gt;.removeLast">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+T removeLast(){
+  T item = _list.last();    
+  _list.removeLast();
+  setDirty(null);
+  return item;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="removeRange">
+<span class="show-code">Code</span>
+void <strong>removeRange</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> start, <a href="http://api.dartlang.org/dart_core/int.html">int</a> length) <a class="anchor-link" href="#removeRange"
+              title="Permalink to PersistentList&lt;T&gt;.removeRange">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void removeRange(int start, int length){    
+  _list.removeRange(start, length);    
+  setDirty(null);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="setDirty">
+<span class="show-code">Code</span>
+void <strong>setDirty</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> propertyName) <a class="anchor-link" href="#setDirty"
+              title="Permalink to PersistentList&lt;T&gt;.setDirty">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void setDirty(String propertyName) {
+  parent.setDirty(pathToMe);    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="setRange">
+<span class="show-code">Code</span>
+void <strong>setRange</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> start, <a href="http://api.dartlang.org/dart_core/int.html">int</a> length, <a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="../persistent_object/PersistentList.html">T</a>&gt; from, [<a href="http://api.dartlang.org/dart_core/int.html">int</a> startFrom]) <a class="anchor-link" href="#setRange"
+              title="Permalink to PersistentList&lt;T&gt;.setRange">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void setRange(int start, int length, List&lt;T&gt; from, [int startFrom]){    
+  _list.setRange(start, length, from, startFrom);    
+  setDirty(null);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="some">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>some</strong>(<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> f(<a href="../persistent_object/PersistentList.html">T</a> element)) <a class="anchor-link" href="#some"
+              title="Permalink to PersistentList&lt;T&gt;.some">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+bool some(bool f(T element)) =&gt; _list.some(f);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="sort">
+<span class="show-code">Code</span>
+void <strong>sort</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> compare(a, b)) <a class="anchor-link" href="#sort"
+              title="Permalink to PersistentList&lt;T&gt;.sort">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void sort(int compare(a, b)) =&gt; _list.sort(compare);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<span class="show-code">Code</span>
+<strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to PersistentList&lt;T&gt;.toString">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+toString() =&gt; "PersistentList($_list)";
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="valueConverter">
+<span class="show-code">Code</span>
+<a href="../persistent_object/_ValueConverter.html">_ValueConverter</a> <strong>get valueConverter</strong>() <a class="anchor-link" href="#valueConverter"
+              title="Permalink to PersistentList&lt;T&gt;.get valueConverter">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+_ValueConverter get valueConverter{
+  if (_valueConverter === null) {
+    _valueConverter = new _ValueConverter(parent,pathToMe);
+  }
+  return _valueConverter;
+}
+</pre>
+</div>
+</div>
+<h3>Fields</h3>
+<div class="field"><h4 id="parent">
+<span class="show-code">Code</span>
+<a href="../persistent_object/BasePersistentObject.html">BasePersistentObject</a>         <strong>parent</strong> <a class="anchor-link"
+            href="#parent"
+            title="Permalink to PersistentList&lt;T&gt;.parent">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+BasePersistentObject parent;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="pathToMe">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>pathToMe</strong> <a class="anchor-link"
+            href="#pathToMe"
+            title="Permalink to PersistentList&lt;T&gt;.pathToMe">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+String pathToMe;
+</pre>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-09-12 16:03:43.347</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

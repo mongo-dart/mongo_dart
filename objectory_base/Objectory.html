@@ -1,0 +1,218 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>Objectory Interface / objectory_base Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="objectory_base" data-type="Objectory">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../objectory_base.html">objectory_base</a> &rsaquo; <a href="../objectory_base/Objectory.html">Objectory</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo.html">mongo</a></h2><h2><div class="icon-library"></div><a href="../objectory.html">objectory</a></h2><h2><div class="icon-library"></div><a href="../objectory_base.html">objectory_base</a></h2><ul class="icon">
+<li><div class="icon-interface"></div><strong>Objectory</strong></li>
+<li><a href="../objectory_base/ObjectoryBaseImpl.html"><div class="icon-class"></div>ObjectoryBaseImpl</a></li>
+</ul>
+<h2><div class="icon-library"></div><a href="../objectory_direct_connection.html">objectory_direct_connection</a></h2><h2><div class="icon-library"></div><a href="../objectory_query.html">objectory_query</a></h2><h2><div class="icon-library"></div><a href="../persistent_object.html">persistent_object</a></h2><h2><div class="icon-library"></div><a href="../persistent_schema.html">persistent_schema</a></h2></div>
+<div class="content">
+        <h2><strong>Objectory</strong>
+          Interface
+        </h2>
+        
+<div class="doc">
+
+</div>
+<h3>Implemented by</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../objectory_base/ObjectoryBaseImpl.html">ObjectoryBaseImpl</a></span></p>
+<h3>Methods</h3>
+<div class="method"><h4 id="addToCache">
+<span class="show-code">Code</span>
+void <strong>addToCache</strong>(<a href="../persistent_object/RootPersistentObject.html">RootPersistentObject</a> obj) <a class="anchor-link" href="#addToCache"
+              title="Permalink to Objectory.addToCache">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void addToCache(RootPersistentObject obj);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="close">
+<span class="show-code">Code</span>
+void <strong>close</strong>() <a class="anchor-link" href="#close"
+              title="Permalink to Objectory.close">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void close();
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="dropCollections">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>dropCollections</strong>() <a class="anchor-link" href="#dropCollections"
+              title="Permalink to Objectory.dropCollections">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Future dropCollections();
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="dropDb">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; <strong>dropDb</strong>() <a class="anchor-link" href="#dropDb"
+              title="Permalink to Objectory.dropDb">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Future&lt;Map&gt; dropDb();
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="find">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="../persistent_object/RootPersistentObject.html">RootPersistentObject</a>&gt;&gt; <strong>find</strong>(<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> selector) <a class="anchor-link" href="#find"
+              title="Permalink to Objectory.find">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Future&lt;List&lt;RootPersistentObject&gt;&gt; find(ObjectoryQueryBuilder selector);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="findInCache">
+<span class="show-code">Code</span>
+<a href="../persistent_object/RootPersistentObject.html">RootPersistentObject</a> <strong>findInCache</strong>(<a href="../bson/ObjectId.html">ObjectId</a> id) <a class="anchor-link" href="#findInCache"
+              title="Permalink to Objectory.findInCache">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+RootPersistentObject findInCache(ObjectId id);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="findOne">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="../persistent_object/RootPersistentObject.html">RootPersistentObject</a>&gt; <strong>findOne</strong>(<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> selector) <a class="anchor-link" href="#findOne"
+              title="Permalink to Objectory.findOne">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Future&lt;RootPersistentObject&gt; findOne(ObjectoryQueryBuilder selector);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="getSchema">
+<span class="show-code">Code</span>
+<a href="../persistent_schema/ClassSchema.html">ClassSchema</a> <strong>getSchema</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> className) <a class="anchor-link" href="#getSchema"
+              title="Permalink to Objectory.getSchema">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+ClassSchema getSchema(String className);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="map2Object">
+<span class="show-code">Code</span>
+<a href="../persistent_object/BasePersistentObject.html">BasePersistentObject</a> <strong>map2Object</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> className, <a href="http://api.dartlang.org/dart_core/Map.html">Map</a> map) <a class="anchor-link" href="#map2Object"
+              title="Permalink to Objectory.map2Object">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+BasePersistentObject map2Object(String className, Map map);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="newInstance">
+<span class="show-code">Code</span>
+<a href="../persistent_object/BasePersistentObject.html">BasePersistentObject</a> <strong>newInstance</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> className) <a class="anchor-link" href="#newInstance"
+              title="Permalink to Objectory.newInstance">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+BasePersistentObject newInstance(String className);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="open">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/bool.html">bool</a>&gt; <strong>open</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> uri) <a class="anchor-link" href="#open"
+              title="Permalink to Objectory.open">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Future&lt;bool&gt; open(String uri);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="registerClass">
+<span class="show-code">Code</span>
+void <strong>registerClass</strong>(<a href="../persistent_schema/ClassSchema.html">ClassSchema</a> schema) <a class="anchor-link" href="#registerClass"
+              title="Permalink to Objectory.registerClass">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void registerClass(ClassSchema schema);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="remove">
+<span class="show-code">Code</span>
+void <strong>remove</strong>(<a href="../persistent_object/PersistentObject.html">PersistentObject</a> persistentObject) <a class="anchor-link" href="#remove"
+              title="Permalink to Objectory.remove">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void remove(PersistentObject persistentObject);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="save">
+<span class="show-code">Code</span>
+void <strong>save</strong>(<a href="../persistent_object/RootPersistentObject.html">RootPersistentObject</a> persistentObject) <a class="anchor-link" href="#save"
+              title="Permalink to Objectory.save">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+void save(RootPersistentObject persistentObject);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="wait">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; <strong>wait</strong>() <a class="anchor-link" href="#wait"
+              title="Permalink to Objectory.wait">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Future&lt;Map&gt; wait();
+</pre>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-09-12 16:03:43.290</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

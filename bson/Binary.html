@@ -1,0 +1,595 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>Binary Class / bson Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="bson" data-type="Binary">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../bson.html">bson</a> &rsaquo; <a href="../bson/Binary.html">Binary</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><ul class="icon">
+<li><a href="../bson/BSON.html"><div class="icon-class"></div>BSON</a></li>
+<li><div class="icon-class"></div><strong>Binary</strong></li>
+<li><a href="../bson/BsonArray.html"><div class="icon-class"></div>BsonArray</a></li>
+<li><a href="../bson/BsonBoolean.html"><div class="icon-class"></div>BsonBoolean</a></li>
+<li><a href="../bson/BsonByteArray.html"><div class="icon-interface"></div>BsonByteArray</a></li>
+<li><a href="../bson/BsonCString.html"><div class="icon-class"></div>BsonCString</a></li>
+<li><a href="../bson/BsonCode.html"><div class="icon-class"></div>BsonCode</a></li>
+<li><a href="../bson/BsonDate.html"><div class="icon-class"></div>BsonDate</a></li>
+<li><a href="../bson/BsonDouble.html"><div class="icon-class"></div>BsonDouble</a></li>
+<li><a href="../bson/BsonInt.html"><div class="icon-class"></div>BsonInt</a></li>
+<li><a href="../bson/BsonLong.html"><div class="icon-class"></div>BsonLong</a></li>
+<li><a href="../bson/BsonMap.html"><div class="icon-class"></div>BsonMap</a></li>
+<li><a href="../bson/BsonNull.html"><div class="icon-class"></div>BsonNull</a></li>
+<li><a href="../bson/BsonObject.html"><div class="icon-class"></div>BsonObject</a></li>
+<li><a href="../bson/BsonObjectId.html"><div class="icon-class"></div>BsonObjectId</a></li>
+<li><a href="../bson/BsonPlatform.html"><div class="icon-class"></div>BsonPlatform</a></li>
+<li><a href="../bson/BsonRegexp.html"><div class="icon-class"></div>BsonRegexp</a></li>
+<li><a href="../bson/BsonString.html"><div class="icon-class"></div>BsonString</a></li>
+<li><a href="../bson/MaxKey.html"><div class="icon-class"></div>MaxKey</a></li>
+<li><a href="../bson/MinKey.html"><div class="icon-class"></div>MinKey</a></li>
+<li><a href="../bson/ObjectId.html"><div class="icon-interface"></div>ObjectId</a></li>
+<li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
+<li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
+</ul>
+<h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo.html">mongo</a></h2><h2><div class="icon-library"></div><a href="../objectory.html">objectory</a></h2><h2><div class="icon-library"></div><a href="../objectory_base.html">objectory_base</a></h2><h2><div class="icon-library"></div><a href="../objectory_direct_connection.html">objectory_direct_connection</a></h2><h2><div class="icon-library"></div><a href="../objectory_query.html">objectory_query</a></h2><h2><div class="icon-library"></div><a href="../persistent_object.html">persistent_object</a></h2><h2><div class="icon-library"></div><a href="../persistent_schema.html">persistent_schema</a></h2></div>
+<div class="content">
+        <h2><strong>Binary</strong>
+          Class
+        </h2>
+        
+<div class="doc">
+
+</div>
+<h3>Extends</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../bson/BsonObject.html">BsonObject</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>Binary</strong></span></p>
+<h3>Constructors</h3>
+<div class="method"><h4 id="Binary.from">
+<span class="show-code">Code</span>
+new <strong>Binary</strong>.from(<a href="http://api.dartlang.org/dart_core/List.html">List</a> from) <a class="anchor-link" href="#Binary.from"
+              title="Permalink to Binary.Binary">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Binary.from(List from): byteList = makeUint8List(from.length),offset=0, subType=0 {    
+  byteList.setRange(0, from.length, from);
+  byteArray = makeByteArray(byteList);    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="Binary">
+<span class="show-code">Code</span>
+new <strong>Binary</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> length) <a class="anchor-link" href="#Binary"
+              title="Permalink to Binary.Binary">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+Binary(int length): byteList = makeUint8List(length), offset=0, subType=0{
+  byteArray = makeByteArray(byteList);    
+}
+</pre>
+</div>
+</div>
+<h3>Static Fields</h3>
+<div class="field"><h4 id="BUFFER_SIZE">
+<span class="show-code">Code</span>
+final         <strong>BUFFER_SIZE</strong> <a class="anchor-link"
+            href="#BUFFER_SIZE"
+            title="Permalink to Binary.BUFFER_SIZE">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+static final BUFFER_SIZE = 256;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="SUBTYPE_BYTE_ARRAY">
+<span class="show-code">Code</span>
+final         <strong>SUBTYPE_BYTE_ARRAY</strong> <a class="anchor-link"
+            href="#SUBTYPE_BYTE_ARRAY"
+            title="Permalink to Binary.SUBTYPE_BYTE_ARRAY">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+static final SUBTYPE_BYTE_ARRAY = 2;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="SUBTYPE_DEFAULT">
+<span class="show-code">Code</span>
+final         <strong>SUBTYPE_DEFAULT</strong> <a class="anchor-link"
+            href="#SUBTYPE_DEFAULT"
+            title="Permalink to Binary.SUBTYPE_DEFAULT">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+static final SUBTYPE_DEFAULT = 0;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="SUBTYPE_FUNCTION">
+<span class="show-code">Code</span>
+final         <strong>SUBTYPE_FUNCTION</strong> <a class="anchor-link"
+            href="#SUBTYPE_FUNCTION"
+            title="Permalink to Binary.SUBTYPE_FUNCTION">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+static final SUBTYPE_FUNCTION = 1;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="SUBTYPE_MD5">
+<span class="show-code">Code</span>
+final         <strong>SUBTYPE_MD5</strong> <a class="anchor-link"
+            href="#SUBTYPE_MD5"
+            title="Permalink to Binary.SUBTYPE_MD5">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+static final SUBTYPE_MD5 = 4;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="SUBTYPE_USER_DEFINED">
+<span class="show-code">Code</span>
+final         <strong>SUBTYPE_USER_DEFINED</strong> <a class="anchor-link"
+            href="#SUBTYPE_USER_DEFINED"
+            title="Permalink to Binary.SUBTYPE_USER_DEFINED">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+static final SUBTYPE_USER_DEFINED = 128;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="SUBTYPE_UUID">
+<span class="show-code">Code</span>
+final         <strong>SUBTYPE_UUID</strong> <a class="anchor-link"
+            href="#SUBTYPE_UUID"
+            title="Permalink to Binary.SUBTYPE_UUID">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+static final SUBTYPE_UUID = 3;
+</pre>
+</div>
+</div>
+<h3>Methods</h3>
+<div class="method"><h4 id="atEnd">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>atEnd</strong>() <a class="anchor-link" href="#atEnd"
+              title="Permalink to Binary.atEnd">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+bool atEnd() =&gt; offset == byteList.length;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="byteLength">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>byteLength</strong>() <a class="anchor-link" href="#byteLength"
+              title="Permalink to Binary.byteLength">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+int byteLength() =&gt; byteList.length+4+1;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="encodeInt">
+<span class="show-code">Code</span>
+<strong>encodeInt</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> position, <a href="http://api.dartlang.org/dart_core/int.html">int</a> value, <a href="http://api.dartlang.org/dart_core/int.html">int</a> numOfBytes, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> forceBigEndian, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> signed) <a class="anchor-link" href="#encodeInt"
+              title="Permalink to Binary.encodeInt">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+encodeInt(int position,int value, int numOfBytes, bool forceBigEndian, bool signed) {
+  int bits = numOfBytes &lt;&lt; 3; 
+  int max = Statics.MaxBits(bits);
+
+  if (value &gt;= max || value &lt; -(max / 2)) {
+    throw new Exception("encodeInt::overflow");      
+  }
+  switch(bits) {
+    case 32:
+      byteArray.setInt32(position,value);        
+      break;
+    case 16: 
+      byteArray.setInt16(position,value);
+      break;
+    case 8: 
+      byteArray.setInt8(position,value);        
+      break;
+    case 24:        
+      setIntExtended(value,numOfBytes);
+      break;      
+    default:
+      throw new Exception("Unsupported num of bits: $bits");
+  }
+  if (forceBigEndian){
+    reverse(numOfBytes);
+  }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="packValue">
+<span class="show-code">Code</span>
+<strong>packValue</strong>(<a href="../bson/Binary.html">Binary</a> buffer) <a class="anchor-link" href="#packValue"
+              title="Permalink to Binary.packValue">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+packValue(Binary buffer){
+  buffer.writeInt(byteList.length);
+  buffer.writeByte(subType);
+  buffer.byteList.setRange(buffer.offset,byteList.length,byteList);
+  buffer.offset += byteList.length;        
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="readByte">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>readByte</strong>() <a class="anchor-link" href="#readByte"
+              title="Permalink to Binary.readByte">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+int readByte(){    
+  return byteList[offset++];
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="readCString">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>readCString</strong>() <a class="anchor-link" href="#readCString"
+              title="Permalink to Binary.readCString">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+String readCString(){ 
+  List&lt;int&gt; stringBytes = [];
+  while (byteList[offset++]!= 0){
+     stringBytes.add(byteList[offset-1]);
+  }
+  return decodeUtf8(stringBytes);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="readDouble">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/num.html">num</a> <strong>readDouble</strong>() <a class="anchor-link" href="#readDouble"
+              title="Permalink to Binary.readDouble">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+num readDouble(){    
+  offset+=8;
+  return byteArray.getFloat64(offset-8);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="readInt32">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>readInt32</strong>() <a class="anchor-link" href="#readInt32"
+              title="Permalink to Binary.readInt32">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+int readInt32(){    
+  offset+=4;
+  return byteArray.getInt32(offset-4);    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="readInt64">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>readInt64</strong>() <a class="anchor-link" href="#readInt64"
+              title="Permalink to Binary.readInt64">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+int readInt64(){    
+  offset+=8;
+  return byteArray.getInt64(offset-8);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="reverse">
+<span class="show-code">Code</span>
+<strong>reverse</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> numOfBytes) <a class="anchor-link" href="#reverse"
+              title="Permalink to Binary.reverse">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+reverse(int numOfBytes){
+  swap(int x, int y){
+    int t = byteList[x+offset];
+    byteList[x+offset] = byteList[y+offset];
+    byteList[y+offset] = t;
+  }
+  for(int i=0;i&lt;=(numOfBytes-1)%2;i++){
+    swap(i,numOfBytes-1-i);
+  }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="rewind">
+<span class="show-code">Code</span>
+<strong>rewind</strong>() <a class="anchor-link" href="#rewind"
+              title="Permalink to Binary.rewind">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+rewind(){
+  offset = 0;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="setIntExtended">
+<span class="show-code">Code</span>
+<strong>setIntExtended</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> value, <a href="http://api.dartlang.org/dart_core/int.html">int</a> numOfBytes) <a class="anchor-link" href="#setIntExtended"
+              title="Permalink to Binary.setIntExtended">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+setIntExtended(int value, int numOfBytes){
+  List&lt;int&gt; byteListTmp = makeUint8List(8);    
+  var byteArrayTmp = makeByteArray(byteListTmp);
+  if (numOfBytes == 3){
+    byteArrayTmp.setInt32(0,value);
+  }
+  else if (numOfBytes &gt; 4 &amp;&amp; numOfBytes &lt; 8){
+    byteArrayTmp.setInt64(0,value);
+  }
+  else {
+      throw new Exception("Unsupported num of bits: ${numOfBytes*8}");
+  }
+  byteList.setRange(offset,numOfBytes,byteListTmp);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toHexString">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toHexString</strong>() <a class="anchor-link" href="#toHexString"
+              title="Permalink to Binary.toHexString">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+String toHexString(){
+  StringBuffer stringBuffer = new StringBuffer();
+  for (final byte in byteList)
+  {      
+     if (byte &lt; 16){
+      stringBuffer.add("0");
+     }       
+     stringBuffer.add(byte.toRadixString(16));
+  }
+  return stringBuffer.toString().toLowerCase();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to Binary.toString">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+String toString()=&gt;"Binary(${toHexString()})";
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="typeByte">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>get typeByte</strong>() <a class="anchor-link" href="#typeByte"
+              title="Permalink to Binary.get typeByte">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+int get typeByte =&gt; BSON.BSON_DATA_BINARY;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="unpackValue">
+<span class="show-code">Code</span>
+<strong>unpackValue</strong>(<a href="../bson/Binary.html">Binary</a> buffer) <a class="anchor-link" href="#unpackValue"
+              title="Permalink to Binary.unpackValue">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+unpackValue(Binary buffer){
+  int size = buffer.readInt32();
+  subType = buffer.readByte();
+  byteList = makeUint8List(size);
+  byteArray = makeByteArray(byteList);
+  byteList.setRange(0,size,buffer.byteList,buffer.offset);
+  buffer.offset += size;  
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="value">
+<span class="show-code">Code</span>
+<strong>get value</strong>() <a class="anchor-link" href="#value"
+              title="Permalink to Binary.get value">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+get value =&gt; this;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="writeByte">
+<span class="show-code">Code</span>
+<strong>writeByte</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> value) <a class="anchor-link" href="#writeByte"
+              title="Permalink to Binary.writeByte">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+writeByte(int value){
+  encodeInt(offset,value, 1,false,false);
+  offset += 1;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="writeCString">
+<span class="show-code">Code</span>
+<strong>writeCString</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> val) <a class="anchor-link" href="#writeCString"
+              title="Permalink to Binary.writeCString">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+writeCString(String val){
+  final utfData = encodeUtf8(val);
+  byteList.setRange(offset,utfData.length,utfData);
+  offset += utfData.length;
+  writeByte(0);    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="writeDouble">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>writeDouble</strong>(<a href="http://api.dartlang.org/dart_core/double.html">double</a> value) <a class="anchor-link" href="#writeDouble"
+              title="Permalink to Binary.writeDouble">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+int writeDouble(double value){    
+  byteArray.setFloat64(offset, value);
+  offset+=8;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="writeInt">
+<span class="show-code">Code</span>
+<strong>writeInt</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> value, [<a href="http://api.dartlang.org/dart_core/int.html">int</a> numOfBytes = 4, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> forceBigEndian = false, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> signed = false]) <a class="anchor-link" href="#writeInt"
+              title="Permalink to Binary.writeInt">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+writeInt(int value, [int numOfBytes=4,bool forceBigEndian=false, bool signed=false]){
+  encodeInt(offset,value, numOfBytes,forceBigEndian,signed);
+  offset += numOfBytes;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="writeInt64">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>writeInt64</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> value) <a class="anchor-link" href="#writeInt64"
+              title="Permalink to Binary.writeInt64">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+int writeInt64(int value){
+  byteArray.setInt64(offset, value);
+  offset+=8;
+}
+</pre>
+</div>
+</div>
+<h3>Fields</h3>
+<div class="field"><h4 id="byteArray">
+<span class="show-code">Code</span>
+var         <strong>byteArray</strong> <a class="anchor-link"
+            href="#byteArray"
+            title="Permalink to Binary.byteArray">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+var byteArray;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="byteList">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html">int</a>&gt;         <strong>byteList</strong> <a class="anchor-link"
+            href="#byteList"
+            title="Permalink to Binary.byteList">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+List&lt;int&gt; byteList;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="offset">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>offset</strong> <a class="anchor-link"
+            href="#offset"
+            title="Permalink to Binary.offset">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+int offset;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="subType">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>subType</strong> <a class="anchor-link"
+            href="#subType"
+            title="Permalink to Binary.subType">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+int subType;
+</pre>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-09-12 16:03:43.085</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

@@ -1,0 +1,175 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>MongoReplyMessage Class / mongo Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo" data-type="MongoReplyMessage">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo.html">mongo</a> &rsaquo; <a href="../mongo/MongoReplyMessage.html">MongoReplyMessage</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo.html">mongo</a></h2><ul class="icon">
+<li><a href="../mongo/Connection.html"><div class="icon-class"></div>Connection</a></li>
+<li><a href="../mongo/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
+<li><a href="../mongo/Db.html"><div class="icon-class"></div>Db</a></li>
+<li><a href="../mongo/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
+<li><a href="../mongo/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><a href="../mongo/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="../mongo/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
+<li><a href="../mongo/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
+<li><a href="../mongo/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
+<li><a href="../mongo/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
+<li><a href="../mongo/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
+<li><a href="../mongo/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
+<li><a href="../mongo/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
+<li><div class="icon-class"></div><strong>MongoReplyMessage</strong></li>
+<li><a href="../mongo/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
+<li><a href="../mongo/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder&lt;K, V&gt;</a></li>
+<li><a href="../mongo/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
+<li><a href="../mongo/Utils.html"><div class="icon-class"></div>Utils</a></li>
+</ul>
+<h2><div class="icon-library"></div><a href="../objectory.html">objectory</a></h2><h2><div class="icon-library"></div><a href="../objectory_base.html">objectory_base</a></h2><h2><div class="icon-library"></div><a href="../objectory_direct_connection.html">objectory_direct_connection</a></h2><h2><div class="icon-library"></div><a href="../objectory_query.html">objectory_query</a></h2><h2><div class="icon-library"></div><a href="../persistent_object.html">persistent_object</a></h2><h2><div class="icon-library"></div><a href="../persistent_schema.html">persistent_schema</a></h2></div>
+<div class="content">
+        <h2><strong>MongoReplyMessage</strong>
+          Class
+        </h2>
+        
+<div class="doc">
+
+</div>
+<h3>Extends</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../mongo/MongoMessage.html">MongoMessage</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>MongoReplyMessage</strong></span></p>
+<h3>Methods</h3>
+<div class="method"><h4 id="deserialize">
+<span class="show-code">Code</span>
+<strong>deserialize</strong>(<a href="../bson/Binary.html">Binary</a> buffer) <a class="anchor-link" href="#deserialize"
+              title="Permalink to MongoReplyMessage.deserialize">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+deserialize(Binary buffer){
+  readMessageHeaderFrom(buffer);
+  responseFlags = buffer.readInt32();
+  cursorId = buffer.readInt64();
+  startingFrom = buffer.readInt32();
+  numberReturned = buffer.readInt32();
+  documents = new List(numberReturned);
+  for (int n=0;n&lt;numberReturned;n++){
+    BsonMap doc = new BsonMap({});
+    doc.unpackValue(buffer);
+    documents[n] = doc.value;
+  }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to MongoReplyMessage.toString">#</a></h4>
+<div class="doc">
+
+<pre class="source">
+String toString(){
+  if (documents.length == 1)
+  {
+    return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags, ${documents[0]})"; 
+  }        
+  return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags)";
+}
+</pre>
+</div>
+</div>
+<h3>Fields</h3>
+<div class="field"><h4 id="cursorId">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>cursorId</strong> <a class="anchor-link"
+            href="#cursorId"
+            title="Permalink to MongoReplyMessage.cursorId">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+int cursorId =-1;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="documents">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/List.html">List</a>         <strong>documents</strong> <a class="anchor-link"
+            href="#documents"
+            title="Permalink to MongoReplyMessage.documents">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+List documents;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="numberReturned">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>numberReturned</strong> <a class="anchor-link"
+            href="#numberReturned"
+            title="Permalink to MongoReplyMessage.numberReturned">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+int numberReturned = -1;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="responseFlags">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>responseFlags</strong> <a class="anchor-link"
+            href="#responseFlags"
+            title="Permalink to MongoReplyMessage.responseFlags">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+int responseFlags;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="startingFrom">
+<span class="show-code">Code</span>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>startingFrom</strong> <a class="anchor-link"
+            href="#startingFrom"
+            title="Permalink to MongoReplyMessage.startingFrom">#</a>
+        </h4>
+        <div class="doc">
+
+<pre class="source">
+int startingFrom;
+</pre>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-09-12 16:03:43.177</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        
