@@ -1,18 +1,14 @@
 class Statics{
   static Stopwatch _stopwatch;  
-  static startStopwatch() => _stopwatch = new Stopwatch.start();
+  static startStopwatch() => _stopwatch = new Stopwatch()..start();
   static stopStopwatch() => _stopwatch.stop();
   static Duration getElapsedTime(){
     _stopwatch.stop();
     return new Duration(milliseconds: _stopwatch.elapsedInMs());        
   }
-  static int _current_increment;
+  static int _current_increment = 0;
   static int get nextIncrement
   {
-    if (_current_increment === null)
-    {
-      _current_increment = 0;
-    } 
     return _current_increment++;
   }   
   static int _requestId;
@@ -38,26 +34,9 @@ class Statics{
     return _maxBits[bits];
   }
   static num _MashineId;
-  static num get MachineId{
-    if (_MashineId === null){
-       _MashineId = (Math.random() * 0xFFFFFFFF).floor().toInt();
-    }
-    return _MashineId;
-  }
-  static num _Pid;
-  static num get Pid{
-    if (_Pid === null){
-       _Pid = (Math.random() * 0xFFFF).floor().toInt();
-    }
-    return _Pid;
-  }
-  static Map<String,List<int>> _keys;
-  static Map<String,List<int>> get keys{
-    if (_keys === null){
-       _keys = new Map<String,List<int>>();
-    }
-    return _keys;
-  }
+  static final int MachineId = (new Random().nextDouble() * 0xFFFFFFFF).floor().toInt();
+  static final int Pid = (new Random().nextDouble() * 0xFFFF).floor().toInt();
+  static final Map<String,List<int>> keys = new Map<String,List<int>>();  
   static getKeyUtf8(String key){
     if (!keys.containsKey(key)){      
       keys[key] = encodeUtf8(key);    

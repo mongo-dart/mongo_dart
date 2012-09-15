@@ -1,6 +1,7 @@
 #library("bson");
 #import("dart:utf");
 #import("dart:uri");
+#import("dart:math");
 #source("src/bson/objectid.dart");
 #source("src/bson/bson_type.dart");
 #source("src/bson/bson_objectid.dart");
