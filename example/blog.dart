@@ -1,6 +1,6 @@
-#import("package:mongo-dart/mongo.dart");
+#import("package:mongo_dart/mongo.dart");
 main(){
-  Db db = new Db("mongodb://127.0.0.1/mongo-dart-blog");
+  Db db = new Db("mongodb://127.0.0.1/mongo_dart-blog");
   print("Connecting to ${db.serverConfig.host}:${db.serverConfig.port}");
   DbCollection collection;
   DbCollection usersCollection;
@@ -8,7 +8,7 @@ main(){
   Map<String,Map> authors = new Map<String,Map>();
   Map<String,Map> users = new Map<String,Map>();  
   db.open().chain((o){
-    print(">> Dropping mongo-dart-blog db");
+    print(">> Dropping mongo_dart-blog db");
     db.drop();
     print("===================================================================================");
     print(">> Adding Authors");

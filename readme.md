@@ -8,4 +8,4 @@ Some samples are in directory **examples**. Also Chris Buckett gave a realistic 
  - [Building a client / server Dart App – Part 2 – client (browser) side](http://blog.dartwatch.com/2012/03/building-client-server-dart-app-part-2.html)
 
 
-[API Doc] (http://vadimtsushko.github.com/mongo-dart/)
+[API Doc] (http://vadimtsushko.github.com/mongo_dart/)

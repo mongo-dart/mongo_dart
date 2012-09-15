@@ -1,6 +1,6 @@
-#import("package:mongo-dart/mongo.dart");
+#import("package:mongo_dart/mongo.dart");
 main(){  
-  Db db = new Db("mongodb://127.0.0.1/mongo-dart-test");
+  Db db = new Db("mongodb://127.0.0.1/mongo_dart-test");
   var id;
   DbCollection coll;
   db.open().chain((c){

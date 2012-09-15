@@ -1,4 +1,4 @@
-name: mongo-dart
+name: mongo_dart
 description: MongoDB driver for Dart
 version: 0.0.1
 dependencies:

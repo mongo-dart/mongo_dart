@@ -21,16 +21,16 @@ testSelectorBuilderOnObjectId(){
 
 
 testDatabaseName(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   String dbName;
-  dbName = 'mongo-dart-test';
+  dbName = 'mongo_dart-test';
   db.validateDatabaseName(dbName);
-  dbName = 'mongo-dart-test';
+  dbName = 'mongo_dart-test';
   db.validateDatabaseName(dbName);  
 }
 
 testCollectionInfoCursor(){
-  Db db = new Db('mongodb://127.0.0.1/mongo-dart-test');
+  Db db = new Db('mongodb://127.0.0.1/mongo_dart-test');
   db.open().chain((c){
     DbCollection newColl = db.collection("new_collecion");
     newColl.drop();
@@ -44,7 +44,7 @@ testCollectionInfoCursor(){
   });
 }
 testRemove(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection newColl;
   db.open().chain((c){  
     db.removeFromCollection("new_collecion_to_remove");
@@ -64,7 +64,7 @@ testRemove(){
   });
 }
 testDropDatabase(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().chain((c){
     return db.drop();
   }).then((v){
@@ -73,7 +73,7 @@ testDropDatabase(){
   });
 }
 testGetNonce(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().chain((c){
     return db.getNonce();
   }).then((v){
@@ -83,7 +83,7 @@ testGetNonce(){
   }); 
 }
 testPwd(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection coll;
   db.open().chain((c){
     coll = db.collection("system.users");
@@ -99,7 +99,7 @@ testCollectionCreation(){
   DbCollection collection = db.collection('student');
 }
 testEach(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
   int sum = 0;  
   db.open().chain((c){  
@@ -109,7 +109,7 @@ testEach(){
   }).then((v)=>info("Completed. Sum = $sum, count = $count"));
 }
 testFindEachWithThenClause(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
   int sum = 0;  
   db.open().chain((c){  
@@ -131,7 +131,7 @@ testFindEachWithThenClause(){
   });
 }
 testFindEach(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
   int sum = 0;  
   db.open().chain((c){  
@@ -155,7 +155,7 @@ testFindEach(){
   
 }
 testDrop(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then((_){
   db.dropCollection("testDrop").then((v)=>v);
   db.dropCollection("testDrop").then((__){    
@@ -166,7 +166,7 @@ testDrop(){
 }  
 
 testSaveWithIntegerId(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection coll;
   var id;
   db.open().chain((c){  
@@ -194,7 +194,7 @@ testSaveWithIntegerId(){
   });      
 }
 testSaveWithObjectId(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection coll;
   var id;
   db.open().chain((c){  
@@ -225,7 +225,7 @@ testSaveWithObjectId(){
 }
 
 testCount(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().chain((c){
     DbCollection coll = db.collection('testCount');
     coll.remove();
@@ -240,7 +240,7 @@ testCount(){
   });
 }
 testSkip(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().chain((c){  
     DbCollection coll = db.collection('testSkip');
     coll.remove();
@@ -255,7 +255,7 @@ testSkip(){
   });
 }
 testLimit(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   int counter = 0;
   Cursor cursor;
   db.open().chain((c){  
@@ -276,12 +276,12 @@ testLimit(){
 }
 
 testCursorCreation(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection collection = db.collection('student');
   Cursor cursor = new Cursor(db,collection);
 }
 testPingRaw(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().chain((c){
     DbCollection collection = db.collection('\$cmd');
     Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);  
@@ -295,7 +295,7 @@ testPingRaw(){
   });
 }
 testNextObject(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().chain((c){
     DbCollection collection = db.collection('\$cmd');
     Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);
@@ -308,7 +308,7 @@ testNextObject(){
 }
 testNextObjectToEnd(){
   var res;
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   Cursor cursor;
   db.open().chain((c){
     DbCollection collection = db.collection('testNextObjectToEnd');
@@ -339,7 +339,7 @@ testNextObjectToEnd(){
 }
 
 testCursorWithOpenServerCursor(){  
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   Cursor cursor;
   db.open().chain((c){
     DbCollection collection = db.collection('new_big_collection');
@@ -358,7 +358,7 @@ testCursorWithOpenServerCursor(){
 }
 testCursorGetMore(){
   var res;
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection collection;
   int count = 0;
   Cursor cursor;  
@@ -393,7 +393,7 @@ testCursorGetMore(){
 }
 testCursorClosing(){
   var res;
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection collection;
   Cursor cursor;
   db.open().chain((c){
@@ -421,12 +421,12 @@ testCursorClosing(){
 }
 
 testDbCommandCreation(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCommand dbCommand = new DbCommand(db,"student",0,0,1,{},{});
-  expect('mongo-dart-test.student',dbCommand.collectionNameBson.value);
+  expect('mongo_dart-test.student',dbCommand.collectionNameBson.value);
 }
 testPingDbCommand(){
-  Db db = new Db('${DefaultUri}mongo-dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then((d){
     DbCommand pingCommand = DbCommand.createPingCommand(db);
     Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(pingCommand);
@@ -437,7 +437,7 @@ testPingDbCommand(){
   });
 }
 testDropDbCommand(){
-  Db db = new Db('${DefaultUri}mongo-dart-test1');
+  Db db = new Db('${DefaultUri}mongo_dart-test1');
   db.open().then((d){
     DbCommand command = DbCommand.createDropDatabaseCommand(db);
     Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(command);

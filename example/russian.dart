@@ -1,7 +1,7 @@
-#import("package:mongo-dart/mongo.dart");
-#import("package:mongo-dart/bson.dart");
+#import("package:mongo_dart/mongo.dart");
+#import("package:mongo_dart/bson.dart");
 main(){
-  Db db = new Db("mongodb://127.0.0.1/mongo-dart-test");
+  Db db = new Db("mongodb://127.0.0.1/mongo_dart-test");
   DbCollection collection;
   print("Connecting to ${db.serverConfig.host}:${db.serverConfig.port}");
   db.open().chain((c){  
