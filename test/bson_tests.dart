@@ -10,14 +10,14 @@ testUint8ListNegativeWrite(){
 }
 testBinaryWithNegativeOne(){
   Binary b = new Binary(4);
-  b.writeInt(-1);   
-  expect(b.toHexString(),'ffffffff');  
+  b.writeInt(-1);
+  expect(b.toHexString(),'ffffffff');
 }
 testBinary(){
    Binary b = new Binary(8);
    b.writeInt(0,4);
    b.writeInt(1,4);
-   expect('0000000001000000',b.toHexString());   
+   expect('0000000001000000',b.toHexString());
    b = new Binary(8);
    b.writeInt(0,4);
    b = new Binary(8);
@@ -30,9 +30,9 @@ testBinary(){
    expect('0000000001020304',b.toHexString());
    b = new Binary(8);
    b.writeInt(0,4);
-   b.writeInt(1,4,forceBigEndian:true);   
-   expect('0000000000000001',b.toHexString());   
-   b = new Binary(8);   
+   b.writeInt(1,4,forceBigEndian:true);
+   expect('0000000000000001',b.toHexString());
+   b = new Binary(8);
    b.writeInt(1,3,forceBigEndian:true);
    expect('0000010000000000',b.toHexString());
    b = new Binary(8);
@@ -40,11 +40,11 @@ testBinary(){
    b.writeInt(1,3,forceBigEndian:true);
    expect('0000000000010000',b.toHexString());
    b = new Binary(4);
-   b.writeInt(-1);   
+   b.writeInt(-1);
    expect(b.toHexString(),'ffffffff');
    b = new Binary(4);
-   b.writeInt(-100);   
-   expect(b.toHexString(),'9cffffff');   
+   b.writeInt(-100);
+   expect(b.toHexString(),'9cffffff');
 }
 
 typeTest(){
@@ -71,7 +71,7 @@ testSerializeDeserialize(){
   Binary buffer = bson.serialize(map);
   expect('15000000105f696400050000001061000400000000',buffer.toHexString());
   buffer.offset = 0;
-  Map root = bson.deserialize(buffer);    
+  Map root = bson.deserialize(buffer);
   expect(root['a'],4);
   expect(root['_id'],5);
 //  expect(map,recursivelyMatches(root));
@@ -79,10 +79,10 @@ testSerializeDeserialize(){
   buffer = bson.serialize(doc1);
   expect('140000000461000c0000001030000f0000000000',buffer.toHexString());
   buffer.offset = 0;
-  
-  root = bson.deserialize(buffer);  
+
+  root = bson.deserialize(buffer);
   expect(15, root['a'][0]);
-  doc1 = {'_id':5, 'a': [2,3,5]};    
+  doc1 = {'_id':5, 'a': [2,3,5]};
   buffer = bson.serialize(doc1);
   expect('2b000000105f696400050000000461001a0000001030000200000010310003000000103200050000000000',buffer.toHexString());
   buffer.offset = 0;
@@ -91,7 +91,7 @@ testSerializeDeserialize(){
   buffer.readInt32();
   expect(5,buffer.offset);
   buffer.offset = 0;
-  root = bson.deserialize(buffer);  
+  root = bson.deserialize(buffer);
   expect(doc1['a'][2],root['a'][2], "doc1['a']");
 }
 
@@ -99,15 +99,15 @@ main(){
   group("BSonBinary:", (){
     test("testUint8ListNegativeWrite",testUint8ListNegativeWrite);
     test("testBinary",testBinary);
-    test("testBinaryWithNegativeOne",testBinaryWithNegativeOne);    
+    test("testBinaryWithNegativeOne",testBinaryWithNegativeOne);
   });
   group("BsonTypesTest:", (){
     test("typeTest",typeTest);
   });
   group("BsonObjectId:", (){
-    test("testObjectId",testObjectId);    
+    test("testObjectId",testObjectId);
   });
   group("BsonSerialization:", (){
-    test("testSerializeDeserialize",testSerializeDeserialize);  
-  });  
+    test("testSerializeDeserialize",testSerializeDeserialize);
+  });
 }

@@ -3,6 +3,8 @@ description: MongoDB driver for Dart
 version: 0.0.1
 dependencies:
   unittest:
-    sdk: unittest  
+    sdk: unittest
+  args:
+    sdk: args  
   log4dart:		    
     git: git://github.com/Solvr/log4dart.git

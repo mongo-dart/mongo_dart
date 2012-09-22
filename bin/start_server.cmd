@@ -1,0 +1,1 @@
+dart ../lib/mongo_dart_server.dart --port=8123 --uri=mongodb://127.0.0.1/mongo_dart_server_test
