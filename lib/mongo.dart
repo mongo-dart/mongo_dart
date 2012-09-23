@@ -3,8 +3,8 @@
 #import("dart:io");
 #import("dart:crypto");
 #import("dart:uri");
-#import("../packages/log4dart/log4dart.dart");
-#import("../packages/log4dart/file_appender.dart");
+#import("package:log4dart/log4dart.dart");
+#import("package:log4dart/file_appender.dart");
 #import("bson.dart");
 #import("bson_vm.dart");
 #source("src/database/connection.dart");

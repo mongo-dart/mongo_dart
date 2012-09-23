@@ -1,11 +1,11 @@
 #library("Database_tests");
-#import("../lib/mongo.dart");
+#import("package:mongo_dart/mongo.dart");
 #import("dart:uri");
-#import("../lib/bson.dart");
-#import("../lib/bson_vm.dart");
+#import("package:mongo_dart/bson.dart");
+#import("package:mongo_dart/bson_vm.dart");
 #import("dart:io");
 #import("dart:crypto");
-#import('../packages/unittest/unittest.dart');
+#import('package:unittest/unittest.dart');
 const DefaultUri = 'mongodb://127.0.0.1/';
 testSelectorBuilderCreation(){
   SelectorBuilder selector = query();
