@@ -455,6 +455,7 @@ class IsolatedServer {
  }
  
  void _saveHandler(HttpRequest request, HttpResponse response) {
+   String createdId;
    StringBuffer body = new StringBuffer();
    StringInputStream input = new StringInputStream(request.inputStream);
    input.onData = () => body.add(input.read());
@@ -465,12 +466,16 @@ class IsolatedServer {
        var collection = _getCollectionFromRequest(request);
        if (mapToSave !== null && collection !== null) {
          if (mapToSave["_id"] === null) {
-           mapToSave["_id"] = new ObjectId().toHexString();
+           createdId = new ObjectId().toHexString(); 
+           mapToSave["_id"] = createdId;
            db.collection(collection).insert(mapToSave);
          } else {
            db.collection(collection).save(mapToSave);     
          }       
          db.getLastError().then((responseData) {
+           if (createdId !== null) {
+             responseData["createdId"] = createdId;
+           } 
            _sendJSONResponse(response, responseData);
          });
        } else {
