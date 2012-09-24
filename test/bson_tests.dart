@@ -1,10 +1,12 @@
 #library("tests");
-#import('../packages/unittest/unittest.dart');
-#import("../lib/bson.dart");
+#import('package:unittest/unittest.dart');
+//#import('dart:scalarlist', prefix: 'scalarlist');
+#import('dart:scalarlist');
+#import("package:mongo_dart/bson.dart");
 
 testUint8ListNegativeWrite(){
   Uint8List bl = new Uint8List(4);
-  ByteArray ba = bl.asByteArray();
+  var ba = bl.asByteArray();
   ba.setInt32(0,-1);
   expect(bl,orderedEquals([255,255,255,255]));
 }

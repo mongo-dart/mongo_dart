@@ -1,7 +1,7 @@
 #library("bson_tests_vm");
-#import("../lib/bson_vm.dart");
+#import("package:mongo_dart/bson_vm.dart");
 #import("bson_tests.dart",prefix:"tests");
 main(){
-  initBsonPlatform();
+  initBsonPlatform();   
   tests.main();  
 }
