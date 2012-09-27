@@ -43,10 +43,10 @@ class DbCommand extends MongoQueryMessage{
   static DbCommand createAuthenticationCommand(Db db, String userName, String password, String nonce) {
     var md5 = new MD5();
     md5.update("${userName}:mongo:${password}".charCodes());
-    var hashed_password = new Binary.from(md5.digest()).toHexString();
+    var hashed_password = new Binary.from(md5.digest()).hexString;
     md5 = new MD5();
     md5.update("${nonce}${userName}${hashed_password}".charCodes());
-    var key = new Binary.from(md5.digest()).toHexString();
+    var key = new Binary.from(md5.digest()).hexString;
     var selector = {'authenticate':1, 'user':userName, 'nonce':nonce, 'key':key};
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NONE, 0, -1, selector, null);
   }

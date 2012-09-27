@@ -11,15 +11,24 @@ class Binary extends BsonObject{
   List<int> byteList;
   int offset;
   int subType;
+  String _hexString;
+  set hexString(String value) => _hexString = value;
+  String get hexString() {
+    if (_hexString == null) {
+      _hexString = _toHexString();
+    }
+    return _hexString;
+  }  
   Binary(int length): byteList = makeUint8List(length), offset=0, subType=0{
     byteArray = makeByteArray(byteList);    
   }
   Binary.from(List from): byteList = makeUint8List(from.length),offset=0, subType=0 {    
     byteList.setRange(0, from.length, from);
     byteArray = makeByteArray(byteList);    
-  }  
+  }
+  Binary.fromHexString(this._hexString);
   int get typeByte => BSON.BSON_DATA_BINARY;  
-  String toHexString(){
+  String _toHexString(){
     StringBuffer stringBuffer = new StringBuffer();
     for (final byte in byteList)
     {      
@@ -147,5 +156,5 @@ class Binary extends BsonObject{
     buffer.offset += size;  
   }
   get value => this;
-  String toString()=>"Binary(${toHexString()})";
+  String toString()=>"Binary($hexString)";
 }

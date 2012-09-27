@@ -13,40 +13,40 @@ testUint8ListNegativeWrite(){
 testBinaryWithNegativeOne(){
   Binary b = new Binary(4);
   b.writeInt(-1);
-  expect(b.toHexString(),'ffffffff');
+  expect(b.hexString,'ffffffff');
 }
 testBinary(){
    Binary b = new Binary(8);
    b.writeInt(0,4);
    b.writeInt(1,4);
-   expect('0000000001000000',b.toHexString());
+   expect('0000000001000000',b.hexString);
    b = new Binary(8);
    b.writeInt(0,4);
    b = new Binary(8);
    b.writeInt(0,4);
    b.writeInt(0x01020304,4);
-   expect(b.toHexString(),'0000000004030201');
+   expect(b.hexString,'0000000004030201');
    b = new Binary(8);
    b.writeInt(0,4);
    b.writeInt(0x01020304,4,forceBigEndian:true);
-   expect('0000000001020304',b.toHexString());
+   expect('0000000001020304',b.hexString);
    b = new Binary(8);
    b.writeInt(0,4);
    b.writeInt(1,4,forceBigEndian:true);
-   expect('0000000000000001',b.toHexString());
+   expect('0000000000000001',b.hexString);
    b = new Binary(8);
    b.writeInt(1,3,forceBigEndian:true);
-   expect('0000010000000000',b.toHexString());
+   expect('0000010000000000',b.hexString);
    b = new Binary(8);
    b.writeInt(0,3);
    b.writeInt(1,3,forceBigEndian:true);
-   expect('0000000000010000',b.toHexString());
+   expect('0000000000010000',b.hexString);
    b = new Binary(4);
    b.writeInt(-1);
-   expect(b.toHexString(),'ffffffff');
+   expect(b.hexString,'ffffffff');
    b = new Binary(4);
    b.writeInt(-100);
-   expect(b.toHexString(),'9cffffff');
+   expect(b.hexString,'9cffffff');
 }
 
 typeTest(){
@@ -71,7 +71,7 @@ testSerializeDeserialize(){
   var bson = new BSON();
   var map = {'_id':5, 'a':4};
   Binary buffer = bson.serialize(map);
-  expect('15000000105f696400050000001061000400000000',buffer.toHexString());
+  expect('15000000105f696400050000001061000400000000',buffer.hexString);
   buffer.offset = 0;
   Map root = bson.deserialize(buffer);
   expect(root['a'],4);
@@ -79,14 +79,14 @@ testSerializeDeserialize(){
 //  expect(map,recursivelyMatches(root));
   var doc1 = {'a': [15]};
   buffer = bson.serialize(doc1);
-  expect('140000000461000c0000001030000f0000000000',buffer.toHexString());
+  expect('140000000461000c0000001030000f0000000000',buffer.hexString);
   buffer.offset = 0;
 
   root = bson.deserialize(buffer);
   expect(15, root['a'][0]);
   doc1 = {'_id':5, 'a': [2,3,5]};
   buffer = bson.serialize(doc1);
-  expect('2b000000105f696400050000000461001a0000001030000200000010310003000000103200050000000000',buffer.toHexString());
+  expect('2b000000105f696400050000000461001a0000001030000200000010310003000000103200050000000000',buffer.hexString);
   buffer.offset = 0;
   buffer.readByte();
   expect(1,buffer.offset);

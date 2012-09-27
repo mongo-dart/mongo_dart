@@ -49,7 +49,7 @@ class Connection{
         debug(message.toString());
         //print(message.toString());
         bufferToSend = message.serialize();
-        debug(bufferToSend.toHexString());
+        debug(bufferToSend.hexString);
       } else {
         bufferToSend = null;  
       } 

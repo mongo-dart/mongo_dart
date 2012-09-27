@@ -26,6 +26,12 @@ class BsonObjectId extends BsonObject implements ObjectId{
     id.writeInt((seconds & 0xFFFF).floor().toInt(),2);
     id.writeInt(Statics.nextIncrement,3,forceBigEndian:true);
   }
+  BsonObjectId.fromBinary(this.id);
+  
+  factory BsonObjectId.fromHexString(String hexString) {
+    return new BsonObjectId.fromBinary(new Binary.fromHexString(hexString));
+  }    
+
   
   factory ObjectId.fromSeconds(int seconds) {
     return new BsonObjectId.fromSeconds(seconds);
@@ -33,11 +39,14 @@ class BsonObjectId extends BsonObject implements ObjectId{
   
   factory ObjectId() {
     return new BsonObjectId();
-  }  
+  }
+  factory ObjectId.fromHexString(String hexString) {
+    return new BsonObjectId.fromHexString(hexString); 
+  }    
 
-  int hashCode() => id.toHexString().hashCode();
-  String toString() => "ObjectId(${id.toHexString()})";
-  String toHexString() => id.toHexString();
+  int hashCode() => id.hexString.hashCode();
+  String toString() => "ObjectId(${id.hexString})";
+  String toHexString() => id.hexString;
   int get typeByte => BSON.BSON_DATA_OID;
   get value => this;
   int byteLength() => 12;
@@ -48,5 +57,10 @@ class BsonObjectId extends BsonObject implements ObjectId{
   packValue(Binary buffer){
     buffer.byteList.setRange(buffer.offset,12,id.byteList);
     buffer.offset += 12;
-  } 
+  }
+  
+  String toJson() {    
+    return '\{"\$oid":"${toHexString()}"\}';
+  }
+  
 }
