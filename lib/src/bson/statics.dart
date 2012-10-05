@@ -32,9 +32,8 @@ class Statics{
       }
     }
     return _maxBits[bits];
-  }
-  static num _MashineId;
-  static final int MachineId = (new Random().nextDouble() * 0xFFFFFFFF).floor().toInt();
+  }  
+  static final int MachineId = (new Random().nextDouble() * 0xFFFFFF).floor().toInt();
   static final int Pid = (new Random().nextDouble() * 0xFFFF).floor().toInt();
   static final Map<String,List<int>> keys = new Map<String,List<int>>();  
   static getKeyUtf8(String key){

@@ -6,16 +6,56 @@ class Binary extends BsonObject{
   static final SUBTYPE_UUID = 3;
   static final SUBTYPE_MD5 = 4;
   static final SUBTYPE_USER_DEFINED = 128;
-  //static final minBits = [1,2,3,4];
+  
+  // Use a list as jump-table. It is faster than switch and if.
+  static const int CHAR_0 = 48;
+  static const int CHAR_1 = 49;
+  static const int CHAR_2 = 50;
+  static const int CHAR_3 = 51;
+  static const int CHAR_4 = 52;
+  static const int CHAR_5 = 53;
+  static const int CHAR_6 = 54;
+  static const int CHAR_7 = 55;
+  static const int CHAR_8 = 56;
+  static const int CHAR_9 = 57;
+  static const int CHAR_a = 97;
+  static const int CHAR_b = 98;
+  static const int CHAR_c = 99;
+  static const int CHAR_d = 100;
+  static const int CHAR_e = 101;
+  static const int CHAR_f = 102;  
+  
+  static final tokens = createTokens();
   var byteArray;
   List<int> byteList;
   int offset;
   int subType;
   String _hexString;
+  
+  static List<int> createTokens(){
+    var result = new List<int>(255);
+    result[CHAR_0] = 0;
+    result[CHAR_1] = 1;
+    result[CHAR_2] = 2;
+    result[CHAR_3] = 3;
+    result[CHAR_4] = 4;
+    result[CHAR_5] = 5;
+    result[CHAR_6] = 6;
+    result[CHAR_7] = 7;    
+    result[CHAR_8] = 8;
+    result[CHAR_9] = 9;    
+    result[CHAR_a] = 10;
+    result[CHAR_b] = 11;
+    result[CHAR_c] = 12;
+    result[CHAR_d] = 13;
+    result[CHAR_e] = 14;
+    result[CHAR_f] = 15;    
+    return result;
+  }  
   set hexString(String value) => _hexString = value;
   String get hexString() {
     if (_hexString == null) {
-      _hexString = _toHexString();
+      makeHexString();
     }
     return _hexString;
   }  
@@ -28,7 +68,7 @@ class Binary extends BsonObject{
   }
   Binary.fromHexString(this._hexString);
   int get typeByte => BSON.BSON_DATA_BINARY;  
-  String _toHexString(){
+  makeHexString(){
     StringBuffer stringBuffer = new StringBuffer();
     for (final byte in byteList)
     {      
@@ -37,7 +77,31 @@ class Binary extends BsonObject{
        }       
        stringBuffer.add(byte.toRadixString(16));
     }
-    return stringBuffer.toString().toLowerCase();
+    _hexString = stringBuffer.toString().toLowerCase();
+  }
+  makeByteList() {
+    if (_hexString.length.remainder(2) != 0) {
+      throw 'Not valid hex representation: $_hexString (odd length)';
+    }     
+    byteList = makeUint8List((_hexString.length / 2).round().toInt());
+    byteArray = makeByteArray(byteList);
+    int pos = 0;
+    int listPos = 0;
+    while (pos < _hexString.length) {
+      int char = _hexString.charCodeAt(pos);
+      int n1 = tokens[char];
+      if (n1 == null) {
+        throw 'Invalid char ${_hexString[pos]} in $_hexString';  
+      }
+      pos++;
+      char = _hexString.charCodeAt(pos);
+      int n2 = tokens[char];
+      if (n2 == null) {
+        throw 'Invalid char ${_hexString[pos]} in $_hexString';  
+      }      
+      byteList[listPos++] = (n1 << 4)  + n2;
+      pos++;       
+    }
   }  
   setIntExtended(int value, int numOfBytes){
     List<int> byteListTmp = makeUint8List(8);    
@@ -142,6 +206,9 @@ class Binary extends BsonObject{
     offset = 0;
   }
   packValue(Binary buffer){
+    if (byteList == null) {
+      makeByteList();            
+    }
     buffer.writeInt(byteList.length);
     buffer.writeByte(subType);
     buffer.byteList.setRange(buffer.offset,byteList.length,byteList);

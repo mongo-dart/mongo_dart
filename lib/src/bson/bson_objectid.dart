@@ -1,49 +1,42 @@
-class BsonObjectId extends BsonObject implements ObjectId{  
+class ObjectId extends BsonObject{  
   Binary id;
   
-  BsonObjectId(){
+  ObjectId([bool clientMode = false]){
     int seconds = new Timestamp(null,0).seconds;    
-    id = new Binary(12);
-    id.writeInt(seconds,4,forceBigEndian:true);
-    /* Todo - restore when Math.random would work
-    id.writeInt(Statics.MachineId,3);
-    id.writeInt(Statics.Pid,2);    
-    */
-    id.writeInt((seconds & 0xFFFFFF).floor().toInt(),3);
-    id.writeInt((seconds & 0xFFFF).floor().toInt(),2);
-    id.writeInt(Statics.nextIncrement,3,forceBigEndian:true);
-
+    id = createId(seconds, clientMode);
   }
   
-  BsonObjectId.fromSeconds(int seconds){
-    id = new Binary(12);
-    id.writeInt(seconds,4,forceBigEndian:true);
-    /* Todo - restore when Math.random would work
-    id.writeInt(Statics.MachineId,3);
-    id.writeInt(Statics.Pid,2);    
-    */
-    id.writeInt((seconds & 0xFFFFFF).floor().toInt(),3);
-    id.writeInt((seconds & 0xFFFF).floor().toInt(),2);
-    id.writeInt(Statics.nextIncrement,3,forceBigEndian:true);
+  ObjectId.fromSeconds(int seconds, [bool clientMode = false]){
+    id = createId(seconds, clientMode);
   }
-  BsonObjectId.fromBinary(this.id);
+  ObjectId.fromBinary(this.id);
   
-  factory BsonObjectId.fromHexString(String hexString) {
-    return new BsonObjectId.fromBinary(new Binary.fromHexString(hexString));
-  }    
-
+  Binary createId(int seconds, bool clientMode) {
+      getOctet(int value) {
+      String res = value.toRadixString(16);
+      while (res.length < 8) {
+        res = '0$res';
+      }
+      return res;
+    }
+    if (clientMode) {
+      String s = '${getOctet(seconds)}${getOctet(Statics.MachineId+Statics.Pid)}${getOctet(Statics.nextIncrement)}';
+      return new Binary.fromHexString(s);
+    } else {
+      return new Binary(12)
+      ..writeInt(seconds,4,forceBigEndian:true)    
+      ..writeInt(Statics.MachineId,3)
+      ..writeInt(Statics.Pid,2)
+      ..writeInt(Statics.nextIncrement,3,forceBigEndian:true);
+    }
+  }  
   
-  factory ObjectId.fromSeconds(int seconds) {
-    return new BsonObjectId.fromSeconds(seconds);
-  }
   
-  factory ObjectId() {
-    return new BsonObjectId();
-  }
   factory ObjectId.fromHexString(String hexString) {
-    return new BsonObjectId.fromHexString(hexString); 
+    return new ObjectId.fromBinary(new Binary.fromHexString(hexString));
   }    
 
+  
   int hashCode() => id.hexString.hashCode();
   String toString() => "ObjectId(${id.hexString})";
   String toHexString() => id.hexString;
@@ -55,6 +48,9 @@ class BsonObjectId extends BsonObject implements ObjectId{
      buffer.offset += 12;
   }
   packValue(Binary buffer){
+    if (id.byteList == null) {
+      id.makeByteList();  
+    }
     buffer.byteList.setRange(buffer.offset,12,id.byteList);
     buffer.offset += 12;
   }

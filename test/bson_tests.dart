@@ -96,20 +96,63 @@ testSerializeDeserialize(){
   root = bson.deserialize(buffer);
   expect(doc1['a'][2],root['a'][2], "doc1['a']");
 }
+testMakeByteList() {
+  for (int n = 0; n<125; n++ ) {
+    var hex = n.toRadixString(16);
+    if (hex.length.remainder(2) != 0) {
+      hex = '0$hex'; 
+    }    
+    var b = new Binary.fromHexString(hex);
+    b.makeByteList();
+    expect(b.byteList[0], n);
+  }
+  var b = new Binary.fromHexString('0301');
+  b.makeByteList();
+  expect(b.byteArray.getInt16(0), 259);
+  b = new Binary.fromHexString('0301ad0c1ad34f1d');
+  b.makeByteList();
+  expect(b.hexString, '0301ad0c1ad34f1d');
+  var oid1 = new ObjectId();
+  var oid2 = new ObjectId.fromHexString(oid1.toHexString());
+  oid2.id.makeByteList();
+  expect(oid2.id.byteList,orderedEquals(oid1.id.byteList));
+}
+
+testBsonIdFromHexString() {
+  var oid1 = new ObjectId();
+  var oid2 = new ObjectId.fromHexString(oid1.toHexString());  
+  oid2.id.makeByteList();
+  expect(oid2.id.byteList,orderedEquals(oid1.id.byteList));
+  var b1 = new BSON().serialize({'id':oid1});
+  var b2 = new BSON().serialize({'id':oid2});
+  b1.rewind();
+  b2.rewind();
+  var oid3 = new BSON().deserialize(b2)['id'];
+  expect(oid3.id.byteList,orderedEquals(oid1.id.byteList));  
+}
+testBsonIdClientMode() {
+  var oid1 = new ObjectId(clientMode: true);
+  var oid2 = new ObjectId(clientMode: true);
+  expect(oid2.toHexString().length, 24);
+}
+
 
 main(){
   group("BSonBinary:", (){
     test("testUint8ListNegativeWrite",testUint8ListNegativeWrite);
     test("testBinary",testBinary);
     test("testBinaryWithNegativeOne",testBinaryWithNegativeOne);
+    test("testMakeByteList",testMakeByteList);    
   });
   group("BsonTypesTest:", (){
     test("typeTest",typeTest);
   });
-  group("BsonObjectId:", (){
+  group("ObjectId:", (){
     test("testObjectId",testObjectId);
+    test("testBsonIdFromHexString",testBsonIdFromHexString);
+    test("testBsonIdClientMode",testBsonIdClientMode);
   });
-  group("BsonSerialization:", (){
-    test("testSerializeDeserialize",testSerializeDeserialize);
+  group("BsonSerialization:", (){    
+    test("testSerializeDeserialize",testSerializeDeserialize);    
   });
 }
