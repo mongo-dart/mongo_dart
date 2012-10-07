@@ -77,6 +77,13 @@ class BSON {
   /**
    * Code BSON Type
    *  
+   * @classconstant BSON_DATA_DBPOINTER
+   **/
+  static const BSON_DATA_DBPOINTER = 12;
+  
+  /**
+   * Code BSON Type
+   *  
    * @classconstant BSON_DATA_CODE
    **/
   static const BSON_DATA_CODE = 13;

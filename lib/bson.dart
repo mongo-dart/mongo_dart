@@ -14,9 +14,11 @@
 #source("src/bson/bson_array.dart");
 #source("src/bson/bson_impl.dart");
 #source("src/bson/bson_double.dart");
+#source("src/bson/bson_dbpointer.dart");
 #source("src/bson/bson_null.dart");
 #source("src/bson/bson_boolean.dart");
 #source("src/bson/bson_date.dart");
 #source("src/bson/bson_regexp.dart");
 #source("src/bson/bson_platform.dart");
+
 

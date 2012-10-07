@@ -135,6 +135,16 @@ testBsonIdClientMode() {
   var oid2 = new ObjectId(clientMode: true);
   expect(oid2.toHexString().length, 24);
 }
+testBsonDbPointer() {
+  var p1 = new BsonDbPointer('Test',new ObjectId());  
+  var bson = new BSON();
+  var b = bson.serialize({'p1': p1});
+  b.rewind();
+  var fromBson = bson.deserialize(b);  
+  var p2 = fromBson['p1'];
+  expect(p2.collection, p1.collection);
+  expect(p2.id.toHexString(), p1.id.toHexString());
+}
 
 
 main(){
@@ -151,6 +161,7 @@ main(){
     test("testObjectId",testObjectId);
     test("testBsonIdFromHexString",testBsonIdFromHexString);
     test("testBsonIdClientMode",testBsonIdClientMode);
+    test("testBsonDbPointer", testBsonDbPointer);
   });
   group("BsonSerialization:", (){    
     test("testSerializeDeserialize",testSerializeDeserialize);    
