@@ -248,6 +248,25 @@ class _JsonParser {
     if (key == '\$oid') {
       return new ObjectId.fromHexString(parseString());
     }
+    if (key == '\$ref') {
+      var collection = parseString();
+      position++;
+      var oidKey = parseString();
+      if (oidKey != '\$oid' || !isToken(COLON)) error("Expected '\$oid:' when parsing DbRef");
+      position++;
+      var hex = parseString();      
+      return new DbRef(collection,new ObjectId.fromHexString(hex));
+    }
+    if (key == '\$regex') {
+      var pattern = parseString();
+      position++;
+      var optkey = parseString();
+      if (optkey != '\$options' || !isToken(COLON)) error("Expected '\$options:' when parsing BsonRegexp");
+      position++;
+      var options = parseString();      
+      return new BsonRegexp(pattern,options: options);
+    }
+    
   }
   
   parseObject() {
@@ -579,10 +598,18 @@ class _JsonStringifier {
       sb.add('"');
       return true;
     } else if (object is Date) {
-      return stringifyJsonValue({'\$date': (object as Date).millisecondsSinceEpoch});            
-    } else if (object is ObjectId) {
-      return stringifyJsonValue({'\$oid': (object as ObjectId).toHexString()});            
-    } else if (object is List) {
+      return stringifyJsonValue({'\$date': (object as Date).millisecondsSinceEpoch});
+    }
+    else if (object is ObjectId) {
+        return stringifyJsonValue({'\$oid': object.toHexString()});        
+    }
+    else if (object is DbRef) {
+      return stringifyJsonValue({'\$ref': object.collection,'\$oid': object.id.toHexString()});        
+    }
+    else if (object is BsonRegexp) {
+      return stringifyJsonValue({'\$regex': object.pattern,'\$options': object.options});        
+    }
+    else if (object is List) {
       checkCycle(object);
       List a = object;
       sb.add('[');

@@ -10,7 +10,7 @@ class BsonRegexp extends BsonObject{
   bool verbose;
   bool dotAll;
   bool extended;
-  BsonRegexp(this.pattern,[this.multiLine=false,this.caseInsensitive=false,this.dotAll=false,this.extended=false]):options=""{
+  BsonRegexp(this.pattern,[this.multiLine=false,this.caseInsensitive=false,this.dotAll=false,this.extended=false,this.options='']){
     createOptionsString();    
     bsonPattern = new BsonCString(pattern,false);
     bsonOptions = new BsonCString(options,false);
@@ -23,6 +23,9 @@ class BsonRegexp extends BsonObject{
     options = buffer.readCString();     
   }   
   createOptionsString(){
+    if (options != '') {
+      return;
+    }
     var buffer = new StringBuffer();
     if (caseInsensitive === true){
       buffer.add("i");
@@ -42,5 +45,6 @@ class BsonRegexp extends BsonObject{
   packValue(Binary buffer){     
      bsonPattern.packValue(buffer);
      bsonOptions.packValue(buffer);
-  }  
+  }
+  toJson() => {'\$regex': pattern,'\$oid': options};
 }

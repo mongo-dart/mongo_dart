@@ -29,7 +29,7 @@ class ObjectId extends BsonObject{
       ..writeInt(Statics.MachineId,3)
       ..writeInt(Statics.Pid,2)
       ..writeInt(Statics.nextIncrement,3,forceBigEndian:true);
-    }
+    }    
   }  
   
   
@@ -39,7 +39,7 @@ class ObjectId extends BsonObject{
 
   
   int hashCode() => id.hexString.hashCode();
-  bool operator ==(other) => toHexString() == other.toHexString();
+  bool operator ==(other) => other is ObjectId && toHexString() == other.toHexString();
   String toString() => "ObjectId(${id.hexString})";
   String toHexString() => id.hexString;
   int get typeByte => BSON.BSON_DATA_OID;

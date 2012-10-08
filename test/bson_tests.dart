@@ -135,7 +135,7 @@ testBsonIdClientMode() {
   expect(oid2.toHexString().length, 24);
 }
 testBsonDbPointer() {
-  var p1 = new BsonDbPointer('Test',new ObjectId());  
+  var p1 = new DbRef('Test',new ObjectId());  
   var bson = new BSON();
   var b = bson.serialize({'p1': p1});
   b.rewind();

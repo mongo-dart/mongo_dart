@@ -1,11 +1,9 @@
 part of bson;
-class BsonDbPointer extends BsonObject{
+class DbRef extends BsonObject{
   String collection;
   ObjectId id;
   BsonString bsonCollection;
-  
-  
-  BsonDbPointer(this.collection, this.id)
+  DbRef(this.collection, this.id)
   {      
     bsonCollection = new BsonString(collection);    
   }  
@@ -25,6 +23,6 @@ class BsonDbPointer extends BsonObject{
      id.packValue(buffer);
   }
   hashCode() => '${collection}.${id.toHexString()}'.hashCode();
-  bool operator ==(other) => collection == other.collection && id.toHexString() == other.id.toHexString(); 
-  
+  bool operator ==(other) => other is DbRef && collection == other.collection && id.toHexString() == other.id.toHexString();
+   
 }
