@@ -1,8 +1,8 @@
-#library("all_tests");
-#import("package:mongo_dart/bson.dart");
-#import("bson_tests_vm.dart",prefix:"bson");
-#import("json_ext_tests.dart",prefix:"json_ext");
-#import("database_tests.dart",prefix:"database");
+library all_tests;
+import 'package:mongo_dart/bson.dart';
+import 'bson_tests_vm.dart' as bson;
+import 'json_ext_tests.dart' as json_ext;
+import 'database_tests.dart' as database;
 
 main(){
   bson.main();

@@ -1,3 +1,4 @@
+part of mongo_dart;
 class MongoUpdateMessage extends MongoMessage{
   BsonCString _collectionFullName;
   int flags;

@@ -1,3 +1,4 @@
+part of mongo_dart;
 class DbCollection{
   Db db;
   String collectionName;

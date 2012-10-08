@@ -1,5 +1,5 @@
-#import("package:mongo_dart/mongo.dart");
-#import("package:mongo_dart/bson.dart");
+import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/bson.dart';
 main(){
   Db db = new Db("mongodb://127.0.0.7/mongo_dart-test");
   DbCollection coll;

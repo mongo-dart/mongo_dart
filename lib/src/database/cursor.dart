@@ -1,3 +1,4 @@
+part of mongo_dart;
 typedef MonadicBlock(var value);
 class Cursor{
 /**

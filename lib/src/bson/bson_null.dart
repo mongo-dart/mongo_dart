@@ -1,3 +1,4 @@
+part of bson;
 class BsonNull extends BsonObject{  
   BsonNull();
   get value=>null;

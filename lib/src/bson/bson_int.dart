@@ -1,3 +1,4 @@
+part of bson;
 class BsonInt extends BsonObject{
   int data;
   BsonInt(this.data);

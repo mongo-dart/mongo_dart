@@ -1,3 +1,4 @@
+part of bson;
 class BsonDbPointer extends BsonObject{
   String collection;
   ObjectId id;
@@ -22,5 +23,8 @@ class BsonDbPointer extends BsonObject{
   packValue(Binary buffer){     
      bsonCollection.packValue(buffer);
      id.packValue(buffer);
-  }  
+  }
+  hashCode() => '${collection}.${id.toHexString()}'.hashCode();
+  bool operator ==(other) => collection == other.collection && id.toHexString() == other.id.toHexString(); 
+  
 }

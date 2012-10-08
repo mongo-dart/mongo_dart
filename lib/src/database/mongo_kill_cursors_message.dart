@@ -1,3 +1,4 @@
+part of mongo_dart;
 class MongoKillCursorsMessage extends MongoMessage{  
   int cursorId;
   MongoKillCursorsMessage(

@@ -1,3 +1,4 @@
+part of bson;
 class BsonRegexp extends BsonObject{
   String pattern;
   String options;

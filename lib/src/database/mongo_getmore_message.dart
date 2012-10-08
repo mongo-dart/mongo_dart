@@ -1,3 +1,4 @@
+part of mongo_dart;
 class MongoGetMoreMessage extends MongoMessage{
   BsonCString _collectionFullName;
   int cursorId;    

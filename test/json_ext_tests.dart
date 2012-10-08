@@ -1,9 +1,9 @@
-#library("tests");
-#import('package:unittest/unittest.dart');
-#import('dart:scalarlist');
-#import('package:mongo_dart/bson.dart');
-#import('package:mongo_dart/bson_vm.dart');
-#import('package:mongo_dart/src/bson/json_ext.dart');
+library json_ext_tests;
+import 'package:unittest/unittest.dart';
+import 'dart:scalarlist';
+import 'package:mongo_dart/bson.dart';
+import 'package:mongo_dart/bson_vm.dart';
+import 'package:mongo_dart/src/bson/json_ext.dart';
 
 main(){
   initBsonPlatform();

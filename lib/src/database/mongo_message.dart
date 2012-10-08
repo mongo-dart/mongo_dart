@@ -1,3 +1,4 @@
+part of mongo_dart;
 class MongoMessage{
   static final Reply = 1;
   static final Message = 1000;

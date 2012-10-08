@@ -1,3 +1,4 @@
+part of bson;
 class BSON {
 
   static const BSON_INT32_MAX = 0x7FFFFFFF;

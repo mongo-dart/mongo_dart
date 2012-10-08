@@ -1,3 +1,4 @@
+part of mongo_dart;
 class MongoQueryMessage extends MongoMessage{
 static final OPTS_NONE = 0;
 static final OPTS_TAILABLE_CURSOR = 2;

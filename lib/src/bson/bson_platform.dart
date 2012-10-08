@@ -1,3 +1,4 @@
+part of bson;
 List<int> makeUint8List(int size) => BsonPlatform.platform.makeUint8List(size);
 makeByteArray(List<int> from) => BsonPlatform.platform.makeByteArray(from);
 

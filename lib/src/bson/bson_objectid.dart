@@ -1,3 +1,4 @@
+part of bson;
 class ObjectId extends BsonObject{  
   Binary id;
   
@@ -38,6 +39,7 @@ class ObjectId extends BsonObject{
 
   
   int hashCode() => id.hexString.hashCode();
+  bool operator ==(other) => toHexString() == other.toHexString();
   String toString() => "ObjectId(${id.hexString})";
   String toHexString() => id.hexString;
   int get typeByte => BSON.BSON_DATA_OID;

@@ -1,3 +1,4 @@
+part of mongo_dart;
 setVerboseState(){
   Utils.setVerboseState();  
 }

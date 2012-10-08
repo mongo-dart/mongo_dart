@@ -1,3 +1,4 @@
+part of mongo_dart;
 class DbCommand extends MongoQueryMessage{
   // Constants
   static final SYSTEM_NAMESPACE_COLLECTION = "system.namespaces";

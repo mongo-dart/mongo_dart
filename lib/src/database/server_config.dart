@@ -1,3 +1,4 @@
+part of mongo_dart;
 class ServerConfig{
   String host;
   int port;

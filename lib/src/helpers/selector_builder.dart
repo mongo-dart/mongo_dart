@@ -1,3 +1,4 @@
+part of mongo_dart;
 SelectorBuilder query(){
   return new SelectorBuilder();
 }

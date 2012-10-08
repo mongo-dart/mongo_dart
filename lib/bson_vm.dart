@@ -1,6 +1,6 @@
-#library("bson_vm");
-#import("bson.dart");
-#import('dart:scalarlist');
+library bson_vm;
+import 'bson.dart';
+import 'dart:scalarlist';
 class BsonPlatformVm extends BsonPlatform {
 
   Dynamic makeUint8List(int size) => new Uint8List(size);

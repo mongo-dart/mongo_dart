@@ -1,3 +1,4 @@
+part of bson;
 class Binary extends BsonObject{
   static final BUFFER_SIZE = 256;
   static final SUBTYPE_DEFAULT = 0;

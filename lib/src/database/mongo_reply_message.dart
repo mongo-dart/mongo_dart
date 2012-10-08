@@ -1,3 +1,4 @@
+part of mongo_dart;
 class MongoReplyMessage extends MongoMessage{
   BsonCString _collectionFullName;
   int responseFlags;

@@ -1,3 +1,4 @@
+part of mongo_dart;
 class Connection{
   Map<int,Completer<MongoReplyMessage>> replyCompleters;
   Binary lengthBuffer;

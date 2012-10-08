@@ -1,8 +1,7 @@
-#library("tests");
-#import('package:unittest/unittest.dart');
-//#import('dart:scalarlist', prefix: 'scalarlist');
-#import('dart:scalarlist');
-#import("package:mongo_dart/bson.dart");
+library tests;
+import 'package:unittest/unittest.dart';
+import 'dart:scalarlist';
+import 'package:mongo_dart/bson.dart';
 
 testUint8ListNegativeWrite(){
   Uint8List bl = new Uint8List(4);

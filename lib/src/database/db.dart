@@ -1,3 +1,4 @@
+part of mongo_dart;
 class Db{
   String databaseName;
   ServerConfig serverConfig;

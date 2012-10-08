@@ -1,3 +1,4 @@
+part of mongo_dart;
 class MapProxy<K,V> implements Map<K,V>{
   LinkedHashMap map;
   Queue keys;
