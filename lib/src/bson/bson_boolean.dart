@@ -1,4 +1,3 @@
-part of bson;
 class BsonBoolean extends BsonObject{
   bool data;
   BsonBoolean(this.data);

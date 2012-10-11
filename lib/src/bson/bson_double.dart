@@ -1,4 +1,3 @@
-part of bson;
 class BsonDouble extends BsonObject{
   double data;
   BsonDouble(this.data);

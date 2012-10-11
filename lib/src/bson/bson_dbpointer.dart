@@ -1,4 +1,3 @@
-part of bson;
 class DbRef extends BsonObject{
   String collection;
   ObjectId id;
