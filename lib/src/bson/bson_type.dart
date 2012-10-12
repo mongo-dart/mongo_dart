@@ -1,3 +1,4 @@
+part of bson;
 class _ElementPair{
   String name;
   var value;

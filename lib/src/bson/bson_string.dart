@@ -1,3 +1,4 @@
+part of bson;
 class BsonString extends BsonObject{
   String data;
   List<int> _utfData;  

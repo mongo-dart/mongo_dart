@@ -1,3 +1,4 @@
+part of bson;
 class ObjectId extends BsonObject{  
   Binary id;
   

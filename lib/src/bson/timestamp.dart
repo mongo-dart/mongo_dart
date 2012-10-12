@@ -1,3 +1,4 @@
+part of bson;
 class Timestamp extends BsonObject{  
   int seconds;
   int increment;  

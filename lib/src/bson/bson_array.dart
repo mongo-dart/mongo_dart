@@ -1,3 +1,4 @@
+part of bson;
 class BsonArray extends BsonObject{
   List data;
   int _dataSize;

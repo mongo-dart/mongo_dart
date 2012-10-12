@@ -1,8 +1,8 @@
 library database_tests;
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:uri';
-import 'package:mongo_dart/bson.dart';
-import 'package:mongo_dart/bson_vm.dart';
+//import 'package:mongo_dart/bson.dart';
+//import 'package:mongo_dart/bson_vm.dart';
 import 'dart:io';
 import 'dart:crypto';
 import 'package:unittest/unittest.dart';
@@ -397,7 +397,7 @@ testCursorClosing(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection collection;
   Cursor cursor;
-  db.open().chain((c){
+  db.open().chain(expectAsync1((c){
     collection = db.collection('new_big_collection1');
     collection.remove();  
     for (int n=0;n < 1000; n++){  
@@ -407,18 +407,18 @@ testCursorClosing(){
     cursor = collection.find();
     expect(cursor.state,Cursor.INIT);
     return cursor.nextObject();
-  }).then((v){    
+  })).then(expectAsync1((v){    
     expect(cursor.state,Cursor.OPEN);
     expect(cursor.cursorId,isPositive);
     cursor.close();
     expect(cursor.state,Cursor.CLOSED);
     expect(cursor.cursorId,0);
-    collection.findOne().then((v1){
+    collection.findOne().then(expectAsync1((v1){
       expect(v,isNotNull);
       db.close();
       callbackDone();  
-    });
-  });
+    }));
+  }));
 }
 
 testDbCommandCreation(){
@@ -549,7 +549,7 @@ main(){
   });
   group("Cursor tests:", (){
     test("testCursorCreation",testCursorCreation);
-    asyncTest("testCursorClosing",1,testCursorClosing);
+    test("testCursorClosing",testCursorClosing);
     asyncTest("testNextObjectToEnd",1,testNextObjectToEnd);
     asyncTest("testPingRaw",1,testPingRaw);
     asyncTest("testNextObject",1,testNextObject);

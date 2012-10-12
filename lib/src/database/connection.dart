@@ -48,7 +48,6 @@ class Connection{
       if(!sendQueue.isEmpty()){
         MongoMessage message = sendQueue.removeFirst();
         debug(message.toString());
-        //print(message.toString());
         bufferToSend = message.serialize();
         debug(bufferToSend.hexString);
       } else {
@@ -69,10 +68,8 @@ class Connection{
       }
       
       new Timer(0,(t)=>sendBufferFromTimer());              
-//      sendBuffer("From sendBuffer");
     }        
     else {
-      //print("setting onwrite to null");
       socket.onWrite = null;        
     }    
   }  
@@ -87,20 +84,15 @@ class Connection{
       messageBuffer.writeInt(messageLength);
     }
     messageBuffer.offset += socket.readList(messageBuffer.byteList,messageBuffer.offset,messageBuffer.byteList.length-messageBuffer.offset);
-    //print("messageBuffer = ${messageBuffer}");
     if (messageBuffer.atEnd()){
       MongoReplyMessage reply = new MongoReplyMessage();
       messageBuffer.rewind();
-      //print("messageBuffer = ${messageBuffer.byteList}");
       reply.deserialize(messageBuffer);
       debug(reply.toString());
-      //print(reply.toString());
-      //print("messageBuffer = ${messageBuffer}");
       messageBuffer = null;
       lengthBuffer.rewind();
       Completer completer = replyCompleters.remove(reply.responseTo);      
-      if (completer !== null){
-        //print("messageBuffer = ${messageBuffer}");
+      if (completer !== null){    
         completer.complete(reply);       
       }
       else {
@@ -113,12 +105,11 @@ class Connection{
     replyCompleters[queryMessage.requestId] = completer;
     socket.onData = receiveData;
     sendQueue.addLast(queryMessage);
-//    sendBuffer("From query");
     socket.onWrite = sendBufferFromOnWrite;    
     return completer.future;
   }
-  execute(MongoMessage message){
-    sendQueue.addLast(message);    
-    socket.onWrite = sendBufferFromOnWrite;
-  }
+//  execute(MongoMessage message){
+//    sendQueue.addLast(message);    
+//    socket.onWrite = sendBufferFromOnWrite;
+//  }
 }

@@ -51,13 +51,13 @@ class Db{
   DbCollection collection(String collectionName){
       return new DbCollection(this,collectionName);
   }
-  Future<MongoReplyMessage> executeQueryMessage(MongoMessage queryMessage){
+  Future executeQueryMessage(MongoMessage queryMessage){
     return connection.query(queryMessage);
   }  
-  executeMessage(MongoMessage message){
-    connection.execute(message);
-  }
-  Future<bool> open(){
+//  executeMessage(MongoMessage message){
+//    connection.execute(message);
+//  }
+  Future open(){
     Completer completer = new Completer();
     initBsonPlatform();
     if (connection.connected){
@@ -76,7 +76,7 @@ class Db{
     });
     return completer.future;
   }
-  Future<Map> executeDbCommand(MongoMessage message){
+  Future executeDbCommand(MongoMessage message){
       Completer<Map> result = new Completer();
       //print("executeDbCommand.message = ${message}");
       connection.query(message).then((replyMessage){
@@ -103,7 +103,7 @@ class Db{
       });
     return result.future;        
   }
-  Future<bool> dropCollection(String collectionName){
+  Future dropCollection(String collectionName){
     Completer completer = new Completer();
     collectionsInfoCursor(collectionName).toList().then((v){
       if (v.length == 1){
@@ -118,15 +118,12 @@ class Db{
 /**
 *   Drop current database
 */
-  Future<Map> drop(){
-    Completer completer = new Completer();
-    executeDbCommand(DbCommand.createDropDatabaseCommand(this))
-      .then((res)=>completer.complete(res));
-    return completer.future;    
+  Future drop(){    
+    return executeDbCommand(DbCommand.createDropDatabaseCommand(this));            
   }
   
-  removeFromCollection(String collectionName, [Map selector = const {}]){
-    connection.execute(new MongoRemoveMessage("$databaseName.$collectionName", selector));    
+  Future removeFromCollection(String collectionName, [Map selector = const {}]){
+    return connection.query(new MongoRemoveMessage("$databaseName.$collectionName", selector));    
   }    
   
   Future<Map> getLastError(){    

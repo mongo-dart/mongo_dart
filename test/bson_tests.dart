@@ -146,7 +146,7 @@ testBsonDbPointer() {
 }
 
 
-main(){
+runMe(){
   group("BSonBinary:", (){
     test("testUint8ListNegativeWrite",testUint8ListNegativeWrite);
     test("testBinary",testBinary);

@@ -1,3 +1,4 @@
+part of bson;
 class Statics{
   static Stopwatch _stopwatch;  
   static startStopwatch() => _stopwatch = new Stopwatch()..start();

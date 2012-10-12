@@ -5,8 +5,10 @@ import 'dart:crypto';
 import 'dart:uri';
 import 'package:log4dart/log4dart.dart';
 import 'package:log4dart/file_appender.dart';
-import 'bson.dart';
 import 'bson_vm.dart';
+
+export 'bson_vm.dart';
+
 part 'src/database/connection.dart';
 part 'src/database/mongo_message.dart';
 part 'src/database/mongo_query_message.dart';
@@ -24,3 +26,4 @@ part 'src/database/cursor.dart';
 part 'src/helpers/utils.dart';
 part 'src/helpers/map_proxy.dart';
 part 'src/helpers/selector_builder.dart';
+

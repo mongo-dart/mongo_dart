@@ -1,3 +1,4 @@
+part of bson;
 class BsonMap extends BsonObject{
   Map data;
   Map utfKeys;

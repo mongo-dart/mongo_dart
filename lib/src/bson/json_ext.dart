@@ -40,7 +40,7 @@ class JsonUnsupportedObjectError {
 /**
  * Utility class to parse JSON and serialize objects to JSON.
  */
-class JSON {
+class JSON_EXT {
   /**
    * Parses [json] and build the corresponding parsed JSON value.
    *

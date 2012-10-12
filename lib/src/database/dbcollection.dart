@@ -23,19 +23,17 @@ class DbCollection{
       insert(document);
     }
   }
- void insertAll(List<Map> documents){
+ Future insertAll(List<Map> documents){
     MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
-    db.executeMessage(insertMessage);   
+    db.executeQueryMessage(insertMessage);   
   }
-  void update(Map selector, Map document){
+ Future update(Map selector, Map document){
     MongoUpdateMessage message = new MongoUpdateMessage(fullName(),selector, document, 0);
-    return db.executeMessage(message);   
+    return db.executeQueryMessage(message);   
   }
   
-  void insert(Map document){
-    return insertAll([document]);
-  } 
-  Cursor find([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
+   
+  Cursor find([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ) {
     return new Cursor(db, this, selector: selector, fields: fields, skip: skip, limit: limit, sort: orderBy);//, [selector, skip, limit,sort, hint, explain]);
   }
   Future<Map> findOne([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
@@ -45,7 +43,7 @@ class DbCollection{
     return result;
   }
   Future drop() => db.dropCollection(collectionName);
-  void remove([Map selector = const {}]) => db.removeFromCollection(collectionName, selector);
+  Future remove([Map selector = const {}]) => db.removeFromCollection(collectionName, selector);
   Future count([Map selector = const {}]){
     Completer completer = new Completer();
     db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,selector)).then((reply){       
@@ -54,4 +52,5 @@ class DbCollection{
     });
     return completer.future;
   }
+  Future insert(Map document) => insertAll([document]);  
 }

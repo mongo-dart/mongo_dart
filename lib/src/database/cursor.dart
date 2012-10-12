@@ -140,13 +140,14 @@ static final CLOSED = 2;
     this.each((v)=>result.addLast(v)).then((v)=>completer.complete(result));
     return completer.future;    
   }
-  void close(){
+  Future close(){
     debug("Closing cursor, cursorId = $cursorId");
+    state = CLOSED;
     if (cursorId != 0){      
       MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);
-      db.executeMessage(msg);
       cursorId = 0;
-    } 
-    state = CLOSED;
+      return db.executeQueryMessage(msg);
+      
+    }
   }
 }
