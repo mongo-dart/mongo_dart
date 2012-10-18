@@ -16,7 +16,7 @@ class BsonArray extends BsonObject{
   get value=>data;
   byteLength()=>dataSize()+1+4;
   int get typeByte => BSON.BSON_DATA_ARRAY;  
-  packValue(Binary buffer){
+  packValue(BsonBinary buffer){
     buffer.writeInt(byteLength());
       for(var i = 0; i < data.length; i++) {
          bsonObjectFrom(data[i]).packElement(i.toString() ,buffer);
@@ -24,7 +24,7 @@ class BsonArray extends BsonObject{
      buffer.writeByte(0);
   }  
 
-  unpackValue(Binary buffer){
+  unpackValue(BsonBinary buffer){
     data = [];        
     buffer.offset += 4;
     int typeByte = buffer.readByte();    

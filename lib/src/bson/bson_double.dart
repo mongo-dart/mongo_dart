@@ -5,10 +5,10 @@ class BsonDouble extends BsonObject{
   get value=>data;
   byteLength()=>8;
   int get typeByte => BSON.BSON_DATA_NUMBER;
-  packValue(Binary buffer){
+  packValue(BsonBinary buffer){
      buffer.writeDouble(data);
   }
-  unpackValue(Binary buffer){
+  unpackValue(BsonBinary buffer){
      data = buffer.readDouble();
   }
 }

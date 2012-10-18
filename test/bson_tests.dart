@@ -9,41 +9,41 @@ testUint8ListNegativeWrite(){
   ba.setInt32(0,-1);
   expect(bl,orderedEquals([255,255,255,255]));
 }
-testBinaryWithNegativeOne(){
-  Binary b = new Binary(4);
+testBsonBinaryWithNegativeOne(){
+  BsonBinary b = new BsonBinary(4);
   b.writeInt(-1);
   expect(b.hexString,'ffffffff');
 }
-testBinary(){
-   Binary b = new Binary(8);
+testBsonBinary(){
+   BsonBinary b = new BsonBinary(8);
    b.writeInt(0,4);
    b.writeInt(1,4);
    expect('0000000001000000',b.hexString);
-   b = new Binary(8);
+   b = new BsonBinary(8);
    b.writeInt(0,4);
-   b = new Binary(8);
+   b = new BsonBinary(8);
    b.writeInt(0,4);
    b.writeInt(0x01020304,4);
    expect(b.hexString,'0000000004030201');
-   b = new Binary(8);
+   b = new BsonBinary(8);
    b.writeInt(0,4);
    b.writeInt(0x01020304,4,forceBigEndian:true);
    expect('0000000001020304',b.hexString);
-   b = new Binary(8);
+   b = new BsonBinary(8);
    b.writeInt(0,4);
    b.writeInt(1,4,forceBigEndian:true);
    expect('0000000000000001',b.hexString);
-   b = new Binary(8);
+   b = new BsonBinary(8);
    b.writeInt(1,3,forceBigEndian:true);
    expect('0000010000000000',b.hexString);
-   b = new Binary(8);
+   b = new BsonBinary(8);
    b.writeInt(0,3);
    b.writeInt(1,3,forceBigEndian:true);
    expect('0000000000010000',b.hexString);
-   b = new Binary(4);
+   b = new BsonBinary(4);
    b.writeInt(-1);
    expect(b.hexString,'ffffffff');
-   b = new Binary(4);
+   b = new BsonBinary(4);
    b.writeInt(-100);
    expect(b.hexString,'9cffffff');
 }
@@ -69,7 +69,7 @@ testObjectId(){
 testSerializeDeserialize(){
   var bson = new BSON();
   var map = {'_id':5, 'a':4};
-  Binary buffer = bson.serialize(map);
+  BsonBinary buffer = bson.serialize(map);
   expect('15000000105f696400050000001061000400000000',buffer.hexString);
   buffer.offset = 0;
   Map root = bson.deserialize(buffer);
@@ -101,14 +101,14 @@ testMakeByteList() {
     if (hex.length.remainder(2) != 0) {
       hex = '0$hex'; 
     }    
-    var b = new Binary.fromHexString(hex);
+    var b = new BsonBinary.fromHexString(hex);
     b.makeByteList();
     expect(b.byteList[0], n);
   }
-  var b = new Binary.fromHexString('0301');
+  var b = new BsonBinary.fromHexString('0301');
   b.makeByteList();
   expect(b.byteArray.getInt16(0), 259);
-  b = new Binary.fromHexString('0301ad0c1ad34f1d');
+  b = new BsonBinary.fromHexString('0301ad0c1ad34f1d');
   b.makeByteList();
   expect(b.hexString, '0301ad0c1ad34f1d');
   var oid1 = new ObjectId();
@@ -147,10 +147,10 @@ testBsonDbPointer() {
 
 
 runMe(){
-  group("BSonBinary:", (){
+  group("BSonBsonBinary:", (){
     test("testUint8ListNegativeWrite",testUint8ListNegativeWrite);
-    test("testBinary",testBinary);
-    test("testBinaryWithNegativeOne",testBinaryWithNegativeOne);
+    test("testBsonBinary",testBsonBinary);
+    test("testBsonBinaryWithNegativeOne",testBsonBinaryWithNegativeOne);
     test("testMakeByteList",testMakeByteList);    
   });
   group("BsonTypesTest:", (){

@@ -18,7 +18,7 @@ class BsonRegexp extends BsonObject{
   get value=>this;
   int get typeByte => BSON.BSON_DATA_REGEXP;  
   byteLength()=>bsonPattern.byteLength()+bsonOptions.byteLength();
-  unpackValue(Binary buffer){
+  unpackValue(BsonBinary buffer){
     pattern = buffer.readCString();
     options = buffer.readCString();     
   }   
@@ -42,7 +42,7 @@ class BsonRegexp extends BsonObject{
     options = buffer.toString();
   }
   toString()=>"BsonRegexp('$pattern',options:'$options')";
-  packValue(Binary buffer){     
+  packValue(BsonBinary buffer){     
      bsonPattern.packValue(buffer);
      bsonOptions.packValue(buffer);
   }

@@ -10,7 +10,7 @@ class DbRef extends BsonObject{
   get value=>this;
   int get typeByte => BSON.BSON_DATA_DBPOINTER;  
   byteLength()=>bsonCollection.byteLength()+id.byteLength();
-  unpackValue(Binary buffer){    
+  unpackValue(BsonBinary buffer){    
     bsonCollection = new BsonString(null);
     bsonCollection.unpackValue(buffer);
     collection = bsonCollection.data;
@@ -18,7 +18,7 @@ class DbRef extends BsonObject{
     id.unpackValue(buffer);
   }   
   toString()=>'BsonDbPointer(collection: $collection, id: $id)';
-  packValue(Binary buffer){     
+  packValue(BsonBinary buffer){     
      bsonCollection.packValue(buffer);
      id.packValue(buffer);
   }

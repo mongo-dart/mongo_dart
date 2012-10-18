@@ -14,8 +14,8 @@ class MongoRemoveMessage extends MongoMessage{
   int get messageLength{
     return 16+4+_collectionFullName.byteLength()+4+_selector.byteLength();
   }
-  Binary serialize(){
-    Binary buffer = new Binary(messageLength);
+  BsonBinary serialize(){
+    BsonBinary buffer = new BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
     _collectionFullName.packValue(buffer);

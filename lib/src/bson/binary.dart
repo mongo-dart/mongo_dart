@@ -1,5 +1,5 @@
 part of bson;
-class Binary extends BsonObject{
+class BsonBinary extends BsonObject{
   static final BUFFER_SIZE = 256;
   static final SUBTYPE_DEFAULT = 0;
   static final SUBTYPE_FUNCTION = 1;
@@ -60,14 +60,14 @@ class Binary extends BsonObject{
     }
     return _hexString;
   }  
-  Binary(int length): byteList = makeUint8List(length), offset=0, subType=0{
+  BsonBinary(int length): byteList = makeUint8List(length), offset=0, subType=0{
     byteArray = makeByteArray(byteList);    
   }
-  Binary.from(List from): byteList = makeUint8List(from.length),offset=0, subType=0 {    
+  BsonBinary.from(List from): byteList = makeUint8List(from.length),offset=0, subType=0 {    
     byteList.setRange(0, from.length, from);
     byteArray = makeByteArray(byteList);    
   }
-  Binary.fromHexString(this._hexString);
+  BsonBinary.fromHexString(this._hexString);
   int get typeByte => BSON.BSON_DATA_BINARY;  
   makeHexString(){
     StringBuffer stringBuffer = new StringBuffer();
@@ -206,7 +206,7 @@ class Binary extends BsonObject{
   rewind(){
     offset = 0;
   }
-  packValue(Binary buffer){
+  packValue(BsonBinary buffer){
     if (byteList == null) {
       makeByteList();            
     }
@@ -215,7 +215,7 @@ class Binary extends BsonObject{
     buffer.byteList.setRange(buffer.offset,byteList.length,byteList);
     buffer.offset += byteList.length;        
   }  
-  unpackValue(Binary buffer){
+  unpackValue(BsonBinary buffer){
     int size = buffer.readInt32();
     subType = buffer.readByte();
     byteList = makeUint8List(size);
@@ -224,5 +224,5 @@ class Binary extends BsonObject{
     buffer.offset += size;  
   }
   get value => this;
-  String toString()=>"Binary($hexString)";
+  String toString()=>"BsonBinary($hexString)";
 }

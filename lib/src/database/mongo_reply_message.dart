@@ -6,7 +6,7 @@ class MongoReplyMessage extends MongoMessage{
   int startingFrom;
   int numberReturned = -1;
   List documents;  
-  deserialize(Binary buffer){
+  deserialize(BsonBinary buffer){
     readMessageHeaderFrom(buffer);
     responseFlags = buffer.readInt32();
     cursorId = buffer.readInt64();

@@ -1,11 +1,11 @@
 part of mongo_dart;
 class Connection{
   Map<int,Completer<MongoReplyMessage>> replyCompleters;
-  Binary lengthBuffer;
+  BsonBinary lengthBuffer;
   ServerConfig serverConfig;
-  Binary bufferToSend;
+  BsonBinary bufferToSend;
   Queue<MongoMessage> sendQueue;
-  Binary messageBuffer;
+  BsonBinary messageBuffer;
   Socket socket;
   bool connected = false;
   Connection([this.serverConfig]){
@@ -21,7 +21,7 @@ class Connection{
     if (socket is! Socket) {
       completer.completeException(new Exception( "can't get send socket"));
     } else {
-      lengthBuffer = new Binary(4);
+      lengthBuffer = new BsonBinary(4);
       socket.onError = (e) {
         print("connect exception ${e}");
         completer.completeException(e);
@@ -40,6 +40,7 @@ class Connection{
     socket.onData = null;
     socket.onWrite = null;
     socket.onError = null;
+    sendQueue.clear();
     socket.close();
     replyCompleters.clear();    
   }
@@ -80,7 +81,7 @@ class Connection{
         return;
       }
       int messageLength = lengthBuffer.readInt32();      
-      messageBuffer = new Binary(messageLength);
+      messageBuffer = new BsonBinary(messageLength);
       messageBuffer.writeInt(messageLength);
     }
     messageBuffer.offset += socket.readList(messageBuffer.byteList,messageBuffer.offset,messageBuffer.byteList.length-messageBuffer.offset);
@@ -108,8 +109,4 @@ class Connection{
     socket.onWrite = sendBufferFromOnWrite;    
     return completer.future;
   }
-//  execute(MongoMessage message){
-//    sendQueue.addLast(message);    
-//    socket.onWrite = sendBufferFromOnWrite;
-//  }
 }

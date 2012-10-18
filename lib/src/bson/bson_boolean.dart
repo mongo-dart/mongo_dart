@@ -5,10 +5,10 @@ class BsonBoolean extends BsonObject{
   get value=>data;
   byteLength()=>1;
   int get typeByte => BSON.BSON_DATA_BOOLEAN;
-  packValue(Binary buffer){
+  packValue(BsonBinary buffer){
      buffer.writeByte(data?1:0);
   }
-  unpackValue(Binary buffer){
+  unpackValue(BsonBinary buffer){
      var b = buffer.readByte();
      if (b == 1){
        data = true;

@@ -12,7 +12,7 @@ main(){
       'hash':{'a':1, 'b':2}, 
       'date':new Date.now(),          // Stores only milisecond resolution
       'oid':new ObjectId(),
-      'binary':new Binary.from([0x23,0x24,0x25]),
+      'binary':new BsonBinary.from([0x23,0x24,0x25]),
       'int':42,
       'float':33.3333,
       'regexp': new BsonRegexp(".?dim"),

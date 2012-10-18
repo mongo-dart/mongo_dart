@@ -9,8 +9,8 @@ class MongoKillCursorsMessage extends MongoMessage{
   int get messageLength{
     return 16+4+4+8;
   }
-  Binary serialize(){
-    Binary buffer = new Binary(messageLength);
+  BsonBinary serialize(){
+    BsonBinary buffer = new BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
     buffer.writeInt(1);    

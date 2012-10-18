@@ -36,8 +36,8 @@ static final OPTS_EXHAUST = 64;
     }
     return result;
   }
-  Binary serialize(){
-    Binary buffer = new Binary(messageLength);
+  BsonBinary serialize(){
+    BsonBinary buffer = new BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(flags);
     _collectionFullName.packValue(buffer);
