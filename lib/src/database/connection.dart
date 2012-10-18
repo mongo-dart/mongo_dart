@@ -35,10 +35,9 @@ class Connection{
   }
   close(){
     while (!sendQueue.isEmpty()){
-      sendBuffer("From close");
+      _sendBuffer();
     }
     socket.onData = null;
-    socket.onWrite = null;
     socket.onError = null;
     sendQueue.clear();
     socket.close();
@@ -56,22 +55,10 @@ class Connection{
       } 
     }
   }
-  sendBufferFromTimer() => sendBuffer("from Timer");
-  sendBufferFromOnWrite() => sendBuffer("from OnWrite");
-  sendBuffer(String origin){
-    debug("sendBuffer($origin)");
-    getNextBufferToSend();
-    if (bufferToSend !== null){      
-      bufferToSend.offset += socket.writeList(bufferToSend.byteList,
-        bufferToSend.offset,bufferToSend.byteList.length-bufferToSend.offset);
-      if (!bufferToSend.atEnd()){        
-       debug("Buffer not send fully, offset: ${bufferToSend.offset}");
-      }
-      
-      new Timer(0,(t)=>sendBufferFromTimer());              
-    }        
-    else {
-      socket.onWrite = null;        
+  _sendBuffer(){    
+    while(sendQueue.length > 0) {
+      bufferToSend = sendQueue.removeFirst().serialize();
+      socket.outputStream.writeFrom(bufferToSend.byteList);              
     }    
   }  
    void receiveData() {
@@ -106,7 +93,7 @@ class Connection{
     replyCompleters[queryMessage.requestId] = completer;
     socket.onData = receiveData;
     sendQueue.addLast(queryMessage);
-    socket.onWrite = sendBufferFromOnWrite;    
+    _sendBuffer();
     return completer.future;
   }
 }
