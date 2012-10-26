@@ -22,8 +22,8 @@ class MongoInsertMessage extends MongoMessage{
     int result = 16+4+_collectionFullName.byteLength()+docsSize;
     return result;
   }
-  Binary serialize(){
-    Binary buffer = new Binary(messageLength);
+  BsonBinary serialize(){
+    BsonBinary buffer = new BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(flags);
     _collectionFullName.packValue(buffer);

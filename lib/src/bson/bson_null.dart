@@ -4,8 +4,8 @@ class BsonNull extends BsonObject{
   get value=>null;
   byteLength()=>0;
   int get typeByte => BSON.BSON_DATA_NULL;
-  packValue(Binary buffer){     
+  packValue(BsonBinary buffer){     
   }
-  unpackValue(Binary buffer){  
+  unpackValue(BsonBinary buffer){  
   }
 }

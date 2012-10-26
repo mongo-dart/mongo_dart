@@ -40,7 +40,7 @@ class BSON {
    **/
   static const BSON_DATA_ARRAY = 4;
   /**
-   * Binary BSON Type
+   * BsonBinary BSON Type
    *  
    * @classconstant BSON_DATA_BINARY
    **/
@@ -132,54 +132,54 @@ class BSON {
   static const BSON_DATA_MAX_KEY = 0x7f;
 
   /**
-   * Binary Default Type
+   * BsonBinary Default Type
    *  
    * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
    **/
   static const BSON_BINARY_SUBTYPE_DEFAULT = 0;
   /**
-   * Binary Function Type
+   * BsonBinary Function Type
    *  
    * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
    **/
   static const BSON_BINARY_SUBTYPE_FUNCTION = 1;
   /**
-   * Binary Byte Array Type
+   * BsonBinary Byte Array Type
    *  
    * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
    **/
   static const BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
   /**
-   * Binary UUID Type
+   * BsonBinary UUID Type
    *  
    * @classconstant BSON_BINARY_SUBTYPE_UUID
    **/
   static const BSON_BINARY_SUBTYPE_UUID = 3;
   /**
-   * Binary MD5 Type
+   * BsonBinary MD5 Type
    *  
    * @classconstant BSON_BINARY_SUBTYPE_MD5
    **/
   static const BSON_BINARY_SUBTYPE_MD5 = 4;
   /**
-   * Binary User Defined Type
+   * BsonBinary User Defined Type
    *  
    * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
    **/
   static const BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
 
 
-  Binary serialize(var object, [int offset = 0]) {
+  BsonBinary serialize(var object, [int offset = 0]) {
     if (!((object is Map) || (object is List))){
       throw new Exception("Invalid value for BSON serialize: $object");
     }
     BsonObject bsonObject = bsonObjectFrom(object);    
-    Binary buffer = new Binary(bsonObject.byteLength()+offset);
+    BsonBinary buffer = new BsonBinary(bsonObject.byteLength()+offset);
     buffer.offset = offset;
     bsonObjectFrom(object).packValue(buffer);
     return buffer;  
   }
-  deserialize(Binary buffer){
+  deserialize(BsonBinary buffer){
     if(buffer.byteList.length < 5){
       throw new Exception("corrupt bson message < 5 bytes long");
     }    

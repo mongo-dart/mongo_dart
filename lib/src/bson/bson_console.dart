@@ -1,11 +1,6 @@
 library bson_vm;
-import 'bson.dart';
-import 'src/bson/json_ext.dart';
+import 'package:mongo_dart/bson.dart';
 import 'dart:scalarlist';
-
-
-export 'bson.dart';
-export 'src/bson/json_ext.dart';
 
 class BsonPlatformVm extends BsonPlatform {
 

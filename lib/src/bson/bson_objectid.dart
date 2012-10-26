@@ -1,6 +1,6 @@
 part of bson;
 class ObjectId extends BsonObject{  
-  Binary id;
+  BsonBinary id;
   
   ObjectId([bool clientMode = false]){
     int seconds = new Timestamp(null,0).seconds;    
@@ -10,9 +10,9 @@ class ObjectId extends BsonObject{
   ObjectId.fromSeconds(int seconds, [bool clientMode = false]){
     id = createId(seconds, clientMode);
   }
-  ObjectId.fromBinary(this.id);
+  ObjectId.fromBsonBinary(this.id);
   
-  Binary createId(int seconds, bool clientMode) {
+  BsonBinary createId(int seconds, bool clientMode) {
       getOctet(int value) {
       String res = value.toRadixString(16);
       while (res.length < 8) {
@@ -22,9 +22,9 @@ class ObjectId extends BsonObject{
     }
     if (clientMode) {
       String s = '${getOctet(seconds)}${getOctet(Statics.MachineId+Statics.Pid)}${getOctet(Statics.nextIncrement)}';
-      return new Binary.fromHexString(s);
+      return new BsonBinary.fromHexString(s);
     } else {
-      return new Binary(12)
+      return new BsonBinary(12)
       ..writeInt(seconds,4,forceBigEndian:true)    
       ..writeInt(Statics.MachineId,3)
       ..writeInt(Statics.Pid,2)
@@ -34,7 +34,7 @@ class ObjectId extends BsonObject{
   
   
   factory ObjectId.fromHexString(String hexString) {
-    return new ObjectId.fromBinary(new Binary.fromHexString(hexString));
+    return new ObjectId.fromBsonBinary(new BsonBinary.fromHexString(hexString));
   }    
 
   
@@ -45,11 +45,11 @@ class ObjectId extends BsonObject{
   int get typeByte => BSON.BSON_DATA_OID;
   get value => this;
   int byteLength() => 12;
-  unpackValue(Binary buffer){
+  unpackValue(BsonBinary buffer){
      id.byteList.setRange(0,12,buffer.byteList,buffer.offset);
      buffer.offset += 12;
   }
-  packValue(Binary buffer){
+  packValue(BsonBinary buffer){
     if (id.byteList == null) {
       id.makeByteList();  
     }

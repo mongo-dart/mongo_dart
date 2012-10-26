@@ -5,10 +5,10 @@ class BsonDate extends BsonObject{
   get value => data;
   byteLength() => 8;
   int get typeByte => BSON.BSON_DATA_DATE;
-  packValue(Binary buffer){
+  packValue(BsonBinary buffer){
      buffer.writeInt64(data.millisecondsSinceEpoch);
   }
-  unpackValue(Binary buffer){
+  unpackValue(BsonBinary buffer){
      data = new Date.fromMillisecondsSinceEpoch(buffer.readInt64());
   }
 }

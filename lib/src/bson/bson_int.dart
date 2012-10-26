@@ -5,10 +5,10 @@ class BsonInt extends BsonObject{
   get value=>data;
   byteLength()=>4;
   int get typeByte => BSON.BSON_DATA_INT;
-  packValue(Binary buffer){
+  packValue(BsonBinary buffer){
      buffer.writeInt(data);
   }
-  unpackValue(Binary buffer){
+  unpackValue(BsonBinary buffer){
      data = buffer.readInt32();
   }
 }
@@ -19,10 +19,10 @@ class BsonLong extends BsonObject{
   get value=>data;
   byteLength()=>8;
   int get typeByte => BSON.BSON_DATA_LONG;
-  packValue(Binary buffer){
+  packValue(BsonBinary buffer){
     buffer.writeInt64(data);
   }
-  unpackValue(Binary buffer){
+  unpackValue(BsonBinary buffer){
     data = buffer.readInt64();
   }
 }

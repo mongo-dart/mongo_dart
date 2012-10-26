@@ -21,13 +21,13 @@ class MongoMessage{
   int get messageLength{
     throw "Must be implemented";
   }
-  Binary serialize(){
+  BsonBinary serialize(){
     throw "Must be implemented";    
   }  
-  MongoMessage deserialize(Binary buffer){
+  MongoMessage deserialize(BsonBinary buffer){
     throw "Must be implemented";    
   }  
-  readMessageHeaderFrom(Binary buffer)
+  readMessageHeaderFrom(BsonBinary buffer)
   {
       _messageLength = buffer.readInt32();
       _requestId = buffer.readInt32();
@@ -38,7 +38,7 @@ class MongoMessage{
       }
   }
 
-  writeMessageHeaderTo(Binary buffer)
+  writeMessageHeaderTo(BsonBinary buffer)
   {
       buffer.writeInt(messageLength); // messageLength will be backpatched later
       buffer.writeInt(requestId);

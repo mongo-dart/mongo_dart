@@ -91,7 +91,7 @@ BsonObject bsonObjectFromTypeByte(int typeByte){
     case BSON.BSON_DATA_BOOLEAN:
       return new BsonBoolean(false);
     case BSON.BSON_DATA_BINARY:
-      return new Binary(0);
+      return new BsonBinary(0);
     case BSON.BSON_DATA_DATE:
       return new BsonDate(null);
     case BSON.BSON_DATA_CODE:
