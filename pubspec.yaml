@@ -5,6 +5,5 @@ dependencies:
   unittest:
     sdk: unittest
   args:
-    sdk: args  
-  log4dart:		    
-    git: git://github.com/Solvr/log4dart.git
+    sdk: args
+  log4dart: ">=1.0.0 <2.0.0"
