@@ -1,7 +1,3 @@
-/packages/
+packages
 /null/
-/.idea/
-/mongo_dart.iml
-/mongo_dart.ipr
-/mongo_dart.iws
 /pubspec.lock
