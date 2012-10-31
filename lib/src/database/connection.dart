@@ -11,7 +11,7 @@ class Connection{
   Connection([this.serverConfig]){
     if (serverConfig === null){
       serverConfig = new ServerConfig();
-    }    
+    }
   }
   Future<bool> connect(){
     replyCompleters = new Map();
@@ -34,40 +34,40 @@ class Connection{
     }
   }
   close(){
-    while (!sendQueue.isEmpty()){
+    while (!sendQueue.isEmpty){
       _sendBuffer();
     }
     socket.onData = null;
     socket.onError = null;
     sendQueue.clear();
     socket.close();
-    replyCompleters.clear();    
+    replyCompleters.clear();
   }
   getNextBufferToSend(){
     if (bufferToSend === null || bufferToSend.atEnd()){
-      if(!sendQueue.isEmpty()){
+      if(!sendQueue.isEmpty){
         MongoMessage message = sendQueue.removeFirst();
         debug(message.toString());
         bufferToSend = message.serialize();
         debug(bufferToSend.hexString);
       } else {
-        bufferToSend = null;  
-      } 
+        bufferToSend = null;
+      }
     }
   }
-  _sendBuffer(){    
+  _sendBuffer(){
     while(sendQueue.length > 0) {
       bufferToSend = sendQueue.removeFirst().serialize();
-      socket.outputStream.writeFrom(bufferToSend.byteList);              
-    }    
-  }  
+      socket.outputStream.writeFrom(bufferToSend.byteList);
+    }
+  }
    void receiveData() {
     if (messageBuffer === null){
       int numBytes = socket.readList(lengthBuffer.byteList, 0, 4);
       if (numBytes == 0) {
         return;
       }
-      int messageLength = lengthBuffer.readInt32();      
+      int messageLength = lengthBuffer.readInt32();
       messageBuffer = new BsonBinary(messageLength);
       messageBuffer.writeInt(messageLength);
     }
@@ -79,14 +79,14 @@ class Connection{
       debug(reply.toString());
       messageBuffer = null;
       lengthBuffer.rewind();
-      Completer completer = replyCompleters.remove(reply.responseTo);      
-      if (completer !== null){    
-        completer.complete(reply);       
+      Completer completer = replyCompleters.remove(reply.responseTo);
+      if (completer !== null){
+        completer.complete(reply);
       }
       else {
         warn("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
-      }  
-    }   
+      }
+    }
   }
   Future<MongoReplyMessage> query(MongoMessage queryMessage){
     Completer completer = new Completer();

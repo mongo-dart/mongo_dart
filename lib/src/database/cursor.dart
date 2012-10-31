@@ -3,21 +3,21 @@ typedef MonadicBlock(var value);
 class Cursor{
 /**
  * Init state
- *  
+ *
  * @classconstant INIT
  **/
 static final INIT = 0;
 
 /**
  * Cursor open
- *  
+ *
  * @classconstant OPEN
  **/
 static final OPEN = 1;
 
 /**
  * Cursor closed
- *  
+ *
  * @classconstant CLOSED
  **/
 static final CLOSED = 2;
@@ -37,15 +37,14 @@ static final CLOSED = 2;
   MonadicBlock eachCallback;
   var eachComplete;
   bool explain;
-  int flags = 0;  
-  Cursor(this.db, this.collection, [this.selector, this.fields, this.skip=0, this.limit=0
+  int flags = 0;
+  Cursor(this.db, this.collection, [this.selector, this.fields, this.skip = 0, this.limit = 0
   , this.sort, this.hint, this.explain]){
     if (selector === null){
       selector = {};
-    } else{
-      if (!selector.containsKey("query")){
+    }
+    if (!selector.containsKey("query")){
         selector = {"query": selector};
-      }          
     }
     if (sort !== null){
       selector["orderby"] = sort;
@@ -64,8 +63,8 @@ static final CLOSED = 2;
     return new  MongoGetMoreMessage(collection.fullName(),
             cursorId);
   }
-  
-  
+
+
   Map getNextItem(){
     return items.removeFirst();
   }
@@ -89,7 +88,7 @@ static final CLOSED = 2;
         }
       });
       return nextItem.future;
-    }  
+    }
     else if (state == OPEN && items.length > 0){
       return new Future.immediate(getNextItem());
     }
@@ -105,12 +104,12 @@ static final CLOSED = 2;
           nextItem.complete(getNextItem());
         }
         else{
-          state = CLOSED;          
+          state = CLOSED;
           nextItem.complete(null);
         }
       });
       return nextItem.future;
-    }    
+    }
     else {
       state = CLOSED;
       return new Future.immediate(null);
@@ -124,12 +123,12 @@ static final CLOSED = 2;
       } else {
         eachCallback(val);
         nextEach();
-      }            
+      }
     });
   }
-  
+
   Future<bool> each(MonadicBlock callback){
-    eachCallback = callback; 
+    eachCallback = callback;
     eachComplete = new Completer();
     nextEach();
     return eachComplete.future;
@@ -138,16 +137,16 @@ static final CLOSED = 2;
     List<Map> result = [];
     Completer completer = new Completer();
     this.each((v)=>result.addLast(v)).then((v)=>completer.complete(result));
-    return completer.future;    
+    return completer.future;
   }
   Future close(){
     debug("Closing cursor, cursorId = $cursorId");
     state = CLOSED;
-    if (cursorId != 0){      
+    if (cursorId != 0){
       MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);
       cursorId = 0;
       return db.executeQueryMessage(msg);
-      
+
     }
   }
 }

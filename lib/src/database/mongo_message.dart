@@ -7,14 +7,14 @@ class MongoMessage{
   static final Query = 2004;
   static final GetMore = 2005;
   static final Delete = 2006;
-  static final KillCursors = 2007;   
+  static final KillCursors = 2007;
   int _messageLength;
   int _requestId;
   int get requestId{
     if (_requestId === null){
-      _requestId = Statics.nextRequestId;    
+      _requestId = Statics.nextRequestId;
     }
-    return _requestId;      
+    return _requestId;
   }
   int responseTo;
   int opcode = MongoMessage.Reply;
@@ -22,11 +22,11 @@ class MongoMessage{
     throw "Must be implemented";
   }
   BsonBinary serialize(){
-    throw "Must be implemented";    
-  }  
+    throw "Must be implemented";
+  }
   MongoMessage deserialize(BsonBinary buffer){
-    throw "Must be implemented";    
-  }  
+    throw "Must be implemented";
+  }
   readMessageHeaderFrom(BsonBinary buffer)
   {
       _messageLength = buffer.readInt32();

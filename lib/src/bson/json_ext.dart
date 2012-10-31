@@ -162,8 +162,8 @@ class _JsonParser {
   static List<int> tokens;
 
   // Extended
-  static const int DOLLAR_SIGN = 36; 
-  
+  static const int DOLLAR_SIGN = 36;
+
   final String json;
   final int length;
   int position = 0;
@@ -242,7 +242,7 @@ class _JsonParser {
     return value;
   }
   parseBsonExtensionValue(String key) {
-    if (key == '\$date') {        
+    if (key == '\$date') {
       return new Date.fromMillisecondsSinceEpoch(parseNumber());
     }
     if (key == '\$oid') {
@@ -254,7 +254,7 @@ class _JsonParser {
       var oidKey = parseString();
       if (oidKey != '\$oid' || !isToken(COLON)) error("Expected '\$oid:' when parsing DbRef");
       position++;
-      var hex = parseString();      
+      var hex = parseString();
       return new DbRef(collection,new ObjectId.fromHexString(hex));
     }
     if (key == '\$regex') {
@@ -263,12 +263,12 @@ class _JsonParser {
       var optkey = parseString();
       if (optkey != '\$options' || !isToken(COLON)) error("Expected '\$options:' when parsing BsonRegexp");
       position++;
-      var options = parseString();      
+      var options = parseString();
       return new BsonRegexp(pattern,options: options);
     }
-    
+
   }
-  
+
   parseObject() {
     var object = {};
 
@@ -284,13 +284,13 @@ class _JsonParser {
           if (extObject != null) {
             object = extObject;
             break;
-          }            
+          }
         }
         object[key] = parseValue();
         if (!isToken(COMMA)) break;
-        position++;  // Skip ','.                  
+        position++;  // Skip ','.
       };
-      
+
       if (!isToken(RBRACE)) error("Expected '}' at end of object");
     }
     position++;
@@ -601,13 +601,13 @@ class _JsonStringifier {
       return stringifyJsonValue({'\$date': (object as Date).millisecondsSinceEpoch});
     }
     else if (object is ObjectId) {
-        return stringifyJsonValue({'\$oid': object.toHexString()});        
+        return stringifyJsonValue({'\$oid': object.toHexString()});
     }
     else if (object is DbRef) {
-      return stringifyJsonValue({'\$ref': object.collection,'\$oid': object.id.toHexString()});        
+      return stringifyJsonValue({'\$ref': object.collection,'\$oid': object.id.toHexString()});
     }
     else if (object is BsonRegexp) {
-      return stringifyJsonValue({'\$regex': object.pattern,'\$options': object.options});        
+      return stringifyJsonValue({'\$regex': object.pattern,'\$options': object.options});
     }
     else if (object is List) {
       checkCycle(object);
@@ -646,5 +646,5 @@ class _JsonStringifier {
     } else {
       return false;
     }
-  }    
+  }
 }

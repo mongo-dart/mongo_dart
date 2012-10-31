@@ -28,7 +28,7 @@ class SelectorBuilder<K,V> extends MapProxy<K,V>{
     map[fieldName] = {"\$gte":value};
     return this;
   }
-  SelectorBuilder lte(String fieldName,value){    
+  SelectorBuilder lte(String fieldName,value){
     map[fieldName] = {"\$lte":value};
     return this;
   }
@@ -43,25 +43,25 @@ class SelectorBuilder<K,V> extends MapProxy<K,V>{
   SelectorBuilder oneFrom(String fieldName, List values){
     map[fieldName] = {"\$in":values};
     return this;
-  } 
+  }
   SelectorBuilder exists(String fieldName){
     map[fieldName] = {"\$exists":true};
-    return this;    
+    return this;
   }
   SelectorBuilder notExists(String fieldName){
     map[fieldName] = {"\$exists":false};
-    return this;    
+    return this;
   }
   SelectorBuilder mod(String fieldName, int value){
     map[fieldName] = {"\$mod":[value,0]};
-    return this;    
+    return this;
   }
-  SelectorBuilder match(String fieldName, String pattern,[bool multiLine, bool caseInsensitive, bool dotAll, bool extended]){        
+  SelectorBuilder match(String fieldName, String pattern,{bool multiLine, bool caseInsensitive, bool dotAll, bool extended}){
     map[fieldName] = {'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
         dotAll:dotAll,extended:extended)};
-    return this;    
+    return this;
   }
-  SelectorBuilder range(String fieldName, min, max, [bool minInclude=true, bool maxInclude=true]){
+  SelectorBuilder range(String fieldName, min, max, {bool minInclude: true, bool maxInclude: true}){
     Map rangeMap = {};
     if (minInclude){
       rangeMap["\$gte"] = min;
@@ -76,52 +76,52 @@ class SelectorBuilder<K,V> extends MapProxy<K,V>{
       rangeMap["\$gt"] = max;
     }
     map[fieldName] = rangeMap;
-    return this;    
+    return this;
   }
   _internQueryMap(){
     if (!map.containsKey("query")){
       LinkedHashMap queryMap = new LinkedHashMap.from(map);
       map.clear();
       map["query"] = queryMap;
-    }    
+    }
   }
-  SelectorBuilder sortBy(String fieldName, [bool descending=false]){
+  SelectorBuilder sortBy(String fieldName, {bool descending: false}){
     _internQueryMap();
     if (!map.containsKey("orderby")){
-      map["orderby"] = new LinkedHashMap();  
+      map["orderby"] = new LinkedHashMap();
     }
     int order = 1;
     if (descending){
       order = -1;
     }
-    map["orderby"][fieldName] = order;      
-    return this;    
+    map["orderby"][fieldName] = order;
+    return this;
   }
   SelectorBuilder comment(String commentStr){
-    _internQueryMap();  
-    map["\$comment"] = commentStr;      
-    return this;    
+    _internQueryMap();
+    map["\$comment"] = commentStr;
+    return this;
   }
   SelectorBuilder explain(){
-    _internQueryMap();  
-    map["\$explain"] = true;      
-    return this;    
+    _internQueryMap();
+    map["\$explain"] = true;
+    return this;
   }
   SelectorBuilder snapshot(){
-    _internQueryMap();  
-    map["\$snapshot"] = true;      
-    return this;    
+    _internQueryMap();
+    map["\$snapshot"] = true;
+    return this;
   }
   SelectorBuilder showDiskLoc(){
-    _internQueryMap();  
-    map["\$showDiskLoc"] = true;      
-    return this;    
+    _internQueryMap();
+    map["\$showDiskLoc"] = true;
+    return this;
   }
   SelectorBuilder returnKey(){
-    _internQueryMap();  
-    map["\$sreturnKey"] = true;      
-    return this;    
-  }  
+    _internQueryMap();
+    map["\$sreturnKey"] = true;
+    return this;
+  }
   SelectorBuilder where(String javaScriptCode){
     map["\$where"] = new BsonCode(javaScriptCode);
     return this;

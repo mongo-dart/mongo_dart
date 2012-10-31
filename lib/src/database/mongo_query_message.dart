@@ -27,7 +27,7 @@ static final OPTS_EXHAUST = 64;
     if (fields !== null){
       _fields = new BsonMap(fields);
     }
-    opcode = MongoMessage.Query;    
+    opcode = MongoMessage.Query;
   }
   int get messageLength{
     int result = 16+4+_collectionFullName.byteLength()+4+4+_query.byteLength();

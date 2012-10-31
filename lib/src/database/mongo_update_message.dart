@@ -9,12 +9,12 @@ class MongoUpdateMessage extends MongoMessage{
   MongoUpdateMessage(String collectionFullName,
             Map selector,
             Map document,
-            this.flags            
-            ){    
+            this.flags
+            ){
     _collectionFullName = new BsonCString(collectionFullName);
     _selector = new BsonMap(selector);
-    _document = new BsonMap(document);    
-    opcode = MongoMessage.Update;    
+    _document = new BsonMap(document);
+    opcode = MongoMessage.Update;
   }
   int get messageLength{
     return 16+4+_collectionFullName.byteLength()+4+_selector.byteLength()+_document.byteLength();

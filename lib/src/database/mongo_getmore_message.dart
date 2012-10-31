@@ -1,13 +1,13 @@
 part of mongo_dart;
 class MongoGetMoreMessage extends MongoMessage{
   BsonCString _collectionFullName;
-  int cursorId;    
+  int cursorId;
   int numberToReturn;
   MongoGetMoreMessage(String collectionFullName,
             this.cursorId,
             [this.numberToReturn = 20]
             ){
-    _collectionFullName = new BsonCString(collectionFullName);    
+    _collectionFullName = new BsonCString(collectionFullName);
     opcode = MongoMessage.GetMore;
   }
   int get messageLength{

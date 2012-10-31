@@ -16,29 +16,29 @@ testBsonBinaryWithNegativeOne(){
 }
 testBsonBinary(){
    BsonBinary b = new BsonBinary(8);
-   b.writeInt(0,4);
-   b.writeInt(1,4);
+   b.writeInt(0);
+   b.writeInt(1);
    expect('0000000001000000',b.hexString);
    b = new BsonBinary(8);
-   b.writeInt(0,4);
+   b.writeInt(0);
    b = new BsonBinary(8);
-   b.writeInt(0,4);
-   b.writeInt(0x01020304,4);
+   b.writeInt(0);
+   b.writeInt(0x01020304);
    expect(b.hexString,'0000000004030201');
    b = new BsonBinary(8);
-   b.writeInt(0,4);
-   b.writeInt(0x01020304,4,forceBigEndian:true);
+   b.writeInt(0);
+   b.writeInt(0x01020304,numOfBytes:4,forceBigEndian:true);
    expect('0000000001020304',b.hexString);
    b = new BsonBinary(8);
-   b.writeInt(0,4);
-   b.writeInt(1,4,forceBigEndian:true);
+   b.writeInt(0);
+   b.writeInt(1,forceBigEndian:true);
    expect('0000000000000001',b.hexString);
    b = new BsonBinary(8);
-   b.writeInt(1,3,forceBigEndian:true);
+   b.writeInt(1,numOfBytes:3,forceBigEndian:true);
    expect('0000010000000000',b.hexString);
    b = new BsonBinary(8);
-   b.writeInt(0,3);
-   b.writeInt(1,3,forceBigEndian:true);
+   b.writeInt(0,numOfBytes:3);
+   b.writeInt(1,numOfBytes:3,forceBigEndian:true);
    expect('0000000000010000',b.hexString);
    b = new BsonBinary(4);
    b.writeInt(-1);
@@ -99,8 +99,8 @@ testMakeByteList() {
   for (int n = 0; n<125; n++ ) {
     var hex = n.toRadixString(16);
     if (hex.length.remainder(2) != 0) {
-      hex = '0$hex'; 
-    }    
+      hex = '0$hex';
+    }
     var b = new BsonBinary.fromHexString(hex);
     b.makeByteList();
     expect(b.byteList[0], n);
@@ -119,7 +119,7 @@ testMakeByteList() {
 
 testBsonIdFromHexString() {
   var oid1 = new ObjectId();
-  var oid2 = new ObjectId.fromHexString(oid1.toHexString());  
+  var oid2 = new ObjectId.fromHexString(oid1.toHexString());
   oid2.id.makeByteList();
   expect(oid2.id.byteList,orderedEquals(oid1.id.byteList));
   var b1 = new BSON().serialize({'id':oid1});
@@ -127,7 +127,7 @@ testBsonIdFromHexString() {
   b1.rewind();
   b2.rewind();
   var oid3 = new BSON().deserialize(b2)['id'];
-  expect(oid3.id.byteList,orderedEquals(oid1.id.byteList));  
+  expect(oid3.id.byteList,orderedEquals(oid1.id.byteList));
 }
 testBsonIdClientMode() {
   var oid1 = new ObjectId(clientMode: true);
@@ -135,11 +135,11 @@ testBsonIdClientMode() {
   expect(oid2.toHexString().length, 24);
 }
 testBsonDbPointer() {
-  var p1 = new DbRef('Test',new ObjectId());  
+  var p1 = new DbRef('Test',new ObjectId());
   var bson = new BSON();
   var b = bson.serialize({'p1': p1});
   b.rewind();
-  var fromBson = bson.deserialize(b);  
+  var fromBson = bson.deserialize(b);
   var p2 = fromBson['p1'];
   expect(p2.collection, p1.collection);
   expect(p2.id.toHexString(), p1.id.toHexString());
@@ -151,7 +151,7 @@ runMe(){
     test("testUint8ListNegativeWrite",testUint8ListNegativeWrite);
     test("testBsonBinary",testBsonBinary);
     test("testBsonBinaryWithNegativeOne",testBsonBinaryWithNegativeOne);
-    test("testMakeByteList",testMakeByteList);    
+    test("testMakeByteList",testMakeByteList);
   });
   group("BsonTypesTest:", (){
     test("typeTest",typeTest);
@@ -162,7 +162,7 @@ runMe(){
     test("testBsonIdClientMode",testBsonIdClientMode);
     test("testBsonDbPointer", testBsonDbPointer);
   });
-  group("BsonSerialization:", (){    
-    test("testSerializeDeserialize",testSerializeDeserialize);    
+  group("BsonSerialization:", (){
+    test("testSerializeDeserialize",testSerializeDeserialize);
   });
 }

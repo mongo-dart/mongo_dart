@@ -4,12 +4,12 @@ class Db{
   ServerConfig serverConfig;
   Connection connection;
   validateDatabaseName(String dbName) {
-    if(dbName.length === 0) throw "database name cannot be the empty string";  
+    if(dbName.length === 0) throw "database name cannot be the empty string";
     var invalidChars = [" ", ".", "\$", "/", "\\"];
     for(var i = 0; i < invalidChars.length; i++) {
       if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
     }
-  }    
+  }
   Db.local(this.databaseName){
      if (serverConfig === null) {
       serverConfig = new ServerConfig();
@@ -17,9 +17,9 @@ class Db{
     connection = new Connection(serverConfig);
   }
 
-/**  
-* Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections). 
-* For example next code points to local mongodb server on default mongodb port, database *testdb*   
+/**
+* Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
+* For example next code points to local mongodb server on default mongodb port, database *testdb*
 *     var db = new Db('mongodb://127.0.0.1/testdb');
 * And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
 *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
@@ -53,7 +53,7 @@ class Db{
   }
   Future executeQueryMessage(MongoMessage queryMessage){
     return connection.query(queryMessage);
-  }  
+  }
 //  executeMessage(MongoMessage message){
 //    connection.execute(message);
 //  }
@@ -82,7 +82,7 @@ class Db{
       connection.query(message).then((replyMessage){
         //print("replyMessage = ${replyMessage}");
         //print("replyMessage.documents = ${replyMessage.documents}");
-        
+
         String errMsg;
         if (replyMessage.documents.length == 0) {
           errMsg = "Error executing Db command, Document length 0 $replyMessage";
@@ -99,9 +99,9 @@ class Db{
           }
           print("Error: $errMsg");
           result.complete(replyMessage.documents[0]);
-        }         
+        }
       });
-    return result.future;        
+    return result.future;
   }
   Future dropCollection(String collectionName){
     Completer completer = new Completer();
@@ -111,25 +111,25 @@ class Db{
           .then((res)=>completer.complete(res));
         } else{
           completer.complete(true);
-        }  
-    });    
-    return completer.future;    
+        }
+    });
+    return completer.future;
   }
 /**
 *   Drop current database
 */
-  Future drop(){    
-    return executeDbCommand(DbCommand.createDropDatabaseCommand(this));            
+  Future drop(){
+    return executeDbCommand(DbCommand.createDropDatabaseCommand(this));
   }
-  
+
   Future removeFromCollection(String collectionName, [Map selector = const {}]){
-    return connection.query(new MongoRemoveMessage("$databaseName.$collectionName", selector));    
-  }    
-  
-  Future<Map> getLastError(){    
+    return connection.query(new MongoRemoveMessage("$databaseName.$collectionName", selector));
+  }
+
+  Future<Map> getLastError(){
     return executeDbCommand(DbCommand.createGetLastErrorCommand(this));
   }
-  Future<Map> getNonce(){    
+  Future<Map> getNonce(){
     return executeDbCommand(DbCommand.createGetNonceCommand(this));
   }
 
@@ -140,15 +140,15 @@ class Db{
 //    print("closing db");
     connection.close();
   }
-  
+
   Cursor collectionsInfoCursor([String collectionName]) {
     Map selector = {};
     // If we are limiting the access to a specific collection name
     if(collectionName !== null){
       selector["name"] = "${this.databaseName}.$collectionName";
-    }  
+    }
     // Return Cursor
-      return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);      
+      return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
   }
 
   Future<bool> authenticate(String userName, String password){
