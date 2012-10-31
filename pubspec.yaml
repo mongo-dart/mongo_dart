@@ -1,6 +1,6 @@
 name: mongo_dart
 description: MongoDB driver for Dart
-version: 0.0.3-dev
+version: 0.0.3
 author: Vadim Tsushko <vadimtsushko@gmail.com>
 homepage: https://github.com/vadimtsushko/mongo_dart
 dependencies:
