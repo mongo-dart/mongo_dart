@@ -1,8 +1,6 @@
 library database_tests;
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:uri';
-//import 'package:mongo_dart/bson.dart';
-//import 'package:mongo_dart/bson_vm.dart';
 import 'dart:io';
 import 'dart:crypto';
 import 'package:unittest/unittest.dart';
@@ -10,13 +8,13 @@ import 'package:unittest/unittest.dart';
 const DefaultUri = 'mongodb://127.0.0.1/';
 testSelectorBuilderCreation(){
   SelectorBuilder selector = query();
-  expect(selector is Map);
+  expect(selector is Map, isTrue);
   expect(selector,isEmpty);
 }
 testSelectorBuilderOnObjectId(){
   ObjectId id = new ObjectId();
   SelectorBuilder selector = query().id(id);
-  expect(selector is Map);
+  expect(selector is Map, isTrue);
   expect(selector.length,greaterThan(0));
 }
 
@@ -59,7 +57,6 @@ testRemove(){
       expect(v1,isEmpty);
       newColl.drop();
       db.close();
-      callbackDone();
     }));
   }));
 }
@@ -69,7 +66,6 @@ testDropDatabase(){
     return db.drop();
   }).then((v){
      db.close();
-     callbackDone();
   });
 }
 testGetNonce(){
@@ -146,8 +142,7 @@ testFindEach(){
   })).then(expectAsync1((v){
     expect(count,3);
     expect(sum,13);
-    db.close();
-    callbackDone();
+    db.close();    
    }));
 }
 testDrop(){
@@ -319,7 +314,6 @@ testNextObjectToEnd(){
         res.then(expectAsync1((v3){
           expect(v3,isNull);
           db.close();
-          callbackDone();
         }));
       }));
     }));
@@ -401,7 +395,6 @@ testCursorClosing(){
     collection.findOne().then(expectAsync1((v1){
       expect(v,isNotNull);
       db.close();
-      callbackDone();
     }));
   }));
 }
@@ -502,7 +495,6 @@ testMongoDbUri(){
   expect(db.serverConfig.password,isNull);
 }
 main(){
-// some tests do not open db, when bson initialize
   initBsonPlatform();
   group("DbCollection tests:", (){
     test("testSelectorBuilderCreation",testSelectorBuilderCreation);
@@ -521,14 +513,14 @@ main(){
     test("testPwd",testPwd);
   });    
   group("DbCollection tests:", (){
-    test("testLimit",testLimit);
-    test("testSkip",testSkip);
+    test("testLimit",testLimit);    
     test("testFindEachWithThenClause",testFindEachWithThenClause);
     test("testCount",testCount);
     test("testFindEach",testFindEach);
     test("testDrop",testDrop);
     test("testSaveWithIntegerId",testSaveWithIntegerId);
     test("testSaveWithObjectId",testSaveWithObjectId);
+    test("testSkip",testSkip);
   });    
   group("Cursor tests:", (){
     test("testCursorCreation",testCursorCreation);

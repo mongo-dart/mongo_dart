@@ -54,7 +54,7 @@ class BsonBinary extends BsonObject{
     return result;
   }
   set hexString(String value) => _hexString = value;
-  String get hexString() {
+  String get hexString {
     if (_hexString == null) {
       makeHexString();
     }

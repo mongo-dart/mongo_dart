@@ -49,10 +49,10 @@ testBsonBinary(){
 }
 
 typeTest(){
-  expect(bsonObjectFrom(1234) is BsonInt);
-  expect(bsonObjectFrom("asdfasdf") is BsonString);
-  expect(bsonObjectFrom(new Date.now()) is BsonDate);
-  expect(bsonObjectFrom([2,3,4]) is BsonArray);
+  expect(bsonObjectFrom(1234) is BsonInt,isTrue);
+  expect(bsonObjectFrom("asdfasdf") is BsonString, isTrue);
+  expect(bsonObjectFrom(new Date.now()) is BsonDate, isTrue);
+  expect(bsonObjectFrom([2,3,4]) is BsonArray, isTrue);
 }
 
 testObjectId(){
@@ -60,10 +60,10 @@ testObjectId(){
   expect(id1,isNotNull);
   id1 = new ObjectId();
   var id2 = new ObjectId();
-  expect(id1,isNot(id2),"ObjectIds must be different albeit by increment");
+  expect(id1,isNot(id2),reason: "ObjectIds must be different albeit by increment");
   id1 = new ObjectId.fromSeconds(10);
   var leading8chars = id1.toHexString().substring(0,8);
-  expect("0000000a",leading8chars, 'Timestamp part of ObjectId must be encoded BigEndian');
+  expect("0000000a",leading8chars, reason: 'Timestamp part of ObjectId must be encoded BigEndian');
 }
 
 testSerializeDeserialize(){
@@ -93,7 +93,7 @@ testSerializeDeserialize(){
   expect(5,buffer.offset);
   buffer.offset = 0;
   root = bson.deserialize(buffer);
-  expect(doc1['a'][2],root['a'][2], "doc1['a']");
+  expect(doc1['a'][2],root['a'][2]);
 }
 testMakeByteList() {
   for (int n = 0; n<125; n++ ) {
