@@ -54,9 +54,9 @@ class Db{
   Future executeQueryMessage(MongoMessage queryMessage){
     return connection.query(queryMessage);
   }
-//  executeMessage(MongoMessage message){
-//    connection.execute(message);
-//  }
+  executeMessage(MongoMessage message){
+    connection.execute(message);
+  }
   Future open(){
     Completer completer = new Completer();
     initBsonPlatform();
@@ -78,27 +78,18 @@ class Db{
   }
   Future executeDbCommand(MongoMessage message){
       Completer<Map> result = new Completer();
-      //print("executeDbCommand.message = ${message}");
       connection.query(message).then((replyMessage){
-        //print("replyMessage = ${replyMessage}");
-        //print("replyMessage.documents = ${replyMessage.documents}");
-
         String errMsg;
         if (replyMessage.documents.length == 0) {
           errMsg = "Error executing Db command, Document length 0 $replyMessage";
           print("Error: $errMsg");
           var m = new Map();
           m["errmsg"]=errMsg;
-          result.complete(m);
-        } else  if (replyMessage.documents[0]["ok"] == 1.0){
+          result.completeException(m);
+        } else  if (replyMessage.documents[0]['ok'] == 1.0 && replyMessage.documents[0]['err'] == null){
           result.complete(replyMessage.documents[0]);
         } else {
-          errMsg = "Error executing Db command";
-          if (replyMessage.documents[0].containsKey("errmsg")){
-            errMsg = replyMessage.documents[0]["errmsg"];
-          }
-          print("Error: $errMsg");
-          result.complete(replyMessage.documents[0]);
+          result.completeException(replyMessage.documents[0]);
         }
       });
     return result.future;
@@ -162,4 +153,21 @@ class Db{
     then((res)=>completer.complete(res["ok"] == 1));
     return completer.future;
   }
+  Future<List> indexInformation([String collectionName]) {    
+    var selector = {};
+    if (collectionName != null) {
+      selector['ns'] = '$databaseName.$collectionName';
+    }
+    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();    
+  }
+  Future createIndex(String collectionName, Map keys, [Map options]) {    
+    var selector = {};
+    selector['ns'] = '$databaseName.$collectionName';
+    selector['key'] = keys;
+    selector['unique'] = false;
+    selector['name'] = '_a_1_';
+    MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);    
+    executeMessage(insertMessage);
+    return getLastError();
+  }  
 }

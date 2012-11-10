@@ -33,7 +33,7 @@ testCollectionInfoCursor(){
   db.open().chain(expectAsync1((c){
     DbCollection newColl = db.collection("new_collecion");
     newColl.drop();
-    newColl.insertAll([{"a":1}]);
+    newColl.insertAll([{"a":1}]);      
     bool found = false;
     return db.collectionsInfoCursor("new_collecion").toList();
   })).then(expectAsync1((v){
@@ -494,46 +494,109 @@ testMongoDbUri(){
   expect(db.databaseName,'DartTest');
   expect(db.serverConfig.password,isNull);
 }
+
+testIndexInformation(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  Cursor cursor;
+  db.open().chain(expectAsync1((c){    
+    DbCollection collection = db.collection('testcol');
+    collection.remove();
+    for (int n=0;n < 100; n++){
+      collection.insert({"a":n});
+    }  
+    return db.indexInformation('testcol');
+  })).then(expectAsync1((indexInfo){    
+    expect(indexInfo.length,1);
+    db.close();
+  }));
+}
+
+testIndexCreation(){
+  Db db = new Db('${DefaultUri}index_creation');
+  Cursor cursor;
+  db.open().chain(expectAsync1((c){    
+    DbCollection collection = db.collection('testcol');
+    collection.remove();
+    for (int n=0;n < 600; n++){
+      collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
+    }  
+    return db.createIndex('testcol',{'a':-1});    
+  })).then(expectAsync1((res){
+    print(res);
+    db.close();
+  }));
+}
+
+testSafeModeUpdate(){
+  Db db = new Db('${DefaultUri}safe_mode');
+  Cursor cursor;
+  DbCollection collection = db.collection('testcol');  
+  db.open().chain(expectAsync1((c){
+    collection.remove();
+    for (int n=0;n < 6; n++){
+      collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
+    }  
+    return collection.update({'a': 200}, {'a':100}, safeMode: true);    
+  })).chain(expectAsync1((res){
+    expect(res['updatedExisting'], false);
+    expect(res['n'], 0);
+    return collection.update({'a': 3}, {'a':100}, safeMode: true);    
+  })).then(expectAsync1((res){
+    expect(res['updatedExisting'], true);
+    expect(res['n'], 1);
+    db.close();
+  }));
+}
+
+
+
 main(){
   initBsonPlatform();
-  group("DbCollection tests:", (){
-    test("testSelectorBuilderCreation",testSelectorBuilderCreation);
-    test("testSelectorBuilderOnObjectId",testSelectorBuilderOnObjectId);
-    test("testAuthComponents",testAuthComponents);
-    test("testMongoDbUri",testMongoDbUri);
+  group('DbCollection tests:', (){
+    test('testSelectorBuilderCreation',testSelectorBuilderCreation);
+    test('testSelectorBuilderOnObjectId',testSelectorBuilderOnObjectId);
+    test('testAuthComponents',testAuthComponents);
+    test('testMongoDbUri',testMongoDbUri);
   });  
-  group("DBCommand:", (){
-    test("testAuthentication",testAuthentication);
-    test("testAuthenticationWithUri",testAuthenticationWithUri);
-    test("testDropDatabase",testDropDatabase);
-    test("testDatabaseName",testDatabaseName);
-    test("testCollectionInfoCursor",testCollectionInfoCursor);
-    test("testRemove",testRemove);
-    test("testGetNonce",testGetNonce);
-    test("testPwd",testPwd);
+  group('DBCommand:', (){
+    test('testAuthentication',testAuthentication);
+    test('testAuthenticationWithUri',testAuthenticationWithUri);
+    test('testDropDatabase',testDropDatabase);
+    test('testDatabaseName',testDatabaseName);
+    test('testCollectionInfoCursor',testCollectionInfoCursor);
+    test('testRemove',testRemove);
+    test('testGetNonce',testGetNonce);
+    test('testPwd',testPwd);
   });    
-  group("DbCollection tests:", (){
-    test("testLimit",testLimit);    
-    test("testFindEachWithThenClause",testFindEachWithThenClause);
-    test("testCount",testCount);
-    test("testFindEach",testFindEach);
-    test("testDrop",testDrop);
-    test("testSaveWithIntegerId",testSaveWithIntegerId);
-    test("testSaveWithObjectId",testSaveWithObjectId);
-    test("testSkip",testSkip);
+  group('DbCollection tests:', (){
+    test('testLimit',testLimit);    
+    test('testFindEachWithThenClause',testFindEachWithThenClause);
+    test('testCount',testCount);
+    test('testFindEach',testFindEach);
+    test('testDrop',testDrop);
+    test('testSaveWithIntegerId',testSaveWithIntegerId);
+    test('testSaveWithObjectId',testSaveWithObjectId);
+    test('testSkip',testSkip);
   });    
-  group("Cursor tests:", (){
-    test("testCursorCreation",testCursorCreation);
-    test("testCursorClosing",testCursorClosing);
-    test("testNextObjectToEnd",testNextObjectToEnd);
-    test("testPingRaw",testPingRaw);
-    test("testNextObject",testNextObject);
-    test("testCursorWithOpenServerCursor",testCursorWithOpenServerCursor);
-    test("testCursorGetMore",testCursorGetMore);
+  group('Cursor tests:', (){
+    test('testCursorCreation',testCursorCreation);
+    test('testCursorClosing',testCursorClosing);
+    test('testNextObjectToEnd',testNextObjectToEnd);
+    test('testPingRaw',testPingRaw);
+    test('testNextObject',testNextObject);
+    test('testCursorWithOpenServerCursor',testCursorWithOpenServerCursor);
+    test('testCursorGetMore',testCursorGetMore);
   });
-  group("DBCommand tests:", (){
-    test("testDbCommandCreation",testDbCommandCreation);
-    test("testPingDbCommand",testPingDbCommand);
-    test("testDropDbCommand",testDropDbCommand);
+  group('DBCommand tests:', (){
+    test('testDbCommandCreation',testDbCommandCreation);
+    test('testPingDbCommand',testPingDbCommand);
+    test('testDropDbCommand',testDropDbCommand);
+  });
+  group('Safe mode tests:', () {  
+    test('testSafeModeUpdate',testSafeModeUpdate);
+  });  
+  group('Indexes tests:', () {
+    test('testIndexInformation',testIndexInformation);
+    test('testIndexCreation',testIndexCreation);
   });
 }

@@ -23,13 +23,27 @@ class DbCollection{
       insert(document);
     }
   }
- Future insertAll(List<Map> documents){
+ Future insertAll(List<Map> documents, {bool safeMode: false}){
     MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
-    db.executeQueryMessage(insertMessage);
+    db.executeMessage(insertMessage);
+    if (safeMode) {
+      return db.getLastError();
+    }
+    else
+    {
+      return new Future.immediate({'ok': 1.0});  
+    }
   }
- Future update(Map selector, Map document){
+ Future update(Map selector, Map document, {bool safeMode: false}){
     MongoUpdateMessage message = new MongoUpdateMessage(fullName(),selector, document, 0);
-    return db.executeQueryMessage(message);
+    db.executeMessage(message);
+    if (safeMode) {
+      return db.getLastError();
+    }
+    else
+    {
+      return new Future.immediate({'ok': 1.0});  
+    }
   }
 
 
@@ -52,5 +66,5 @@ class DbCollection{
     });
     return completer.future;
   }
-  Future insert(Map document) => insertAll([document]);
+  Future insert(Map document, {bool safeMode: false}) => insertAll([document], safeMode: safeMode);
 }

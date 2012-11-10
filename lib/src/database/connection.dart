@@ -96,4 +96,8 @@ class Connection{
     _sendBuffer();
     return completer.future;
   }
+  void execute(MongoMessage mongoMessage){  
+    sendQueue.addLast(mongoMessage);
+    _sendBuffer();  
+  }  
 }
