@@ -514,15 +514,29 @@ testIndexInformation(){
 testIndexCreation(){
   Db db = new Db('${DefaultUri}index_creation');
   Cursor cursor;
+  DbCollection collection; 
   db.open().chain(expectAsync1((c){    
-    DbCollection collection = db.collection('testcol');
-    collection.remove();
-    for (int n=0;n < 600; n++){
+    collection = db.collection('testcol');
+    return collection.drop();
+  })).chain(expectAsync1((res){    
+    for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
-    }  
-    return db.createIndex('testcol',{'a':-1});    
+    }
+    expect(() => db.createIndex('testcol'),throws, reason: 'Invalid number of arguments');
+    expect(() => db.createIndex('testcol',key: 'a', keys:{'a':-1}),throws, reason: 'Invalid number of arguments');
+    return db.createIndex('testcol',key:'a');
+  })).chain(expectAsync1((res){
+    expect(res['ok'],1.0);    
+    return db.createIndex('testcol',keys:{'a':-1,'embedded.c': 1});    
+  })).chain(expectAsync1((res){
+    expect(res['ok'],1.0);
+    return db.indexInformation('testcol');
+  })).chain(expectAsync1((res){
+    expect(res.length, 3);
+    return db.ensureIndex('testcol',keys:{'a':-1,'embedded.c': 1}); 
   })).then(expectAsync1((res){
-    print(res);
+    expect(res['ok'],1.0);
+    expect(res['result'],'index preexists');
     db.close();
   }));
 }

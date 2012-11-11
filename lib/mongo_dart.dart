@@ -5,11 +5,11 @@ import 'dart:crypto';
 import 'dart:uri';
 import 'package:log4dart/log4dart.dart';
 import 'package:log4dart/file_appender.dart';
-import 'src/bson/bson_console.dart';
+import 'bson_console.dart';
 import 'bson.dart';
 import 'src/bson/json_ext.dart';
 
-export 'src/bson/bson_console.dart';
+export 'bson_console.dart';
 export 'bson.dart';
 export 'src/bson/json_ext.dart';
 

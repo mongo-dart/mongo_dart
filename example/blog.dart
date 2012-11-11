@@ -12,7 +12,7 @@ main(){
     db.drop();
     print("===================================================================================");
     print(">> Adding Authors");
-    collection = db.collection("authors");
+    collection = db.collection('authors');
     collection.insertAll(
       [{'name':'William Shakespeare', 'email':'william@shakespeare.com', 'age':587},
       {'name':'Jorge Luis Borges', 'email':'jorge@borges.com', 'age':123}]
@@ -21,6 +21,7 @@ main(){
   }).chain((v){
     print("===================================================================================");
     print(">> Authors ordered by age ascending");
+    db.ensureIndex('authors', key: 'age');
     return collection.find(query().sortBy('age')).each(
       (auth)=>print("[${auth['name']}]:[${auth['email']}]:[${auth['age']}]"));
   }).chain((v){
@@ -29,11 +30,12 @@ main(){
     usersCollection = db.collection("users");
     usersCollection.insertAll([{'login':'jdoe', 'name':'John Doe', 'email':'john@doe.com'},
        {'login':'lsmith', 'name':'Lucy Smith', 'email':'lucy@smith.com'}]);
+    db.ensureIndex('users', keys: {'login': -1});    
     return usersCollection.find().each((user)=>users[user["login"]] = user);
   }).chain((v){
     print("===================================================================================");
-    print(">> Users ordered by login ascending");
-    return usersCollection.find(query().sortBy('login')).each(
+    print(">> Users ordered by login descending");
+    return usersCollection.find(query().sortBy('login', descending: true)).each(
       (user)=>print("[${user['login']}]:[${user['name']}]:[${user['email']}]"));
   }).chain((v){
     print("===================================================================================");

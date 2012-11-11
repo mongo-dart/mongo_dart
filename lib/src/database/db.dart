@@ -160,14 +160,73 @@ class Db{
     }
     return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();    
   }
-  Future createIndex(String collectionName, Map keys, [Map options]) {    
+  String _createIndexName(Map keys) {
+    var name = '';
+    keys.forEach((key,value) {
+      name = '${name}_${key}_$value';
+    });
+    return name;    
+  }
+  Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {    
     var selector = {};
     selector['ns'] = '$databaseName.$collectionName';
+    keys = _setKeys(key, keys);
     selector['key'] = keys;
-    selector['unique'] = false;
-    selector['name'] = '_a_1_';
+    for (final order in keys.values) {
+      if (order != 1 && order != -1) {
+        throw const ArgumentError('Keys may contain only 1 or -1');  
+      }
+    }
+    if (unique == true) { 
+      selector['unique'] = true;
+    } else {
+      selector['unique'] = false;
+    }    
+    if (sparse == true) {
+      selector['sparse'] = true;
+    }
+    if (background == true) {
+      selector['background'] = true;
+    }
+    if (dropDups == true) {
+      selector['dropDups'] = true;
+    }
+    if (name ==  null) {
+      name = _createIndexName(keys);
+    }
+    selector['name'] = name;
     MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);    
     executeMessage(insertMessage);
     return getLastError();
+  }
+
+  Map _setKeys(String key, Map keys) {    
+    if (key != null && keys != null) {    
+      throw const ArgumentError('Only one parameter must be set: key or keys');    
+    }    
+    if (key != null) {    
+      keys = {'$key': 1};    
+    }    
+    if (keys == null) {    
+      throw const ArgumentError('key or keys parameter must be set');    
+    }
+    return keys;    
+  } 
+  Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
+    keys = _setKeys(key, keys);
+    var completer = new Completer();
+    indexInformation(collectionName).then((indexInfos) {
+      if (name == null) {
+        name = _createIndexName(keys);
+      }        
+      if (indexInfos.some((info) => info['name'] == name)) {
+        completer.complete({'ok': 1.0, 'result': 'index preexists'});
+      } else {
+        return createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name);
+      }
+    });
+    return completer.future;
   }  
 }
+
+  
