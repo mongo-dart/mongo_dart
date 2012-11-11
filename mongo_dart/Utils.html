@@ -1,0 +1,142 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>Utils class / mongo_dart Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart" data-type="Utils">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/Utils.html">Utils</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
+<li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
+<li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
+<li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
+<li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
+<li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
+<li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
+<li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
+<li><a href="../mongo_dart/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
+<li><a href="../mongo_dart/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
+<li><a href="../mongo_dart/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
+<li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
+<li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
+<li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
+<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
+<li><div class="icon-class"></div><strong>Utils</strong></li>
+</ul>
+</div>
+<div class="content">
+        <h2><strong>Utils</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class Utils{
+ static Logger logger;
+ static Logger getLogger(){
+   if (logger === null){
+     LoggerFactory.config["Runtime"].infoEnabled = false;
+     LoggerFactory.config["Runtime"].debugEnabled = false;
+     logger = LoggerFactory.getLogger("Runtime");
+   }
+   return logger;
+ }
+ static setVerboseState(){
+   File file = new File("log.txt");
+   if (file.existsSync()){
+     file.deleteSync();
+   }
+   LoggerFactory.config["Verbose"].appenders =  [new FileAppender("log.txt")];
+   LoggerFactory.config["Verbose"].infoEnabled = true;
+   LoggerFactory.config["Verbose"].debugEnabled = true;
+   logger = LoggerFactory.getLogger("Verbose");
+ }
+}
+</pre>
+</div>
+<div>
+<h3>Static Properties</h3>
+<div class="field"><h4 id="logger">
+<button class="show-code">Code</button>
+var         <strong>logger</strong> <a class="anchor-link"
+            href="#logger"
+            title="Permalink to Utils.logger">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static Logger logger;
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Static Methods</h3>
+<div class="method"><h4 id="getLogger">
+<button class="show-code">Code</button>
+<strong>getLogger</strong>() <a class="anchor-link" href="#getLogger"
+              title="Permalink to Utils.getLogger">#</a></h4>
+<div class="doc">
+<pre class="source">
+static Logger getLogger(){
+ if (logger === null){
+   LoggerFactory.config["Runtime"].infoEnabled = false;
+   LoggerFactory.config["Runtime"].debugEnabled = false;
+   logger = LoggerFactory.getLogger("Runtime");
+ }
+ return logger;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="setVerboseState">
+<button class="show-code">Code</button>
+<strong>setVerboseState</strong>() <a class="anchor-link" href="#setVerboseState"
+              title="Permalink to Utils.setVerboseState">#</a></h4>
+<div class="doc">
+<pre class="source">
+static setVerboseState(){
+ File file = new File("log.txt");
+ if (file.existsSync()){
+   file.deleteSync();
+ }
+ LoggerFactory.config["Verbose"].appenders =  [new FileAppender("log.txt")];
+ LoggerFactory.config["Verbose"].infoEnabled = true;
+ LoggerFactory.config["Verbose"].debugEnabled = true;
+ logger = LoggerFactory.getLogger("Verbose");
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-11-11 18:14:50.816</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

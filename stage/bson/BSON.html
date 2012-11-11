@@ -1,0 +1,724 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>BSON class / bson Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="bson" data-type="BSON">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../bson.html">bson</a> &rsaquo; <a href="../bson/BSON.html">BSON</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><ul class="icon">
+<li><div class="icon-class"></div><strong>BSON</strong></li>
+<li><a href="../bson/BsonArray.html"><div class="icon-class"></div>BsonArray</a></li>
+<li><a href="../bson/BsonBinary.html"><div class="icon-class"></div>BsonBinary</a></li>
+<li><a href="../bson/BsonBoolean.html"><div class="icon-class"></div>BsonBoolean</a></li>
+<li><a href="../bson/BsonCode.html"><div class="icon-class"></div>BsonCode</a></li>
+<li><a href="../bson/BsonCString.html"><div class="icon-class"></div>BsonCString</a></li>
+<li><a href="../bson/BsonDate.html"><div class="icon-class"></div>BsonDate</a></li>
+<li><a href="../bson/BsonDouble.html"><div class="icon-class"></div>BsonDouble</a></li>
+<li><a href="../bson/BsonInt.html"><div class="icon-class"></div>BsonInt</a></li>
+<li><a href="../bson/BsonLong.html"><div class="icon-class"></div>BsonLong</a></li>
+<li><a href="../bson/BsonMap.html"><div class="icon-class"></div>BsonMap</a></li>
+<li><a href="../bson/BsonNull.html"><div class="icon-class"></div>BsonNull</a></li>
+<li><a href="../bson/BsonObject.html"><div class="icon-class"></div>BsonObject</a></li>
+<li><a href="../bson/BsonPlatform.html"><div class="icon-class"></div>BsonPlatform</a></li>
+<li><a href="../bson/BsonRegexp.html"><div class="icon-class"></div>BsonRegexp</a></li>
+<li><a href="../bson/BsonString.html"><div class="icon-class"></div>BsonString</a></li>
+<li><a href="../bson/DbRef.html"><div class="icon-class"></div>DbRef</a></li>
+<li><a href="../bson/MaxKey.html"><div class="icon-class"></div>MaxKey</a></li>
+<li><a href="../bson/MinKey.html"><div class="icon-class"></div>MinKey</a></li>
+<li><a href="../bson/ObjectId.html"><div class="icon-class"></div>ObjectId</a></li>
+<li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
+<li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
+</ul>
+<h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
+<div class="content">
+        <h2><strong>BSON</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class BSON {
+
+ static const BSON_INT32_MAX = 0x7FFFFFFF;
+ static const BSON_INT32_MIN = -0x80000000;
+
+ //static const BSON_INT64_MAX = Math.pow(2, 63) - 1;
+ //static const BSON_INT64_MIN = -Math.pow(2, 63);
+
+ // JS MAX PRECISE VALUES
+ static const JS_INT_MAX = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
+ static const JS_INT_MIN = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
+
+ // Internal long versions
+ static const JS_INT_MAX_LONG = 0x20000000000000;  // Any integer up to 2^53 can be precisely represented by a double.
+ static const JS_INT_MIN_LONG = -0x20000000000000;  // Any integer down to -2^53 can be precisely represented by a double.
+
+ /**
+  * Number BSON Type
+  *
+  * @classconstant BSON_DATA_NUMBER
+  **/
+ static const BSON_DATA_NUMBER = 1;
+ /**
+  * String BSON Type
+  *
+  * @classconstant BSON_DATA_STRING
+  **/
+ static const BSON_DATA_STRING = 2;
+ /**
+  * Object BSON Type
+  *
+  * @classconstant BSON_DATA_OBJECT
+  **/
+ static const BSON_DATA_OBJECT = 3;
+ /**
+  * Array BSON Type
+  *
+  * @classconstant BSON_DATA_ARRAY
+  **/
+ static const BSON_DATA_ARRAY = 4;
+ /**
+  * BsonBinary BSON Type
+  *
+  * @classconstant BSON_DATA_BINARY
+  **/
+ static const BSON_DATA_BINARY = 5;
+ /**
+  * ObjectID BSON Type
+  *
+  * @classconstant BSON_DATA_OID
+  **/
+ static const BSON_DATA_OID = 7;
+ /**
+  * Boolean BSON Type
+  *
+  * @classconstant BSON_DATA_BOOLEAN
+  **/
+ static const BSON_DATA_BOOLEAN = 8;
+ /**
+  * Date BSON Type
+  *
+  * @classconstant BSON_DATA_DATE
+  **/
+ static const BSON_DATA_DATE = 9;
+ /**
+  * null BSON Type
+  *
+  * @classconstant BSON_DATA_NULL
+  **/
+ static const BSON_DATA_NULL = 10;
+ /**
+  * RegExp BSON Type
+  *
+  * @classconstant BSON_DATA_REGEXP
+  **/
+ static const BSON_DATA_REGEXP = 11;
+ /**
+  * Code BSON Type
+  *
+  * @classconstant BSON_DATA_DBPOINTER
+  **/
+ static const BSON_DATA_DBPOINTER = 12;
+
+ /**
+  * Code BSON Type
+  *
+  * @classconstant BSON_DATA_CODE
+  **/
+ static const BSON_DATA_CODE = 13;
+ /**
+  * Symbol BSON Type
+  *
+  * @classconstant BSON_DATA_SYMBOL
+  **/
+ static const BSON_DATA_SYMBOL = 14;
+ /**
+  * Code with Scope BSON Type
+  *
+  * @classconstant BSON_DATA_CODE_W_SCOPE
+  **/
+ static const BSON_DATA_CODE_W_SCOPE = 15;
+ /**
+  * 32 bit Integer BSON Type
+  *
+  * @classconstant BSON_DATA_INT
+  **/
+ static const BSON_DATA_INT = 16;
+ /**
+  * Timestamp BSON Type
+  *
+  * @classconstant BSON_DATA_TIMESTAMP
+  **/
+ static const BSON_DATA_TIMESTAMP = 17;
+ /**
+  * Long BSON Type
+  *
+  * @classconstant BSON_DATA_LONG
+  **/
+ static const BSON_DATA_LONG = 18;
+ /**
+  * MinKey BSON Type
+  *
+  * @classconstant BSON_DATA_MIN_KEY
+  **/
+ static const BSON_DATA_MIN_KEY = 0xff;
+ /**
+  * MaxKey BSON Type
+  *
+  * @classconstant BSON_DATA_MAX_KEY
+  **/
+ static const BSON_DATA_MAX_KEY = 0x7f;
+
+ /**
+  * BsonBinary Default Type
+  *
+  * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
+  **/
+ static const BSON_BINARY_SUBTYPE_DEFAULT = 0;
+ /**
+  * BsonBinary Function Type
+  *
+  * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
+  **/
+ static const BSON_BINARY_SUBTYPE_FUNCTION = 1;
+ /**
+  * BsonBinary Byte Array Type
+  *
+  * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
+  **/
+ static const BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
+ /**
+  * BsonBinary UUID Type
+  *
+  * @classconstant BSON_BINARY_SUBTYPE_UUID
+  **/
+ static const BSON_BINARY_SUBTYPE_UUID = 3;
+ /**
+  * BsonBinary MD5 Type
+  *
+  * @classconstant BSON_BINARY_SUBTYPE_MD5
+  **/
+ static const BSON_BINARY_SUBTYPE_MD5 = 4;
+ /**
+  * BsonBinary User Defined Type
+  *
+  * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
+  **/
+ static const BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
+
+
+ BsonBinary serialize(var object, [int offset = 0]) {
+   if (!((object is Map) || (object is List))){
+     throw new Exception("Invalid value for BSON serialize: $object");
+   }
+   BsonObject bsonObject = bsonObjectFrom(object);
+   BsonBinary buffer = new BsonBinary(bsonObject.byteLength()+offset);
+   buffer.offset = offset;
+   bsonObjectFrom(object).packValue(buffer);
+   return buffer;
+ }
+ deserialize(BsonBinary buffer){
+   if(buffer.byteList.length &lt; 5){
+     throw new Exception("corrupt bson message &lt; 5 bytes long");
+   }
+   var bsonMap = new BsonMap(null);
+   bsonMap.unpackValue(buffer);
+   return bsonMap.value;
+ }
+}
+</pre>
+</div>
+<div>
+<h3>Static Properties</h3>
+<div class="field"><h4 id="BSON_BINARY_SUBTYPE_BYTE_ARRAY">
+<button class="show-code">Code</button>
+const         <strong>BSON_BINARY_SUBTYPE_BYTE_ARRAY</strong> <a class="anchor-link"
+            href="#BSON_BINARY_SUBTYPE_BYTE_ARRAY"
+            title="Permalink to BSON.BSON_BINARY_SUBTYPE_BYTE_ARRAY">#</a>
+        </h4>
+        <div class="doc">
+<p>BsonBinary Byte Array Type</p>
+<p>@classconstant BSON<em>BINARY</em>SUBTYPE<em>BYTE</em>ARRAY</p>
+<pre class="source">
+static const BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_BINARY_SUBTYPE_DEFAULT">
+<button class="show-code">Code</button>
+const         <strong>BSON_BINARY_SUBTYPE_DEFAULT</strong> <a class="anchor-link"
+            href="#BSON_BINARY_SUBTYPE_DEFAULT"
+            title="Permalink to BSON.BSON_BINARY_SUBTYPE_DEFAULT">#</a>
+        </h4>
+        <div class="doc">
+<p>BsonBinary Default Type</p>
+<p>@classconstant BSON<em>BINARY</em>SUBTYPE_DEFAULT</p>
+<pre class="source">
+static const BSON_BINARY_SUBTYPE_DEFAULT = 0;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_BINARY_SUBTYPE_FUNCTION">
+<button class="show-code">Code</button>
+const         <strong>BSON_BINARY_SUBTYPE_FUNCTION</strong> <a class="anchor-link"
+            href="#BSON_BINARY_SUBTYPE_FUNCTION"
+            title="Permalink to BSON.BSON_BINARY_SUBTYPE_FUNCTION">#</a>
+        </h4>
+        <div class="doc">
+<p>BsonBinary Function Type</p>
+<p>@classconstant BSON<em>BINARY</em>SUBTYPE_FUNCTION</p>
+<pre class="source">
+static const BSON_BINARY_SUBTYPE_FUNCTION = 1;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_BINARY_SUBTYPE_MD5">
+<button class="show-code">Code</button>
+const         <strong>BSON_BINARY_SUBTYPE_MD5</strong> <a class="anchor-link"
+            href="#BSON_BINARY_SUBTYPE_MD5"
+            title="Permalink to BSON.BSON_BINARY_SUBTYPE_MD5">#</a>
+        </h4>
+        <div class="doc">
+<p>BsonBinary MD5 Type</p>
+<p>@classconstant BSON<em>BINARY</em>SUBTYPE_MD5</p>
+<pre class="source">
+static const BSON_BINARY_SUBTYPE_MD5 = 4;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_BINARY_SUBTYPE_USER_DEFINED">
+<button class="show-code">Code</button>
+const         <strong>BSON_BINARY_SUBTYPE_USER_DEFINED</strong> <a class="anchor-link"
+            href="#BSON_BINARY_SUBTYPE_USER_DEFINED"
+            title="Permalink to BSON.BSON_BINARY_SUBTYPE_USER_DEFINED">#</a>
+        </h4>
+        <div class="doc">
+<p>BsonBinary User Defined Type</p>
+<p>@classconstant BSON<em>BINARY</em>SUBTYPE<em>USER</em>DEFINED</p>
+<pre class="source">
+static const BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_BINARY_SUBTYPE_UUID">
+<button class="show-code">Code</button>
+const         <strong>BSON_BINARY_SUBTYPE_UUID</strong> <a class="anchor-link"
+            href="#BSON_BINARY_SUBTYPE_UUID"
+            title="Permalink to BSON.BSON_BINARY_SUBTYPE_UUID">#</a>
+        </h4>
+        <div class="doc">
+<p>BsonBinary UUID Type</p>
+<p>@classconstant BSON<em>BINARY</em>SUBTYPE_UUID</p>
+<pre class="source">
+static const BSON_BINARY_SUBTYPE_UUID = 3;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_ARRAY">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_ARRAY</strong> <a class="anchor-link"
+            href="#BSON_DATA_ARRAY"
+            title="Permalink to BSON.BSON_DATA_ARRAY">#</a>
+        </h4>
+        <div class="doc">
+<p>Array BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>ARRAY</p>
+<pre class="source">
+static const BSON_DATA_ARRAY = 4;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_BINARY">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_BINARY</strong> <a class="anchor-link"
+            href="#BSON_DATA_BINARY"
+            title="Permalink to BSON.BSON_DATA_BINARY">#</a>
+        </h4>
+        <div class="doc">
+<p>BsonBinary BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>BINARY</p>
+<pre class="source">
+static const BSON_DATA_BINARY = 5;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_BOOLEAN">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_BOOLEAN</strong> <a class="anchor-link"
+            href="#BSON_DATA_BOOLEAN"
+            title="Permalink to BSON.BSON_DATA_BOOLEAN">#</a>
+        </h4>
+        <div class="doc">
+<p>Boolean BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>BOOLEAN</p>
+<pre class="source">
+static const BSON_DATA_BOOLEAN = 8;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_CODE">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_CODE</strong> <a class="anchor-link"
+            href="#BSON_DATA_CODE"
+            title="Permalink to BSON.BSON_DATA_CODE">#</a>
+        </h4>
+        <div class="doc">
+<p>Code BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>CODE</p>
+<pre class="source">
+static const BSON_DATA_CODE = 13;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_CODE_W_SCOPE">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_CODE_W_SCOPE</strong> <a class="anchor-link"
+            href="#BSON_DATA_CODE_W_SCOPE"
+            title="Permalink to BSON.BSON_DATA_CODE_W_SCOPE">#</a>
+        </h4>
+        <div class="doc">
+<p>Code with Scope BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>CODE<em>W</em>SCOPE</p>
+<pre class="source">
+static const BSON_DATA_CODE_W_SCOPE = 15;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_DATE">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_DATE</strong> <a class="anchor-link"
+            href="#BSON_DATA_DATE"
+            title="Permalink to BSON.BSON_DATA_DATE">#</a>
+        </h4>
+        <div class="doc">
+<p>Date BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>DATE</p>
+<pre class="source">
+static const BSON_DATA_DATE = 9;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_DBPOINTER">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_DBPOINTER</strong> <a class="anchor-link"
+            href="#BSON_DATA_DBPOINTER"
+            title="Permalink to BSON.BSON_DATA_DBPOINTER">#</a>
+        </h4>
+        <div class="doc">
+<p>Code BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>DBPOINTER</p>
+<pre class="source">
+static const BSON_DATA_DBPOINTER = 12;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_INT">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_INT</strong> <a class="anchor-link"
+            href="#BSON_DATA_INT"
+            title="Permalink to BSON.BSON_DATA_INT">#</a>
+        </h4>
+        <div class="doc">
+<p>32 bit Integer BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>INT</p>
+<pre class="source">
+static const BSON_DATA_INT = 16;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_LONG">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_LONG</strong> <a class="anchor-link"
+            href="#BSON_DATA_LONG"
+            title="Permalink to BSON.BSON_DATA_LONG">#</a>
+        </h4>
+        <div class="doc">
+<p>Long BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>LONG</p>
+<pre class="source">
+static const BSON_DATA_LONG = 18;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_MAX_KEY">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_MAX_KEY</strong> <a class="anchor-link"
+            href="#BSON_DATA_MAX_KEY"
+            title="Permalink to BSON.BSON_DATA_MAX_KEY">#</a>
+        </h4>
+        <div class="doc">
+<p>MaxKey BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>MAX_KEY</p>
+<pre class="source">
+static const BSON_DATA_MAX_KEY = 0x7f;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_MIN_KEY">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_MIN_KEY</strong> <a class="anchor-link"
+            href="#BSON_DATA_MIN_KEY"
+            title="Permalink to BSON.BSON_DATA_MIN_KEY">#</a>
+        </h4>
+        <div class="doc">
+<p>MinKey BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>MIN_KEY</p>
+<pre class="source">
+static const BSON_DATA_MIN_KEY = 0xff;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_NULL">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_NULL</strong> <a class="anchor-link"
+            href="#BSON_DATA_NULL"
+            title="Permalink to BSON.BSON_DATA_NULL">#</a>
+        </h4>
+        <div class="doc">
+<p>null BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>NULL</p>
+<pre class="source">
+static const BSON_DATA_NULL = 10;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_NUMBER">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_NUMBER</strong> <a class="anchor-link"
+            href="#BSON_DATA_NUMBER"
+            title="Permalink to BSON.BSON_DATA_NUMBER">#</a>
+        </h4>
+        <div class="doc">
+<p>Number BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>NUMBER</p>
+<pre class="source">
+static const BSON_DATA_NUMBER = 1;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_OBJECT">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_OBJECT</strong> <a class="anchor-link"
+            href="#BSON_DATA_OBJECT"
+            title="Permalink to BSON.BSON_DATA_OBJECT">#</a>
+        </h4>
+        <div class="doc">
+<p>Object BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>OBJECT</p>
+<pre class="source">
+static const BSON_DATA_OBJECT = 3;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_OID">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_OID</strong> <a class="anchor-link"
+            href="#BSON_DATA_OID"
+            title="Permalink to BSON.BSON_DATA_OID">#</a>
+        </h4>
+        <div class="doc">
+<p>ObjectID BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>OID</p>
+<pre class="source">
+static const BSON_DATA_OID = 7;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_REGEXP">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_REGEXP</strong> <a class="anchor-link"
+            href="#BSON_DATA_REGEXP"
+            title="Permalink to BSON.BSON_DATA_REGEXP">#</a>
+        </h4>
+        <div class="doc">
+<p>RegExp BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>REGEXP</p>
+<pre class="source">
+static const BSON_DATA_REGEXP = 11;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_STRING">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_STRING</strong> <a class="anchor-link"
+            href="#BSON_DATA_STRING"
+            title="Permalink to BSON.BSON_DATA_STRING">#</a>
+        </h4>
+        <div class="doc">
+<p>String BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>STRING</p>
+<pre class="source">
+static const BSON_DATA_STRING = 2;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_SYMBOL">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_SYMBOL</strong> <a class="anchor-link"
+            href="#BSON_DATA_SYMBOL"
+            title="Permalink to BSON.BSON_DATA_SYMBOL">#</a>
+        </h4>
+        <div class="doc">
+<p>Symbol BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>SYMBOL</p>
+<pre class="source">
+static const BSON_DATA_SYMBOL = 14;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_DATA_TIMESTAMP">
+<button class="show-code">Code</button>
+const         <strong>BSON_DATA_TIMESTAMP</strong> <a class="anchor-link"
+            href="#BSON_DATA_TIMESTAMP"
+            title="Permalink to BSON.BSON_DATA_TIMESTAMP">#</a>
+        </h4>
+        <div class="doc">
+<p>Timestamp BSON Type</p>
+<p>@classconstant BSON<em>DATA</em>TIMESTAMP</p>
+<pre class="source">
+static const BSON_DATA_TIMESTAMP = 17;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_INT32_MAX">
+<button class="show-code">Code</button>
+const         <strong>BSON_INT32_MAX</strong> <a class="anchor-link"
+            href="#BSON_INT32_MAX"
+            title="Permalink to BSON.BSON_INT32_MAX">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const BSON_INT32_MAX = 0x7FFFFFFF;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BSON_INT32_MIN">
+<button class="show-code">Code</button>
+const         <strong>BSON_INT32_MIN</strong> <a class="anchor-link"
+            href="#BSON_INT32_MIN"
+            title="Permalink to BSON.BSON_INT32_MIN">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const BSON_INT32_MIN = -0x80000000;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="JS_INT_MAX">
+<button class="show-code">Code</button>
+const         <strong>JS_INT_MAX</strong> <a class="anchor-link"
+            href="#JS_INT_MAX"
+            title="Permalink to BSON.JS_INT_MAX">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const JS_INT_MAX = 0x20000000000000;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="JS_INT_MAX_LONG">
+<button class="show-code">Code</button>
+const         <strong>JS_INT_MAX_LONG</strong> <a class="anchor-link"
+            href="#JS_INT_MAX_LONG"
+            title="Permalink to BSON.JS_INT_MAX_LONG">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const JS_INT_MAX_LONG = 0x20000000000000;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="JS_INT_MIN">
+<button class="show-code">Code</button>
+const         <strong>JS_INT_MIN</strong> <a class="anchor-link"
+            href="#JS_INT_MIN"
+            title="Permalink to BSON.JS_INT_MIN">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const JS_INT_MIN = -0x20000000000000;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="JS_INT_MIN_LONG">
+<button class="show-code">Code</button>
+const         <strong>JS_INT_MIN_LONG</strong> <a class="anchor-link"
+            href="#JS_INT_MIN_LONG"
+            title="Permalink to BSON.JS_INT_MIN_LONG">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const JS_INT_MIN_LONG = -0x20000000000000;
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="deserialize">
+<button class="show-code">Code</button>
+<strong>deserialize</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#deserialize"
+              title="Permalink to BSON.deserialize">#</a></h4>
+<div class="doc">
+<pre class="source">
+deserialize(BsonBinary buffer){
+ if(buffer.byteList.length &lt; 5){
+   throw new Exception("corrupt bson message &lt; 5 bytes long");
+ }
+ var bsonMap = new BsonMap(null);
+ bsonMap.unpackValue(buffer);
+ return bsonMap.value;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="serialize">
+<button class="show-code">Code</button>
+<a href="../bson/BsonBinary.html">BsonBinary</a> <strong>serialize</strong>(object, [<a href="http://api.dartlang.org/dart_core/int.html">int</a> offset = 0]) <a class="anchor-link" href="#serialize"
+              title="Permalink to BSON.serialize">#</a></h4>
+<div class="doc">
+<pre class="source">
+BsonBinary serialize(var object, [int offset = 0]) {
+ if (!((object is Map) || (object is List))){
+   throw new Exception("Invalid value for BSON serialize: $object");
+ }
+ BsonObject bsonObject = bsonObjectFrom(object);
+ BsonBinary buffer = new BsonBinary(bsonObject.byteLength()+offset);
+ buffer.offset = offset;
+ bsonObjectFrom(object).packValue(buffer);
+ return buffer;
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-11-12 13:31:35.980</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

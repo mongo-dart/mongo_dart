@@ -2,7 +2,7 @@
         <html>
         <head>
                 <meta charset="utf-8">
-        <title>BsonPlatformVm Class / bson_vm Library / Dart Documentation</title>
+        <title>BsonPlatformVm class / bson_vm Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="../styles.css">
         <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
@@ -27,39 +27,46 @@
 <h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><ul class="icon">
 <li><div class="icon-class"></div><strong>BsonPlatformVm</strong></li>
 </ul>
-<h2><div class="icon-library"></div><a href="../mongo.html">mongo</a></h2><h2><div class="icon-library"></div><a href="../objectory.html">objectory</a></h2><h2><div class="icon-library"></div><a href="../objectory_base.html">objectory_base</a></h2><h2><div class="icon-library"></div><a href="../objectory_direct_connection.html">objectory_direct_connection</a></h2><h2><div class="icon-library"></div><a href="../objectory_query.html">objectory_query</a></h2><h2><div class="icon-library"></div><a href="../persistent_object.html">persistent_object</a></h2><h2><div class="icon-library"></div><a href="../persistent_schema.html">persistent_schema</a></h2></div>
+<h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
 <div class="content">
         <h2><strong>BsonPlatformVm</strong>
-          Class
+          class
         </h2>
         
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
 <div class="doc">
+<pre class="source">
+class BsonPlatformVm extends BsonPlatform {
 
+ dynamic makeUint8List(int size) =&gt; new Uint8List(size);
+ makeByteArray(from) =&gt; from.asByteArray();
+}
+</pre>
 </div>
 <h3>Extends</h3>
 <p>
 <span class="type-box"><span class="icon-class"></span><a href="../bson/BsonPlatform.html">BsonPlatform</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>BsonPlatformVm</strong></span></p>
+<div>
 <h3>Methods</h3>
 <div class="method"><h4 id="makeByteArray">
-<span class="show-code">Code</span>
+<button class="show-code">Code</button>
 <strong>makeByteArray</strong>(from) <a class="anchor-link" href="#makeByteArray"
               title="Permalink to BsonPlatformVm.makeByteArray">#</a></h4>
 <div class="doc">
-
 <pre class="source">
 makeByteArray(from) =&gt; from.asByteArray();
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="makeUint8List">
-<span class="show-code">Code</span>
-<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html">int</a>&gt; <strong>makeUint8List</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> size) <a class="anchor-link" href="#makeUint8List"
+<button class="show-code">Code</button>
+<strong>makeUint8List</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> size) <a class="anchor-link" href="#makeUint8List"
               title="Permalink to BsonPlatformVm.makeUint8List">#</a></h4>
 <div class="doc">
-
 <pre class="source">
-List&lt;int&gt; makeUint8List(int size) =&gt; new Uint8List(size);
+dynamic makeUint8List(int size) =&gt; new Uint8List(size);
 </pre>
+</div>
 </div>
 </div>
         </div>
@@ -67,7 +74,7 @@ List&lt;int&gt; makeUint8List(int size) =&gt; new Uint8List(size);
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-09-12 16:03:43.104</div>
+          <div>This page was generated at 2012-11-11 18:14:50.572</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

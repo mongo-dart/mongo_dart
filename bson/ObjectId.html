@@ -2,7 +2,7 @@
         <html>
         <head>
                 <meta charset="utf-8">
-        <title>ObjectId Interface / bson Library / Dart Documentation</title>
+        <title>ObjectId class / bson Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="../styles.css">
         <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
@@ -26,12 +26,11 @@
         
 <h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><ul class="icon">
 <li><a href="../bson/BSON.html"><div class="icon-class"></div>BSON</a></li>
-<li><a href="../bson/Binary.html"><div class="icon-class"></div>Binary</a></li>
 <li><a href="../bson/BsonArray.html"><div class="icon-class"></div>BsonArray</a></li>
+<li><a href="../bson/BsonBinary.html"><div class="icon-class"></div>BsonBinary</a></li>
 <li><a href="../bson/BsonBoolean.html"><div class="icon-class"></div>BsonBoolean</a></li>
-<li><a href="../bson/BsonByteArray.html"><div class="icon-interface"></div>BsonByteArray</a></li>
-<li><a href="../bson/BsonCString.html"><div class="icon-class"></div>BsonCString</a></li>
 <li><a href="../bson/BsonCode.html"><div class="icon-class"></div>BsonCode</a></li>
+<li><a href="../bson/BsonCString.html"><div class="icon-class"></div>BsonCString</a></li>
 <li><a href="../bson/BsonDate.html"><div class="icon-class"></div>BsonDate</a></li>
 <li><a href="../bson/BsonDouble.html"><div class="icon-class"></div>BsonDouble</a></li>
 <li><a href="../bson/BsonInt.html"><div class="icon-class"></div>BsonInt</a></li>
@@ -39,75 +38,360 @@
 <li><a href="../bson/BsonMap.html"><div class="icon-class"></div>BsonMap</a></li>
 <li><a href="../bson/BsonNull.html"><div class="icon-class"></div>BsonNull</a></li>
 <li><a href="../bson/BsonObject.html"><div class="icon-class"></div>BsonObject</a></li>
-<li><a href="../bson/BsonObjectId.html"><div class="icon-class"></div>BsonObjectId</a></li>
 <li><a href="../bson/BsonPlatform.html"><div class="icon-class"></div>BsonPlatform</a></li>
 <li><a href="../bson/BsonRegexp.html"><div class="icon-class"></div>BsonRegexp</a></li>
 <li><a href="../bson/BsonString.html"><div class="icon-class"></div>BsonString</a></li>
+<li><a href="../bson/DbRef.html"><div class="icon-class"></div>DbRef</a></li>
 <li><a href="../bson/MaxKey.html"><div class="icon-class"></div>MaxKey</a></li>
 <li><a href="../bson/MinKey.html"><div class="icon-class"></div>MinKey</a></li>
-<li><div class="icon-interface"></div><strong>ObjectId</strong></li>
+<li><div class="icon-class"></div><strong>ObjectId</strong></li>
 <li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
 <li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
 </ul>
-<h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo.html">mongo</a></h2><h2><div class="icon-library"></div><a href="../objectory.html">objectory</a></h2><h2><div class="icon-library"></div><a href="../objectory_base.html">objectory_base</a></h2><h2><div class="icon-library"></div><a href="../objectory_direct_connection.html">objectory_direct_connection</a></h2><h2><div class="icon-library"></div><a href="../objectory_query.html">objectory_query</a></h2><h2><div class="icon-library"></div><a href="../persistent_object.html">persistent_object</a></h2><h2><div class="icon-library"></div><a href="../persistent_schema.html">persistent_schema</a></h2></div>
+<h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
 <div class="content">
         <h2><strong>ObjectId</strong>
-          Interface
+          class
         </h2>
         
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
 <div class="doc">
+<pre class="source">
+class ObjectId extends BsonObject{
+ BsonBinary id;
 
+ ObjectId({bool clientMode: false}){
+   int seconds = new Timestamp(null,0).seconds;
+   id = createId(seconds, clientMode);
+ }
+
+ ObjectId.fromSeconds(int seconds, [bool clientMode = false]){
+   id = createId(seconds, clientMode);
+ }
+ ObjectId.fromBsonBinary(this.id);
+
+ BsonBinary createId(int seconds, bool clientMode) {
+     getOctet(int value) {
+     String res = value.toRadixString(16);
+     while (res.length &lt; 8) {
+       res = '0$res';
+     }
+     return res;
+   }
+   if (clientMode) {
+     String s = '${getOctet(seconds)}${getOctet(Statics.MachineId+Statics.Pid)}${getOctet(Statics.nextIncrement)}';
+     return new BsonBinary.fromHexString(s);
+   } else {
+     return new BsonBinary(12)
+     ..writeInt(seconds,forceBigEndian:true)
+     ..writeInt(Statics.MachineId,numOfBytes:3)
+     ..writeInt(Statics.Pid,numOfBytes:2)
+     ..writeInt(Statics.nextIncrement,numOfBytes:3,forceBigEndian:true);
+   }
+ }
+
+
+ factory ObjectId.fromHexString(String hexString) {
+   return new ObjectId.fromBsonBinary(new BsonBinary.fromHexString(hexString));
+ }
+
+
+ int get hashCode =&gt; id.hexString.hashCode;
+ bool operator ==(other) =&gt; other is ObjectId &amp;&amp; toHexString() == other.toHexString();
+ String toString() =&gt; "ObjectId(${id.hexString})";
+ String toHexString() =&gt; id.hexString;
+ int get typeByte =&gt; BSON.BSON_DATA_OID;
+ get value =&gt; this;
+ int byteLength() =&gt; 12;
+ unpackValue(BsonBinary buffer){
+    id.byteList.setRange(0,12,buffer.byteList,buffer.offset);
+    buffer.offset += 12;
+ }
+ packValue(BsonBinary buffer){
+   if (id.byteList == null) {
+     id.makeByteList();
+   }
+   buffer.byteList.setRange(buffer.offset,12,id.byteList);
+   buffer.offset += 12;
+ }
+
+ String toJson() {
+   return '\{"\$oid":"${toHexString()}"\}';
+ }
+
+}
+</pre>
 </div>
-<h3>Default class</h3>
+<h3>Extends</h3>
 <p>
-<span class="type-box"><span class="icon-class"></span><a href="../bson/BsonObjectId.html">BsonObjectId</a></span></p>
-<h3>Implemented by</h3>
-<p>
-<span class="type-box"><span class="icon-class"></span><a href="../bson/BsonObjectId.html">BsonObjectId</a></span></p>
+<span class="type-box"><span class="icon-class"></span><a href="../bson/BsonObject.html">BsonObject</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>ObjectId</strong></span></p>
+<div>
 <h3>Constructors</h3>
-<div class="method"><h4 id="ObjectId.fromSeconds">
-<span class="show-code">Code</span>
-new <strong>ObjectId</strong>.fromSeconds(<a href="http://api.dartlang.org/dart_core/int.html">int</a> seconds) <a class="anchor-link" href="#ObjectId.fromSeconds"
-              title="Permalink to ObjectId.ObjectId">#</a></h4>
-<div class="doc">
-
-<pre class="source">
-ObjectId.fromSeconds(int seconds);
-</pre>
-</div>
-</div>
 <div class="method"><h4 id="ObjectId">
-<span class="show-code">Code</span>
-new <strong>ObjectId</strong>() <a class="anchor-link" href="#ObjectId"
+<button class="show-code">Code</button>
+new <strong>ObjectId</strong>({<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> clientMode: false}) <a class="anchor-link" href="#ObjectId"
               title="Permalink to ObjectId.ObjectId">#</a></h4>
 <div class="doc">
-
 <pre class="source">
-ObjectId();
+ObjectId({bool clientMode: false}){
+ int seconds = new Timestamp(null,0).seconds;
+ id = createId(seconds, clientMode);
+}
 </pre>
 </div>
 </div>
-<h3>Methods</h3>
-<div class="method"><h4 id="hashCode">
-<span class="show-code">Code</span>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>hashCode</strong>() <a class="anchor-link" href="#hashCode"
-              title="Permalink to ObjectId.hashCode">#</a></h4>
+<div class="method"><h4 id="ObjectId.fromBsonBinary">
+<button class="show-code">Code</button>
+new <strong>ObjectId.fromBsonBinary</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> id) <a class="anchor-link" href="#ObjectId.fromBsonBinary"
+              title="Permalink to ObjectId.ObjectId.fromBsonBinary">#</a></h4>
 <div class="doc">
-
 <pre class="source">
-int hashCode();
+ObjectId.fromBsonBinary(this.id);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="ObjectId.fromHexString">
+<button class="show-code">Code</button>
+factory <strong>ObjectId.fromHexString</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> hexString) <a class="anchor-link" href="#ObjectId.fromHexString"
+              title="Permalink to ObjectId.ObjectId.fromHexString">#</a></h4>
+<div class="doc">
+<pre class="source">
+factory ObjectId.fromHexString(String hexString) {
+ return new ObjectId.fromBsonBinary(new BsonBinary.fromHexString(hexString));
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="ObjectId.fromSeconds">
+<button class="show-code">Code</button>
+new <strong>ObjectId.fromSeconds</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> seconds, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> clientMode = false]) <a class="anchor-link" href="#ObjectId.fromSeconds"
+              title="Permalink to ObjectId.ObjectId.fromSeconds">#</a></h4>
+<div class="doc">
+<pre class="source">
+ObjectId.fromSeconds(int seconds, [bool clientMode = false]){
+ id = createId(seconds, clientMode);
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="hashCode">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>hashCode</strong> <a class="anchor-link"
+            href="#hashCode"
+            title="Permalink to ObjectId.hashCode">#</a>
+        </h4>
+        <div class="doc">
+<div class="inherited">
+<p>Get a hash code for this object.</p>
+<p>All objects have hash codes. Hash codes are guaranteed to be the
+same for objects that are equal when compared using the equality
+operator <code>==</code>. Other than that there are no guarantees about
+the hash codes. They will not be consistent between runs and
+there are no distribution guarantees.</p>
+<p>If a subclass overrides <a class="crossref" href="../bson/ObjectId.html#hashCode">hashCode</a> it should override the
+equality operator as well to maintain consistency.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<pre class="source">
+int get hashCode =&gt; id.hexString.hashCode;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="id">
+<button class="show-code">Code</button>
+<a href="../bson/BsonBinary.html">BsonBinary</a>         <strong>id</strong> <a class="anchor-link"
+            href="#id"
+            title="Permalink to ObjectId.id">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+BsonBinary id;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="typeByte">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>typeByte</strong> <a class="anchor-link"
+            href="#typeByte"
+            title="Permalink to ObjectId.typeByte">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int get typeByte =&gt; BSON.BSON_DATA_OID;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="value">
+<button class="show-code">Code</button>
+final         <strong>value</strong> <a class="anchor-link"
+            href="#value"
+            title="Permalink to ObjectId.value">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+get value =&gt; this;
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Operators</h3>
+<div class="method"><h4 id="==">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>operator ==</strong>(other) <a class="anchor-link" href="#=="
+              title="Permalink to ObjectId.operator ==">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>The equality operator.</p>
+<p>The default behavior for all <code>Object</code>s is to return true if and
+only if <code>this</code> and 
+<span class="param">other</span> are the same object.</p>
+<p>If a subclass overrides the equality operator it should override
+the <a class="crossref" href="../bson/ObjectId.html#hashCode">hashCode</a> method as well to maintain consistency.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<pre class="source">
+bool operator ==(other) =&gt; other is ObjectId &amp;&amp; toHexString() == other.toHexString();
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="byteLength">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>byteLength</strong>() <a class="anchor-link" href="#byteLength"
+              title="Permalink to ObjectId.byteLength">#</a></h4>
+<div class="doc">
+<pre class="source">
+int byteLength() =&gt; 12;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="createId">
+<button class="show-code">Code</button>
+<a href="../bson/BsonBinary.html">BsonBinary</a> <strong>createId</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> seconds, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> clientMode) <a class="anchor-link" href="#createId"
+              title="Permalink to ObjectId.createId">#</a></h4>
+<div class="doc">
+<pre class="source">
+BsonBinary createId(int seconds, bool clientMode) {
+   getOctet(int value) {
+   String res = value.toRadixString(16);
+   while (res.length &lt; 8) {
+     res = '0$res';
+   }
+   return res;
+ }
+ if (clientMode) {
+   String s = '${getOctet(seconds)}${getOctet(Statics.MachineId+Statics.Pid)}${getOctet(Statics.nextIncrement)}';
+   return new BsonBinary.fromHexString(s);
+ } else {
+   return new BsonBinary(12)
+   ..writeInt(seconds,forceBigEndian:true)
+   ..writeInt(Statics.MachineId,numOfBytes:3)
+   ..writeInt(Statics.Pid,numOfBytes:2)
+   ..writeInt(Statics.nextIncrement,numOfBytes:3,forceBigEndian:true);
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="packElement">
+<button class="show-code">Code</button>
+<strong>packElement</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> name, buffer) <a class="anchor-link" href="#packElement"
+              title="Permalink to ObjectId.packElement">#</a></h4>
+<div class="inherited-from">inherited from <a href="../bson/BsonObject.html">BsonObject</a> </div><div class="doc">
+<pre class="source">
+packElement(String name, var buffer){
+ buffer.writeByte(typeByte);
+ if (name !== null){
+   new BsonCString(name).packValue(buffer);
+ }
+ packValue(buffer);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="packValue">
+<button class="show-code">Code</button>
+<strong>packValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#packValue"
+              title="Permalink to ObjectId.packValue">#</a></h4>
+<div class="doc">
+<pre class="source">
+packValue(BsonBinary buffer){
+ if (id.byteList == null) {
+   id.makeByteList();
+ }
+ buffer.byteList.setRange(buffer.offset,12,id.byteList);
+ buffer.offset += 12;
+}
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="toHexString">
-<span class="show-code">Code</span>
+<button class="show-code">Code</button>
 <a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toHexString</strong>() <a class="anchor-link" href="#toHexString"
               title="Permalink to ObjectId.toHexString">#</a></h4>
 <div class="doc">
-
 <pre class="source">
-String toHexString();
+String toHexString() =&gt; id.hexString;
 </pre>
+</div>
+</div>
+<div class="method"><h4 id="toJson">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toJson</strong>() <a class="anchor-link" href="#toJson"
+              title="Permalink to ObjectId.toJson">#</a></h4>
+<div class="doc">
+<pre class="source">
+String toJson() {
+ return '\{"\$oid":"${toHexString()}"\}';
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to ObjectId.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<pre class="source">
+String toString() =&gt; "ObjectId(${id.hexString})";
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="unpackElement">
+<button class="show-code">Code</button>
+<a href="../bson/_ElementPair.html">_ElementPair</a> <strong>unpackElement</strong>(buffer) <a class="anchor-link" href="#unpackElement"
+              title="Permalink to ObjectId.unpackElement">#</a></h4>
+<div class="inherited-from">inherited from <a href="../bson/BsonObject.html">BsonObject</a> </div><div class="doc">
+<pre class="source">
+_ElementPair unpackElement(buffer){
+ _ElementPair result = new _ElementPair();
+ result.name = buffer.readCString();
+ unpackValue(buffer);
+ result.value = value;
+ return result;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="unpackValue">
+<button class="show-code">Code</button>
+<strong>unpackValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#unpackValue"
+              title="Permalink to ObjectId.unpackValue">#</a></h4>
+<div class="doc">
+<pre class="source">
+unpackValue(BsonBinary buffer){
+  id.byteList.setRange(0,12,buffer.byteList,buffer.offset);
+  buffer.offset += 12;
+}
+</pre>
+</div>
 </div>
 </div>
         </div>
@@ -115,7 +399,7 @@ String toHexString();
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-09-12 16:03:42.979</div>
+          <div>This page was generated at 2012-11-11 18:14:50.471</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

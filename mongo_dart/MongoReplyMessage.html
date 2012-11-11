@@ -1,0 +1,311 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>MongoReplyMessage class / mongo_dart Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart" data-type="MongoReplyMessage">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/MongoReplyMessage.html">MongoReplyMessage</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
+<li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
+<li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
+<li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
+<li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
+<li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
+<li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
+<li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
+<li><a href="../mongo_dart/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
+<li><a href="../mongo_dart/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
+<li><a href="../mongo_dart/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
+<li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
+<li><div class="icon-class"></div><strong>MongoReplyMessage</strong></li>
+<li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
+<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
+<li><a href="../mongo_dart/Utils.html"><div class="icon-class"></div>Utils</a></li>
+</ul>
+</div>
+<div class="content">
+        <h2><strong>MongoReplyMessage</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class MongoReplyMessage extends MongoMessage{
+ BsonCString _collectionFullName;
+ int responseFlags;
+ int cursorId =-1; // 64bit integer
+ int startingFrom;
+ int numberReturned = -1;
+ List documents;
+ deserialize(BsonBinary buffer){
+   readMessageHeaderFrom(buffer);
+   responseFlags = buffer.readInt32();
+   cursorId = buffer.readInt64();
+   startingFrom = buffer.readInt32();
+   numberReturned = buffer.readInt32();
+   documents = new List(numberReturned);
+   for (int n=0;n&lt;numberReturned;n++){
+     BsonMap doc = new BsonMap({});
+     doc.unpackValue(buffer);
+     documents[n] = doc.value;
+   }
+ }
+ String toString(){
+   if (documents.length == 1)
+   {
+     return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags, ${documents[0]})";
+   }
+   return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags)";
+ }
+
+}
+</pre>
+</div>
+<h3>Extends</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../mongo_dart/MongoMessage.html">MongoMessage</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>MongoReplyMessage</strong></span></p>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="cursorId">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>cursorId</strong> <a class="anchor-link"
+            href="#cursorId"
+            title="Permalink to MongoReplyMessage.cursorId">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int cursorId =-1;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="documents">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/List.html">List</a>         <strong>documents</strong> <a class="anchor-link"
+            href="#documents"
+            title="Permalink to MongoReplyMessage.documents">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+List documents;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="messageLength">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>messageLength</strong> <a class="anchor-link"
+            href="#messageLength"
+            title="Permalink to MongoReplyMessage.messageLength">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
+<pre class="source">
+int get messageLength{
+ throw "Must be implemented";
+}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="numberReturned">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>numberReturned</strong> <a class="anchor-link"
+            href="#numberReturned"
+            title="Permalink to MongoReplyMessage.numberReturned">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int numberReturned = -1;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="opcode">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>opcode</strong> <a class="anchor-link"
+            href="#opcode"
+            title="Permalink to MongoReplyMessage.opcode">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
+<pre class="source">
+int opcode = MongoMessage.Reply;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="requestId">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>requestId</strong> <a class="anchor-link"
+            href="#requestId"
+            title="Permalink to MongoReplyMessage.requestId">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
+<pre class="source">
+int get requestId{
+ if (_requestId === null){
+   _requestId = Statics.nextRequestId;
+ }
+ return _requestId;
+}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="responseFlags">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>responseFlags</strong> <a class="anchor-link"
+            href="#responseFlags"
+            title="Permalink to MongoReplyMessage.responseFlags">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int responseFlags;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="responseTo">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>responseTo</strong> <a class="anchor-link"
+            href="#responseTo"
+            title="Permalink to MongoReplyMessage.responseTo">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
+<pre class="source">
+int responseTo;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="startingFrom">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>startingFrom</strong> <a class="anchor-link"
+            href="#startingFrom"
+            title="Permalink to MongoReplyMessage.startingFrom">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int startingFrom;
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="deserialize">
+<button class="show-code">Code</button>
+<strong>deserialize</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#deserialize"
+              title="Permalink to MongoReplyMessage.deserialize">#</a></h4>
+<div class="doc">
+<pre class="source">
+deserialize(BsonBinary buffer){
+ readMessageHeaderFrom(buffer);
+ responseFlags = buffer.readInt32();
+ cursorId = buffer.readInt64();
+ startingFrom = buffer.readInt32();
+ numberReturned = buffer.readInt32();
+ documents = new List(numberReturned);
+ for (int n=0;n&lt;numberReturned;n++){
+   BsonMap doc = new BsonMap({});
+   doc.unpackValue(buffer);
+   documents[n] = doc.value;
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="readMessageHeaderFrom">
+<button class="show-code">Code</button>
+<strong>readMessageHeaderFrom</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#readMessageHeaderFrom"
+              title="Permalink to MongoReplyMessage.readMessageHeaderFrom">#</a></h4>
+<div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
+<pre class="source">
+readMessageHeaderFrom(BsonBinary buffer)
+{
+   _messageLength = buffer.readInt32();
+   _requestId = buffer.readInt32();
+   responseTo = buffer.readInt32();
+   if (buffer.readInt32() != opcode)
+   {
+       throw "Message header opcode is not the expected one.";
+   }
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="serialize">
+<button class="show-code">Code</button>
+<a href="../bson/BsonBinary.html">BsonBinary</a> <strong>serialize</strong>() <a class="anchor-link" href="#serialize"
+              title="Permalink to MongoReplyMessage.serialize">#</a></h4>
+<div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
+<pre class="source">
+BsonBinary serialize(){
+ throw "Must be implemented";
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to MongoReplyMessage.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<pre class="source">
+String toString(){
+ if (documents.length == 1)
+ {
+   return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags, ${documents[0]})";
+ }
+ return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags)";
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="writeMessageHeaderTo">
+<button class="show-code">Code</button>
+<strong>writeMessageHeaderTo</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#writeMessageHeaderTo"
+              title="Permalink to MongoReplyMessage.writeMessageHeaderTo">#</a></h4>
+<div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
+<pre class="source">
+writeMessageHeaderTo(BsonBinary buffer)
+{
+   buffer.writeInt(messageLength); // messageLength will be backpatched later
+   buffer.writeInt(requestId);
+   buffer.writeInt(0); // responseTo not used in requests sent by client
+   buffer.writeInt(opcode);
+   if (messageLength &lt; 0){
+     throw "Error in message length";
+   }
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-11-11 18:14:51.743</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        
