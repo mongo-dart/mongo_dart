@@ -1,5 +1,5 @@
 library bson_vm;
-import 'package:mongo_dart/bson.dart';
+import 'bson.dart';
 import 'dart:scalarlist';
 
 class BsonPlatformVm extends BsonPlatform {

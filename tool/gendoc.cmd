@@ -1,1 +1,1 @@
-dartdoc --mode=static --link-api --exclude-lib=log4dart,log4dart:file --out=../../mongo_dart_docs ../lib/mongo.dart
+dartdoc --mode=static --link-api --out=../../mongo_dart_docs/stage mongo_dart_lib_for_dartdoc.dart
