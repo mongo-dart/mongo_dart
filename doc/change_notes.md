@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.0.6
+
+- Repairing incomplete commit v0.0.5 
+
 ###0.0.5
 
 - DbCollection's update and insert methods got optional *safeMode* parameter
