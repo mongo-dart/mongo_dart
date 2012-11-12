@@ -3,18 +3,12 @@ class Db{
   String databaseName;
   ServerConfig serverConfig;
   Connection connection;
-  validateDatabaseName(String dbName) {
+  _validateDatabaseName(String dbName) {
     if(dbName.length === 0) throw "database name cannot be the empty string";
     var invalidChars = [" ", ".", "\$", "/", "\\"];
     for(var i = 0; i < invalidChars.length; i++) {
       if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
     }
-  }
-  Db.local(this.databaseName){
-     if (serverConfig === null) {
-      serverConfig = new ServerConfig();
-     }
-    connection = new Connection(serverConfig);
   }
 
 /**
@@ -25,6 +19,7 @@ class Db{
 *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
 */
   Db(String uriString){
+    _configureConsoleLogger();
     var uri = new Uri.fromString(uriString);
     if (uri.scheme != 'mongodb') {
       throw 'Invalid scheme in uri: $uriString ${uri.scheme}';
@@ -51,7 +46,7 @@ class Db{
   DbCollection collection(String collectionName){
       return new DbCollection(this,collectionName);
   }
-  Future executeQueryMessage(MongoMessage queryMessage){
+  Future queryMessage(MongoMessage queryMessage){
     return connection.query(queryMessage);
   }
   executeMessage(MongoMessage message){

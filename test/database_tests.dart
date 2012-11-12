@@ -18,16 +18,6 @@ testSelectorBuilderOnObjectId(){
   expect(selector.length,greaterThan(0));
 }
 
-
-testDatabaseName(){
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  String dbName;
-  dbName = 'mongo_dart-test';
-  db.validateDatabaseName(dbName);
-  dbName = 'mongo_dart-test';
-  db.validateDatabaseName(dbName);
-}
-
 testCollectionInfoCursor(){
   Db db = new Db('mongodb://127.0.0.1/mongo_dart-test');
   db.open().chain(expectAsync1((c){
@@ -52,7 +42,6 @@ testRemove(){
   })).then(expectAsync1((v){
     expect(v,hasLength(1));
     db.removeFromCollection("new_collecion_to_remove");
-    //db.getLastError().then((v)=>print("remove result: $v"));
     newColl.find().toList().then(expectAsync1((v1){
       expect(v1,isEmpty);
       newColl.drop();
@@ -92,7 +81,7 @@ testCollectionCreation(){
   Db db = new Db('${DefaultUri}db');
   DbCollection collection = db.collection('student');
 }
-testEach(){
+testEachOnEmptyCollection(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
   int sum = 0;
@@ -100,7 +89,10 @@ testEach(){
     DbCollection newColl = db.collection('newColl1');
     return newColl.find().each((v)
       {sum += v["a"]; count++;});
-  }).then((v)=>info("Completed. Sum = $sum, count = $count"));
+  }).then((v) {
+    expect(sum, 0);
+    expect(count, 0);
+  });
 }
 testFindEachWithThenClause(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
@@ -118,8 +110,9 @@ testFindEachWithThenClause(){
     );
     return students.find().each((v)
       {sum += v["score"]; count++;});
-   })).then(expectAsync1((v){
-    info("Students Completed. Sum = $sum, count = $count average score = ${sum/count}");
+   })).then(expectAsync1((v){    
+    expect(sum,13);
+    expect(count,3);
     db.close();    
   }));
 }
@@ -408,7 +401,7 @@ testPingDbCommand(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then((d){
     DbCommand pingCommand = DbCommand.createPingCommand(db);
-    Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(pingCommand);
+    Future<MongoReplyMessage> mapFuture = db.queryMessage(pingCommand);
     mapFuture.then((msg) {
       expect(msg.documents[0],containsPair('ok', 1));
       db.close();
@@ -419,7 +412,7 @@ testDropDbCommand(){
   Db db = new Db('${DefaultUri}mongo_dart-test1');
   db.open().then((d){
     DbCommand command = DbCommand.createDropDatabaseCommand(db);
-    Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(command);
+    Future<MongoReplyMessage> mapFuture = db.queryMessage(command);
     mapFuture.then((msg) {
       expect(msg.documents[0]["ok"],1);
       db.close();
@@ -564,7 +557,7 @@ testSafeModeUpdate(){
 
 
 
-main(){
+main(){  
   initBsonPlatform();
   group('DbCollection tests:', (){
     test('testSelectorBuilderCreation',testSelectorBuilderCreation);
@@ -575,8 +568,7 @@ main(){
   group('DBCommand:', (){
     test('testAuthentication',testAuthentication);
     test('testAuthenticationWithUri',testAuthenticationWithUri);
-    test('testDropDatabase',testDropDatabase);
-    test('testDatabaseName',testDatabaseName);
+    test('testDropDatabase',testDropDatabase); 
     test('testCollectionInfoCursor',testCollectionInfoCursor);
     test('testRemove',testRemove);
     test('testGetNonce',testGetNonce);
@@ -587,6 +579,7 @@ main(){
     test('testFindEachWithThenClause',testFindEachWithThenClause);
     test('testCount',testCount);
     test('testFindEach',testFindEach);
+    test('testEach',testEachOnEmptyCollection);
     test('testDrop',testDrop);
     test('testSaveWithIntegerId',testSaveWithIntegerId);
     test('testSaveWithObjectId',testSaveWithObjectId);

@@ -3,11 +3,11 @@ import 'dart:isolate';
 import 'dart:io';
 import 'dart:crypto';
 import 'dart:uri';
-import 'package:log4dart/log4dart.dart';
-import 'package:log4dart/file_appender.dart';
 import 'bson_console.dart';
 import 'bson.dart';
 import 'src/bson/json_ext.dart';
+import 'package:logging/logging.dart';
+
 
 export 'bson_console.dart';
 export 'bson.dart';
@@ -27,7 +27,13 @@ part 'src/database/dbcommand.dart';
 part 'src/database/db.dart';
 part 'src/database/dbcollection.dart';
 part 'src/database/cursor.dart';
-part 'src/helpers/utils.dart';
 part 'src/helpers/map_proxy.dart';
 part 'src/helpers/selector_builder.dart';
 
+final Logger _log = Logger.root;
+
+_configureConsoleLogger([Level level = Level.INFO]) {
+  _log.level = level;
+  _log.on.record.clear();  
+  _log.on.record.add((LogRecord rec) => print('${rec.time} [${rec.level}] ${rec.message}')); 
+}

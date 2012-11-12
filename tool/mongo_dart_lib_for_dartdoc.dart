@@ -25,7 +25,6 @@ part '../lib/src/database/dbcommand.dart';
 part '../lib/src/database/db.dart';
 part '../lib/src/database/dbcollection.dart';
 part '../lib/src/database/cursor.dart';
-part '../lib/src/helpers/utils.dart';
 part '../lib/src/helpers/map_proxy.dart';
 part '../lib/src/helpers/selector_builder.dart';
 

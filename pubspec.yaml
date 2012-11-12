@@ -7,5 +7,6 @@ dependencies:
   unittest:
     sdk: unittest
   args:
-    sdk: args  
-  log4dart: any
+    sdk: args
+  logging:
+    sdk: logging

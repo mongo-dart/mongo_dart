@@ -1,11 +1,11 @@
 part of mongo_dart;
 class Connection{
-  Map<int,Completer<MongoReplyMessage>> replyCompleters;
-  BsonBinary lengthBuffer;
+  Map<int,Completer<MongoReplyMessage>> _replyCompleters;
+  BsonBinary _lengthBuffer;
   ServerConfig serverConfig;
-  BsonBinary bufferToSend;
-  Queue<MongoMessage> sendQueue;
-  BsonBinary messageBuffer;
+  BsonBinary _bufferToSend;
+  Queue<MongoMessage> _sendQueue;
+  BsonBinary _messageBuffer;
   Socket socket;
   bool connected = false;
   Connection([this.serverConfig]){
@@ -14,14 +14,14 @@ class Connection{
     }
   }
   Future<bool> connect(){
-    replyCompleters = new Map();
-    sendQueue = new Queue();
+    _replyCompleters = new Map();
+    _sendQueue = new Queue();
     socket = new Socket(serverConfig.host, serverConfig.port);
     Completer completer = new Completer();
     if (socket is! Socket) {
       completer.completeException(new Exception( "can't get send socket"));
     } else {
-      lengthBuffer = new BsonBinary(4);
+      _lengthBuffer = new BsonBinary(4);
       socket.onError = (e) {
         print("connect exception ${e}");
         completer.completeException(e);
@@ -33,71 +33,73 @@ class Connection{
       return completer.future;
     }
   }
-  close(){
-    while (!sendQueue.isEmpty){
+  void close(){
+    while (!_sendQueue.isEmpty){
       _sendBuffer();
     }
     socket.onData = null;
     socket.onError = null;
-    sendQueue.clear();
+    _sendQueue.clear();
     socket.close();
-    replyCompleters.clear();
+    _replyCompleters.clear();
   }
-  getNextBufferToSend(){
-    if (bufferToSend === null || bufferToSend.atEnd()){
-      if(!sendQueue.isEmpty){
-        MongoMessage message = sendQueue.removeFirst();
-        debug(message.toString());
-        bufferToSend = message.serialize();
-        debug(bufferToSend.hexString);
+  _getNextBufferToSend(){
+    if (_bufferToSend === null || _bufferToSend.atEnd()){
+      if(!_sendQueue.isEmpty){
+        MongoMessage message = _sendQueue.removeFirst();
+        _log.finer(message.toString());
+        _bufferToSend = message.serialize();
+        _log.finer(_bufferToSend.hexString);
       } else {
-        bufferToSend = null;
+        _bufferToSend = null;
       }
     }
   }
   _sendBuffer(){
-    while(sendQueue.length > 0) {
-      bufferToSend = sendQueue.removeFirst().serialize();
-      socket.outputStream.writeFrom(bufferToSend.byteList);
+    while(_sendQueue.length > 0) {
+      _bufferToSend = _sendQueue.removeFirst().serialize();
+      socket.outputStream.writeFrom(_bufferToSend.byteList);
     }
   }
-   void receiveData() {
-    if (messageBuffer === null){
-      int numBytes = socket.readList(lengthBuffer.byteList, 0, 4);
+  void _receiveData() {
+    if (_messageBuffer === null){
+      int numBytes = socket.readList(_lengthBuffer.byteList, 0, 4);
       if (numBytes == 0) {
         return;
       }
-      int messageLength = lengthBuffer.readInt32();
-      messageBuffer = new BsonBinary(messageLength);
-      messageBuffer.writeInt(messageLength);
+      int messageLength = _lengthBuffer.readInt32();
+      _messageBuffer = new BsonBinary(messageLength);
+      _messageBuffer.writeInt(messageLength);
     }
-    messageBuffer.offset += socket.readList(messageBuffer.byteList,messageBuffer.offset,messageBuffer.byteList.length-messageBuffer.offset);
-    if (messageBuffer.atEnd()){
+    _messageBuffer.offset += socket.readList(_messageBuffer.byteList,_messageBuffer.offset,_messageBuffer.byteList.length-_messageBuffer.offset);
+    if (_messageBuffer.atEnd()){
       MongoReplyMessage reply = new MongoReplyMessage();
-      messageBuffer.rewind();
-      reply.deserialize(messageBuffer);
-      debug(reply.toString());
-      messageBuffer = null;
-      lengthBuffer.rewind();
-      Completer completer = replyCompleters.remove(reply.responseTo);
+      _messageBuffer.rewind();
+      reply.deserialize(_messageBuffer);
+      _log.finer(reply.toString());
+      _messageBuffer = null;
+      _lengthBuffer.rewind();
+      Completer completer = _replyCompleters.remove(reply.responseTo);
       if (completer !== null){
-        completer.complete(reply);
+        completer.complete(reply);        
       }
       else {
-        warn("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
+        _log.shout("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
       }
     }
   }
+ 
+  
   Future<MongoReplyMessage> query(MongoMessage queryMessage){
     Completer completer = new Completer();
-    replyCompleters[queryMessage.requestId] = completer;
-    socket.onData = receiveData;
-    sendQueue.addLast(queryMessage);
+    _replyCompleters[queryMessage.requestId] = completer;
+    socket.onData = _receiveData;
+    _sendQueue.addLast(queryMessage);
     _sendBuffer();
     return completer.future;
   }
   void execute(MongoMessage mongoMessage){  
-    sendQueue.addLast(mongoMessage);
+    _sendQueue.addLast(mongoMessage);
     _sendBuffer();  
   }  
 }
