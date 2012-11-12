@@ -46,10 +46,19 @@ class DbCollection{
     }
   }
 
-
+ /**
+  * Creates a cursor for a query that can be used to iterate over results from MongoDB
+  * ##[selector] 
+  * parameter represents query to locate objects. If omitted as in `find()` then query matches all documents in colleciton.
+  * Here's a more selective example: 
+  *     find({'last_name': 'Smith'})
+  * Here our selector will match every document where the last_name attribute is 'Smith.'       
+  *   
+  */
   Cursor find([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ) {
     return new Cursor(db, this, selector, fields, skip, limit, orderBy);//, [selector, skip, limit,sort, hint, explain]);
   }
+  
   Future<Map> findOne([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
     Cursor cursor = find(selector, fields, orderBy, skip, limit, hint, explain);
     Future<Map> result = cursor.nextObject();
