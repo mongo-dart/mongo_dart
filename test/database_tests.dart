@@ -7,15 +7,15 @@ import 'package:unittest/unittest.dart';
 
 const DefaultUri = 'mongodb://127.0.0.1/';
 testSelectorBuilderCreation(){
-  SelectorBuilder selector = query();
-  expect(selector is Map, isTrue);
-  expect(selector,isEmpty);
+  SelectorBuilder selector = where;
+  expect(selector.map is Map, isTrue);
+  expect(selector.map,isEmpty);
 }
 testSelectorBuilderOnObjectId(){
   ObjectId id = new ObjectId();
-  SelectorBuilder selector = query().id(id);
-  expect(selector is Map, isTrue);
-  expect(selector.length,greaterThan(0));
+  SelectorBuilder selector = where.id(id);
+  expect(selector.map is Map, isTrue);
+  expect(selector.map.length,greaterThan(0));
 }
 
 testCollectionInfoCursor(){
@@ -98,9 +98,11 @@ testFindEachWithThenClause(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
   int sum = 0;
+  DbCollection students;  
   db.open().chain(expectAsync1((c){
-    DbCollection students = db.collection('students');
-    students.drop();
+    students = db.collection('students');
+    return students.drop();
+  })).chain(expectAsync1((c){    
     students.insertAll(
       [
       {"name":"Vadim","score":4},
@@ -228,7 +230,7 @@ testSkip(){
     for(int n=0;n<600;n++){
       coll.insert({"a":n});
         }
-    return coll.findOne(null,null,{"a":1},300);
+    return coll.findOne(where.sortBy('a').skip(300));
   })).then(expectAsync1((v){
     expect(v["a"],300);
     db.close();    
@@ -244,7 +246,7 @@ testLimit(){
     for(int n=0;n<600;n++){
       coll.insert({"a":n});
     }    
-    cursor = coll.find(null,null,{"a":1},300, 10);    
+    cursor = coll.find(where.sortBy('a').skip(300).limit(10));    
     return cursor.each((e)=>counter++);
   })).then(expectAsync1((v){    
     expect(counter,10);
@@ -257,13 +259,13 @@ testLimit(){
 testCursorCreation(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection collection = db.collection('student');
-  Cursor cursor = new Cursor(db,collection);
+  Cursor cursor = new Cursor(db, collection, null);
 }
 testPingRaw(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().chain(expectAsync1((c){
     DbCollection collection = db.collection('\$cmd');
-    Cursor cursor = new Cursor(db,collection,{"ping":1},null,0,1);
+    Cursor cursor = new Cursor(db,collection,where.eq('ping',1).limit(1));
     MongoQueryMessage queryMessage = cursor.generateQueryMessage();
     Future mapFuture = db.connection.query(queryMessage);
     return mapFuture;
@@ -276,7 +278,7 @@ testNextObject(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().chain(expectAsync1((c){
     DbCollection collection = db.collection('\$cmd');
-    Cursor cursor = new Cursor(db,collection,{"ping":1},null,0,1);
+    Cursor cursor = new Cursor(db,collection,where.eq('ping',1).limit(1));
     return cursor.nextObject();
   })).then(expectAsync1((v){
     expect(v,containsPair('ok', 1));
@@ -293,7 +295,7 @@ testNextObjectToEnd(){
     collection.insert({"a":1});
     collection.insert({"a":2});
     collection.insert({"a":3});
-    cursor = new Cursor(db,collection,null,null,0,10);
+    cursor = new Cursor(db,collection,where.limit(10));
     return cursor.nextObject();
   })).then(expectAsync1((v){
     expect(v,isNotNull);
@@ -322,7 +324,7 @@ testCursorWithOpenServerCursor(){
     for (int n=0;n < 100; n++){
       collection.insert({"a":n});
     }
-    cursor = new Cursor(db,collection,null,null,0,10);
+    cursor = new Cursor(db,collection,where.limit(10));
     return cursor.nextObject();
   })).then(expectAsync1((v){
     expect(cursor.state, Cursor.OPEN);
@@ -341,7 +343,7 @@ testCursorGetMore(){
     collection.remove();
     return db.getLastError();
   })).chain(expectAsync1((_){
-    cursor = new Cursor(db,collection,null,null,0,10);
+    cursor = new Cursor(db,collection,where.limit(10));
     return cursor.each((v){
      count++;
     });
@@ -354,7 +356,7 @@ testCursorGetMore(){
     collection.insertAll(toInsert);
     return db.getLastError();
   })).chain(expectAsync1((_){
-    cursor = new Cursor(db,collection,null,null,0,10);
+    cursor = new Cursor(db,collection,where.limit(10));
     return cursor.each((v)=>count++);
   })).then(expectAsync1((v){
     expect(count,1000);

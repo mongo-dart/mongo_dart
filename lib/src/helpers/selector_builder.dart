@@ -1,9 +1,28 @@
 part of mongo_dart;
+
+@deprecated
 SelectorBuilder query(){
   return new SelectorBuilder();
 }
-class SelectorBuilder<K,V> extends MapProxy<K,V>{
+
+SelectorBuilder get where => new SelectorBuilder();
+
+SelectorBuilder get selector => new SelectorBuilder();
+
+SelectorBuilder get modify => new SelectorBuilder();
+
+class _ExtParams {
+  int skip = 0;
+  int limit = 0;
+  Map fields;
+}
+class SelectorBuilder{
+  Map map = {};
+  _ExtParams extParams = new _ExtParams();
+  
   toString()=>"SelectorBuilder($map)";
+  
+  
   SelectorBuilder eq(String fieldName,value){
     map[fieldName] = value;
     return this;
@@ -126,4 +145,42 @@ class SelectorBuilder<K,V> extends MapProxy<K,V>{
     map["\$where"] = new BsonCode(javaScriptCode);
     return this;
   }
+  
+  SelectorBuilder fields(List<String> fields) {
+     if (extParams.fields != null) {
+       throw 'Fields parameter may be set only once for selector';
+     }
+     extParams.fields = {};
+     for (var field in fields) {
+       extParams.fields[field] = 1;
+     }
+     return this;
+  }
+  SelectorBuilder excludeFields(List<String> fields) {
+    if (extParams.fields != null) {
+      throw 'Fields parameter may be set only once for selector';
+    }
+    extParams.fields = {};
+    for (var field in fields) {
+      extParams.fields[field] = -1;
+    }
+    return this;
+  }
+  
+  SelectorBuilder limit(int limit) {
+    extParams.limit = limit;
+    return this;
+  }
+  
+  SelectorBuilder skip(int skip) {
+    extParams.skip = skip;
+    return this;
+  }
+  
+  SelectorBuilder raw(Map rawSelector) {
+    map = rawSelector;
+    return this;
+  }
+  
+  
 }

@@ -7,11 +7,12 @@ import 'bson_console.dart';
 import 'bson.dart';
 import 'src/bson/json_ext.dart';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 
 
 export 'bson_console.dart';
 export 'bson.dart';
-export 'src/bson/json_ext.dart';
+export 'src/bson/json_ext.dart'; 
 
 part 'src/database/connection.dart';
 part 'src/database/mongo_message.dart';

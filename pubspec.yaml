@@ -10,3 +10,5 @@ dependencies:
     sdk: args
   logging:
     sdk: logging
+  meta:
+    sdk: meta    

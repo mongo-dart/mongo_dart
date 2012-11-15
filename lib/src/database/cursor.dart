@@ -14,24 +14,30 @@ static const CLOSED = 2;
   DbCollection collection;
   Map selector;
   Map fields;
-  int skip;
-  int limit;
+  int skip = 0;
+  int limit = 0;
   Map sort;
   Map hint;
   MonadicBlock eachCallback;
   var eachComplete;
   bool explain;
   int flags = 0;
-  Cursor(this.db, this.collection, [this.selector, this.fields, this.skip = 0, this.limit = 0
-  , this.sort, this.hint, this.explain]){
-    if (selector === null){
+  Cursor(this.db, this.collection, selectorBuilderOrMap){
+    if (selectorBuilderOrMap === null){
       selector = {};
+    } else if (selectorBuilderOrMap is SelectorBuilder) {      
+      selector = selectorBuilderOrMap.map;
+      fields = selectorBuilderOrMap.extParams.fields;
+      limit = selectorBuilderOrMap.extParams.limit;
+      skip = selectorBuilderOrMap.extParams.skip;      
+    } else if (selectorBuilderOrMap is Map) {
+      selector = selectorBuilderOrMap;
+    } else {
+      throw new ArgumentError('Expected SelectorBuilder or Map, got $selectorBuilderOrMap');
     }
-    if (!selector.containsKey("query")){
+    
+    if (!selector.isEmpty && !selector.containsKey("query")){
         selector = {"query": selector};
-    }
-    if (sort !== null){
-      selector["orderby"] = sort;
     }
     items = new Queue();
   }

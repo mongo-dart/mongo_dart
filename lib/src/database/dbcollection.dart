@@ -34,8 +34,8 @@ class DbCollection{
       return new Future.immediate({'ok': 1.0});  
     }
   }
- Future update(Map selector, Map document, {bool safeMode: false}){
-    MongoUpdateMessage message = new MongoUpdateMessage(fullName(),selector, document, 0);
+ Future update(selector, document, {bool safeMode: false}){
+    MongoUpdateMessage message = new MongoUpdateMessage(fullName(),_selectorBuiltder2Map(selector), document, 0);
     db.executeMessage(message);
     if (safeMode) {
       return db.getLastError();
@@ -55,25 +55,35 @@ class DbCollection{
   * Here our selector will match every document where the last_name attribute is 'Smith.'       
   *   
   */
-  Cursor find([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ) {
-    return new Cursor(db, this, selector, fields, skip, limit, orderBy);//, [selector, skip, limit,sort, hint, explain]);
+  Cursor find([selector]) {
+    return new Cursor(db, this, selector);
   }
   
-  Future<Map> findOne([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
-    Cursor cursor = find(selector, fields, orderBy, skip, limit, hint, explain);
+  Future<Map> findOne([selector]){
+    Cursor cursor = find(selector);
     Future<Map> result = cursor.nextObject();
     cursor.close();
     return result;
   }
   Future drop() => db.dropCollection(collectionName);
-  Future remove([Map selector = const {}]) => db.removeFromCollection(collectionName, selector);
-  Future count([Map selector = const {}]){
+  Future remove([selector]) => db.removeFromCollection(collectionName, _selectorBuiltder2Map(selector));
+  Future count([selector]){
     Completer completer = new Completer();
-    db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,selector)).then((reply){
+    db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuiltder2Map(selector))).then((reply){
       //print("reply = ${reply}");
       completer.complete(reply["n"]);
     });
     return completer.future;
   }
   Future insert(Map document, {bool safeMode: false}) => insertAll([document], safeMode: safeMode);
+  
+  Map _selectorBuiltder2Map(selector) {
+    if (selector == null) {
+      return {};
+    }
+    if (selector is SelectorBuilder) {
+      return selector.map;      
+    }
+    return selector;
+  }
 }
