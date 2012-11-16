@@ -7,10 +7,6 @@ SelectorBuilder query(){
 
 SelectorBuilder get where => new SelectorBuilder();
 
-SelectorBuilder get selector => new SelectorBuilder();
-
-SelectorBuilder get modify => new SelectorBuilder();
-
 class _ExtParams {
   int skip = 0;
   int limit = 0;
@@ -141,10 +137,17 @@ class SelectorBuilder{
     map["\$sreturnKey"] = true;
     return this;
   }
+  @deprecated
   SelectorBuilder where(String javaScriptCode){
     map["\$where"] = new BsonCode(javaScriptCode);
     return this;
   }
+  
+  SelectorBuilder jsQuery(String javaScriptCode){
+    map["\$where"] = new BsonCode(javaScriptCode);
+    return this;
+  }
+  
   
   SelectorBuilder fields(List<String> fields) {
      if (extParams.fields != null) {
@@ -181,6 +184,5 @@ class SelectorBuilder{
     map = rawSelector;
     return this;
   }
-  
   
 }

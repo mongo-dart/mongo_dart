@@ -30,6 +30,7 @@ part 'src/database/dbcollection.dart';
 part 'src/database/cursor.dart';
 part 'src/helpers/map_proxy.dart';
 part 'src/helpers/selector_builder.dart';
+part 'src/helpers/modifier_builder.dart';
 
 final Logger _log = Logger.root;
 
