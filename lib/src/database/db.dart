@@ -4,7 +4,7 @@ class Db{
   ServerConfig serverConfig;
   Connection connection;
   _validateDatabaseName(String dbName) {
-    if(dbName.length === 0) throw "database name cannot be the empty string";
+    if(dbName.length == 0) throw "database name cannot be the empty string";
     var invalidChars = [" ", ".", "\$", "/", "\\"];
     for(var i = 0; i < invalidChars.length; i++) {
       if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
@@ -12,12 +12,12 @@ class Db{
   }
 
 /**
-* Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
-* For example next code points to local mongodb server on default mongodb port, database *testdb*
-*     var db = new Db('mongodb://127.0.0.1/testdb');
-* And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
-*     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
-*/
+  * Db constructor expects [valid mongodb URI](http://www.mongodb.org/display/DOCS/Connections).
+  * For example next code points to local mongodb server on default mongodb port, database *testdb*
+  *     var db = new Db('mongodb://127.0.0.1/testdb');
+  * And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
+  *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
+  */
   Db(String uriString){
     _configureConsoleLogger();
     var uri = new Uri.fromString(uriString);
@@ -60,7 +60,7 @@ class Db{
       connection = new Connection(serverConfig);
     }
     connection.connect().then((v) {
-      if (serverConfig.userName === null) {
+      if (serverConfig.userName == null) {
         completer.complete(v);
       }
       else {
@@ -130,7 +130,7 @@ class Db{
   Cursor collectionsInfoCursor([String collectionName]) {
     Map selector = {};
     // If we are limiting the access to a specific collection name
-    if(collectionName !== null){
+    if(collectionName != null){
       selector["name"] = "${this.databaseName}.$collectionName";
     }
     // Return Cursor
@@ -148,35 +148,35 @@ class Db{
     then((res)=>completer.complete(res["ok"] == 1));
     return completer.future;
   }
-  Future<List> indexInformation([String collectionName]) {    
+  Future<List> indexInformation([String collectionName]) {
     var selector = {};
     if (collectionName != null) {
       selector['ns'] = '$databaseName.$collectionName';
     }
-    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();    
+    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();
   }
   String _createIndexName(Map keys) {
     var name = '';
     keys.forEach((key,value) {
       name = '${name}_${key}_$value';
     });
-    return name;    
+    return name;
   }
-  Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {    
+  Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
     var selector = {};
     selector['ns'] = '$databaseName.$collectionName';
     keys = _setKeys(key, keys);
     selector['key'] = keys;
     for (final order in keys.values) {
       if (order != 1 && order != -1) {
-        throw const ArgumentError('Keys may contain only 1 or -1');  
+        throw new ArgumentError('Keys may contain only 1 or -1');
       }
     }
-    if (unique == true) { 
+    if (unique == true) {
       selector['unique'] = true;
     } else {
       selector['unique'] = false;
-    }    
+    }
     if (sparse == true) {
       selector['sparse'] = true;
     }
@@ -190,30 +190,30 @@ class Db{
       name = _createIndexName(keys);
     }
     selector['name'] = name;
-    MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);    
+    MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);
     executeMessage(insertMessage);
     return getLastError();
   }
 
-  Map _setKeys(String key, Map keys) {    
-    if (key != null && keys != null) {    
-      throw const ArgumentError('Only one parameter must be set: key or keys');    
-    }    
-    if (key != null) {    
-      keys = {'$key': 1};    
-    }    
-    if (keys == null) {    
-      throw const ArgumentError('key or keys parameter must be set');    
+  Map _setKeys(String key, Map keys) {
+    if (key != null && keys != null) {
+      throw new ArgumentError('Only one parameter must be set: key or keys');
     }
-    return keys;    
-  } 
+    if (key != null) {
+      keys = {'$key': 1};
+    }
+    if (keys == null) {
+      throw new ArgumentError('key or keys parameter must be set');
+    }
+    return keys;
+  }
   Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
     keys = _setKeys(key, keys);
     var completer = new Completer();
     indexInformation(collectionName).then((indexInfos) {
       if (name == null) {
         name = _createIndexName(keys);
-      }        
+      }
       if (indexInfos.some((info) => info['name'] == name)) {
         completer.complete({'ok': 1.0, 'result': 'index preexists'});
       } else {
@@ -221,7 +221,7 @@ class Db{
       }
     });
     return completer.future;
-  }  
+  }
 }
 
-  
+

@@ -169,7 +169,7 @@ class BSON {
   static const BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
 
 
-  BsonBinary serialize(var object, [int offset = 0]) {
+  BsonBinary serialize(var object, {int offset: 0}) {
     if (!((object is Map) || (object is List))){
       throw new Exception("Invalid value for BSON serialize: $object");
     }

@@ -30,7 +30,7 @@ main(){
     usersCollection = db.collection("users");
     usersCollection.insertAll([{'login':'jdoe', 'name':'John Doe', 'email':'john@doe.com'},
        {'login':'lsmith', 'name':'Lucy Smith', 'email':'lucy@smith.com'}]);
-    db.ensureIndex('users', keys: {'login': -1});    
+    db.ensureIndex('users', keys: {'login': -1});
     return usersCollection.find().each((user)=>users[user["login"]] = user);
   }).chain((v){
     print("===================================================================================");

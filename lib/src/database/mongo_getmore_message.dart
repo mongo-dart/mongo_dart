@@ -5,7 +5,7 @@ class MongoGetMoreMessage extends MongoMessage{
   int numberToReturn;
   MongoGetMoreMessage(String collectionFullName,
             this.cursorId,
-            [this.numberToReturn = 20]
+            {this.numberToReturn: 20}
             ){
     _collectionFullName = new BsonCString(collectionFullName);
     opcode = MongoMessage.GetMore;

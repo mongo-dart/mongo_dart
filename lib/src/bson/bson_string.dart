@@ -3,7 +3,7 @@ class BsonString extends BsonObject{
   String data;
   List<int> _utfData;
   List<int> get utfData{
-    if (_utfData === null){
+    if (_utfData == null){
       _utfData = encodeUtf8(data);
     }
     return _utfData;
