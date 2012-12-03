@@ -5,7 +5,7 @@ class MongoInsertMessage extends MongoMessage{
   List<BsonMap> _documents;
   MongoInsertMessage(String collectionFullName,
             List<Map> documents,
-            [this.flags = 0]
+            {this.flags: 0}
             ){
     _collectionFullName = new BsonCString(collectionFullName);
     _documents = new List();

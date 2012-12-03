@@ -7,7 +7,7 @@ class ObjectId extends BsonObject{
     id = createId(seconds, clientMode);
   }
 
-  ObjectId.fromSeconds(int seconds, [bool clientMode = false]){
+  ObjectId.fromSeconds(int seconds, {bool clientMode: false}){
     id = createId(seconds, clientMode);
   }
   ObjectId.fromBsonBinary(this.id);

@@ -32,8 +32,8 @@ part 'src/helpers/selector_builder.dart';
 
 final Logger _log = Logger.root;
 
-_configureConsoleLogger([Level level = Level.INFO]) {
+_configureConsoleLogger({Level level: Level.INFO}) {
   _log.level = level;
-  _log.on.record.clear();  
-  _log.on.record.add((LogRecord rec) => print('${rec.time} [${rec.level}] ${rec.message}')); 
+  _log.on.record.clear();
+  _log.on.record.add((LogRecord rec) => print('${rec.time} [${rec.level}] ${rec.message}'));
 }

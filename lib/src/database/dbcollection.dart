@@ -9,11 +9,11 @@ class DbCollection{
     bool createId = false;
     if (document.containsKey("_id")){
       id = document["_id"];
-      if (id === null){
+      if (id == null){
         createId = true;
       }
     }
-    if (id !== null){
+    if (id != null){
       update({"_id": id}, document);
     }
     else{
@@ -31,7 +31,7 @@ class DbCollection{
     }
     else
     {
-      return new Future.immediate({'ok': 1.0});  
+      return new Future.immediate({'ok': 1.0});
     }
   }
  Future update(Map selector, Map document, {bool safeMode: false}){
@@ -42,7 +42,7 @@ class DbCollection{
     }
     else
     {
-      return new Future.immediate({'ok': 1.0});  
+      return new Future.immediate({'ok': 1.0});
     }
   }
 
@@ -50,10 +50,10 @@ class DbCollection{
   * Creates a cursor for a query that can be used to iterate over results from MongoDB
  *
  * [selector] map representing query to locate objects. If omitted, query matches all documents in colleciton.
- * Here's a more selective example: 
+ * Here's a more selective example:
  *     find({'last_name': 'Smith'})
- * Here our selector will match every document where the last_name attribute is 'Smith.'        
- *   
+ * Here our selector will match every document where the last_name attribute is 'Smith.'
+ *
  */
   Cursor find([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ) {
     return new Cursor(db, this, selector, fields, skip, limit, orderBy);//, [selector, skip, limit,sort, hint, explain]);
@@ -65,8 +65,8 @@ class DbCollection{
     return result;
   }
   Future drop() => db.dropCollection(collectionName);
-  Future remove([Map selector = const {}]) => db.removeFromCollection(collectionName, selector);
-  Future count([Map selector = const {}]){
+  Future remove({Map selector: const {}}) => db.removeFromCollection(collectionName, selector);
+  Future count({Map selector: const {}}){
     Completer completer = new Completer();
     db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,selector)).then((reply){
       //print("reply = ${reply}");

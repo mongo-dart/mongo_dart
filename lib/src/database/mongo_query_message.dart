@@ -24,14 +24,14 @@ static final OPTS_EXHAUST = 64;
             Map fields){
     _collectionFullName = new BsonCString(collectionFullName);
     _query = new BsonMap(query);
-    if (fields !== null){
+    if (fields != null){
       _fields = new BsonMap(fields);
     }
     opcode = MongoMessage.Query;
   }
   int get messageLength{
     int result = 16+4+_collectionFullName.byteLength()+4+4+_query.byteLength();
-    if (_fields !== null){
+    if (_fields != null){
       result += _fields.byteLength();
     }
     return result;

@@ -9,7 +9,7 @@ class Connection{
   Socket socket;
   bool connected = false;
   Connection([this.serverConfig]){
-    if (serverConfig === null){
+    if (serverConfig == null){
       serverConfig = new ServerConfig();
     }
   }
@@ -44,7 +44,7 @@ class Connection{
     _replyCompleters.clear();
   }
   _getNextBufferToSend(){
-    if (_bufferToSend === null || _bufferToSend.atEnd()){
+    if (_bufferToSend == null || _bufferToSend.atEnd()){
       if(!_sendQueue.isEmpty){
         MongoMessage message = _sendQueue.removeFirst();
         _log.finer(message.toString());
@@ -62,7 +62,7 @@ class Connection{
     }
   }
   void _receiveData() {
-    if (_messageBuffer === null){
+    if (_messageBuffer == null){
       int numBytes = socket.readList(_lengthBuffer.byteList, 0, 4);
       if (numBytes == 0) {
         return;
@@ -80,16 +80,16 @@ class Connection{
       _messageBuffer = null;
       _lengthBuffer.rewind();
       Completer completer = _replyCompleters.remove(reply.responseTo);
-      if (completer !== null){
-        completer.complete(reply);        
+      if (completer != null){
+        completer.complete(reply);
       }
       else {
         _log.shout("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
       }
     }
   }
- 
-  
+
+
   Future<MongoReplyMessage> query(MongoMessage queryMessage){
     Completer completer = new Completer();
     _replyCompleters[queryMessage.requestId] = completer;
@@ -98,8 +98,8 @@ class Connection{
     _sendBuffer();
     return completer.future;
   }
-  void execute(MongoMessage mongoMessage){  
+  void execute(MongoMessage mongoMessage){
     _sendQueue.addLast(mongoMessage);
-    _sendBuffer();  
-  }  
+    _sendBuffer();
+  }
 }

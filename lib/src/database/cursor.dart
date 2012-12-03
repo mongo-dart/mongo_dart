@@ -1,7 +1,7 @@
 part of mongo_dart;
 typedef MonadicBlock(var value);
 class Cursor{
-  
+
 static const INIT = 0;
 static const OPEN = 1;
 static const CLOSED = 2;
@@ -24,13 +24,13 @@ static const CLOSED = 2;
   int flags = 0;
   Cursor(this.db, this.collection, [this.selector, this.fields, this.skip = 0, this.limit = 0
   , this.sort, this.hint, this.explain]){
-    if (selector === null){
+    if (selector == null){
       selector = {};
     }
     if (!selector.containsKey("query")){
         selector = {"query": selector};
     }
-    if (sort !== null){
+    if (sort != null){
       selector["orderby"] = sort;
     }
     items = new Queue();
@@ -101,7 +101,7 @@ static const CLOSED = 2;
   }
   void _nextEach(){
     nextObject().then((val){
-      if (val === null){
+      if (val == null){
         eachCallback = null;
         eachComplete.complete(true);
       } else {
