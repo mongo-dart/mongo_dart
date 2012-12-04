@@ -5,6 +5,7 @@ import 'dart:crypto';
 import 'dart:uri';
 import '../lib/bson_console.dart';
 import '../lib/bson.dart';
+import '../lib/src/helpers/selector_builder.dart';
 
 /*
 export 'bson_console.dart';

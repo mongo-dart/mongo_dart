@@ -1,9 +1,24 @@
 part of mongo_dart;
+
+@deprecated
 SelectorBuilder query(){
   return new SelectorBuilder();
 }
-class SelectorBuilder<K,V> extends MapProxy<K,V>{
+
+SelectorBuilder get where => new SelectorBuilder();
+
+class _ExtParams {
+  int skip = 0;
+  int limit = 0;
+  Map fields;
+}
+class SelectorBuilder{
+  Map map = {};
+  _ExtParams extParams = new _ExtParams();
+
   toString()=>"SelectorBuilder($map)";
+
+
   SelectorBuilder eq(String fieldName,value){
     map[fieldName] = value;
     return this;
@@ -61,7 +76,12 @@ class SelectorBuilder<K,V> extends MapProxy<K,V>{
         dotAll:dotAll,extended:extended)};
     return this;
   }
+  @deprecated
   SelectorBuilder range(String fieldName, min, max, {bool minInclude: true, bool maxInclude: true}){
+    return inRange(fieldName, min, max, minInclude: minInclude, maxInclude: maxInclude);
+  }
+
+  SelectorBuilder inRange(String fieldName, min, max, {bool minInclude: true, bool maxInclude: false}) {
     Map rangeMap = {};
     if (minInclude){
       rangeMap["\$gte"] = min;
@@ -122,8 +142,52 @@ class SelectorBuilder<K,V> extends MapProxy<K,V>{
     map["\$sreturnKey"] = true;
     return this;
   }
+  @deprecated
   SelectorBuilder where(String javaScriptCode){
     map["\$where"] = new BsonCode(javaScriptCode);
     return this;
   }
+
+  SelectorBuilder jsQuery(String javaScriptCode){
+    map["\$where"] = new BsonCode(javaScriptCode);
+    return this;
+  }
+
+
+  SelectorBuilder fields(List<String> fields) {
+     if (extParams.fields != null) {
+       throw 'Fields parameter may be set only once for selector';
+     }
+     extParams.fields = {};
+     for (var field in fields) {
+       extParams.fields[field] = 1;
+     }
+     return this;
+  }
+  SelectorBuilder excludeFields(List<String> fields) {
+    if (extParams.fields != null) {
+      throw 'Fields parameter may be set only once for selector';
+    }
+    extParams.fields = {};
+    for (var field in fields) {
+      extParams.fields[field] = -1;
+    }
+    return this;
+  }
+
+  SelectorBuilder limit(int limit) {
+    extParams.limit = limit;
+    return this;
+  }
+
+  SelectorBuilder skip(int skip) {
+    extParams.skip = skip;
+    return this;
+  }
+
+  SelectorBuilder raw(Map rawSelector) {
+    map = rawSelector;
+    return this;
+  }
+
 }

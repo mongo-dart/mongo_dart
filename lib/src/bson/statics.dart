@@ -15,7 +15,7 @@ class Statics{
   static int _requestId;
   static int get nextRequestId
   {
-    if (_requestId === null)
+    if (_requestId == null)
     {
       _requestId = 1;
     }
@@ -25,7 +25,7 @@ class Statics{
   static List<int> _maxBits;
   static int MaxBits(int bits){
     int res;
-    if (_maxBits === null){
+    if (_maxBits == null){
       _maxBits = new List<int>(65);
       _maxBits[0] = 0;
       for (var i = 1; i < 65; i++) {

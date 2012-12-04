@@ -7,6 +7,7 @@ import 'bson_console.dart';
 import 'bson.dart';
 import 'src/bson/json_ext.dart';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 
 
 export 'bson_console.dart';
@@ -29,11 +30,12 @@ part 'src/database/dbcollection.dart';
 part 'src/database/cursor.dart';
 part 'src/helpers/map_proxy.dart';
 part 'src/helpers/selector_builder.dart';
+part 'src/helpers/modifier_builder.dart';
 
 final Logger _log = Logger.root;
 
 _configureConsoleLogger([Level level = Level.INFO]) {
   _log.level = level;
-  _log.on.record.clear();  
-  _log.on.record.add((LogRecord rec) => print('${rec.time} [${rec.level}] ${rec.message}')); 
+  _log.on.record.clear();
+  _log.on.record.add((LogRecord rec) => print('${rec.time} [${rec.level}] ${rec.message}'));
 }

@@ -5,7 +5,7 @@ class _ElementPair{
   _ElementPair([this.name,this.value]);
 }
 class BsonObject {
-  int get typeByte{ throw const Exception("must be implemented");}
+  int get typeByte{ throw "must be implemented";}
   int byteLength() => 0;
   packElement(String name, var buffer){
     buffer.writeByte(typeByte);
@@ -14,7 +14,7 @@ class BsonObject {
     }
     packValue(buffer);
   }
-  packValue(var buffer){ throw const Exception("must be implemented");}
+  packValue(var buffer){ throw "must be implemented";}
   _ElementPair unpackElement(buffer){
     _ElementPair result = new _ElementPair();
     result.name = buffer.readCString();
@@ -22,7 +22,7 @@ class BsonObject {
     result.value = value;
     return result;
   }
-  unpackValue(var buffer){ throw const Exception("must be implemented");}
+  unpackValue(var buffer){ throw "must be implemented";}
   get value=>null;
 }
 int elementSize(String name, value) {
@@ -53,13 +53,13 @@ BsonObject bsonObjectFrom(var value){
   if (value is List){
     return new BsonArray(value);
   }
-  if (value === null){
+  if (value == null){
     return new BsonNull();
   }
   if (value is Date){
     return new BsonDate(value);
   }
-  if (value === true || value === false){
+  if (value == true || value == false){
     return new BsonBoolean(value);
   }
   if (value is BsonRegexp){
