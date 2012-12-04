@@ -11,7 +11,7 @@ class MongoMessage{
   int _messageLength;
   int _requestId;
   int get requestId{
-    if (_requestId === null){
+    if (_requestId == null){
       _requestId = Statics.nextRequestId;
     }
     return _requestId;

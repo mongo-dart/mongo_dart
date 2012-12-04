@@ -12,7 +12,7 @@ import 'package:meta/meta.dart';
 
 export 'bson_console.dart';
 export 'bson.dart';
-export 'src/bson/json_ext.dart'; 
+export 'src/bson/json_ext.dart';
 
 part 'src/database/connection.dart';
 part 'src/database/mongo_message.dart';
@@ -36,6 +36,6 @@ final Logger _log = Logger.root;
 
 _configureConsoleLogger([Level level = Level.INFO]) {
   _log.level = level;
-  _log.on.record.clear();  
-  _log.on.record.add((LogRecord rec) => print('${rec.time} [${rec.level}] ${rec.message}')); 
+  _log.on.record.clear();
+  _log.on.record.add((LogRecord rec) => print('${rec.time} [${rec.level}] ${rec.message}'));
 }

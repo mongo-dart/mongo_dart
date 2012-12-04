@@ -9,7 +9,7 @@ class DbCollection{
     bool createId = false;
     if (document.containsKey("_id")){
       id = document["_id"];
-      if (id === null){
+      if (id == null){
         createId = true;
       }
     }
@@ -31,7 +31,7 @@ class DbCollection{
     }
     else
     {
-      return new Future.immediate({'ok': 1.0});  
+      return new Future.immediate({'ok': 1.0});
     }
   }
  Future update(selector, document, {bool safeMode: false}){
@@ -42,23 +42,23 @@ class DbCollection{
     }
     else
     {
-      return new Future.immediate({'ok': 1.0});  
+      return new Future.immediate({'ok': 1.0});
     }
   }
 
  /**
   * Creates a cursor for a query that can be used to iterate over results from MongoDB
-  * ##[selector] 
+  * ##[selector]
   * parameter represents query to locate objects. If omitted as in `find()` then query matches all documents in colleciton.
-  * Here's a more selective example: 
+  * Here's a more selective example:
   *     find({'last_name': 'Smith'})
-  * Here our selector will match every document where the last_name attribute is 'Smith.'       
-  *   
+  * Here our selector will match every document where the last_name attribute is 'Smith.'
+  *
   */
   Cursor find([selector]) {
     return new Cursor(db, this, selector);
   }
-  
+
   Future<Map> findOne([selector]){
     Cursor cursor = find(selector);
     Future<Map> result = cursor.nextObject();
@@ -76,13 +76,13 @@ class DbCollection{
     return completer.future;
   }
   Future insert(Map document, {bool safeMode: false}) => insertAll([document], safeMode: safeMode);
-  
+
   Map _selectorBuiltder2Map(selector) {
     if (selector == null) {
       return {};
     }
     if (selector is SelectorBuilder) {
-      return selector.map;      
+      return selector.map;
     }
     return selector;
   }

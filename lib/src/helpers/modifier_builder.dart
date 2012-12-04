@@ -5,8 +5,8 @@ ModifierBuilder get modify => new ModifierBuilder();
 
 class ModifierBuilder{
   Map map = {};
-  
-  toString()=>"ModifierBuilder($map)";  
+
+  toString()=>"ModifierBuilder($map)";
   Map _pair2Map(String fieldName, value) {
     var res = {};
     res[fieldName] = value;
@@ -16,20 +16,20 @@ class ModifierBuilder{
     map['\$inc'] = _pair2Map(fieldName,value);
     return this;
   }
-  
+
   ModifierBuilder set(String fieldName,value) {
     map['\$set'] = _pair2Map(fieldName,value);
     return this;
   }
-  
+
   ModifierBuilder unset(String fieldName) {
     map['\$unset'] = _pair2Map(fieldName, 1);
     return this;
   }
-  
+
   ModifierBuilder push(String fieldName, value) {
     map['\$push'] = _pair2Map(fieldName, value);
     return this;
-  }  
-  
+  }
+
 }

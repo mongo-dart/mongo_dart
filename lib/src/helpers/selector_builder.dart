@@ -15,10 +15,10 @@ class _ExtParams {
 class SelectorBuilder{
   Map map = {};
   _ExtParams extParams = new _ExtParams();
-  
+
   toString()=>"SelectorBuilder($map)";
-  
-  
+
+
   SelectorBuilder eq(String fieldName,value){
     map[fieldName] = value;
     return this;
@@ -76,7 +76,12 @@ class SelectorBuilder{
         dotAll:dotAll,extended:extended)};
     return this;
   }
+  @deprecated
   SelectorBuilder range(String fieldName, min, max, {bool minInclude: true, bool maxInclude: true}){
+    return inRange(fieldName, min, max, minInclude: minInclude, maxInclude: maxInclude);
+  }
+
+  SelectorBuilder inRange(String fieldName, min, max, {bool minInclude: true, bool maxInclude: false}) {
     Map rangeMap = {};
     if (minInclude){
       rangeMap["\$gte"] = min;
@@ -142,13 +147,13 @@ class SelectorBuilder{
     map["\$where"] = new BsonCode(javaScriptCode);
     return this;
   }
-  
+
   SelectorBuilder jsQuery(String javaScriptCode){
     map["\$where"] = new BsonCode(javaScriptCode);
     return this;
   }
-  
-  
+
+
   SelectorBuilder fields(List<String> fields) {
      if (extParams.fields != null) {
        throw 'Fields parameter may be set only once for selector';
@@ -169,20 +174,20 @@ class SelectorBuilder{
     }
     return this;
   }
-  
+
   SelectorBuilder limit(int limit) {
     extParams.limit = limit;
     return this;
   }
-  
+
   SelectorBuilder skip(int skip) {
     extParams.skip = skip;
     return this;
   }
-  
+
   SelectorBuilder raw(Map rawSelector) {
     map = rawSelector;
     return this;
   }
-  
+
 }

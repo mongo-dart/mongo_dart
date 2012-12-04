@@ -23,12 +23,12 @@ testCollectionInfoCursor(){
   db.open().chain(expectAsync1((c){
     DbCollection newColl = db.collection("new_collecion");
     newColl.drop();
-    newColl.insertAll([{"a":1}]);      
+    newColl.insertAll([{"a":1}]);
     bool found = false;
     return db.collectionsInfoCursor("new_collecion").toList();
   })).then(expectAsync1((v){
     expect(v,hasLength(1));
-    db.close();  
+    db.close();
   }));
 }
 testRemove(){
@@ -63,7 +63,7 @@ testGetNonce(){
     return db.getNonce();
   })).then(expectAsync1((v){
       expect(v["ok"],1);
-      db.close();  
+      db.close();
   }));
 }
 testPwd(){
@@ -73,7 +73,7 @@ testPwd(){
     coll = db.collection("system.users");
     return coll.find().each((user)=>print(user));
   })).then(expectAsync1((v){
-      db.close();  
+      db.close();
   }));
 }
 
@@ -98,11 +98,11 @@ testFindEachWithThenClause(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
   int sum = 0;
-  DbCollection students;  
+  DbCollection students;
   db.open().chain(expectAsync1((c){
     students = db.collection('students');
     return students.drop();
-  })).chain(expectAsync1((c){    
+  })).chain(expectAsync1((c){
     students.insertAll(
       [
       {"name":"Vadim","score":4},
@@ -112,10 +112,10 @@ testFindEachWithThenClause(){
     );
     return students.find().each((v)
       {sum += v["score"]; count++;});
-   })).then(expectAsync1((v){    
+   })).then(expectAsync1((v){
     expect(sum,13);
     expect(count,3);
-    db.close();    
+    db.close();
   }));
 }
 testFindEach(){
@@ -137,18 +137,18 @@ testFindEach(){
   })).then(expectAsync1((v){
     expect(count,3);
     expect(sum,13);
-    db.close();    
+    db.close();
    }));
 }
 testDrop(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().chain(expectAsync1((_){
     return db.dropCollection("testDrop");
-  })).chain(expectAsync1((v) {    
+  })).chain(expectAsync1((v) {
       return db.dropCollection("testDrop");
   })).then(expectAsync1((__){
-      db.close();  
-  }));  
+      db.close();
+  }));
 }
 
 testSaveWithIntegerId(){
@@ -175,7 +175,7 @@ testSaveWithIntegerId(){
     return coll.findOne({"_id":3});
   })).then(expectAsync1((v1){
     expect(v1["value"],2);
-    db.close();    
+    db.close();
   }));
 }
 testSaveWithObjectId(){
@@ -204,7 +204,7 @@ testSaveWithObjectId(){
     return coll.findOne({"_id":id});
   })).then(expectAsync1((v1){
     expect(v1["value"],1);
-    db.close();    
+    db.close();
   }));
 }
 
@@ -219,7 +219,7 @@ testCount(){
     return coll.count();
   })).then(expectAsync1((v){
     expect(v,167);
-    db.close();  
+    db.close();
   }));
 }
 testSkip(){
@@ -233,7 +233,7 @@ testSkip(){
     return coll.findOne(where.sortBy('a').skip(300));
   })).then(expectAsync1((v){
     expect(v["a"],300);
-    db.close();    
+    db.close();
   }));
 }
 testLimit(){
@@ -245,10 +245,10 @@ testLimit(){
     coll.remove();
     for(int n=0;n<600;n++){
       coll.insert({"a":n});
-    }    
-    cursor = coll.find(where.sortBy('a').skip(300).limit(10));    
+    }
+    cursor = coll.find(where.sortBy('a').skip(300).limit(10));
     return cursor.each((e)=>counter++);
-  })).then(expectAsync1((v){    
+  })).then(expectAsync1((v){
     expect(counter,10);
     expect(cursor.state,Cursor.CLOSED);
     expect(cursor.cursorId,0);
@@ -271,7 +271,7 @@ testPingRaw(){
     return mapFuture;
   })).then(expectAsync1((msg) {
     expect(msg.documents[0],containsPair('ok', 1));
-    db.close();  
+    db.close();
   }));
 }
 testNextObject(){
@@ -282,7 +282,7 @@ testNextObject(){
     return cursor.nextObject();
   })).then(expectAsync1((v){
     expect(v,containsPair('ok', 1));
-    db.close();  
+    db.close();
   }));
 }
 testNextObjectToEnd(){
@@ -455,7 +455,7 @@ testAuthentication(){
   db.open().chain(expectAsync1((c){
     return db.authenticate('dart','test');
   })).then(expectAsync1((v){
-    db.close();  
+    db.close();
   }));
 }
 testAuthenticationWithUri(){
@@ -469,7 +469,7 @@ testAuthenticationWithUri(){
     return collection.findOne();
   })).then(expectAsync1((v){
     expect(v['a'],isNotNull);
-    db.close();    
+    db.close();
   }));
 }
 
@@ -493,14 +493,14 @@ testMongoDbUri(){
 testIndexInformation(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   Cursor cursor;
-  db.open().chain(expectAsync1((c){    
+  db.open().chain(expectAsync1((c){
     DbCollection collection = db.collection('testcol');
     collection.remove();
     for (int n=0;n < 100; n++){
       collection.insert({"a":n});
-    }  
+    }
     return db.indexInformation('testcol');
-  })).then(expectAsync1((indexInfo){    
+  })).then(expectAsync1((indexInfo){
     expect(indexInfo.length,1);
     db.close();
   }));
@@ -509,11 +509,11 @@ testIndexInformation(){
 testIndexCreation(){
   Db db = new Db('${DefaultUri}index_creation');
   Cursor cursor;
-  DbCollection collection; 
-  db.open().chain(expectAsync1((c){    
+  DbCollection collection;
+  db.open().chain(expectAsync1((c){
     collection = db.collection('testcol');
     return collection.drop();
-  })).chain(expectAsync1((res){    
+  })).chain(expectAsync1((res){
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
     }
@@ -521,14 +521,14 @@ testIndexCreation(){
     expect(() => db.createIndex('testcol',key: 'a', keys:{'a':-1}),throws, reason: 'Invalid number of arguments');
     return db.createIndex('testcol',key:'a');
   })).chain(expectAsync1((res){
-    expect(res['ok'],1.0);    
-    return db.createIndex('testcol',keys:{'a':-1,'embedded.c': 1});    
+    expect(res['ok'],1.0);
+    return db.createIndex('testcol',keys:{'a':-1,'embedded.c': 1});
   })).chain(expectAsync1((res){
     expect(res['ok'],1.0);
     return db.indexInformation('testcol');
   })).chain(expectAsync1((res){
     expect(res.length, 3);
-    return db.ensureIndex('testcol',keys:{'a':-1,'embedded.c': 1}); 
+    return db.ensureIndex('testcol',keys:{'a':-1,'embedded.c': 1});
   })).then(expectAsync1((res){
     expect(res['ok'],1.0);
     expect(res['result'],'index preexists');
@@ -539,17 +539,17 @@ testIndexCreation(){
 testSafeModeUpdate(){
   Db db = new Db('${DefaultUri}safe_mode');
   Cursor cursor;
-  DbCollection collection = db.collection('testcol');  
+  DbCollection collection = db.collection('testcol');
   db.open().chain(expectAsync1((c){
     collection.remove();
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
-    }  
-    return collection.update({'a': 200}, {'a':100}, safeMode: true);    
+    }
+    return collection.update({'a': 200}, {'a':100}, safeMode: true);
   })).chain(expectAsync1((res){
     expect(res['updatedExisting'], false);
     expect(res['n'], 0);
-    return collection.update({'a': 3}, {'a':100}, safeMode: true);    
+    return collection.update({'a': 3}, {'a':100}, safeMode: true);
   })).then(expectAsync1((res){
     expect(res['updatedExisting'], true);
     expect(res['n'], 1);
@@ -559,25 +559,25 @@ testSafeModeUpdate(){
 
 
 
-main(){  
+main(){
   initBsonPlatform();
   group('DbCollection tests:', (){
     test('testSelectorBuilderCreation',testSelectorBuilderCreation);
     test('testSelectorBuilderOnObjectId',testSelectorBuilderOnObjectId);
     test('testAuthComponents',testAuthComponents);
     test('testMongoDbUri',testMongoDbUri);
-  });  
+  });
   group('DBCommand:', (){
     test('testAuthentication',testAuthentication);
     test('testAuthenticationWithUri',testAuthenticationWithUri);
-    test('testDropDatabase',testDropDatabase); 
+    test('testDropDatabase',testDropDatabase);
     test('testCollectionInfoCursor',testCollectionInfoCursor);
     test('testRemove',testRemove);
     test('testGetNonce',testGetNonce);
     test('testPwd',testPwd);
-  });    
+  });
   group('DbCollection tests:', (){
-    test('testLimit',testLimit);    
+    test('testLimit',testLimit);
     test('testFindEachWithThenClause',testFindEachWithThenClause);
     test('testCount',testCount);
     test('testFindEach',testFindEach);
@@ -586,7 +586,7 @@ main(){
     test('testSaveWithIntegerId',testSaveWithIntegerId);
     test('testSaveWithObjectId',testSaveWithObjectId);
     test('testSkip',testSkip);
-  });    
+  });
   group('Cursor tests:', (){
     test('testCursorCreation',testCursorCreation);
     test('testCursorClosing',testCursorClosing);
@@ -601,9 +601,9 @@ main(){
     test('testPingDbCommand',testPingDbCommand);
     test('testDropDbCommand',testDropDbCommand);
   });
-  group('Safe mode tests:', () {  
+  group('Safe mode tests:', () {
     test('testSafeModeUpdate',testSafeModeUpdate);
-  });  
+  });
   group('Indexes tests:', () {
     test('testIndexInformation',testIndexInformation);
     test('testIndexCreation',testIndexCreation);
