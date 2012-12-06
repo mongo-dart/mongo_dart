@@ -85,14 +85,15 @@ testEachOnEmptyCollection(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
   int sum = 0;
-  db.open().chain((c){
+  db.open().chain(expectAsync1((c){
     DbCollection newColl = db.collection('newColl1');
     return newColl.find().each((v)
       {sum += v["a"]; count++;});
-  }).then((v) {
+  })).then(expectAsync1((v) {
     expect(sum, 0);
     expect(count, 0);
-  });
+    db.close();
+  }));
 }
 testFindEachWithThenClause(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
@@ -586,7 +587,7 @@ main(){
     test('testSaveWithIntegerId',testSaveWithIntegerId);
     test('testSaveWithObjectId',testSaveWithObjectId);
     test('testSkip',testSkip);
-  });
+  });  
   group('Cursor tests:', (){
     test('testCursorCreation',testCursorCreation);
     test('testCursorClosing',testCursorClosing);
@@ -595,7 +596,7 @@ main(){
     test('testNextObject',testNextObject);
     test('testCursorWithOpenServerCursor',testCursorWithOpenServerCursor);
     test('testCursorGetMore',testCursorGetMore);
-  });
+  });  
   group('DBCommand tests:', (){
     test('testDbCommandCreation',testDbCommandCreation);
     test('testPingDbCommand',testPingDbCommand);
@@ -603,7 +604,7 @@ main(){
   });
   group('Safe mode tests:', () {
     test('testSafeModeUpdate',testSafeModeUpdate);
-  });
+  });  
   group('Indexes tests:', () {
     test('testIndexInformation',testIndexInformation);
     test('testIndexCreation',testIndexCreation);
