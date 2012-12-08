@@ -215,11 +215,11 @@ class _JsonParser {
   }
 
   parseValue() {
-    final int token = token();
-    if (token === null) {
+    final int tok = token();
+    if (tok == null) {
       error('Nothing to parse');
     }
-    switch (token) {
+    switch (tok) {
       case STRING_LITERAL: return parseString();
       case NUMBER_LITERAL: return parseNumber();
       case NULL_LITERAL: return expectKeyword(NULL_STRING, null);
@@ -227,7 +227,6 @@ class _JsonParser {
       case TRUE_LITERAL: return expectKeyword(TRUE_STRING, true);
       case LBRACE: return parseObject();
       case LBRACKET: return parseList();
-
       default:
         error('Unexpected token');
     }
@@ -388,36 +387,36 @@ class _JsonParser {
     if (!isToken(NUMBER_LITERAL)) error('Expected number literal');
 
     final int startPos = position;
-    int char = char();
-    if (char === MINUS) char = nextChar();
-    if (char === CHAR_0) {
-      char = nextChar();
-    } else if (isDigit(char)) {
-      char = nextChar();
-      while (isDigit(char)) char = nextChar();
+    int chr = char();
+    if (chr == MINUS) chr = nextChar();
+    if (chr == CHAR_0) {
+      chr = nextChar();
+    } else if (isDigit(chr)) {
+      chr = nextChar();
+      while (isDigit(chr)) chr = nextChar();
     } else {
       error('Expected digit when parsing number');
     }
 
     bool isInt = true;
-    if (char === DOT) {
-      char = nextChar();
-      if (isDigit(char)) {
-        char = nextChar();
+    if (chr == DOT) {
+      chr = nextChar();
+      if (isDigit(chr)) {
+        chr = nextChar();
         isInt = false;
-        while (isDigit(char)) char = nextChar();
+        while (isDigit(chr)) chr = nextChar();
       } else {
         error('Expected digit following comma');
       }
     }
 
-    if (char === CHAR_E || char === CHAR_CAPITAL_E) {
-      char = nextChar();
-      if (char === MINUS || char === PLUS) char = nextChar();
-      if (isDigit(char)) {
-        char = nextChar();
+    if (chr == CHAR_E || chr == CHAR_CAPITAL_E) {
+      chr = nextChar();
+      if (chr == MINUS || chr == PLUS) chr = nextChar();
+      if (isDigit(chr)) {
+        chr = nextChar();
         isInt = false;
-        while (isDigit(char)) char = nextChar();
+        while (isDigit(chr)) chr = nextChar();
       } else {
         error('Expected digit following \'e\' or \'E\'');
       }
@@ -460,11 +459,11 @@ class _JsonParser {
       if (position >= length) return null;
       int char = json.charCodeAt(position);
       int token = tokens[char];
-      if (token === WHITESPACE) {
+      if (token == WHITESPACE) {
         position++;
         continue;
       }
-      if (token === null) return 0;
+      if (token == null) return 0;
       return token;
     }
   }
@@ -547,7 +546,7 @@ class _JsonStringifier {
   void checkCycle(final object) {
     // TODO: use Iterables.
     for (int i = 0; i < seen.length; i++) {
-      if (seen[i] === object) {
+      if (seen[i] == object) {
         throw 'Cyclic structure';
       }
     }
@@ -583,13 +582,13 @@ class _JsonStringifier {
       // TODO: use writeOn.
       sb.add(numberToString(object));
       return true;
-    } else if (object === true) {
+    } else if (object == true) {
       sb.add('true');
       return true;
-    } else if (object === false) {
+    } else if (object == false) {
       sb.add('false');
        return true;
-    } else if (object === null) {
+    } else if (object == null) {
       sb.add('null');
       return true;
     } else if (object is String) {

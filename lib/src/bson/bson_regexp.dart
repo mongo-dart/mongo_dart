@@ -27,16 +27,16 @@ class BsonRegexp extends BsonObject{
       return;
     }
     var buffer = new StringBuffer();
-    if (caseInsensitive === true){
+    if (caseInsensitive == true){
       buffer.add("i");
     }
-    if (multiLine === true){
+    if (multiLine == true){
       buffer.add("m");
     }
-    if (dotAll === true){
+    if (dotAll == true){
       buffer.add("s");
     }
-    if (extended === true){
+    if (extended == true){
       buffer.add("x");
     }
     options = buffer.toString();
