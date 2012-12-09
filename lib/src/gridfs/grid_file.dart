@@ -25,15 +25,24 @@ class GridFSFile {
     return fs.files.insert(tempData, safeMode:true);
   }
 
-  void validate() {
+  Future<bool> validate() {
     if (fs == null)
       throw "no fs";
     if (md5 == null)
       throw "no md5 stored";
 
+    Completer completer = new Completer();
     // query for md5 at filemd5
-    // see if the md5s are the same
-    // throw an error if they are not
+    DbCommand dbCommand = new DbCommand(
+        fs.database,fs.bucketName,0,0,1,{"filemd5" : id}, {"md5" : 1});
+    fs.database.executeDbCommand(dbCommand).then((Map data) {
+      if (data != null && data.containsKey("md5")) {
+        completer.complete(md5 == data["md5"]);
+      } else {
+        completer.complete(false);
+      }
+    });
+    return completer.future;
   }
 
   int numChunks() {
