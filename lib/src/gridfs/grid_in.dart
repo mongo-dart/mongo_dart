@@ -1,7 +1,7 @@
 part of mongo_dart;
 
 class GridIn extends GridFSFile {
-  InputStream input;
+  RandomAccessFile input;
   bool closeStreamOnPersist;
   bool savedChunks = false;
   List<int> buffer = null; // Is this needed?
@@ -11,33 +11,32 @@ class GridIn extends GridFSFile {
   ObjectId id;
   GridFS fs;
   String filename;
-
-  // Message digest?
-  OutputStream outputStream = null;
+  MD5 messageDigester;
 
   GridIn(this.fs, [this.filename = null, this.input = null, this.closeStreamOnPersist = false]) {
     id = new ObjectId();
     chunkSize = GridFS.DEFAULT_CHUNKSIZE;
     uploadDate = new Date.now();
-    // MD5 message digest??
-    // reset digester
-    // buffer??
+    messageDigester = new MD5();
   }
 
-  void save([int chunkSize = this.chunkSize]) {
-    if (outputStream != null) {
-      throw "cannot mix OutputStream and regular save()";
+  Future save([int chunkSize = 0]) {
+    if (!?chunkSize) {
+      chunkSize = this.chunkSize;
     }
 
+    Future result;
     if (!savedChunks) {
-      saveChunks(chunkSize);
+      result = saveChunks(chunkSize);
+    } else {
+      result = new Future.immediate({'ok': 1.0});
     }
-    super.save();
+    return result;
   }
 
-  void saveChunks([int chunkSize = this.chunkSize]) {
-    if (outputStream != null) {
-      throw "cannot mix OutputStream and regular save()";
+  Future<Map> saveChunks([int chunkSize = 0]) {
+    if (!?chunkSize) {
+      chunkSize = this.chunkSize;
     }
     if (savedChunks) {
       throw "chunks already saved!";
@@ -45,35 +44,41 @@ class GridIn extends GridFSFile {
     if (chunkSize <= 0 || chunkSize > GridFS.MAX_CHUNKSIZE) {
       throw "chunkSize must be greater than zero and less than or equal to GridFS.MAX_CHUNKSIZE";
     }
-    input.onData = () {
-      List buffer = new List<int>(chunkSize);
-      int bytesRead = 0;
-      do {
-        currentBufferPosition = 0;
-        while (currentBufferPosition < chunkSize) {
-          bytesRead = input.readInto(buffer, currentBufferPosition, chunkSize - currentBufferPosition);
-          if (bytesRead > 0) {
-            currentBufferPosition += bytesRead;
-          } else {
-            break;
-          }
+    List<Future> futures = new List();
+    Completer completer = new Completer();
+    buffer = new List<int>(chunkSize);
+    int bytesRead = 0;
+    do {
+      currentBufferPosition = 0;
+      while (currentBufferPosition < chunkSize) {
+        bytesRead = input.readListSync(buffer, currentBufferPosition, chunkSize - currentBufferPosition);
+        if (bytesRead > 0) {
+          currentBufferPosition += bytesRead;
+        } else {
+          break;
         }
+      }
         
-        dumpBuffer(true);
-      } while (bytesRead > 0);
-      finishData();
-    };
+      futures.add(dumpBuffer(true));
+    } while (bytesRead > 0);
+
+    Futures.wait(futures).chain((list) {
+      return finishData();
+    }).then((map){
+      completer.complete({});
+    });
+    return completer.future;
   }
   // TODO(tsander): OutputStream??
 
-  void dumpBuffer( bool writePartial ) {
+  Future<Map> dumpBuffer( bool writePartial ) {
     if ( (currentBufferPosition < chunkSize) && !writePartial) {
       // Chunk not completed yet
-      return;
+      return new Future.immediate({});
     }
     if (currentBufferPosition == 0) {
       // Chunk is empty, may be last chunk
-      return;
+      return new Future.immediate({});
     }
     
     List<int> writeBuffer = buffer;
@@ -81,18 +86,19 @@ class GridIn extends GridFSFile {
       writeBuffer = new List<int>(currentBufferPosition);
       writeBuffer.setRange(0, currentBufferPosition, buffer);
     }
-    Map chunk = {"files_id" : id, "n" : currentChunkNumber, "data": writeBuffer};
-    fs.chunks.save(chunk);
-    
+
+    Map chunk = {"files_id" : id, "n" : currentChunkNumber, "data": new BsonBinary.from(writeBuffer)};
     currentChunkNumber++;
     totalBytes += writeBuffer.length;
-    // Update md5 digest??
+    messageDigester.update(writeBuffer);
     currentBufferPosition = 0;
+
+    return fs.chunks.insert(chunk, safeMode:true);
   }
 
-  void finishData() {
+  Future finishData() {
     if (!savedChunks) {
-      // TODO md5 calculate
+      md5 = CryptoUtils.bytesToHex(messageDigester.digest());
       length = totalBytes;
       savedChunks = true;
       try {
@@ -103,5 +109,6 @@ class GridIn extends GridFSFile {
         // Ignore
       }
     }
+    return super.save();
   }
 }

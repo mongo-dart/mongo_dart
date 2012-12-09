@@ -11,11 +11,18 @@ class GridFSFile {
   Map<String, Object> extraData;
   String md5;
 
-  void save() {
+  GridFSFile([Map data]) {
+    if (?data) {
+      this.data = data;
+    }
+  }
+
+  Future<Map> save() {
     if (fs == null) {
       throw "Need fs";
     }
-    fs.files.save(data);
+    Map tempData = data;
+    return fs.files.insert(tempData, safeMode:true);
   }
 
   void validate() {
@@ -56,6 +63,17 @@ class GridFSFile {
       "md5" : md5,
       // TODO(tsander): Extra Data?? Meta Data??
     };
+  }
+
+  set data(Map input) {
+    id = input["_id"];
+    filename = input["filename"];
+    contentType = input["contentType"];
+    length = input["length"];
+    chunkSize = input["chunkSize"];
+    uploadDate = input["uploadDate"];
+    md5 = input["md5"];
+    // TODO(tsander): Extra Data?? Meta Data??
   }
 
   void setGridFS( GridFS fs ) {

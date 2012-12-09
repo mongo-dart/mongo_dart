@@ -19,7 +19,18 @@ class GridFS {
     return files.find(selectorBuilder.sortBy("filename", descending:true));
   }
 
-  GridOut find(var id) {}
+  Future<GridOut> findOne(dynamic selector) {
+    Completer completer = new Completer();
+    files.findOne(selector).then((Map file) {
+      GridOut result = null;
+      if (file != null) {
+        result = new GridOut(file);
+        result.setGridFS(this);
+      }
+      completer.complete(result);
+    });
+    return completer.future;
+  }
 
   GridIn createFile(InputStream input, String filename) {
     return new GridIn(this, filename, input);
