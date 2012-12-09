@@ -31,6 +31,10 @@ part 'src/database/cursor.dart';
 part 'src/helpers/map_proxy.dart';
 part 'src/helpers/selector_builder.dart';
 part 'src/helpers/modifier_builder.dart';
+part 'src/gridfs/gridfs.dart';
+part 'src/gridfs/grid_file.dart';
+part 'src/gridfs/grid_in.dart';
+part 'src/gridfs/grid_out.dart';
 
 final Logger _log = Logger.root;
 
