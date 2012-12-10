@@ -1,3 +1,5 @@
+part of bson;
+
 class BSON {
 
   static const BSON_INT32_MAX = 0x7FFFFFFF;
@@ -16,146 +18,146 @@ class BSON {
 
   /**
    * Number BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_NUMBER
    **/
   static const BSON_DATA_NUMBER = 1;
   /**
    * String BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_STRING
    **/
   static const BSON_DATA_STRING = 2;
   /**
    * Object BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_OBJECT
    **/
   static const BSON_DATA_OBJECT = 3;
   /**
    * Array BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_ARRAY
    **/
   static const BSON_DATA_ARRAY = 4;
   /**
    * Binary BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_BINARY
    **/
   static const BSON_DATA_BINARY = 5;
   /**
    * ObjectID BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_OID
    **/
   static const BSON_DATA_OID = 7;
   /**
    * Boolean BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_BOOLEAN
    **/
   static const BSON_DATA_BOOLEAN = 8;
   /**
    * Date BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_DATE
    **/
   static const BSON_DATA_DATE = 9;
   /**
    * null BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_NULL
    **/
   static const BSON_DATA_NULL = 10;
   /**
    * RegExp BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_REGEXP
    **/
   static const BSON_DATA_REGEXP = 11;
   /**
    * Code BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_CODE
    **/
   static const BSON_DATA_CODE = 13;
   /**
    * Symbol BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_SYMBOL
    **/
   static const BSON_DATA_SYMBOL = 14;
   /**
    * Code with Scope BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_CODE_W_SCOPE
    **/
   static const BSON_DATA_CODE_W_SCOPE = 15;
   /**
    * 32 bit Integer BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_INT
    **/
   static const BSON_DATA_INT = 16;
   /**
    * Timestamp BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_TIMESTAMP
    **/
   static const BSON_DATA_TIMESTAMP = 17;
   /**
    * Long BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_LONG
    **/
   static const BSON_DATA_LONG = 18;
   /**
    * MinKey BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_MIN_KEY
    **/
   static const BSON_DATA_MIN_KEY = 0xff;
   /**
    * MaxKey BSON Type
-   *  
+   *
    * @classconstant BSON_DATA_MAX_KEY
    **/
   static const BSON_DATA_MAX_KEY = 0x7f;
 
   /**
    * Binary Default Type
-   *  
+   *
    * @classconstant BSON_BINARY_SUBTYPE_DEFAULT
    **/
   static const BSON_BINARY_SUBTYPE_DEFAULT = 0;
   /**
    * Binary Function Type
-   *  
+   *
    * @classconstant BSON_BINARY_SUBTYPE_FUNCTION
    **/
   static const BSON_BINARY_SUBTYPE_FUNCTION = 1;
   /**
    * Binary Byte Array Type
-   *  
+   *
    * @classconstant BSON_BINARY_SUBTYPE_BYTE_ARRAY
    **/
   static const BSON_BINARY_SUBTYPE_BYTE_ARRAY = 2;
   /**
    * Binary UUID Type
-   *  
+   *
    * @classconstant BSON_BINARY_SUBTYPE_UUID
    **/
   static const BSON_BINARY_SUBTYPE_UUID = 3;
   /**
    * Binary MD5 Type
-   *  
+   *
    * @classconstant BSON_BINARY_SUBTYPE_MD5
    **/
   static const BSON_BINARY_SUBTYPE_MD5 = 4;
   /**
    * Binary User Defined Type
-   *  
+   *
    * @classconstant BSON_BINARY_SUBTYPE_USER_DEFINED
    **/
   static const BSON_BINARY_SUBTYPE_USER_DEFINED = 128;
@@ -165,16 +167,16 @@ class BSON {
     if (!((object is Map) || (object is List))){
       throw new Exception("Invalid value for BSON serialize: $object");
     }
-    BsonObject bsonObject = bsonObjectFrom(object);    
+    BsonObject bsonObject = bsonObjectFrom(object);
     Binary buffer = new Binary(bsonObject.byteLength()+offset);
     buffer.offset = offset;
     bsonObjectFrom(object).packValue(buffer);
-    return buffer;  
+    return buffer;
   }
   deserialize(Binary buffer){
     if(buffer.byteList.length < 5){
       throw new Exception("corrupt bson message < 5 bytes long");
-    }    
+    }
     var bsonMap = new BsonMap(null);
     bsonMap.unpackValue(buffer);
     return bsonMap.value;

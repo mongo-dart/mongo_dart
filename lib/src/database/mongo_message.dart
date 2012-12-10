@@ -1,3 +1,5 @@
+part of mongo;
+
 class MongoMessage{
   static final Reply = 1;
   static final Message = 1000;
@@ -6,14 +8,14 @@ class MongoMessage{
   static final Query = 2004;
   static final GetMore = 2005;
   static final Delete = 2006;
-  static final KillCursors = 2007;   
+  static final KillCursors = 2007;
   int _messageLength;
   int _requestId;
   int get requestId{
-    if (_requestId === null){
-      _requestId = Statics.nextRequestId;    
+    if (_requestId == null){
+      _requestId = Statics.nextRequestId;
     }
-    return _requestId;      
+    return _requestId;
   }
   int responseTo;
   int opcode = MongoMessage.Reply;
@@ -21,11 +23,11 @@ class MongoMessage{
     throw "Must be implemented";
   }
   Binary serialize(){
-    throw "Must be implemented";    
-  }  
+    throw "Must be implemented";
+  }
   MongoMessage deserialize(Binary buffer){
-    throw "Must be implemented";    
-  }  
+    throw "Must be implemented";
+  }
   readMessageHeaderFrom(Binary buffer)
   {
       _messageLength = buffer.readInt32();

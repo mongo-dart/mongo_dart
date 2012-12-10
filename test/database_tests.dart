@@ -1,11 +1,11 @@
-#library("Database_tests");
-#import("package:mongo_dart/mongo.dart");
-#import("dart:uri");
-#import("package:mongo_dart/bson.dart");
-#import("package:mongo_dart/bson_vm.dart");
-#import("dart:io");
-#import("dart:crypto");
-#import('package:unittest/unittest.dart');
+library Database_tests;
+import "package:mongo_dart/mongo.dart";
+import "dart:uri";
+import "package:mongo_dart/bson.dart";
+import "package:mongo_dart/bson_vm.dart";
+import "dart:io";
+import "dart:crypto";
+import 'package:unittest/unittest.dart';
 const DefaultUri = 'mongodb://127.0.0.1/';
 testSelectorBuilderCreation(){
   SelectorBuilder selector = query();
@@ -16,7 +16,7 @@ testSelectorBuilderOnObjectId(){
   ObjectId id = new ObjectId();
   SelectorBuilder selector = query().id(id);
   expect(selector is Map);
-  expect(selector.length,greaterThan(0));  
+  expect(selector.length,greaterThan(0));
 }
 
 
@@ -26,7 +26,7 @@ testDatabaseName(){
   dbName = 'mongo_dart-test';
   db.validateDatabaseName(dbName);
   dbName = 'mongo_dart-test';
-  db.validateDatabaseName(dbName);  
+  db.validateDatabaseName(dbName);
 }
 
 testCollectionInfoCursor(){
@@ -46,12 +46,12 @@ testCollectionInfoCursor(){
 testRemove(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection newColl;
-  db.open().chain((c){  
+  db.open().chain((c){
     db.removeFromCollection("new_collecion_to_remove");
-    newColl = db.collection("new_collecion_to_remove");  
+    newColl = db.collection("new_collecion_to_remove");
     newColl.insertAll([{"a":1}]);
   return db.collectionsInfoCursor("new_collecion_to_remove").toList();
-  }).then((v){    
+  }).then((v){
     expect(v,hasLength(1));
     db.removeFromCollection("new_collecion_to_remove");
     //db.getLastError().then((v)=>print("remove result: $v"));
@@ -80,7 +80,7 @@ testGetNonce(){
       expect(v["ok"],1);
       db.close();
       callbackDone();
-  }); 
+  });
 }
 testPwd(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
@@ -91,7 +91,7 @@ testPwd(){
   }).then((v){
       db.close();
       callbackDone();
-  }); 
+  });
 }
 
 testCollectionCreation(){
@@ -101,8 +101,8 @@ testCollectionCreation(){
 testEach(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
-  int sum = 0;  
-  db.open().chain((c){  
+  int sum = 0;
+  db.open().chain((c){
     DbCollection newColl = db.collection('newColl1');
     return newColl.find().each((v)
       {sum += v["a"]; count++;});
@@ -111,8 +111,8 @@ testEach(){
 testFindEachWithThenClause(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
-  int sum = 0;  
-  db.open().chain((c){  
+  int sum = 0;
+  db.open().chain((c){
     DbCollection students = db.collection('students');
     students.drop();
     students.insertAll(
@@ -125,7 +125,7 @@ testFindEachWithThenClause(){
     return students.find().each((v)
       {sum += v["score"]; count++;});
    }).then((v){
-    info("Students Completed. Sum = $sum, count = $count average score = ${sum/count}");    
+    info("Students Completed. Sum = $sum, count = $count average score = ${sum/count}");
     db.close();
     callbackDone();
   });
@@ -133,8 +133,8 @@ testFindEachWithThenClause(){
 testFindEach(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
-  int sum = 0;  
-  db.open().chain((c){  
+  int sum = 0;
+  db.open().chain((c){
     DbCollection students = db.collection('students');
     students.remove();
     students.insertAll(
@@ -142,7 +142,7 @@ testFindEach(){
       {"name":"Vadim","score":4},
        {"name": "Daniil","score":4},
       {"name": "Nick", "score": 5}
-    ]);     
+    ]);
    return students.find().each((v1){
     count++;
     sum += v1["score"];});
@@ -152,26 +152,26 @@ testFindEach(){
     db.close();
     callbackDone();
    });
-  
+
 }
 testDrop(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then((_){
   db.dropCollection("testDrop").then((v)=>v);
-  db.dropCollection("testDrop").then((__){    
+  db.dropCollection("testDrop").then((__){
     db.close();
-    callbackDone();    
+    callbackDone();
   });
   });
-}  
+}
 
 testSaveWithIntegerId(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection coll;
   var id;
-  db.open().chain((c){  
+  db.open().chain((c){
     coll = db.collection('testSaveWithIntegerId');
-    coll.remove();  
+    coll.remove();
     List toInsert = [
                    {"_id":1,"name":"a", "value": 10},
                    {"_id":2,"name":"b", "value": 20},
@@ -180,26 +180,26 @@ testSaveWithIntegerId(){
                  ];
     coll.insertAll(toInsert);
     return coll.findOne({"name":"c"});
-  }).chain((v){  
-    expect(v["value"],30);    
+  }).chain((v){
+    expect(v["value"],30);
     return coll.findOne({"_id":3});
-    }).chain((v){  
-    v["value"] = 2;    
+    }).chain((v){
+    v["value"] = 2;
     coll.save(v);
     return coll.findOne({"_id":3});
   }).then((v1){
-    expect(v1["value"],2);    
+    expect(v1["value"],2);
     db.close();
     callbackDone();
-  });      
+  });
 }
 testSaveWithObjectId(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection coll;
   var id;
-  db.open().chain((c){  
+  db.open().chain((c){
     coll = db.collection('testSaveWithObjectId');
-    coll.remove();    
+    coll.remove();
     List toInsert = [
                    {"name":"a", "value": 10},
                    {"name":"b", "value": 20},
@@ -208,20 +208,20 @@ testSaveWithObjectId(){
                  ];
     coll.insertAll(toInsert);
     return coll.findOne({"name":"c"});
-  }).chain((v){  
+  }).chain((v){
     expect(v["value"],30);
-    id = v["_id"];    
+    id = v["_id"];
     return coll.findOne({"_id":id});
     }).chain((v){
     expect(v["value"],30);
-    v["value"] = 1;    
-    coll.save(v);    
+    v["value"] = 1;
+    coll.save(v);
     return coll.findOne({"_id":id});
-  }).then((v1){    
-    expect(v1["value"],1);    
+  }).then((v1){
+    expect(v1["value"],1);
     db.close();
-    callbackDone();    
-  });      
+    callbackDone();
+  });
 }
 
 testCount(){
@@ -231,7 +231,7 @@ testCount(){
     coll.remove();
     for(int n=0;n<167;n++){
       coll.insert({"a":n});
-        }    
+        }
     return coll.count();
   }).then((v){
     expect(v,167);
@@ -241,14 +241,14 @@ testCount(){
 }
 testSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  db.open().chain((c){  
+  db.open().chain((c){
     DbCollection coll = db.collection('testSkip');
     coll.remove();
     for(int n=0;n<600;n++){
       coll.insert({"a":n});
-        }    
+        }
     return coll.findOne(skip:300, orderBy: {"a":1});
-  }).then((v){    
+  }).then((v){
     expect(v["a"],300);
     db.close();
     callbackDone();
@@ -258,15 +258,15 @@ testLimit(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int counter = 0;
   Cursor cursor;
-  db.open().chain((c){  
+  db.open().chain((c){
     DbCollection coll = db.collection('testLimit');
     coll.remove();
     for(int n=0;n<600;n++){
       coll.insert({"a":n});
-    }    
-    cursor = coll.find(skip:300, limit: 10, orderBy: {"a":1}); 
-    return cursor.each((e)=>counter++);    
-  }).then((v){    
+    }
+    cursor = coll.find(skip:300, limit: 10, orderBy: {"a":1});
+    return cursor.each((e)=>counter++);
+  }).then((v){
     expect(counter,10);
     expect(cursor.state,Cursor.CLOSED);
     expect(cursor.cursorId,0);
@@ -284,7 +284,7 @@ testPingRaw(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().chain((c){
     DbCollection collection = db.collection('\$cmd');
-    Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);  
+    Cursor cursor = new Cursor(db,collection,{"ping":1},limit:1);
     MongoQueryMessage queryMessage = cursor.generateQueryMessage();
     Future mapFuture = db.connection.query(queryMessage);
     return mapFuture;
@@ -316,8 +316,8 @@ testNextObjectToEnd(){
     collection.insert({"a":1});
     collection.insert({"a":2});
     collection.insert({"a":3});
-    cursor = new Cursor(db,collection,limit:10);  
-    return cursor.nextObject();  
+    cursor = new Cursor(db,collection,limit:10);
+    return cursor.nextObject();
   }).then((v){
     expect(v,isNotNull);
     res = cursor.nextObject();
@@ -331,14 +331,14 @@ testNextObjectToEnd(){
           expect(v3,isNull);
           db.close();
           callbackDone();
-        });  
-      });  
-    });  
-  });  
+        });
+      });
+    });
+  });
 
 }
 
-testCursorWithOpenServerCursor(){  
+testCursorWithOpenServerCursor(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   Cursor cursor;
   db.open().chain((c){
@@ -347,10 +347,10 @@ testCursorWithOpenServerCursor(){
     for (int n=0;n < 100; n++){
       collection.insert({"a":n});
     }
-    cursor = new Cursor(db,collection,limit:10);  
+    cursor = new Cursor(db,collection,limit:10);
     return cursor.nextObject();
-  }).then((v){  
-    expect(cursor.state, Cursor.OPEN);  
+  }).then((v){
+    expect(cursor.state, Cursor.OPEN);
     expect(cursor.cursorId, isPositive);
     db.close();
     callbackDone();
@@ -361,7 +361,7 @@ testCursorGetMore(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection collection;
   int count = 0;
-  Cursor cursor;  
+  Cursor cursor;
   db.open().chain((c){
     collection = db.collection('new_big_collection2');
     collection.remove();
@@ -380,7 +380,7 @@ testCursorGetMore(){
     collection.insertAll(toInsert);
     return db.getLastError();
   }).chain((_){
-    cursor = new Cursor(db,collection,limit:10);  
+    cursor = new Cursor(db,collection,limit:10);
     return cursor.each((v)=>count++);
   }).then((v){
     expect(count,1000);
@@ -388,8 +388,8 @@ testCursorGetMore(){
     expect(cursor.state,Cursor.CLOSED);
     collection.remove();
     db.close();
-    callbackDone();  
-  });    
+    callbackDone();
+  });
 }
 testCursorClosing(){
   var res;
@@ -398,15 +398,15 @@ testCursorClosing(){
   Cursor cursor;
   db.open().chain((c){
     collection = db.collection('new_big_collection1');
-    collection.remove();  
-    for (int n=0;n < 1000; n++){  
+    collection.remove();
+    for (int n=0;n < 1000; n++){
       collection.insert({"a":n});
       }
     int count = 0;
     cursor = collection.find();
     expect(cursor.state,Cursor.INIT);
     return cursor.nextObject();
-  }).then((v){    
+  }).then((v){
     expect(cursor.state,Cursor.OPEN);
     expect(cursor.cursorId,isPositive);
     cursor.close();
@@ -415,7 +415,7 @@ testCursorClosing(){
     collection.findOne().then((v1){
       expect(v,isNotNull);
       db.close();
-      callbackDone();  
+      callbackDone();
     });
   });
 }
@@ -432,7 +432,7 @@ testPingDbCommand(){
     Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(pingCommand);
     mapFuture.then((msg) {
       expect(msg.documents[0],containsPair('ok', 1));
-      db.close();      
+      db.close();
     });
   });
 }
@@ -441,9 +441,9 @@ testDropDbCommand(){
   db.open().then((d){
     DbCommand command = DbCommand.createDropDatabaseCommand(db);
     Future<MongoReplyMessage> mapFuture = db.executeQueryMessage(command);
-    mapFuture.then((msg) {      
-      expect(msg.documents[0]["ok"],1);      
-      db.close();      
+    mapFuture.then((msg) {
+      expect(msg.documents[0]["ok"],1);
+      db.close();
     });
   });
 }
@@ -519,7 +519,7 @@ testMongoDbUri(){
 }
 main(){
 // some tests do not open db, when bson initialize
-  initBsonPlatform(); 
+  initBsonPlatform();
   group("DbCollection tests:", (){
     test("testSelectorBuilderCreation",testSelectorBuilderCreation);
     test("testSelectorBuilderOnObjectId",testSelectorBuilderOnObjectId);

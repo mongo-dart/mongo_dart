@@ -1,3 +1,5 @@
+part of bson;
+
 class BsonDate extends BsonObject{
   Date data;
   BsonDate(this.data);

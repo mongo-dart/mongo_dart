@@ -1,14 +1,16 @@
+part of bson;
+
 List<int> makeUint8List(int size) => BsonPlatform.platform.makeUint8List(size);
 makeByteArray(List<int> from) => BsonPlatform.platform.makeByteArray(from);
 
 abstract class BsonPlatform {
   static BsonPlatform platform;
-  abstract Dynamic makeUint8List(int size);
-  abstract Dynamic makeByteArray(List<int> from);  
+  dynamic makeUint8List(int size);
+  dynamic makeByteArray(List<int> from);
 }
 
 
-interface BsonByteArray {  
+abstract class BsonByteArray {
   int getInt8(int byteOffset);
 
   void setInt8(int byteOffset, int value);
@@ -47,5 +49,5 @@ interface BsonByteArray {
 
   double getFloat64(int byteOffset);
 
-  void setFloat64(int byteOffset, double value);   
+  void setFloat64(int byteOffset, double value);
 }

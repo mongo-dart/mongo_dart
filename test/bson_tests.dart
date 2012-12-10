@@ -1,8 +1,8 @@
-#library("tests");
-#import('package:unittest/unittest.dart');
+library tests;
+import 'package:unittest/unittest.dart';
 //#import('dart:scalarlist', prefix: 'scalarlist');
-#import('dart:scalarlist');
-#import("package:mongo_dart/bson.dart");
+import 'dart:scalarlist';
+import "package:mongo_dart/bson.dart";
 
 testUint8ListNegativeWrite(){
   Uint8List bl = new Uint8List(4);
@@ -28,18 +28,18 @@ testBinary(){
    expect(b.hexString,'0000000004030201');
    b = new Binary(8);
    b.writeInt(0,4);
-   b.writeInt(0x01020304,4,forceBigEndian:true);
+   b.writeInt(0x01020304,4,true);
    expect('0000000001020304',b.hexString);
    b = new Binary(8);
    b.writeInt(0,4);
-   b.writeInt(1,4,forceBigEndian:true);
+   b.writeInt(1,4,true);
    expect('0000000000000001',b.hexString);
    b = new Binary(8);
-   b.writeInt(1,3,forceBigEndian:true);
+   b.writeInt(1,3,true);
    expect('0000010000000000',b.hexString);
    b = new Binary(8);
    b.writeInt(0,3);
-   b.writeInt(1,3,forceBigEndian:true);
+   b.writeInt(1,3,true);
    expect('0000000000010000',b.hexString);
    b = new Binary(4);
    b.writeInt(-1);
@@ -100,8 +100,8 @@ testMakeByteList() {
   for (int n = 0; n<125; n++ ) {
     var hex = n.toRadixString(16);
     if (hex.length.remainder(2) != 0) {
-      hex = '0$hex'; 
-    }    
+      hex = '0$hex';
+    }
     var b = new Binary.fromHexString(hex);
     b.makeByteList();
     expect(b.byteList[0], n);
@@ -120,7 +120,7 @@ testMakeByteList() {
 
 testBsonIdFromHexString() {
   var oid1 = new ObjectId();
-  var oid2 = new ObjectId.fromHexString(oid1.toHexString());  
+  var oid2 = new ObjectId.fromHexString(oid1.toHexString());
   oid2.id.makeByteList();
   expect(oid2.id.byteList,orderedEquals(oid1.id.byteList));
   var b1 = new BSON().serialize({'id':oid1});
@@ -128,7 +128,7 @@ testBsonIdFromHexString() {
   b1.rewind();
   b2.rewind();
   var oid3 = new BSON().deserialize(b2)['id'];
-  expect(oid3.id.byteList,orderedEquals(oid1.id.byteList));  
+  expect(oid3.id.byteList,orderedEquals(oid1.id.byteList));
 }
 testBsonIdClientMode() {
   var oid1 = new ObjectId(clientMode: true);
@@ -142,7 +142,7 @@ main(){
     test("testUint8ListNegativeWrite",testUint8ListNegativeWrite);
     test("testBinary",testBinary);
     test("testBinaryWithNegativeOne",testBinaryWithNegativeOne);
-    test("testMakeByteList",testMakeByteList);    
+    test("testMakeByteList",testMakeByteList);
   });
   group("BsonTypesTest:", (){
     test("typeTest",typeTest);
@@ -152,7 +152,7 @@ main(){
     test("testBsonIdFromHexString",testBsonIdFromHexString);
     test("testBsonIdClientMode",testBsonIdClientMode);
   });
-  group("BsonSerialization:", (){    
-    test("testSerializeDeserialize",testSerializeDeserialize);    
+  group("BsonSerialization:", (){
+    test("testSerializeDeserialize",testSerializeDeserialize);
   });
 }

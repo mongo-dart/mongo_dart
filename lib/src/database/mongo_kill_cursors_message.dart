@@ -1,8 +1,10 @@
-class MongoKillCursorsMessage extends MongoMessage{  
+part of mongo;
+
+class MongoKillCursorsMessage extends MongoMessage{
   int cursorId;
   MongoKillCursorsMessage(
-            this.cursorId  
-            ){    
+            this.cursorId
+            ){
     opcode = MongoMessage.KillCursors;
   }
   int get messageLength{
@@ -12,7 +14,7 @@ class MongoKillCursorsMessage extends MongoMessage{
     Binary buffer = new Binary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
-    buffer.writeInt(1);    
+    buffer.writeInt(1);
     buffer.writeInt64(cursorId);
     buffer.offset = 0;
     return buffer;

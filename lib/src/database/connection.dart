@@ -1,3 +1,5 @@
+part of mongo;
+
 class Connection{
   Map<int,Completer<MongoReplyMessage>> replyCompleters;
   Binary lengthBuffer;
@@ -8,9 +10,9 @@ class Connection{
   Socket socket;
   bool connected = false;
   Connection([this.serverConfig]){
-    if (serverConfig === null){
+    if (serverConfig == null){
       serverConfig = new ServerConfig();
-    }    
+    }
   }
   Future<bool> connect(){
     replyCompleters = new Map();
@@ -40,10 +42,10 @@ class Connection{
     socket.onWrite = null;
     socket.onError = null;
     socket.close();
-    replyCompleters.clear();    
+    replyCompleters.clear();
   }
   getNextBufferToSend(){
-    if (bufferToSend === null || bufferToSend.atEnd()){
+    if (bufferToSend == null || bufferToSend.atEnd()){
       if(!sendQueue.isEmpty()){
         MongoMessage message = sendQueue.removeFirst();
         debug(message.toString());
@@ -51,8 +53,8 @@ class Connection{
         bufferToSend = message.serialize();
         debug(bufferToSend.hexString);
       } else {
-        bufferToSend = null;  
-      } 
+        bufferToSend = null;
+      }
     }
   }
   sendBufferFromTimer() => sendBuffer("from Timer");
@@ -60,28 +62,28 @@ class Connection{
   sendBuffer(String origin){
     debug("sendBuffer($origin)");
     getNextBufferToSend();
-    if (bufferToSend !== null){      
+    if (bufferToSend != null){
       bufferToSend.offset += socket.writeList(bufferToSend.byteList,
         bufferToSend.offset,bufferToSend.byteList.length-bufferToSend.offset);
-      if (!bufferToSend.atEnd()){        
+      if (!bufferToSend.atEnd()){
        debug("Buffer not send fully, offset: ${bufferToSend.offset}");
       }
-      
-      new Timer(0,(t)=>sendBufferFromTimer());              
+
+      new Timer(0,(t)=>sendBufferFromTimer());
 //      sendBuffer("From sendBuffer");
-    }        
+    }
     else {
       //print("setting onwrite to null");
-      socket.onWrite = null;        
-    }    
-  }  
+      socket.onWrite = null;
+    }
+  }
    void receiveData() {
-    if (messageBuffer === null){
+    if (messageBuffer == null){
       int numBytes = socket.readList(lengthBuffer.byteList, 0, 4);
       if (numBytes == 0) {
         return;
       }
-      int messageLength = lengthBuffer.readInt32();      
+      int messageLength = lengthBuffer.readInt32();
       messageBuffer = new Binary(messageLength);
       messageBuffer.writeInt(messageLength);
     }
@@ -97,15 +99,15 @@ class Connection{
       //print("messageBuffer = ${messageBuffer}");
       messageBuffer = null;
       lengthBuffer.rewind();
-      Completer completer = replyCompleters.remove(reply.responseTo);      
-      if (completer !== null){
+      Completer completer = replyCompleters.remove(reply.responseTo);
+      if (completer != null){
         //print("messageBuffer = ${messageBuffer}");
-        completer.complete(reply);       
+        completer.complete(reply);
       }
       else {
         warn("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
-      }  
-    }   
+      }
+    }
   }
   Future<MongoReplyMessage> query(MongoMessage queryMessage){
     Completer completer = new Completer();
@@ -113,11 +115,11 @@ class Connection{
     socket.onData = receiveData;
     sendQueue.addLast(queryMessage);
 //    sendBuffer("From query");
-    socket.onWrite = sendBufferFromOnWrite;    
+    socket.onWrite = sendBufferFromOnWrite;
     return completer.future;
   }
   execute(MongoMessage message){
-    sendQueue.addLast(message);    
+    sendQueue.addLast(message);
     socket.onWrite = sendBufferFromOnWrite;
   }
 }

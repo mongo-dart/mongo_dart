@@ -1,9 +1,9 @@
-#library("tests");
-#import('package:unittest/unittest.dart');
-#import('dart:scalarlist');
-#import('package:mongo_dart/bson.dart');
-#import('package:mongo_dart/bson_vm.dart');
-#import('package:mongo_dart/src/bson/json_ext.dart');
+library tests;
+import 'package:unittest/unittest.dart';
+import 'dart:scalarlist';
+import 'package:mongo_dart/bson.dart';
+import 'package:mongo_dart/bson_vm.dart';
+import 'package:mongo_dart/src/bson/json_ext.dart';
 
 main(){
   initBsonPlatform();
@@ -24,21 +24,21 @@ main(){
       test('Simple ObjectId stringify',(){
         expect(JSON.stringify(new ObjectId.fromHexString("AAAA")),'{"\$oid":"AAAA"}');
       });
-      test('Simple ObjectId parse',(){                 
+      test('Simple ObjectId parse',(){
         expect((JSON.parse('{"\$oid":"AAAAAAAAAAAAAAAAAAAAAAAA"}') as ObjectId).toHexString() ,"AAAAAAAAAAAAAAAAAAAAAAAA");
       });
       test('ObjectId lifecycle native/json/bson/native',(){
         ObjectId originalOid = new ObjectId();
-        ObjectId jsonOid = JSON.parse(JSON.stringify([originalOid]))[0];        
+        ObjectId jsonOid = JSON.parse(JSON.stringify([originalOid]))[0];
         expect(jsonOid.toHexString(),originalOid.toHexString());
         var bson = new BSON();
         var b = bson.serialize({'oid':jsonOid});
         b.rewind();
-        Map map = bson.deserialize(b);        
-        var targetOid = map['oid'];        
+        Map map = bson.deserialize(b);
+        var targetOid = map['oid'];
         expect(targetOid.toHexString(),originalOid.toHexString());
       });
-      
-    });    
-  });    
+
+    });
+  });
 }
