@@ -175,7 +175,7 @@ class _JsonParser {
   _JsonParser(String json)
       : json = json,
         length = json.length {
-    if (tokens !== null) return;
+    if (tokens != null) return;
 
     // Use a list as jump-table. It is faster than switch and if.
     tokens = new List<int>(LAST_ASCII + 1);
@@ -208,7 +208,7 @@ class _JsonParser {
 
   parseToplevel() {
     final result = parseValue();
-    if (token() !== null) {
+    if (token() != null) {
       error('Junk at the end of JSON input');
     }
     return result;
@@ -229,6 +229,7 @@ class _JsonParser {
       case LBRACKET: return parseList();
       default:
         error('Unexpected token');
+        return;
     }
   }
 
@@ -374,6 +375,7 @@ class _JsonParser {
             break;
           default:
             error('Invalid esacape sequence in string literal');
+            break;
         }
       }
       charCodes.add(c);

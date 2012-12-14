@@ -130,7 +130,7 @@ class Db{
   Cursor collectionsInfoCursor([String collectionName]) {
     Map selector = {};
     // If we are limiting the access to a specific collection name
-    if(collectionName !== null){
+    if(collectionName != null){
       selector["name"] = "${this.databaseName}.$collectionName";
     }
     // Return Cursor

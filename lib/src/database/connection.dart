@@ -80,7 +80,7 @@ class Connection{
       _messageBuffer = null;
       _lengthBuffer.rewind();
       Completer completer = _replyCompleters.remove(reply.responseTo);
-      if (completer !== null){
+      if (completer != null){
         completer.complete(reply);
       }
       else {

@@ -9,7 +9,7 @@ class BsonObject {
   int byteLength() => 0;
   packElement(String name, var buffer){
     buffer.writeByte(typeByte);
-    if (name !== null){
+    if (name != null){
       new BsonCString(name).packValue(buffer);
     }
     packValue(buffer);
@@ -27,7 +27,7 @@ class BsonObject {
 }
 int elementSize(String name, value) {
   int size = 1;
-  if (name !== null){
+  if (name != null){
     size += Statics.getKeyUtf8(name).length + 1;
   }
   size += bsonObjectFrom(value).byteLength();

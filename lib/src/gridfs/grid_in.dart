@@ -58,7 +58,7 @@ class GridIn extends GridFSFile {
           break;
         }
       }
-        
+
       futures.add(dumpBuffer(true));
     } while (bytesRead > 0);
 
@@ -80,7 +80,7 @@ class GridIn extends GridFSFile {
       // Chunk is empty, may be last chunk
       return new Future.immediate({});
     }
-    
+
     List<int> writeBuffer = buffer;
     if ( currentBufferPosition != chunkSize ) {
       writeBuffer = new List<int>(currentBufferPosition);

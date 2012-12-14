@@ -13,7 +13,7 @@ class DbCollection{
         createId = true;
       }
     }
-    if (id !== null){
+    if (id != null){
       update({"_id": id}, document);
     }
     else{

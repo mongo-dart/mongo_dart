@@ -26,10 +26,12 @@ class GridFSFile {
   }
 
   Future<bool> validate() {
-    if (fs == null)
+    if (fs == null) {
       throw "no fs";
-    if (md5 == null)
+    }
+    if (md5 == null) {
       throw "no md5 stored";
+    }
 
     Completer completer = new Completer();
     // query for md5 at filemd5
@@ -56,7 +58,7 @@ class GridFSFile {
   Map get metaData {
     return extraData["metadata"];
   }
-  
+
   set metaData(Map metaData) {
     extraData["metadata"] = metaData;
   }
