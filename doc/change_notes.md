@@ -1,5 +1,24 @@
 #Recent change notes
 
+###0.0.10
+
+- New syntax cleanUp. Next revisions will be published on pub.dartlangl.org. No more need to use git dependency for dependend application. 
+
+###0.0.9
+
+- Ted Sander joined project and added initial support of GridFS functionality
+
+###0.0.8
+
+- Fixed bux in database_tests.dart (Process did not ends cleanly)
+- Sdk package dependencies moved to pub.dartlang.org 
+
+###0.0.7
+
+- new syntax changes
+- Selector API changed
+- modifier_builder added
+
 ###0.0.6
 
 - Repairing incomplete commit v0.0.5 
