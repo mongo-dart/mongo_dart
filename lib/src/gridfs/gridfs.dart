@@ -34,7 +34,7 @@ class GridFS {
     return completer.future;
   }
 
-  GridIn createFile(RandomAccessFile input, String filename) {
+  GridIn createFile(InputStream input, String filename) {
     return new GridIn(this, filename, input);
   }
 }
