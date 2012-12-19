@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.0.11
+
+- Refactorings in GridFS. Tetst for GridFS added. 
+
 ###0.0.10
 
 - New syntax cleanUp. Next revisions will be published on pub.dartlangl.org. No more need to use git dependency for dependend application. 

@@ -27,7 +27,7 @@ From [Feature Checklist for Mongo Drivers](http://www.mongodb.org/display/DOCS/F
 - count() helper function: **Done**
 - $where clause: **Done**
 - eval()
-- File chunking (GridFS)
+- File chunking (GridFS) **Done**
 - hint fields
 - explain helper
 
