@@ -24,13 +24,18 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
 <li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
 <li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
 <li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
 <li><div class="icon-class"></div><strong>DbCollection</strong></li>
 <li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><a href="../mongo_dart/GridFS.html"><div class="icon-class"></div>GridFS</a></li>
+<li><a href="../mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
+<li><a href="../mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
+<li><a href="../mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
 <li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
 <li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
 <li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
 <li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
@@ -40,9 +45,8 @@
 <li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
 <li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
 <li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
-<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
 <li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
-<li><a href="../mongo_dart/Utils.html"><div class="icon-class"></div>Utils</a></li>
 </ul>
 </div>
 <div class="content">
@@ -63,11 +67,11 @@ class DbCollection{
    bool createId = false;
    if (document.containsKey("_id")){
      id = document["_id"];
-     if (id === null){
+     if (id == null){
        createId = true;
      }
    }
-   if (id !== null){
+   if (id != null){
      update({"_id": id}, document);
    }
    else{
@@ -85,42 +89,61 @@ Future insertAll(List&lt;Map&gt; documents, {bool safeMode: false}){
    }
    else
    {
-     return new Future.immediate({'ok': 1.0});  
+     return new Future.immediate({'ok': 1.0});
    }
  }
-Future update(Map selector, Map document, {bool safeMode: false}){
-   MongoUpdateMessage message = new MongoUpdateMessage(fullName(),selector, document, 0);
+Future update(selector, document, {bool safeMode: false}){
+   MongoUpdateMessage message = new MongoUpdateMessage(fullName(),_selectorBuiltder2Map(selector), document, 0);
    db.executeMessage(message);
    if (safeMode) {
      return db.getLastError();
    }
    else
    {
-     return new Future.immediate({'ok': 1.0});  
+     return new Future.immediate({'ok': 1.0});
    }
  }
 
-
- Cursor find([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ) {
-   return new Cursor(db, this, selector, fields, skip, limit, orderBy);//, [selector, skip, limit,sort, hint, explain]);
+/**
+ * Creates a cursor for a query that can be used to iterate over results from MongoDB
+ * ##[selector]
+ * parameter represents query to locate objects. If omitted as in `find()` then query matches all documents in colleciton.
+ * Here's a more selective example:
+ *     find({'last_name': 'Smith'})
+ * Here our selector will match every document where the last_name attribute is 'Smith.'
+ *
+ */
+ Cursor find([selector]) {
+   return new Cursor(db, this, selector);
  }
- Future&lt;Map&gt; findOne([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
-   Cursor cursor = find(selector, fields, orderBy, skip, limit, hint, explain);
+
+ Future&lt;Map&gt; findOne([selector]){
+   Cursor cursor = find(selector);
    Future&lt;Map&gt; result = cursor.nextObject();
    cursor.close();
    return result;
  }
  Future drop() =&gt; db.dropCollection(collectionName);
- Future remove([Map selector = const {}]) =&gt; db.removeFromCollection(collectionName, selector);
- Future count([Map selector = const {}]){
+ Future remove([selector]) =&gt; db.removeFromCollection(collectionName, _selectorBuiltder2Map(selector));
+ Future count([selector]){
    Completer completer = new Completer();
-   db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,selector)).then((reply){
+   db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuiltder2Map(selector))).then((reply){
      //print("reply = ${reply}");
      completer.complete(reply["n"]);
    });
    return completer.future;
  }
  Future insert(Map document, {bool safeMode: false}) =&gt; insertAll([document], safeMode: safeMode);
+
+ Map _selectorBuiltder2Map(selector) {
+   if (selector == null) {
+     return {};
+   }
+   if (selector is SelectorBuilder) {
+     return selector.map;
+   }
+   return selector;
+ }
 }
 </pre>
 </div>
@@ -168,13 +191,13 @@ Db db;
 <h3>Methods</h3>
 <div class="method"><h4 id="count">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>count</strong>([<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> selector = const{}]) <a class="anchor-link" href="#count"
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>count</strong>([selector]) <a class="anchor-link" href="#count"
               title="Permalink to DbCollection.count">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future count([Map selector = const {}]){
+Future count([selector]){
  Completer completer = new Completer();
- db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,selector)).then((reply){
+ db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuiltder2Map(selector))).then((reply){
    //print("reply = ${reply}");
    completer.complete(reply["n"]);
  });
@@ -195,24 +218,32 @@ Future drop() =&gt; db.dropCollection(collectionName);
 </div>
 <div class="method"><h4 id="find">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/Cursor.html">Cursor</a> <strong>find</strong>([<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> selector = const{}, <a href="http://api.dartlang.org/dart_core/Map.html">Map</a> fields = null, <a href="http://api.dartlang.org/dart_core/Map.html">Map</a> orderBy, <a href="http://api.dartlang.org/dart_core/int.html">int</a> skip = 0, <a href="http://api.dartlang.org/dart_core/int.html">int</a> limit = 0, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> hint = false, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> explain = false]) <a class="anchor-link" href="#find"
+<a href="../mongo_dart/Cursor.html">Cursor</a> <strong>find</strong>([selector]) <a class="anchor-link" href="#find"
               title="Permalink to DbCollection.find">#</a></h4>
 <div class="doc">
+<p>Creates a cursor for a query that can be used to iterate over results from MongoDB</p>
+<h2>
+<span class="param">selector</span></h2>
+<p>parameter represents query to locate objects. If omitted as in <code>find()</code> then query matches all documents in colleciton.
+Here's a more selective example:</p>
+<pre><code>find({'last_name': 'Smith'})
+</code></pre>
+<p>Here our selector will match every document where the last_name attribute is 'Smith.'</p>
 <pre class="source">
-Cursor find([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ) {
- return new Cursor(db, this, selector, fields, skip, limit, orderBy);//, [selector, skip, limit,sort, hint, explain]);
+Cursor find([selector]) {
+ return new Cursor(db, this, selector);
 }
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="findOne">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; <strong>findOne</strong>([<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> selector = const{}, <a href="http://api.dartlang.org/dart_core/Map.html">Map</a> fields = null, <a href="http://api.dartlang.org/dart_core/Map.html">Map</a> orderBy, <a href="http://api.dartlang.org/dart_core/int.html">int</a> skip = 0, <a href="http://api.dartlang.org/dart_core/int.html">int</a> limit = 0, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> hint = false, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> explain = false]) <a class="anchor-link" href="#findOne"
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; <strong>findOne</strong>([selector]) <a class="anchor-link" href="#findOne"
               title="Permalink to DbCollection.findOne">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future&lt;Map&gt; findOne([Map selector = const {}, Map fields = null, Map orderBy, int skip = 0,int limit = 0, bool hint = false, bool explain = false] ){
- Cursor cursor = find(selector, fields, orderBy, skip, limit, hint, explain);
+Future&lt;Map&gt; findOne([selector]){
+ Cursor cursor = find(selector);
  Future&lt;Map&gt; result = cursor.nextObject();
  cursor.close();
  return result;
@@ -254,7 +285,7 @@ Future insertAll(List&lt;Map&gt; documents, {bool safeMode: false}){
   }
   else
   {
-    return new Future.immediate({'ok': 1.0});  
+    return new Future.immediate({'ok': 1.0});
   }
 }
 </pre>
@@ -262,11 +293,11 @@ Future insertAll(List&lt;Map&gt; documents, {bool safeMode: false}){
 </div>
 <div class="method"><h4 id="remove">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>remove</strong>([<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> selector = const{}]) <a class="anchor-link" href="#remove"
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>remove</strong>([selector]) <a class="anchor-link" href="#remove"
               title="Permalink to DbCollection.remove">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future remove([Map selector = const {}]) =&gt; db.removeFromCollection(collectionName, selector);
+Future remove([selector]) =&gt; db.removeFromCollection(collectionName, _selectorBuiltder2Map(selector));
 </pre>
 </div>
 </div>
@@ -281,11 +312,11 @@ void save(Map document){
  bool createId = false;
  if (document.containsKey("_id")){
    id = document["_id"];
-   if (id === null){
+   if (id == null){
      createId = true;
    }
  }
- if (id !== null){
+ if (id != null){
    update({"_id": id}, document);
  }
  else{
@@ -300,19 +331,19 @@ void save(Map document){
 </div>
 <div class="method"><h4 id="update">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>update</strong>(<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> selector, <a href="http://api.dartlang.org/dart_core/Map.html">Map</a> document, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> safeMode: false}) <a class="anchor-link" href="#update"
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>update</strong>(selector, document, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> safeMode: false}) <a class="anchor-link" href="#update"
               title="Permalink to DbCollection.update">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future update(Map selector, Map document, {bool safeMode: false}){
-  MongoUpdateMessage message = new MongoUpdateMessage(fullName(),selector, document, 0);
+Future update(selector, document, {bool safeMode: false}){
+  MongoUpdateMessage message = new MongoUpdateMessage(fullName(),_selectorBuiltder2Map(selector), document, 0);
   db.executeMessage(message);
   if (safeMode) {
     return db.getLastError();
   }
   else
   {
-    return new Future.immediate({'ok': 1.0});  
+    return new Future.immediate({'ok': 1.0});
   }
 }
 </pre>
@@ -324,7 +355,7 @@ Future update(Map selector, Map document, {bool safeMode: false}){
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:50.961</div>
+          <div>This page was generated at 2012-12-27 12:26:56.051</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

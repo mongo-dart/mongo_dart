@@ -48,7 +48,7 @@
 <li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
 <li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
 </ul>
-<h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
+<h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
 <div class="content">
         <h2><strong>BsonCode</strong>
           class
@@ -116,7 +116,7 @@ final <a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href=
         <div class="inherited-from">inherited from <a href="../bson/BsonString.html">BsonString</a> </div><div class="doc">
 <pre class="source">
 List&lt;int&gt; get utfData{
- if (_utfData === null){
+ if (_utfData == null){
    _utfData = encodeUtf8(data);
  }
  return _utfData;
@@ -157,7 +157,7 @@ byteLength()=&gt;utfData.length+1+4;
 <pre class="source">
 packElement(String name, var buffer){
  buffer.writeByte(typeByte);
- if (name !== null){
+ if (name != null){
    new BsonCString(name).packValue(buffer);
  }
  packValue(buffer);
@@ -229,7 +229,7 @@ unpackValue(BsonBinary buffer){
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:50.068</div>
+          <div>This page was generated at 2012-12-27 12:26:55.838</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

@@ -48,7 +48,7 @@
 <li><div class="icon-class"></div><strong>Statics</strong></li>
 <li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
 </ul>
-<h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
+<h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
 <div class="content">
         <h2><strong>Statics</strong>
           class
@@ -73,7 +73,7 @@ class Statics{
  static int _requestId;
  static int get nextRequestId
  {
-   if (_requestId === null)
+   if (_requestId == null)
    {
      _requestId = 1;
    }
@@ -83,7 +83,7 @@ class Statics{
  static List&lt;int&gt; _maxBits;
  static int MaxBits(int bits){
    int res;
-   if (_maxBits === null){
+   if (_maxBits == null){
      _maxBits = new List&lt;int&gt;(65);
      _maxBits[0] = 0;
      for (var i = 1; i &lt; 65; i++) {
@@ -155,7 +155,7 @@ final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <stro
 <pre class="source">
 static int get nextRequestId
 {
- if (_requestId === null)
+ if (_requestId == null)
  {
    _requestId = 1;
  }
@@ -220,7 +220,7 @@ static Duration getElapsedTime(){
 <pre class="source">
 static int MaxBits(int bits){
  int res;
- if (_maxBits === null){
+ if (_maxBits == null){
    _maxBits = new List&lt;int&gt;(65);
    _maxBits[0] = 0;
    for (var i = 1; i &lt; 65; i++) {
@@ -253,7 +253,7 @@ static getKeyUtf8(String key){
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:50.303</div>
+          <div>This page was generated at 2012-12-27 12:26:55.873</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

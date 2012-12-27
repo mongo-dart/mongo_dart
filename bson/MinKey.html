@@ -48,7 +48,7 @@
 <li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
 <li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
 </ul>
-<h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
+<h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
 <div class="content">
         <h2><strong>MinKey</strong>
           class
@@ -75,7 +75,7 @@ final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <stro
         </h4>
         <div class="inherited-from">inherited from <a href="../bson/BsonObject.html">BsonObject</a> </div><div class="doc">
 <pre class="source">
-int get typeByte{ throw const Exception("must be implemented");}
+int get typeByte{ throw "must be implemented";}
 </pre>
 </div>
 </div>
@@ -112,7 +112,7 @@ int byteLength() =&gt; 0;
 <pre class="source">
 packElement(String name, var buffer){
  buffer.writeByte(typeByte);
- if (name !== null){
+ if (name != null){
    new BsonCString(name).packValue(buffer);
  }
  packValue(buffer);
@@ -126,7 +126,7 @@ packElement(String name, var buffer){
               title="Permalink to MinKey.packValue">#</a></h4>
 <div class="inherited-from">inherited from <a href="../bson/BsonObject.html">BsonObject</a> </div><div class="doc">
 <pre class="source">
-packValue(var buffer){ throw const Exception("must be implemented");}
+packValue(var buffer){ throw "must be implemented";}
 </pre>
 </div>
 </div>
@@ -152,7 +152,7 @@ _ElementPair unpackElement(buffer){
               title="Permalink to MinKey.unpackValue">#</a></h4>
 <div class="inherited-from">inherited from <a href="../bson/BsonObject.html">BsonObject</a> </div><div class="doc">
 <pre class="source">
-unpackValue(var buffer){ throw const Exception("must be implemented");}
+unpackValue(var buffer){ throw "must be implemented";}
 </pre>
 </div>
 </div>
@@ -162,7 +162,7 @@ unpackValue(var buffer){ throw const Exception("must be implemented");}
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:50.262</div>
+          <div>This page was generated at 2012-12-27 12:26:55.868</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

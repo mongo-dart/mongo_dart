@@ -24,13 +24,18 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
 <li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
 <li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
 <li><div class="icon-class"></div><strong>Db</strong></li>
 <li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
 <li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><a href="../mongo_dart/GridFS.html"><div class="icon-class"></div>GridFS</a></li>
+<li><a href="../mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
+<li><a href="../mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
+<li><a href="../mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
 <li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
 <li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
 <li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
 <li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
@@ -40,9 +45,8 @@
 <li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
 <li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
 <li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
-<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
 <li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
-<li><a href="../mongo_dart/Utils.html"><div class="icon-class"></div>Utils</a></li>
 </ul>
 </div>
 <div class="content">
@@ -57,28 +61,23 @@ class Db{
  String databaseName;
  ServerConfig serverConfig;
  Connection connection;
- validateDatabaseName(String dbName) {
-   if(dbName.length === 0) throw "database name cannot be the empty string";
+ _validateDatabaseName(String dbName) {
+   if(dbName.length == 0) throw "database name cannot be the empty string";
    var invalidChars = [" ", ".", "\$", "/", "\\"];
    for(var i = 0; i &lt; invalidChars.length; i++) {
      if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
    }
- }
- Db.local(this.databaseName){
-    if (serverConfig === null) {
-     serverConfig = new ServerConfig();
-    }
-   connection = new Connection(serverConfig);
  }
 
 /**
 * Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
 * For example next code points to local mongodb server on default mongodb port, database *testdb*
 *     var db = new Db('mongodb://127.0.0.1/testdb');
-* And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
+* And that code direct to MongoLab server *ds037637-a.mongolab.com* on 37637 port, database *objectory_blog*, username *dart*, password *test*
 *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
 */
  Db(String uriString){
+   _configureConsoleLogger();
    var uri = new Uri.fromString(uriString);
    if (uri.scheme != 'mongodb') {
      throw 'Invalid scheme in uri: $uriString ${uri.scheme}';
@@ -105,7 +104,7 @@ class Db{
  DbCollection collection(String collectionName){
      return new DbCollection(this,collectionName);
  }
- Future executeQueryMessage(MongoMessage queryMessage){
+ Future queryMessage(MongoMessage queryMessage){
    return connection.query(queryMessage);
  }
  executeMessage(MongoMessage message){
@@ -119,7 +118,7 @@ class Db{
      connection = new Connection(serverConfig);
    }
    connection.connect().then((v) {
-     if (serverConfig.userName === null) {
+     if (serverConfig.userName == null) {
        completer.complete(v);
      }
      else {
@@ -189,7 +188,7 @@ class Db{
  Cursor collectionsInfoCursor([String collectionName]) {
    Map selector = {};
    // If we are limiting the access to a specific collection name
-   if(collectionName !== null){
+   if(collectionName != null){
      selector["name"] = "${this.databaseName}.$collectionName";
    }
    // Return Cursor
@@ -207,35 +206,35 @@ class Db{
    then((res)=&gt;completer.complete(res["ok"] == 1));
    return completer.future;
  }
- Future&lt;List&gt; indexInformation([String collectionName]) {    
+ Future&lt;List&gt; indexInformation([String collectionName]) {
    var selector = {};
    if (collectionName != null) {
      selector['ns'] = '$databaseName.$collectionName';
    }
-   return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();    
+   return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();
  }
  String _createIndexName(Map keys) {
    var name = '';
    keys.forEach((key,value) {
      name = '${name}_${key}_$value';
    });
-   return name;    
+   return name;
  }
- Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {    
+ Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
    var selector = {};
    selector['ns'] = '$databaseName.$collectionName';
    keys = _setKeys(key, keys);
    selector['key'] = keys;
    for (final order in keys.values) {
      if (order != 1 &amp;&amp; order != -1) {
-       throw const ArgumentError('Keys may contain only 1 or -1');  
+       throw new ArgumentError('Keys may contain only 1 or -1');
      }
    }
-   if (unique == true) { 
+   if (unique == true) {
      selector['unique'] = true;
    } else {
      selector['unique'] = false;
-   }    
+   }
    if (sparse == true) {
      selector['sparse'] = true;
    }
@@ -249,30 +248,30 @@ class Db{
      name = _createIndexName(keys);
    }
    selector['name'] = name;
-   MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);    
+   MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);
    executeMessage(insertMessage);
    return getLastError();
  }
 
- Map _setKeys(String key, Map keys) {    
-   if (key != null &amp;&amp; keys != null) {    
-     throw const ArgumentError('Only one parameter must be set: key or keys');    
-   }    
-   if (key != null) {    
-     keys = {'$key': 1};    
-   }    
-   if (keys == null) {    
-     throw const ArgumentError('key or keys parameter must be set');    
+ Map _setKeys(String key, Map keys) {
+   if (key != null &amp;&amp; keys != null) {
+     throw new ArgumentError('Only one parameter must be set: key or keys');
    }
-   return keys;    
- } 
+   if (key != null) {
+     keys = {'$key': 1};
+   }
+   if (keys == null) {
+     throw new ArgumentError('key or keys parameter must be set');
+   }
+   return keys;
+ }
  Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
    keys = _setKeys(key, keys);
    var completer = new Completer();
    indexInformation(collectionName).then((indexInfos) {
      if (name == null) {
        name = _createIndexName(keys);
-     }        
+     }
      if (indexInfos.some((info) =&gt; info['name'] == name)) {
        completer.complete({'ok': 1.0, 'result': 'index preexists'});
      } else {
@@ -280,7 +279,7 @@ class Db{
      }
    });
    return completer.future;
- }  
+ }
 }
 </pre>
 </div>
@@ -295,11 +294,12 @@ new <strong>Db</strong>(<a href="http://api.dartlang.org/dart_core/String.html">
 For example next code points to local mongodb server on default mongodb port, database <em>testdb</em></p>
 <pre><code>var db = new Db('mongodb://127.0.0.1/testdb');
 </code></pre>
-<p>And that code direct to MongoLab server on 37637 port, database <em>testdb</em>, username <em>dart</em>, password <em>test</em></p>
+<p>And that code direct to MongoLab server <em>ds037637-a.mongolab.com</em> on 37637 port, database <em>objectory_blog</em>, username <em>dart</em>, password <em>test</em></p>
 <pre><code>var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
 </code></pre>
 <pre class="source">
 Db(String uriString){
+ _configureConsoleLogger();
  var uri = new Uri.fromString(uriString);
  if (uri.scheme != 'mongodb') {
    throw 'Invalid scheme in uri: $uriString ${uri.scheme}';
@@ -321,21 +321,6 @@ Db(String uriString){
  if (uri.path != '') {
    databaseName = uri.path.replaceAll('/','');
  }
- connection = new Connection(serverConfig);
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="Db.local">
-<button class="show-code">Code</button>
-new <strong>Db.local</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> databaseName) <a class="anchor-link" href="#Db.local"
-              title="Permalink to Db.Db.local">#</a></h4>
-<div class="doc">
-<pre class="source">
-Db.local(this.databaseName){
-  if (serverConfig === null) {
-   serverConfig = new ServerConfig();
-  }
  connection = new Connection(serverConfig);
 }
 </pre>
@@ -437,7 +422,7 @@ DbCollection collection(String collectionName){
 Cursor collectionsInfoCursor([String collectionName]) {
  Map selector = {};
  // If we are limiting the access to a specific collection name
- if(collectionName !== null){
+ if(collectionName != null){
    selector["name"] = "${this.databaseName}.$collectionName";
  }
  // Return Cursor
@@ -452,21 +437,21 @@ Cursor collectionsInfoCursor([String collectionName]) {
               title="Permalink to Db.createIndex">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {    
+Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
  var selector = {};
  selector['ns'] = '$databaseName.$collectionName';
  keys = _setKeys(key, keys);
  selector['key'] = keys;
  for (final order in keys.values) {
    if (order != 1 &amp;&amp; order != -1) {
-     throw const ArgumentError('Keys may contain only 1 or -1');  
+     throw new ArgumentError('Keys may contain only 1 or -1');
    }
  }
- if (unique == true) { 
+ if (unique == true) {
    selector['unique'] = true;
  } else {
    selector['unique'] = false;
- }    
+ }
  if (sparse == true) {
    selector['sparse'] = true;
  }
@@ -480,7 +465,7 @@ Future createIndex(String collectionName, {String key, Map keys, bool unique, bo
    name = _createIndexName(keys);
  }
  selector['name'] = name;
- MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);    
+ MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);
  executeMessage(insertMessage);
  return getLastError();
 }
@@ -533,7 +518,7 @@ Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bo
  indexInformation(collectionName).then((indexInfos) {
    if (name == null) {
      name = _createIndexName(keys);
-   }        
+   }
    if (indexInfos.some((info) =&gt; info['name'] == name)) {
      completer.complete({'ok': 1.0, 'result': 'index preexists'});
    } else {
@@ -584,18 +569,6 @@ executeMessage(MongoMessage message){
 </pre>
 </div>
 </div>
-<div class="method"><h4 id="executeQueryMessage">
-<button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>executeQueryMessage</strong>(<a href="../mongo_dart/MongoMessage.html">MongoMessage</a> queryMessage) <a class="anchor-link" href="#executeQueryMessage"
-              title="Permalink to Db.executeQueryMessage">#</a></h4>
-<div class="doc">
-<pre class="source">
-Future executeQueryMessage(MongoMessage queryMessage){
- return connection.query(queryMessage);
-}
-</pre>
-</div>
-</div>
 <div class="method"><h4 id="getLastError">
 <button class="show-code">Code</button>
 <a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; <strong>getLastError</strong>() <a class="anchor-link" href="#getLastError"
@@ -626,12 +599,12 @@ Future&lt;Map&gt; getNonce(){
               title="Permalink to Db.indexInformation">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future&lt;List&gt; indexInformation([String collectionName]) {    
+Future&lt;List&gt; indexInformation([String collectionName]) {
  var selector = {};
  if (collectionName != null) {
    selector['ns'] = '$databaseName.$collectionName';
  }
- return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();    
+ return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();
 }
 </pre>
 </div>
@@ -650,7 +623,7 @@ Future open(){
    connection = new Connection(serverConfig);
  }
  connection.connect().then((v) {
-   if (serverConfig.userName === null) {
+   if (serverConfig.userName == null) {
      completer.complete(v);
    }
    else {
@@ -664,6 +637,18 @@ Future open(){
 </pre>
 </div>
 </div>
+<div class="method"><h4 id="queryMessage">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>queryMessage</strong>(<a href="../mongo_dart/MongoMessage.html">MongoMessage</a> queryMessage) <a class="anchor-link" href="#queryMessage"
+              title="Permalink to Db.queryMessage">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future queryMessage(MongoMessage queryMessage){
+ return connection.query(queryMessage);
+}
+</pre>
+</div>
+</div>
 <div class="method"><h4 id="removeFromCollection">
 <button class="show-code">Code</button>
 <a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>removeFromCollection</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> collectionName, [<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> selector = const{}]) <a class="anchor-link" href="#removeFromCollection"
@@ -672,22 +657,6 @@ Future open(){
 <pre class="source">
 Future removeFromCollection(String collectionName, [Map selector = const {}]){
  return connection.query(new MongoRemoveMessage("$databaseName.$collectionName", selector));
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="validateDatabaseName">
-<button class="show-code">Code</button>
-<strong>validateDatabaseName</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> dbName) <a class="anchor-link" href="#validateDatabaseName"
-              title="Permalink to Db.validateDatabaseName">#</a></h4>
-<div class="doc">
-<pre class="source">
-validateDatabaseName(String dbName) {
- if(dbName.length === 0) throw "database name cannot be the empty string";
- var invalidChars = [" ", ".", "\$", "/", "\\"];
- for(var i = 0; i &lt; invalidChars.length; i++) {
-   if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
- }
 }
 </pre>
 </div>
@@ -710,7 +679,7 @@ Future&lt;Map&gt; wait(){
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:51.051</div>
+          <div>This page was generated at 2012-12-27 12:26:56.078</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

@@ -48,7 +48,7 @@
 <li><a href="bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
 <li><a href="bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
 </ul>
-<h2><div class="icon-library"></div><a href="bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="mongo_dart.html">mongo_dart</a></h2></div>
+<h2><div class="icon-library"></div><a href="mongo_dart.html">mongo_dart</a></h2></div>
 <div class="content">
 <h2><strong>bson</strong> library</h2>
 <div>
@@ -142,13 +142,13 @@ BsonObject bsonObjectFrom(var value){
  if (value is List){
    return new BsonArray(value);
  }
- if (value === null){
+ if (value == null){
    return new BsonNull();
  }
  if (value is Date){
    return new BsonDate(value);
  }
- if (value === true || value === false){
+ if (value == true || value == false){
    return new BsonBoolean(value);
  }
  if (value is BsonRegexp){
@@ -167,7 +167,7 @@ BsonObject bsonObjectFrom(var value){
 <pre class="source">
 int elementSize(String name, value) {
  int size = 1;
- if (name !== null){
+ if (name != null){
    size += Statics.getKeyUtf8(name).length + 1;
  }
  size += bsonObjectFrom(value).byteLength();
@@ -320,7 +320,7 @@ int elementSize(String name, value) {
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:49.080</div>
+          <div>This page was generated at 2012-12-27 12:26:55.605</div>
         </div>
         <script async src="client-static.js"></script>
         </body></html>

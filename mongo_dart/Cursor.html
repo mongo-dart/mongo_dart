@@ -24,13 +24,18 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
 <li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
 <li><div class="icon-class"></div><strong>Cursor</strong></li>
 <li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
 <li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
 <li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><a href="../mongo_dart/GridFS.html"><div class="icon-class"></div>GridFS</a></li>
+<li><a href="../mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
+<li><a href="../mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
+<li><a href="../mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
 <li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
 <li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
 <li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
 <li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
@@ -40,9 +45,8 @@
 <li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
 <li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
 <li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
-<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
 <li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
-<li><a href="../mongo_dart/Utils.html"><div class="icon-class"></div>Utils</a></li>
 </ul>
 </div>
 <div class="content">
@@ -54,26 +58,10 @@
 <div class="doc">
 <pre class="source">
 class Cursor{
-/**
-* Init state
-*
-* @classconstant INIT
-**/
-static final INIT = 0;
 
-/**
-* Cursor open
-*
-* @classconstant OPEN
-**/
-static final OPEN = 1;
-
-/**
-* Cursor closed
-*
-* @classconstant CLOSED
-**/
-static final CLOSED = 2;
+static const INIT = 0;
+static const OPEN = 1;
+static const CLOSED = 2;
 
 
  int state = INIT;
@@ -83,24 +71,30 @@ static final CLOSED = 2;
  DbCollection collection;
  Map selector;
  Map fields;
- int skip;
- int limit;
+ int skip = 0;
+ int limit = 0;
  Map sort;
  Map hint;
  MonadicBlock eachCallback;
  var eachComplete;
  bool explain;
  int flags = 0;
- Cursor(this.db, this.collection, [this.selector, this.fields, this.skip = 0, this.limit = 0
- , this.sort, this.hint, this.explain]){
-   if (selector === null){
+ Cursor(this.db, this.collection, selectorBuilderOrMap){
+   if (selectorBuilderOrMap == null){
      selector = {};
+   } else if (selectorBuilderOrMap is SelectorBuilder) {
+     selector = selectorBuilderOrMap.map;
+     fields = selectorBuilderOrMap.extParams.fields;
+     limit = selectorBuilderOrMap.extParams.limit;
+     skip = selectorBuilderOrMap.extParams.skip;
+   } else if (selectorBuilderOrMap is Map) {
+     selector = selectorBuilderOrMap;
+   } else {
+     throw new ArgumentError('Expected SelectorBuilder or Map, got $selectorBuilderOrMap');
    }
-   if (!selector.containsKey("query")){
+
+   if (!selector.isEmpty &amp;&amp; !selector.containsKey("query")){
        selector = {"query": selector};
-   }
-   if (sort !== null){
-     selector["orderby"] = sort;
    }
    items = new Queue();
  }
@@ -118,22 +112,22 @@ static final CLOSED = 2;
  }
 
 
- Map getNextItem(){
+ Map _getNextItem(){
    return items.removeFirst();
  }
  Future&lt;Map&gt; nextObject(){
    if (state == INIT){
      Completer&lt;Map&gt; nextItem = new Completer&lt;Map&gt;();
      MongoQueryMessage qm = generateQueryMessage();
-     Future&lt;MongoReplyMessage&gt; reply = db.executeQueryMessage(qm);
+     Future&lt;MongoReplyMessage&gt; reply = db.queryMessage(qm);
      reply.then((replyMessage){
        state = OPEN;
        //print("${replyMessage.cursorId}");
        cursorId = replyMessage.cursorId;
        items.addAll(replyMessage.documents);
        if (items.length &gt; 0){
-         Map nextDoc = getNextItem();
-         debug("Cursor getNextItem $nextDoc");
+         Map nextDoc = _getNextItem();
+         _log.finer("Cursor _getNextItem $nextDoc");
          nextItem.complete(nextDoc);
        }
        else{
@@ -143,18 +137,18 @@ static final CLOSED = 2;
      return nextItem.future;
    }
    else if (state == OPEN &amp;&amp; items.length &gt; 0){
-     return new Future.immediate(getNextItem());
+     return new Future.immediate(_getNextItem());
    }
    else if (state == OPEN &amp;&amp; cursorId &gt; 0){
      Completer nextItem = new Completer();
      var qm = generateGetMoreMessage();
-     Future&lt;MongoReplyMessage&gt; reply = db.executeQueryMessage(qm);
+     Future&lt;MongoReplyMessage&gt; reply = db.queryMessage(qm);
      reply.then((replyMessage){
        state = OPEN;
        cursorId = replyMessage.cursorId;
        items.addAll(replyMessage.documents);
        if (items.length &gt; 0){
-         nextItem.complete(getNextItem());
+         nextItem.complete(_getNextItem());
        }
        else{
          state = CLOSED;
@@ -168,14 +162,14 @@ static final CLOSED = 2;
      return new Future.immediate(null);
    }
  }
- void nextEach(){
+ void _nextEach(){
    nextObject().then((val){
-     if (val === null){
+     if (val == null){
        eachCallback = null;
        eachComplete.complete(true);
      } else {
        eachCallback(val);
-       nextEach();
+       _nextEach();
      }
    });
  }
@@ -183,7 +177,7 @@ static final CLOSED = 2;
  Future&lt;bool&gt; each(MonadicBlock callback){
    eachCallback = callback;
    eachComplete = new Completer();
-   nextEach();
+   _nextEach();
    return eachComplete.future;
  }
  Future&lt;List&lt;Map&gt;&gt; toList(){
@@ -193,13 +187,12 @@ static final CLOSED = 2;
    return completer.future;
  }
  Future close(){
-   debug("Closing cursor, cursorId = $cursorId");
+   _log.finer("Closing cursor, cursorId = $cursorId");
    state = CLOSED;
    if (cursorId != 0){
      MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);
      cursorId = 0;
-     return db.executeQueryMessage(msg);
-
+     return db.queryMessage(msg);
    }
  }
 }
@@ -209,43 +202,37 @@ static final CLOSED = 2;
 <h3>Static Properties</h3>
 <div class="field"><h4 id="CLOSED">
 <button class="show-code">Code</button>
-final         <strong>CLOSED</strong> <a class="anchor-link"
+const         <strong>CLOSED</strong> <a class="anchor-link"
             href="#CLOSED"
             title="Permalink to Cursor.CLOSED">#</a>
         </h4>
         <div class="doc">
-<p>Cursor closed</p>
-<p>@classconstant CLOSED</p>
 <pre class="source">
-static final CLOSED = 2;
+static const CLOSED = 2;
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="INIT">
 <button class="show-code">Code</button>
-final         <strong>INIT</strong> <a class="anchor-link"
+const         <strong>INIT</strong> <a class="anchor-link"
             href="#INIT"
             title="Permalink to Cursor.INIT">#</a>
         </h4>
         <div class="doc">
-<p>Init state</p>
-<p>@classconstant INIT</p>
 <pre class="source">
-static final INIT = 0;
+static const INIT = 0;
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="OPEN">
 <button class="show-code">Code</button>
-final         <strong>OPEN</strong> <a class="anchor-link"
+const         <strong>OPEN</strong> <a class="anchor-link"
             href="#OPEN"
             title="Permalink to Cursor.OPEN">#</a>
         </h4>
         <div class="doc">
-<p>Cursor open</p>
-<p>@classconstant OPEN</p>
 <pre class="source">
-static final OPEN = 1;
+static const OPEN = 1;
 </pre>
 </div>
 </div>
@@ -254,20 +241,26 @@ static final OPEN = 1;
 <h3>Constructors</h3>
 <div class="method"><h4 id="Cursor">
 <button class="show-code">Code</button>
-new <strong>Cursor</strong>(<a href="../mongo_dart/Db.html">Db</a> db, <a href="../mongo_dart/DbCollection.html">DbCollection</a> collection, [<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> selector, <a href="http://api.dartlang.org/dart_core/Map.html">Map</a> fields, <a href="http://api.dartlang.org/dart_core/int.html">int</a> skip = 0, <a href="http://api.dartlang.org/dart_core/int.html">int</a> limit = 0, <a href="http://api.dartlang.org/dart_core/Map.html">Map</a> sort, <a href="http://api.dartlang.org/dart_core/Map.html">Map</a> hint, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> explain]) <a class="anchor-link" href="#Cursor"
+new <strong>Cursor</strong>(<a href="../mongo_dart/Db.html">Db</a> db, <a href="../mongo_dart/DbCollection.html">DbCollection</a> collection, selectorBuilderOrMap) <a class="anchor-link" href="#Cursor"
               title="Permalink to Cursor.Cursor">#</a></h4>
 <div class="doc">
 <pre class="source">
-Cursor(this.db, this.collection, [this.selector, this.fields, this.skip = 0, this.limit = 0
-, this.sort, this.hint, this.explain]){
- if (selector === null){
+Cursor(this.db, this.collection, selectorBuilderOrMap){
+ if (selectorBuilderOrMap == null){
    selector = {};
+ } else if (selectorBuilderOrMap is SelectorBuilder) {
+   selector = selectorBuilderOrMap.map;
+   fields = selectorBuilderOrMap.extParams.fields;
+   limit = selectorBuilderOrMap.extParams.limit;
+   skip = selectorBuilderOrMap.extParams.skip;
+ } else if (selectorBuilderOrMap is Map) {
+   selector = selectorBuilderOrMap;
+ } else {
+   throw new ArgumentError('Expected SelectorBuilder or Map, got $selectorBuilderOrMap');
  }
- if (!selector.containsKey("query")){
+
+ if (!selector.isEmpty &amp;&amp; !selector.containsKey("query")){
      selector = {"query": selector};
- }
- if (sort !== null){
-   selector["orderby"] = sort;
  }
  items = new Queue();
 }
@@ -405,7 +398,7 @@ Queue items;
         </h4>
         <div class="doc">
 <pre class="source">
-int limit;
+int limit = 0;
 </pre>
 </div>
 </div>
@@ -429,7 +422,7 @@ Map selector;
         </h4>
         <div class="doc">
 <pre class="source">
-int skip;
+int skip = 0;
 </pre>
 </div>
 </div>
@@ -467,13 +460,12 @@ int state = INIT;
 <div class="doc">
 <pre class="source">
 Future close(){
- debug("Closing cursor, cursorId = $cursorId");
+ _log.finer("Closing cursor, cursorId = $cursorId");
  state = CLOSED;
  if (cursorId != 0){
    MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);
    cursorId = 0;
-   return db.executeQueryMessage(msg);
-
+   return db.queryMessage(msg);
  }
 }
 </pre>
@@ -488,7 +480,7 @@ Future close(){
 Future&lt;bool&gt; each(MonadicBlock callback){
  eachCallback = callback;
  eachComplete = new Completer();
- nextEach();
+ _nextEach();
  return eachComplete.future;
 }
 </pre>
@@ -524,38 +516,6 @@ MongoQueryMessage generateQueryMessage(){
 </pre>
 </div>
 </div>
-<div class="method"><h4 id="getNextItem">
-<button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> <strong>getNextItem</strong>() <a class="anchor-link" href="#getNextItem"
-              title="Permalink to Cursor.getNextItem">#</a></h4>
-<div class="doc">
-<pre class="source">
-Map getNextItem(){
- return items.removeFirst();
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="nextEach">
-<button class="show-code">Code</button>
-void <strong>nextEach</strong>() <a class="anchor-link" href="#nextEach"
-              title="Permalink to Cursor.nextEach">#</a></h4>
-<div class="doc">
-<pre class="source">
-void nextEach(){
- nextObject().then((val){
-   if (val === null){
-     eachCallback = null;
-     eachComplete.complete(true);
-   } else {
-     eachCallback(val);
-     nextEach();
-   }
- });
-}
-</pre>
-</div>
-</div>
 <div class="method"><h4 id="nextObject">
 <button class="show-code">Code</button>
 <a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; <strong>nextObject</strong>() <a class="anchor-link" href="#nextObject"
@@ -566,15 +526,15 @@ Future&lt;Map&gt; nextObject(){
  if (state == INIT){
    Completer&lt;Map&gt; nextItem = new Completer&lt;Map&gt;();
    MongoQueryMessage qm = generateQueryMessage();
-   Future&lt;MongoReplyMessage&gt; reply = db.executeQueryMessage(qm);
+   Future&lt;MongoReplyMessage&gt; reply = db.queryMessage(qm);
    reply.then((replyMessage){
      state = OPEN;
      //print("${replyMessage.cursorId}");
      cursorId = replyMessage.cursorId;
      items.addAll(replyMessage.documents);
      if (items.length &gt; 0){
-       Map nextDoc = getNextItem();
-       debug("Cursor getNextItem $nextDoc");
+       Map nextDoc = _getNextItem();
+       _log.finer("Cursor _getNextItem $nextDoc");
        nextItem.complete(nextDoc);
      }
      else{
@@ -584,18 +544,18 @@ Future&lt;Map&gt; nextObject(){
    return nextItem.future;
  }
  else if (state == OPEN &amp;&amp; items.length &gt; 0){
-   return new Future.immediate(getNextItem());
+   return new Future.immediate(_getNextItem());
  }
  else if (state == OPEN &amp;&amp; cursorId &gt; 0){
    Completer nextItem = new Completer();
    var qm = generateGetMoreMessage();
-   Future&lt;MongoReplyMessage&gt; reply = db.executeQueryMessage(qm);
+   Future&lt;MongoReplyMessage&gt; reply = db.queryMessage(qm);
    reply.then((replyMessage){
      state = OPEN;
      cursorId = replyMessage.cursorId;
      items.addAll(replyMessage.documents);
      if (items.length &gt; 0){
-       nextItem.complete(getNextItem());
+       nextItem.complete(_getNextItem());
      }
      else{
        state = CLOSED;
@@ -633,7 +593,7 @@ Future&lt;List&lt;Map&gt;&gt; toList(){
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:50.868</div>
+          <div>This page was generated at 2012-12-27 12:26:56.038</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

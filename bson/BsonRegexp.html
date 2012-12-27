@@ -48,7 +48,7 @@
 <li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
 <li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
 </ul>
-<h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
+<h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
 <div class="content">
         <h2><strong>BsonRegexp</strong>
           class
@@ -85,16 +85,16 @@ class BsonRegexp extends BsonObject{
      return;
    }
    var buffer = new StringBuffer();
-   if (caseInsensitive === true){
+   if (caseInsensitive == true){
      buffer.add("i");
    }
-   if (multiLine === true){
+   if (multiLine == true){
      buffer.add("m");
    }
-   if (dotAll === true){
+   if (dotAll == true){
      buffer.add("s");
    }
-   if (extended === true){
+   if (extended == true){
      buffer.add("x");
    }
    options = buffer.toString();
@@ -286,16 +286,16 @@ createOptionsString(){
    return;
  }
  var buffer = new StringBuffer();
- if (caseInsensitive === true){
+ if (caseInsensitive == true){
    buffer.add("i");
  }
- if (multiLine === true){
+ if (multiLine == true){
    buffer.add("m");
  }
- if (dotAll === true){
+ if (dotAll == true){
    buffer.add("s");
  }
- if (extended === true){
+ if (extended == true){
    buffer.add("x");
  }
  options = buffer.toString();
@@ -311,7 +311,7 @@ createOptionsString(){
 <pre class="source">
 packElement(String name, var buffer){
  buffer.writeByte(typeByte);
- if (name !== null){
+ if (name != null){
    new BsonCString(name).packValue(buffer);
  }
  packValue(buffer);
@@ -390,7 +390,7 @@ unpackValue(BsonBinary buffer){
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:49.367</div>
+          <div>This page was generated at 2012-12-27 12:26:55.698</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

@@ -1,0 +1,254 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>GridFS class / mongo_dart Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart" data-type="GridFS">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/GridFS.html">GridFS</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
+<li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
+<li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
+<li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
+<li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
+<li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><div class="icon-class"></div><strong>GridFS</strong></li>
+<li><a href="../mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
+<li><a href="../mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
+<li><a href="../mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
+<li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
+<li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
+<li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
+<li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
+<li><a href="../mongo_dart/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
+<li><a href="../mongo_dart/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
+<li><a href="../mongo_dart/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
+<li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
+<li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
+<li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
+<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
+<li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
+</ul>
+</div>
+<div class="content">
+        <h2><strong>GridFS</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class GridFS {
+ static int DEFAULT_CHUNKSIZE = 256 * 1024;
+ static int MAX_CHUNKSIZE = (3.5 * 1000 * 1000).toInt();
+
+ Db database;
+ DbCollection files;
+ DbCollection chunks;
+ String bucketName;
+
+ GridFS(Db this.database, [String collection="fs"]) {
+   this.files = database.collection("$collection.files");
+   this.chunks = database.collection("$collection.chunks");
+   bucketName = collection;
+
+   // TODO(tsander): Ensure index.
+ }
+
+ Cursor getFileList(SelectorBuilder selectorBuilder) {
+   return files.find(selectorBuilder.sortBy("filename", descending:true));
+ }
+
+ Future&lt;GridOut&gt; findOne(dynamic selector) {
+   Completer completer = new Completer();
+   files.findOne(selector).then((Map file) {
+     GridOut result = null;
+     if (file != null) {
+       result = new GridOut(file);
+       result.setGridFS(this);
+     }
+     completer.complete(result);
+   });
+   return completer.future;
+ }
+
+ GridIn createFile(InputStream input, String filename) {
+   return new GridIn(this, filename, input);
+ }
+}
+</pre>
+</div>
+<div>
+<h3>Static Properties</h3>
+<div class="field"><h4 id="DEFAULT_CHUNKSIZE">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>DEFAULT_CHUNKSIZE</strong> <a class="anchor-link"
+            href="#DEFAULT_CHUNKSIZE"
+            title="Permalink to GridFS.DEFAULT_CHUNKSIZE">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static int DEFAULT_CHUNKSIZE = 256 * 1024;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="MAX_CHUNKSIZE">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>MAX_CHUNKSIZE</strong> <a class="anchor-link"
+            href="#MAX_CHUNKSIZE"
+            title="Permalink to GridFS.MAX_CHUNKSIZE">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static int MAX_CHUNKSIZE = (3.5 * 1000 * 1000).toInt();
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="GridFS">
+<button class="show-code">Code</button>
+new <strong>GridFS</strong>(<a href="../mongo_dart/Db.html">Db</a> database, [<a href="http://api.dartlang.org/dart_core/String.html">String</a> collection = "fs"]) <a class="anchor-link" href="#GridFS"
+              title="Permalink to GridFS.GridFS">#</a></h4>
+<div class="doc">
+<pre class="source">
+GridFS(Db this.database, [String collection="fs"]) {
+ this.files = database.collection("$collection.files");
+ this.chunks = database.collection("$collection.chunks");
+ bucketName = collection;
+
+ // TODO(tsander): Ensure index.
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="bucketName">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>bucketName</strong> <a class="anchor-link"
+            href="#bucketName"
+            title="Permalink to GridFS.bucketName">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+String bucketName;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="chunks">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/DbCollection.html">DbCollection</a>         <strong>chunks</strong> <a class="anchor-link"
+            href="#chunks"
+            title="Permalink to GridFS.chunks">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+DbCollection chunks;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="database">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/Db.html">Db</a>         <strong>database</strong> <a class="anchor-link"
+            href="#database"
+            title="Permalink to GridFS.database">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Db database;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="files">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/DbCollection.html">DbCollection</a>         <strong>files</strong> <a class="anchor-link"
+            href="#files"
+            title="Permalink to GridFS.files">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+DbCollection files;
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="createFile">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/GridIn.html">GridIn</a> <strong>createFile</strong>(<a href="http://api.dartlang.org/dart_io/InputStream.html">InputStream</a> input, <a href="http://api.dartlang.org/dart_core/String.html">String</a> filename) <a class="anchor-link" href="#createFile"
+              title="Permalink to GridFS.createFile">#</a></h4>
+<div class="doc">
+<pre class="source">
+GridIn createFile(InputStream input, String filename) {
+ return new GridIn(this, filename, input);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="findOne">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="../mongo_dart/GridOut.html">GridOut</a>&gt; <strong>findOne</strong>(selector) <a class="anchor-link" href="#findOne"
+              title="Permalink to GridFS.findOne">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;GridOut&gt; findOne(dynamic selector) {
+ Completer completer = new Completer();
+ files.findOne(selector).then((Map file) {
+   GridOut result = null;
+   if (file != null) {
+     result = new GridOut(file);
+     result.setGridFS(this);
+   }
+   completer.complete(result);
+ });
+ return completer.future;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="getFileList">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/Cursor.html">Cursor</a> <strong>getFileList</strong>(<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> selectorBuilder) <a class="anchor-link" href="#getFileList"
+              title="Permalink to GridFS.getFileList">#</a></h4>
+<div class="doc">
+<pre class="source">
+Cursor getFileList(SelectorBuilder selectorBuilder) {
+ return files.find(selectorBuilder.sortBy("filename", descending:true));
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-12-27 12:26:55.993</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

@@ -1,0 +1,434 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>GridFSFile class / mongo_dart Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart" data-type="GridFSFile">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/GridFSFile.html">GridFSFile</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
+<li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
+<li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
+<li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
+<li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
+<li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><a href="../mongo_dart/GridFS.html"><div class="icon-class"></div>GridFS</a></li>
+<li><div class="icon-class"></div><strong>GridFSFile</strong></li>
+<li><a href="../mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
+<li><a href="../mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
+<li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
+<li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
+<li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
+<li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
+<li><a href="../mongo_dart/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
+<li><a href="../mongo_dart/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
+<li><a href="../mongo_dart/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
+<li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
+<li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
+<li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
+<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
+<li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
+</ul>
+</div>
+<div class="content">
+        <h2><strong>GridFSFile</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class GridFSFile {
+ GridFS fs = null;
+ var id;
+ String filename;
+ String contentType;
+ int length;
+ int chunkSize;
+ Date uploadDate;
+ Map&lt;String, Object&gt; extraData;
+ String md5;
+
+ GridFSFile([Map data]) {
+   if (?data) {
+     this.data = data;
+   }
+ }
+
+ Future&lt;Map&gt; save() {
+   if (fs == null) {
+     throw "Need fs";
+   }
+   Map tempData = data;
+   return fs.files.insert(tempData, safeMode:true);
+ }
+
+ Future&lt;bool&gt; validate() {
+   if (fs == null) {
+     throw "no fs";
+   }
+   if (md5 == null) {
+     throw "no md5 stored";
+   }
+
+   Completer completer = new Completer();
+   // query for md5 at filemd5
+   DbCommand dbCommand = new DbCommand(
+       fs.database,fs.bucketName,0,0,1,{"filemd5" : id}, {"md5" : 1});
+   fs.database.executeDbCommand(dbCommand).then((Map data) {
+     if (data != null &amp;&amp; data.containsKey("md5")) {
+       completer.complete(md5 == data["md5"]);
+     } else {
+       completer.complete(false);
+     }
+   });
+   return completer.future;
+ }
+
+ int numChunks() {
+   return (length.toDouble() / chunkSize).ceil().toInt();
+ }
+
+ List&lt;String&gt; get aliases {
+   return extraData["aliases"];
+ }
+
+ Map get metaData {
+   return extraData["metadata"];
+ }
+
+ set metaData(Map metaData) {
+   extraData["metadata"] = metaData;
+ }
+
+ Map get data {
+   return {
+     "_id" : id,
+     "filename" : filename,
+     "contentType" : contentType,
+     "length" : length,
+     "chunkSize" : chunkSize,
+     "uploadDate" : uploadDate,
+     "md5" : md5,
+     // TODO(tsander): Extra Data?? Meta Data??
+   };
+ }
+
+ set data(Map input) {
+   id = input["_id"];
+   filename = input["filename"];
+   contentType = input["contentType"];
+   length = input["length"];
+   chunkSize = input["chunkSize"];
+   uploadDate = input["uploadDate"];
+   md5 = input["md5"];
+   // TODO(tsander): Extra Data?? Meta Data??
+ }
+
+ void setGridFS( GridFS fs ) {
+   this.fs = fs;
+ }
+}
+</pre>
+</div>
+<h3>Subclasses</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../mongo_dart/GridIn.html">GridIn</a></span>, <span class="type-box"><span class="icon-class"></span><a href="../mongo_dart/GridOut.html">GridOut</a></span></p>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="GridFSFile">
+<button class="show-code">Code</button>
+new <strong>GridFSFile</strong>([<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> data]) <a class="anchor-link" href="#GridFSFile"
+              title="Permalink to GridFSFile.GridFSFile">#</a></h4>
+<div class="doc">
+<pre class="source">
+GridFSFile([Map data]) {
+ if (?data) {
+   this.data = data;
+ }
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="aliases">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt;         <strong>aliases</strong> <a class="anchor-link"
+            href="#aliases"
+            title="Permalink to GridFSFile.aliases">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+List&lt;String&gt; get aliases {
+ return extraData["aliases"];
+}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="chunkSize">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>chunkSize</strong> <a class="anchor-link"
+            href="#chunkSize"
+            title="Permalink to GridFSFile.chunkSize">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int chunkSize;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="contentType">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>contentType</strong> <a class="anchor-link"
+            href="#contentType"
+            title="Permalink to GridFSFile.contentType">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+String contentType;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="data">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>         <strong>data</strong> <a class="anchor-link"
+            href="#data"
+            title="Permalink to GridFSFile.data">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Map get data {
+ return {
+   "_id" : id,
+   "filename" : filename,
+   "contentType" : contentType,
+   "length" : length,
+   "chunkSize" : chunkSize,
+   "uploadDate" : uploadDate,
+   "md5" : md5,
+   // TODO(tsander): Extra Data?? Meta Data??
+ };
+}
+</pre>
+<pre class="source">
+set data(Map input) {
+ id = input["_id"];
+ filename = input["filename"];
+ contentType = input["contentType"];
+ length = input["length"];
+ chunkSize = input["chunkSize"];
+ uploadDate = input["uploadDate"];
+ md5 = input["md5"];
+ // TODO(tsander): Extra Data?? Meta Data??
+}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="extraData">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="http://api.dartlang.org/dart_core/Object.html">Object</a>&gt;         <strong>extraData</strong> <a class="anchor-link"
+            href="#extraData"
+            title="Permalink to GridFSFile.extraData">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Map&lt;String, Object&gt; extraData;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="filename">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>filename</strong> <a class="anchor-link"
+            href="#filename"
+            title="Permalink to GridFSFile.filename">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+String filename;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="fs">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/GridFS.html">GridFS</a>         <strong>fs</strong> <a class="anchor-link"
+            href="#fs"
+            title="Permalink to GridFSFile.fs">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+GridFS fs = null;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="id">
+<button class="show-code">Code</button>
+var         <strong>id</strong> <a class="anchor-link"
+            href="#id"
+            title="Permalink to GridFSFile.id">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+var id;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="length">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>length</strong> <a class="anchor-link"
+            href="#length"
+            title="Permalink to GridFSFile.length">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int length;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="md5">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>md5</strong> <a class="anchor-link"
+            href="#md5"
+            title="Permalink to GridFSFile.md5">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+String md5;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="metaData">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>         <strong>metaData</strong> <a class="anchor-link"
+            href="#metaData"
+            title="Permalink to GridFSFile.metaData">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Map get metaData {
+ return extraData["metadata"];
+}
+</pre>
+<pre class="source">
+set metaData(Map metaData) {
+ extraData["metadata"] = metaData;
+}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="uploadDate">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Date.html">Date</a>         <strong>uploadDate</strong> <a class="anchor-link"
+            href="#uploadDate"
+            title="Permalink to GridFSFile.uploadDate">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Date uploadDate;
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="numChunks">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>numChunks</strong>() <a class="anchor-link" href="#numChunks"
+              title="Permalink to GridFSFile.numChunks">#</a></h4>
+<div class="doc">
+<pre class="source">
+int numChunks() {
+ return (length.toDouble() / chunkSize).ceil().toInt();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="save">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; <strong>save</strong>() <a class="anchor-link" href="#save"
+              title="Permalink to GridFSFile.save">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;Map&gt; save() {
+ if (fs == null) {
+   throw "Need fs";
+ }
+ Map tempData = data;
+ return fs.files.insert(tempData, safeMode:true);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="setGridFS">
+<button class="show-code">Code</button>
+void <strong>setGridFS</strong>(<a href="../mongo_dart/GridFS.html">GridFS</a> fs) <a class="anchor-link" href="#setGridFS"
+              title="Permalink to GridFSFile.setGridFS">#</a></h4>
+<div class="doc">
+<pre class="source">
+void setGridFS( GridFS fs ) {
+ this.fs = fs;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="validate">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/bool.html">bool</a>&gt; <strong>validate</strong>() <a class="anchor-link" href="#validate"
+              title="Permalink to GridFSFile.validate">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;bool&gt; validate() {
+ if (fs == null) {
+   throw "no fs";
+ }
+ if (md5 == null) {
+   throw "no md5 stored";
+ }
+
+ Completer completer = new Completer();
+ // query for md5 at filemd5
+ DbCommand dbCommand = new DbCommand(
+     fs.database,fs.bucketName,0,0,1,{"filemd5" : id}, {"md5" : 1});
+ fs.database.executeDbCommand(dbCommand).then((Map data) {
+   if (data != null &amp;&amp; data.containsKey("md5")) {
+     completer.complete(md5 == data["md5"]);
+   } else {
+     completer.complete(false);
+   }
+ });
+ return completer.future;
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-12-27 12:26:55.985</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

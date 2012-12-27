@@ -1,0 +1,541 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>GridOut class / mongo_dart Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart" data-type="GridOut">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/GridOut.html">GridOut</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
+<li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
+<li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
+<li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
+<li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
+<li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><a href="../mongo_dart/GridFS.html"><div class="icon-class"></div>GridFS</a></li>
+<li><a href="../mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
+<li><a href="../mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
+<li><div class="icon-class"></div><strong>GridOut</strong></li>
+<li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
+<li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
+<li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
+<li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
+<li><a href="../mongo_dart/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
+<li><a href="../mongo_dart/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
+<li><a href="../mongo_dart/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
+<li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
+<li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
+<li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
+<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
+<li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
+</ul>
+</div>
+<div class="content">
+        <h2><strong>GridOut</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class GridOut extends GridFSFile {
+
+ GridOut([Map data]) {
+   // TODO there is a better way
+   if (?data) {
+     this.data = data;
+   }
+ }
+
+ InputStream get inputStream {
+   // TODO do this
+   return null;
+ }
+
+ Future&lt;List&lt;int&gt;&gt; getChunk(int i) {
+   if (fs == null) {
+     // TODO throw error
+   }
+   Completer completer = new Completer();
+   // TODO(tsander): Would it be better to ask for all the chunks instead of
+   // one at a time?
+   fs.chunks.findOne(where.eq("files_id", id).eq("n", i))
+   ..handleException((e){
+     // TODO better error handling.
+     print(e);
+   })
+   ..then((Map chunk) {
+     List&lt;int&gt; result = null;
+     if (chunk != null) {
+       BsonBinary data = chunk["data"];
+       result = data.byteList;
+     }
+     completer.complete(result);
+   });
+   return completer.future;
+ }
+
+ Future&lt;int&gt; writeToFilename(String filename) {
+   return writeToFile(new File(filename));
+ }
+
+ Future&lt;int&gt; writeToFile(File file) {
+   OutputStream out = file.openOutputStream(FileMode.WRITE);
+   Future&lt;int&gt; written = writeTo(out);
+   written.chain((int length) {
+     out.close();
+     return new Future.immediate(length);
+   });
+   return written;
+ }
+
+ Future&lt;int&gt; writeTo(OutputStream out) {
+   final int nc = numChunks();
+   // TODO(tsander): Find a better name??
+   Future&lt;List&lt;int&gt;&gt; chain = null;
+   Completer completer = new Completer();
+   for ( int i = 0; i&lt;nc; i++ ){
+     if (chain == null) {
+       chain = getChunk(i);
+     } else {
+       chain = chain.chain((List&lt;int&gt; buffer){
+         return getChunk(i);
+       });
+     }
+     chain = chain.chain((List&lt;int&gt; buffer) {
+       if (buffer != null) {
+         out.write(buffer, true);
+         out.flush();
+       }
+       return new Future.immediate(buffer);
+     });
+   }
+   if (chain != null) {
+     chain.then((List&lt;int&gt; buffer){
+       completer.complete(length);
+     });
+   } else {
+     return new Future.immediate(length);
+   }
+   return completer.future;
+ }
+}
+</pre>
+</div>
+<h3>Extends</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../mongo_dart/GridFSFile.html">GridFSFile</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>GridOut</strong></span></p>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="GridOut">
+<button class="show-code">Code</button>
+new <strong>GridOut</strong>([<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> data]) <a class="anchor-link" href="#GridOut"
+              title="Permalink to GridOut.GridOut">#</a></h4>
+<div class="doc">
+<pre class="source">
+GridOut([Map data]) {
+ // TODO there is a better way
+ if (?data) {
+   this.data = data;
+ }
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field inherited"><h4 id="aliases">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt;         <strong>aliases</strong> <a class="anchor-link"
+            href="#aliases"
+            title="Permalink to GridOut.aliases">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+List&lt;String&gt; get aliases {
+ return extraData["aliases"];
+}
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="chunkSize">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>chunkSize</strong> <a class="anchor-link"
+            href="#chunkSize"
+            title="Permalink to GridOut.chunkSize">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+int chunkSize;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="contentType">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>contentType</strong> <a class="anchor-link"
+            href="#contentType"
+            title="Permalink to GridOut.contentType">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+String contentType;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="data">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>         <strong>data</strong> <a class="anchor-link"
+            href="#data"
+            title="Permalink to GridOut.data">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+Map get data {
+ return {
+   "_id" : id,
+   "filename" : filename,
+   "contentType" : contentType,
+   "length" : length,
+   "chunkSize" : chunkSize,
+   "uploadDate" : uploadDate,
+   "md5" : md5,
+   // TODO(tsander): Extra Data?? Meta Data??
+ };
+}
+</pre>
+<pre class="source">
+set data(Map input) {
+ id = input["_id"];
+ filename = input["filename"];
+ contentType = input["contentType"];
+ length = input["length"];
+ chunkSize = input["chunkSize"];
+ uploadDate = input["uploadDate"];
+ md5 = input["md5"];
+ // TODO(tsander): Extra Data?? Meta Data??
+}
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="extraData">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="http://api.dartlang.org/dart_core/Object.html">Object</a>&gt;         <strong>extraData</strong> <a class="anchor-link"
+            href="#extraData"
+            title="Permalink to GridOut.extraData">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+Map&lt;String, Object&gt; extraData;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="filename">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>filename</strong> <a class="anchor-link"
+            href="#filename"
+            title="Permalink to GridOut.filename">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+String filename;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="fs">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/GridFS.html">GridFS</a>         <strong>fs</strong> <a class="anchor-link"
+            href="#fs"
+            title="Permalink to GridOut.fs">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+GridFS fs = null;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="id">
+<button class="show-code">Code</button>
+var         <strong>id</strong> <a class="anchor-link"
+            href="#id"
+            title="Permalink to GridOut.id">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+var id;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="inputStream">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_io/InputStream.html">InputStream</a>         <strong>inputStream</strong> <a class="anchor-link"
+            href="#inputStream"
+            title="Permalink to GridOut.inputStream">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+InputStream get inputStream {
+ // TODO do this
+ return null;
+}
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="length">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>length</strong> <a class="anchor-link"
+            href="#length"
+            title="Permalink to GridOut.length">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+int length;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="md5">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>md5</strong> <a class="anchor-link"
+            href="#md5"
+            title="Permalink to GridOut.md5">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+String md5;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="metaData">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>         <strong>metaData</strong> <a class="anchor-link"
+            href="#metaData"
+            title="Permalink to GridOut.metaData">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+Map get metaData {
+ return extraData["metadata"];
+}
+</pre>
+<pre class="source">
+set metaData(Map metaData) {
+ extraData["metadata"] = metaData;
+}
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="uploadDate">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Date.html">Date</a>         <strong>uploadDate</strong> <a class="anchor-link"
+            href="#uploadDate"
+            title="Permalink to GridOut.uploadDate">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+Date uploadDate;
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="getChunk">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html">int</a>&gt;&gt; <strong>getChunk</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> i) <a class="anchor-link" href="#getChunk"
+              title="Permalink to GridOut.getChunk">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;List&lt;int&gt;&gt; getChunk(int i) {
+ if (fs == null) {
+   // TODO throw error
+ }
+ Completer completer = new Completer();
+ // TODO(tsander): Would it be better to ask for all the chunks instead of
+ // one at a time?
+ fs.chunks.findOne(where.eq("files_id", id).eq("n", i))
+ ..handleException((e){
+   // TODO better error handling.
+   print(e);
+ })
+ ..then((Map chunk) {
+   List&lt;int&gt; result = null;
+   if (chunk != null) {
+     BsonBinary data = chunk["data"];
+     result = data.byteList;
+   }
+   completer.complete(result);
+ });
+ return completer.future;
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="numChunks">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>numChunks</strong>() <a class="anchor-link" href="#numChunks"
+              title="Permalink to GridOut.numChunks">#</a></h4>
+<div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+int numChunks() {
+ return (length.toDouble() / chunkSize).ceil().toInt();
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="save">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; <strong>save</strong>() <a class="anchor-link" href="#save"
+              title="Permalink to GridOut.save">#</a></h4>
+<div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+Future&lt;Map&gt; save() {
+ if (fs == null) {
+   throw "Need fs";
+ }
+ Map tempData = data;
+ return fs.files.insert(tempData, safeMode:true);
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="setGridFS">
+<button class="show-code">Code</button>
+void <strong>setGridFS</strong>(<a href="../mongo_dart/GridFS.html">GridFS</a> fs) <a class="anchor-link" href="#setGridFS"
+              title="Permalink to GridOut.setGridFS">#</a></h4>
+<div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+void setGridFS( GridFS fs ) {
+ this.fs = fs;
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="validate">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/bool.html">bool</a>&gt; <strong>validate</strong>() <a class="anchor-link" href="#validate"
+              title="Permalink to GridOut.validate">#</a></h4>
+<div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
+<pre class="source">
+Future&lt;bool&gt; validate() {
+ if (fs == null) {
+   throw "no fs";
+ }
+ if (md5 == null) {
+   throw "no md5 stored";
+ }
+
+ Completer completer = new Completer();
+ // query for md5 at filemd5
+ DbCommand dbCommand = new DbCommand(
+     fs.database,fs.bucketName,0,0,1,{"filemd5" : id}, {"md5" : 1});
+ fs.database.executeDbCommand(dbCommand).then((Map data) {
+   if (data != null &amp;&amp; data.containsKey("md5")) {
+     completer.complete(md5 == data["md5"]);
+   } else {
+     completer.complete(false);
+   }
+ });
+ return completer.future;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="writeTo">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html">int</a>&gt; <strong>writeTo</strong>(<a href="http://api.dartlang.org/dart_io/OutputStream.html">OutputStream</a> out) <a class="anchor-link" href="#writeTo"
+              title="Permalink to GridOut.writeTo">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;int&gt; writeTo(OutputStream out) {
+ final int nc = numChunks();
+ // TODO(tsander): Find a better name??
+ Future&lt;List&lt;int&gt;&gt; chain = null;
+ Completer completer = new Completer();
+ for ( int i = 0; i&lt;nc; i++ ){
+   if (chain == null) {
+     chain = getChunk(i);
+   } else {
+     chain = chain.chain((List&lt;int&gt; buffer){
+       return getChunk(i);
+     });
+   }
+   chain = chain.chain((List&lt;int&gt; buffer) {
+     if (buffer != null) {
+       out.write(buffer, true);
+       out.flush();
+     }
+     return new Future.immediate(buffer);
+   });
+ }
+ if (chain != null) {
+   chain.then((List&lt;int&gt; buffer){
+     completer.complete(length);
+   });
+ } else {
+   return new Future.immediate(length);
+ }
+ return completer.future;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="writeToFile">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html">int</a>&gt; <strong>writeToFile</strong>(<a href="http://api.dartlang.org/dart_io/File.html">File</a> file) <a class="anchor-link" href="#writeToFile"
+              title="Permalink to GridOut.writeToFile">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;int&gt; writeToFile(File file) {
+ OutputStream out = file.openOutputStream(FileMode.WRITE);
+ Future&lt;int&gt; written = writeTo(out);
+ written.chain((int length) {
+   out.close();
+   return new Future.immediate(length);
+ });
+ return written;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="writeToFilename">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html">int</a>&gt; <strong>writeToFilename</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> filename) <a class="anchor-link" href="#writeToFilename"
+              title="Permalink to GridOut.writeToFilename">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;int&gt; writeToFilename(String filename) {
+ return writeToFile(new File(filename));
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        
+        <div class="footer">
+          <div>This page was generated at 2012-12-27 12:26:55.930</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

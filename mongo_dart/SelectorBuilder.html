@@ -2,19 +2,19 @@
         <html>
         <head>
                 <meta charset="utf-8">
-        <title>SelectorBuilder&lt;K, V&gt; class / mongo_dart Library / Dart Documentation</title>
+        <title>SelectorBuilder class / mongo_dart Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="../styles.css">
         <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
         <link rel="shortcut icon" href="../favicon.ico">
         
         </head>
-        <body data-library="mongo_dart" data-type="SelectorBuilder&amp;lt;K, V&amp;gt;">
+        <body data-library="mongo_dart" data-type="SelectorBuilder">
         <div class="page">
         <div class="header">
           <a href="../index.html"><div class="logo"></div></a>
           <a href="../index.html">Dart Documentation</a>
-         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder&lt;K, V&gt;</a>        <div id="search-box">
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a>        <div id="search-box">
           <input type="search" name="q" id="q" autocomplete="off"
               class="search-input" placeholder="Search API">
         </div>
@@ -24,13 +24,18 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
 <li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
 <li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
 <li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
 <li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
 <li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><a href="../mongo_dart/GridFS.html"><div class="icon-class"></div>GridFS</a></li>
+<li><a href="../mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
+<li><a href="../mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
+<li><a href="../mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
 <li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
 <li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
 <li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
 <li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
@@ -40,21 +45,25 @@
 <li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
 <li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
 <li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
-<li><div class="icon-class"></div><strong>SelectorBuilder&lt;K, V&gt;</strong></li>
+<li><div class="icon-class"></div><strong>SelectorBuilder</strong></li>
 <li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
-<li><a href="../mongo_dart/Utils.html"><div class="icon-class"></div>Utils</a></li>
 </ul>
 </div>
 <div class="content">
-        <h2><strong>SelectorBuilder&lt;K, V&gt;</strong>
+        <h2><strong>SelectorBuilder</strong>
           class
         </h2>
         
 <button id="show-inherited" class="show-inherited">Hide inherited</button>
 <div class="doc">
 <pre class="source">
-class SelectorBuilder&lt;K,V&gt; extends MapProxy&lt;K,V&gt;{
+class SelectorBuilder{
+ Map map = {};
+ _ExtParams extParams = new _ExtParams();
+
  toString()=&gt;"SelectorBuilder($map)";
+
+
  SelectorBuilder eq(String fieldName,value){
    map[fieldName] = value;
    return this;
@@ -112,7 +121,12 @@ class SelectorBuilder&lt;K,V&gt; extends MapProxy&lt;K,V&gt;{
        dotAll:dotAll,extended:extended)};
    return this;
  }
+ @deprecated
  SelectorBuilder range(String fieldName, min, max, {bool minInclude: true, bool maxInclude: true}){
+   return inRange(fieldName, min, max, minInclude: minInclude, maxInclude: maxInclude);
+ }
+
+ SelectorBuilder inRange(String fieldName, min, max, {bool minInclude: true, bool maxInclude: false}) {
    Map rangeMap = {};
    if (minInclude){
      rangeMap["\$gte"] = min;
@@ -173,125 +187,80 @@ class SelectorBuilder&lt;K,V&gt; extends MapProxy&lt;K,V&gt;{
    map["\$sreturnKey"] = true;
    return this;
  }
+ @deprecated
  SelectorBuilder where(String javaScriptCode){
    map["\$where"] = new BsonCode(javaScriptCode);
    return this;
  }
+
+ SelectorBuilder jsQuery(String javaScriptCode){
+   map["\$where"] = new BsonCode(javaScriptCode);
+   return this;
+ }
+
+
+ SelectorBuilder fields(List&lt;String&gt; fields) {
+    if (extParams.fields != null) {
+      throw 'Fields parameter may be set only once for selector';
+    }
+    extParams.fields = {};
+    for (var field in fields) {
+      extParams.fields[field] = 1;
+    }
+    return this;
+ }
+ SelectorBuilder excludeFields(List&lt;String&gt; fields) {
+   if (extParams.fields != null) {
+     throw 'Fields parameter may be set only once for selector';
+   }
+   extParams.fields = {};
+   for (var field in fields) {
+     extParams.fields[field] = -1;
+   }
+   return this;
+ }
+
+ SelectorBuilder limit(int limit) {
+   extParams.limit = limit;
+   return this;
+ }
+
+ SelectorBuilder skip(int skip) {
+   extParams.skip = skip;
+   return this;
+ }
+
+ SelectorBuilder raw(Map rawSelector) {
+   map = rawSelector;
+   return this;
+ }
+
 }
 </pre>
 </div>
-<h3>Extends</h3>
-<p>
-<span class="type-box"><span class="icon-class"></span><a href="../mongo_dart/MapProxy.html">MapProxy&lt;K, V&gt;</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>SelectorBuilder&lt;K, V&gt;</strong></span></p>
-<div class="inherited">
+<div>
 <h3>Properties</h3>
-<div class="field inherited"><h4 id="isEmpty">
+<div class="field"><h4 id="extParams">
 <button class="show-code">Code</button>
-final <a href="http://api.dartlang.org/dart_core/bool.html">bool</a>         <strong>isEmpty</strong> <a class="anchor-link"
-            href="#isEmpty"
-            title="Permalink to SelectorBuilder&lt;K, V&gt;.isEmpty">#</a>
+<a href="../mongo_dart/_ExtParams.html">_ExtParams</a>         <strong>extParams</strong> <a class="anchor-link"
+            href="#extParams"
+            title="Permalink to SelectorBuilder.extParams">#</a>
         </h4>
-        <div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>Returns true if there is no {key, value} pair in the map.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
+        <div class="doc">
 <pre class="source">
-bool get isEmpty=&gt;map.isEmpty;
+_ExtParams extParams = new _ExtParams();
 </pre>
 </div>
 </div>
-<div class="field inherited"><h4 id="keys">
+<div class="field"><h4 id="map">
 <button class="show-code">Code</button>
-final <a href="http://api.dartlang.org/dart_core/Collection.html">Collection</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>&gt;         <strong>keys</strong> <a class="anchor-link"
-            href="#keys"
-            title="Permalink to SelectorBuilder&lt;K, V&gt;.keys">#</a>
-        </h4>
-        <div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>Returns a collection containing all the keys in the map.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
-<pre class="source">
-Collection&lt;K&gt; get keys =&gt; map.keys;
-</pre>
-</div>
-</div>
-<div class="field inherited"><h4 id="length">
-<button class="show-code">Code</button>
-final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>length</strong> <a class="anchor-link"
-            href="#length"
-            title="Permalink to SelectorBuilder&lt;K, V&gt;.length">#</a>
-        </h4>
-        <div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>The number of {key, value} pairs in the map.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
-<pre class="source">
-int get length =&gt; map.length;
-</pre>
-</div>
-</div>
-<div class="field inherited"><h4 id="map">
-<button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/LinkedHashMap.html">LinkedHashMap</a>         <strong>map</strong> <a class="anchor-link"
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>         <strong>map</strong> <a class="anchor-link"
             href="#map"
-            title="Permalink to SelectorBuilder&lt;K, V&gt;.map">#</a>
+            title="Permalink to SelectorBuilder.map">#</a>
         </h4>
-        <div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
+        <div class="doc">
 <pre class="source">
-LinkedHashMap map;
-</pre>
-</div>
-</div>
-<div class="field inherited"><h4 id="values">
-<button class="show-code">Code</button>
-final <a href="http://api.dartlang.org/dart_core/Collection.html">Collection</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">V</a>&gt;         <strong>values</strong> <a class="anchor-link"
-            href="#values"
-            title="Permalink to SelectorBuilder&lt;K, V&gt;.values">#</a>
-        </h4>
-        <div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>Returns a collection containing all the values in the map.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
-<pre class="source">
-Collection&lt;V&gt; get values =&gt; map.values;
-</pre>
-</div>
-</div>
-</div>
-<div class="inherited">
-<h3>Operators</h3>
-<div class="method inherited"><h4 id="[]">
-<button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">V</a> <strong>operator []</strong>(<a href="../mongo_dart/SelectorBuilder.html">K</a> key) <a class="anchor-link" href="#[]"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.operator []">#</a></h4>
-<div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>Returns the value for the given 
-<span class="param">key</span> or null if 
-<span class="param">key</span> is not
-in the map. Because null values are supported, one should either
-use containsKey to distinguish between an absent key and a null
-value, or use the <code>putIfAbsent</code> method.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
-<pre class="source">
-V operator [](K key)=&gt;map[key];
-</pre>
-</div>
-</div>
-<div class="method inherited"><h4 id="[]=">
-<button class="show-code">Code</button>
-void <strong>operator []=</strong>(<a href="../mongo_dart/SelectorBuilder.html">K</a> key, <a href="../mongo_dart/SelectorBuilder.html">V</a> value) <a class="anchor-link" href="#[]="
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.operator []=">#</a></h4>
-<div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>Associates the 
-<span class="param">key</span> with the given 
-<span class="param">value</span>.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
-<pre class="source">
-void operator []=(K key, V value){
-map[key]=value;
-}
+Map map = {};
 </pre>
 </div>
 </div>
@@ -301,7 +270,7 @@ map[key]=value;
 <div class="method"><h4 id="all">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>all</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, <a href="http://api.dartlang.org/dart_core/List.html">List</a> values) <a class="anchor-link" href="#all"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.all">#</a></h4>
+              title="Permalink to SelectorBuilder.all">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder all(String fieldName, List values){
@@ -311,23 +280,10 @@ SelectorBuilder all(String fieldName, List values){
 </pre>
 </div>
 </div>
-<div class="method inherited"><h4 id="clear">
-<button class="show-code">Code</button>
-void <strong>clear</strong>() <a class="anchor-link" href="#clear"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.clear">#</a></h4>
-<div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>Removes all pairs from the map.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
-<pre class="source">
-void clear()=&gt;map.clear();
-</pre>
-</div>
-</div>
 <div class="method"><h4 id="comment">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>comment</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> commentStr) <a class="anchor-link" href="#comment"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.comment">#</a></h4>
+              title="Permalink to SelectorBuilder.comment">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder comment(String commentStr){
@@ -338,38 +294,10 @@ SelectorBuilder comment(String commentStr){
 </pre>
 </div>
 </div>
-<div class="method inherited"><h4 id="containsKey">
-<button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>containsKey</strong>(<a href="../mongo_dart/SelectorBuilder.html">K</a> key) <a class="anchor-link" href="#containsKey"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.containsKey">#</a></h4>
-<div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>Returns whether this map contains the given 
-<span class="param">key</span>.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
-<pre class="source">
-bool containsKey(K key)=&gt;map.containsKey(key);
-</pre>
-</div>
-</div>
-<div class="method inherited"><h4 id="containsValue">
-<button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>containsValue</strong>(<a href="../mongo_dart/SelectorBuilder.html">V</a> value) <a class="anchor-link" href="#containsValue"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.containsValue">#</a></h4>
-<div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>Returns whether this map contains the given 
-<span class="param">value</span>.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
-<pre class="source">
-bool containsValue(V value)=&gt;map.containsValue(value);
-</pre>
-</div>
-</div>
 <div class="method"><h4 id="eq">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>eq</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, value) <a class="anchor-link" href="#eq"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.eq">#</a></h4>
+              title="Permalink to SelectorBuilder.eq">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder eq(String fieldName,value){
@@ -379,10 +307,29 @@ SelectorBuilder eq(String fieldName,value){
 </pre>
 </div>
 </div>
+<div class="method"><h4 id="excludeFields">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>excludeFields</strong>(<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; fields) <a class="anchor-link" href="#excludeFields"
+              title="Permalink to SelectorBuilder.excludeFields">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder excludeFields(List&lt;String&gt; fields) {
+ if (extParams.fields != null) {
+   throw 'Fields parameter may be set only once for selector';
+ }
+ extParams.fields = {};
+ for (var field in fields) {
+   extParams.fields[field] = -1;
+ }
+ return this;
+}
+</pre>
+</div>
+</div>
 <div class="method"><h4 id="exists">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>exists</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName) <a class="anchor-link" href="#exists"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.exists">#</a></h4>
+              title="Permalink to SelectorBuilder.exists">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder exists(String fieldName){
@@ -395,7 +342,7 @@ SelectorBuilder exists(String fieldName){
 <div class="method"><h4 id="explain">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>explain</strong>() <a class="anchor-link" href="#explain"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.explain">#</a></h4>
+              title="Permalink to SelectorBuilder.explain">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder explain(){
@@ -406,24 +353,29 @@ SelectorBuilder explain(){
 </pre>
 </div>
 </div>
-<div class="method inherited"><h4 id="forEach">
+<div class="method"><h4 id="fields">
 <button class="show-code">Code</button>
-void <strong>forEach</strong>(void f(<a href="../mongo_dart/SelectorBuilder.html">K</a> key, <a href="../mongo_dart/SelectorBuilder.html">V</a> value)) <a class="anchor-link" href="#forEach"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.forEach">#</a></h4>
-<div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>Applies 
-<span class="param">f</span> to each {key, value} pair of the map.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>fields</strong>(<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; fields) <a class="anchor-link" href="#fields"
+              title="Permalink to SelectorBuilder.fields">#</a></h4>
+<div class="doc">
 <pre class="source">
-void forEach(void f(K key, V value))=&gt;map.forEach(f);
+SelectorBuilder fields(List&lt;String&gt; fields) {
+  if (extParams.fields != null) {
+    throw 'Fields parameter may be set only once for selector';
+  }
+  extParams.fields = {};
+  for (var field in fields) {
+    extParams.fields[field] = 1;
+  }
+  return this;
+}
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="gt">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>gt</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, value) <a class="anchor-link" href="#gt"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.gt">#</a></h4>
+              title="Permalink to SelectorBuilder.gt">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder gt(String fieldName,value){
@@ -436,7 +388,7 @@ SelectorBuilder gt(String fieldName,value){
 <div class="method"><h4 id="gte">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>gte</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, value) <a class="anchor-link" href="#gte"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.gte">#</a></h4>
+              title="Permalink to SelectorBuilder.gte">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder gte(String fieldName,value){
@@ -449,7 +401,7 @@ SelectorBuilder gte(String fieldName,value){
 <div class="method"><h4 id="id">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>id</strong>(value) <a class="anchor-link" href="#id"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.id">#</a></h4>
+              title="Permalink to SelectorBuilder.id">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder id(value){
@@ -459,137 +411,13 @@ SelectorBuilder id(value){
 </pre>
 </div>
 </div>
-<div class="method"><h4 id="lt">
+<div class="method"><h4 id="inRange">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>lt</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, value) <a class="anchor-link" href="#lt"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.lt">#</a></h4>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>inRange</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, min, max, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> minInclude: true, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> maxInclude: false}) <a class="anchor-link" href="#inRange"
+              title="Permalink to SelectorBuilder.inRange">#</a></h4>
 <div class="doc">
 <pre class="source">
-SelectorBuilder lt(String fieldName,value){
- map[fieldName] = {"\$lt":value};
- return this;
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="lte">
-<button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>lte</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, value) <a class="anchor-link" href="#lte"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.lte">#</a></h4>
-<div class="doc">
-<pre class="source">
-SelectorBuilder lte(String fieldName,value){
- map[fieldName] = {"\$lte":value};
- return this;
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="match">
-<button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>match</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, <a href="http://api.dartlang.org/dart_core/String.html">String</a> pattern, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> multiLine, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> caseInsensitive, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> dotAll, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> extended}) <a class="anchor-link" href="#match"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.match">#</a></h4>
-<div class="doc">
-<pre class="source">
-SelectorBuilder match(String fieldName, String pattern,{bool multiLine, bool caseInsensitive, bool dotAll, bool extended}){
- map[fieldName] = {'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
-     dotAll:dotAll,extended:extended)};
- return this;
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="mod">
-<button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>mod</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, <a href="http://api.dartlang.org/dart_core/int.html">int</a> value) <a class="anchor-link" href="#mod"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.mod">#</a></h4>
-<div class="doc">
-<pre class="source">
-SelectorBuilder mod(String fieldName, int value){
- map[fieldName] = {"\$mod":[value,0]};
- return this;
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="ne">
-<button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>ne</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, value) <a class="anchor-link" href="#ne"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.ne">#</a></h4>
-<div class="doc">
-<pre class="source">
-SelectorBuilder ne(String fieldName, value){
- map[fieldName] = {"\$ne":value};
- return this;
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="nin">
-<button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>nin</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, <a href="http://api.dartlang.org/dart_core/List.html">List</a> values) <a class="anchor-link" href="#nin"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.nin">#</a></h4>
-<div class="doc">
-<pre class="source">
-SelectorBuilder nin(String fieldName, List values){
- map[fieldName] = {"\$nin":values};
- return this;
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="notExists">
-<button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>notExists</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName) <a class="anchor-link" href="#notExists"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.notExists">#</a></h4>
-<div class="doc">
-<pre class="source">
-SelectorBuilder notExists(String fieldName){
- map[fieldName] = {"\$exists":false};
- return this;
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="oneFrom">
-<button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>oneFrom</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, <a href="http://api.dartlang.org/dart_core/List.html">List</a> values) <a class="anchor-link" href="#oneFrom"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.oneFrom">#</a></h4>
-<div class="doc">
-<pre class="source">
-SelectorBuilder oneFrom(String fieldName, List values){
- map[fieldName] = {"\$in":values};
- return this;
-}
-</pre>
-</div>
-</div>
-<div class="method inherited"><h4 id="putIfAbsent">
-<button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">V</a> <strong>putIfAbsent</strong>(<a href="../mongo_dart/SelectorBuilder.html">K</a> key, <a href="../mongo_dart/SelectorBuilder.html">V</a> ifAbsent()) <a class="anchor-link" href="#putIfAbsent"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.putIfAbsent">#</a></h4>
-<div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>If 
-<span class="param">key</span> is not associated to a value, calls 
-<span class="param">ifAbsent</span> and
-updates the map by mapping 
-<span class="param">key</span> to the value returned by
-
-<span class="param">ifAbsent</span>. Returns the value in the map.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
-<pre class="source">
-V putIfAbsent(K key, V ifAbsent())=&gt;map.putIfAbsent(key, ifAbsent);
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="range">
-<button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>range</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, min, max, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> minInclude: true, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> maxInclude: true}) <a class="anchor-link" href="#range"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.range">#</a></h4>
-<div class="doc">
-<pre class="source">
-SelectorBuilder range(String fieldName, min, max, {bool minInclude: true, bool maxInclude: true}){
+SelectorBuilder inRange(String fieldName, min, max, {bool minInclude: true, bool maxInclude: false}) {
  Map rangeMap = {};
  if (minInclude){
    rangeMap["\$gte"] = min;
@@ -609,29 +437,166 @@ SelectorBuilder range(String fieldName, min, max, {bool minInclude: true, bool m
 </pre>
 </div>
 </div>
-<div class="method inherited"><h4 id="remove">
+<div class="method"><h4 id="jsQuery">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">V</a> <strong>remove</strong>(<a href="../mongo_dart/SelectorBuilder.html">K</a> key) <a class="anchor-link" href="#remove"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.remove">#</a></h4>
-<div class="inherited-from">inherited from <a href="../mongo_dart/MapProxy.html">MapProxy</a> </div><div class="doc">
-<div class="inherited">
-<p>Removes the association for the given 
-<span class="param">key</span>. Returns the value for
-
-<span class="param">key</span> in the map or null if 
-<span class="param">key</span> is not in the map. Note that values
-can be null and a returned null value does not always imply that the
-key is absent.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="../mongo_dart/SelectorBuilder.html">K</a>, <a href="../mongo_dart/SelectorBuilder.html">V</a>&gt; </div></div>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>jsQuery</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> javaScriptCode) <a class="anchor-link" href="#jsQuery"
+              title="Permalink to SelectorBuilder.jsQuery">#</a></h4>
+<div class="doc">
 <pre class="source">
-V remove(K key)=&gt;map.remove(key);
+SelectorBuilder jsQuery(String javaScriptCode){
+ map["\$where"] = new BsonCode(javaScriptCode);
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="limit">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>limit</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> limit) <a class="anchor-link" href="#limit"
+              title="Permalink to SelectorBuilder.limit">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder limit(int limit) {
+ extParams.limit = limit;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="lt">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>lt</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, value) <a class="anchor-link" href="#lt"
+              title="Permalink to SelectorBuilder.lt">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder lt(String fieldName,value){
+ map[fieldName] = {"\$lt":value};
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="lte">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>lte</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, value) <a class="anchor-link" href="#lte"
+              title="Permalink to SelectorBuilder.lte">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder lte(String fieldName,value){
+ map[fieldName] = {"\$lte":value};
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="match">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>match</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, <a href="http://api.dartlang.org/dart_core/String.html">String</a> pattern, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> multiLine, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> caseInsensitive, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> dotAll, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> extended}) <a class="anchor-link" href="#match"
+              title="Permalink to SelectorBuilder.match">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder match(String fieldName, String pattern,{bool multiLine, bool caseInsensitive, bool dotAll, bool extended}){
+ map[fieldName] = {'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
+     dotAll:dotAll,extended:extended)};
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="mod">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>mod</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, <a href="http://api.dartlang.org/dart_core/int.html">int</a> value) <a class="anchor-link" href="#mod"
+              title="Permalink to SelectorBuilder.mod">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder mod(String fieldName, int value){
+ map[fieldName] = {"\$mod":[value,0]};
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="ne">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>ne</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, value) <a class="anchor-link" href="#ne"
+              title="Permalink to SelectorBuilder.ne">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder ne(String fieldName, value){
+ map[fieldName] = {"\$ne":value};
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="nin">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>nin</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, <a href="http://api.dartlang.org/dart_core/List.html">List</a> values) <a class="anchor-link" href="#nin"
+              title="Permalink to SelectorBuilder.nin">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder nin(String fieldName, List values){
+ map[fieldName] = {"\$nin":values};
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="notExists">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>notExists</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName) <a class="anchor-link" href="#notExists"
+              title="Permalink to SelectorBuilder.notExists">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder notExists(String fieldName){
+ map[fieldName] = {"\$exists":false};
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="oneFrom">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>oneFrom</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, <a href="http://api.dartlang.org/dart_core/List.html">List</a> values) <a class="anchor-link" href="#oneFrom"
+              title="Permalink to SelectorBuilder.oneFrom">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder oneFrom(String fieldName, List values){
+ map[fieldName] = {"\$in":values};
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="range">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>range</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, min, max, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> minInclude: true, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> maxInclude: true}) <a class="anchor-link" href="#range"
+              title="Permalink to SelectorBuilder.range">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder range(String fieldName, min, max, {bool minInclude: true, bool maxInclude: true}){
+ return inRange(fieldName, min, max, minInclude: minInclude, maxInclude: maxInclude);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="raw">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>raw</strong>(<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> rawSelector) <a class="anchor-link" href="#raw"
+              title="Permalink to SelectorBuilder.raw">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder raw(Map rawSelector) {
+ map = rawSelector;
+ return this;
+}
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="returnKey">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>returnKey</strong>() <a class="anchor-link" href="#returnKey"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.returnKey">#</a></h4>
+              title="Permalink to SelectorBuilder.returnKey">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder returnKey(){
@@ -645,7 +610,7 @@ SelectorBuilder returnKey(){
 <div class="method"><h4 id="showDiskLoc">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>showDiskLoc</strong>() <a class="anchor-link" href="#showDiskLoc"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.showDiskLoc">#</a></h4>
+              title="Permalink to SelectorBuilder.showDiskLoc">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder showDiskLoc(){
@@ -656,10 +621,23 @@ SelectorBuilder showDiskLoc(){
 </pre>
 </div>
 </div>
+<div class="method"><h4 id="skip">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>skip</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> skip) <a class="anchor-link" href="#skip"
+              title="Permalink to SelectorBuilder.skip">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder skip(int skip) {
+ extParams.skip = skip;
+ return this;
+}
+</pre>
+</div>
+</div>
 <div class="method"><h4 id="snapshot">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>snapshot</strong>() <a class="anchor-link" href="#snapshot"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.snapshot">#</a></h4>
+              title="Permalink to SelectorBuilder.snapshot">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder snapshot(){
@@ -673,7 +651,7 @@ SelectorBuilder snapshot(){
 <div class="method"><h4 id="sortBy">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>sortBy</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> fieldName, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> descending: false}) <a class="anchor-link" href="#sortBy"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.sortBy">#</a></h4>
+              title="Permalink to SelectorBuilder.sortBy">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder sortBy(String fieldName, {bool descending: false}){
@@ -694,7 +672,7 @@ SelectorBuilder sortBy(String fieldName, {bool descending: false}){
 <div class="method"><h4 id="toString">
 <button class="show-code">Code</button>
 <strong>toString</strong>() <a class="anchor-link" href="#toString"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.toString">#</a></h4>
+              title="Permalink to SelectorBuilder.toString">#</a></h4>
 <div class="doc">
 <div class="inherited">
 <p>Returns a string representation of this object.</p>
@@ -707,7 +685,7 @@ toString()=&gt;"SelectorBuilder($map)";
 <div class="method"><h4 id="where">
 <button class="show-code">Code</button>
 <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>where</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> javaScriptCode) <a class="anchor-link" href="#where"
-              title="Permalink to SelectorBuilder&lt;K, V&gt;.where">#</a></h4>
+              title="Permalink to SelectorBuilder.where">#</a></h4>
 <div class="doc">
 <pre class="source">
 SelectorBuilder where(String javaScriptCode){
@@ -723,7 +701,7 @@ SelectorBuilder where(String javaScriptCode){
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:50.704</div>
+          <div>This page was generated at 2012-12-27 12:26:56.011</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

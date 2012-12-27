@@ -24,13 +24,18 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
+<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
 <li><div class="icon-class"></div><strong>Connection</strong></li>
 <li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
 <li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
 <li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
 <li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
+<li><a href="../mongo_dart/GridFS.html"><div class="icon-class"></div>GridFS</a></li>
+<li><a href="../mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
+<li><a href="../mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
+<li><a href="../mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
 <li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
 <li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
 <li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
 <li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
@@ -40,9 +45,8 @@
 <li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
 <li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
 <li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
-<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder&lt;K, V&gt;</a></li>
+<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
 <li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
-<li><a href="../mongo_dart/Utils.html"><div class="icon-class"></div>Utils</a></li>
 </ul>
 </div>
 <div class="content">
@@ -54,28 +58,28 @@
 <div class="doc">
 <pre class="source">
 class Connection{
- Map&lt;int,Completer&lt;MongoReplyMessage&gt;&gt; replyCompleters;
- BsonBinary lengthBuffer;
+ Map&lt;int,Completer&lt;MongoReplyMessage&gt;&gt; _replyCompleters;
+ BsonBinary _lengthBuffer;
  ServerConfig serverConfig;
- BsonBinary bufferToSend;
- Queue&lt;MongoMessage&gt; sendQueue;
- BsonBinary messageBuffer;
+ BsonBinary _bufferToSend;
+ Queue&lt;MongoMessage&gt; _sendQueue;
+ BsonBinary _messageBuffer;
  Socket socket;
  bool connected = false;
  Connection([this.serverConfig]){
-   if (serverConfig === null){
+   if (serverConfig == null){
      serverConfig = new ServerConfig();
    }
  }
  Future&lt;bool&gt; connect(){
-   replyCompleters = new Map();
-   sendQueue = new Queue();
+   _replyCompleters = new Map();
+   _sendQueue = new Queue();
    socket = new Socket(serverConfig.host, serverConfig.port);
    Completer completer = new Completer();
    if (socket is! Socket) {
      completer.completeException(new Exception( "can't get send socket"));
    } else {
-     lengthBuffer = new BsonBinary(4);
+     _lengthBuffer = new BsonBinary(4);
      socket.onError = (e) {
        print("connect exception ${e}");
        completer.completeException(e);
@@ -87,73 +91,75 @@ class Connection{
      return completer.future;
    }
  }
- close(){
-   while (!sendQueue.isEmpty){
+ void close(){
+   while (!_sendQueue.isEmpty){
      _sendBuffer();
    }
    socket.onData = null;
    socket.onError = null;
-   sendQueue.clear();
+   _sendQueue.clear();
    socket.close();
-   replyCompleters.clear();
+   _replyCompleters.clear();
  }
- getNextBufferToSend(){
-   if (bufferToSend === null || bufferToSend.atEnd()){
-     if(!sendQueue.isEmpty){
-       MongoMessage message = sendQueue.removeFirst();
-       debug(message.toString());
-       bufferToSend = message.serialize();
-       debug(bufferToSend.hexString);
+ _getNextBufferToSend(){
+   if (_bufferToSend == null || _bufferToSend.atEnd()){
+     if(!_sendQueue.isEmpty){
+       MongoMessage message = _sendQueue.removeFirst();
+       _log.finer(message.toString());
+       _bufferToSend = message.serialize();
+       _log.finer(_bufferToSend.hexString);
      } else {
-       bufferToSend = null;
+       _bufferToSend = null;
      }
    }
  }
  _sendBuffer(){
-   while(sendQueue.length &gt; 0) {
-     bufferToSend = sendQueue.removeFirst().serialize();
-     socket.outputStream.writeFrom(bufferToSend.byteList);
+   while(_sendQueue.length &gt; 0) {
+     _bufferToSend = _sendQueue.removeFirst().serialize();
+     socket.outputStream.writeFrom(_bufferToSend.byteList);
    }
  }
-  void receiveData() {
-   if (messageBuffer === null){
-     int numBytes = socket.readList(lengthBuffer.byteList, 0, 4);
+ void _receiveData() {
+   if (_messageBuffer == null){
+     int numBytes = socket.readList(_lengthBuffer.byteList, 0, 4);
      if (numBytes == 0) {
        return;
      }
-     int messageLength = lengthBuffer.readInt32();
-     messageBuffer = new BsonBinary(messageLength);
-     messageBuffer.writeInt(messageLength);
+     int messageLength = _lengthBuffer.readInt32();
+     _messageBuffer = new BsonBinary(messageLength);
+     _messageBuffer.writeInt(messageLength);
    }
-   messageBuffer.offset += socket.readList(messageBuffer.byteList,messageBuffer.offset,messageBuffer.byteList.length-messageBuffer.offset);
-   if (messageBuffer.atEnd()){
+   _messageBuffer.offset += socket.readList(_messageBuffer.byteList,_messageBuffer.offset,_messageBuffer.byteList.length-_messageBuffer.offset);
+   if (_messageBuffer.atEnd()){
      MongoReplyMessage reply = new MongoReplyMessage();
-     messageBuffer.rewind();
-     reply.deserialize(messageBuffer);
-     debug(reply.toString());
-     messageBuffer = null;
-     lengthBuffer.rewind();
-     Completer completer = replyCompleters.remove(reply.responseTo);
-     if (completer !== null){
+     _messageBuffer.rewind();
+     reply.deserialize(_messageBuffer);
+     _log.finer(reply.toString());
+     _messageBuffer = null;
+     _lengthBuffer.rewind();
+     Completer completer = _replyCompleters.remove(reply.responseTo);
+     if (completer != null){
        completer.complete(reply);
      }
      else {
-       warn("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
+       _log.shout("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
      }
    }
  }
+
+
  Future&lt;MongoReplyMessage&gt; query(MongoMessage queryMessage){
    Completer completer = new Completer();
-   replyCompleters[queryMessage.requestId] = completer;
-   socket.onData = receiveData;
-   sendQueue.addLast(queryMessage);
+   _replyCompleters[queryMessage.requestId] = completer;
+   socket.onData = _receiveData;
+   _sendQueue.addLast(queryMessage);
    _sendBuffer();
    return completer.future;
  }
- void execute(MongoMessage mongoMessage){  
-   sendQueue.addLast(mongoMessage);
-   _sendBuffer();  
- }  
+ void execute(MongoMessage mongoMessage){
+   _sendQueue.addLast(mongoMessage);
+   _sendBuffer();
+ }
 }
 </pre>
 </div>
@@ -166,7 +172,7 @@ new <strong>Connection</strong>([<a href="../mongo_dart/ServerConfig.html">Serve
 <div class="doc">
 <pre class="source">
 Connection([this.serverConfig]){
- if (serverConfig === null){
+ if (serverConfig == null){
    serverConfig = new ServerConfig();
  }
 }
@@ -176,18 +182,6 @@ Connection([this.serverConfig]){
 </div>
 <div>
 <h3>Properties</h3>
-<div class="field"><h4 id="bufferToSend">
-<button class="show-code">Code</button>
-<a href="../bson/BsonBinary.html">BsonBinary</a>         <strong>bufferToSend</strong> <a class="anchor-link"
-            href="#bufferToSend"
-            title="Permalink to Connection.bufferToSend">#</a>
-        </h4>
-        <div class="doc">
-<pre class="source">
-BsonBinary bufferToSend;
-</pre>
-</div>
-</div>
 <div class="field"><h4 id="connected">
 <button class="show-code">Code</button>
 <a href="http://api.dartlang.org/dart_core/bool.html">bool</a>         <strong>connected</strong> <a class="anchor-link"
@@ -197,54 +191,6 @@ BsonBinary bufferToSend;
         <div class="doc">
 <pre class="source">
 bool connected = false;
-</pre>
-</div>
-</div>
-<div class="field"><h4 id="lengthBuffer">
-<button class="show-code">Code</button>
-<a href="../bson/BsonBinary.html">BsonBinary</a>         <strong>lengthBuffer</strong> <a class="anchor-link"
-            href="#lengthBuffer"
-            title="Permalink to Connection.lengthBuffer">#</a>
-        </h4>
-        <div class="doc">
-<pre class="source">
-BsonBinary lengthBuffer;
-</pre>
-</div>
-</div>
-<div class="field"><h4 id="messageBuffer">
-<button class="show-code">Code</button>
-<a href="../bson/BsonBinary.html">BsonBinary</a>         <strong>messageBuffer</strong> <a class="anchor-link"
-            href="#messageBuffer"
-            title="Permalink to Connection.messageBuffer">#</a>
-        </h4>
-        <div class="doc">
-<pre class="source">
-BsonBinary messageBuffer;
-</pre>
-</div>
-</div>
-<div class="field"><h4 id="replyCompleters">
-<button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html">int</a>, <a href="http://api.dartlang.org/dart_core/Completer.html">Completer</a>&lt;<a href="../mongo_dart/MongoReplyMessage.html">MongoReplyMessage</a>&gt;&gt;         <strong>replyCompleters</strong> <a class="anchor-link"
-            href="#replyCompleters"
-            title="Permalink to Connection.replyCompleters">#</a>
-        </h4>
-        <div class="doc">
-<pre class="source">
-Map&lt;int,Completer&lt;MongoReplyMessage&gt;&gt; replyCompleters;
-</pre>
-</div>
-</div>
-<div class="field"><h4 id="sendQueue">
-<button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Queue.html">Queue</a>&lt;<a href="../mongo_dart/MongoMessage.html">MongoMessage</a>&gt;         <strong>sendQueue</strong> <a class="anchor-link"
-            href="#sendQueue"
-            title="Permalink to Connection.sendQueue">#</a>
-        </h4>
-        <div class="doc">
-<pre class="source">
-Queue&lt;MongoMessage&gt; sendQueue;
 </pre>
 </div>
 </div>
@@ -277,19 +223,19 @@ Socket socket;
 <h3>Methods</h3>
 <div class="method"><h4 id="close">
 <button class="show-code">Code</button>
-<strong>close</strong>() <a class="anchor-link" href="#close"
+void <strong>close</strong>() <a class="anchor-link" href="#close"
               title="Permalink to Connection.close">#</a></h4>
 <div class="doc">
 <pre class="source">
-close(){
- while (!sendQueue.isEmpty){
+void close(){
+ while (!_sendQueue.isEmpty){
    _sendBuffer();
  }
  socket.onData = null;
  socket.onError = null;
- sendQueue.clear();
+ _sendQueue.clear();
  socket.close();
- replyCompleters.clear();
+ _replyCompleters.clear();
 }
 </pre>
 </div>
@@ -301,14 +247,14 @@ close(){
 <div class="doc">
 <pre class="source">
 Future&lt;bool&gt; connect(){
- replyCompleters = new Map();
- sendQueue = new Queue();
+ _replyCompleters = new Map();
+ _sendQueue = new Queue();
  socket = new Socket(serverConfig.host, serverConfig.port);
  Completer completer = new Completer();
  if (socket is! Socket) {
    completer.completeException(new Exception( "can't get send socket"));
  } else {
-   lengthBuffer = new BsonBinary(4);
+   _lengthBuffer = new BsonBinary(4);
    socket.onError = (e) {
      print("connect exception ${e}");
      completer.completeException(e);
@@ -329,30 +275,9 @@ void <strong>execute</strong>(<a href="../mongo_dart/MongoMessage.html">MongoMes
               title="Permalink to Connection.execute">#</a></h4>
 <div class="doc">
 <pre class="source">
-void execute(MongoMessage mongoMessage){  
- sendQueue.addLast(mongoMessage);
- _sendBuffer();  
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="getNextBufferToSend">
-<button class="show-code">Code</button>
-<strong>getNextBufferToSend</strong>() <a class="anchor-link" href="#getNextBufferToSend"
-              title="Permalink to Connection.getNextBufferToSend">#</a></h4>
-<div class="doc">
-<pre class="source">
-getNextBufferToSend(){
- if (bufferToSend === null || bufferToSend.atEnd()){
-   if(!sendQueue.isEmpty){
-     MongoMessage message = sendQueue.removeFirst();
-     debug(message.toString());
-     bufferToSend = message.serialize();
-     debug(bufferToSend.hexString);
-   } else {
-     bufferToSend = null;
-   }
- }
+void execute(MongoMessage mongoMessage){
+ _sendQueue.addLast(mongoMessage);
+ _sendBuffer();
 }
 </pre>
 </div>
@@ -365,47 +290,11 @@ getNextBufferToSend(){
 <pre class="source">
 Future&lt;MongoReplyMessage&gt; query(MongoMessage queryMessage){
  Completer completer = new Completer();
- replyCompleters[queryMessage.requestId] = completer;
- socket.onData = receiveData;
- sendQueue.addLast(queryMessage);
+ _replyCompleters[queryMessage.requestId] = completer;
+ socket.onData = _receiveData;
+ _sendQueue.addLast(queryMessage);
  _sendBuffer();
  return completer.future;
-}
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="receiveData">
-<button class="show-code">Code</button>
-void <strong>receiveData</strong>() <a class="anchor-link" href="#receiveData"
-              title="Permalink to Connection.receiveData">#</a></h4>
-<div class="doc">
-<pre class="source">
-void receiveData() {
-if (messageBuffer === null){
-  int numBytes = socket.readList(lengthBuffer.byteList, 0, 4);
-  if (numBytes == 0) {
-    return;
-  }
-  int messageLength = lengthBuffer.readInt32();
-  messageBuffer = new BsonBinary(messageLength);
-  messageBuffer.writeInt(messageLength);
-}
-messageBuffer.offset += socket.readList(messageBuffer.byteList,messageBuffer.offset,messageBuffer.byteList.length-messageBuffer.offset);
-if (messageBuffer.atEnd()){
-  MongoReplyMessage reply = new MongoReplyMessage();
-  messageBuffer.rewind();
-  reply.deserialize(messageBuffer);
-  debug(reply.toString());
-  messageBuffer = null;
-  lengthBuffer.rewind();
-  Completer completer = replyCompleters.remove(reply.responseTo);
-  if (completer !== null){
-    completer.complete(reply);
-  }
-  else {
-    warn("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
-  }
-}
 }
 </pre>
 </div>
@@ -416,7 +305,7 @@ if (messageBuffer.atEnd()){
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:51.888</div>
+          <div>This page was generated at 2012-12-27 12:26:56.178</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

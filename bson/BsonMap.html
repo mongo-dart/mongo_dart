@@ -48,7 +48,7 @@
 <li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
 <li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
 </ul>
-<h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
+<h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
 <div class="content">
         <h2><strong>BsonMap</strong>
           class
@@ -62,37 +62,37 @@ class BsonMap extends BsonObject{
  Map utfKeys;
  int _dataSize;
  int dataSize(){
-   if (_dataSize === null){
+   if (_dataSize == null){
      _dataSize = 0;
      data.forEach((String key, var value)
        {
           _dataSize += elementSize(key, value);
        });
-   }    
+   }
    return _dataSize;
  }
  BsonMap(this.data);
  get value=&gt;data;
  byteLength()=&gt;dataSize()+1+4;
- int get typeByte =&gt; BSON.BSON_DATA_OBJECT;  
+ int get typeByte =&gt; BSON.BSON_DATA_OBJECT;
  packValue(BsonBinary buffer){
    buffer.writeInt(byteLength());
    data.forEach((var key, var value)
      {
         bsonObjectFrom(value).packElement(key ,buffer);
-     });     
+     });
     buffer.writeByte(0);
  }
  unpackValue(BsonBinary buffer){
-   data = {};    
-   buffer.offset += 4;    
+   data = {};
+   buffer.offset += 4;
    int typeByte = buffer.readByte();
    while (typeByte != 0){
      BsonObject bsonObject = bsonObjectFromTypeByte(typeByte);
      var element = bsonObject.unpackElement(buffer);
-     data[element.name] = element.value;    
+     data[element.name] = element.value;
      typeByte = buffer.readByte();
-   }    
+   }
  }
 }
 </pre>
@@ -183,13 +183,13 @@ byteLength()=&gt;dataSize()+1+4;
 <div class="doc">
 <pre class="source">
 int dataSize(){
- if (_dataSize === null){
+ if (_dataSize == null){
    _dataSize = 0;
    data.forEach((String key, var value)
      {
         _dataSize += elementSize(key, value);
      });
- }    
+ }
  return _dataSize;
 }
 </pre>
@@ -203,7 +203,7 @@ int dataSize(){
 <pre class="source">
 packElement(String name, var buffer){
  buffer.writeByte(typeByte);
- if (name !== null){
+ if (name != null){
    new BsonCString(name).packValue(buffer);
  }
  packValue(buffer);
@@ -222,7 +222,7 @@ packValue(BsonBinary buffer){
  data.forEach((var key, var value)
    {
       bsonObjectFrom(value).packElement(key ,buffer);
-   });     
+   });
   buffer.writeByte(0);
 }
 </pre>
@@ -251,15 +251,15 @@ _ElementPair unpackElement(buffer){
 <div class="doc">
 <pre class="source">
 unpackValue(BsonBinary buffer){
- data = {};    
- buffer.offset += 4;    
+ data = {};
+ buffer.offset += 4;
  int typeByte = buffer.readByte();
  while (typeByte != 0){
    BsonObject bsonObject = bsonObjectFromTypeByte(typeByte);
    var element = bsonObject.unpackElement(buffer);
-   data[element.name] = element.value;    
+   data[element.name] = element.value;
    typeByte = buffer.readByte();
- }    
+ }
 }
 </pre>
 </div>
@@ -270,7 +270,7 @@ unpackValue(BsonBinary buffer){
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:49.963</div>
+          <div>This page was generated at 2012-12-27 12:26:55.819</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

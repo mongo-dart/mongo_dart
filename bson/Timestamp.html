@@ -48,7 +48,7 @@
 <li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
 <li><div class="icon-class"></div><strong>Timestamp</strong></li>
 </ul>
-<h2><div class="icon-library"></div><a href="../bson_vm.html">bson_vm</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
+<h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
 <div class="content">
         <h2><strong>Timestamp</strong>
           class
@@ -61,10 +61,10 @@ class Timestamp extends BsonObject{
  int seconds;
  int increment;
  Timestamp([this.seconds,this.increment]){
-   if (seconds === null){
+   if (seconds == null){
      seconds = (new Date.now().millisecondsSinceEpoch ~/ 1000).toInt();
    }
-   if (increment === null){
+   if (increment == null){
      increment = Statics.nextIncrement;
    }
  }
@@ -85,10 +85,10 @@ new <strong>Timestamp</strong>([<a href="http://api.dartlang.org/dart_core/int.h
 <div class="doc">
 <pre class="source">
 Timestamp([this.seconds,this.increment]){
- if (seconds === null){
+ if (seconds == null){
    seconds = (new Date.now().millisecondsSinceEpoch ~/ 1000).toInt();
  }
- if (increment === null){
+ if (increment == null){
    increment = Statics.nextIncrement;
  }
 }
@@ -130,7 +130,7 @@ final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <stro
         </h4>
         <div class="inherited-from">inherited from <a href="../bson/BsonObject.html">BsonObject</a> </div><div class="doc">
 <pre class="source">
-int get typeByte{ throw const Exception("must be implemented");}
+int get typeByte{ throw "must be implemented";}
 </pre>
 </div>
 </div>
@@ -167,7 +167,7 @@ int byteLength() =&gt; 8;
 <pre class="source">
 packElement(String name, var buffer){
  buffer.writeByte(typeByte);
- if (name !== null){
+ if (name != null){
    new BsonCString(name).packValue(buffer);
  }
  packValue(buffer);
@@ -181,7 +181,7 @@ packElement(String name, var buffer){
               title="Permalink to Timestamp.packValue">#</a></h4>
 <div class="inherited-from">inherited from <a href="../bson/BsonObject.html">BsonObject</a> </div><div class="doc">
 <pre class="source">
-packValue(var buffer){ throw const Exception("must be implemented");}
+packValue(var buffer){ throw "must be implemented";}
 </pre>
 </div>
 </div>
@@ -220,7 +220,7 @@ _ElementPair unpackElement(buffer){
               title="Permalink to Timestamp.unpackValue">#</a></h4>
 <div class="inherited-from">inherited from <a href="../bson/BsonObject.html">BsonObject</a> </div><div class="doc">
 <pre class="source">
-unpackValue(var buffer){ throw const Exception("must be implemented");}
+unpackValue(var buffer){ throw "must be implemented";}
 </pre>
 </div>
 </div>
@@ -230,7 +230,7 @@ unpackValue(var buffer){ throw const Exception("must be implemented");}
         </div>
         
         <div class="footer">
-          <div>This page was generated at 2012-11-11 18:14:50.424</div>
+          <div>This page was generated at 2012-12-27 12:26:55.898</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>
