@@ -209,6 +209,26 @@ testSaveWithObjectId(){
   }));
 }
 
+testInsertWithObjectId(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  DbCollection coll;
+  var id;
+  var objectToSave;
+  db.open().chain(expectAsync1((c){
+    coll = db.collection('testInsertWithObjectId');
+    coll.remove();
+    objectToSave = {"_id": new ObjectId(),"name":"a", "value": 10};
+    id = objectToSave["_id"];
+    coll.insert(objectToSave);
+    return coll.findOne({"name":"a"});
+  })).then(expectAsync1((v1){
+    expect(v1["_id"],id);
+    expect(v1["value"],10);
+    db.close();
+  }));
+}
+
+
 testCount(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().chain(expectAsync1((c){
@@ -586,6 +606,7 @@ main(){
     test('testDrop',testDrop);
     test('testSaveWithIntegerId',testSaveWithIntegerId);
     test('testSaveWithObjectId',testSaveWithObjectId);
+    test('testInsertWithObjectId',testSaveWithObjectId);    
     test('testSkip',testSkip);
   });  
   group('Cursor tests:', (){
