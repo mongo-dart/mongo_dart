@@ -220,7 +220,7 @@ testInsertWithObjectId(){
     objectToSave = {"_id": new ObjectId(),"name":"a", "value": 10};
     id = objectToSave["_id"];
     coll.insert(objectToSave);
-    return coll.findOne({"name":"a"});
+    return coll.findOne(where.eq("name","a"));
   })).then(expectAsync1((v1){
     expect(v1["_id"],id);
     expect(v1["value"],10);
