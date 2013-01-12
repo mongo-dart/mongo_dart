@@ -12,7 +12,7 @@ main(){
                      {"name":"d", "value": 40}
                    ];
     coll.insertAll(toInsert);
-    coll.findOne({"name":"c"}).chain((v1){
+    coll.findOne({"name":"c"}).then((v1){
       print("Record c: $v1");
       v1["value"] = 31;
       coll.save(v1);

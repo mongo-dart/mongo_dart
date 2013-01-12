@@ -80,11 +80,11 @@ class Db{
           print("Error: $errMsg");
           var m = new Map();
           m["errmsg"]=errMsg;
-          result.completeException(m);
+          result.completeError(m);
         } else  if (replyMessage.documents[0]['ok'] == 1.0 && replyMessage.documents[0]['err'] == null){
           result.complete(replyMessage.documents[0]);
         } else {
-          result.completeException(replyMessage.documents[0]);
+          result.completeError(replyMessage.documents[0]);
         }
       });
     return result.future;
@@ -139,7 +139,7 @@ class Db{
 
   Future<bool> authenticate(String userName, String password){
     Completer completer = new Completer();
-    getNonce().chain((msg) {
+    getNonce().then((msg) {
       var nonce = msg["nonce"];
       var command = DbCommand.createAuthenticationCommand(this,userName,password,nonce);
       serverConfig.password = '***********';
@@ -214,7 +214,7 @@ class Db{
       if (name == null) {
         name = _createIndexName(keys);
       }
-      if (indexInfos.some((info) => info['name'] == name)) {
+      if (indexInfos.any((info) => info['name'] == name)) {
         completer.complete({'ok': 1.0, 'result': 'index preexists'});
       } else {
         return createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name);

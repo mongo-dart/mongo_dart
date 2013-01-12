@@ -3,7 +3,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 main(){
   Db db = new Db("mongodb://127.0.0.1/mongo_dart-blog");
   print("Connecting to ${db.serverConfig.host}:${db.serverConfig.port}");
-  db.open().chain((c){
+  db.open().then((c){
     DbCollection collection = db.collection('test-types');
     collection.remove();
     collection.insert({

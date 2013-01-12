@@ -2,6 +2,7 @@ library mongo_dart;
 import 'dart:isolate';
 import 'dart:io';
 import 'dart:crypto';
+import 'dart:async';
 import 'dart:uri';
 import 'bson_console.dart';
 import 'bson.dart';

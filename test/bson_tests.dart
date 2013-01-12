@@ -7,7 +7,8 @@ testUint8ListNegativeWrite(){
   Uint8List bl = new Uint8List(4);
   var ba = bl.asByteArray();
   ba.setInt32(0,-1);
-  expect(bl,orderedEquals([255,255,255,255]));
+  expect(bl[0], 255);
+  //expect(bl,equals([255,255,255,255]));
 }
 testBsonBinaryWithNegativeOne(){
   BsonBinary b = new BsonBinary(4);
@@ -48,9 +49,9 @@ testBsonBinary(){
    expect(b.hexString,'9cffffff');
 }
 
-typeTest(){
+typeTest(){  
   expect(bsonObjectFrom(1234) is BsonInt,isTrue);
-  expect(bsonObjectFrom("asdfasdf") is BsonString, isTrue);
+  expect(bsonObjectFrom("asdfasdf") is BsonString, isTrue);  
   expect(bsonObjectFrom(new Date.now()) is BsonDate, isTrue);
   expect(bsonObjectFrom([2,3,4]) is BsonArray, isTrue);
 }
@@ -147,7 +148,8 @@ testBsonDbPointer() {
 
 
 runMe(){
-  group("BSonBsonBinary:", (){
+  test("typeTest",typeTest);
+  group("BSonBsonBinary:", (){    
     test("testUint8ListNegativeWrite",testUint8ListNegativeWrite);
     test("testBsonBinary",testBsonBinary);
     test("testBsonBinaryWithNegativeOne",testBsonBinaryWithNegativeOne);

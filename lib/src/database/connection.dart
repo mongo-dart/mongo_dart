@@ -19,12 +19,12 @@ class Connection{
     socket = new Socket(serverConfig.host, serverConfig.port);
     Completer completer = new Completer();
     if (socket is! Socket) {
-      completer.completeException(new Exception( "can't get send socket"));
+      completer.completeError(new Exception( "can't get send socket"));
     } else {
       _lengthBuffer = new BsonBinary(4);
       socket.onError = (e) {
         print("connect exception ${e}");
-        completer.completeException(e);
+        completer.completeError(e);
       };
       socket.onConnect = () {
         connected = true;

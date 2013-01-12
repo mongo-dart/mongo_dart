@@ -7,7 +7,7 @@ main(){
   DbCollection articlesCollection;
   Map<String,Map> authors = new Map<String,Map>();
   Map<String,Map> users = new Map<String,Map>();
-  db.open().chain((o){
+  db.open().then((o){
     print(">> Dropping mongo_dart-blog db");
     db.drop();
     print("===================================================================================");
@@ -18,13 +18,13 @@ main(){
       {'name':'Jorge Luis Borges', 'email':'jorge@borges.com', 'age':123}]
     );
     return collection.find().each((v){authors[v["name"]] = v;});
-  }).chain((v){
+  }).then((v){
     print("===================================================================================");
     print(">> Authors ordered by age ascending");
     db.ensureIndex('authors', key: 'age');
-    return collection.find(query().sortBy('age')).each(
+    return collection.find(where.sortBy('age')).each(
       (auth)=>print("[${auth['name']}]:[${auth['email']}]:[${auth['age']}]"));
-  }).chain((v){
+  }).then((v){
     print("===================================================================================");
     print(">> Adding Users");
     usersCollection = db.collection("users");
@@ -32,12 +32,12 @@ main(){
        {'login':'lsmith', 'name':'Lucy Smith', 'email':'lucy@smith.com'}]);
     db.ensureIndex('users', keys: {'login': -1});
     return usersCollection.find().each((user)=>users[user["login"]] = user);
-  }).chain((v){
+  }).then((v){
     print("===================================================================================");
     print(">> Users ordered by login descending");
-    return usersCollection.find(query().sortBy('login', descending: true)).each(
+    return usersCollection.find(where.sortBy('login', descending: true)).each(
       (user)=>print("[${user['login']}]:[${user['name']}]:[${user['email']}]"));
-  }).chain((v){
+  }).then((v){
     print("===================================================================================");
     print(">> Adding articles");
     articlesCollection = db.collection("articles");
@@ -53,10 +53,10 @@ main(){
                                 ]);
     print("===================================================================================");
     print(">> Articles ordered by title ascending");
-    return articlesCollection.find(query().sortBy('title')).each((article){
+    return articlesCollection.find(where.sortBy('title')).each((article){
       print("[${article['title']}]:[${article['body']}]:[author_id: ${article['author_id']}]");
     });
-  }).chain((v){
+  }).then((v){
     return db.collectionsInfoCursor().each((col) => col);
   }).then((dummy){
     db.close();

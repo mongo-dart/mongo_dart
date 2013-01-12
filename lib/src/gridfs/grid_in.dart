@@ -53,7 +53,7 @@ class GridIn extends GridFSFile {
     };
 
     input.onClosed = () {
-      Futures.wait(futures).chain((list) {
+      Future.wait(futures).then((list) {
         return finishData();
       }).then((map){
         completer.complete({});
@@ -73,7 +73,7 @@ class GridIn extends GridFSFile {
     Map chunk = {"files_id" : id, "n" : currentChunkNumber, "data": new BsonBinary.from(writeBuffer)};
     currentChunkNumber++;
     totalBytes += writeBuffer.length;
-    messageDigester.update(writeBuffer);
+    messageDigester.add(writeBuffer);
     currentBufferPosition = 0;
 
     return fs.chunks.insert(chunk, safeMode:true);
@@ -81,7 +81,7 @@ class GridIn extends GridFSFile {
 
   Future finishData() {
     if (!savedChunks) {
-      md5 = CryptoUtils.bytesToHex(messageDigester.digest());
+      md5 = CryptoUtils.bytesToHex(messageDigester.close());
       length = totalBytes;
       savedChunks = true;
     }

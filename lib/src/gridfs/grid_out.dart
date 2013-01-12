@@ -22,7 +22,7 @@ class GridOut extends GridFSFile {
     // TODO(tsander): Would it be better to ask for all the chunks instead of
     // one at a time?
     fs.chunks.findOne(where.eq("files_id", id).eq("n", i))
-    ..handleException((e){
+    ..catchError((e){
       // TODO better error handling.
       print(e);
     })
@@ -44,7 +44,7 @@ class GridOut extends GridFSFile {
   Future<int> writeToFile(File file) {
     OutputStream out = file.openOutputStream(FileMode.WRITE);
     Future<int> written = writeTo(out);
-    written.chain((int length) {
+    written.then((int length) {
       out.close();
       return new Future.immediate(length);
     });
@@ -60,11 +60,11 @@ class GridOut extends GridFSFile {
       if (chain == null) {
         chain = getChunk(i);
       } else {
-        chain = chain.chain((List<int> buffer){
+        chain = chain.then((List<int> buffer){
           return getChunk(i);
         });
       }
-      chain = chain.chain((List<int> buffer) {
+      chain = chain.then((List<int> buffer) {
         if (buffer != null) {
           out.write(buffer, true);
           out.flush();
