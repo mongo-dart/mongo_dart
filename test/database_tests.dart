@@ -538,10 +538,9 @@ testIndexCreation(){
   })).then(expectAsync1((res){
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
-    }
-  print('TODO: reapply checks in testIndexCreation when unittest will be repaired');    
-//    expect(() => db.createIndex('testcol'),throws, reason: 'Invalid number of arguments');
-//    expect(() => db.createIndex('testcol',key: 'a', keys:{'a':-1}),throws, reason: 'Invalid number of arguments');
+    }      
+    expect(() => db.createIndex('testcol'),throws, reason: 'Invalid number of arguments');
+    expect(() => db.createIndex('testcol',key: 'a', keys:{'a':-1}),throws, reason: 'Invalid number of arguments');
     return db.createIndex('testcol',key:'a');
   })).then(expectAsync1((res){
     expect(res['ok'],1.0);
@@ -580,8 +579,6 @@ testSafeModeUpdate(){
   }));
 }
 
-
-
 main(){
   initBsonPlatform();
   group('DbCollection tests:', (){
@@ -615,7 +612,7 @@ main(){
     test('testCursorCreation',testCursorCreation);
     test('testCursorClosing',testCursorClosing);
     test('testNextObjectToEnd',testNextObjectToEnd);
-    solo_test('testPingRaw',testPingRaw);
+    test('testPingRaw',testPingRaw);
     test('testNextObject',testNextObject);
     test('testCursorWithOpenServerCursor',testCursorWithOpenServerCursor);
     test('testCursorGetMore',testCursorGetMore);
