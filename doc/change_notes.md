@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.0.12
+
+- M3 ready. Run on version 0.3.1.1_r17328
+
 ###0.0.10
 
 - New syntax cleanUp. Next revisions will be published on pub.dartlangl.org. No more need to use git dependency for dependend application. 
