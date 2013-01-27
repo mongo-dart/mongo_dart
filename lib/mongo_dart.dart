@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:crypto';
 import 'dart:async';
 import 'dart:uri';
+import 'dart:collection';
 import 'bson_console.dart';
 import 'bson.dart';
 import 'src/bson/json_ext.dart';
