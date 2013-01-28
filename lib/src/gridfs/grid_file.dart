@@ -64,7 +64,7 @@ class GridFSFile {
   }
 
   Map get data {
-    return {
+    Map result = {
       "_id" : id,
       "filename" : filename,
       "contentType" : contentType,
@@ -72,19 +72,23 @@ class GridFSFile {
       "chunkSize" : chunkSize,
       "uploadDate" : uploadDate,
       "md5" : md5,
-      // TODO(tsander): Extra Data?? Meta Data??
     };
+    extraData.forEach((String key, Object value) {
+      result[key] = value;
+    });
   }
 
   set data(Map input) {
-    id = input["_id"];
-    filename = input["filename"];
-    contentType = input["contentType"];
-    length = input["length"];
-    chunkSize = input["chunkSize"];
-    uploadDate = input["uploadDate"];
-    md5 = input["md5"];
-    // TODO(tsander): Extra Data?? Meta Data??
+    Map extraData = new Map.from(input);
+
+    // Remove the known keys. Leaving the extraData. 
+    id = extraData.remove("_id");
+    filename = extraData.remove("filename");
+    contentType = extraData.remove("contentType");
+    length = extraData.remove("length");
+    chunkSize = extraData.remove("chunkSize");
+    uploadDate = extraData.remove("uploadDate");
+    md5 = extraData.remove("md5");
   }
 
   void setGridFS( GridFS fs ) {
