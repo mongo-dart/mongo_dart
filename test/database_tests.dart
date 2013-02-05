@@ -258,7 +258,7 @@ testSkip(){
     db.close();
   }));
 }
-testLimit(){
+testLimitWithSortByAndSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int counter = 0;
   Cursor cursor;
@@ -277,6 +277,27 @@ testLimit(){
     db.close();
   }));
 }
+
+testLimit(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  int counter = 0;
+  Cursor cursor;
+  db.open().then(expectAsync1((c){
+    DbCollection coll = db.collection('testLimit');
+    coll.remove();
+    for(int n=0;n<600;n++){
+      coll.insert({"a":n});
+    }
+    cursor = coll.find(where.limit(10));
+    return cursor.each((e)=>counter++);
+  })).then(expectAsync1((v){
+    expect(counter,10);
+    expect(cursor.state,Cursor.CLOSED);
+    expect(cursor.cursorId,0);
+    db.close();
+  }));
+}
+
 
 testCursorCreation(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
@@ -378,7 +399,7 @@ testCursorGetMore(){
     collection.insertAll(toInsert);
     return db.getLastError();
   })).then(expectAsync1((_){
-    cursor = new Cursor(db,collection,where.limit(10));
+    cursor = new Cursor(db,collection,null);
     return cursor.each((v)=>count++);
   })).then(expectAsync1((v){
     expect(count,1000);
@@ -597,7 +618,8 @@ main(){
     test('testPwd',testPwd);
   });
   group('DbCollection tests:', (){
-    test('testLimit',testLimit);
+    test('testLimitWithSortByAndSkip',testLimitWithSortByAndSkip);
+    test('testLimitWithSkip',testLimit);    
     test('testFindEachWithThenClause',testFindEachWithThenClause);
     test('testCount',testCount);
     test('testFindEach',testFindEach);

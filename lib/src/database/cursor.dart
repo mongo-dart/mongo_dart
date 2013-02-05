@@ -16,8 +16,9 @@ static const CLOSED = 2;
   Map fields;
   int skip = 0;
   int limit = 0;
+  int _returnedCount = 0;
   Map sort;
-  Map hint;
+  Map hint;  
   MonadicBlock eachCallback;
   var eachComplete;
   bool explain;
@@ -35,7 +36,7 @@ static const CLOSED = 2;
     } else {
       throw new ArgumentError('Expected SelectorBuilder or Map, got $selectorBuilderOrMap');
     }
-
+    
     if (!selector.isEmpty && !selector.containsKey("query")){
         selector = {"query": selector};
     }
@@ -56,12 +57,13 @@ static const CLOSED = 2;
 
 
   Map _getNextItem(){
+    _returnedCount++;
     return items.removeFirst();
   }
   Future<Map> nextObject(){
     if (state == INIT){
       Completer<Map> nextItem = new Completer<Map>();
-      MongoQueryMessage qm = generateQueryMessage();
+      MongoQueryMessage qm = generateQueryMessage();      
       Future<MongoReplyMessage> reply = db.queryMessage(qm);
       reply.then((replyMessage){
         state = OPEN;
@@ -79,6 +81,9 @@ static const CLOSED = 2;
       });
       return nextItem.future;
     }
+    else if (state == OPEN && limit > 0 && _returnedCount == limit){
+      return this.close();
+    }    
     else if (state == OPEN && items.length > 0){
       return new Future.immediate(_getNextItem());
     }
@@ -135,7 +140,8 @@ static const CLOSED = 2;
     if (cursorId != 0){
       MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);
       cursorId = 0;
-      return db.queryMessage(msg);
+      db.queryMessage(msg);
     }
+    return new Future.immediate(null);
   }
 }
