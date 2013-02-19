@@ -34,8 +34,13 @@ class DbCollection{
       return new Future.immediate({'ok': 1.0});
     }
   }
- Future update(selector, document, {bool safeMode: false}){
-    MongoUpdateMessage message = new MongoUpdateMessage(fullName(),_selectorBuiltder2Map(selector), document, 0);
+  Future update(selector, document, {bool safeMode: false, bool upsert: false}){
+    int flags = 0;
+    if (upsert) {
+      flags |= 0x1;
+    }
+    MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
+        _selectorBuiltder2Map(selector), document, flags);
     db.executeMessage(message);
     if (safeMode) {
       return db.getLastError();
