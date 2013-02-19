@@ -258,6 +258,35 @@ testSkip(){
     db.close();
   }));
 }
+
+testUpdateWithUpsert() {
+  Db db = new Db('${DefaultUri}update');
+  DbCollection collection = db.collection('testupdate');
+  db.open().then(expectAsync1((c) {
+    return collection.drop().then(expectAsync1((_) {
+      return collection.insert({'name': 'a', 'value': 10}, safeMode: true);
+    })).then(expectAsync1((result) {
+      expect(result['n'], 0);
+      return collection.find({'name': 'a'}).toList();
+    })).then(expectAsync1((results) {
+      expect(results.length, 1);
+      expect(results.first['name'], 'a');
+      expect(results.first['value'], 10);
+    })).then(expectAsync1((result) {
+      var objectUpdate = {r'$set': {'value': 20}};
+      return collection.update({'name': 'a'}, objectUpdate, safeMode: true);
+    })).then(expectAsync1((result) {
+      expect(result['updatedExisting'], true);
+      expect(result['n'], 1);
+      return collection.find({'name': 'a'}).toList();
+    })).then(expectAsync1((results) {
+      expect(results.length, 1);
+      expect(results.first['value'], 20);
+      db.close();
+    }));
+  }));
+}
+
 testLimitWithSortByAndSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int counter = 0;
@@ -629,7 +658,8 @@ main(){
     test('testSaveWithObjectId',testSaveWithObjectId);
     test('testInsertWithObjectId',testSaveWithObjectId);    
     test('testSkip',testSkip);
-  });  
+    test('testUpdateWithUpsert', testUpdateWithUpsert);
+  });
   group('Cursor tests:', (){
     test('testCursorCreation',testCursorCreation);
     test('testCursorClosing',testCursorClosing);
