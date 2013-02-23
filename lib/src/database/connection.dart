@@ -62,6 +62,9 @@ class Connection{
     if (_messageBuffer == null){
       _lengthBuffer.byteList.setRange(0, 4, data);
       int messageLength = _lengthBuffer.readInt32();
+      if (messageLength == 0) {
+        return;
+      }
       _messageBuffer = new BsonBinary(messageLength);
     }
     _messageBuffer.byteList.setRange(_messageBuffer.offset, data.length, data);
