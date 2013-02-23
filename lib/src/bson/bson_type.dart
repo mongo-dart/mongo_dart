@@ -56,7 +56,7 @@ BsonObject bsonObjectFrom(var value){
   if (value == null){
     return new BsonNull();
   }
-  if (value is Date){
+  if (value is DateTime){
     return new BsonDate(value);
   }
   if (value == true || value == false){

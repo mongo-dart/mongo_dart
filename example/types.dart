@@ -10,7 +10,7 @@ main(){
       'array':[1,2,3],
       'string':'hello',
       'hash':{'a':1, 'b':2},
-      'date':new Date.now(),          // Stores only milisecond resolution
+      'date':new DateTime.now(),          // Stores only milisecond resolution
       'oid':new ObjectId(),
       'binary':new BsonBinary.from([0x23,0x24,0x25]),
       'int':42,

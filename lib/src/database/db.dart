@@ -20,7 +20,7 @@ class Db{
 */
   Db(String uriString){
     _configureConsoleLogger();
-    var uri = new Uri.fromString(uriString);
+    var uri = Uri.parse(uriString);
     if (uri.scheme != 'mongodb') {
       throw 'Invalid scheme in uri: $uriString ${uri.scheme}';
     }

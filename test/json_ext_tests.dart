@@ -8,13 +8,13 @@ main(){
   initBsonPlatform();
   group('JSON_EXT Date:', (){
     test('Simple date stringify',(){
-      expect(JSON_EXT.stringify(new Date.fromMillisecondsSinceEpoch(30)),'{"\$date":30}');
+      expect(JSON_EXT.stringify(new DateTime.fromMillisecondsSinceEpoch(30)),'{"\$date":30}');
     });
     test('Simple date parse',(){
-      expect(JSON_EXT.parse('{"\$date":30}'),new Date.fromMillisecondsSinceEpoch(30));
+      expect(JSON_EXT.parse('{"\$date":30}'),new DateTime.fromMillisecondsSinceEpoch(30));
     });
     test('Date deep in object',(){
-      var date = new Date.now();
+      var date = new DateTime.now();
       var article = {'title': 'Article 1', 'comments': [{'body': 'First comment','date': date}, {'body':'Second comment', 'date': date}]};
       Map articleRetrieved = JSON_EXT.parse(JSON_EXT.stringify(article));
       expect(articleRetrieved['comments'][0]['date'],date);

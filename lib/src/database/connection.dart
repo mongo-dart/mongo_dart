@@ -7,6 +7,7 @@ class Connection{
   Queue<MongoMessage> _sendQueue;
   BsonBinary _messageBuffer;
   Socket socket;
+  StreamSubscription<List<int>> _socketSubscription;
   bool connected = false;
   Connection([this.serverConfig]){
     if (serverConfig == null){
@@ -16,29 +17,25 @@ class Connection{
   Future<bool> connect(){
     _replyCompleters = new Map();
     _sendQueue = new Queue();
-    socket = new Socket(serverConfig.host, serverConfig.port);
-    Completer completer = new Completer();
-    if (socket is! Socket) {
-      completer.completeError(new Exception( "can't get send socket"));
-    } else {
-      _lengthBuffer = new BsonBinary(4);
-      socket.onError = (e) {
+    _lengthBuffer = new BsonBinary(4);    
+    Completer completer = new Completer();   
+    Socket.connect(serverConfig.host, serverConfig.port).then((Socket _socket) {
+      /* Socket connected. */
+      socket = _socket;
+      _socketSubscription = socket.listen(_receiveData,onError: (e) {
         print("connect exception ${e}");
         completer.completeError(e);
-      };
-      socket.onConnect = () {
-        connected = true;
-        completer.complete(true);
-      };
-      return completer.future;
-    }
+      });
+      connected = true;
+      completer.complete(true);
+    });
+    return completer.future;
   }
+  
   void close(){
     while (!_sendQueue.isEmpty){
       _sendBuffer();
     }
-    socket.onData = null;
-    socket.onError = null;
     _sendQueue.clear();
     socket.close();
     _replyCompleters.clear();
@@ -58,20 +55,17 @@ class Connection{
   _sendBuffer(){
     while(_sendQueue.length > 0) {
       _bufferToSend = _sendQueue.removeFirst().serialize();
-      socket.outputStream.writeFrom(_bufferToSend.byteList);
+      socket.add(_bufferToSend.byteList);
     }
   }
-  void _receiveData() {
+  void _receiveData(List<int> data) {
     if (_messageBuffer == null){
-      int numBytes = socket.readList(_lengthBuffer.byteList, 0, 4);
-      if (numBytes == 0) {
-        return;
-      }
+      _lengthBuffer.byteList.setRange(0, 4, data);
       int messageLength = _lengthBuffer.readInt32();
       _messageBuffer = new BsonBinary(messageLength);
-      _messageBuffer.writeInt(messageLength);
     }
-    _messageBuffer.offset += socket.readList(_messageBuffer.byteList,_messageBuffer.offset,_messageBuffer.byteList.length-_messageBuffer.offset);
+    _messageBuffer.byteList.setRange(_messageBuffer.offset, data.length, data);
+    _messageBuffer.offset += data.length;
     if (_messageBuffer.atEnd()){
       MongoReplyMessage reply = new MongoReplyMessage();
       _messageBuffer.rewind();
@@ -83,17 +77,11 @@ class Connection{
       if (completer != null){
         completer.complete(reply);
       }
-      else {
-        _log.shout("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
-      }
     }
   }
-
-
   Future<MongoReplyMessage> query(MongoMessage queryMessage){
     Completer completer = new Completer();
     _replyCompleters[queryMessage.requestId] = completer;
-    socket.onData = _receiveData;
     _sendQueue.addLast(queryMessage);
     _sendBuffer();
     return completer.future;

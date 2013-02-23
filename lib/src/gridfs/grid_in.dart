@@ -15,7 +15,7 @@ class GridIn extends GridFSFile {
     input = new ChunkedInputStream(inputStream);
     id = new ObjectId();
     chunkSize = GridFS.DEFAULT_CHUNKSIZE;
-    uploadDate = new Date.now();
+    uploadDate = new DateTime.now();
     messageDigester = new MD5();
   }
 
@@ -46,7 +46,7 @@ class GridIn extends GridFSFile {
     input.chunkSize = chunkSize;
     List<Future> futures = new List();
     Completer completer = new Completer();
-    
+
     input.onData = () {
       List<int> buffer = input.read();
       futures.add(dumpBuffer(buffer));
@@ -59,7 +59,7 @@ class GridIn extends GridFSFile {
         completer.complete({});
       });
     };
-    
+
     return completer.future;
   }
   // TODO(tsander): OutputStream??

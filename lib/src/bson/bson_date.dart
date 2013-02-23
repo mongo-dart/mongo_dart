@@ -1,6 +1,6 @@
 part of bson;
 class BsonDate extends BsonObject{
-  Date data;
+  DateTime data;
   BsonDate(this.data);
   get value => data;
   byteLength() => 8;
@@ -9,6 +9,6 @@ class BsonDate extends BsonObject{
      buffer.writeInt64(data.millisecondsSinceEpoch);
   }
   unpackValue(BsonBinary buffer){
-     data = new Date.fromMillisecondsSinceEpoch(buffer.readInt64());
+     data = new DateTime.fromMillisecondsSinceEpoch(buffer.readInt64());
   }
 }
