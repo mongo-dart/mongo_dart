@@ -32,8 +32,8 @@ class DbCommand extends MongoQueryMessage{
     return createQueryDBCommand(db, {'getnonce':1});
   }
 
-  static DbCommand createGetLastErrorCommand(Db db) {
-    return createQueryDBCommand(db, {"getlasterror":1});
+  static DbCommand createGetLastErrorCommand(Db db, {bool j: false, int w: 0}) {
+    return createQueryDBCommand(db, {"getlasterror":1, "j": j, "w": w});
   }
   static DbCommand createCountCommand(Db db, String collectionName, [Map selector = const {}]) {
     var finalQuery = new Map();

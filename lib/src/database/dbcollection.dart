@@ -4,7 +4,7 @@ class DbCollection{
   String collectionName;
   DbCollection(this.db, this.collectionName){}
   String fullName() => "${db.databaseName}.$collectionName";
-  void save(Map document){
+  void save(Map document, {WriteConcern writeConcern}){
     var id;
     bool createId = false;
     if (document.containsKey("_id")){
@@ -14,21 +14,21 @@ class DbCollection{
       }
     }
     if (id != null){
-      update({"_id": id}, document);
+      update({"_id": id}, document, writeConcern: writeConcern);
     }
     else{
       if (createId) {
         document["_id"] = new ObjectId();
       }
-      insert(document);
+      insert(document, writeConcern: writeConcern);
     }
   }
- Future insertAll(List<Map> documents){
+ Future insertAll(List<Map> documents, {WriteConcern writeConcern}){
     MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
     db.executeMessage(insertMessage);
-    return db._getAcknowledgement();
+    return db._getAcknowledgement(writeConcern: writeConcern);
   }
-  Future update(selector, document, {bool upsert: false}){
+  Future update(selector, document, {bool upsert: false, WriteConcern writeConcern}){
     int flags = 0;
     if (upsert) {
       flags |= 0x1;
@@ -36,7 +36,7 @@ class DbCollection{
     MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
         _selectorBuiltder2Map(selector), document, flags);
     db.executeMessage(message);
-    return db._getAcknowledgement();
+    return db._getAcknowledgement(writeConcern: writeConcern);
   }
 
  /**
@@ -59,7 +59,7 @@ class DbCollection{
     return result;
   }
   Future drop() => db.dropCollection(collectionName);
-  Future remove([selector]) => db.removeFromCollection(collectionName, _selectorBuiltder2Map(selector));
+  Future remove([selector, writeConcern]) => db.removeFromCollection(collectionName, _selectorBuiltder2Map(selector), writeConcern);
   Future count([selector]){
     Completer completer = new Completer();
     db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuiltder2Map(selector))).then((reply){
@@ -68,7 +68,7 @@ class DbCollection{
     });
     return completer.future;
   }
-  Future insert(Map document, {bool safeMode: false}) => insertAll([document]);
+  Future insert(Map document, {WriteConcern writeConcern}) => insertAll([document], writeConcern: writeConcern);
 
   Map _selectorBuiltder2Map(selector) {
     if (selector == null) {
