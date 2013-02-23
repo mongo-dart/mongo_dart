@@ -58,17 +58,19 @@ class Connection{
       socket.add(_bufferToSend.byteList);
     }
   }
-  void _receiveData(List<int> data) {
+  void _receiveData(List<int> data, [int offset = 0]) {
     if (_messageBuffer == null){
-      _lengthBuffer.byteList.setRange(0, 4, data);
+      _lengthBuffer.byteList.setRange(0, 4, data, offset);
       int messageLength = _lengthBuffer.readInt32();
       if (messageLength == 0) {
         return;
       }
       _messageBuffer = new BsonBinary(messageLength);
     }
-    _messageBuffer.byteList.setRange(_messageBuffer.offset, data.length, data);
-    _messageBuffer.offset += data.length;
+    int delta = min(data.length - offset,_messageBuffer.byteList.length-_messageBuffer.offset);
+    //print('$offset $delta ${data.length}');
+    _messageBuffer.byteList.setRange(_messageBuffer.offset, delta , data, offset);
+    _messageBuffer.offset += delta;
     if (_messageBuffer.atEnd()){
       MongoReplyMessage reply = new MongoReplyMessage();
       _messageBuffer.rewind();
@@ -80,6 +82,12 @@ class Connection{
       if (completer != null){
         completer.complete(reply);
       }
+      else {
+        _log.fine("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
+      }
+      if (delta + offset < data.length) {
+        _receiveData(data, delta); 
+      }  
     }
   }
   Future<MongoReplyMessage> query(MongoMessage queryMessage){

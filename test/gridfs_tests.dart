@@ -46,7 +46,7 @@ Future testInOut(List<int> data, GridFS gridFS) {
     GridIn input = gridFS.createFile(inputStream, "test");
     return input.save().then(expectAsync1((c) {
       return gridFS.findOne(where.eq("_id", input.id)).then(expectAsync1((GridOut gridOut) {
-        expect(gridOut != null, reason: "Did not find file by Id");
+        expect(gridOut,isNotNull, reason: "Did not find file by Id");
         expect(input.id, gridOut.id, reason: "Ids not equal.");
         expect(GridFS.DEFAULT_CHUNKSIZE, gridOut.chunkSize, reason: "Chunk size not the same.");
         expect("test", gridOut.filename, reason: "Filename not equal");

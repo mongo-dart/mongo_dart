@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'dart:io';
 import 'dart:crypto';
 import 'dart:async';
+import 'dart:math';
 import 'dart:uri';
 import 'dart:collection';
 import 'bson_console.dart';

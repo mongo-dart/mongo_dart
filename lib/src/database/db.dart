@@ -109,7 +109,8 @@ class Db{
   }
 
   Future removeFromCollection(String collectionName, [Map selector = const {}]){
-    return connection.query(new MongoRemoveMessage("$databaseName.$collectionName", selector));
+    executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector));
+    return getLastError(); 
   }
 
   Future<Map> getLastError(){

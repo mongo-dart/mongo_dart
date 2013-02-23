@@ -12,4 +12,12 @@ class Timestamp extends BsonObject{
   }
   String toString()=>"Timestamp(seconds: $seconds, increment: $increment)";
   int byteLength() => 8;
+  packValue(BsonBinary buffer){
+    buffer.writeInt(seconds);
+    buffer.writeInt(increment);    
+  }
+  unpackValue(BsonBinary buffer){
+     seconds = buffer.readInt32();
+     increment = buffer.readInt32();     
+  }
 }

@@ -43,11 +43,23 @@ testRemove(){
   })).then(expectAsync1((v){
     expect(v,hasLength(1));
     db.removeFromCollection("new_collecion_to_remove");
+  })).then(expectAsync1((v){  
     newColl.find().toList().then(expectAsync1((v1){
       expect(v1,isEmpty);
       newColl.drop();
       db.close();
     }));
+  }));
+}
+testRemove11(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  DbCollection newColl;
+  db.open().then(expectAsync1((c){
+    db.removeFromCollection("new_collecion_to_remove");
+    return db.removeFromCollection("new_collecion_to_remove");
+  })).then(expectAsync1((v){
+    print(v);
+    db.close();
   }));
 }
 testDropDatabase(){
