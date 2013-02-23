@@ -7,6 +7,7 @@ class Connection{
   Queue<MongoMessage> _sendQueue;
   BsonBinary _messageBuffer;
   Socket socket;
+  List _incompleteLengthBytes = [];
   StreamSubscription<List<int>> _socketSubscription;
   bool connected = false;
   Connection([this.serverConfig]){
@@ -58,17 +59,32 @@ class Connection{
       socket.add(_bufferToSend.byteList);
     }
   }
-  void _receiveData(List<int> data, [int offset = 0]) {
+  void _receiveData(List<int> data, [int offset = 0, int recursion = 0]) {
     if (_messageBuffer == null){
-      _lengthBuffer.byteList.setRange(0, 4, data, offset);
+      if (data.length - offset < 4) {
+        _incompleteLengthBytes = data.getRange(offset, data.length - offset);
+       // print('Trapped incomplete length header $_incompleteLengthBytes');
+        return;
+      }
+      //print('new Buffer offset:$offset  data.length:${data.length} recursion:$recursion');
+      _lengthBuffer.byteList.setRange(0, _incompleteLengthBytes.length, _incompleteLengthBytes, offset);     
+      _lengthBuffer.byteList.setRange(0 + _incompleteLengthBytes.length, 4 - _incompleteLengthBytes.length, data, offset);
       int messageLength = _lengthBuffer.readInt32();
       if (messageLength == 0) {
         return;
       }
       _messageBuffer = new BsonBinary(messageLength);
+      _messageBuffer.byteList.setRange(0, 4 , _lengthBuffer.byteList);   
+      _messageBuffer.offset += 4;
+      offset += 4 - _incompleteLengthBytes.length;
+      _incompleteLengthBytes = [];
     }
     int delta = min(data.length - offset,_messageBuffer.byteList.length-_messageBuffer.offset);
-    //print('$offset $delta ${data.length}');
+    //print('offset:$offset delta:$delta data.length:${data.length} message.lenght:${_messageBuffer.byteList.length}');
+    //***** temporary safety hatch
+    if (recursion > 20) {
+      return;
+    }
     _messageBuffer.byteList.setRange(_messageBuffer.offset, delta , data, offset);
     _messageBuffer.offset += delta;
     if (_messageBuffer.atEnd()){
@@ -86,7 +102,7 @@ class Connection{
         _log.fine("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
       }
       if (delta + offset < data.length) {
-        _receiveData(data, delta); 
+        _receiveData(data, delta + offset, recursion + 1); 
       }  
     }
   }

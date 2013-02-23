@@ -276,7 +276,7 @@ testUpdateWithUpsert() {
   DbCollection collection = db.collection('testupdate');
   db.open().then(expectAsync1((c) {
     return collection.drop().then(expectAsync1((_) {
-      return collection.insert({'name': 'a', 'value': 10}, safeMode: true);
+      return collection.insert({'name': 'a', 'value': 10});
     })).then(expectAsync1((result) {
       expect(result['n'], 0);
       return collection.find({'name': 'a'}).toList();
@@ -286,7 +286,7 @@ testUpdateWithUpsert() {
       expect(results.first['value'], 10);
     })).then(expectAsync1((result) {
       var objectUpdate = {r'$set': {'value': 20}};
-      return collection.update({'name': 'a'}, objectUpdate, safeMode: true);
+      return collection.update({'name': 'a'}, objectUpdate);
     })).then(expectAsync1((result) {
       expect(result['updatedExisting'], true);
       expect(result['n'], 1);
@@ -629,11 +629,11 @@ testSafeModeUpdate(){
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
     }
-    return collection.update({'a': 200}, {'a':100}, safeMode: true);
+    return collection.update({'a': 200}, {'a':100});
   })).then(expectAsync1((res){
     expect(res['updatedExisting'], false);
     expect(res['n'], 0);
-    return collection.update({'a': 3}, {'a':100}, safeMode: true);
+    return collection.update({'a': 3}, {'a':100});
   })).then(expectAsync1((res){
     expect(res['updatedExisting'], true);
     expect(res['n'], 1);

@@ -23,18 +23,12 @@ class DbCollection{
       insert(document);
     }
   }
- Future insertAll(List<Map> documents, {bool safeMode: false}){
+ Future insertAll(List<Map> documents){
     MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
     db.executeMessage(insertMessage);
-    if (safeMode) {
-      return db.getLastError();
-    }
-    else
-    {
-      return new Future.immediate({'ok': 1.0});
-    }
+    return db._getAcknowledgement();
   }
-  Future update(selector, document, {bool safeMode: false, bool upsert: false}){
+  Future update(selector, document, {bool upsert: false}){
     int flags = 0;
     if (upsert) {
       flags |= 0x1;
@@ -42,13 +36,7 @@ class DbCollection{
     MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
         _selectorBuiltder2Map(selector), document, flags);
     db.executeMessage(message);
-    if (safeMode) {
-      return db.getLastError();
-    }
-    else
-    {
-      return new Future.immediate({'ok': 1.0});
-    }
+    return db._getAcknowledgement();
   }
 
  /**
@@ -80,7 +68,7 @@ class DbCollection{
     });
     return completer.future;
   }
-  Future insert(Map document, {bool safeMode: false}) => insertAll([document], safeMode: safeMode);
+  Future insert(Map document, {bool safeMode: false}) => insertAll([document]);
 
   Map _selectorBuiltder2Map(selector) {
     if (selector == null) {

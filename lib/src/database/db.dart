@@ -1,8 +1,11 @@
 part of mongo_dart;
 class Db{
+  static const WRITE_CONCERN_UNACKNOWLEDGED = 0;
+  static const WRITE_CONCERN_ACKNOWLEDGED = 1;  
   String databaseName;
   ServerConfig serverConfig;
   Connection connection;
+  int _writeConcern;
   _validateDatabaseName(String dbName) {
     if(dbName.length == 0) throw "database name cannot be the empty string";
     var invalidChars = [" ", ".", "\$", "/", "\\"];
@@ -18,8 +21,9 @@ class Db{
 * And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
 *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
 */
-  Db(String uriString){
+  Db(String uriString, {int writeConcern: WRITE_CONCERN_ACKNOWLEDGED}){
     _configureConsoleLogger();
+    _writeConcern = writeConcern;
     var uri = Uri.parse(uriString);
     if (uri.scheme != 'mongodb') {
       throw 'Invalid scheme in uri: $uriString ${uri.scheme}';
@@ -110,7 +114,7 @@ class Db{
 
   Future removeFromCollection(String collectionName, [Map selector = const {}]){
     executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector));
-    return getLastError(); 
+    return _getAcknowledgement(); 
   }
 
   Future<Map> getLastError(){
@@ -223,6 +227,18 @@ class Db{
     });
     return completer.future;
   }
+  
+  Future _getAcknowledgement() {
+    if (_writeConcern == Db.WRITE_CONCERN_UNACKNOWLEDGED) {
+      return new Future.immediate({'ok': 1.0});            
+    }
+    else
+    {
+      return getLastError();
+    }   
+  }
 }
+
+
 
 
