@@ -12,7 +12,7 @@ class MongoReplyMessage extends MongoMessage{
     cursorId = buffer.readInt64();
     startingFrom = buffer.readInt32();
     numberReturned = buffer.readInt32();
-    documents = new List(numberReturned);
+    documents = new List.fixedLength(numberReturned);
     for (int n=0;n<numberReturned;n++){
       BsonMap doc = new BsonMap({});
       doc.unpackValue(buffer);

@@ -7,7 +7,7 @@ class GridFSFile {
   String contentType;
   int length;
   int chunkSize;
-  Date uploadDate;
+  DateTime uploadDate;
   Map<String, Object> extraData;
   String md5;
 

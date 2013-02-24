@@ -17,10 +17,10 @@ main(){
   }).then((v){
     print("Utf8 encoding demonstration. I18 strings may be used not only as values but also as keys");
     print(v);
-    return collection.findOne(query().eq('Имя', 'Вадим'));
+    return collection.findOne(where.eq('Имя', 'Вадим'));
   }).then((v){
     print("Filtered by query().eq(): $v");
-    return collection.findOne(query().match('Имя', '^..ДИМ\$',caseInsensitive:true));
+    return collection.findOne(where.match('Имя', '^..ДИМ\$',caseInsensitive:true));
   }).then((v){
     print("Filtered by query().match(): $v");
     db.close();

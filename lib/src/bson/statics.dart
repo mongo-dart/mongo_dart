@@ -26,7 +26,7 @@ class Statics{
   static int MaxBits(int bits){
     int res;
     if (_maxBits == null){
-      _maxBits = new List<int>(65);
+      _maxBits = new List<int>.fixedLength(65);
       _maxBits[0] = 0;
       for (var i = 1; i < 65; i++) {
         _maxBits[i]=(2 << i-1);

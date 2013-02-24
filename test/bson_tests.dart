@@ -49,10 +49,10 @@ testBsonBinary(){
    expect(b.hexString,'9cffffff');
 }
 
-typeTest(){  
+typeTest(){
   expect(bsonObjectFrom(1234) is BsonInt,isTrue);
-  expect(bsonObjectFrom("asdfasdf") is BsonString, isTrue);  
-  expect(bsonObjectFrom(new Date.now()) is BsonDate, isTrue);
+  expect(bsonObjectFrom("asdfasdf") is BsonString, isTrue);
+  expect(bsonObjectFrom(new DateTime.now()) is BsonDate, isTrue);
   expect(bsonObjectFrom([2,3,4]) is BsonArray, isTrue);
 }
 
@@ -149,7 +149,7 @@ testBsonDbPointer() {
 
 runMe(){
   test("typeTest",typeTest);
-  group("BSonBsonBinary:", (){    
+  group("BSonBsonBinary:", (){
     test("testUint8ListNegativeWrite",testUint8ListNegativeWrite);
     test("testBsonBinary",testBsonBinary);
     test("testBsonBinaryWithNegativeOne",testBsonBinaryWithNegativeOne);

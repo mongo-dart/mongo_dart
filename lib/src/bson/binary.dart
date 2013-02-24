@@ -34,7 +34,7 @@ class BsonBinary extends BsonObject{
   String _hexString;
 
   static List<int> createTokens(){
-    var result = new List<int>(255);
+    var result = new List<int>.fixedLength(255);
     result[CHAR_0] = 0;
     result[CHAR_1] = 1;
     result[CHAR_2] = 2;

@@ -178,7 +178,7 @@ class _JsonParser {
     if (tokens != null) return;
 
     // Use a list as jump-table. It is faster than switch and if.
-    tokens = new List<int>(LAST_ASCII + 1);
+    tokens = new List<int>.fixedLength(LAST_ASCII + 1);
     tokens[TAB] = WHITESPACE;
     tokens[NEW_LINE] = WHITESPACE;
     tokens[CARRIAGE_RETURN] = WHITESPACE;
@@ -243,7 +243,7 @@ class _JsonParser {
   }
   parseBsonExtensionValue(String key) {
     if (key == '\$date') {
-      return new Date.fromMillisecondsSinceEpoch(parseNumber());
+      return new DateTime.fromMillisecondsSinceEpoch(parseNumber());
     }
     if (key == '\$oid') {
       return new ObjectId.fromHexString(parseString());
@@ -598,8 +598,8 @@ class _JsonStringifier {
       escape(sb, object);
       sb.add('"');
       return true;
-    } else if (object is Date) {
-      return stringifyJsonValue({'\$date': (object as Date).millisecondsSinceEpoch});
+    } else if (object is DateTime) {
+      return stringifyJsonValue({'\$date': (object as DateTime).millisecondsSinceEpoch});
     }
     else if (object is ObjectId) {
         return stringifyJsonValue({'\$oid': object.toHexString()});

@@ -1,4 +1,4 @@
-library database_tests;
+library gridfs_tests;
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:uri';
 import 'dart:io';
@@ -12,7 +12,7 @@ testSmall(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then(expectAsync1((c){
     List<int> data = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
-    
+
     GridFS gridFS = new GridFS(db);
     return testInOut(data, gridFS);
   })).then((c){
@@ -24,7 +24,7 @@ testBig(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then(expectAsync1((c){
     List<int> smallData = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
-    
+
     int target = GridFS.DEFAULT_CHUNKSIZE * 3;
     List<int> data = new List();
     while (data.length < target) {
@@ -46,14 +46,14 @@ Future testInOut(List<int> data, GridFS gridFS) {
     GridIn input = gridFS.createFile(inputStream, "test");
     return input.save().then(expectAsync1((c) {
       return gridFS.findOne(where.eq("_id", input.id)).then(expectAsync1((GridOut gridOut) {
-        Expect.isNotNull(gridOut, "Did not find file by Id");
-        Expect.equals(input.id, gridOut.id, "Ids not equal.");
-        Expect.equals(GridFS.DEFAULT_CHUNKSIZE, gridOut.chunkSize, "Chunk size not the same.");
-        Expect.equals("test", gridOut.filename, "Filename not equal");
-        
+        expect(gridOut,isNotNull, reason: "Did not find file by Id");
+        expect(input.id, gridOut.id, reason: "Ids not equal.");
+        expect(GridFS.DEFAULT_CHUNKSIZE, gridOut.chunkSize, reason: "Chunk size not the same.");
+        expect("test", gridOut.filename, reason: "Filename not equal");
+
         return gridOut.writeTo(out);
       })).then(expectAsync1((c){
-        Expect.listEquals(data, out.read());
+        expect(data, orderedEquals(out.read()));
         return getInitialState(gridFS);
       }));
     }));
@@ -66,7 +66,7 @@ Future<List<int>> getInitialState(GridFS gridFS) {
   futures.add(gridFS.files.count());
   futures.add(gridFS.chunks.count());
   Future.wait(futures).then((List<double> futureResults) {
-    List<int> result = new List<int>(2);
+    List<int> result = new List<int>.fixedLength(2);
     result[0] = futureResults[0].toInt();
     result[1] = futureResults[1].toInt();
     completer.complete(result);

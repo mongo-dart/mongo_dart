@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.0.14
+
+- Fixed bug in limit functionality. Corresponding test added.
+
 ###0.0.12
 
 - M3 ready. Run on version 0.3.1.1_r17328

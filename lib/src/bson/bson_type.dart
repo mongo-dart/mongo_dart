@@ -56,7 +56,7 @@ BsonObject bsonObjectFrom(var value){
   if (value == null){
     return new BsonNull();
   }
-  if (value is Date){
+  if (value is DateTime){
     return new BsonDate(value);
   }
   if (value == true || value == false){
@@ -98,6 +98,8 @@ BsonObject bsonObjectFromTypeByte(int typeByte){
       return new BsonCode(null);
     case BSON.BSON_DATA_REGEXP:
       return new BsonRegexp(null);
+    case BSON.BSON_DATA_TIMESTAMP:
+      return new Timestamp(0,0);
     default:
       throw new Exception("Not implemented for BSON TYPE $typeByte");
   }

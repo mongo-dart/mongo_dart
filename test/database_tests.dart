@@ -43,11 +43,23 @@ testRemove(){
   })).then(expectAsync1((v){
     expect(v,hasLength(1));
     db.removeFromCollection("new_collecion_to_remove");
+  })).then(expectAsync1((v){  
     newColl.find().toList().then(expectAsync1((v1){
       expect(v1,isEmpty);
       newColl.drop();
       db.close();
     }));
+  }));
+}
+testRemove11(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  DbCollection newColl;
+  db.open().then(expectAsync1((c){
+    db.removeFromCollection("new_collecion_to_remove");
+    return db.removeFromCollection("new_collecion_to_remove");
+  })).then(expectAsync1((v){
+    print(v);
+    db.close();
   }));
 }
 testDropDatabase(){
@@ -258,7 +270,36 @@ testSkip(){
     db.close();
   }));
 }
-testLimit(){
+
+testUpdateWithUpsert() {
+  Db db = new Db('${DefaultUri}update');
+  DbCollection collection = db.collection('testupdate');
+  db.open().then(expectAsync1((c) {
+    return collection.drop().then(expectAsync1((_) {
+      return collection.insert({'name': 'a', 'value': 10});
+    })).then(expectAsync1((result) {
+      expect(result['n'], 0);
+      return collection.find({'name': 'a'}).toList();
+    })).then(expectAsync1((results) {
+      expect(results.length, 1);
+      expect(results.first['name'], 'a');
+      expect(results.first['value'], 10);
+    })).then(expectAsync1((result) {
+      var objectUpdate = {r'$set': {'value': 20}};
+      return collection.update({'name': 'a'}, objectUpdate);
+    })).then(expectAsync1((result) {
+      expect(result['updatedExisting'], true);
+      expect(result['n'], 1);
+      return collection.find({'name': 'a'}).toList();
+    })).then(expectAsync1((results) {
+      expect(results.length, 1);
+      expect(results.first['value'], 20);
+      db.close();
+    }));
+  }));
+}
+
+testLimitWithSortByAndSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int counter = 0;
   Cursor cursor;
@@ -277,6 +318,27 @@ testLimit(){
     db.close();
   }));
 }
+
+testLimit(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  int counter = 0;
+  Cursor cursor;
+  db.open().then(expectAsync1((c){
+    DbCollection coll = db.collection('testLimit');
+    coll.remove();
+    for(int n=0;n<600;n++){
+      coll.insert({"a":n});
+    }
+    cursor = coll.find(where.limit(10));
+    return cursor.each((e)=>counter++);
+  })).then(expectAsync1((v){
+    expect(counter,10);
+    expect(cursor.state,Cursor.CLOSED);
+    expect(cursor.cursorId,0);
+    db.close();
+  }));
+}
+
 
 testCursorCreation(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
@@ -378,7 +440,7 @@ testCursorGetMore(){
     collection.insertAll(toInsert);
     return db.getLastError();
   })).then(expectAsync1((_){
-    cursor = new Cursor(db,collection,where.limit(10));
+    cursor = new Cursor(db,collection,null);
     return cursor.each((v)=>count++);
   })).then(expectAsync1((v){
     expect(count,1000);
@@ -567,11 +629,11 @@ testSafeModeUpdate(){
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
     }
-    return collection.update({'a': 200}, {'a':100}, safeMode: true);
+    return collection.update({'a': 200}, {'a':100});
   })).then(expectAsync1((res){
     expect(res['updatedExisting'], false);
     expect(res['n'], 0);
-    return collection.update({'a': 3}, {'a':100}, safeMode: true);
+    return collection.update({'a': 3}, {'a':100});
   })).then(expectAsync1((res){
     expect(res['updatedExisting'], true);
     expect(res['n'], 1);
@@ -597,7 +659,8 @@ main(){
     test('testPwd',testPwd);
   });
   group('DbCollection tests:', (){
-    test('testLimit',testLimit);
+    test('testLimitWithSortByAndSkip',testLimitWithSortByAndSkip);
+    test('testLimitWithSkip',testLimit);    
     test('testFindEachWithThenClause',testFindEachWithThenClause);
     test('testCount',testCount);
     test('testFindEach',testFindEach);
@@ -607,7 +670,8 @@ main(){
     test('testSaveWithObjectId',testSaveWithObjectId);
     test('testInsertWithObjectId',testSaveWithObjectId);    
     test('testSkip',testSkip);
-  });  
+    test('testUpdateWithUpsert', testUpdateWithUpsert);
+  });
   group('Cursor tests:', (){
     test('testCursorCreation',testCursorCreation);
     test('testCursorClosing',testCursorClosing);
