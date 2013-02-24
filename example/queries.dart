@@ -11,7 +11,9 @@ main(){
     for (var n = 0; n<1000; n++){
       coll.insert({"my_field":n,"str_field":"str_$n"});
     }
-    print('Done. Now sending it to MongoDb...');
+    print('Done. Now sending it to MongoDb...');    
+    return coll.find(where.gt("my_field", 995).sortBy('my_field')).each((v)=>print(v));
+  }).then((val){   
     return coll.findOne(where.eq("my_field", 17));
   }).then((val){
       print("Filtered by my_field=17 $val");
@@ -28,7 +30,7 @@ main(){
   }).then((val){
     print("Filtered by my_field gt 700, lte 703");
     return coll.find(
-      where.range("my_field", 700, 703, minInclude: false)
+      where.inRange("my_field", 700, 703, minInclude: false).sortBy('my_field')
         ).each((v)=>print(v));
   }).then((val){
       print("Filtered by str_field match '^str_(5|7|8)17\$'");
@@ -43,7 +45,10 @@ main(){
     print('Now where clause with jscript code: where("this.my_field % 100 == 35")');
     print(where.jsQuery("this.my_field == 517"));
     return coll.find(where.jsQuery("this.my_field % 100 == 35")).each((v)=>print(v));
-  }).then((v){
-     db.close();
+  }).then((v) {
+    return coll.count(where.gt("my_field", 995));
+  }).then((count){
+    print('Count of records with my_field > 995: $count');
+    db.close();
   });
 }

@@ -64,7 +64,7 @@ class DbCollection{
     Completer completer = new Completer();
     db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuiltder2Map(selector))).then((reply){
       //print("reply = ${reply}");
-      completer.complete(reply["n"]);
+      completer.complete(reply["n"].toInt());
     });
     return completer.future;
   }
