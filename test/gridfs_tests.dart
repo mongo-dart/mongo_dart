@@ -74,8 +74,22 @@ Future<List<int>> getInitialState(GridFS gridFS) {
   return completer.future;
 }
 
+testChunkTransformer(){
+  new Stream.fromIterable([[1,2,3,4,5,6,7,8,9,10,11]]).transform(new ChunkTransformer(3))
+  .toList().then(expectAsync1((chunkedList){    
+    expect(chunkedList[0],orderedEquals([1,2,3]));
+    expect(chunkedList[1],orderedEquals([4,5,6]));
+    expect(chunkedList[2],orderedEquals([7,8,9]));
+    expect(chunkedList[3],orderedEquals([10,11]));    
+  }));    
+}
+
+
 main(){
   initBsonPlatform();
+  group('ChunkTransformer tests:', (){
+    solo_test('testChunkTransformer',testChunkTransformer);    
+  });    
   group('GridFS tests:', (){
     test('testSmall',testSmall);
     test('testBig',testBig);
