@@ -1,5 +1,5 @@
 name: mongo_dart
-version: 0.0.15-dev
+version: 0.1.1
 authors:
 - Vadim Tsushko <vadimtsushko@gmail.com>
 - Ted Sander <ted@tedsander.com>

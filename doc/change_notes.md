@@ -1,5 +1,11 @@
 #Recent change notes
 
+###0.1.1
+
+- Support of dart:io version 2. (Stream-based). 
+- [WriteConcern] (http://docs.mongodb.org/manual/core/write-operations/#write-concern) introduced. Db.open method has writeConcern param, as individual modifying operations. Default writeConcern = WriteConcern.AKNOWLEDGED
+- writeConcern parameter replaced safeMode parameter on modifying operations
+
 ###0.0.14
 
 - Fixed bug in limit functionality. Corresponding test added.
