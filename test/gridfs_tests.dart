@@ -88,7 +88,7 @@ testChunkTransformer(){
 main(){
   initBsonPlatform();
   group('ChunkTransformer tests:', (){
-    solo_test('testChunkTransformer',testChunkTransformer);    
+    test('testChunkTransformer',testChunkTransformer);    
   });    
   group('GridFS tests:', (){
     test('testSmall',testSmall);
