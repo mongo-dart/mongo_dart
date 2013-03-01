@@ -8,12 +8,7 @@ class GridOut extends GridFSFile {
       this.data = data;
     }
   }
-
-  InputStream get inputStream {
-    // TODO do this
-    return null;
-  }
-
+  
   Future<List<int>> getChunk(int i) {
     if (fs == null) {
       // TODO throw error
@@ -42,7 +37,7 @@ class GridOut extends GridFSFile {
   }
 
   Future<int> writeToFile(File file) {
-    OutputStream out = file.openOutputStream(FileMode.WRITE);
+    IOSink out = file.openWrite(FileMode.WRITE);    
     Future<int> written = writeTo(out);
     written.then((int length) {
       out.close();
@@ -51,7 +46,7 @@ class GridOut extends GridFSFile {
     return written;
   }
 
-  Future<int> writeTo(OutputStream out) {
+  Future<int> writeTo(IOSink out) {
     final int nc = numChunks();
     // TODO(tsander): Find a better name??
     Future<List<int>> chain = null;
@@ -66,8 +61,7 @@ class GridOut extends GridFSFile {
       }
       chain = chain.then((List<int> buffer) {
         if (buffer != null) {
-          out.write(buffer, true);
-          out.flush();
+          out.add(buffer);          
         }
         return new Future.immediate(buffer);
       });

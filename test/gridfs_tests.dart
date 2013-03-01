@@ -8,6 +8,18 @@ import 'package:unittest/unittest.dart';
 
 const DefaultUri = 'mongodb://127.0.0.1/';
 
+class ListSink implements IOSink{
+  List<int> list;
+  ListSink([List<int> this.list]) {
+    if (list == null) {
+      list = new List<int>();
+    }
+  }
+  add(List<int> data) {
+    list.addAll(data); 
+  }  
+}
+
 testSmall(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then(expectAsync1((c){
@@ -38,13 +50,11 @@ testBig(){
 }
 
 Future testInOut(List<int> data, GridFS gridFS) {
-  ListOutputStream out = new ListOutputStream();
-  return getInitialState(gridFS).then(expectAsync1((List<int> initialState){
-    ListInputStream inputStream = new ListInputStream();
-    inputStream.write(data);
-    inputStream.markEndOfStream();
-    GridIn input = gridFS.createFile(inputStream, "test");
-    return input.save().then(expectAsync1((c) {
+  ListSink out = new ListSink();  
+  return getInitialState(gridFS).then(expectAsync1((List<int> initialState){    
+    var inputStream = new Stream.fromIterable([data]);
+    GridIn input = gridFS.createFile(inputStream, "test");  
+    return input.save().then(expectAsync1((c) {      
       return gridFS.findOne(where.eq("_id", input.id)).then(expectAsync1((GridOut gridOut) {
         expect(gridOut,isNotNull, reason: "Did not find file by Id");
         expect(input.id, gridOut.id, reason: "Ids not equal.");
@@ -53,7 +63,7 @@ Future testInOut(List<int> data, GridFS gridFS) {
 
         return gridOut.writeTo(out);
       })).then(expectAsync1((c){
-        expect(data, orderedEquals(out.read()));
+        expect(data, orderedEquals(out.list));
         return getInitialState(gridFS);
       }));
     }));
@@ -74,7 +84,7 @@ Future<List<int>> getInitialState(GridFS gridFS) {
   return completer.future;
 }
 
-testChunkTransformer(){
+testChunkTransformerOneChunk(){
   new Stream.fromIterable([[1,2,3,4,5,6,7,8,9,10,11]]).transform(new ChunkTransformer(3))
   .toList().then(expectAsync1((chunkedList){    
     expect(chunkedList[0],orderedEquals([1,2,3]));
@@ -83,15 +93,44 @@ testChunkTransformer(){
     expect(chunkedList[3],orderedEquals([10,11]));    
   }));    
 }
+testChunkTransformerSeveralChunks(){
+  new Stream.fromIterable([[1,2,3,4],[5],[6,7],[8,9,10,11]]).transform(new ChunkTransformer(3))
+  .toList().then(expectAsync1((chunkedList){    
+    expect(chunkedList[0],orderedEquals([1,2,3]));
+    expect(chunkedList[1],orderedEquals([4,5,6]));
+    expect(chunkedList[2],orderedEquals([7,8,9]));
+    expect(chunkedList[3],orderedEquals([10,11]));    
+  }));    
+}
 
+testWithFile() {
+  expect(true, false, reason: 'GridGS is currently broken');
+//  Db db = new Db('${DefaultUri}mongo_dart-test');  
+//  db.open().then(expectAsync1((c){
+//    Stream input = new File('c:/projects/mongo_dart/test/gridfs_testdata_in.txt').openRead();  
+//    GridFS gridFS = new GridFS(db);
+//    return gridFS.createFile(input, 'gridfs_testdata.txt').save();    
+//  })).then(expectAsync1((c){    
+//    GridFS gridFS = new GridFS(db);
+//    return gridFS.getFile('gridfs_testdata.txt');
+//  })).then(expectAsync1((GridOut out){
+//    print(out.data);
+//    out.writeToFilename('c:/projects/mongo_dart/test/gridfs_testdata_out.txt');        
+//  })).then((c){
+//    print(c);
+//    db.close();
+//  });
+}
 
 main(){
   initBsonPlatform();
-  group('ChunkTransformer tests:', (){
-    test('testChunkTransformer',testChunkTransformer);    
+  group('ChunkTransformer tests:', (){    
+    test('testChunkTransformer',testChunkTransformerOneChunk);
+    test('testChunkTransformerSeveralChunks',testChunkTransformerSeveralChunks);    
   });    
   group('GridFS tests:', (){
     test('testSmall',testSmall);
     test('testBig',testBig);
+    test('testWithFile',testWithFile);
   });
 }

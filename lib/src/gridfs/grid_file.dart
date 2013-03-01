@@ -22,7 +22,7 @@ class GridFSFile {
       throw "Need fs";
     }
     Map tempData = data;
-    return fs.files.insert(tempData, safeMode:true);
+    return fs.files.insert(tempData);
   }
 
   Future<bool> validate() {

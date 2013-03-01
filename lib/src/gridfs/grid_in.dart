@@ -1,7 +1,7 @@
 part of mongo_dart;
 
 class GridIn extends GridFSFile {
-  ChunkedInputStream input;
+  Stream<List<int>> input;
   bool savedChunks = false;
   int currentChunkNumber = 0;
   int currentBufferPosition = 0;
@@ -11,10 +11,10 @@ class GridIn extends GridFSFile {
   String filename;
   MD5 messageDigester;
 
-  GridIn(this.fs, [this.filename = null, InputStream inputStream = null]) {
-    input = new ChunkedInputStream(inputStream);
+  GridIn(this.fs, [this.filename = null, Stream<List<int>> inputStream = null]) {    
     id = new ObjectId();
     chunkSize = GridFS.DEFAULT_CHUNKSIZE;
+    input = inputStream.transform(new ChunkTransformer(chunkSize));
     uploadDate = new DateTime.now();
     messageDigester = new MD5();
   }
@@ -34,6 +34,16 @@ class GridIn extends GridFSFile {
   }
 
   Future<Map> saveChunks([int chunkSize = 0]) {
+    List<Future> futures = new List();
+    Completer completer = new Completer();
+    
+    _onDone() {
+      Future.wait(futures).then((list) {
+        return finishData();
+      }).then((map){
+        completer.complete({});
+      });
+    }
     if (!?chunkSize) {
       chunkSize = this.chunkSize;
     }
@@ -42,24 +52,10 @@ class GridIn extends GridFSFile {
     }
     if (chunkSize <= 0 || chunkSize > GridFS.MAX_CHUNKSIZE) {
       throw "chunkSize must be greater than zero and less than or equal to GridFS.MAX_CHUNKSIZE";
-    }
-    input.chunkSize = chunkSize;
-    List<Future> futures = new List();
-    Completer completer = new Completer();
-
-    input.onData = () {
-      List<int> buffer = input.read();
-      futures.add(dumpBuffer(buffer));
-    };
-
-    input.onClosed = () {
-      Future.wait(futures).then((list) {
-        return finishData();
-      }).then((map){
-        completer.complete({});
-      });
-    };
-
+    }    
+    input.listen((data) {
+        futures.add(dumpBuffer(data));
+        }, onDone: _onDone);    
     return completer.future;
   }
   // TODO(tsander): OutputStream??
@@ -76,7 +72,7 @@ class GridIn extends GridFSFile {
     messageDigester.add(writeBuffer);
     currentBufferPosition = 0;
 
-    return fs.chunks.insert(chunk, safeMode:true);
+    return fs.chunks.insert(chunk);
   }
 
   Future finishData() {

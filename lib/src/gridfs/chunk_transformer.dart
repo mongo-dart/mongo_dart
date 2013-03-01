@@ -6,21 +6,23 @@ class ChunkTransformer extends StreamEventTransformer<List<int>, List<int>> {
 
   ChunkTransformer([this.chunkSize = 1024 * 256]);
 
-  void _handle(List<int> data, StreamSink<List<int>> sink, bool isClosing) {  // <== added sink.
-      if (_carry != null) {
-        data.addAll(_carry);
+  void _handle(List<int> data, StreamSink<List<int>> sink, bool isClosing) { 
+      if (_carry != null) {        
+        _carry.addAll(data);
+        data = _carry;
         _carry = null;
       }
       int startPos = 0;
       int pos = 0;
       while (pos + chunkSize < data.length) {        
-        sink.add(data.getRange(pos,chunkSize));  // <== changed to sink.
+        sink.add(data.getRange(pos,chunkSize));  
         pos += chunkSize;
       }        
       if (data.length > pos) {
-        _carry = data.getRange(pos, data.length - pos);  
+        _carry = new List<int>();
+        _carry.addAll(data.getRange(pos, data.length - pos));  
         if (isClosing) {
-          sink.add(_carry);  // <== changed to sink
+          sink.add(_carry);  
         }
       }
     }
