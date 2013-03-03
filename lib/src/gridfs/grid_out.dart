@@ -47,32 +47,16 @@ class GridOut extends GridFSFile {
   }
 
   Future<int> writeTo(IOSink out) {
-    final int nc = numChunks();
-    // TODO(tsander): Find a better name??
-    Future<List<int>> chain = null;
+    int length = 0;
     Completer completer = new Completer();
-    for ( int i = 0; i<nc; i++ ){
-      if (chain == null) {
-        chain = getChunk(i);
-      } else {
-        chain = chain.then((List<int> buffer){
-          return getChunk(i);
-        });
-      }
-      chain = chain.then((List<int> buffer) {
-        if (buffer != null) {
-          out.add(buffer);          
-        }
-        return new Future.immediate(buffer);
-      });
-    }
-    if (chain != null) {
-      chain.then((List<int> buffer){
-        completer.complete(length);
-      });
-    } else {
-      return new Future.immediate(length);
-    }
+    addToSink(Map chunk) {
+      BsonBinary data = chunk["data"];
+      out.add(data.byteList);
+      length += data.byteList.length;
+    }  
+    fs.chunks.find(where.eq("files_id", id).sortBy('n'))
+      .each(addToSink)
+      .then((_) => completer.complete(length));
     return completer.future;
   }
 }

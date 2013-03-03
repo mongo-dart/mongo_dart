@@ -8,24 +8,27 @@ import 'package:unittest/unittest.dart';
 
 const DefaultUri = 'mongodb://127.0.0.1/';
 
-class ListSink implements IOSink{
-  List<int> list;
-  ListSink([List<int> this.list]) {
-    if (list == null) {
-      list = new List<int>();
-    }
+class MockConsumer<S, T> implements StreamConsumer<S, T> {
+  List<S> data = <S>[];
+  Future<T> consume(Stream<S> stream) {
+    var completer = new Completer();
+    stream.listen(_onData, onDone: () => completer.complete(null));
+    return completer.future;
   }
-  add(List<int> data) {
-    list.addAll(data); 
-  }  
+  _onData(chunk) {
+    data.addAll(chunk);
+  }
 }
-
+clearFSCollections(GridFS gridFS) {
+  gridFS.files.remove();
+  gridFS.chunks.remove();
+}
 testSmall(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then(expectAsync1((c){
     List<int> data = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
-
     GridFS gridFS = new GridFS(db);
+    clearFSCollections(gridFS);
     return testInOut(data, gridFS);
   })).then((c){
     db.close();
@@ -43,14 +46,33 @@ testBig(){
       data.addAll(smallData);
     }
     GridFS gridFS = new GridFS(db);
+    clearFSCollections(gridFS);
     return testInOut(data, gridFS);
   })).then((c){
     db.close();
   });
 }
 
+tesSomeChunks(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  db.open().then(expectAsync1((c){
+    List<int> smallData = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
+    GridFS.DEFAULT_CHUNKSIZE = 9;
+    int target = GridFS.DEFAULT_CHUNKSIZE * 3;
+    List<int> data = new List();
+    while (data.length < target) {
+      data.addAll(smallData);
+    }
+    GridFS gridFS = new GridFS(db);
+    clearFSCollections(gridFS);
+    return testInOut(data, gridFS);
+  })).then((c){
+    db.close();
+  });
+}
 Future testInOut(List<int> data, GridFS gridFS) {
-  ListSink out = new ListSink();  
+  var consumer = new MockConsumer();
+  var out = new IOSink(consumer);
   return getInitialState(gridFS).then(expectAsync1((List<int> initialState){    
     var inputStream = new Stream.fromIterable([data]);
     GridIn input = gridFS.createFile(inputStream, "test");  
@@ -63,7 +85,7 @@ Future testInOut(List<int> data, GridFS gridFS) {
 
         return gridOut.writeTo(out);
       })).then(expectAsync1((c){
-        expect(data, orderedEquals(out.list));
+        expect(data, orderedEquals(consumer.data));
         return getInitialState(gridFS);
       }));
     }));
@@ -104,22 +126,32 @@ testChunkTransformerSeveralChunks(){
 }
 
 testWithFile() {
-  expect(true, false, reason: 'GridGS is currently broken');
-//  Db db = new Db('${DefaultUri}mongo_dart-test');  
-//  db.open().then(expectAsync1((c){
-//    Stream input = new File('c:/projects/mongo_dart/test/gridfs_testdata_in.txt').openRead();  
-//    GridFS gridFS = new GridFS(db);
-//    return gridFS.createFile(input, 'gridfs_testdata.txt').save();    
-//  })).then(expectAsync1((c){    
-//    GridFS gridFS = new GridFS(db);
-//    return gridFS.getFile('gridfs_testdata.txt');
-//  })).then(expectAsync1((GridOut out){
-//    print(out.data);
-//    out.writeToFilename('c:/projects/mongo_dart/test/gridfs_testdata_out.txt');        
-//  })).then((c){
-//    print(c);
-//    db.close();
-//  });
+  var consumer = new MockConsumer();
+  var sink = new IOSink(consumer);
+  GridFS.DEFAULT_CHUNKSIZE = 30;  
+  GridIn input;
+  var path = new Path(new Options().script).directoryPath;
+  var inputStream = new File('$path/gridfs_testdata_in.txt').openRead();   
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  db.open().then(expectAsync1((c){
+    var gridFS = new GridFS(db);
+    clearFSCollections(gridFS);
+    input = gridFS.createFile(inputStream, "test");  
+    return input.save();
+  })).then(expectAsync1((c) { 
+    var gridFS = new GridFS(db);
+    return gridFS.getFile('test');
+  })).then(expectAsync1((GridOut gridOut) {    
+    return gridOut.writeToFilename('$path/gridfs_testdata_out.txt');
+  })).then(expectAsync1((c){
+//    print(consumer.data);
+//    print(data);
+//    print(new String.fromCharCodes(consumer.data));    
+//    print(new String.fromCharCodes(data));  
+    List<int> data = new File('$path/gridfs_testdata_out.txt').readAsBytesSync();     
+    expect(data, orderedEquals(consumer.data));
+    db.close();
+  }));
 }
 
 main(){
@@ -129,8 +161,10 @@ main(){
     test('testChunkTransformerSeveralChunks',testChunkTransformerSeveralChunks);    
   });    
   group('GridFS tests:', (){
+    setUp(() => GridFS.DEFAULT_CHUNKSIZE = 256 * 1024);
     test('testSmall',testSmall);
+    test('tesSomeChunks',tesSomeChunks);    
     test('testBig',testBig);
-    test('testWithFile',testWithFile);
+    solo_test('testWithFile',testWithFile);
   });
 }
