@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.3
+
+- GridFS refactored, now works on all old and added tests.
+
 ###0.1.2
 
 - GridFS still broken, but in this version there is no malformed types from previous dart:io version 

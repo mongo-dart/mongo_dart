@@ -8,42 +8,18 @@ class GridOut extends GridFSFile {
       this.data = data;
     }
   }
-  
-  Future<List<int>> getChunk(int i) {
-    if (fs == null) {
-      // TODO throw error
-    }
-    Completer completer = new Completer();
-    // TODO(tsander): Would it be better to ask for all the chunks instead of
-    // one at a time?
-    fs.chunks.findOne(where.eq("files_id", id).eq("n", i))
-    ..catchError((e){
-      // TODO better error handling.
-      print(e);
-    })
-    ..then((Map chunk) {
-      List<int> result = null;
-      if (chunk != null) {
-        BsonBinary data = chunk["data"];
-        result = data.byteList;
-      }
-      completer.complete(result);
-    });
-    return completer.future;
-  }
 
-  Future<int> writeToFilename(String filename) {
+  Future writeToFilename(String filename) {
     return writeToFile(new File(filename));
   }
 
-  Future<int> writeToFile(File file) {
-    IOSink out = file.openWrite(FileMode.WRITE);    
-    Future<int> written = writeTo(out);
-    written.then((int length) {
-      out.close();
-      return new Future.immediate(length);
+  Future writeToFile(File file) {
+    var completer = new Completer();
+    var sink = file.openWrite(FileMode.WRITE);    
+    writeTo(sink).then((int length) {
+      sink.close();
     });
-    return written;
+    return sink.done;
   }
 
   Future<int> writeTo(IOSink out) {
