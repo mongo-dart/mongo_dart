@@ -126,12 +126,13 @@ testChunkTransformerSeveralChunks(){
 }
 
 testWithFile() {
-  var consumer = new MockConsumer();
-  var sink = new IOSink(consumer);
+//  var consumer = new MockConsumer();
+//  var sink = new IOSink(consumer);
   GridFS.DEFAULT_CHUNKSIZE = 30;  
   GridIn input;
   var path = new Path(new Options().script).directoryPath;
-  var inputStream = new File('$path/gridfs_testdata_in.txt').openRead();   
+  var inputStream = new File('$path/gridfs_testdata_in.txt').openRead();
+  var sink = new File('$path/gridfs_testdata_out.txt').openWrite(FileMode.WRITE);
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then(expectAsync1((c){
     var gridFS = new GridFS(db);
@@ -141,15 +142,17 @@ testWithFile() {
   })).then(expectAsync1((c) { 
     var gridFS = new GridFS(db);
     return gridFS.getFile('test');
-  })).then(expectAsync1((GridOut gridOut) {    
-    return gridOut.writeToFilename('$path/gridfs_testdata_out.txt');
+  })).then(expectAsync1((GridOut gridOut) {
+    return gridOut.writeTo(sink);    
+//    return gridOut.writeToFilename('$path/gridfs_testdata_out.txt');
   })).then(expectAsync1((c){
 //    print(consumer.data);
 //    print(data);
 //    print(new String.fromCharCodes(consumer.data));    
 //    print(new String.fromCharCodes(data));  
-    List<int> data = new File('$path/gridfs_testdata_out.txt').readAsBytesSync();     
-    expect(data, orderedEquals(consumer.data));
+    List<int> dataIn = new File('$path/gridfs_testdata_in.txt').readAsBytesSync();
+    List<int> dataOut = new File('$path/gridfs_testdata_out.txt').readAsBytesSync();      
+    expect(dataOut, orderedEquals(dataIn));
     db.close();
   }));
 }
