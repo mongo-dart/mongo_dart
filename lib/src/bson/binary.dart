@@ -89,13 +89,13 @@ class BsonBinary extends BsonObject{
     int pos = 0;
     int listPos = 0;
     while (pos < _hexString.length) {
-      int char = _hexString.charCodeAt(pos);
+      int char = _hexString.codeUnitAt(pos);
       int n1 = tokens[char];
       if (n1 == null) {
         throw 'Invalid char ${_hexString[pos]} in $_hexString';
       }
       pos++;
-      char = _hexString.charCodeAt(pos);
+      char = _hexString.codeUnitAt(pos);
       int n2 = tokens[char];
       if (n2 == null) {
         throw 'Invalid char ${_hexString[pos]} in $_hexString';

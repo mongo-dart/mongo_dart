@@ -2,6 +2,10 @@
 
 ###0.1.3
 
+- Support for Dart Editor version 0.4.1_r19425
+
+###0.1.3
+
 - GridFS refactored, now works on all old and added tests.
 
 ###0.1.2
