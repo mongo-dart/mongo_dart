@@ -34,7 +34,7 @@ class BsonBinary extends BsonObject{
   String _hexString;
 
   static List<int> createTokens(){
-    var result = new List<int>.fixedLength(255);
+    var result = new List<int>(255);
     result[CHAR_0] = 0;
     result[CHAR_1] = 1;
     result[CHAR_2] = 2;
@@ -74,9 +74,9 @@ class BsonBinary extends BsonObject{
     for (final byte in byteList)
     {
        if (byte < 16){
-        stringBuffer.add("0");
+        stringBuffer.write("0");
        }
-       stringBuffer.add(byte.toRadixString(16));
+       stringBuffer.write(byte.toRadixString(16));
     }
     _hexString = stringBuffer.toString().toLowerCase();
   }

@@ -15,7 +15,7 @@ class GridOut extends GridFSFile {
 
   Future writeToFile(File file) {
     var completer = new Completer();
-    var sink = file.openWrite(FileMode.WRITE);    
+    var sink = file.openWrite(mode: FileMode.WRITE);    
     writeTo(sink).then((int length) {
       sink.close();
     });
@@ -27,7 +27,7 @@ class GridOut extends GridFSFile {
     Completer completer = new Completer();
     addToSink(Map chunk) {
       BsonBinary data = chunk["data"];
-      out.add(data.byteList);
+      out.writeBytes(data.byteList);
       length += data.byteList.length;
     }  
     fs.chunks.find(where.eq("files_id", id).sortBy('n'))

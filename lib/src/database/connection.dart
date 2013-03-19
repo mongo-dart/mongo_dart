@@ -56,17 +56,15 @@ class Connection{
   _sendBuffer(){
     while(_sendQueue.length > 0) {
       _bufferToSend = _sendQueue.removeFirst().serialize();
-      socket.add(_bufferToSend.byteList);
+      socket.writeBytes(_bufferToSend.byteList);
     }
   }
   void _receiveData(List<int> data, [int offset = 0, int recursion = 0]) {
     if (_messageBuffer == null){
       if (data.length - offset < 4) {
-        _incompleteLengthBytes = data.getRange(offset, data.length - offset);
-       // print('Trapped incomplete length header $_incompleteLengthBytes');
+        _incompleteLengthBytes = data.sublist(offset);
         return;
       }
-      //print('new Buffer offset:$offset  data.length:${data.length} recursion:$recursion');
       _lengthBuffer.byteList.setRange(0, _incompleteLengthBytes.length, _incompleteLengthBytes, offset);     
       _lengthBuffer.byteList.setRange(0 + _incompleteLengthBytes.length, 4 - _incompleteLengthBytes.length, data, offset);
       int messageLength = _lengthBuffer.readInt32();
