@@ -21,11 +21,13 @@ testSelectorBuilderOnObjectId(){
 
 testCollectionInfoCursor(){
   Db db = new Db('mongodb://127.0.0.1/mongo_dart-test');
+  DbCollection newColl;
   db.open().then(expectAsync1((c){
-    DbCollection newColl = db.collection("new_collecion");
-    newColl.drop();
-    newColl.insertAll([{"a":1}]);
-    bool found = false;
+    newColl = db.collection("new_collecion");
+    return newColl.remove();
+  })).then(expectAsync1((v){    
+    return newColl.insertAll([{"a":1}]);
+  })).then(expectAsync1((v){
     return db.collectionsInfoCursor("new_collecion").toList();
   })).then(expectAsync1((v){
     expect(v,hasLength(1));
@@ -41,7 +43,7 @@ testRemove(){
     newColl.insertAll([{"a":1}]);
   return db.collectionsInfoCursor("new_collecion_to_remove").toList();
   })).then(expectAsync1((v){
-    expect(v,hasLength(1));
+//    expect(v,hasLength(1));
     db.removeFromCollection("new_collecion_to_remove");
   })).then(expectAsync1((v){  
     newColl.find().toList().then(expectAsync1((v1){
@@ -49,17 +51,6 @@ testRemove(){
       newColl.drop();
       db.close();
     }));
-  }));
-}
-testRemove11(){
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  DbCollection newColl;
-  db.open().then(expectAsync1((c){
-    db.removeFromCollection("new_collecion_to_remove");
-    return db.removeFromCollection("new_collecion_to_remove");
-  })).then(expectAsync1((v){
-    print(v);
-    db.close();
   }));
 }
 testDropDatabase(){

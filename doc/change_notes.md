@@ -1,6 +1,10 @@
 #Recent change notes
 
-###0.1.3
+###0.1.6
+
+- Support for dart SDK version 0.4.2.5_r20193
+
+###0.1.4
 
 - Support for Dart Editor version 0.4.1_r19425
 
