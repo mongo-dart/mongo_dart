@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.7
+
+- Bug fix for MongoMessage header curruption
+
 ###0.1.6
 
 - Support for dart SDK version 0.4.2.5_r20193
