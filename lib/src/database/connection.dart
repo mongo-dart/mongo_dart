@@ -23,7 +23,7 @@ class Connection{
       /* Socket connected. */
       socket = _socket;
       _socketSubscription = socket.listen(_receiveData,onError: (e) {
-        print("connect exception ${e}");
+        print("Socket error ${e}");
         completer.completeError(e);
       });
       connected = true;
@@ -78,7 +78,6 @@ class Connection{
       _incompleteLengthBytes = [];
     }
     int delta = min(data.length - offset,_messageBuffer.byteList.length-_messageBuffer.offset);
-    //print('offset:$offset delta:$delta data.length:${data.length} message.lenght:${_messageBuffer.byteList.length}');
     if (recursion > 2000) {
       throw 'Maybe we in infinite recursion?';
     }
@@ -101,7 +100,6 @@ class Connection{
         }
       }
       if (delta + offset < data.length) {
-//        print('delta:$delta offset:$offset length:${data.length} data:$data');
         _receiveData(data, delta + offset, recursion + 1); 
       }  
     }

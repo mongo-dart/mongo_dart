@@ -65,7 +65,8 @@ BsonObject bsonObjectFrom(var value){
   if (value is BsonRegexp){
     return value;
   }
-  throw new Exception("Not implemented for $value");
+  return new BsonMap(value.toJson());
+//  throw new Exception("Not implemented for $value");
 }
 
 BsonObject bsonObjectFromTypeByte(int typeByte){

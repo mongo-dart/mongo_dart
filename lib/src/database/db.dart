@@ -138,7 +138,6 @@ class Db{
     return getLastError();
   }
   void close(){
-//    print("closing db");
     connection.close();
   }
 

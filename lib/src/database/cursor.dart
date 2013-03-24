@@ -67,7 +67,6 @@ static const CLOSED = 2;
       Future<MongoReplyMessage> reply = db.queryMessage(qm);
       reply.then((replyMessage){
         state = OPEN;
-        //print("${replyMessage.cursorId}");
         cursorId = replyMessage.cursorId;
         items.addAll(replyMessage.documents);
         if (items.length > 0){
