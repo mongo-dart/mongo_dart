@@ -1,7 +1,7 @@
 part of mongo_dart;
 class Connection{
   final _replyCompleters = new Map<int,Completer<MongoReplyMessage>>();
-  final BsonBinary _lengthBuffer = new BsonBinary(4);
+  BsonBinary _lengthBuffer;
   ServerConfig serverConfig;
   BsonBinary _bufferToSend;
   final _sendQueue = new Queue<MongoMessage>();
@@ -17,6 +17,7 @@ class Connection{
     }
   }
   Future<bool> connect(){
+    _lengthBuffer = new BsonBinary(4);
     Completer completer = new Completer();   
     Socket.connect(serverConfig.host, serverConfig.port).then((Socket _socket) {
       /* Socket connected. */

@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.8
+
+- Bug fix for unitialized BsonPlatform
+
 ###0.1.7
 
 - Bug fix for MongoMessage header curruption
