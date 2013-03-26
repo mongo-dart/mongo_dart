@@ -611,6 +611,25 @@ testIndexCreation(){
   }));
 }
 
+testEnsureIndexWithIndexCreation(){    
+  Db db = new Db('${DefaultUri}ensureIndex_indexCreation');
+  Cursor cursor;
+  DbCollection collection;
+  db.open().then(expectAsync1((c){
+    collection = db.collection('testcol');
+    return collection.drop();
+  })).then(expectAsync1((res){
+    print(res);
+    for (int n=0;n < 6; n++){
+      collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
+    }   
+    return db.ensureIndex('testcol',keys:{'a':-1,'embedded.c': 1});
+  })).then(expectAsync1((res){
+    expect(res['ok'],1.0);
+    expect(res['err'],isNull);
+    db.close();
+  }));
+}
 testSafeModeUpdate(){
   Db db = new Db('${DefaultUri}safe_mode');
   Cursor cursor;
@@ -683,5 +702,6 @@ main(){
   group('Indexes tests:', () {
     test('testIndexInformation',testIndexInformation);
     test('testIndexCreation',testIndexCreation);
+    test('testEnsureIndexWithIndexCreation',testEnsureIndexWithIndexCreation);
   });
 }

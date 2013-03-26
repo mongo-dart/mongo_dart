@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.9 
+
+- Bug fix on [Issue 18] (https://github.com/vadimtsushko/mongo_dart/issues/18) about db.ensureIndex
+
 ###0.1.8
 
 - Bug fix for unitialized BsonPlatform

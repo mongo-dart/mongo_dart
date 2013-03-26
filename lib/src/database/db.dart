@@ -231,7 +231,8 @@ class Db{
       if (indexInfos.any((info) => info['name'] == name)) {
         completer.complete({'ok': 1.0, 'result': 'index preexists'});
       } else {
-        return createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name);
+        createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name)
+          .then((res)=>completer.complete(res));
       }
     });
     return completer.future;

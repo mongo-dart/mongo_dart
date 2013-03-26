@@ -92,6 +92,7 @@ class Connection{
       _lengthBuffer.rewind();
       Completer completer = _replyCompleters.remove(reply.responseTo);
       if (completer != null){
+        _log.finest('Completing $reply');
         completer.complete(reply);
       }
       else {
@@ -106,12 +107,14 @@ class Connection{
   }
   Future<MongoReplyMessage> query(MongoMessage queryMessage){
     Completer completer = new Completer();
-    _replyCompleters[queryMessage.requestId] = completer;
+    _replyCompleters[queryMessage.requestId] = completer;    
     _sendQueue.addLast(queryMessage);
+    _log.finest('Query $queryMessage');
     _sendBuffer();
     return completer.future;
   }
   void execute(MongoMessage mongoMessage){
+    _log.finest('Execute $mongoMessage');
     _sendQueue.addLast(mongoMessage);
     _sendBuffer();
   }
