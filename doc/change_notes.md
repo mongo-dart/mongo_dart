@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.10 
+
+- Switch from dart:scalarlist to dart:typeddata. Logging updated to new API.
+
 ###0.1.9 
 
 - Bug fix on [Issue 18] (https://github.com/vadimtsushko/mongo_dart/issues/18) about db.ensureIndex

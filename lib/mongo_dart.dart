@@ -44,6 +44,5 @@ final Logger _log = Logger.root;
 
 _configureConsoleLogger([Level level = Level.INFO]) {
   _log.level = level;
-  _log.on.record.clear();
-  _log.on.record.add((LogRecord rec) => print('${rec.time} [${rec.level}] ${rec.message}'));
+  _log.onRecord.listen((LogRecord rec) => print('${rec.time} [${rec.level}] ${rec.message}'));
 }
