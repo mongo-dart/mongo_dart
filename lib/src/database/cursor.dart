@@ -130,7 +130,7 @@ static const CLOSED = 2;
   Future<List<Map>> toList(){
     List<Map> result = [];
     Completer completer = new Completer();
-    this.each((v)=>result.addLast(v)).then((v)=>completer.complete(result));
+    this.each((v)=>result.add(v)).then((v)=>completer.complete(result));
     return completer.future;
   }
   Future close(){

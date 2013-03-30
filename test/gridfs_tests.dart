@@ -98,7 +98,7 @@ Future<List<int>> getInitialState(GridFS gridFS) {
   futures.add(gridFS.files.count());
   futures.add(gridFS.chunks.count());
   Future.wait(futures).then((List<double> futureResults) {
-    List<int> result = new List<int>.fixedLength(2);
+    List<int> result = new List<int>(2);
     result[0] = futureResults[0].toInt();
     result[1] = futureResults[1].toInt();
     completer.complete(result);

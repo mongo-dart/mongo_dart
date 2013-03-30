@@ -1,11 +1,11 @@
 library tests;
 import 'package:unittest/unittest.dart';
-import 'dart:scalarlist';
+import 'dart:typeddata';  
 import 'package:mongo_dart/bson.dart';
 
 testUint8ListNegativeWrite(){
   Uint8List bl = new Uint8List(4);
-  var ba = bl.asByteArray();
+  var ba = new ByteData.view(bl.buffer);
   ba.setInt32(0,-1);
   expect(bl[0], 255);
   //expect(bl,equals([255,255,255,255]));

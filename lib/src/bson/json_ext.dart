@@ -178,7 +178,7 @@ class _JsonParser {
     if (tokens != null) return;
 
     // Use a list as jump-table. It is faster than switch and if.
-    tokens = new List<int>.fixedLength(LAST_ASCII + 1);
+    tokens = new List<int>(LAST_ASCII + 1);
     tokens[TAB] = WHITESPACE;
     tokens[NEW_LINE] = WHITESPACE;
     tokens[CARRIAGE_RETURN] = WHITESPACE;

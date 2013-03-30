@@ -15,12 +15,12 @@ class ChunkTransformer extends StreamEventTransformer<List<int>, List<int>> {
       int startPos = 0;
       int pos = 0;
       while (pos + chunkSize < data.length) {        
-        sink.add(data.getRange(pos,chunkSize));  
+        sink.add(data.sublist(pos,pos + chunkSize));  
         pos += chunkSize;
       }        
       if (data.length > pos) {
         _carry = new List<int>();
-        _carry.addAll(data.getRange(pos, data.length - pos));  
+        _carry.addAll(data.sublist(pos));  
         if (isClosing) {
           sink.add(_carry);  
         }

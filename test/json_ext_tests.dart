@@ -1,6 +1,6 @@
 library JSON_EXT_ext_tests;
 import 'package:unittest/unittest.dart';
-import 'dart:scalarlist';
+import 'dart:typeddata';
 import 'package:mongo_dart/mongo_dart.dart';
 
 
