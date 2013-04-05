@@ -28,6 +28,8 @@ class Connection{
       });
       connected = true;
       completer.complete(true);
+    }).catchError( (err) {
+      completer.completeError(err);
     });
     return completer.future;
   }

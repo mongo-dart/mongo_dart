@@ -82,6 +82,8 @@ class Db{
           completer.complete(v);
         });
       }
+    }).catchError( (err) {
+      completer.completeError(err);
     });
     return completer.future;
   }
