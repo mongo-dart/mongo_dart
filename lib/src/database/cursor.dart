@@ -84,7 +84,7 @@ static const CLOSED = 2;
       return this.close();
     }
     else if (state == OPEN && items.length > 0){
-      return new Future.immediate(_getNextItem());
+      return new Future.value(_getNextItem());
     }
     else if (state == OPEN && cursorId > 0){
       Completer nextItem = new Completer();
@@ -106,7 +106,7 @@ static const CLOSED = 2;
     }
     else {
       state = CLOSED;
-      return new Future.immediate(null);
+      return new Future.value(null);
     }
   }
   void _nextEach(){
@@ -141,6 +141,6 @@ static const CLOSED = 2;
       cursorId = 0;
       db.queryMessage(msg);
     }
-    return new Future.immediate(null);
+    return new Future.value(null);
   }
 }

@@ -21,9 +21,9 @@ class MapProxy<K,V> implements Map<K,V>{
 
   void forEach(void f(K key, V value))=>map.forEach(f);
 
-  Collection<K> get keys => map.keys;
+  Iterable<K> get keys => map.keys;
 
-  Collection<V> get values => map.values;
+  Iterable<V> get values => map.values;
 
   int get length => map.length;
 

@@ -58,7 +58,7 @@ class Connection{
   _sendBuffer(){
     while(_sendQueue.length > 0) {
       _bufferToSend = _sendQueue.removeFirst().serialize();
-      socket.writeBytes(_bufferToSend.byteList);
+      socket.add(_bufferToSend.byteList);
     }
   }
   void _receiveData(List<int> data, [int offset = 0, int recursion = 0]) {
@@ -68,7 +68,7 @@ class Connection{
         return;
       }
       _lengthBuffer.byteList.setRange(0, _incompleteLengthBytes.length, _incompleteLengthBytes, offset);     
-      _lengthBuffer.byteList.setRange(0 + _incompleteLengthBytes.length, 4 - _incompleteLengthBytes.length, data, offset);
+      _lengthBuffer.byteList.setRange(0 + _incompleteLengthBytes.length, 0 + _incompleteLengthBytes.length + 4 - _incompleteLengthBytes.length, data, offset);
       int messageLength = _lengthBuffer.readInt32();
       if (messageLength == 0) {
         throw 'messageLength == 0 $data';
@@ -83,7 +83,7 @@ class Connection{
     if (recursion > 2000) {
       throw 'Maybe we in infinite recursion?';
     }
-    _messageBuffer.byteList.setRange(_messageBuffer.offset, delta , data, offset);
+    _messageBuffer.byteList.setRange(_messageBuffer.offset, _messageBuffer.offset+delta , data, offset);
     _messageBuffer.offset += delta;
     if (_messageBuffer.atEnd()){
       MongoReplyMessage reply = new MongoReplyMessage();

@@ -27,7 +27,7 @@ class GridOut extends GridFSFile {
     Completer completer = new Completer();
     addToSink(Map chunk) {
       BsonBinary data = chunk["data"];
-      out.writeBytes(data.byteList);
+      out.add(data.byteList);                
       length += data.byteList.length;
     }  
     fs.chunks.find(where.eq("files_id", id).sortBy('n'))

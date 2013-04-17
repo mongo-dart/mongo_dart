@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.12
+
+- Upgrade for M4.  
+
 ###0.1.10 
 
 - Switch from dart:scalarlist to dart:typeddata. Logging updated to new API.

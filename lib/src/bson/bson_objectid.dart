@@ -53,7 +53,7 @@ class ObjectId extends BsonObject{
     if (id.byteList == null) {
       id.makeByteList();
     }
-    buffer.byteList.setRange(buffer.offset,12,id.byteList);
+    buffer.byteList.setRange(buffer.offset,buffer.offset+12,id.byteList);
     buffer.offset += 12;
   }
 

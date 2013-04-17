@@ -216,7 +216,8 @@ class Db{
       throw new ArgumentError('Only one parameter must be set: key or keys');
     }
     if (key != null) {
-      keys = {'$key': 1};
+      keys = new Map();
+      keys['$key'] = 1;
     }
     if (keys == null) {
       throw new ArgumentError('key or keys parameter must be set');
@@ -245,7 +246,7 @@ class Db{
       writeConcern = _writeConcern;
     }
     if (writeConcern == WriteConcern.ERRORS_IGNORED) {
-      return new Future.immediate({'ok': 1.0});            
+      return new Future.value({'ok': 1.0});            
     }
     else
     {

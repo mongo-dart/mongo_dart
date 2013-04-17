@@ -8,9 +8,9 @@ import 'package:unittest/unittest.dart';
 
 const DefaultUri = 'mongodb://127.0.0.1/';
 
-class MockConsumer<S, T> implements StreamConsumer<S, T> {
+class MockConsumer<S> implements StreamConsumer<S> {
   List<S> data = <S>[];
-  Future<T> consume(Stream<S> stream) {
+  Future consume(Stream<S> stream) {
     var completer = new Completer();
     stream.listen(_onData, onDone: () => completer.complete(null));
     return completer.future;
@@ -18,6 +18,13 @@ class MockConsumer<S, T> implements StreamConsumer<S, T> {
   _onData(chunk) {
     data.addAll(chunk);
   }
+  Future addStream(Stream<S> stream) {
+    var completer = new Completer();
+    stream.listen(_onData, onDone: () => completer.complete(null));
+    return completer.future;
+  }  
+  Future close() {
+  }   
 }
 clearFSCollections(GridFS gridFS) {
   gridFS.files.remove();
@@ -82,7 +89,6 @@ Future testInOut(List<int> data, GridFS gridFS) {
         expect(input.id, gridOut.id, reason: "Ids not equal.");
         expect(GridFS.DEFAULT_CHUNKSIZE, gridOut.chunkSize, reason: "Chunk size not the same.");
         expect("test", gridOut.filename, reason: "Filename not equal");
-
         return gridOut.writeTo(out);
       })).then(expectAsync1((c){
         expect(data, orderedEquals(consumer.data));

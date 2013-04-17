@@ -116,7 +116,7 @@ class BsonBinary extends BsonObject{
     else {
         throw new Exception("Unsupported num of bits: ${numOfBytes*8}");
     }
-    byteList.setRange(offset,numOfBytes,byteListTmp);
+    byteList.setRange(offset,offset+numOfBytes,byteListTmp);
   }
   reverse(int numOfBytes){
     swap(int x, int y){
@@ -196,7 +196,7 @@ class BsonBinary extends BsonObject{
   }
   writeCString(String val){
     final utfData = encodeUtf8(val);
-    byteList.setRange(offset,utfData.length,utfData);
+    byteList.setRange(offset,offset+utfData.length,utfData);
     offset += utfData.length;
     writeByte(0);
  }
@@ -212,7 +212,7 @@ class BsonBinary extends BsonObject{
     }
     buffer.writeInt(byteList.length);
     buffer.writeByte(subType);
-    buffer.byteList.setRange(buffer.offset,byteList.length,byteList);
+    buffer.byteList.setRange(buffer.offset,buffer.offset+byteList.length,byteList);
     buffer.offset += byteList.length;
   }
   unpackValue(BsonBinary buffer){

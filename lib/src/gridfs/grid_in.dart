@@ -28,7 +28,7 @@ class GridIn extends GridFSFile {
     if (!savedChunks) {
       result = saveChunks(chunkSize);
     } else {
-      result = new Future.immediate({'ok': 1.0});
+      result = new Future.value({'ok': 1.0});
     }
     return result;
   }
@@ -63,7 +63,7 @@ class GridIn extends GridFSFile {
   Future<Map> dumpBuffer( List<int> writeBuffer ) {
     if (writeBuffer.length == 0) {
       // Chunk is empty, may be last chunk
-      return new Future.immediate({});
+      return new Future.value({});
     }
 
     Map chunk = {"files_id" : id, "n" : currentChunkNumber, "data": new BsonBinary.from(writeBuffer)};
