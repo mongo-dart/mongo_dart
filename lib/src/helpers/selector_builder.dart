@@ -93,7 +93,7 @@ class SelectorBuilder{
       rangeMap["\$lte"] = max;
     }
     else{
-      rangeMap["\$gt"] = max;
+      rangeMap["\$lt"] = max;
     }
     map[fieldName] = rangeMap;
     return this;

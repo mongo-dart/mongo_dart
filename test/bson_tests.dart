@@ -1,11 +1,11 @@
 library tests;
 import 'package:unittest/unittest.dart';
-import 'dart:scalarlist';
+import 'dart:typeddata';  
 import 'package:mongo_dart/bson.dart';
 
 testUint8ListNegativeWrite(){
   Uint8List bl = new Uint8List(4);
-  var ba = bl.asByteArray();
+  var ba = new ByteData.view(bl.buffer);
   ba.setInt32(0,-1);
   expect(bl[0], 255);
   //expect(bl,equals([255,255,255,255]));
@@ -19,34 +19,34 @@ testBsonBinary(){
    BsonBinary b = new BsonBinary(8);
    b.writeInt(0);
    b.writeInt(1);
-   expect('0000000001000000',b.hexString);
+   expect(b.hexString,'0000000001000000');
    b = new BsonBinary(8);
    b.writeInt(0);
    b = new BsonBinary(8);
    b.writeInt(0);
    b.writeInt(0x01020304);
-   expect(b.hexString,'0000000004030201');
+   expect('0000000004030201',b.hexString);
    b = new BsonBinary(8);
    b.writeInt(0);
    b.writeInt(0x01020304,numOfBytes:4,forceBigEndian:true);
-   expect('0000000001020304',b.hexString);
+   expect(b.hexString,'0000000001020304');
    b = new BsonBinary(8);
    b.writeInt(0);
    b.writeInt(1,forceBigEndian:true);
-   expect('0000000000000001',b.hexString);
+   expect(b.hexString,'0000000000000001');
    b = new BsonBinary(8);
    b.writeInt(1,numOfBytes:3,forceBigEndian:true);
-   expect('0000010000000000',b.hexString);
+   expect(b.hexString,'0000010000000000');
    b = new BsonBinary(8);
    b.writeInt(0,numOfBytes:3);
    b.writeInt(1,numOfBytes:3,forceBigEndian:true);
-   expect('0000000000010000',b.hexString);
+   expect(b.hexString,'0000000000010000');
    b = new BsonBinary(4);
    b.writeInt(-1);
-   expect(b.hexString,'ffffffff');
+   expect('ffffffff',b.hexString);
    b = new BsonBinary(4);
    b.writeInt(-100);
-   expect(b.hexString,'9cffffff');
+   expect('9cffffff',b.hexString);
 }
 
 typeTest(){

@@ -33,8 +33,10 @@ class GridFS {
     });
     return completer.future;
   }
-
-  GridIn createFile(InputStream input, String filename) {
+  
+  Future<GridOut> getFile(String fileName) => findOne(where.eq('filename',fileName));
+  
+  GridIn createFile(Stream<List<int>> input, String filename) {
     return new GridIn(this, filename, input);
   }
 }

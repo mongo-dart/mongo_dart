@@ -178,7 +178,7 @@ class _JsonParser {
     if (tokens != null) return;
 
     // Use a list as jump-table. It is faster than switch and if.
-    tokens = new List<int>.fixedLength(LAST_ASCII + 1);
+    tokens = new List<int>(LAST_ASCII + 1);
     tokens[TAB] = WHITESPACE;
     tokens[NEW_LINE] = WHITESPACE;
     tokens[CARRIAGE_RETURN] = WHITESPACE;
@@ -236,7 +236,7 @@ class _JsonParser {
   Object expectKeyword(String word, Object value) {
     for (int i = 0; i < word.length; i++) {
       // Implicit end check in char().
-      if (char() != word.charCodeAt(i)) error("Expected keyword '$word'");
+      if (char() != word.codeUnitAt(i)) error("Expected keyword '$word'");
       position++;
     }
     return value;
@@ -279,7 +279,7 @@ class _JsonParser {
         final String key = parseString();
         if (!isToken(COLON)) error("Expected ':' when parsing object");
         position++;
-        if (key.charCodeAt(0) == DOLLAR_SIGN) {
+        if (key.codeUnitAt(0) == DOLLAR_SIGN) {
           var extObject = parseBsonExtensionValue(key);
           if (extObject != null) {
             object = extObject;
@@ -434,7 +434,7 @@ class _JsonParser {
 
   bool isChar(int char) {
     if (position >= length) return false;
-    return json.charCodeAt(position) == char;
+    return json.codeUnitAt(position) == char;
   }
 
   bool isDigit(int char) {
@@ -447,19 +447,19 @@ class _JsonParser {
     if (position >= length) {
       error('Unexpected end of JSON stream');
     }
-    return json.charCodeAt(position);
+    return json.codeUnitAt(position);
   }
 
   int nextChar() {
     position++;
     if (position >= length) return 0;
-    return json.charCodeAt(position);
+    return json.codeUnitAt(position);
   }
 
   int token() {
     while (true) {
       if (position >= length) return null;
-      int char = json.charCodeAt(position);
+      int char = json.codeUnitAt(position);
       int token = tokens[char];
       if (token == WHITESPACE) {
         position++;
@@ -505,7 +505,7 @@ class _JsonStringifier {
     bool needsEscape = false;
     final charCodes = new List<int>();
     for (int i = 0; i < length; i++) {
-      int charCode = s.charCodeAt(i);
+      int charCode = s.codeUnitAt(i);
       if (charCode < 32) {
         needsEscape = true;
         charCodes.add(_JsonParser.BACKSLASH);
@@ -542,7 +542,7 @@ class _JsonStringifier {
         charCodes.add(charCode);
       }
     }
-    sb.add(needsEscape ? new String.fromCharCodes(charCodes) : s);
+   sb.write(needsEscape ? new String.fromCharCodes(charCodes) : s);
   }
 
   void checkCycle(final object) {
@@ -582,21 +582,21 @@ class _JsonStringifier {
   bool stringifyJsonValue(final object) {
     if (object is num) {
       // TODO: use writeOn.
-      sb.add(numberToString(object));
+     sb.write(numberToString(object));
       return true;
     } else if (object == true) {
-      sb.add('true');
+     sb.write('true');
       return true;
     } else if (object == false) {
-      sb.add('false');
+     sb.write('false');
        return true;
     } else if (object == null) {
-      sb.add('null');
+     sb.write('null');
       return true;
     } else if (object is String) {
-      sb.add('"');
+     sb.write('"');
       escape(sb, object);
-      sb.add('"');
+     sb.write('"');
       return true;
     } else if (object is DateTime) {
       return stringifyJsonValue({'\$date': (object as DateTime).millisecondsSinceEpoch});
@@ -613,35 +613,35 @@ class _JsonStringifier {
     else if (object is List) {
       checkCycle(object);
       List a = object;
-      sb.add('[');
+     sb.write('[');
       if (a.length > 0) {
         stringifyValue(a[0]);
         // TODO: switch to Iterables.
         for (int i = 1; i < a.length; i++) {
-          sb.add(',');
+         sb.write(',');
           stringifyValue(a[i]);
         }
       }
-      sb.add(']');
+     sb.write(']');
       seen.removeLast();
       return true;
     } else if (object is Map) {
       checkCycle(object);
       Map<String, Object> m = object;
-      sb.add('{');
+     sb.write('{');
       bool first = true;
       m.forEach((String key, Object value) {
         if (!first) {
-          sb.add(',"');
+         sb.write(',"');
         } else {
-          sb.add('"');
+         sb.write('"');
         }
         escape(sb, key);
-        sb.add('":');
+       sb.write('":');
         stringifyValue(value);
         first = false;
       });
-      sb.add('}');
+     sb.write('}');
       seen.removeLast();
       return true;
     } else {

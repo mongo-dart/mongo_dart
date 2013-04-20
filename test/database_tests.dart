@@ -21,11 +21,13 @@ testSelectorBuilderOnObjectId(){
 
 testCollectionInfoCursor(){
   Db db = new Db('mongodb://127.0.0.1/mongo_dart-test');
+  DbCollection newColl;
   db.open().then(expectAsync1((c){
-    DbCollection newColl = db.collection("new_collecion");
-    newColl.drop();
-    newColl.insertAll([{"a":1}]);
-    bool found = false;
+    newColl = db.collection("new_collecion");
+    return newColl.remove();
+  })).then(expectAsync1((v){    
+    return newColl.insertAll([{"a":1}]);
+  })).then(expectAsync1((v){
     return db.collectionsInfoCursor("new_collecion").toList();
   })).then(expectAsync1((v){
     expect(v,hasLength(1));
@@ -41,7 +43,7 @@ testRemove(){
     newColl.insertAll([{"a":1}]);
   return db.collectionsInfoCursor("new_collecion_to_remove").toList();
   })).then(expectAsync1((v){
-    expect(v,hasLength(1));
+//    expect(v,hasLength(1));
     db.removeFromCollection("new_collecion_to_remove");
   })).then(expectAsync1((v){  
     newColl.find().toList().then(expectAsync1((v1){
@@ -49,17 +51,6 @@ testRemove(){
       newColl.drop();
       db.close();
     }));
-  }));
-}
-testRemove11(){
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  DbCollection newColl;
-  db.open().then(expectAsync1((c){
-    db.removeFromCollection("new_collecion_to_remove");
-    return db.removeFromCollection("new_collecion_to_remove");
-  })).then(expectAsync1((v){
-    print(v);
-    db.close();
   }));
 }
 testDropDatabase(){
@@ -510,15 +501,15 @@ testAuthComponents(){
   var hash;
   var digest;
   hash = new MD5();
-  hash.add(''.charCodes);
+  hash.add(''.codeUnits);
   digest = new BsonBinary.from(hash.close()).hexString;
   expect(digest,'d41d8cd98f00b204e9800998ecf8427e');
   hash = new MD5();
-  hash.add('md4'.charCodes);
+  hash.add('md4'.codeUnits);
   digest = new BsonBinary.from(hash.close()).hexString;
   expect(digest,'c93d3bf7a7c4afe94b64e30c2ce39f4f');
   hash = new MD5();
-  hash.add('md5'.charCodes);
+  hash.add('md5'.codeUnits);
   digest = new BsonBinary.from(hash.close()).hexString;
   expect(digest,'1bc29b36f623ba82aaf6724fd3b16718');
   var nonce = '94505e7196beb570';
@@ -526,10 +517,10 @@ testAuthComponents(){
   var password = 'test';
   var test_key = 'aea09fb38775830306c5ff6de964ff04';
   var md5 = new MD5();
-  md5.add("${userName}:mongo:${password}".charCodes);
+  md5.add("${userName}:mongo:${password}".codeUnits);
   var hashed_password = new BsonBinary.from(md5.close()).hexString;
   md5 = new MD5();
-  md5.add("${nonce}${userName}${hashed_password}".charCodes);
+  md5.add("${nonce}${userName}${hashed_password}".codeUnits);
   var key = new BsonBinary.from(md5.close()).hexString;
   expect(key,test_key);
 }
@@ -620,6 +611,25 @@ testIndexCreation(){
   }));
 }
 
+testEnsureIndexWithIndexCreation(){    
+  Db db = new Db('${DefaultUri}ensureIndex_indexCreation');
+  Cursor cursor;
+  DbCollection collection;
+  db.open().then(expectAsync1((c){
+    collection = db.collection('testcol');
+    return collection.drop();
+  })).then(expectAsync1((res){
+    print(res);
+    for (int n=0;n < 6; n++){
+      collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
+    }   
+    return db.ensureIndex('testcol',keys:{'a':-1,'embedded.c': 1});
+  })).then(expectAsync1((res){
+    expect(res['ok'],1.0);
+    expect(res['err'],isNull);
+    db.close();
+  }));
+}
 testSafeModeUpdate(){
   Db db = new Db('${DefaultUri}safe_mode');
   Cursor cursor;
@@ -692,5 +702,6 @@ main(){
   group('Indexes tests:', () {
     test('testIndexInformation',testIndexInformation);
     test('testIndexCreation',testIndexCreation);
+    test('testEnsureIndexWithIndexCreation',testEnsureIndexWithIndexCreation);
   });
 }

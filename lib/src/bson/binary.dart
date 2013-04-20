@@ -34,7 +34,7 @@ class BsonBinary extends BsonObject{
   String _hexString;
 
   static List<int> createTokens(){
-    var result = new List<int>.fixedLength(255);
+    var result = new List<int>(255);
     result[CHAR_0] = 0;
     result[CHAR_1] = 1;
     result[CHAR_2] = 2;
@@ -74,9 +74,9 @@ class BsonBinary extends BsonObject{
     for (final byte in byteList)
     {
        if (byte < 16){
-        stringBuffer.add("0");
+        stringBuffer.write("0");
        }
-       stringBuffer.add(byte.toRadixString(16));
+       stringBuffer.write(byte.toRadixString(16));
     }
     _hexString = stringBuffer.toString().toLowerCase();
   }
@@ -89,13 +89,13 @@ class BsonBinary extends BsonObject{
     int pos = 0;
     int listPos = 0;
     while (pos < _hexString.length) {
-      int char = _hexString.charCodeAt(pos);
+      int char = _hexString.codeUnitAt(pos);
       int n1 = tokens[char];
       if (n1 == null) {
         throw 'Invalid char ${_hexString[pos]} in $_hexString';
       }
       pos++;
-      char = _hexString.charCodeAt(pos);
+      char = _hexString.codeUnitAt(pos);
       int n2 = tokens[char];
       if (n2 == null) {
         throw 'Invalid char ${_hexString[pos]} in $_hexString';
@@ -116,7 +116,7 @@ class BsonBinary extends BsonObject{
     else {
         throw new Exception("Unsupported num of bits: ${numOfBytes*8}");
     }
-    byteList.setRange(offset,numOfBytes,byteListTmp);
+    byteList.setRange(offset,offset+numOfBytes,byteListTmp);
   }
   reverse(int numOfBytes){
     swap(int x, int y){
@@ -196,7 +196,7 @@ class BsonBinary extends BsonObject{
   }
   writeCString(String val){
     final utfData = encodeUtf8(val);
-    byteList.setRange(offset,utfData.length,utfData);
+    byteList.setRange(offset,offset+utfData.length,utfData);
     offset += utfData.length;
     writeByte(0);
  }
@@ -212,7 +212,7 @@ class BsonBinary extends BsonObject{
     }
     buffer.writeInt(byteList.length);
     buffer.writeByte(subType);
-    buffer.byteList.setRange(buffer.offset,byteList.length,byteList);
+    buffer.byteList.setRange(buffer.offset,buffer.offset+byteList.length,byteList);
     buffer.offset += byteList.length;
   }
   unpackValue(BsonBinary buffer){

@@ -1,11 +1,11 @@
 library bson_vm;
 import 'bson.dart';
-import 'dart:scalarlist';
+import 'dart:typeddata';
 
 class BsonPlatformVm extends BsonPlatform {
 
   dynamic makeUint8List(int size) => new Uint8List(size);
-  makeByteArray(from) => from.asByteArray();
+  makeByteArray(from) => new ByteData.view(from.buffer);
 }
 
 initBsonPlatform() {

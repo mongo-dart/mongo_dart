@@ -9,76 +9,30 @@ class GridOut extends GridFSFile {
     }
   }
 
-  InputStream get inputStream {
-    // TODO do this
-    return null;
-  }
-
-  Future<List<int>> getChunk(int i) {
-    if (fs == null) {
-      // TODO throw error
-    }
-    Completer completer = new Completer();
-    // TODO(tsander): Would it be better to ask for all the chunks instead of
-    // one at a time?
-    fs.chunks.findOne(where.eq("files_id", id).eq("n", i))
-    ..catchError((e){
-      // TODO better error handling.
-      print(e);
-    })
-    ..then((Map chunk) {
-      List<int> result = null;
-      if (chunk != null) {
-        BsonBinary data = chunk["data"];
-        result = data.byteList;
-      }
-      completer.complete(result);
-    });
-    return completer.future;
-  }
-
-  Future<int> writeToFilename(String filename) {
+  Future writeToFilename(String filename) {
     return writeToFile(new File(filename));
   }
 
-  Future<int> writeToFile(File file) {
-    OutputStream out = file.openOutputStream(FileMode.WRITE);
-    Future<int> written = writeTo(out);
-    written.then((int length) {
-      out.close();
-      return new Future.immediate(length);
+  Future writeToFile(File file) {
+    var completer = new Completer();
+    var sink = file.openWrite(mode: FileMode.WRITE);    
+    writeTo(sink).then((int length) {
+      sink.close();
     });
-    return written;
+    return sink.done;
   }
 
-  Future<int> writeTo(OutputStream out) {
-    final int nc = numChunks();
-    // TODO(tsander): Find a better name??
-    Future<List<int>> chain = null;
+  Future<int> writeTo(IOSink out) {
+    int length = 0;
     Completer completer = new Completer();
-    for ( int i = 0; i<nc; i++ ){
-      if (chain == null) {
-        chain = getChunk(i);
-      } else {
-        chain = chain.then((List<int> buffer){
-          return getChunk(i);
-        });
-      }
-      chain = chain.then((List<int> buffer) {
-        if (buffer != null) {
-          out.write(buffer, true);
-          out.flush();
-        }
-        return new Future.immediate(buffer);
-      });
-    }
-    if (chain != null) {
-      chain.then((List<int> buffer){
-        completer.complete(length);
-      });
-    } else {
-      return new Future.immediate(length);
-    }
+    addToSink(Map chunk) {
+      BsonBinary data = chunk["data"];
+      out.add(data.byteList);                
+      length += data.byteList.length;
+    }  
+    fs.chunks.find(where.eq("files_id", id).sortBy('n'))
+      .each(addToSink)
+      .then((_) => completer.complete(length));
     return completer.future;
   }
 }

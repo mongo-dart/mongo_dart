@@ -1,39 +1,41 @@
 part of mongo_dart;
 class Connection{
-  Map<int,Completer<MongoReplyMessage>> _replyCompleters;
+  final _replyCompleters = new Map<int,Completer<MongoReplyMessage>>();
   BsonBinary _lengthBuffer;
   ServerConfig serverConfig;
   BsonBinary _bufferToSend;
-  Queue<MongoMessage> _sendQueue;
+  final _sendQueue = new Queue<MongoMessage>();
   BsonBinary _messageBuffer;
   Socket socket;
   List _incompleteLengthBytes = [];
   StreamSubscription<List<int>> _socketSubscription;
   bool connected = false;
+  bool _closing = false;
   Connection([this.serverConfig]){
     if (serverConfig == null){
       serverConfig = new ServerConfig();
     }
   }
   Future<bool> connect(){
-    _replyCompleters = new Map();
-    _sendQueue = new Queue();
-    _lengthBuffer = new BsonBinary(4);    
+    _lengthBuffer = new BsonBinary(4);
     Completer completer = new Completer();   
     Socket.connect(serverConfig.host, serverConfig.port).then((Socket _socket) {
       /* Socket connected. */
       socket = _socket;
       _socketSubscription = socket.listen(_receiveData,onError: (e) {
-        print("connect exception ${e}");
+        print("Socket error ${e}");
         completer.completeError(e);
       });
       connected = true;
       completer.complete(true);
+    }).catchError( (err) {
+      completer.completeError(err);
     });
     return completer.future;
   }
   
   void close(){
+    _closing = true;
     while (!_sendQueue.isEmpty){
       _sendBuffer();
     }
@@ -62,16 +64,14 @@ class Connection{
   void _receiveData(List<int> data, [int offset = 0, int recursion = 0]) {
     if (_messageBuffer == null){
       if (data.length - offset < 4) {
-        _incompleteLengthBytes = data.getRange(offset, data.length - offset);
-       // print('Trapped incomplete length header $_incompleteLengthBytes');
+        _incompleteLengthBytes = data.sublist(offset);
         return;
       }
-      //print('new Buffer offset:$offset  data.length:${data.length} recursion:$recursion');
       _lengthBuffer.byteList.setRange(0, _incompleteLengthBytes.length, _incompleteLengthBytes, offset);     
-      _lengthBuffer.byteList.setRange(0 + _incompleteLengthBytes.length, 4 - _incompleteLengthBytes.length, data, offset);
+      _lengthBuffer.byteList.setRange(0 + _incompleteLengthBytes.length, 0 + _incompleteLengthBytes.length + 4 - _incompleteLengthBytes.length, data, offset);
       int messageLength = _lengthBuffer.readInt32();
       if (messageLength == 0) {
-        return;
+        throw 'messageLength == 0 $data';
       }
       _messageBuffer = new BsonBinary(messageLength);
       _messageBuffer.byteList.setRange(0, 4 , _lengthBuffer.byteList);   
@@ -80,12 +80,10 @@ class Connection{
       _incompleteLengthBytes = [];
     }
     int delta = min(data.length - offset,_messageBuffer.byteList.length-_messageBuffer.offset);
-    //print('offset:$offset delta:$delta data.length:${data.length} message.lenght:${_messageBuffer.byteList.length}');
-    //***** temporary safety hatch
-    if (recursion > 20) {
-      return;
+    if (recursion > 2000) {
+      throw 'Maybe we in infinite recursion?';
     }
-    _messageBuffer.byteList.setRange(_messageBuffer.offset, delta , data, offset);
+    _messageBuffer.byteList.setRange(_messageBuffer.offset, _messageBuffer.offset+delta , data, offset);
     _messageBuffer.offset += delta;
     if (_messageBuffer.atEnd()){
       MongoReplyMessage reply = new MongoReplyMessage();
@@ -96,10 +94,13 @@ class Connection{
       _lengthBuffer.rewind();
       Completer completer = _replyCompleters.remove(reply.responseTo);
       if (completer != null){
+        _log.finest('Completing $reply');
         completer.complete(reply);
       }
       else {
-        _log.fine("Unexpected respondTo: ${reply.responseTo} ${reply.documents[0]}");
+        if (!_closing) {
+          _log.info("Unexpected respondTo: ${reply.responseTo} $reply");
+        }
       }
       if (delta + offset < data.length) {
         _receiveData(data, delta + offset, recursion + 1); 
@@ -108,12 +109,14 @@ class Connection{
   }
   Future<MongoReplyMessage> query(MongoMessage queryMessage){
     Completer completer = new Completer();
-    _replyCompleters[queryMessage.requestId] = completer;
+    _replyCompleters[queryMessage.requestId] = completer;    
     _sendQueue.addLast(queryMessage);
+    _log.finest('Query $queryMessage');
     _sendBuffer();
     return completer.future;
   }
   void execute(MongoMessage mongoMessage){
+    _log.finest('Execute $mongoMessage');
     _sendQueue.addLast(mongoMessage);
     _sendBuffer();
   }

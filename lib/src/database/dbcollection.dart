@@ -33,6 +33,7 @@ class DbCollection{
     if (upsert) {
       flags |= 0x1;
     }
+
     MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
         _selectorBuiltder2Map(selector), document, flags);
     db.executeMessage(message);
@@ -59,12 +60,11 @@ class DbCollection{
     return result;
   }
   Future drop() => db.dropCollection(collectionName);
-  Future remove([selector, writeConcern]) => db.removeFromCollection(collectionName, _selectorBuiltder2Map(selector), writeConcern);
-  Future count([selector]){
+  Future remove([selector, WriteConcern writeConcern]) => db.removeFromCollection(collectionName, _selectorBuiltder2Map(selector), writeConcern);
+  Future<int> count([selector]){
     Completer completer = new Completer();
     db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuiltder2Map(selector))).then((reply){
-      //print("reply = ${reply}");
-      completer.complete(reply["n"]);
+      completer.complete(reply["n"].toInt());
     });
     return completer.future;
   }

@@ -67,7 +67,6 @@ static const CLOSED = 2;
       Future<MongoReplyMessage> reply = db.queryMessage(qm);
       reply.then((replyMessage){
         state = OPEN;
-        //print("${replyMessage.cursorId}");
         cursorId = replyMessage.cursorId;
         items.addAll(replyMessage.documents);
         if (items.length > 0){
@@ -85,7 +84,7 @@ static const CLOSED = 2;
       return this.close();
     }
     else if (state == OPEN && items.length > 0){
-      return new Future.immediate(_getNextItem());
+      return new Future.value(_getNextItem());
     }
     else if (state == OPEN && cursorId > 0){
       Completer nextItem = new Completer();
@@ -107,7 +106,7 @@ static const CLOSED = 2;
     }
     else {
       state = CLOSED;
-      return new Future.immediate(null);
+      return new Future.value(null);
     }
   }
   void _nextEach(){
@@ -131,7 +130,7 @@ static const CLOSED = 2;
   Future<List<Map>> toList(){
     List<Map> result = [];
     Completer completer = new Completer();
-    this.each((v)=>result.addLast(v)).then((v)=>completer.complete(result));
+    this.each((v)=>result.add(v)).then((v)=>completer.complete(result));
     return completer.future;
   }
   Future close(){
@@ -142,6 +141,6 @@ static const CLOSED = 2;
       cursorId = 0;
       db.queryMessage(msg);
     }
-    return new Future.immediate(null);
+    return new Future.value(null);
   }
 }

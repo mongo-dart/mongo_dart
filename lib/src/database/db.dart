@@ -82,6 +82,8 @@ class Db{
           completer.complete(v);
         });
       }
+    }).catchError( (err) {
+      completer.completeError(err);
     });
     return completer.future;
   }
@@ -138,7 +140,6 @@ class Db{
     return getLastError();
   }
   void close(){
-//    print("closing db");
     connection.close();
   }
 
@@ -215,7 +216,8 @@ class Db{
       throw new ArgumentError('Only one parameter must be set: key or keys');
     }
     if (key != null) {
-      keys = {'$key': 1};
+      keys = new Map();
+      keys['$key'] = 1;
     }
     if (keys == null) {
       throw new ArgumentError('key or keys parameter must be set');
@@ -232,7 +234,8 @@ class Db{
       if (indexInfos.any((info) => info['name'] == name)) {
         completer.complete({'ok': 1.0, 'result': 'index preexists'});
       } else {
-        return createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name);
+        createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name)
+          .then((res)=>completer.complete(res));
       }
     });
     return completer.future;
@@ -243,7 +246,7 @@ class Db{
       writeConcern = _writeConcern;
     }
     if (writeConcern == WriteConcern.ERRORS_IGNORED) {
-      return new Future.immediate({'ok': 1.0});            
+      return new Future.value({'ok': 1.0});            
     }
     else
     {

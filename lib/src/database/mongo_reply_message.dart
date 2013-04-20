@@ -12,7 +12,7 @@ class MongoReplyMessage extends MongoMessage{
     cursorId = buffer.readInt64();
     startingFrom = buffer.readInt32();
     numberReturned = buffer.readInt32();
-    documents = new List.fixedLength(numberReturned);
+    documents = new List(numberReturned);
     for (int n=0;n<numberReturned;n++){
       BsonMap doc = new BsonMap({});
       doc.unpackValue(buffer);
@@ -22,9 +22,9 @@ class MongoReplyMessage extends MongoMessage{
   String toString(){
     if (documents.length == 1)
     {
-      return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags, ${documents[0]})";
+      return "MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags, ${documents[0]})";
     }
-    return "MongoReplpyMessage(ResponceTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags)";
+    return "MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags)";
   }
 
 }

@@ -1,12 +1,13 @@
 name: mongo_dart
-version: 0.0.15-dev
+version: 0.1.12
 authors:
 - Vadim Tsushko <vadimtsushko@gmail.com>
 - Ted Sander <ted@tedsander.com>
 description: MongoDB driver for Dart
 homepage: https://github.com/vadimtsushko/mongo_dart
 dependencies:
-  unittest: any
   args: any
   logging: any
   meta: any
+dev_dependencies:
+  unittest: any
