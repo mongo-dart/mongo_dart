@@ -14,6 +14,8 @@ class GridFSFile {
   GridFSFile([Map data]) {
     if (?data) {
       this.data = data;
+    } else {
+      this.data = {};
     }
   }
 
@@ -76,10 +78,11 @@ class GridFSFile {
     extraData.forEach((String key, Object value) {
       result[key] = value;
     });
+    return result;
   }
 
   set data(Map input) {
-    Map extraData = new Map.from(input);
+    extraData = new Map.from(input);
 
     // Remove the known keys. Leaving the extraData. 
     id = extraData.remove("_id");

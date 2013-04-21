@@ -2,12 +2,7 @@ part of mongo_dart;
 
 class GridOut extends GridFSFile {
 
-  GridOut([Map data]) {
-    // TODO there is a better way
-    if (?data) {
-      this.data = data;
-    }
-  }
+  GridOut([Map data]) : super(data);
 
   Future writeToFilename(String filename) {
     return writeToFile(new File(filename));
