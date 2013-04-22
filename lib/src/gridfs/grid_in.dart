@@ -11,12 +11,13 @@ class GridIn extends GridFSFile {
   String filename;
   MD5 messageDigester;
 
-  GridIn(this.fs, [this.filename = null, Stream<List<int>> inputStream = null]) {    
+  GridIn(this.fs, [String filename = null, Stream<List<int>> inputStream = null]) {
     id = new ObjectId();
     chunkSize = GridFS.DEFAULT_CHUNKSIZE;
     input = inputStream.transform(new ChunkTransformer(chunkSize));
     uploadDate = new DateTime.now();
     messageDigester = new MD5();
+    this.filename = filename;
   }
 
   Future save([int chunkSize = 0]) {

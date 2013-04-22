@@ -77,18 +77,22 @@ tesSomeChunks(){
     db.close();
   });
 }
-Future testInOut(List<int> data, GridFS gridFS) {
+Future testInOut(List<int> data, GridFS gridFS, [Map extraData = null]) {
   var consumer = new MockConsumer();
   var out = new IOSink(consumer);
   return getInitialState(gridFS).then(expectAsync1((List<int> initialState){    
     var inputStream = new Stream.fromIterable([data]);
-    GridIn input = gridFS.createFile(inputStream, "test");  
-    return input.save().then(expectAsync1((c) {      
+    GridIn input = gridFS.createFile(inputStream, "test");
+    if (extraData != null) {
+      input.extraData = extraData;
+    }
+    return input.save().then(expectAsync1((c) {
       return gridFS.findOne(where.eq("_id", input.id)).then(expectAsync1((GridOut gridOut) {
         expect(gridOut,isNotNull, reason: "Did not find file by Id");
         expect(input.id, gridOut.id, reason: "Ids not equal.");
         expect(GridFS.DEFAULT_CHUNKSIZE, gridOut.chunkSize, reason: "Chunk size not the same.");
         expect("test", gridOut.filename, reason: "Filename not equal");
+        expect(input.extraData, gridOut.extraData);
         return gridOut.writeTo(out);
       })).then(expectAsync1((c){
         expect(data, orderedEquals(consumer.data));
@@ -155,6 +159,25 @@ testFileToGridFSToFile() {
   }));
 }
 
+testExtraData() {
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  db.open().then(expectAsync1((c){
+    List<int> data = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
+    GridFS gridFS = new GridFS(db);
+    clearFSCollections(gridFS);
+    Map extraData = {
+      "test" : [1,2,3],
+      "extraData" : "Test",
+      "map" : {
+        "a" : 1
+      }
+    };
+    return testInOut(data, gridFS, extraData);
+  })).then((c){
+    db.close();
+  });
+}
+
 main(){
   initBsonPlatform();
   group('ChunkTransformer tests:', (){    
@@ -166,6 +189,7 @@ main(){
     test('testSmall',testSmall);
     test('tesSomeChunks',tesSomeChunks);    
     test('testBig',testBig);
-    test('testFileToGridFSToFile',testFileToGridFSToFile);   
+    test('testFileToGridFSToFile',testFileToGridFSToFile);
+    test('testExtraData', testExtraData);
   });
 }
