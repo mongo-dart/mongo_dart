@@ -27,7 +27,7 @@ class BsonBinary extends BsonObject{
   static const int CHAR_f = 102;
 
   static final tokens = createTokens();
-  var byteArray;
+  ByteData byteArray;
   List<int> byteList;
   int offset;
   int subType;
@@ -108,10 +108,10 @@ class BsonBinary extends BsonObject{
     List<int> byteListTmp = makeUint8List(8);
     var byteArrayTmp = makeByteArray(byteListTmp);
     if (numOfBytes == 3){
-      byteArrayTmp.setInt32(0,value);
+      byteArrayTmp.setInt32(0,value,Endianness.LITTLE_ENDIAN);
     }
     else if (numOfBytes > 4 && numOfBytes < 8){
-      byteArrayTmp.setInt64(0,value);
+      byteArrayTmp.setInt64(0,value,Endianness.LITTLE_ENDIAN);
     }
     else {
         throw new Exception("Unsupported num of bits: ${numOfBytes*8}");
@@ -137,10 +137,10 @@ class BsonBinary extends BsonObject{
     }
     switch(bits) {
       case 32:
-        byteArray.setInt32(position,value);
+        byteArray.setInt32(position,value,Endianness.LITTLE_ENDIAN);
         break;
       case 16:
-        byteArray.setInt16(position,value);
+        byteArray.setInt16(position,value,Endianness.LITTLE_ENDIAN);
         break;
       case 8:
         byteArray.setInt8(position,value);
@@ -164,11 +164,11 @@ class BsonBinary extends BsonObject{
     offset += 1;
   }
   int writeDouble(double value){
-    byteArray.setFloat64(offset, value);
+    byteArray.setFloat64(offset, value,Endianness.LITTLE_ENDIAN);
     offset+=8;
   }
   int writeInt64(int value){
-    byteArray.setInt64(offset, value);
+    byteArray.setInt64(offset, value,Endianness.LITTLE_ENDIAN);
     offset+=8;
   }
   int readByte(){
@@ -176,15 +176,15 @@ class BsonBinary extends BsonObject{
   }
   int readInt32(){
     offset+=4;
-    return byteArray.getInt32(offset-4);
+    return byteArray.getInt32(offset-4,Endianness.LITTLE_ENDIAN);
   }
   int readInt64(){
     offset+=8;
-    return byteArray.getInt64(offset-8);
+    return byteArray.getInt64(offset-8,Endianness.LITTLE_ENDIAN);
   }
   num readDouble(){
     offset+=8;
-    return byteArray.getFloat64(offset-8);
+    return byteArray.getFloat64(offset-8,Endianness.LITTLE_ENDIAN);
   }
 
   String readCString(){

@@ -3,6 +3,7 @@ import 'dart:utf';
 import 'dart:uri';
 import 'dart:math';
 import 'dart:collection';
+import 'dart:typeddata';
 part 'src/bson/bson_type.dart';
 part 'src/bson/bson_objectid.dart';
 part 'src/bson/timestamp.dart';

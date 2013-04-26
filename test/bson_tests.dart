@@ -108,7 +108,7 @@ testMakeByteList() {
   }
   var b = new BsonBinary.fromHexString('0301');
   b.makeByteList();
-  expect(b.byteArray.getInt16(0), 259);
+  expect(b.byteArray.getInt16(0,Endianness.LITTLE_ENDIAN), 259);
   b = new BsonBinary.fromHexString('0301ad0c1ad34f1d');
   b.makeByteList();
   expect(b.hexString, '0301ad0c1ad34f1d');

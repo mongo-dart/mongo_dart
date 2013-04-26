@@ -5,7 +5,7 @@ import 'dart:typeddata';
 class BsonPlatformVm extends BsonPlatform {
 
   dynamic makeUint8List(int size) => new Uint8List(size);
-  makeByteArray(from) => new ByteData.view(from.buffer);
+  ByteData makeByteArray(from) => new ByteData.view(from.buffer);
 }
 
 initBsonPlatform() {
