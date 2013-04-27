@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.1.14
+
+- Bson library published separately and added as dependency to mongo_dart  
+
+
 ###0.1.13
 
 - Upgrade in Bson for changed implementation of dart:typeddata in Dart SDK version 0.5.0.1_r21823.  

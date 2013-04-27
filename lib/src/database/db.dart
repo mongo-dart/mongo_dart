@@ -68,7 +68,6 @@ class Db{
     
     _writeConcern = writeConcern;
     Completer completer = new Completer();
-    initBsonPlatform();
     if (connection.connected){
       connection.close();
       connection = new Connection(serverConfig);

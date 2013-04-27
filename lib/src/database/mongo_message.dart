@@ -1,4 +1,16 @@
 part of mongo_dart;
+class _Statics{
+  static int _requestId;
+  static int get nextRequestId
+  {
+    if (_requestId == null)
+    {
+      _requestId = 1;
+    }
+    return ++_requestId;
+  }
+}
+
 class MongoMessage{
   static final Reply = 1;
   static final Message = 1000;
@@ -12,7 +24,7 @@ class MongoMessage{
   int _requestId;
   int get requestId{
     if (_requestId == null){
-      _requestId = Statics.nextRequestId;
+      _requestId = _Statics.nextRequestId;
     }
     return _requestId;
   }

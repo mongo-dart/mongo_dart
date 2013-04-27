@@ -652,7 +652,6 @@ testSafeModeUpdate(){
 }
 
 main(){
-  initBsonPlatform();
   group('DbCollection tests:', (){
     test('testSelectorBuilderCreation',testSelectorBuilderCreation);
     test('testSelectorBuilderOnObjectId',testSelectorBuilderOnObjectId);

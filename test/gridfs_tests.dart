@@ -179,7 +179,6 @@ testExtraData() {
 }
 
 main(){
-  initBsonPlatform();
   group('ChunkTransformer tests:', (){    
     test('testChunkTransformer',testChunkTransformerOneChunk);
     test('testChunkTransformerSeveralChunks',testChunkTransformerSeveralChunks);    
