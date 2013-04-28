@@ -67,24 +67,21 @@ class Db{
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
     
     _writeConcern = writeConcern;
-    Completer completer = new Completer();
     if (connection.connected){
       connection.close();
       connection = new Connection(serverConfig);
     }
-    connection.connect().then((v) {
+    
+    return connection.connect().then((v) {
       if (serverConfig.userName == null) {
-        completer.complete(v);
+        return v;
       }
       else {
-        authenticate(serverConfig.userName,serverConfig.password).then((v) {
-          completer.complete(v);
+        return authenticate(serverConfig.userName,serverConfig.password).then((v) {
+          return v;
         });
       }
-    }).catchError( (err) {
-      completer.completeError(err);
-    });
-    return completer.future;
+    });    
   }
   Future executeDbCommand(MongoMessage message){
       Completer<Map> result = new Completer();
@@ -153,15 +150,12 @@ class Db{
   }
 
   Future<bool> authenticate(String userName, String password){
-    Completer completer = new Completer();
-    getNonce().then((msg) {
+    return getNonce().then((msg) {
       var nonce = msg["nonce"];
       var command = DbCommand.createAuthenticationCommand(this,userName,password,nonce);
       serverConfig.password = '***********';
       return executeDbCommand(command);
-    }).
-    then((res)=>completer.complete(res["ok"] == 1));
-    return completer.future;
+    }).then( (res) => res["ok"]==1 );
   }
   Future<List> indexInformation([String collectionName]) {
     var selector = {};
