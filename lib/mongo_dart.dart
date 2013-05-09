@@ -10,10 +10,11 @@ import 'package:bson/bson.dart';
 import 'package:bson/src/json_ext.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
+import 'package:mongo_dart_query/mongo_dart_query.dart';
 
 
 export 'package:bson/bson.dart';
-export 'package:bson/src/json_ext.dart';
+export 'package:mongo_dart_query/mongo_dart_query.dart';
 
 part 'src/database/connection.dart';
 part 'src/database/mongo_message.dart';
@@ -29,9 +30,6 @@ part 'src/database/dbcommand.dart';
 part 'src/database/db.dart';
 part 'src/database/dbcollection.dart';
 part 'src/database/cursor.dart';
-part 'src/helpers/map_proxy.dart';
-part 'src/helpers/selector_builder.dart';
-part 'src/helpers/modifier_builder.dart';
 part 'src/gridfs/gridfs.dart';
 part 'src/gridfs/grid_file.dart';
 part 'src/gridfs/grid_in.dart';

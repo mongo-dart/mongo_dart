@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 main(){
   Db db = new Db("mongodb://127.0.0.1/mongo_dart-test");
-  var id;
+  ObjectId id;
   DbCollection coll;
   db.open().then((c){
     print('connection open');

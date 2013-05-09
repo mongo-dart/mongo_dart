@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.15
+
+- mongo_dart_query published separately and added as dependency to mongo_dart. Unified SelectorBuilder will be used by mongo_dart and objectory.  
+
 ###0.1.14
 
 - Bson library published separately and added as dependency to mongo_dart  
