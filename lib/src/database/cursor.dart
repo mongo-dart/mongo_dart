@@ -28,9 +28,9 @@ static const CLOSED = 2;
       selector = {};
     } else if (selectorBuilderOrMap is SelectorBuilder) {
       selector = selectorBuilderOrMap.map;
-      fields = selectorBuilderOrMap.extParams.fields;
-      limit = selectorBuilderOrMap.extParams.limit;
-      skip = selectorBuilderOrMap.extParams.skip;
+      fields = selectorBuilderOrMap.paramFields;
+      limit = selectorBuilderOrMap.paramLimit;
+      skip = selectorBuilderOrMap.paramSkip;
     } else if (selectorBuilderOrMap is Map) {
       selector = selectorBuilderOrMap;
     } else {
