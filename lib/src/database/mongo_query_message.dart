@@ -44,6 +44,9 @@ static final OPTS_EXHAUST = 64;
     buffer.writeInt(numberToSkip);
     buffer.writeInt(numberToReturn);
     _query.packValue(buffer);
+    if (_fields != null){
+      _fields.packValue(buffer);
+    }
     buffer.offset = 0;
     return buffer;
   }

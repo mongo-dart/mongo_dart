@@ -650,6 +650,26 @@ testSafeModeUpdate(){
     db.close();
   }));
 }
+testFindWithFieldsClause(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  int count = 0;
+  int sum = 0;
+  db.open().then(expectAsync1((c){
+    DbCollection students = db.collection('students');
+    students.remove();
+    students.insertAll(
+    [
+      {"name":"Vadim","score":4},
+       {"name": "Daniil","score":4},
+      {"name": "Nick", "score": 5}
+    ]);
+   return students.findOne(where.eq('name','Vadim').fields(['score']));
+ })).then(expectAsync1((v){
+    expect(v['name'],isNull);
+    expect(v['score'],4);
+    db.close();
+   }));
+}
 
 main(){
   group('DbCollection tests:', (){
@@ -680,6 +700,7 @@ main(){
     test('testInsertWithObjectId',testSaveWithObjectId);    
     test('testSkip',testSkip);
     test('testUpdateWithUpsert', testUpdateWithUpsert);
+    test('testFindWithFieldsClause',testFindWithFieldsClause);
   });
   group('Cursor tests:', (){
     test('testCursorCreation',testCursorCreation);

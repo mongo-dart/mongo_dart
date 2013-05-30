@@ -139,7 +139,7 @@ testFileToGridFSToFile() {
   GridFS.DEFAULT_CHUNKSIZE = 30;  
   GridIn input;
   var path = new Path(new Options().script).directoryPath;
-  var inputStream = new File('$path/gridfs_testdata_in.txt').openRead();
+  var inputStream = new File('gridfs_testdata_in.txt').openRead();
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then(expectAsync1((c){
     var gridFS = new GridFS(db);
@@ -150,10 +150,10 @@ testFileToGridFSToFile() {
     var gridFS = new GridFS(db);
     return gridFS.getFile('test');
   })).then(expectAsync1((GridOut gridOut) {   
-    return gridOut.writeToFilename('$path/gridfs_testdata_out.txt');
+    return gridOut.writeToFilename('gridfs_testdata_out.txt');
   })).then(expectAsync1((c){
-    List<int> dataIn = new File('$path/gridfs_testdata_in.txt').readAsBytesSync();
-    List<int> dataOut = new File('$path/gridfs_testdata_out.txt').readAsBytesSync();      
+    List<int> dataIn = new File('gridfs_testdata_in.txt').readAsBytesSync();
+    List<int> dataOut = new File('gridfs_testdata_out.txt').readAsBytesSync();      
     expect(dataOut, orderedEquals(dataIn));
     db.close();
   }));

@@ -16,8 +16,11 @@ main(){
   }).then((val){   
     return coll.findOne(where.eq("my_field", 17));
   }).then((val){
-      print("Filtered by my_field=17 $val");
-      id = val["_id"];
+    print("Filtered by my_field=17 $val");
+    id = val["_id"];
+    return coll.findOne(where.eq("my_field", 17).fields(['str_field']));
+  }).then((val){
+      print("findOne with fields clause 'str_field' $val");
       return coll.findOne(where.id(id));
   }).then((val){
       print("Filtered by _id=$id: $val");
