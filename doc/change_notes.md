@@ -2,6 +2,10 @@
 
 ###0.1.17
 
+- Query API supports logical AND and OR operators.
+
+###0.1.17
+
 - Bugfix to [fields() issue ](https://github.com/vadimtsushko/mongo_dart/issues/26). Fields clause in find(), findOne() methods did not work.
 Relevant test and sample (in example/query.dart) added
 
