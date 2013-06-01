@@ -7,17 +7,6 @@ import 'dart:async';
 import 'package:unittest/unittest.dart';
 
 const DefaultUri = 'mongodb://127.0.0.1/';
-testSelectorBuilderCreation(){
-  SelectorBuilder selector = where;
-  expect(selector.map is Map, isTrue);
-  expect(selector.map,isEmpty);
-}
-testSelectorBuilderOnObjectId(){
-  ObjectId id = new ObjectId();
-  SelectorBuilder selector = where.id(id);
-  expect(selector.map is Map, isTrue);
-  expect(selector.map.length,greaterThan(0));  
-}
 
 testCollectionInfoCursor(){
   Db db = new Db('mongodb://127.0.0.1/mongo_dart-test');
@@ -619,7 +608,6 @@ testEnsureIndexWithIndexCreation(){
     collection = db.collection('testcol');
     return collection.drop();
   })).then(expectAsync1((res){
-    print(res);
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
     }   
@@ -671,10 +659,64 @@ testFindWithFieldsClause(){
    }));
 }
 
+testSimpleQuery(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  int count = 0;
+  int sum = 0;
+  ObjectId id;
+  DbCollection coll;
+  db.open().then(expectAsync1((c){
+    coll = db.collection("simple_data");
+    coll.remove();
+    for (var n = 0; n<10; n++){
+      coll.insert({"my_field":n,"str_field":"str_$n"});
+    }
+    return coll.find(where.gt("my_field", 5).sortBy('my_field')).toList();
+  })).then(expectAsync1((result){
+    expect(result.length,4);
+    expect(result[0]['my_field'],6);
+    return coll.findOne(where.eq('my_field', 3));
+  })).then(expectAsync1((v){
+    expect(v,isNotNull);
+    expect(v['my_field'], 3);
+    id = v['_id'];
+    return coll.findOne(where.id(id));
+  })).then(expectAsync1((v){
+    expect(v,isNotNull);
+    expect(v['my_field'], 3);
+    coll.remove(where.id(id));
+    return coll.findOne(where.eq('my_field', 3));
+  })).then(expectAsync1((v){
+    expect(v,isNull);
+    db.close();
+   }));
+}
+
+testCompoundQuery(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  int count = 0;
+  int sum = 0;
+  ObjectId id;
+  DbCollection coll;
+  db.open().then(expectAsync1((c){
+    coll = db.collection("simple_data");
+    coll.remove();
+    for (var n = 0; n<10; n++){
+      coll.insert({"my_field":n,"str_field":"str_$n"});
+    }
+    return coll.find(where.gt("my_field", 8).or(where.lt('my_field', 2))).toList();
+  })).then(expectAsync1((result){
+    expect(result.length,3);
+    return coll.findOne(where.gt("my_field", 8).or(where.lt('my_field', 2)).and(where.eq('str_field','str_1')));
+  })).then(expectAsync1((v){
+    expect(v,isNotNull);
+    expect(v['my_field'], 1);
+    db.close();
+   }));
+}
+
 main(){
   group('DbCollection tests:', (){
-    test('testSelectorBuilderCreation',testSelectorBuilderCreation);
-    test('testSelectorBuilderOnObjectId',testSelectorBuilderOnObjectId);
     test('testAuthComponents',testAuthComponents);
     test('testMongoDbUri',testMongoDbUri);
   });
@@ -691,6 +733,8 @@ main(){
     test('testLimitWithSortByAndSkip',testLimitWithSortByAndSkip);
     test('testLimitWithSkip',testLimit);    
     test('testFindEachWithThenClause',testFindEachWithThenClause);
+    test('testSimpleQuery',testSimpleQuery);
+    test('testCompoundQuery',testCompoundQuery);
     test('testCount',testCount);
     test('testFindEach',testFindEach);
     test('testEach',testEachOnEmptyCollection);

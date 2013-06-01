@@ -35,7 +35,7 @@ class DbCollection{
     }
 
     MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
-        _selectorBuiltder2Map(selector), document, flags);
+        _selectorBuilder2Map(selector), document, flags);
     db.executeMessage(message);
     return db._getAcknowledgement(writeConcern: writeConcern);
   }
@@ -60,22 +60,22 @@ class DbCollection{
     return result;
   }
   Future drop() => db.dropCollection(collectionName);
-  Future remove([selector, WriteConcern writeConcern]) => db.removeFromCollection(collectionName, _selectorBuiltder2Map(selector), writeConcern);
+  Future remove([selector, WriteConcern writeConcern]) => db.removeFromCollection(collectionName, _selectorBuilder2Map(selector), writeConcern);
   Future<int> count([selector]){
     Completer completer = new Completer();
-    db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuiltder2Map(selector))).then((reply){
+    db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuilder2Map(selector))).then((reply){
       completer.complete(reply["n"].toInt());
     });
     return completer.future;
   }
   Future insert(Map document, {WriteConcern writeConcern}) => insertAll([document], writeConcern: writeConcern);
 
-  Map _selectorBuiltder2Map(selector) {
+  Map _selectorBuilder2Map(selector) {
     if (selector == null) {
       return {};
     }
     if (selector is SelectorBuilder) {
-      return selector.map;
+      return selector.map['\$query'];
     }
     return selector;
   }

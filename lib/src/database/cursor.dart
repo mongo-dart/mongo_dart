@@ -37,9 +37,9 @@ static const CLOSED = 2;
       throw new ArgumentError('Expected SelectorBuilder or Map, got $selectorBuilderOrMap');
     }
 
-    if (!selector.isEmpty && !selector.containsKey("query")){
-        selector = {"query": selector};
-    }
+//    if (!selector.isEmpty && !selector.containsKey(r"$query")){
+//        selector = {r"$query": selector};
+//    }
     items = new Queue();
   }
   MongoQueryMessage generateQueryMessage(){

@@ -29,6 +29,14 @@ main(){
       return coll.findOne(where.id(id));
   }).then((val){
       print("Filtered by _id=$id: $val. There more no such a doc");
+      return coll.find(where.gt("my_field", 995).or(where.lt("my_field", 10)).and(where.match('str_field', '99'))).each((v)=>print(v));
+
+  }).then((val){
+    print("Filtered by (my_field gt 995 or my_field lt 10) and str_field like '99' ");
+    return coll.find(
+      where.inRange("my_field", 700, 703, minInclude: false).sortBy('my_field')
+        ).each((v)=>print(v));
+      
       return coll.find(where.gt("my_field", 995)).each((v)=>print(v));
   }).then((val){
     print("Filtered by my_field gt 700, lte 703");
