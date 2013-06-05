@@ -7,10 +7,14 @@ description: MongoDB driver for Dart
 homepage: https://github.com/vadimtsushko/mongo_dart
 dependencies:
   args: any
-  bson: any
+  bson:
+    git: https://github.com/SonarDesignInc/bson
   crypto: any
   logging: any
   meta: any
-  mongo_dart_query: any
+  mongo_dart_query:
+    git:
+      ref: sonar
+      url: https://github.com/SonarDesignInc/mongo_dart_query
 dev_dependencies:
   unittest: any
