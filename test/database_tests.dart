@@ -1,8 +1,7 @@
 library database_tests;
 import 'package:mongo_dart/mongo_dart.dart';
-import 'dart:uri';
 import 'dart:io';
-import 'dart:crypto';
+import 'package:crypto/crypto.dart';
 import 'dart:async';
 import 'package:unittest/unittest.dart';
 

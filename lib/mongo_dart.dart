@@ -1,10 +1,9 @@
 library mongo_dart;
 import 'dart:isolate';
 import 'dart:io';
-import 'dart:crypto';
 import 'dart:async';
 import 'dart:math';
-import 'dart:uri';
+import 'package:crypto/crypto.dart';
 import 'dart:collection';
 import 'package:bson/bson.dart';
 import 'package:bson/src/json_ext.dart';
