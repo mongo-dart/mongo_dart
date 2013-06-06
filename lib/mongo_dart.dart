@@ -6,7 +6,6 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'dart:collection';
 import 'package:bson/bson.dart';
-import 'package:bson/src/json_ext.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
