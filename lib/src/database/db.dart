@@ -37,7 +37,7 @@ class Db{
       throw 'Invalid scheme in uri: $uriString ${uri.scheme}';
     }
     serverConfig = new ServerConfig();
-    serverConfig.host = uri.domain;
+    serverConfig.host = uri.host;
     serverConfig.port = uri.port;
     if (serverConfig.port == null || serverConfig.port == 0){
       serverConfig.port = 27017;
