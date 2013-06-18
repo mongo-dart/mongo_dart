@@ -68,6 +68,15 @@ class DbCollection{
     });
     return completer.future;
   }
+  
+  Future distinct(String field, [selector]){
+    Completer completer = new Completer();
+    db.executeDbCommand(DbCommand.createDistinctCommand(db,collectionName,field,_selectorBuilder2Map(selector))).then((reply){
+      completer.complete(reply);
+    });
+    return completer.future;
+  }
+  
   Future insert(Map document, {WriteConcern writeConcern}) => insertAll([document], writeConcern: writeConcern);
 
   Map _selectorBuilder2Map(selector) {

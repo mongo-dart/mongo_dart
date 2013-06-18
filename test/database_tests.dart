@@ -235,6 +235,28 @@ testCount(){
     db.close();
   }));
 }
+
+testDistinct() {
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  db.open().then(expectAsync1((c){
+    DbCollection coll = db.collection('testDistinct');
+    coll.remove();
+    coll.insert({"foo":1});
+    coll.insert({"foo":2});
+    coll.insert({"foo":2});
+    coll.insert({"foo":3});
+    coll.insert({"foo":3});
+    coll.insert({"foo":3});        
+    return coll.distinct("foo");
+  })).then(expectAsync1((v){
+    List values = v['values'];
+    expect(values[0],1);
+    expect(values[1],2);
+    expect(values[2],3);
+    db.close();
+  }));
+}
+
 testSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then(expectAsync1((c){
@@ -318,12 +340,12 @@ testLimit(){
   }));
 }
 
-
 testCursorCreation(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection collection = db.collection('student');
   Cursor cursor = new Cursor(db, collection, null);
 }
+
 testPingRaw(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then(expectAsync1((c){
@@ -735,6 +757,7 @@ main(){
     test('testSimpleQuery',testSimpleQuery);
     test('testCompoundQuery',testCompoundQuery);
     test('testCount',testCount);
+    test('testDistinct',testDistinct);    
     test('testFindEach',testFindEach);
     test('testEach',testEachOnEmptyCollection);
     test('testDrop',testDrop);
