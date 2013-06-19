@@ -56,4 +56,9 @@ class DbCommand extends MongoQueryMessage{
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, 
       {'distinct': collectionName, 'key': field, 'query': selector }, null);
   }
+  
+  static DbCommand createAggregateCommand(Db db, String collectionName, List pipeline) {
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, 
+      {'aggregate': collectionName, 'pipeline': pipeline }, null);
+  }
 }
