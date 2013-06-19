@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.1.21
+
+- [Paul Evans] (https://github.com/PaulECoyote) added distinct operation 
+
+
 ###0.1.20
 
 - Upgrade for Dart SDK version 0.5.13.1_r23552
