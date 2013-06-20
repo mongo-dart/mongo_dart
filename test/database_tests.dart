@@ -280,7 +280,6 @@ testAggregate() {
     coll.insert({"game":"Ticket To Ride", "player": "Anthony", "rating": 2, "v": 1});
     
     // Avg 4.5 with 4 ratings (counting only highest v)
-    //coll.insert({"game":"Dominion", "player": "Paul", "rating": 4, "v": 1});
     coll.insert({"game":"Dominion", "player": "Paul", "rating": 5, "v": 2});    
     coll.insert({"game":"Dominion", "player": "Erin", "rating": 4, "v": 1});
     coll.insert({"game":"Dominion", "player": "Dallas", "rating": 4, "v": 1});
@@ -328,11 +327,7 @@ db.runCommand(
     expect(result[0]["_id"], "Age of Steam");
     expect(result[0]["avgRating"], 3);
     db.close();
-  }))  
-  .catchError((err) {
-    //TODO: No error :(
-    print(err);
-  });
+  }));
 }
 
 testSkip(){
