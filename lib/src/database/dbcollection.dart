@@ -77,6 +77,17 @@ class DbCollection{
     return completer.future;
   }
   
+  Future aggregate(List pipeline){
+    Completer completer = new Completer();
+    var cmd = DbCommand.createAggregateCommand(db,collectionName,pipeline);
+    db.executeDbCommand(cmd)
+      .then((reply){
+      completer.complete(reply);
+    });
+    
+    return completer.future;
+  }
+  
   Future insert(Map document, {WriteConcern writeConcern}) => insertAll([document], writeConcern: writeConcern);
 
   Map _selectorBuilder2Map(selector) {
