@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.22
+
+- [Paul Evans] (https://github.com/PaulECoyote) added raw aggregate operation 
+
 ###0.1.21
 
 - [Paul Evans] (https://github.com/PaulECoyote) added distinct operation 
