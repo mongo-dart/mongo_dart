@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.23
+
+- Updgrate for Dart SDK version 0.6.3.3_r24898 (? operator removed)
+
 ###0.1.22
 
 - [Paul Evans] (https://github.com/PaulECoyote) added raw aggregate operation 

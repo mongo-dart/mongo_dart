@@ -20,8 +20,8 @@ class GridIn extends GridFSFile {
     this.filename = filename;
   }
 
-  Future save([int chunkSize = 0]) {
-    if (!?chunkSize) {
+  Future save([int chunkSize]) {
+    if (chunkSize == null) {
       chunkSize = this.chunkSize;
     }
 
@@ -45,7 +45,7 @@ class GridIn extends GridFSFile {
         completer.complete({});
       });
     }
-    if (!?chunkSize) {
+    if (chunkSize == null) {
       chunkSize = this.chunkSize;
     }
     if (savedChunks) {

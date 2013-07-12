@@ -11,12 +11,8 @@ class GridFSFile {
   Map<String, Object> extraData;
   String md5;
 
-  GridFSFile([Map data]) {
-    if (?data) {
+  GridFSFile([Map data = const {}]) {
       this.data = data;
-    } else {
-      this.data = {};
-    }
   }
 
   Future<Map> save() {
