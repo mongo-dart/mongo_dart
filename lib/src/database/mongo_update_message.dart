@@ -8,11 +8,14 @@ class MongoUpdateMessage extends MongoMessage{
   BsonMap _document;
   MongoUpdateMessage(String collectionFullName,
             Map selector,
-            Map document,
+            document,
             this.flags
             ){
     _collectionFullName = new BsonCString(collectionFullName);
     _selector = new BsonMap(selector);
+    if (document is ModifierBuilder) {
+      document = document.map;
+    }
     _document = new BsonMap(document);
     opcode = MongoMessage.Update;
   }

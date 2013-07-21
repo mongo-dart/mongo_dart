@@ -809,6 +809,35 @@ testCompoundQuery(){
    }));
 }
 
+testFieldLevelUpdateSimple() {
+  ObjectId id;
+  Db db = new Db('${DefaultUri}update');
+  DbCollection collection = db.collection('testupdate');
+  db.open().then(expectAsync1((c) {
+    return collection.drop().then(expectAsync1((_) {
+      return collection.insert({
+        'name': 'a', 'value': 10});
+    })).then(expectAsync1((result) {
+      expect(result['n'], 0);
+      return collection.findOne({'name': 'a'});
+    })).then(expectAsync1((result) {
+      expect(result, isNotNull);
+      id = result['_id'];
+      var objectUpdate = {r'$set': {'value': 20}};
+      return collection.update(where.id(id), modify.set('name', 'BBB'));
+    })).then(expectAsync1((result) {
+      expect(result['updatedExisting'], true);
+      expect(result['n'], 1);
+      return collection.findOne(where.id(id));
+    })).then(expectAsync1((result) {
+      expect(result, isNotNull);
+      expect(result['name'], 'BBB');
+      db.close();
+    }));
+  }));
+}
+
+
 main(){
   group('DbCollection tests:', (){
     test('testAuthComponents',testAuthComponents);
@@ -864,4 +893,10 @@ main(){
     test('testIndexCreation',testIndexCreation);
     test('testEnsureIndexWithIndexCreation',testEnsureIndexWithIndexCreation);
   });
+
+  group('Field level update tests:', () {
+    test('testFieldLevelUpdateSimple',testFieldLevelUpdateSimple);
+  });
+
+  
 }

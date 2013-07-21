@@ -36,8 +36,6 @@ main(){
     return coll.find(
       where.inRange("my_field", 700, 703, minInclude: false).sortBy('my_field')
         ).each((v)=>print(v));
-      
-      return coll.find(where.gt("my_field", 995)).each((v)=>print(v));
   }).then((val){
     print("Filtered by my_field gt 700, lte 703");
     return coll.find(

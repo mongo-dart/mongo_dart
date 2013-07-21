@@ -2,6 +2,10 @@
 
 ###0.1.23
 
+- Added support for modifier builder for field level updates. See example/update.dart and testFieldLevelUpdateSimple
+
+###0.1.23
+
 - Updgrate for Dart SDK version 0.6.3.3_r24898 (? operator removed)
 
 ###0.1.22
