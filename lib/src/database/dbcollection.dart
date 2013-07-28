@@ -54,7 +54,7 @@ class DbCollection{
   }
 
   Future<Map> findOne([selector]){
-    Cursor cursor = find(selector);
+    Cursor cursor = new Cursor(db, this, selector);
     Future<Map> result = cursor.nextObject();
     cursor.close();
     return result;

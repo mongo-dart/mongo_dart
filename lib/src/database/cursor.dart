@@ -1,11 +1,10 @@
 part of mongo_dart;
-typedef MonadicBlock(var value);
+typedef void MonadicBlock(Map value);
 class Cursor{
 
 static const INIT = 0;
 static const OPEN = 1;
 static const CLOSED = 2;
-
 
   int state = INIT;
   int cursorId = 0;
@@ -23,6 +22,8 @@ static const CLOSED = 2;
   var eachComplete;
   bool explain;
   int flags = 0;
+  var controller = new StreamController<Map>();
+
   Cursor(this.db, this.collection, selectorBuilderOrMap){
     if (selectorBuilderOrMap == null){
       selector = {};
@@ -120,8 +121,11 @@ static const CLOSED = 2;
       }
     });
   }
-
-  Future<bool> each(MonadicBlock callback){
+  @deprecated
+  Future<bool> each(MonadicBlock callback) => forEach(callback);
+  
+  
+  Future<bool> forEach(MonadicBlock callback){
     eachCallback = callback;
     eachComplete = new Completer();
     _nextEach();
@@ -130,7 +134,7 @@ static const CLOSED = 2;
   Future<List<Map>> toList(){
     List<Map> result = [];
     Completer completer = new Completer();
-    this.each((v)=>result.add(v)).then((v)=>completer.complete(result));
+    this.forEach((v)=>result.add(v)).then((v)=>completer.complete(result));
     return completer.future;
   }
   Future close(){
@@ -142,5 +146,9 @@ static const CLOSED = 2;
       db.queryMessage(msg);
     }
     return new Future.value(null);
+  }
+  Stream<Map> get stream {
+    forEach(controller.add).then((_) => controller.close());
+    return controller.stream; 
   }
 }

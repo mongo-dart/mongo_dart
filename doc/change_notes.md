@@ -1,6 +1,11 @@
 #Recent change notes
 
-###0.1.23
+###0.1.25
+
+- each() method is deprecated in favor of foEach(), so Cursor have more stream-like interface. 
+- stream getter added to Cursor. In future find() will return Stream of Map  
+
+###0.1.24
 
 - Added support for modifier builder for field level updates. See example/update.dart and testFieldLevelUpdateSimple
 

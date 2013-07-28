@@ -63,7 +63,7 @@ testPwd(){
   DbCollection coll;
   db.open().then(expectAsync1((c){
     coll = db.collection("system.users");
-    return coll.find().each((user)=>print(user));
+    return coll.find().forEach((user)=>print(user));
   })).then(expectAsync1((v){
       db.close();
   }));
@@ -79,7 +79,7 @@ testEachOnEmptyCollection(){
   int sum = 0;
   db.open().then(expectAsync1((c){
     DbCollection newColl = db.collection('newColl1');
-    return newColl.find().each((v)
+    return newColl.find().forEach((v)
       {sum += v["a"]; count++;});
   })).then(expectAsync1((v) {
     expect(sum, 0);
@@ -103,7 +103,7 @@ testFindEachWithThenClause(){
       {"name": "Nick", "score": 5}
       ]
     );
-    return students.find().each((v)
+    return students.find().forEach((v)
       {sum += v["score"]; count++;});
    })).then(expectAsync1((v){
     expect(sum,13);
@@ -124,7 +124,7 @@ testFindEach(){
        {"name": "Daniil","score":4},
       {"name": "Nick", "score": 5}
     ]);
-   return students.find().each((v1){
+   return students.find().forEach((v1){
     count++;
     sum += v1["score"];});
   })).then(expectAsync1((v){
@@ -133,6 +133,30 @@ testFindEach(){
     db.close();
    }));
 }
+
+testFindStream(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  int count = 0;
+  int sum = 0;
+  db.open().then(expectAsync1((c){
+    DbCollection students = db.collection('students');
+    students.remove();
+    students.insertAll(
+    [
+      {"name":"Vadim","score":4},
+       {"name": "Daniil","score":4},
+      {"name": "Nick", "score": 5}
+    ]);
+   return students.find().stream.forEach((v1){
+    count++;
+    sum += v1["score"];});
+  })).then(expectAsync1((v){
+    expect(count,3);
+    expect(sum,13);
+    db.close();
+   }));
+}
+
 testDrop(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then(expectAsync1((_){
@@ -384,7 +408,7 @@ testLimitWithSortByAndSkip(){
       coll.insert({"a":n});
     }
     cursor = coll.find(where.sortBy('a').skip(300).limit(10));
-    return cursor.each((e)=>counter++);
+    return cursor.forEach((e)=>counter++);
   })).then(expectAsync1((v){
     expect(counter,10);
     expect(cursor.state,Cursor.CLOSED);
@@ -404,7 +428,7 @@ testLimit(){
       coll.insert({"a":n});
     }
     cursor = coll.find(where.limit(10));
-    return cursor.each((e)=>counter++);
+    return cursor.forEach((e)=>counter++);
   })).then(expectAsync1((v){
     expect(counter,10);
     expect(cursor.state,Cursor.CLOSED);
@@ -502,7 +526,7 @@ testCursorGetMore(){
     return db.getLastError();
   })).then(expectAsync1((_){
     cursor = new Cursor(db,collection,where.limit(10));
-    return cursor.each((v){
+    return cursor.forEach((v){
      count++;
     });
   })).then(expectAsync1((dummy){
@@ -515,7 +539,7 @@ testCursorGetMore(){
     return db.getLastError();
   })).then(expectAsync1((_){
     cursor = new Cursor(db,collection,null);
-    return cursor.each((v)=>count++);
+    return cursor.forEach((v)=>count++);
   })).then(expectAsync1((v){
     expect(count,1000);
     expect(cursor.cursorId,0);
@@ -879,6 +903,7 @@ main(){
     test('testNextObject',testNextObject);
     test('testCursorWithOpenServerCursor',testCursorWithOpenServerCursor);
     test('testCursorGetMore',testCursorGetMore);
+    test('testFindStream',testFindStream);
   });  
   group('DBCommand tests:', (){
     test('testDbCommandCreation',testDbCommandCreation);

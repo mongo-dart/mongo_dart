@@ -24,7 +24,7 @@ main(){
   }).then((val){
       print("Filtered by _id=$id: $val. There more no such a doc");
       print("Filtered by {'str_field': {'\$regex': new BsonRegexp('^str_(5|7|8)17\$')}");
-      return coll.find({'str_field': {'\$regex': new BsonRegexp('^str_(5|7|8)17\$')}}).each((v)=>print(v));
+      return coll.find({'str_field': {'\$regex': new BsonRegexp('^str_(5|7|8)17\$')}}).forEach((v)=>print(v));
   }).then((dummy){
       db.close();
   });

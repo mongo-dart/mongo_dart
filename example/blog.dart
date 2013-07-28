@@ -17,12 +17,12 @@ main(){
       [{'name':'William Shakespeare', 'email':'william@shakespeare.com', 'age':587},
       {'name':'Jorge Luis Borges', 'email':'jorge@borges.com', 'age':123}]
     );
-    return collection.find().each((v){authors[v["name"]] = v;});
+    return collection.find().forEach((v){authors[v["name"]] = v;});
   }).then((v){
     print("===================================================================================");
     print(">> Authors ordered by age ascending");
     db.ensureIndex('authors', key: 'age');
-    return collection.find(where.sortBy('age')).each(
+    return collection.find(where.sortBy('age')).forEach(
       (auth)=>print("[${auth['name']}]:[${auth['email']}]:[${auth['age']}]"));
   }).then((v){
     print("===================================================================================");
@@ -31,11 +31,11 @@ main(){
     usersCollection.insertAll([{'login':'jdoe', 'name':'John Doe', 'email':'john@doe.com'},
        {'login':'lsmith', 'name':'Lucy Smith', 'email':'lucy@smith.com'}]);
     db.ensureIndex('users', keys: {'login': -1});
-    return usersCollection.find().each((user)=>users[user["login"]] = user);
+    return usersCollection.find().forEach((user)=>users[user["login"]] = user);
   }).then((v){
     print("===================================================================================");
     print(">> Users ordered by login descending");
-    return usersCollection.find(where.sortBy('login', descending: true)).each(
+    return usersCollection.find(where.sortBy('login', descending: true)).forEach(
       (user)=>print("[${user['login']}]:[${user['name']}]:[${user['email']}]"));
   }).then((v){
     print("===================================================================================");
@@ -53,11 +53,11 @@ main(){
                                 ]);
     print("===================================================================================");
     print(">> Articles ordered by title ascending");
-    return articlesCollection.find(where.sortBy('title')).each((article){
+    return articlesCollection.find(where.sortBy('title')).forEach((article){
       print("[${article['title']}]:[${article['body']}]:[author_id: ${article['author_id']}]");
     });
   }).then((v){
-    return db.collectionsInfoCursor().each((col) => col);
+    return db.collectionsInfoCursor().forEach((col) => col);
   }).then((dummy){
     db.close();
   });
