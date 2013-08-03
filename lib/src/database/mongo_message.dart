@@ -31,22 +31,23 @@ class MongoMessage{
   int responseTo;
   int opcode = MongoMessage.Reply;
   int get messageLength{
-    throw "Must be implemented";
+    throw new MongoDartError('Must be implemented');
   }
   BsonBinary serialize(){
-    throw "Must be implemented";
+    throw new MongoDartError('Must be implemented');
   }
   MongoMessage deserialize(BsonBinary buffer){
-    throw "Must be implemented";
+    throw new MongoDartError('Must be implemented');
   }
   readMessageHeaderFrom(BsonBinary buffer)
   {
       _messageLength = buffer.readInt32();
       _requestId = buffer.readInt32();
       responseTo = buffer.readInt32();
-      if (buffer.readInt32() != opcode)
+      int opcodeFromWire = buffer.readInt32();
+      if (opcodeFromWire != opcode)
       {
-          throw "Message header opcode is not the expected one.";
+          throw new MongoDartError('Expected $opcode in Message header. Got $opcodeFromWire');
       }
   }
 
@@ -57,11 +58,11 @@ class MongoMessage{
       buffer.writeInt(0); // responseTo not used in requests sent by client
       buffer.writeInt(opcode);
       if (messageLength < 0){
-        throw "Error in message length";
+        throw new MongoDartError('Error in message length');
       }
   }
   String toString(){
-    throw "must be implemented";
+    throw new MongoDartError('must be implemented');
   }
 
 }

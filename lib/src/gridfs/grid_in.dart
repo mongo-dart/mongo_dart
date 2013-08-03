@@ -49,10 +49,10 @@ class GridIn extends GridFSFile {
       chunkSize = this.chunkSize;
     }
     if (savedChunks) {
-      throw "chunks already saved!";
+      throw new MongoDartError('chunks already saved!');
     }
     if (chunkSize <= 0 || chunkSize > GridFS.MAX_CHUNKSIZE) {
-      throw "chunkSize must be greater than zero and less than or equal to GridFS.MAX_CHUNKSIZE";
+      throw new MongoDartError('chunkSize must be greater than zero and less than or equal to GridFS.MAX_CHUNKSIZE');
     }    
     input.listen((data) {
         futures.add(dumpBuffer(data));

@@ -9,12 +9,14 @@ import 'package:bson/bson.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
-
+import 'src/network/buffered_socket.dart';
+import 'src/network/buffer.dart';
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_dart_query.dart';
 
-part 'src/database/connection.dart';
+part 'src/network/connection.dart';
+part 'src/network/message_header.dart';
 part 'src/database/mongo_message.dart';
 part 'src/database/mongo_query_message.dart';
 part 'src/database/mongo_reply_message.dart';
@@ -33,10 +35,3 @@ part 'src/gridfs/grid_file.dart';
 part 'src/gridfs/grid_in.dart';
 part 'src/gridfs/grid_out.dart';
 part 'src/gridfs/chunk_transformer.dart';
-
-final Logger _log = Logger.root;
-
-_configureConsoleLogger([Level level = Level.INFO]) {
-  _log.level = level;
-  _log.onRecord.listen((LogRecord rec) => print('${rec.time} [${rec.level}] ${rec.message}'));
-}

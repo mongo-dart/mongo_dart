@@ -5,7 +5,7 @@ class Cursor{
 static const INIT = 0;
 static const OPEN = 1;
 static const CLOSED = 2;
-
+  final _log= new Logger('Cursor');
   int state = INIT;
   int cursorId = 0;
   Db db;
@@ -72,7 +72,7 @@ static const CLOSED = 2;
         items.addAll(replyMessage.documents);
         if (items.length > 0){
           Map nextDoc = _getNextItem();
-          _log.finer("Cursor _getNextItem $nextDoc");
+          ////_log.finer("Cursor _getNextItem $nextDoc");
           nextItem.complete(nextDoc);
         }
         else{
@@ -138,7 +138,7 @@ static const CLOSED = 2;
     return completer.future;
   }
   Future close(){
-    _log.finer("Closing cursor, cursorId = $cursorId");
+    ////_log.finer("Closing cursor, cursorId = $cursorId");
     state = CLOSED;
     if (cursorId != 0){
       MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);

@@ -4,11 +4,12 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'dart:async';
 import 'package:unittest/unittest.dart';
+import 'package:logging/logging.dart';
 
 const DefaultUri = 'mongodb://127.0.0.1/';
 
 testCollectionInfoCursor(){
-  Db db = new Db('mongodb://127.0.0.1/mongo_dart-test');
+  Db db = new Db('mongodb://127.0.0.1/mongo_dart-test','testCollectionInfoCursor');
   DbCollection newColl;
   db.open().then(expectAsync1((c){
     newColl = db.collection("new_collecion");
@@ -74,7 +75,7 @@ testCollectionCreation(){
   DbCollection collection = db.collection('student');
 }
 testEachOnEmptyCollection(){
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test','testEachOnEmptyCollection');
   int count = 0;
   int sum = 0;
   db.open().then(expectAsync1((c){
@@ -196,7 +197,7 @@ testSaveWithIntegerId(){
   }));
 }
 testSaveWithObjectId(){
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test','testSaveWithObjectId');
   DbCollection coll;
   var id;
   db.open().then(expectAsync1((c){
@@ -261,7 +262,7 @@ testCount(){
 }
 
 testDistinct() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test','testDistinct');
   db.open().then(expectAsync1((c){
     DbCollection coll = db.collection('testDistinct');
     coll.remove();
@@ -355,8 +356,8 @@ db.runCommand(
 }
 
 testSkip(){
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  db.open().then(expectAsync1((c){
+  Db db = new Db('${DefaultUri}mongo_dart-test','testSkip');
+  db.open(writeConcern: WriteConcern.ERRORS_IGNORED).then(expectAsync1((c){
     DbCollection coll = db.collection('testSkip');
     coll.remove();
     for(int n=0;n<600;n++){
@@ -398,10 +399,10 @@ testUpdateWithUpsert() {
 }
 
 testLimitWithSortByAndSkip(){
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test','testLimitWithSortByAndSkip');
   int counter = 0;
   Cursor cursor;
-  db.open().then(expectAsync1((c){
+  db.open(writeConcern: WriteConcern.ERRORS_IGNORED).then(expectAsync1((c){
     DbCollection coll = db.collection('testLimit');
     coll.remove();
     for(int n=0;n<600;n++){
@@ -418,10 +419,10 @@ testLimitWithSortByAndSkip(){
 }
 
 testLimit(){
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test','testLimit');
   int counter = 0;
   Cursor cursor;
-  db.open().then(expectAsync1((c){
+  db.open(writeConcern: WriteConcern.ERRORS_IGNORED).then(expectAsync1((c){
     DbCollection coll = db.collection('testLimit');
     coll.remove();
     for(int n=0;n<600;n++){
@@ -550,10 +551,10 @@ testCursorGetMore(){
 }
 testCursorClosing(){
   var res;
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test','testCursorClosing');
   DbCollection collection;
   Cursor cursor;
-  db.open().then(expectAsync1((c){
+  db.open(writeConcern: WriteConcern.ERRORS_IGNORED).then(expectAsync1((c){
     collection = db.collection('new_big_collection1');
     collection.remove();
     for (int n=0;n < 1000; n++){
@@ -633,7 +634,7 @@ testAuthComponents(){
 }
 
 testAuthentication(){
-  var db = new Db('mongodb://ds031477.mongolab.com:31477/dart');
+  var db = new Db('mongodb://ds031477.mongolab.com:31477/dart','testAuthentication');
   db.open().then(expectAsync1((c){
     return db.authenticate('dart','test');
   })).then(expectAsync1((v){
@@ -757,7 +758,7 @@ testSafeModeUpdate(){
   }));
 }
 testFindWithFieldsClause(){
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test','testFindWithFieldsClause');
   int count = 0;
   int sum = 0;
   db.open().then(expectAsync1((c){
@@ -811,7 +812,7 @@ testSimpleQuery(){
 }
 
 testCompoundQuery(){
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+  Db db = new Db('${DefaultUri}mongo_dart-test','testCompoundQuery');
   int count = 0;
   int sum = 0;
   ObjectId id;
@@ -863,6 +864,22 @@ testFieldLevelUpdateSimple() {
 
 
 main(){
+  hierarchicalLoggingEnabled = true;
+  Logger.root.level = Level.OFF;
+  new Logger('Db').level = Level.ALL;
+  var listener = (LogRecord r) {
+    var name = r.loggerName;
+    if (name.length > 15) {
+      name = name.substring(0, 15);
+    }
+    while (name.length < 15) {
+      name = "$name ";
+    }
+    print("${r.time}: $name: ${r.message}");
+  };
+  Logger.root.onRecord.listen(listener);
+
+  
   group('DbCollection tests:', (){
     test('testAuthComponents',testAuthComponents);
     test('testMongoDbUri',testMongoDbUri);

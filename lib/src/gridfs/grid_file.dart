@@ -17,7 +17,7 @@ class GridFSFile {
 
   Future<Map> save() {
     if (fs == null) {
-      throw "Need fs";
+      throw new MongoDartError('Need fs');
     }
     Map tempData = data;
     return fs.files.insert(tempData);
@@ -25,10 +25,10 @@ class GridFSFile {
 
   Future<bool> validate() {
     if (fs == null) {
-      throw "no fs";
+      throw new MongoDartError('no fs');
     }
     if (md5 == null) {
-      throw "no md5 stored";
+      throw new MongoDartError('no md5 stored');
     }
 
     Completer completer = new Completer();

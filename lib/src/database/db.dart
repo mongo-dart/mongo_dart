@@ -9,20 +9,29 @@ class WriteConcern {
   final int value; 
 } 
 
+class MongoDartError extends Error
+{
+  final String message;
+  const MongoDartError(this.message);
+  String toString() => "MongoDart Error: $message";
+}
 
 class Db{
+  final _log = new Logger('Db');
   String databaseName;
+  String _debugInfo;
   ServerConfig serverConfig;
-  Connection connection;
+  _Connection connection;
   WriteConcern _writeConcern;
   _validateDatabaseName(String dbName) {
-    if(dbName.length == 0) throw "database name cannot be the empty string";
+    if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
     var invalidChars = [" ", ".", "\$", "/", "\\"];
     for(var i = 0; i < invalidChars.length; i++) {
       if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
     }
   }
-
+  String toString() => 'Db($databaseName,$_debugInfo)';
+  
 /**
 * Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
 * For example next code points to local mongodb server on default mongodb port, database *testdb*
@@ -30,11 +39,10 @@ class Db{
 * And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
 *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
 */
-  Db(String uriString){
-    _configureConsoleLogger();
+  Db(String uriString, [this._debugInfo]){
     var uri = Uri.parse(uriString);
     if (uri.scheme != 'mongodb') {
-      throw 'Invalid scheme in uri: $uriString ${uri.scheme}';
+      throw new MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
     }
     serverConfig = new ServerConfig();
     serverConfig.host = uri.host;
@@ -45,7 +53,7 @@ class Db{
     if (uri.userInfo != '') {
       var userInfo = uri.userInfo.split(':');
       if (userInfo.length != 2) {
-        throw 'Неверный формат поля userInfo: $uri.userInfo';
+        throw new MongoDartError('Неверный формат поля userInfo: $uri.userInfo');
       }
       serverConfig.userName = userInfo[0];
       serverConfig.password = userInfo[1];
@@ -53,7 +61,7 @@ class Db{
     if (uri.path != '') {
       databaseName = uri.path.replaceAll('/','');
     }
-    connection = new Connection(serverConfig);
+    connection = new _Connection(serverConfig);
   }
   DbCollection collection(String collectionName){
       return new DbCollection(this,collectionName);
@@ -68,16 +76,18 @@ class Db{
     
     _writeConcern = writeConcern;
     if (connection.connected){
-      connection.close();
-      connection = new Connection(serverConfig);
+      connection.release();
+      connection = new _Connection(serverConfig);
     }
     
     return connection.connect().then((v) {
       if (serverConfig.userName == null) {
+        _log.fine('$this connected');
         return v;
       }
       else {
         return authenticate(serverConfig.userName,serverConfig.password).then((v) {
+          _log.fine('$this connected');
           return v;
         });
       }
@@ -136,7 +146,8 @@ class Db{
     return getLastError();
   }
   void close(){
-    connection.close();
+    _log.fine('$this closed');
+    connection.release();
   }
 
   Cursor collectionsInfoCursor([String collectionName]) {

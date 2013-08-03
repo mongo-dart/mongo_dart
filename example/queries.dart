@@ -52,7 +52,6 @@ main(){
   }).then((explanation){
     print("Query explained: $explanation");
     print('Now where clause with jscript code: where("this.my_field % 100 == 35")');
-    print(where.jsQuery("this.my_field == 517"));
     return coll.find(where.jsQuery("this.my_field % 100 == 35")).forEach((v)=>print(v));
   }).then((v) {
     return coll.count(where.gt("my_field", 995));

@@ -3,7 +3,7 @@
 ###0.1.25
 
 - each() method is deprecated in favor of foEach(), so Cursor have more stream-like interface. 
-- stream getter added to Cursor. In future find() will return Stream of Map  
+- stream getter added to Cursor. After deprecation period find() will return Stream<Map> instead of Cursor  
 
 ###0.1.24
 
