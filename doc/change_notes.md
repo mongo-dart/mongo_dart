@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.26
+
+- Network data packets to MongoDb messages conversion refactored.
+
 ###0.1.25
 
 - each() method is deprecated in favor of foEach(), so Cursor have more stream-like interface. 

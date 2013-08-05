@@ -9,8 +9,6 @@ import 'package:bson/bson.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
-import 'src/network/buffered_socket.dart';
-import 'src/network/buffer.dart';
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_dart_query.dart';
