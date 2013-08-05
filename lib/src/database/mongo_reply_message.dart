@@ -24,7 +24,7 @@ class MongoReplyMessage extends MongoMessage{
     {
       return "MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags, ${documents[0]})";
     }
-    return "MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags)";
+    return "MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags,$documents)";
   }
 
 }

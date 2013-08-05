@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'dart:async';
 import 'package:unittest/unittest.dart';
+import 'package:path/path.dart' as path;
 
 const DefaultUri = 'mongodb://127.0.0.1/';
 
@@ -137,8 +138,8 @@ testChunkTransformerSeveralChunks(){
 testFileToGridFSToFile() {
   GridFS.DEFAULT_CHUNKSIZE = 30;  
   GridIn input;
-  var path = new Path(new Options().script).directoryPath;
-  var inputStream = new File('gridfs_testdata_in.txt').openRead();
+  str dir = path.dirname(new Options().script);
+  var inputStream = new File('$dir/gridfs_testdata_in.txt').openRead();
   Db db = new Db('${DefaultUri}mongo_dart-test');
   db.open().then(expectAsync1((c){
     var gridFS = new GridFS(db);
@@ -149,10 +150,10 @@ testFileToGridFSToFile() {
     var gridFS = new GridFS(db);
     return gridFS.getFile('test');
   })).then(expectAsync1((GridOut gridOut) {   
-    return gridOut.writeToFilename('gridfs_testdata_out.txt');
+    return gridOut.writeToFilename('$dir/gridfs_testdata_out.txt');
   })).then(expectAsync1((c){
-    List<int> dataIn = new File('gridfs_testdata_in.txt').readAsBytesSync();
-    List<int> dataOut = new File('gridfs_testdata_out.txt').readAsBytesSync();      
+    List<int> dataIn = new File('$dir/gridfs_testdata_in.txt').readAsBytesSync();
+    List<int> dataOut = new File('$dir/gridfs_testdata_out.txt').readAsBytesSync();
     expect(dataOut, orderedEquals(dataIn));
     db.close();
   }));

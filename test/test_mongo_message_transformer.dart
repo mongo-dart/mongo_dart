@@ -5,10 +5,10 @@ import 'package:crypto/crypto.dart';
 import 'dart:async';
 import 'package:unittest/unittest.dart';
 import 'package:logging/logging.dart';
-
-
+Logger _log = new Logger('Tester');
+int counter = 0;
 processMessage(MongoReplyMessage message) {
-  print('Got message $message');
+  print('Got ${counter++} message $message');
 }
 main() {
   hierarchicalLoggingEnabled = true;
@@ -22,17 +22,14 @@ main() {
     while (name.length < 15) {
       name = "$name ";
     }
-    print("${r.time}: $name: ${r.message}");
+    ("${r.time}: $name: ${r.message}");
   };
   Logger.root.onRecord.listen(listener);
   var messageTransformer = new MongoMessageTransformer();
   var inputStream = new File(r'c:\projects\mongo_dart\test\debug_data.bin').openRead()
-    .transform(new ChunkTransformer(13))
-    .transform(messageTransformer.chunkTransformer)
+    .transform(new ChunkTransformer(11))
     .transform(messageTransformer);
 
   inputStream.listen( processMessage,
-  onDone: () => print('Finished'),
-  onError: (e) { print(e.toString()); });
-
+  onDone: () => print('Finished'));
 }

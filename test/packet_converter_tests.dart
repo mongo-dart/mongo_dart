@@ -11,8 +11,7 @@ main() {
     });
     test('bytesAvailable',(){
       var converter = new PacketConverter();
-      converter.addPacket([1,2,3]);
-      converter.addPacket([4,5,6,7]);
+      converter.packets.addAll([[1,2,3],[4,5,6,7]]);
       expect(converter.bytesAvailable(), 7);
       converter.readPos = 2;
       expect(converter.bytesAvailable(), 5);
@@ -20,8 +19,7 @@ main() {
     test('readIntoBuffer 1',(){
       var converter = new PacketConverter();
       var buffer = new List<int>(7);
-      converter.addPacket([1,2,3]);
-      converter.addPacket([4,5,6,7]);
+      converter.packets.addAll([[1,2,3],[4,5,6,7]]);
       converter.readIntoBuffer(buffer,0);
       expect(buffer,[1,2,3,4,5,6,7]);
       expect(converter.readPos,0);
@@ -30,8 +28,7 @@ main() {
     test('readIntoBuffer 2',(){
       var converter = new PacketConverter();
       var buffer = new List<int>(5);
-      converter.addPacket([1,2,3]);
-      converter.addPacket([4,5,6,7]);
+      converter.packets.addAll([[1,2,3],[4,5,6,7]]);
       converter.readPos = 2;
       converter.readIntoBuffer(buffer,0);
       expect(buffer,[3,4,5,6,7]);
@@ -41,8 +38,7 @@ main() {
     test('readIntoBuffer 3',(){
       var converter = new PacketConverter();
       var buffer = new List<int>(3);
-      converter.addPacket([1,2,3]);
-      converter.addPacket([4,5,6,7]);
+      converter.packets.addAll([[1,2,3],[4,5,6,7]]);
       converter.readPos = 2;
       converter.readIntoBuffer(buffer,0);
       expect(buffer,[3,4,5]);
@@ -53,6 +49,40 @@ main() {
       expect(buffer,[6,7]);
       expect(converter.packets,isEmpty);
       expect(converter.readPos,0);
+    });
+  });
+  group('PacketConverter messages tests',() {
+    test('Full message in one packet', (){
+      // Length of 7 in first four bytes and 3 elements.
+      // Full message in one packet
+      var packet = [7,0,0,0,1,2,3];
+      var converter = new PacketConverter();
+      converter.addPacket(packet);
+      expect(converter.messages.length, 1);
+      expect(converter.messages.first, packet);
+    });
+
+    test('Length part splitted', (){
+      var converter = new PacketConverter();
+      converter.addPacket([7,0,0]);
+      converter.addPacket([0,1,2,3]);
+      expect(converter.messages.length, 1);
+      expect(converter.messages.first, [7,0,0,0,1,2,3]);
+    });
+    test('Packets not full for message', (){
+      var converter = new PacketConverter();
+      converter.addPacket([7,0,0]);
+      converter.addPacket([0,1,2]);
+      expect(converter.messages, isEmpty);
+    });
+    test('Full message in one packet and some more', (){
+      var packet = [7,0,0,0,1,2,3,4,5];
+      var converter = new PacketConverter();
+      converter.addPacket(packet);
+      expect(converter.messages.length, 1);
+      expect(converter.messages.first, [7,0,0,0,1,2,3]);
+      expect(converter.packets.length,1);
+      expect(converter.bytesAvailable(),2);
     });
 
   });

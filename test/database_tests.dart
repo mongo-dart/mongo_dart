@@ -357,7 +357,7 @@ db.runCommand(
 
 testSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testSkip');
-  db.open(writeConcern: WriteConcern.ERRORS_IGNORED).then(expectAsync1((c){
+  db.open().then(expectAsync1((c){
     DbCollection coll = db.collection('testSkip');
     coll.remove();
     for(int n=0;n<600;n++){
@@ -402,7 +402,7 @@ testLimitWithSortByAndSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testLimitWithSortByAndSkip');
   int counter = 0;
   Cursor cursor;
-  db.open(writeConcern: WriteConcern.ERRORS_IGNORED).then(expectAsync1((c){
+  db.open().then(expectAsync1((c){
     DbCollection coll = db.collection('testLimit');
     coll.remove();
     for(int n=0;n<600;n++){
@@ -422,7 +422,7 @@ testLimit(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testLimit');
   int counter = 0;
   Cursor cursor;
-  db.open(writeConcern: WriteConcern.ERRORS_IGNORED).then(expectAsync1((c){
+  db.open().then(expectAsync1((c){
     DbCollection coll = db.collection('testLimit');
     coll.remove();
     for(int n=0;n<600;n++){
@@ -554,7 +554,7 @@ testCursorClosing(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testCursorClosing');
   DbCollection collection;
   Cursor cursor;
-  db.open(writeConcern: WriteConcern.ERRORS_IGNORED).then(expectAsync1((c){
+  db.open().then(expectAsync1((c){
     collection = db.collection('new_big_collection1');
     collection.remove();
     for (int n=0;n < 1000; n++){
@@ -864,21 +864,21 @@ testFieldLevelUpdateSimple() {
 
 
 main(){
-  hierarchicalLoggingEnabled = true;
-  Logger.root.level = Level.OFF;
-  new Logger('Db').level = Level.ALL;
-  var listener = (LogRecord r) {
-    var name = r.loggerName;
-    if (name.length > 15) {
-      name = name.substring(0, 15);
-    }
-    while (name.length < 15) {
-      name = "$name ";
-    }
-    print("${r.time}: $name: ${r.message}");
-  };
-  Logger.root.onRecord.listen(listener);
-
+//  hierarchicalLoggingEnabled = true;
+//  Logger.root.level = Level.OFF;
+//  new Logger('Db').level = Level.ALL;
+//  var listener = (LogRecord r) {
+//    var name = r.loggerName;
+//    if (name.length > 15) {
+//      name = name.substring(0, 15);
+//    }
+//    while (name.length < 15) {
+//      name = "$name ";
+//    }
+//    print("${r.time}: $name: ${r.message}");
+//  };
+//  Logger.root.onRecord.listen(listener);
+//
   
   group('DbCollection tests:', (){
     test('testAuthComponents',testAuthComponents);

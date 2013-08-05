@@ -69,7 +69,7 @@ class Db{
     
     _writeConcern = writeConcern;
     if (connection.connected){
-      connection.release();
+      connection.close();
       connection = new _Connection(serverConfig);
     }
     
@@ -140,7 +140,7 @@ class Db{
   }
   void close(){
     _log.fine('$this closed');
-    connection.release();
+    connection.close();
   }
 
   Cursor collectionsInfoCursor([String collectionName]) {

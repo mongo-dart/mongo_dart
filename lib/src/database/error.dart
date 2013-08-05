@@ -5,6 +5,3 @@ class MongoDartError extends Error {
   String toString() => "MongoDart Error: $message";
 }
 
-class MongoDartException extends Exception {
-
-}
