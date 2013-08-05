@@ -15,8 +15,10 @@ import 'src/network/buffer.dart';
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_dart_query.dart';
 
+part 'src/network/packet_converter.dart';
 part 'src/network/connection.dart';
 part 'src/network/message_header.dart';
+part 'src/network/mongo_message_transformer.dart';
 part 'src/database/mongo_message.dart';
 part 'src/database/mongo_query_message.dart';
 part 'src/database/mongo_reply_message.dart';
@@ -28,6 +30,7 @@ part 'src/database/mongo_update_message.dart';
 part 'src/database/server_config.dart';
 part 'src/database/dbcommand.dart';
 part 'src/database/db.dart';
+part 'src/database/error.dart';
 part 'src/database/dbcollection.dart';
 part 'src/database/cursor.dart';
 part 'src/gridfs/gridfs.dart';

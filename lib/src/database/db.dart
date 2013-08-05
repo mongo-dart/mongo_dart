@@ -9,13 +9,6 @@ class WriteConcern {
   final int value; 
 } 
 
-class MongoDartError extends Error
-{
-  final String message;
-  const MongoDartError(this.message);
-  String toString() => "MongoDart Error: $message";
-}
-
 class Db{
   final _log = new Logger('Db');
   String databaseName;

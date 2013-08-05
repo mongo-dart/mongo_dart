@@ -61,9 +61,9 @@ class BufferedSocket {
 
   void _onData(RawSocketEvent event) {
     if (event == RawSocketEvent.READ) {
-      //log.finest("READ data");
+      log.finest("READ data");
       if (_readingBuffer == null) {
-        //log.finest("READ data: no buffer");
+        log.finest("READ data: no buffer");
         if (onDataReady != null) {
           onDataReady();
         }
@@ -71,9 +71,9 @@ class BufferedSocket {
         _readBuffer();
       }
     } else if (event == RawSocketEvent.READ_CLOSED) {
-      //log.fine('READ CLOSED');
+      log.fine('READ CLOSED');
     } else if (event == RawSocketEvent.WRITE) {
-      //log.fine("WRITE data");
+      log.fine("WRITE data");
       if (_writingBuffer != null) {
         _writeBuffer();
       }
@@ -85,7 +85,7 @@ class BufferedSocket {
    * completes when it has all been written.
    */
   Future<Buffer> writeBuffer(Buffer buffer) {
-    //log.fine("writeBuffer length=${buffer.length}");
+    log.fine("writeBuffer length=${buffer.length}");
     if (_writingBuffer != null) {
       throw new StateError("Cannot write to socket, already writing");
     }
@@ -99,9 +99,9 @@ class BufferedSocket {
   }
 
   void _writeBuffer() {
-    //log.fine("_writeBuffer offset=${_writeOffset}");
+    log.fine("_writeBuffer offset=${_writeOffset}");
     int bytesWritten = _writingBuffer.writeToSocket(_socket, _writeOffset, _writingBuffer.length - _writeOffset);
-    //log.fine("Wrote $bytesWritten bytes");
+    log.fine("Wrote $bytesWritten bytes");
     _writeOffset += bytesWritten;
     if (_writeOffset == _writingBuffer.length) {
       _writeCompleter.complete(_writingBuffer);
@@ -119,7 +119,7 @@ class BufferedSocket {
    * and the read will start instead.
    */
   Future<Buffer> readBuffer(Buffer buffer) {
-    //log.fine("readBuffer, length=${buffer.length}");
+    log.fine("readBuffer, length=${buffer.length}");
     if (_readingBuffer != null) {
       throw new StateError("Cannot read from socket, already reading");
     }
@@ -128,16 +128,19 @@ class BufferedSocket {
     _readCompleter = new Completer<Buffer>();
 
     if (_socket.available() > 0) {
-      //log.fine("readBuffer, data already ready");
+      log.fine("readBuffer, data already ready");
       _readBuffer();
+    } else {
+      log.fine("readBuffer, data NOT ready");
     }
+    
 
     return _readCompleter.future;
   }
 
   void _readBuffer() {
     int bytesRead = _readingBuffer.readFromSocket(_socket, _readingBuffer.length - _readOffset);
-    //log.fine("read $bytesRead bytes");
+    log.fine("read $bytesRead bytes");
     _readOffset += bytesRead;
     if (_readOffset == _readingBuffer.length) {
       _readCompleter.complete(_readingBuffer);
