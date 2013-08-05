@@ -1,5 +1,5 @@
 name: mongo_dart
-version: 0.1.26-dev
+version: 0.1.26
 authors:
 - Vadim Tsushko <vadimtsushko@gmail.com>
 - Ted Sander <ted@tedsander.com>
@@ -15,4 +15,3 @@ dependencies:
   mongo_dart_query: '>=0.1.5 <0.2.0'
 dev_dependencies:
   unittest: any
-  pathos: any
