@@ -5,7 +5,7 @@
         <title>GridFS class / mongo_dart Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="../styles.css">
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
         <link rel="shortcut icon" href="../favicon.ico">
         
         </head>
@@ -24,30 +24,6 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
-<li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
-<li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
-<li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
-<li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
-<li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
-<li><div class="icon-class"></div><strong>GridFS</strong></li>
-<li><a href="../mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
-<li><a href="../mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
-<li><a href="../mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
-<li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
-<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
-<li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
-<li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
-<li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
-<li><a href="../mongo_dart/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
-<li><a href="../mongo_dart/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
-<li><a href="../mongo_dart/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
-<li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
-<li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
-<li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
-<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
-<li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
-</ul>
 </div>
 <div class="content">
         <h2><strong>GridFS</strong>
@@ -90,8 +66,10 @@ class GridFS {
    });
    return completer.future;
  }
-
- GridIn createFile(InputStream input, String filename) {
+ 
+ Future&lt;GridOut&gt; getFile(String fileName) =&gt; findOne(where.eq('filename',fileName));
+ 
+ GridIn createFile(Stream&lt;List&lt;int&gt;&gt; input, String filename) {
    return new GridIn(this, filename, input);
  }
 }
@@ -101,36 +79,42 @@ class GridFS {
 <h3>Static Properties</h3>
 <div class="field"><h4 id="DEFAULT_CHUNKSIZE">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>DEFAULT_CHUNKSIZE</strong> <a class="anchor-link"
+int         <strong>DEFAULT_CHUNKSIZE</strong> <a class="anchor-link"
             href="#DEFAULT_CHUNKSIZE"
             title="Permalink to GridFS.DEFAULT_CHUNKSIZE">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static int DEFAULT_CHUNKSIZE = 256 * 1024;
+static int DEFAULT_CHUNKSIZE = 256 * 1024
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="MAX_CHUNKSIZE">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>MAX_CHUNKSIZE</strong> <a class="anchor-link"
+int         <strong>MAX_CHUNKSIZE</strong> <a class="anchor-link"
             href="#MAX_CHUNKSIZE"
             title="Permalink to GridFS.MAX_CHUNKSIZE">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static int MAX_CHUNKSIZE = (3.5 * 1000 * 1000).toInt();
+static int MAX_CHUNKSIZE = (3.5 * 1000 * 1000).toInt()
 </pre>
 </div>
 </div>
 </div>
 <div>
 <h3>Constructors</h3>
-<div class="method"><h4 id="GridFS">
+<div class="method"><h4 id="">
 <button class="show-code">Code</button>
-new <strong>GridFS</strong>(<a href="../mongo_dart/Db.html">Db</a> database, [<a href="http://api.dartlang.org/dart_core/String.html">String</a> collection = "fs"]) <a class="anchor-link" href="#GridFS"
+new <strong>GridFS</strong>(<a href="../mongo_dart/Db.html">Db</a> database, [String collection = "fs"]) <a class="anchor-link" href="#"
               title="Permalink to GridFS.GridFS">#</a></h4>
 <div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="../dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="../dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="../dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
 GridFS(Db this.database, [String collection="fs"]) {
  this.files = database.collection("$collection.files");
@@ -147,13 +131,13 @@ GridFS(Db this.database, [String collection="fs"]) {
 <h3>Properties</h3>
 <div class="field"><h4 id="bucketName">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>bucketName</strong> <a class="anchor-link"
+String         <strong>bucketName</strong> <a class="anchor-link"
             href="#bucketName"
             title="Permalink to GridFS.bucketName">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-String bucketName;
+String bucketName
 </pre>
 </div>
 </div>
@@ -165,7 +149,7 @@ String bucketName;
         </h4>
         <div class="doc">
 <pre class="source">
-DbCollection chunks;
+DbCollection chunks
 </pre>
 </div>
 </div>
@@ -177,7 +161,7 @@ DbCollection chunks;
         </h4>
         <div class="doc">
 <pre class="source">
-Db database;
+Db database
 </pre>
 </div>
 </div>
@@ -189,7 +173,7 @@ Db database;
         </h4>
         <div class="doc">
 <pre class="source">
-DbCollection files;
+DbCollection files
 </pre>
 </div>
 </div>
@@ -198,11 +182,11 @@ DbCollection files;
 <h3>Methods</h3>
 <div class="method"><h4 id="createFile">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/GridIn.html">GridIn</a> <strong>createFile</strong>(<a href="http://api.dartlang.org/dart_io/InputStream.html">InputStream</a> input, <a href="http://api.dartlang.org/dart_core/String.html">String</a> filename) <a class="anchor-link" href="#createFile"
+<a href="../mongo_dart/GridIn.html">GridIn</a> <strong>createFile</strong>(Stream&lt;List&lt;int&gt;&gt; input, String filename) <a class="anchor-link" href="#createFile"
               title="Permalink to GridFS.createFile">#</a></h4>
 <div class="doc">
 <pre class="source">
-GridIn createFile(InputStream input, String filename) {
+GridIn createFile(Stream&lt;List&lt;int&gt;&gt; input, String filename) {
  return new GridIn(this, filename, input);
 }
 </pre>
@@ -210,7 +194,7 @@ GridIn createFile(InputStream input, String filename) {
 </div>
 <div class="method"><h4 id="findOne">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="../mongo_dart/GridOut.html">GridOut</a>&gt; <strong>findOne</strong>(selector) <a class="anchor-link" href="#findOne"
+Future&lt;<a href="../mongo_dart/GridOut.html">GridOut</a>&gt; <strong>findOne</strong>(selector) <a class="anchor-link" href="#findOne"
               title="Permalink to GridFS.findOne">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -229,9 +213,19 @@ Future&lt;GridOut&gt; findOne(dynamic selector) {
 </pre>
 </div>
 </div>
+<div class="method"><h4 id="getFile">
+<button class="show-code">Code</button>
+Future&lt;<a href="../mongo_dart/GridOut.html">GridOut</a>&gt; <strong>getFile</strong>(String fileName) <a class="anchor-link" href="#getFile"
+              title="Permalink to GridFS.getFile">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;GridOut&gt; getFile(String fileName) =&gt; findOne(where.eq('filename',fileName));
+</pre>
+</div>
+</div>
 <div class="method"><h4 id="getFileList">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/Cursor.html">Cursor</a> <strong>getFileList</strong>(<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> selectorBuilder) <a class="anchor-link" href="#getFileList"
+<a href="../mongo_dart/Cursor.html">Cursor</a> <strong>getFileList</strong>(<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> selectorBuilder) <a class="anchor-link" href="#getFileList"
               title="Permalink to GridFS.getFileList">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -245,10 +239,9 @@ Cursor getFileList(SelectorBuilder selectorBuilder) {
         </div>
         <div class="clear"></div>
         </div>
-        
         <div class="footer">
-          <div>This page was generated at 2012-12-27 12:26:55.993</div>
+          <div>This page was generated at 2013-08-06 10:39:53.898</div>
         </div>
-        <script async src="../client-static.js"></script>
+        <script async src="../client-live-nav.js"></script>
         </body></html>
         

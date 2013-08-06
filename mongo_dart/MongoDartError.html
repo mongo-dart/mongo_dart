@@ -2,19 +2,19 @@
         <html>
         <head>
                 <meta charset="utf-8">
-        <title>ServerConfig class / mongo_dart Library / Dart Documentation</title>
+        <title>MongoDartError class / mongo_dart Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="../styles.css">
         <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
         <link rel="shortcut icon" href="../favicon.ico">
         
         </head>
-        <body data-library="mongo_dart" data-type="ServerConfig">
+        <body data-library="mongo_dart" data-type="MongoDartError">
         <div class="page">
         <div class="header">
           <a href="../index.html"><div class="logo"></div></a>
           <a href="../index.html">Dart Documentation</a>
-         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/ServerConfig.html">ServerConfig</a>        <div id="search-box">
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/MongoDartError.html">MongoDartError</a>        <div id="search-box">
           <input type="search" name="q" id="q" autocomplete="off"
               class="search-input" placeholder="Search API">
         </div>
@@ -26,28 +26,29 @@
         
 </div>
 <div class="content">
-        <h2><strong>ServerConfig</strong>
+        <h2><strong>MongoDartError</strong>
           class
         </h2>
         
 <button id="show-inherited" class="show-inherited">Hide inherited</button>
 <div class="doc">
 <pre class="source">
-class ServerConfig{
- String host;
- int port;
- String userName;
- String password;
- ServerConfig([this.host='127.0.0.1', this.port=27017]);
+class MongoDartError extends Error {
+ final String message;
+ MongoDartError(this.message);
+ String toString() =&gt; "MongoDart Error: $message";
 }
 </pre>
 </div>
+<h3>Extends</h3>
+<p>
+<span class="type-box"><span class="icon-exception"></span><a href="../dart_core/Error.html">Error</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-exception"></span><strong>MongoDartError</strong></span></p>
 <div>
 <h3>Constructors</h3>
 <div class="method"><h4 id="">
 <button class="show-code">Code</button>
-new <strong>ServerConfig</strong>([String host = '127.0.0.1', int port = 27017]) <a class="anchor-link" href="#"
-              title="Permalink to ServerConfig.ServerConfig">#</a></h4>
+new <strong>MongoDartError</strong>(String message) <a class="anchor-link" href="#"
+              title="Permalink to MongoDartError.MongoDartError">#</a></h4>
 <div class="doc">
 <div class="inherited">
 <p>Creates a new <a class="crossref" href="../dart_core/Object.html">Object</a> instance.</p>
@@ -56,58 +57,50 @@ through their identity. An <a class="crossref" href="../dart_core/Object.html">O
 only.</p>
 <div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
-ServerConfig([this.host='127.0.0.1', this.port=27017]);
+MongoDartError(this.message);
 </pre>
 </div>
 </div>
 </div>
 <div>
 <h3>Properties</h3>
-<div class="field"><h4 id="host">
+<div class="field"><h4 id="message">
 <button class="show-code">Code</button>
-String         <strong>host</strong> <a class="anchor-link"
-            href="#host"
-            title="Permalink to ServerConfig.host">#</a>
+final String         <strong>message</strong> <a class="anchor-link"
+            href="#message"
+            title="Permalink to MongoDartError.message">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-String host
+final String message
 </pre>
 </div>
 </div>
-<div class="field"><h4 id="password">
+<div class="field inherited"><h4 id="stackTrace">
 <button class="show-code">Code</button>
-String         <strong>password</strong> <a class="anchor-link"
-            href="#password"
-            title="Permalink to ServerConfig.password">#</a>
+final StackTrace         <strong>stackTrace</strong> <a class="anchor-link"
+            href="#stackTrace"
+            title="Permalink to MongoDartError.stackTrace">#</a>
         </h4>
-        <div class="doc">
+        <div class="inherited-from">inherited from Error </div><div class="doc">
 <pre class="source">
-String password
+external StackTrace get stackTrace;
 </pre>
 </div>
 </div>
-<div class="field"><h4 id="port">
-<button class="show-code">Code</button>
-int         <strong>port</strong> <a class="anchor-link"
-            href="#port"
-            title="Permalink to ServerConfig.port">#</a>
-        </h4>
-        <div class="doc">
-<pre class="source">
-int port
-</pre>
 </div>
-</div>
-<div class="field"><h4 id="userName">
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="toString">
 <button class="show-code">Code</button>
-String         <strong>userName</strong> <a class="anchor-link"
-            href="#userName"
-            title="Permalink to ServerConfig.userName">#</a>
-        </h4>
-        <div class="doc">
+String <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to MongoDartError.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
-String userName
+String toString() =&gt; "MongoDart Error: $message";
 </pre>
 </div>
 </div>
@@ -116,7 +109,7 @@ String userName
         <div class="clear"></div>
         </div>
         <div class="footer">
-          <div>This page was generated at 2013-08-06 10:39:54.112</div>
+          <div>This page was generated at 2013-08-06 10:39:53.988</div>
         </div>
         <script async src="../client-live-nav.js"></script>
         </body></html>

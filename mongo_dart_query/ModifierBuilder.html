@@ -1,0 +1,179 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>ModifierBuilder class / mongo_dart_query Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart_query" data-type="ModifierBuilder">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart_query.html">mongo_dart_query</a> &rsaquo; <a href="../mongo_dart_query/ModifierBuilder.html">ModifierBuilder</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>ModifierBuilder</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class ModifierBuilder{
+ Map map = {};
+
+ toString()=&gt;"ModifierBuilder($map)";
+ Map _pair2Map(String fieldName, value) {
+   var res = {};
+   res[fieldName] = value;
+   return res;
+ }
+ ModifierBuilder inc(String fieldName,value) {
+   map['\$inc'] = _pair2Map(fieldName,value);
+   return this;
+ }
+
+ ModifierBuilder set(String fieldName,value) {
+   Map setMap = map['\$set'];
+   if (setMap == null) {
+     setMap = {};
+   }
+   setMap[fieldName] = value;
+   map['\$set'] = setMap;
+   return this;
+ }
+
+ ModifierBuilder unset(String fieldName) {
+   Map unSetMap = map['\$unset'];
+   if (unSetMap == null) {
+     unSetMap = {};
+   }
+   unSetMap[fieldName] = 1;
+   map['\$unset'] = unSetMap;
+   return this;
+ }
+
+ ModifierBuilder push(String fieldName, value) {
+   map['\$push'] = _pair2Map(fieldName, value);
+   return this;
+ }
+
+}
+</pre>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="map">
+<button class="show-code">Code</button>
+Map         <strong>map</strong> <a class="anchor-link"
+            href="#map"
+            title="Permalink to ModifierBuilder.map">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Map map = {}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="inc">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/ModifierBuilder.html">ModifierBuilder</a> <strong>inc</strong>(String fieldName, value) <a class="anchor-link" href="#inc"
+              title="Permalink to ModifierBuilder.inc">#</a></h4>
+<div class="doc">
+<pre class="source">
+ModifierBuilder inc(String fieldName,value) {
+ map['\$inc'] = _pair2Map(fieldName,value);
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="push">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/ModifierBuilder.html">ModifierBuilder</a> <strong>push</strong>(String fieldName, value) <a class="anchor-link" href="#push"
+              title="Permalink to ModifierBuilder.push">#</a></h4>
+<div class="doc">
+<pre class="source">
+ModifierBuilder push(String fieldName, value) {
+ map['\$push'] = _pair2Map(fieldName, value);
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="set">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/ModifierBuilder.html">ModifierBuilder</a> <strong>set</strong>(String fieldName, value) <a class="anchor-link" href="#set"
+              title="Permalink to ModifierBuilder.set">#</a></h4>
+<div class="doc">
+<pre class="source">
+ModifierBuilder set(String fieldName,value) {
+ Map setMap = map['\$set'];
+ if (setMap == null) {
+   setMap = {};
+ }
+ setMap[fieldName] = value;
+ map['\$set'] = setMap;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+dynamic <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to ModifierBuilder.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
+<pre class="source">
+toString()=&gt;"ModifierBuilder($map)";
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="unset">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/ModifierBuilder.html">ModifierBuilder</a> <strong>unset</strong>(String fieldName) <a class="anchor-link" href="#unset"
+              title="Permalink to ModifierBuilder.unset">#</a></h4>
+<div class="doc">
+<pre class="source">
+ModifierBuilder unset(String fieldName) {
+ Map unSetMap = map['\$unset'];
+ if (unSetMap == null) {
+   unSetMap = {};
+ }
+ unSetMap[fieldName] = 1;
+ map['\$unset'] = unSetMap;
+ return this;
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          <div>This page was generated at 2013-08-06 10:39:54.377</div>
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

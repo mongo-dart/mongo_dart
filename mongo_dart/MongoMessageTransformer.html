@@ -1,0 +1,166 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>MongoMessageTransformer class / mongo_dart Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart" data-type="MongoMessageTransformer">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/MongoMessageTransformer.html">MongoMessageTransformer</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>MongoMessageTransformer</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class MongoMessageTransformer extends StreamEventTransformer&lt;List&lt;int&gt;, MongoReplyMessage&gt;{
+ final _log = new Logger('MongoMessageTransformer');
+ final converter = new PacketConverter();
+//  final debugData = new File('debug_data1.bin').openSync(mode: FileMode.WRITE);
+void handleData(List&lt;int&gt; data, EventSink&lt;List&lt;int&gt;&gt; sink) {
+ //    debugData.writeFromSync(data);
+ //    debugData.flushSync();
+ //_log.fine('handleData length=${data.length} $data');
+   converter.addPacket(data);
+   while (!converter.messages.isEmpty) {
+     var buffer = new BsonBinary.from(converter.messages.removeFirst());
+     MongoReplyMessage reply = new MongoReplyMessage();
+     reply.deserialize(buffer);
+     _log.fine(reply.toString());
+     sink.add(reply);
+   }
+ }
+ void handleDone(EventSink&lt;List&lt;int&gt;&gt; sink) {
+   if (!converter.isClear) {
+     _log.warning('Invalid state of PacketConverter in handleDone: $converter');
+   }
+   sink.close();
+ }
+ 
+}
+</pre>
+</div>
+<h3>Extends</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../dart_async/StreamEventTransformer.html">StreamEventTransformer&lt;List&lt;int&gt;, MongoReplyMessage&gt;</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>MongoMessageTransformer</strong></span></p>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="converter">
+<button class="show-code">Code</button>
+final         <strong>converter</strong> <a class="anchor-link"
+            href="#converter"
+            title="Permalink to MongoMessageTransformer.converter">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final converter = new PacketConverter()
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method inherited"><h4 id="bind">
+<button class="show-code">Code</button>
+Stream&lt;<a href="../mongo_dart/MongoMessageTransformer.html">T</a>&gt; <strong>bind</strong>(Stream&lt;<a href="../mongo_dart/MongoMessageTransformer.html">S</a>&gt; source) <a class="anchor-link" href="#bind"
+              title="Permalink to MongoMessageTransformer.bind">#</a></h4>
+<div class="inherited-from">inherited from StreamEventTransformer </div><div class="doc">
+<pre class="source">
+Stream&lt;T&gt; bind(Stream&lt;S&gt; source) {
+ return new EventTransformStream&lt;S, T&gt;(source, this);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="handleData">
+<button class="show-code">Code</button>
+void <strong>handleData</strong>(List&lt;int&gt; data, EventSink&lt;List&lt;int&gt;&gt; sink) <a class="anchor-link" href="#handleData"
+              title="Permalink to MongoMessageTransformer.handleData">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Act on incoming data event.</p>
+<p>The method may generate any number of events on the sink, but should
+not throw.</p>
+<div class="docs-inherited-from">docs inherited from StreamEventTransformer&lt;List&lt;int&gt;, <a href="../mongo_dart/MongoReplyMessage.html">MongoReplyMessage</a>&gt; </div></div>
+<pre class="source">
+void handleData(List&lt;int&gt; data, EventSink&lt;List&lt;int&gt;&gt; sink) {
+ //    debugData.writeFromSync(data);
+ //    debugData.flushSync();
+ //_log.fine('handleData length=${data.length} $data');
+   converter.addPacket(data);
+   while (!converter.messages.isEmpty) {
+     var buffer = new BsonBinary.from(converter.messages.removeFirst());
+     MongoReplyMessage reply = new MongoReplyMessage();
+     reply.deserialize(buffer);
+     _log.fine(reply.toString());
+     sink.add(reply);
+   }
+ }
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="handleDone">
+<button class="show-code">Code</button>
+void <strong>handleDone</strong>(EventSink&lt;List&lt;int&gt;&gt; sink) <a class="anchor-link" href="#handleDone"
+              title="Permalink to MongoMessageTransformer.handleDone">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Act on incoming done event.</p>
+<p>The method may generate any number of events on the sink, but should
+not throw.</p>
+<div class="docs-inherited-from">docs inherited from StreamEventTransformer&lt;List&lt;int&gt;, <a href="../mongo_dart/MongoReplyMessage.html">MongoReplyMessage</a>&gt; </div></div>
+<pre class="source">
+void handleDone(EventSink&lt;List&lt;int&gt;&gt; sink) {
+ if (!converter.isClear) {
+   _log.warning('Invalid state of PacketConverter in handleDone: $converter');
+ }
+ sink.close();
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="handleError">
+<button class="show-code">Code</button>
+void <strong>handleError</strong>(error, EventSink&lt;<a href="../mongo_dart/MongoMessageTransformer.html">T</a>&gt; sink) <a class="anchor-link" href="#handleError"
+              title="Permalink to MongoMessageTransformer.handleError">#</a></h4>
+<div class="inherited-from">inherited from StreamEventTransformer </div><div class="doc">
+<p>Act on incoming error event.</p>
+<p>The method may generate any number of events on the sink, but should
+not throw.</p>
+<pre class="source">
+void handleError(error, EventSink&lt;T&gt; sink) {
+ sink.addError(error);
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          <div>This page was generated at 2013-08-06 10:39:54.334</div>
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

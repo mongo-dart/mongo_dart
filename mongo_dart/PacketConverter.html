@@ -1,0 +1,363 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>PacketConverter class / mongo_dart Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart" data-type="PacketConverter">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/PacketConverter.html">PacketConverter</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>PacketConverter</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class PacketConverter {
+ final _log = new Logger('PacketConverter');
+ final packets = new ListQueue&lt;List&lt;int&gt;&gt;();
+ final messages = new ListQueue&lt;List&lt;int&gt;&gt;();
+ final MAX_DOC_SIZE = 32 * 1024 * 1024;
+ bool headerMode = true;
+ int bytesToRead = 4;
+ List&lt;int&gt; buffer;
+ int readPos = 0;
+ List&lt;int&gt; messageBuffer;
+ int messagesConverted = 0;
+ final lengthBuffer = new BsonBinary(4);
+
+ addPacket(List&lt;int&gt; packet) {
+   packets.addLast(packet);
+   //print('addPacket to $this');
+   if (headerMode) {
+     handleHeader();
+   } else {
+     handleBody();
+   }
+ }
+ handleHeader(){
+   if (bytesAvailable()&gt;=4) {
+     headerMode = false;
+     lengthBuffer.rewind();
+     readIntoBuffer(lengthBuffer.byteList,0);
+     int len = lengthBuffer.readInt32();
+     if (len &gt; MAX_DOC_SIZE) {
+       throw new MongoDartError('Message length $len over maximum document size');
+     }
+     messageBuffer = new List&lt;int&gt;(len);
+     handleBody();
+   }
+ }
+ handleBody(){
+   if (bytesAvailable()&gt;=messageBuffer.length-4) {
+     headerMode = true;
+     messageBuffer.setRange(0,4,lengthBuffer.byteList);
+     readIntoBuffer(messageBuffer,4);
+     messagesConverted++;
+     messages.addLast(messageBuffer);
+     handleHeader();
+   }
+ }
+ /// Length of all packets with current read position on first packet subtracted
+ int bytesAvailable() =&gt; packets.fold(- readPos,(value, element) =&gt; value + element.length) ;
+ void readIntoBuffer(List&lt;int&gt; buffer, int pos) {
+   if(buffer.length - pos &gt; bytesAvailable()) {
+//      print('$this $buffer $pos');
+     throw new MongoDartError('Bad state. Read buffer too big');
+   }
+   int writePos = pos;
+   while (writePos &lt; buffer.length) {
+     writePos += _readPacketIntoBuffer(buffer, writePos);
+   }
+   if (writePos &lt; buffer.length) {
+     throw new MongoDartError('Bad state. Buffer was not written fully');
+   }
+ }
+ int _readPacketIntoBuffer(List&lt;int&gt; buffer, int pos) {
+   int bytesRead = min(buffer.length - pos,packets.first.length - readPos);
+   buffer.setRange(pos,pos+bytesRead,packets.first,readPos);
+   if (readPos + bytesRead == packets.first.length) {
+     readPos = 0;
+     packets.removeFirst();
+   } else {
+     readPos += bytesRead;
+   }
+   return bytesRead;
+ }
+ String toString() =&gt; 'PacketConverter(readPos: $readPos, headerMode: $headerMode, packets: $packets)';
+ bool get isClear =&gt; this.packets.isEmpty &amp;&amp; messages.isEmpty &amp;&amp; headerMode;
+}
+</pre>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="buffer">
+<button class="show-code">Code</button>
+List&lt;int&gt;         <strong>buffer</strong> <a class="anchor-link"
+            href="#buffer"
+            title="Permalink to PacketConverter.buffer">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+List&lt;int&gt; buffer
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="bytesToRead">
+<button class="show-code">Code</button>
+int         <strong>bytesToRead</strong> <a class="anchor-link"
+            href="#bytesToRead"
+            title="Permalink to PacketConverter.bytesToRead">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int bytesToRead = 4
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="headerMode">
+<button class="show-code">Code</button>
+bool         <strong>headerMode</strong> <a class="anchor-link"
+            href="#headerMode"
+            title="Permalink to PacketConverter.headerMode">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+bool headerMode = true
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="isClear">
+<button class="show-code">Code</button>
+final bool         <strong>isClear</strong> <a class="anchor-link"
+            href="#isClear"
+            title="Permalink to PacketConverter.isClear">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+bool get isClear =&gt; this.packets.isEmpty &amp;&amp; messages.isEmpty &amp;&amp; headerMode;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="lengthBuffer">
+<button class="show-code">Code</button>
+final         <strong>lengthBuffer</strong> <a class="anchor-link"
+            href="#lengthBuffer"
+            title="Permalink to PacketConverter.lengthBuffer">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final lengthBuffer = new BsonBinary(4)
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="MAX_DOC_SIZE">
+<button class="show-code">Code</button>
+final         <strong>MAX_DOC_SIZE</strong> <a class="anchor-link"
+            href="#MAX_DOC_SIZE"
+            title="Permalink to PacketConverter.MAX_DOC_SIZE">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final MAX_DOC_SIZE = 32 * 1024 * 1024
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="messageBuffer">
+<button class="show-code">Code</button>
+List&lt;int&gt;         <strong>messageBuffer</strong> <a class="anchor-link"
+            href="#messageBuffer"
+            title="Permalink to PacketConverter.messageBuffer">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+List&lt;int&gt; messageBuffer
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="messages">
+<button class="show-code">Code</button>
+final         <strong>messages</strong> <a class="anchor-link"
+            href="#messages"
+            title="Permalink to PacketConverter.messages">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final messages = new ListQueue&lt;List&lt;int&gt;&gt;()
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="messagesConverted">
+<button class="show-code">Code</button>
+int         <strong>messagesConverted</strong> <a class="anchor-link"
+            href="#messagesConverted"
+            title="Permalink to PacketConverter.messagesConverted">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int messagesConverted = 0
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="packets">
+<button class="show-code">Code</button>
+final         <strong>packets</strong> <a class="anchor-link"
+            href="#packets"
+            title="Permalink to PacketConverter.packets">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final packets = new ListQueue&lt;List&lt;int&gt;&gt;()
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="readPos">
+<button class="show-code">Code</button>
+int         <strong>readPos</strong> <a class="anchor-link"
+            href="#readPos"
+            title="Permalink to PacketConverter.readPos">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int readPos = 0
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="addPacket">
+<button class="show-code">Code</button>
+dynamic <strong>addPacket</strong>(List&lt;int&gt; packet) <a class="anchor-link" href="#addPacket"
+              title="Permalink to PacketConverter.addPacket">#</a></h4>
+<div class="doc">
+<pre class="source">
+addPacket(List&lt;int&gt; packet) {
+ packets.addLast(packet);
+ //print('addPacket to $this');
+ if (headerMode) {
+   handleHeader();
+ } else {
+   handleBody();
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="bytesAvailable">
+<button class="show-code">Code</button>
+int <strong>bytesAvailable</strong>() <a class="anchor-link" href="#bytesAvailable"
+              title="Permalink to PacketConverter.bytesAvailable">#</a></h4>
+<div class="doc">
+<p>Length of all packets with current read position on first packet subtracted</p>
+<pre class="source">
+int bytesAvailable() =&gt; packets.fold(- readPos,(value, element) =&gt; value + element.length) ;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="handleBody">
+<button class="show-code">Code</button>
+dynamic <strong>handleBody</strong>() <a class="anchor-link" href="#handleBody"
+              title="Permalink to PacketConverter.handleBody">#</a></h4>
+<div class="doc">
+<pre class="source">
+handleBody(){
+ if (bytesAvailable()&gt;=messageBuffer.length-4) {
+   headerMode = true;
+   messageBuffer.setRange(0,4,lengthBuffer.byteList);
+   readIntoBuffer(messageBuffer,4);
+   messagesConverted++;
+   messages.addLast(messageBuffer);
+   handleHeader();
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="handleHeader">
+<button class="show-code">Code</button>
+dynamic <strong>handleHeader</strong>() <a class="anchor-link" href="#handleHeader"
+              title="Permalink to PacketConverter.handleHeader">#</a></h4>
+<div class="doc">
+<pre class="source">
+handleHeader(){
+ if (bytesAvailable()&gt;=4) {
+   headerMode = false;
+   lengthBuffer.rewind();
+   readIntoBuffer(lengthBuffer.byteList,0);
+   int len = lengthBuffer.readInt32();
+   if (len &gt; MAX_DOC_SIZE) {
+     throw new MongoDartError('Message length $len over maximum document size');
+   }
+   messageBuffer = new List&lt;int&gt;(len);
+   handleBody();
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="readIntoBuffer">
+<button class="show-code">Code</button>
+void <strong>readIntoBuffer</strong>(List&lt;int&gt; buffer, int pos) <a class="anchor-link" href="#readIntoBuffer"
+              title="Permalink to PacketConverter.readIntoBuffer">#</a></h4>
+<div class="doc">
+<pre class="source">
+void readIntoBuffer(List&lt;int&gt; buffer, int pos) {
+ if(buffer.length - pos &gt; bytesAvailable()) {
+//      print('$this $buffer $pos');
+   throw new MongoDartError('Bad state. Read buffer too big');
+ }
+ int writePos = pos;
+ while (writePos &lt; buffer.length) {
+   writePos += _readPacketIntoBuffer(buffer, writePos);
+ }
+ if (writePos &lt; buffer.length) {
+   throw new MongoDartError('Bad state. Buffer was not written fully');
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+String <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to PacketConverter.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
+<pre class="source">
+String toString() =&gt; 'PacketConverter(readPos: $readPos, headerMode: $headerMode, packets: $packets)';
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          <div>This page was generated at 2013-08-06 10:39:54.350</div>
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

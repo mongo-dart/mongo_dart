@@ -5,7 +5,7 @@
         <title>DbCollection class / mongo_dart Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="../styles.css">
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
         <link rel="shortcut icon" href="../favicon.ico">
         
         </head>
@@ -24,30 +24,6 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
-<li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
-<li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
-<li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
-<li><div class="icon-class"></div><strong>DbCollection</strong></li>
-<li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
-<li><a href="../mongo_dart/GridFS.html"><div class="icon-class"></div>GridFS</a></li>
-<li><a href="../mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
-<li><a href="../mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
-<li><a href="../mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
-<li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
-<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
-<li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
-<li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
-<li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
-<li><a href="../mongo_dart/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
-<li><a href="../mongo_dart/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
-<li><a href="../mongo_dart/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
-<li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
-<li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
-<li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
-<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
-<li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
-</ul>
 </div>
 <div class="content">
         <h2><strong>DbCollection</strong>
@@ -62,7 +38,7 @@ class DbCollection{
  String collectionName;
  DbCollection(this.db, this.collectionName){}
  String fullName() =&gt; "${db.databaseName}.$collectionName";
- void save(Map document){
+ void save(Map document, {WriteConcern writeConcern}){
    var id;
    bool createId = false;
    if (document.containsKey("_id")){
@@ -72,36 +48,30 @@ class DbCollection{
      }
    }
    if (id != null){
-     update({"_id": id}, document);
+     update({"_id": id}, document, writeConcern: writeConcern);
    }
    else{
      if (createId) {
        document["_id"] = new ObjectId();
      }
-     insert(document);
+     insert(document, writeConcern: writeConcern);
    }
  }
-Future insertAll(List&lt;Map&gt; documents, {bool safeMode: false}){
+Future insertAll(List&lt;Map&gt; documents, {WriteConcern writeConcern}){
    MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
    db.executeMessage(insertMessage);
-   if (safeMode) {
-     return db.getLastError();
-   }
-   else
-   {
-     return new Future.immediate({'ok': 1.0});
-   }
+   return db._getAcknowledgement(writeConcern: writeConcern);
  }
-Future update(selector, document, {bool safeMode: false}){
-   MongoUpdateMessage message = new MongoUpdateMessage(fullName(),_selectorBuiltder2Map(selector), document, 0);
+ Future update(selector, document, {bool upsert: false, WriteConcern writeConcern}){
+   int flags = 0;
+   if (upsert) {
+     flags |= 0x1;
+   }
+
+   MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
+       _selectorBuilder2Map(selector), document, flags);
    db.executeMessage(message);
-   if (safeMode) {
-     return db.getLastError();
-   }
-   else
-   {
-     return new Future.immediate({'ok': 1.0});
-   }
+   return db._getAcknowledgement(writeConcern: writeConcern);
  }
 
 /**
@@ -118,29 +88,48 @@ Future update(selector, document, {bool safeMode: false}){
  }
 
  Future&lt;Map&gt; findOne([selector]){
-   Cursor cursor = find(selector);
+   Cursor cursor = new Cursor(db, this, selector);
    Future&lt;Map&gt; result = cursor.nextObject();
    cursor.close();
    return result;
  }
  Future drop() =&gt; db.dropCollection(collectionName);
- Future remove([selector]) =&gt; db.removeFromCollection(collectionName, _selectorBuiltder2Map(selector));
- Future count([selector]){
+ Future remove([selector, WriteConcern writeConcern]) =&gt; db.removeFromCollection(collectionName, _selectorBuilder2Map(selector), writeConcern);
+ Future&lt;int&gt; count([selector]){
    Completer completer = new Completer();
-   db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuiltder2Map(selector))).then((reply){
-     //print("reply = ${reply}");
-     completer.complete(reply["n"]);
+   db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuilder2Map(selector))).then((reply){
+     completer.complete(reply["n"].toInt());
    });
    return completer.future;
  }
- Future insert(Map document, {bool safeMode: false}) =&gt; insertAll([document], safeMode: safeMode);
+ 
+ Future distinct(String field, [selector]){
+   Completer completer = new Completer();
+   db.executeDbCommand(DbCommand.createDistinctCommand(db,collectionName,field,_selectorBuilder2Map(selector))).then((reply){
+     completer.complete(reply);
+   });
+   return completer.future;
+ }
+ 
+ Future aggregate(List pipeline){
+   Completer completer = new Completer();
+   var cmd = DbCommand.createAggregateCommand(db,collectionName,pipeline);
+   db.executeDbCommand(cmd)
+     .then((reply){
+     completer.complete(reply);
+   });
+   
+   return completer.future;
+ }
+ 
+ Future insert(Map document, {WriteConcern writeConcern}) =&gt; insertAll([document], writeConcern: writeConcern);
 
- Map _selectorBuiltder2Map(selector) {
+ Map _selectorBuilder2Map(selector) {
    if (selector == null) {
      return {};
    }
    if (selector is SelectorBuilder) {
-     return selector.map;
+     return selector.map['\$query'];
    }
    return selector;
  }
@@ -149,11 +138,17 @@ Future update(selector, document, {bool safeMode: false}){
 </div>
 <div>
 <h3>Constructors</h3>
-<div class="method"><h4 id="DbCollection">
+<div class="method"><h4 id="">
 <button class="show-code">Code</button>
-new <strong>DbCollection</strong>(<a href="../mongo_dart/Db.html">Db</a> db, <a href="http://api.dartlang.org/dart_core/String.html">String</a> collectionName) <a class="anchor-link" href="#DbCollection"
+new <strong>DbCollection</strong>(<a href="../mongo_dart/Db.html">Db</a> db, String collectionName) <a class="anchor-link" href="#"
               title="Permalink to DbCollection.DbCollection">#</a></h4>
 <div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="../dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="../dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="../dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
 DbCollection(this.db, this.collectionName){}
 </pre>
@@ -164,13 +159,13 @@ DbCollection(this.db, this.collectionName){}
 <h3>Properties</h3>
 <div class="field"><h4 id="collectionName">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>collectionName</strong> <a class="anchor-link"
+String         <strong>collectionName</strong> <a class="anchor-link"
             href="#collectionName"
             title="Permalink to DbCollection.collectionName">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-String collectionName;
+String collectionName
 </pre>
 </div>
 </div>
@@ -182,24 +177,58 @@ String collectionName;
         </h4>
         <div class="doc">
 <pre class="source">
-Db db;
+Db db
 </pre>
 </div>
 </div>
 </div>
 <div>
 <h3>Methods</h3>
+<div class="method"><h4 id="aggregate">
+<button class="show-code">Code</button>
+Future <strong>aggregate</strong>(List pipeline) <a class="anchor-link" href="#aggregate"
+              title="Permalink to DbCollection.aggregate">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future aggregate(List pipeline){
+ Completer completer = new Completer();
+ var cmd = DbCommand.createAggregateCommand(db,collectionName,pipeline);
+ db.executeDbCommand(cmd)
+   .then((reply){
+   completer.complete(reply);
+ });
+ 
+ return completer.future;
+}
+</pre>
+</div>
+</div>
 <div class="method"><h4 id="count">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>count</strong>([selector]) <a class="anchor-link" href="#count"
+Future&lt;int&gt; <strong>count</strong>([selector]) <a class="anchor-link" href="#count"
               title="Permalink to DbCollection.count">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future count([selector]){
+Future&lt;int&gt; count([selector]){
  Completer completer = new Completer();
- db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuiltder2Map(selector))).then((reply){
-   //print("reply = ${reply}");
-   completer.complete(reply["n"]);
+ db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuilder2Map(selector))).then((reply){
+   completer.complete(reply["n"].toInt());
+ });
+ return completer.future;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="distinct">
+<button class="show-code">Code</button>
+Future <strong>distinct</strong>(String field, [selector]) <a class="anchor-link" href="#distinct"
+              title="Permalink to DbCollection.distinct">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future distinct(String field, [selector]){
+ Completer completer = new Completer();
+ db.executeDbCommand(DbCommand.createDistinctCommand(db,collectionName,field,_selectorBuilder2Map(selector))).then((reply){
+   completer.complete(reply);
  });
  return completer.future;
 }
@@ -208,7 +237,7 @@ Future count([selector]){
 </div>
 <div class="method"><h4 id="drop">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>drop</strong>() <a class="anchor-link" href="#drop"
+Future <strong>drop</strong>() <a class="anchor-link" href="#drop"
               title="Permalink to DbCollection.drop">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -238,12 +267,12 @@ Cursor find([selector]) {
 </div>
 <div class="method"><h4 id="findOne">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; <strong>findOne</strong>([selector]) <a class="anchor-link" href="#findOne"
+Future&lt;Map&gt; <strong>findOne</strong>([selector]) <a class="anchor-link" href="#findOne"
               title="Permalink to DbCollection.findOne">#</a></h4>
 <div class="doc">
 <pre class="source">
 Future&lt;Map&gt; findOne([selector]){
- Cursor cursor = find(selector);
+ Cursor cursor = new Cursor(db, this, selector);
  Future&lt;Map&gt; result = cursor.nextObject();
  cursor.close();
  return result;
@@ -253,7 +282,7 @@ Future&lt;Map&gt; findOne([selector]){
 </div>
 <div class="method"><h4 id="fullName">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>fullName</strong>() <a class="anchor-link" href="#fullName"
+String <strong>fullName</strong>() <a class="anchor-link" href="#fullName"
               title="Permalink to DbCollection.fullName">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -263,51 +292,45 @@ String fullName() =&gt; "${db.databaseName}.$collectionName";
 </div>
 <div class="method"><h4 id="insert">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>insert</strong>(<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> document, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> safeMode: false}) <a class="anchor-link" href="#insert"
+Future <strong>insert</strong>(Map document, {<a href="../mongo_dart/WriteConcern.html">WriteConcern</a> writeConcern}) <a class="anchor-link" href="#insert"
               title="Permalink to DbCollection.insert">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future insert(Map document, {bool safeMode: false}) =&gt; insertAll([document], safeMode: safeMode);
+Future insert(Map document, {WriteConcern writeConcern}) =&gt; insertAll([document], writeConcern: writeConcern);
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="insertAll">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>insertAll</strong>(<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; documents, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> safeMode: false}) <a class="anchor-link" href="#insertAll"
+Future <strong>insertAll</strong>(List&lt;Map&gt; documents, {<a href="../mongo_dart/WriteConcern.html">WriteConcern</a> writeConcern}) <a class="anchor-link" href="#insertAll"
               title="Permalink to DbCollection.insertAll">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future insertAll(List&lt;Map&gt; documents, {bool safeMode: false}){
+Future insertAll(List&lt;Map&gt; documents, {WriteConcern writeConcern}){
   MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
   db.executeMessage(insertMessage);
-  if (safeMode) {
-    return db.getLastError();
-  }
-  else
-  {
-    return new Future.immediate({'ok': 1.0});
-  }
+  return db._getAcknowledgement(writeConcern: writeConcern);
 }
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="remove">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>remove</strong>([selector]) <a class="anchor-link" href="#remove"
+Future <strong>remove</strong>([selector, <a href="../mongo_dart/WriteConcern.html">WriteConcern</a> writeConcern]) <a class="anchor-link" href="#remove"
               title="Permalink to DbCollection.remove">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future remove([selector]) =&gt; db.removeFromCollection(collectionName, _selectorBuiltder2Map(selector));
+Future remove([selector, WriteConcern writeConcern]) =&gt; db.removeFromCollection(collectionName, _selectorBuilder2Map(selector), writeConcern);
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="save">
 <button class="show-code">Code</button>
-void <strong>save</strong>(<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> document) <a class="anchor-link" href="#save"
+void <strong>save</strong>(Map document, {<a href="../mongo_dart/WriteConcern.html">WriteConcern</a> writeConcern}) <a class="anchor-link" href="#save"
               title="Permalink to DbCollection.save">#</a></h4>
 <div class="doc">
 <pre class="source">
-void save(Map document){
+void save(Map document, {WriteConcern writeConcern}){
  var id;
  bool createId = false;
  if (document.containsKey("_id")){
@@ -317,13 +340,13 @@ void save(Map document){
    }
  }
  if (id != null){
-   update({"_id": id}, document);
+   update({"_id": id}, document, writeConcern: writeConcern);
  }
  else{
    if (createId) {
      document["_id"] = new ObjectId();
    }
-   insert(document);
+   insert(document, writeConcern: writeConcern);
  }
 }
 </pre>
@@ -331,20 +354,20 @@ void save(Map document){
 </div>
 <div class="method"><h4 id="update">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>update</strong>(selector, document, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> safeMode: false}) <a class="anchor-link" href="#update"
+Future <strong>update</strong>(selector, document, {bool upsert: false, <a href="../mongo_dart/WriteConcern.html">WriteConcern</a> writeConcern}) <a class="anchor-link" href="#update"
               title="Permalink to DbCollection.update">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future update(selector, document, {bool safeMode: false}){
-  MongoUpdateMessage message = new MongoUpdateMessage(fullName(),_selectorBuiltder2Map(selector), document, 0);
-  db.executeMessage(message);
-  if (safeMode) {
-    return db.getLastError();
-  }
-  else
-  {
-    return new Future.immediate({'ok': 1.0});
-  }
+Future update(selector, document, {bool upsert: false, WriteConcern writeConcern}){
+ int flags = 0;
+ if (upsert) {
+   flags |= 0x1;
+ }
+
+ MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
+     _selectorBuilder2Map(selector), document, flags);
+ db.executeMessage(message);
+ return db._getAcknowledgement(writeConcern: writeConcern);
 }
 </pre>
 </div>
@@ -353,10 +376,9 @@ Future update(selector, document, {bool safeMode: false}){
         </div>
         <div class="clear"></div>
         </div>
-        
         <div class="footer">
-          <div>This page was generated at 2012-12-27 12:26:56.051</div>
+          <div>This page was generated at 2013-08-06 10:39:53.968</div>
         </div>
-        <script async src="../client-static.js"></script>
+        <script async src="../client-live-nav.js"></script>
         </body></html>
         

@@ -1,0 +1,871 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>SelectorBuilder class / mongo_dart_query Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart_query" data-type="SelectorBuilder">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart_query.html">mongo_dart_query</a> &rsaquo; <a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>SelectorBuilder</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class SelectorBuilder{
+ Map map = {};
+ bool _isQuerySet = false;
+ Map get _query {
+   if (!_isQuerySet) {
+     map['\$query'] = {};
+     _isQuerySet = true;
+   }
+   return map['\$query'];
+ }
+ int paramSkip = 0;
+ int paramLimit = 0;
+ Map paramFields;
+
+ toString()=&gt;"SelectorBuilder($map)";
+
+ _addExpression(String fieldName, value) {
+   Map exprMap = {};
+   exprMap[fieldName] = value;
+   if (_query.isEmpty) {
+     _query[fieldName] = value;
+   } else {
+     _addExpressionMap(exprMap);
+   }
+ }
+ _addExpressionMap(Map expr) {
+   if (_query.containsKey('\$and')) {
+     List expressions = _query['\$and'];
+     expressions.add(expr);
+   } else {
+     var expressions = [_query];
+     expressions.add(expr);
+     map['\$query'] = {'\$and': expressions};
+   }
+ }
+
+ SelectorBuilder eq(String fieldName,value){
+   _addExpression(fieldName,value);
+   return this;
+ }
+ SelectorBuilder id(ObjectId value){
+   _addExpression('_id', value);
+   return this;
+ }
+ SelectorBuilder ne(String fieldName, value){
+   _addExpression(fieldName,{"\$ne":value});
+   return this;
+ }
+ SelectorBuilder gt(String fieldName,value){
+   _addExpression(fieldName,{"\$gt":value});
+   return this;
+ }
+ SelectorBuilder lt(String fieldName,value){
+   _addExpression(fieldName,{"\$lt":value});
+   return this;
+ }
+ SelectorBuilder gte(String fieldName,value){
+   _addExpression(fieldName,{"\$gte":value});
+   return this;
+ }
+ SelectorBuilder lte(String fieldName,value){
+   _addExpression(fieldName,{"\$lte":value});
+   return this;
+ }
+ SelectorBuilder all(String fieldName, List values){
+   _addExpression(fieldName,{"\$all":values});
+   return this;
+ }
+ SelectorBuilder nin(String fieldName, List values){
+   _addExpression(fieldName,{"\$nin":values});
+   return this;
+ }
+ SelectorBuilder oneFrom(String fieldName, List values){
+   _addExpression(fieldName,{"\$in":values});
+   return this;
+ }
+ SelectorBuilder exists(String fieldName){
+   _addExpression(fieldName,{"\$exists":true});
+   return this;
+ }
+ SelectorBuilder notExists(String fieldName){
+   _addExpression(fieldName,{"\$exists":false});
+   return this;
+ }
+ SelectorBuilder mod(String fieldName, int value){
+   _addExpression(fieldName,{"\$mod":[value,0]});
+   return this;
+ }
+ SelectorBuilder match(String fieldName, String pattern,{bool multiLine, bool caseInsensitive, bool dotAll, bool extended}){
+   _addExpression(fieldName,{'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
+       dotAll:dotAll,extended:extended)});
+   return this;
+ }
+ 
+ SelectorBuilder inRange(String fieldName, min, max, {bool minInclude: true, bool maxInclude: false}) {
+   Map rangeMap = {};
+   if (minInclude){
+     rangeMap["\$gte"] = min;
+   }
+   else{
+     rangeMap["\$gt"] = min;
+   }
+   if (maxInclude){
+     rangeMap["\$lte"] = max;
+   }
+   else{
+     rangeMap["\$lt"] = max;
+   }
+   _addExpression(fieldName,rangeMap);
+   return this;
+ }
+ SelectorBuilder sortBy(String fieldName, {bool descending: false}){
+   _query;
+   if (!map.containsKey("orderby")){
+     map["orderby"] = new LinkedHashMap();
+   }
+   int order = 1;
+   if (descending){
+     order = -1;
+   }
+   map["orderby"][fieldName] = order;
+   return this;
+ }
+ SelectorBuilder hint(String fieldName, {bool descending: false}){
+   _query;
+   if (!map.containsKey("\$hint")){
+     map["\$hint"] = new LinkedHashMap();
+   }
+   int order = 1;
+   if (descending){
+     order = -1;
+   }
+   map["\$hint"][fieldName] = order;
+   return this;
+ }
+ 
+ SelectorBuilder comment(String commentStr){
+   _query;
+   map["\$comment"] = commentStr;
+   return this;
+ }
+ SelectorBuilder explain(){
+   _query;
+   map["\$explain"] = true;
+   return this;
+ }
+ SelectorBuilder snapshot(){
+   _query;
+   map["\$snapshot"] = true;
+   return this;
+ }
+ SelectorBuilder showDiskLoc(){
+   _query;
+   map["\$showDiskLoc"] = true;
+   return this;
+ }
+ SelectorBuilder returnKey(){
+   _query;
+   map["\$sreturnKey"] = true;
+   return this;
+ }
+
+ SelectorBuilder jsQuery(String javaScriptCode){
+   _query["\$where"] = new BsonCode(javaScriptCode);
+   return this;
+ }
+
+
+ SelectorBuilder fields(List&lt;String&gt; fields) {
+    if (paramFields != null) {
+      throw 'Fields parameter may be set only once for selector';
+    }
+    paramFields = {};
+    for (var field in fields) {
+      paramFields[field] = 1;
+    }
+    return this;
+ }
+ SelectorBuilder excludeFields(List&lt;String&gt; fields) {
+   if (paramFields != null) {
+     throw 'Fields parameter may be set only once for selector';
+   }
+   paramFields = {};
+   for (var field in fields) {
+     paramFields[field] = -1;
+   }
+   return this;
+ }
+
+ SelectorBuilder limit(int limit) {
+   paramLimit = limit;
+   return this;
+ }
+
+ SelectorBuilder skip(int skip) {
+   paramSkip = skip;
+   return this;
+ }
+
+ SelectorBuilder raw(Map rawSelector) {
+   map = rawSelector;
+   return this;
+ }
+ SelectorBuilder within(String fieldName, value){
+   _addExpression(fieldName,{"\$within":{"\$box":value}});
+   return this;
+ }
+ SelectorBuilder near(String fieldName, var value, [double maxDistance]){
+   if (maxDistance != null){
+     _addExpression(fieldName,{"\$near":value});
+   } else {
+     _addExpression(fieldName,{"\$near":value,"\$maxDistance":maxDistance});
+   }
+   return this;
+ }
+/// Combine current expression with expression in parameter. 
+/// [See MongoDB doc](http://docs.mongodb.org/manual/reference/operator/and/#op._S_and)
+/// [SelectorBuilder] provides implicit `and` operator for chained queries so these two expression will produce
+/// identical MongoDB queries
+///  
+///     where.eq('price', 1.99).lt('qty', 20).eq('sale', true);
+///     where.eq('price', 1.99).and(where.lt('qty',20)).and(where.eq('sale', true))
+///
+/// Both these queries would produce json map:
+///  
+///     {'\$query': {'\$and': [{'price':1.99},{'qty': {'\$lt': 20 }}, {'sale': true }]}}
+ SelectorBuilder and(SelectorBuilder other) {
+   if (_query.isEmpty) {
+     throw new StateError('`And` opertion is not supported on empty query');
+   }
+   _addExpressionMap(other._query);
+   return this;
+ }
+/// Combine current expression with expression in parameter by logical operator **OR**. 
+/// [See MongoDB doc](http://docs.mongodb.org/manual/reference/operator/and/#op._S_or)
+/// For example  
+///    inventory.find(where.eq('price', 1.99).and(where.lt('qty',20).or(where.eq('sale', true))));
+/// 
+/// This query will select all documents in the inventory collection where:
+/// * the **price** field value equals 1.99 and
+/// * either the **qty** field value is less than 20 or the **sale** field value is true 
+/// MongoDB json query from this expression would be
+///      {'\$query': {'\$and': [{'price':1.99}, {'\$or': [{'qty': {'\$lt': 20 }}, {'sale': true }]}]}}
+ SelectorBuilder or(SelectorBuilder other) {
+   if (_query.isEmpty) {
+     throw new StateError('`And` opertion is not supported on empty query');
+   }
+   if (_query.containsKey('\$or')) {
+     List expressions = _query['\$or'];
+     expressions.add(other._query);
+   } else {
+     var expressions = [_query];
+     expressions.add(other._query);
+     map['\$query'] = {'\$or': expressions};
+   }
+   return this;
+ }
+}
+</pre>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="map">
+<button class="show-code">Code</button>
+Map         <strong>map</strong> <a class="anchor-link"
+            href="#map"
+            title="Permalink to SelectorBuilder.map">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Map map = {}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="paramFields">
+<button class="show-code">Code</button>
+Map         <strong>paramFields</strong> <a class="anchor-link"
+            href="#paramFields"
+            title="Permalink to SelectorBuilder.paramFields">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Map paramFields
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="paramLimit">
+<button class="show-code">Code</button>
+int         <strong>paramLimit</strong> <a class="anchor-link"
+            href="#paramLimit"
+            title="Permalink to SelectorBuilder.paramLimit">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int paramLimit = 0
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="paramSkip">
+<button class="show-code">Code</button>
+int         <strong>paramSkip</strong> <a class="anchor-link"
+            href="#paramSkip"
+            title="Permalink to SelectorBuilder.paramSkip">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int paramSkip = 0
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="all">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>all</strong>(String fieldName, List values) <a class="anchor-link" href="#all"
+              title="Permalink to SelectorBuilder.all">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder all(String fieldName, List values){
+ _addExpression(fieldName,{"\$all":values});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="and">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>and</strong>(<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> other) <a class="anchor-link" href="#and"
+              title="Permalink to SelectorBuilder.and">#</a></h4>
+<div class="doc">
+<p>Combine current expression with expression in parameter. 
+<a href="http://docs.mongodb.org/manual/reference/operator/and/#op._S_and">See MongoDB doc</a>
+<a class="crossref" href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> provides implicit <code>and</code> operator for chained queries so these two expression will produce
+identical MongoDB queries</p>
+<pre><code>where.eq('price', 1.99).lt('qty', 20).eq('sale', true);
+where.eq('price', 1.99).and(where.lt('qty',20)).and(where.eq('sale', true))
+</code></pre>
+<p>Both these queries would produce json map:</p>
+<pre><code>{'\$query': {'\$and': [{'price':1.99},{'qty': {'\$lt': 20 }}, {'sale': true }]}}
+</code></pre>
+<pre class="source">
+SelectorBuilder and(SelectorBuilder other) {
+ if (_query.isEmpty) {
+   throw new StateError('`And` opertion is not supported on empty query');
+ }
+ _addExpressionMap(other._query);
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="comment">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>comment</strong>(String commentStr) <a class="anchor-link" href="#comment"
+              title="Permalink to SelectorBuilder.comment">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder comment(String commentStr){
+ _query;
+ map["\$comment"] = commentStr;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="eq">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>eq</strong>(String fieldName, value) <a class="anchor-link" href="#eq"
+              title="Permalink to SelectorBuilder.eq">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder eq(String fieldName,value){
+ _addExpression(fieldName,value);
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="excludeFields">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>excludeFields</strong>(List&lt;String&gt; fields) <a class="anchor-link" href="#excludeFields"
+              title="Permalink to SelectorBuilder.excludeFields">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder excludeFields(List&lt;String&gt; fields) {
+ if (paramFields != null) {
+   throw 'Fields parameter may be set only once for selector';
+ }
+ paramFields = {};
+ for (var field in fields) {
+   paramFields[field] = -1;
+ }
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="exists">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>exists</strong>(String fieldName) <a class="anchor-link" href="#exists"
+              title="Permalink to SelectorBuilder.exists">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder exists(String fieldName){
+ _addExpression(fieldName,{"\$exists":true});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="explain">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>explain</strong>() <a class="anchor-link" href="#explain"
+              title="Permalink to SelectorBuilder.explain">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder explain(){
+ _query;
+ map["\$explain"] = true;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="fields">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>fields</strong>(List&lt;String&gt; fields) <a class="anchor-link" href="#fields"
+              title="Permalink to SelectorBuilder.fields">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder fields(List&lt;String&gt; fields) {
+  if (paramFields != null) {
+    throw 'Fields parameter may be set only once for selector';
+  }
+  paramFields = {};
+  for (var field in fields) {
+    paramFields[field] = 1;
+  }
+  return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="gt">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>gt</strong>(String fieldName, value) <a class="anchor-link" href="#gt"
+              title="Permalink to SelectorBuilder.gt">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder gt(String fieldName,value){
+ _addExpression(fieldName,{"\$gt":value});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="gte">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>gte</strong>(String fieldName, value) <a class="anchor-link" href="#gte"
+              title="Permalink to SelectorBuilder.gte">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder gte(String fieldName,value){
+ _addExpression(fieldName,{"\$gte":value});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="hint">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>hint</strong>(String fieldName, {bool descending: false}) <a class="anchor-link" href="#hint"
+              title="Permalink to SelectorBuilder.hint">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder hint(String fieldName, {bool descending: false}){
+ _query;
+ if (!map.containsKey("\$hint")){
+   map["\$hint"] = new LinkedHashMap();
+ }
+ int order = 1;
+ if (descending){
+   order = -1;
+ }
+ map["\$hint"][fieldName] = order;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="id">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>id</strong>(<a href="../bson/ObjectId.html">ObjectId</a> value) <a class="anchor-link" href="#id"
+              title="Permalink to SelectorBuilder.id">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder id(ObjectId value){
+ _addExpression('_id', value);
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="inRange">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>inRange</strong>(String fieldName, min, max, {bool minInclude: true, bool maxInclude: false}) <a class="anchor-link" href="#inRange"
+              title="Permalink to SelectorBuilder.inRange">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder inRange(String fieldName, min, max, {bool minInclude: true, bool maxInclude: false}) {
+ Map rangeMap = {};
+ if (minInclude){
+   rangeMap["\$gte"] = min;
+ }
+ else{
+   rangeMap["\$gt"] = min;
+ }
+ if (maxInclude){
+   rangeMap["\$lte"] = max;
+ }
+ else{
+   rangeMap["\$lt"] = max;
+ }
+ _addExpression(fieldName,rangeMap);
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="jsQuery">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>jsQuery</strong>(String javaScriptCode) <a class="anchor-link" href="#jsQuery"
+              title="Permalink to SelectorBuilder.jsQuery">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder jsQuery(String javaScriptCode){
+ _query["\$where"] = new BsonCode(javaScriptCode);
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="limit">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>limit</strong>(int limit) <a class="anchor-link" href="#limit"
+              title="Permalink to SelectorBuilder.limit">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder limit(int limit) {
+ paramLimit = limit;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="lt">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>lt</strong>(String fieldName, value) <a class="anchor-link" href="#lt"
+              title="Permalink to SelectorBuilder.lt">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder lt(String fieldName,value){
+ _addExpression(fieldName,{"\$lt":value});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="lte">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>lte</strong>(String fieldName, value) <a class="anchor-link" href="#lte"
+              title="Permalink to SelectorBuilder.lte">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder lte(String fieldName,value){
+ _addExpression(fieldName,{"\$lte":value});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="match">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>match</strong>(String fieldName, String pattern, {bool multiLine, bool caseInsensitive, bool dotAll, bool extended}) <a class="anchor-link" href="#match"
+              title="Permalink to SelectorBuilder.match">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder match(String fieldName, String pattern,{bool multiLine, bool caseInsensitive, bool dotAll, bool extended}){
+ _addExpression(fieldName,{'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
+     dotAll:dotAll,extended:extended)});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="mod">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>mod</strong>(String fieldName, int value) <a class="anchor-link" href="#mod"
+              title="Permalink to SelectorBuilder.mod">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder mod(String fieldName, int value){
+ _addExpression(fieldName,{"\$mod":[value,0]});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="ne">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>ne</strong>(String fieldName, value) <a class="anchor-link" href="#ne"
+              title="Permalink to SelectorBuilder.ne">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder ne(String fieldName, value){
+ _addExpression(fieldName,{"\$ne":value});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="near">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>near</strong>(String fieldName, value, [double maxDistance]) <a class="anchor-link" href="#near"
+              title="Permalink to SelectorBuilder.near">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder near(String fieldName, var value, [double maxDistance]){
+ if (maxDistance != null){
+   _addExpression(fieldName,{"\$near":value});
+ } else {
+   _addExpression(fieldName,{"\$near":value,"\$maxDistance":maxDistance});
+ }
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="nin">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>nin</strong>(String fieldName, List values) <a class="anchor-link" href="#nin"
+              title="Permalink to SelectorBuilder.nin">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder nin(String fieldName, List values){
+ _addExpression(fieldName,{"\$nin":values});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="notExists">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>notExists</strong>(String fieldName) <a class="anchor-link" href="#notExists"
+              title="Permalink to SelectorBuilder.notExists">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder notExists(String fieldName){
+ _addExpression(fieldName,{"\$exists":false});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="oneFrom">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>oneFrom</strong>(String fieldName, List values) <a class="anchor-link" href="#oneFrom"
+              title="Permalink to SelectorBuilder.oneFrom">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder oneFrom(String fieldName, List values){
+ _addExpression(fieldName,{"\$in":values});
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="or">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>or</strong>(<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> other) <a class="anchor-link" href="#or"
+              title="Permalink to SelectorBuilder.or">#</a></h4>
+<div class="doc">
+<p>Combine current expression with expression in parameter by logical operator <strong>OR</strong>. 
+<a href="http://docs.mongodb.org/manual/reference/operator/and/#op._S_or">See MongoDB doc</a>
+For example  
+   inventory.find(where.eq('price', 1.99).and(where.lt('qty',20).or(where.eq('sale', true))));</p>
+<p>This query will select all documents in the inventory collection where:
+<em> the </em><em>price</em><em> field value equals 1.99 and
+</em> either the <strong>qty</strong> field value is less than 20 or the <strong>sale</strong> field value is true 
+MongoDB json query from this expression would be</p>
+<pre><code> {'\$query': {'\$and': [{'price':1.99}, {'\$or': [{'qty': {'\$lt': 20 }}, {'sale': true }]}]}}
+</code></pre>
+<pre class="source">
+SelectorBuilder or(SelectorBuilder other) {
+ if (_query.isEmpty) {
+   throw new StateError('`And` opertion is not supported on empty query');
+ }
+ if (_query.containsKey('\$or')) {
+   List expressions = _query['\$or'];
+   expressions.add(other._query);
+ } else {
+   var expressions = [_query];
+   expressions.add(other._query);
+   map['\$query'] = {'\$or': expressions};
+ }
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="raw">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>raw</strong>(Map rawSelector) <a class="anchor-link" href="#raw"
+              title="Permalink to SelectorBuilder.raw">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder raw(Map rawSelector) {
+ map = rawSelector;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="returnKey">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>returnKey</strong>() <a class="anchor-link" href="#returnKey"
+              title="Permalink to SelectorBuilder.returnKey">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder returnKey(){
+ _query;
+ map["\$sreturnKey"] = true;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="showDiskLoc">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>showDiskLoc</strong>() <a class="anchor-link" href="#showDiskLoc"
+              title="Permalink to SelectorBuilder.showDiskLoc">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder showDiskLoc(){
+ _query;
+ map["\$showDiskLoc"] = true;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="skip">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>skip</strong>(int skip) <a class="anchor-link" href="#skip"
+              title="Permalink to SelectorBuilder.skip">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder skip(int skip) {
+ paramSkip = skip;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="snapshot">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>snapshot</strong>() <a class="anchor-link" href="#snapshot"
+              title="Permalink to SelectorBuilder.snapshot">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder snapshot(){
+ _query;
+ map["\$snapshot"] = true;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="sortBy">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>sortBy</strong>(String fieldName, {bool descending: false}) <a class="anchor-link" href="#sortBy"
+              title="Permalink to SelectorBuilder.sortBy">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder sortBy(String fieldName, {bool descending: false}){
+ _query;
+ if (!map.containsKey("orderby")){
+   map["orderby"] = new LinkedHashMap();
+ }
+ int order = 1;
+ if (descending){
+   order = -1;
+ }
+ map["orderby"][fieldName] = order;
+ return this;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+dynamic <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to SelectorBuilder.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
+<pre class="source">
+toString()=&gt;"SelectorBuilder($map)";
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="within">
+<button class="show-code">Code</button>
+<a href="../mongo_dart_query/SelectorBuilder.html">SelectorBuilder</a> <strong>within</strong>(String fieldName, value) <a class="anchor-link" href="#within"
+              title="Permalink to SelectorBuilder.within">#</a></h4>
+<div class="doc">
+<pre class="source">
+SelectorBuilder within(String fieldName, value){
+ _addExpression(fieldName,{"\$within":{"\$box":value}});
+ return this;
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          <div>This page was generated at 2013-08-06 10:39:54.580</div>
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

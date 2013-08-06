@@ -5,7 +5,7 @@
         <title>BsonBinary class / bson Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="../styles.css">
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
         <link rel="shortcut icon" href="../favicon.ico">
         
         </head>
@@ -24,31 +24,7 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><ul class="icon">
-<li><a href="../bson/BSON.html"><div class="icon-class"></div>BSON</a></li>
-<li><a href="../bson/BsonArray.html"><div class="icon-class"></div>BsonArray</a></li>
-<li><div class="icon-class"></div><strong>BsonBinary</strong></li>
-<li><a href="../bson/BsonBoolean.html"><div class="icon-class"></div>BsonBoolean</a></li>
-<li><a href="../bson/BsonCode.html"><div class="icon-class"></div>BsonCode</a></li>
-<li><a href="../bson/BsonCString.html"><div class="icon-class"></div>BsonCString</a></li>
-<li><a href="../bson/BsonDate.html"><div class="icon-class"></div>BsonDate</a></li>
-<li><a href="../bson/BsonDouble.html"><div class="icon-class"></div>BsonDouble</a></li>
-<li><a href="../bson/BsonInt.html"><div class="icon-class"></div>BsonInt</a></li>
-<li><a href="../bson/BsonLong.html"><div class="icon-class"></div>BsonLong</a></li>
-<li><a href="../bson/BsonMap.html"><div class="icon-class"></div>BsonMap</a></li>
-<li><a href="../bson/BsonNull.html"><div class="icon-class"></div>BsonNull</a></li>
-<li><a href="../bson/BsonObject.html"><div class="icon-class"></div>BsonObject</a></li>
-<li><a href="../bson/BsonPlatform.html"><div class="icon-class"></div>BsonPlatform</a></li>
-<li><a href="../bson/BsonRegexp.html"><div class="icon-class"></div>BsonRegexp</a></li>
-<li><a href="../bson/BsonString.html"><div class="icon-class"></div>BsonString</a></li>
-<li><a href="../bson/DbRef.html"><div class="icon-class"></div>DbRef</a></li>
-<li><a href="../bson/MaxKey.html"><div class="icon-class"></div>MaxKey</a></li>
-<li><a href="../bson/MinKey.html"><div class="icon-class"></div>MinKey</a></li>
-<li><a href="../bson/ObjectId.html"><div class="icon-class"></div>ObjectId</a></li>
-<li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
-<li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
-</ul>
-<h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
+</div>
 <div class="content">
         <h2><strong>BsonBinary</strong>
           class
@@ -58,6 +34,7 @@
 <div class="doc">
 <pre class="source">
 class BsonBinary extends BsonObject{
+ static final bool  UseFixnum = _isIntWorkaroundNeeded();
  static final BUFFER_SIZE = 256;
  static final SUBTYPE_DEFAULT = 0;
  static final SUBTYPE_FUNCTION = 1;
@@ -85,7 +62,7 @@ class BsonBinary extends BsonObject{
  static const int CHAR_f = 102;
 
  static final tokens = createTokens();
- var byteArray;
+ ByteData byteArray;
  List&lt;int&gt; byteList;
  int offset;
  int subType;
@@ -118,23 +95,24 @@ class BsonBinary extends BsonObject{
    }
    return _hexString;
  }
- BsonBinary(int length): byteList = makeUint8List(length), offset=0, subType=0{
-   byteArray = makeByteArray(byteList);
+ BsonBinary(int length): byteList = new Uint8List(length), offset=0, subType=0{
+   byteArray = _getByteData(byteList);
  }
- BsonBinary.from(List from): byteList = makeUint8List(from.length),offset=0, subType=0 {
+ BsonBinary.from(List from): byteList = new Uint8List(from.length),offset=0, subType=0 {
    byteList.setRange(0, from.length, from);
-   byteArray = makeByteArray(byteList);
+   byteArray = _getByteData(byteList);
  }
  BsonBinary.fromHexString(this._hexString);
- int get typeByte =&gt; BSON.BSON_DATA_BINARY;
+ int get typeByte =&gt; _BSON_DATA_BINARY;
+ ByteData _getByteData(from) =&gt; new ByteData.view(from.buffer);
  makeHexString(){
    StringBuffer stringBuffer = new StringBuffer();
    for (final byte in byteList)
    {
       if (byte &lt; 16){
-       stringBuffer.add("0");
+       stringBuffer.write("0");
       }
-      stringBuffer.add(byte.toRadixString(16));
+      stringBuffer.write(byte.toRadixString(16));
    }
    _hexString = stringBuffer.toString().toLowerCase();
  }
@@ -142,18 +120,18 @@ class BsonBinary extends BsonObject{
    if (_hexString.length.remainder(2) != 0) {
      throw 'Not valid hex representation: $_hexString (odd length)';
    }
-   byteList = makeUint8List((_hexString.length / 2).round().toInt());
-   byteArray = makeByteArray(byteList);
+   byteList = new Uint8List((_hexString.length / 2).round().toInt());
+   byteArray = _getByteData(byteList);
    int pos = 0;
    int listPos = 0;
    while (pos &lt; _hexString.length) {
-     int char = _hexString.charCodeAt(pos);
+     int char = _hexString.codeUnitAt(pos);
      int n1 = tokens[char];
      if (n1 == null) {
        throw 'Invalid char ${_hexString[pos]} in $_hexString';
      }
      pos++;
-     char = _hexString.charCodeAt(pos);
+     char = _hexString.codeUnitAt(pos);
      int n2 = tokens[char];
      if (n2 == null) {
        throw 'Invalid char ${_hexString[pos]} in $_hexString';
@@ -162,19 +140,19 @@ class BsonBinary extends BsonObject{
      pos++;
    }
  }
- setIntExtended(int value, int numOfBytes){
-   List&lt;int&gt; byteListTmp = makeUint8List(8);
-   var byteArrayTmp = makeByteArray(byteListTmp);
+ setIntExtended(int value, int numOfBytes, Endianness endianness){
+   List&lt;int&gt; byteListTmp = new Uint8List(4);
+   var byteArrayTmp = _getByteData(byteListTmp);
    if (numOfBytes == 3){
-     byteArrayTmp.setInt32(0,value);
+     byteArrayTmp.setInt32(0,value,endianness);
    }
-   else if (numOfBytes &gt; 4 &amp;&amp; numOfBytes &lt; 8){
-     byteArrayTmp.setInt64(0,value);
-   }
+//    else if (numOfBytes &gt; 4 &amp;&amp; numOfBytes &lt; 8){
+//      byteArrayTmp.setInt64(0,value,Endianness.LITTLE_ENDIAN);
+//    }
    else {
-       throw new Exception("Unsupported num of bits: ${numOfBytes*8}");
+       throw new Exception("Unsupported num of bytes: ${numOfBytes}");
    }
-   byteList.setRange(offset,numOfBytes,byteListTmp);
+   byteList.setRange(offset,offset+numOfBytes,byteListTmp);
  }
  reverse(int numOfBytes){
    swap(int x, int y){
@@ -186,47 +164,42 @@ class BsonBinary extends BsonObject{
      swap(i,numOfBytes-1-i);
    }
  }
- encodeInt(int position,int value, int numOfBytes, bool forceBigEndian, bool signed) {
-   int bits = numOfBytes &lt;&lt; 3;
-   int max = Statics.MaxBits(bits);
-
-   if (value &gt;= max || value &lt; -(max / 2)) {
-     throw new Exception("encodeInt::overflow");
-   }
-   switch(bits) {
-     case 32:
-       byteArray.setInt32(position,value);
+ encodeInt(int position,int value, int numOfBytes, Endianness endianness, bool signed) {
+   switch(numOfBytes) {
+     case 4:
+       byteArray.setInt32(position,value,endianness);
        break;
-     case 16:
-       byteArray.setInt16(position,value);
+     case 2:
+       byteArray.setInt16(position,value,endianness);
        break;
-     case 8:
+     case 1:
        byteArray.setInt8(position,value);
        break;
-     case 24:
-       setIntExtended(value,numOfBytes);
-       break;
      default:
-       throw new Exception("Unsupported num of bits: $bits");
-   }
-   if (forceBigEndian){
-     reverse(numOfBytes);
+       throw new Exception("Unsupported num of bytes: $numOfBytes");
    }
  }
- writeInt(int value, {int numOfBytes:4, bool forceBigEndian:false, bool signed:false}){
-   encodeInt(offset,value, numOfBytes,forceBigEndian,signed);
+ writeInt(int value, {int numOfBytes:4, endianness: Endianness.LITTLE_ENDIAN, bool signed:false}){
+   encodeInt(offset,value, numOfBytes,endianness,signed);
    offset += numOfBytes;
  }
  writeByte(int value){
-   encodeInt(offset,value, 1,false,false);
+   encodeInt(offset,value, 1,Endianness.LITTLE_ENDIAN,false);
    offset += 1;
  }
  int writeDouble(double value){
-   byteArray.setFloat64(offset, value);
+   byteArray.setFloat64(offset, value,Endianness.LITTLE_ENDIAN);
    offset+=8;
  }
  int writeInt64(int value){
-   byteArray.setInt64(offset, value);
+   if (UseFixnum) {
+     int64 d64 = new int64.fromInt(value);
+     BsonBinary b2 = new BsonBinary(8);
+     byteList.setRange(offset,offset+8,d64.toBytes());
+   }
+   else {
+     byteArray.setInt64(offset, value,Endianness.LITTLE_ENDIAN);
+   }
    offset+=8;
  }
  int readByte(){
@@ -234,15 +207,22 @@ class BsonBinary extends BsonObject{
  }
  int readInt32(){
    offset+=4;
-   return byteArray.getInt32(offset-4);
+   return byteArray.getInt32(offset-4,Endianness.LITTLE_ENDIAN);
  }
  int readInt64(){
    offset+=8;
-   return byteArray.getInt64(offset-8);
+   if (UseFixnum) {
+     offset -= 8;
+     int i1 = readInt32();
+     int i2 = readInt32();
+     var i64 = new int64.fromInts(i2, i1);
+     return i64.toInt();
+   }
+   return byteArray.getInt64(offset-8,Endianness.LITTLE_ENDIAN);
  }
  num readDouble(){
    offset+=8;
-   return byteArray.getFloat64(offset-8);
+   return byteArray.getFloat64(offset-8,Endianness.LITTLE_ENDIAN);
  }
 
  String readCString(){
@@ -254,7 +234,7 @@ class BsonBinary extends BsonObject{
  }
  writeCString(String val){
    final utfData = encodeUtf8(val);
-   byteList.setRange(offset,utfData.length,utfData);
+   byteList.setRange(offset,offset+utfData.length,utfData);
    offset += utfData.length;
    writeByte(0);
 }
@@ -270,14 +250,14 @@ class BsonBinary extends BsonObject{
    }
    buffer.writeInt(byteList.length);
    buffer.writeByte(subType);
-   buffer.byteList.setRange(buffer.offset,byteList.length,byteList);
+   buffer.byteList.setRange(buffer.offset,buffer.offset+byteList.length,byteList);
    buffer.offset += byteList.length;
  }
  unpackValue(BsonBinary buffer){
    int size = buffer.readInt32();
    subType = buffer.readByte();
-   byteList = makeUint8List(size);
-   byteArray = makeByteArray(byteList);
+   byteList = new Uint8List(size);
+   byteArray = _getByteData(byteList);
    byteList.setRange(0,size,buffer.byteList,buffer.offset);
    buffer.offset += size;
  }
@@ -299,199 +279,199 @@ final         <strong>BUFFER_SIZE</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final BUFFER_SIZE = 256;
+static final BUFFER_SIZE = 256
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_0">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_0</strong> <a class="anchor-link"
+const int         <strong>CHAR_0</strong> <a class="anchor-link"
             href="#CHAR_0"
             title="Permalink to BsonBinary.CHAR_0">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_0 = 48;
+static const int CHAR_0 = 48
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_1">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_1</strong> <a class="anchor-link"
+const int         <strong>CHAR_1</strong> <a class="anchor-link"
             href="#CHAR_1"
             title="Permalink to BsonBinary.CHAR_1">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_1 = 49;
+static const int CHAR_1 = 49
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_2">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_2</strong> <a class="anchor-link"
+const int         <strong>CHAR_2</strong> <a class="anchor-link"
             href="#CHAR_2"
             title="Permalink to BsonBinary.CHAR_2">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_2 = 50;
+static const int CHAR_2 = 50
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_3">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_3</strong> <a class="anchor-link"
+const int         <strong>CHAR_3</strong> <a class="anchor-link"
             href="#CHAR_3"
             title="Permalink to BsonBinary.CHAR_3">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_3 = 51;
+static const int CHAR_3 = 51
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_4">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_4</strong> <a class="anchor-link"
+const int         <strong>CHAR_4</strong> <a class="anchor-link"
             href="#CHAR_4"
             title="Permalink to BsonBinary.CHAR_4">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_4 = 52;
+static const int CHAR_4 = 52
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_5">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_5</strong> <a class="anchor-link"
+const int         <strong>CHAR_5</strong> <a class="anchor-link"
             href="#CHAR_5"
             title="Permalink to BsonBinary.CHAR_5">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_5 = 53;
+static const int CHAR_5 = 53
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_6">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_6</strong> <a class="anchor-link"
+const int         <strong>CHAR_6</strong> <a class="anchor-link"
             href="#CHAR_6"
             title="Permalink to BsonBinary.CHAR_6">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_6 = 54;
+static const int CHAR_6 = 54
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_7">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_7</strong> <a class="anchor-link"
+const int         <strong>CHAR_7</strong> <a class="anchor-link"
             href="#CHAR_7"
             title="Permalink to BsonBinary.CHAR_7">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_7 = 55;
+static const int CHAR_7 = 55
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_8">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_8</strong> <a class="anchor-link"
+const int         <strong>CHAR_8</strong> <a class="anchor-link"
             href="#CHAR_8"
             title="Permalink to BsonBinary.CHAR_8">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_8 = 56;
+static const int CHAR_8 = 56
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_9">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_9</strong> <a class="anchor-link"
+const int         <strong>CHAR_9</strong> <a class="anchor-link"
             href="#CHAR_9"
             title="Permalink to BsonBinary.CHAR_9">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_9 = 57;
+static const int CHAR_9 = 57
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_a">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_a</strong> <a class="anchor-link"
+const int         <strong>CHAR_a</strong> <a class="anchor-link"
             href="#CHAR_a"
             title="Permalink to BsonBinary.CHAR_a">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_a = 97;
+static const int CHAR_a = 97
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_b">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_b</strong> <a class="anchor-link"
+const int         <strong>CHAR_b</strong> <a class="anchor-link"
             href="#CHAR_b"
             title="Permalink to BsonBinary.CHAR_b">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_b = 98;
+static const int CHAR_b = 98
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_c">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_c</strong> <a class="anchor-link"
+const int         <strong>CHAR_c</strong> <a class="anchor-link"
             href="#CHAR_c"
             title="Permalink to BsonBinary.CHAR_c">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_c = 99;
+static const int CHAR_c = 99
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_d">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_d</strong> <a class="anchor-link"
+const int         <strong>CHAR_d</strong> <a class="anchor-link"
             href="#CHAR_d"
             title="Permalink to BsonBinary.CHAR_d">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_d = 100;
+static const int CHAR_d = 100
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_e">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_e</strong> <a class="anchor-link"
+const int         <strong>CHAR_e</strong> <a class="anchor-link"
             href="#CHAR_e"
             title="Permalink to BsonBinary.CHAR_e">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_e = 101;
+static const int CHAR_e = 101
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="CHAR_f">
 <button class="show-code">Code</button>
-const <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>CHAR_f</strong> <a class="anchor-link"
+const int         <strong>CHAR_f</strong> <a class="anchor-link"
             href="#CHAR_f"
             title="Permalink to BsonBinary.CHAR_f">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-static const int CHAR_f = 102;
+static const int CHAR_f = 102
 </pre>
 </div>
 </div>
@@ -503,7 +483,7 @@ final         <strong>SUBTYPE_BYTE_ARRAY</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final SUBTYPE_BYTE_ARRAY = 2;
+static final SUBTYPE_BYTE_ARRAY = 2
 </pre>
 </div>
 </div>
@@ -515,7 +495,7 @@ final         <strong>SUBTYPE_DEFAULT</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final SUBTYPE_DEFAULT = 0;
+static final SUBTYPE_DEFAULT = 0
 </pre>
 </div>
 </div>
@@ -527,7 +507,7 @@ final         <strong>SUBTYPE_FUNCTION</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final SUBTYPE_FUNCTION = 1;
+static final SUBTYPE_FUNCTION = 1
 </pre>
 </div>
 </div>
@@ -539,7 +519,7 @@ final         <strong>SUBTYPE_MD5</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final SUBTYPE_MD5 = 4;
+static final SUBTYPE_MD5 = 4
 </pre>
 </div>
 </div>
@@ -551,7 +531,7 @@ final         <strong>SUBTYPE_USER_DEFINED</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final SUBTYPE_USER_DEFINED = 128;
+static final SUBTYPE_USER_DEFINED = 128
 </pre>
 </div>
 </div>
@@ -563,7 +543,7 @@ final         <strong>SUBTYPE_UUID</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final SUBTYPE_UUID = 3;
+static final SUBTYPE_UUID = 3
 </pre>
 </div>
 </div>
@@ -575,7 +555,19 @@ final         <strong>tokens</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final tokens = createTokens();
+static final tokens = createTokens()
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="UseFixnum">
+<button class="show-code">Code</button>
+final bool         <strong>UseFixnum</strong> <a class="anchor-link"
+            href="#UseFixnum"
+            title="Permalink to BsonBinary.UseFixnum">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static final bool  UseFixnum = _isIntWorkaroundNeeded()
 </pre>
 </div>
 </div>
@@ -584,7 +576,7 @@ static final tokens = createTokens();
 <h3>Static Methods</h3>
 <div class="method"><h4 id="createTokens">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html">int</a>&gt; <strong>createTokens</strong>() <a class="anchor-link" href="#createTokens"
+List&lt;int&gt; <strong>createTokens</strong>() <a class="anchor-link" href="#createTokens"
               title="Permalink to BsonBinary.createTokens">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -614,34 +606,40 @@ static List&lt;int&gt; createTokens(){
 </div>
 <div>
 <h3>Constructors</h3>
-<div class="method"><h4 id="BsonBinary">
+<div class="method"><h4 id="">
 <button class="show-code">Code</button>
-new <strong>BsonBinary</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> length) <a class="anchor-link" href="#BsonBinary"
+new <strong>BsonBinary</strong>(int length) <a class="anchor-link" href="#"
               title="Permalink to BsonBinary.BsonBinary">#</a></h4>
 <div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="../dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="../dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="../dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
-BsonBinary(int length): byteList = makeUint8List(length), offset=0, subType=0{
- byteArray = makeByteArray(byteList);
+BsonBinary(int length): byteList = new Uint8List(length), offset=0, subType=0{
+ byteArray = _getByteData(byteList);
 }
 </pre>
 </div>
 </div>
-<div class="method"><h4 id="BsonBinary.from">
+<div class="method"><h4 id="from">
 <button class="show-code">Code</button>
-new <strong>BsonBinary.from</strong>(<a href="http://api.dartlang.org/dart_core/List.html">List</a> from) <a class="anchor-link" href="#BsonBinary.from"
+new <strong>BsonBinary.from</strong>(List from) <a class="anchor-link" href="#from"
               title="Permalink to BsonBinary.BsonBinary.from">#</a></h4>
 <div class="doc">
 <pre class="source">
-BsonBinary.from(List from): byteList = makeUint8List(from.length),offset=0, subType=0 {
+BsonBinary.from(List from): byteList = new Uint8List(from.length),offset=0, subType=0 {
  byteList.setRange(0, from.length, from);
- byteArray = makeByteArray(byteList);
+ byteArray = _getByteData(byteList);
 }
 </pre>
 </div>
 </div>
-<div class="method"><h4 id="BsonBinary.fromHexString">
+<div class="method"><h4 id="fromHexString">
 <button class="show-code">Code</button>
-new <strong>BsonBinary.fromHexString</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> _hexString) <a class="anchor-link" href="#BsonBinary.fromHexString"
+new <strong>BsonBinary.fromHexString</strong>(String _hexString) <a class="anchor-link" href="#fromHexString"
               title="Permalink to BsonBinary.BsonBinary.fromHexString">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -654,31 +652,31 @@ BsonBinary.fromHexString(this._hexString);
 <h3>Properties</h3>
 <div class="field"><h4 id="byteArray">
 <button class="show-code">Code</button>
-var         <strong>byteArray</strong> <a class="anchor-link"
+ByteData         <strong>byteArray</strong> <a class="anchor-link"
             href="#byteArray"
             title="Permalink to BsonBinary.byteArray">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-var byteArray;
+ByteData byteArray
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="byteList">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html">int</a>&gt;         <strong>byteList</strong> <a class="anchor-link"
+List&lt;int&gt;         <strong>byteList</strong> <a class="anchor-link"
             href="#byteList"
             title="Permalink to BsonBinary.byteList">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-List&lt;int&gt; byteList;
+List&lt;int&gt; byteList
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="hexString">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>hexString</strong> <a class="anchor-link"
+String         <strong>hexString</strong> <a class="anchor-link"
             href="#hexString"
             title="Permalink to BsonBinary.hexString">#</a>
         </h4>
@@ -698,37 +696,37 @@ set hexString(String value) =&gt; _hexString = value;
 </div>
 <div class="field"><h4 id="offset">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>offset</strong> <a class="anchor-link"
+int         <strong>offset</strong> <a class="anchor-link"
             href="#offset"
             title="Permalink to BsonBinary.offset">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-int offset;
+int offset
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="subType">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>subType</strong> <a class="anchor-link"
+int         <strong>subType</strong> <a class="anchor-link"
             href="#subType"
             title="Permalink to BsonBinary.subType">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-int subType;
+int subType
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="typeByte">
 <button class="show-code">Code</button>
-final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>typeByte</strong> <a class="anchor-link"
+final int         <strong>typeByte</strong> <a class="anchor-link"
             href="#typeByte"
             title="Permalink to BsonBinary.typeByte">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-int get typeByte =&gt; BSON.BSON_DATA_BINARY;
+int get typeByte =&gt; _BSON_DATA_BINARY;
 </pre>
 </div>
 </div>
@@ -749,7 +747,7 @@ get value =&gt; this;
 <h3>Methods</h3>
 <div class="method"><h4 id="atEnd">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>atEnd</strong>() <a class="anchor-link" href="#atEnd"
+bool <strong>atEnd</strong>() <a class="anchor-link" href="#atEnd"
               title="Permalink to BsonBinary.atEnd">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -759,7 +757,7 @@ bool atEnd() =&gt; offset == byteList.length;
 </div>
 <div class="method"><h4 id="byteLength">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>byteLength</strong>() <a class="anchor-link" href="#byteLength"
+int <strong>byteLength</strong>() <a class="anchor-link" href="#byteLength"
               title="Permalink to BsonBinary.byteLength">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -769,35 +767,23 @@ int byteLength() =&gt; byteList.length+4+1;
 </div>
 <div class="method"><h4 id="encodeInt">
 <button class="show-code">Code</button>
-<strong>encodeInt</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> position, <a href="http://api.dartlang.org/dart_core/int.html">int</a> value, <a href="http://api.dartlang.org/dart_core/int.html">int</a> numOfBytes, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> forceBigEndian, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> signed) <a class="anchor-link" href="#encodeInt"
+dynamic <strong>encodeInt</strong>(int position, int value, int numOfBytes, Endianness endianness, bool signed) <a class="anchor-link" href="#encodeInt"
               title="Permalink to BsonBinary.encodeInt">#</a></h4>
 <div class="doc">
 <pre class="source">
-encodeInt(int position,int value, int numOfBytes, bool forceBigEndian, bool signed) {
- int bits = numOfBytes &lt;&lt; 3;
- int max = Statics.MaxBits(bits);
-
- if (value &gt;= max || value &lt; -(max / 2)) {
-   throw new Exception("encodeInt::overflow");
- }
- switch(bits) {
-   case 32:
-     byteArray.setInt32(position,value);
+encodeInt(int position,int value, int numOfBytes, Endianness endianness, bool signed) {
+ switch(numOfBytes) {
+   case 4:
+     byteArray.setInt32(position,value,endianness);
      break;
-   case 16:
-     byteArray.setInt16(position,value);
+   case 2:
+     byteArray.setInt16(position,value,endianness);
      break;
-   case 8:
+   case 1:
      byteArray.setInt8(position,value);
      break;
-   case 24:
-     setIntExtended(value,numOfBytes);
-     break;
    default:
-     throw new Exception("Unsupported num of bits: $bits");
- }
- if (forceBigEndian){
-   reverse(numOfBytes);
+     throw new Exception("Unsupported num of bytes: $numOfBytes");
  }
 }
 </pre>
@@ -805,7 +791,7 @@ encodeInt(int position,int value, int numOfBytes, bool forceBigEndian, bool sign
 </div>
 <div class="method"><h4 id="makeByteList">
 <button class="show-code">Code</button>
-<strong>makeByteList</strong>() <a class="anchor-link" href="#makeByteList"
+dynamic <strong>makeByteList</strong>() <a class="anchor-link" href="#makeByteList"
               title="Permalink to BsonBinary.makeByteList">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -813,18 +799,18 @@ makeByteList() {
  if (_hexString.length.remainder(2) != 0) {
    throw 'Not valid hex representation: $_hexString (odd length)';
  }
- byteList = makeUint8List((_hexString.length / 2).round().toInt());
- byteArray = makeByteArray(byteList);
+ byteList = new Uint8List((_hexString.length / 2).round().toInt());
+ byteArray = _getByteData(byteList);
  int pos = 0;
  int listPos = 0;
  while (pos &lt; _hexString.length) {
-   int char = _hexString.charCodeAt(pos);
+   int char = _hexString.codeUnitAt(pos);
    int n1 = tokens[char];
    if (n1 == null) {
      throw 'Invalid char ${_hexString[pos]} in $_hexString';
    }
    pos++;
-   char = _hexString.charCodeAt(pos);
+   char = _hexString.codeUnitAt(pos);
    int n2 = tokens[char];
    if (n2 == null) {
      throw 'Invalid char ${_hexString[pos]} in $_hexString';
@@ -838,7 +824,7 @@ makeByteList() {
 </div>
 <div class="method"><h4 id="makeHexString">
 <button class="show-code">Code</button>
-<strong>makeHexString</strong>() <a class="anchor-link" href="#makeHexString"
+dynamic <strong>makeHexString</strong>() <a class="anchor-link" href="#makeHexString"
               title="Permalink to BsonBinary.makeHexString">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -847,9 +833,9 @@ makeHexString(){
  for (final byte in byteList)
  {
     if (byte &lt; 16){
-     stringBuffer.add("0");
+     stringBuffer.write("0");
     }
-    stringBuffer.add(byte.toRadixString(16));
+    stringBuffer.write(byte.toRadixString(16));
  }
  _hexString = stringBuffer.toString().toLowerCase();
 }
@@ -858,7 +844,7 @@ makeHexString(){
 </div>
 <div class="method inherited"><h4 id="packElement">
 <button class="show-code">Code</button>
-<strong>packElement</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> name, buffer) <a class="anchor-link" href="#packElement"
+dynamic <strong>packElement</strong>(String name, buffer) <a class="anchor-link" href="#packElement"
               title="Permalink to BsonBinary.packElement">#</a></h4>
 <div class="inherited-from">inherited from <a href="../bson/BsonObject.html">BsonObject</a> </div><div class="doc">
 <pre class="source">
@@ -874,7 +860,7 @@ packElement(String name, var buffer){
 </div>
 <div class="method"><h4 id="packValue">
 <button class="show-code">Code</button>
-<strong>packValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#packValue"
+dynamic <strong>packValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#packValue"
               title="Permalink to BsonBinary.packValue">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -884,7 +870,7 @@ packValue(BsonBinary buffer){
  }
  buffer.writeInt(byteList.length);
  buffer.writeByte(subType);
- buffer.byteList.setRange(buffer.offset,byteList.length,byteList);
+ buffer.byteList.setRange(buffer.offset,buffer.offset+byteList.length,byteList);
  buffer.offset += byteList.length;
 }
 </pre>
@@ -892,7 +878,7 @@ packValue(BsonBinary buffer){
 </div>
 <div class="method"><h4 id="readByte">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>readByte</strong>() <a class="anchor-link" href="#readByte"
+int <strong>readByte</strong>() <a class="anchor-link" href="#readByte"
               title="Permalink to BsonBinary.readByte">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -904,7 +890,7 @@ int readByte(){
 </div>
 <div class="method"><h4 id="readCString">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>readCString</strong>() <a class="anchor-link" href="#readCString"
+String <strong>readCString</strong>() <a class="anchor-link" href="#readCString"
               title="Permalink to BsonBinary.readCString">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -920,46 +906,53 @@ String readCString(){
 </div>
 <div class="method"><h4 id="readDouble">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/num.html">num</a> <strong>readDouble</strong>() <a class="anchor-link" href="#readDouble"
+num <strong>readDouble</strong>() <a class="anchor-link" href="#readDouble"
               title="Permalink to BsonBinary.readDouble">#</a></h4>
 <div class="doc">
 <pre class="source">
 num readDouble(){
  offset+=8;
- return byteArray.getFloat64(offset-8);
+ return byteArray.getFloat64(offset-8,Endianness.LITTLE_ENDIAN);
 }
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="readInt32">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>readInt32</strong>() <a class="anchor-link" href="#readInt32"
+int <strong>readInt32</strong>() <a class="anchor-link" href="#readInt32"
               title="Permalink to BsonBinary.readInt32">#</a></h4>
 <div class="doc">
 <pre class="source">
 int readInt32(){
  offset+=4;
- return byteArray.getInt32(offset-4);
+ return byteArray.getInt32(offset-4,Endianness.LITTLE_ENDIAN);
 }
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="readInt64">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>readInt64</strong>() <a class="anchor-link" href="#readInt64"
+int <strong>readInt64</strong>() <a class="anchor-link" href="#readInt64"
               title="Permalink to BsonBinary.readInt64">#</a></h4>
 <div class="doc">
 <pre class="source">
 int readInt64(){
  offset+=8;
- return byteArray.getInt64(offset-8);
+ if (UseFixnum) {
+   offset -= 8;
+   int i1 = readInt32();
+   int i2 = readInt32();
+   var i64 = new int64.fromInts(i2, i1);
+   return i64.toInt();
+ }
+ return byteArray.getInt64(offset-8,Endianness.LITTLE_ENDIAN);
 }
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="reverse">
 <button class="show-code">Code</button>
-<strong>reverse</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> numOfBytes) <a class="anchor-link" href="#reverse"
+dynamic <strong>reverse</strong>(int numOfBytes) <a class="anchor-link" href="#reverse"
               title="Permalink to BsonBinary.reverse">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -978,7 +971,7 @@ reverse(int numOfBytes){
 </div>
 <div class="method"><h4 id="rewind">
 <button class="show-code">Code</button>
-<strong>rewind</strong>() <a class="anchor-link" href="#rewind"
+dynamic <strong>rewind</strong>() <a class="anchor-link" href="#rewind"
               title="Permalink to BsonBinary.rewind">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -990,35 +983,35 @@ rewind(){
 </div>
 <div class="method"><h4 id="setIntExtended">
 <button class="show-code">Code</button>
-<strong>setIntExtended</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> value, <a href="http://api.dartlang.org/dart_core/int.html">int</a> numOfBytes) <a class="anchor-link" href="#setIntExtended"
+dynamic <strong>setIntExtended</strong>(int value, int numOfBytes, Endianness endianness) <a class="anchor-link" href="#setIntExtended"
               title="Permalink to BsonBinary.setIntExtended">#</a></h4>
 <div class="doc">
 <pre class="source">
-setIntExtended(int value, int numOfBytes){
- List&lt;int&gt; byteListTmp = makeUint8List(8);
- var byteArrayTmp = makeByteArray(byteListTmp);
+setIntExtended(int value, int numOfBytes, Endianness endianness){
+ List&lt;int&gt; byteListTmp = new Uint8List(4);
+ var byteArrayTmp = _getByteData(byteListTmp);
  if (numOfBytes == 3){
-   byteArrayTmp.setInt32(0,value);
+   byteArrayTmp.setInt32(0,value,endianness);
  }
- else if (numOfBytes &gt; 4 &amp;&amp; numOfBytes &lt; 8){
-   byteArrayTmp.setInt64(0,value);
- }
+//    else if (numOfBytes &gt; 4 &amp;&amp; numOfBytes &lt; 8){
+//      byteArrayTmp.setInt64(0,value,Endianness.LITTLE_ENDIAN);
+//    }
  else {
-     throw new Exception("Unsupported num of bits: ${numOfBytes*8}");
+     throw new Exception("Unsupported num of bytes: ${numOfBytes}");
  }
- byteList.setRange(offset,numOfBytes,byteListTmp);
+ byteList.setRange(offset,offset+numOfBytes,byteListTmp);
 }
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="toString">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+String <strong>toString</strong>() <a class="anchor-link" href="#toString"
               title="Permalink to BsonBinary.toString">#</a></h4>
 <div class="doc">
 <div class="inherited">
 <p>Returns a string representation of this object.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
 String toString()=&gt;"BsonBinary($hexString)";
 </pre>
@@ -1042,15 +1035,15 @@ _ElementPair unpackElement(buffer){
 </div>
 <div class="method"><h4 id="unpackValue">
 <button class="show-code">Code</button>
-<strong>unpackValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#unpackValue"
+dynamic <strong>unpackValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#unpackValue"
               title="Permalink to BsonBinary.unpackValue">#</a></h4>
 <div class="doc">
 <pre class="source">
 unpackValue(BsonBinary buffer){
  int size = buffer.readInt32();
  subType = buffer.readByte();
- byteList = makeUint8List(size);
- byteArray = makeByteArray(byteList);
+ byteList = new Uint8List(size);
+ byteArray = _getByteData(byteList);
  byteList.setRange(0,size,buffer.byteList,buffer.offset);
  buffer.offset += size;
 }
@@ -1059,12 +1052,12 @@ unpackValue(BsonBinary buffer){
 </div>
 <div class="method"><h4 id="writeByte">
 <button class="show-code">Code</button>
-<strong>writeByte</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> value) <a class="anchor-link" href="#writeByte"
+dynamic <strong>writeByte</strong>(int value) <a class="anchor-link" href="#writeByte"
               title="Permalink to BsonBinary.writeByte">#</a></h4>
 <div class="doc">
 <pre class="source">
 writeByte(int value){
- encodeInt(offset,value, 1,false,false);
+ encodeInt(offset,value, 1,Endianness.LITTLE_ENDIAN,false);
  offset += 1;
 }
 </pre>
@@ -1072,13 +1065,13 @@ writeByte(int value){
 </div>
 <div class="method"><h4 id="writeCString">
 <button class="show-code">Code</button>
-<strong>writeCString</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> val) <a class="anchor-link" href="#writeCString"
+dynamic <strong>writeCString</strong>(String val) <a class="anchor-link" href="#writeCString"
               title="Permalink to BsonBinary.writeCString">#</a></h4>
 <div class="doc">
 <pre class="source">
 writeCString(String val){
  final utfData = encodeUtf8(val);
- byteList.setRange(offset,utfData.length,utfData);
+ byteList.setRange(offset,offset+utfData.length,utfData);
  offset += utfData.length;
  writeByte(0);
 }
@@ -1087,12 +1080,12 @@ writeCString(String val){
 </div>
 <div class="method"><h4 id="writeDouble">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>writeDouble</strong>(<a href="http://api.dartlang.org/dart_core/double.html">double</a> value) <a class="anchor-link" href="#writeDouble"
+int <strong>writeDouble</strong>(double value) <a class="anchor-link" href="#writeDouble"
               title="Permalink to BsonBinary.writeDouble">#</a></h4>
 <div class="doc">
 <pre class="source">
 int writeDouble(double value){
- byteArray.setFloat64(offset, value);
+ byteArray.setFloat64(offset, value,Endianness.LITTLE_ENDIAN);
  offset+=8;
 }
 </pre>
@@ -1100,12 +1093,12 @@ int writeDouble(double value){
 </div>
 <div class="method"><h4 id="writeInt">
 <button class="show-code">Code</button>
-<strong>writeInt</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> value, {<a href="http://api.dartlang.org/dart_core/int.html">int</a> numOfBytes: 4, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> forceBigEndian: false, <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> signed: false}) <a class="anchor-link" href="#writeInt"
+dynamic <strong>writeInt</strong>(int value, {int numOfBytes: 4, endianness: Endianness.LITTLE_ENDIAN, bool signed: false}) <a class="anchor-link" href="#writeInt"
               title="Permalink to BsonBinary.writeInt">#</a></h4>
 <div class="doc">
 <pre class="source">
-writeInt(int value, {int numOfBytes:4, bool forceBigEndian:false, bool signed:false}){
- encodeInt(offset,value, numOfBytes,forceBigEndian,signed);
+writeInt(int value, {int numOfBytes:4, endianness: Endianness.LITTLE_ENDIAN, bool signed:false}){
+ encodeInt(offset,value, numOfBytes,endianness,signed);
  offset += numOfBytes;
 }
 </pre>
@@ -1113,12 +1106,19 @@ writeInt(int value, {int numOfBytes:4, bool forceBigEndian:false, bool signed:fa
 </div>
 <div class="method"><h4 id="writeInt64">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>writeInt64</strong>(<a href="http://api.dartlang.org/dart_core/int.html">int</a> value) <a class="anchor-link" href="#writeInt64"
+int <strong>writeInt64</strong>(int value) <a class="anchor-link" href="#writeInt64"
               title="Permalink to BsonBinary.writeInt64">#</a></h4>
 <div class="doc">
 <pre class="source">
 int writeInt64(int value){
- byteArray.setInt64(offset, value);
+ if (UseFixnum) {
+   int64 d64 = new int64.fromInt(value);
+   BsonBinary b2 = new BsonBinary(8);
+   byteList.setRange(offset,offset+8,d64.toBytes());
+ }
+ else {
+   byteArray.setInt64(offset, value,Endianness.LITTLE_ENDIAN);
+ }
  offset+=8;
 }
 </pre>
@@ -1128,10 +1128,9 @@ int writeInt64(int value){
         </div>
         <div class="clear"></div>
         </div>
-        
         <div class="footer">
-          <div>This page was generated at 2012-12-27 12:26:55.887</div>
+          <div>This page was generated at 2013-08-06 10:39:53.614</div>
         </div>
-        <script async src="../client-static.js"></script>
+        <script async src="../client-live-nav.js"></script>
         </body></html>
         

@@ -5,7 +5,7 @@
         <title>mongo_dart Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="styles.css">
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
         <link rel="shortcut icon" href="favicon.ico">
         
         </head>
@@ -24,80 +24,14 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="bson.html">bson</a></h2><h2><div class="icon-library"></div><strong>mongo_dart</strong></h2><ul class="icon">
-<li><a href="mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
-<li><a href="mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
-<li><a href="mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
-<li><a href="mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
-<li><a href="mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
-<li><a href="mongo_dart/GridFS.html"><div class="icon-class"></div>GridFS</a></li>
-<li><a href="mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
-<li><a href="mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
-<li><a href="mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
-<li><a href="mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
-<li><a href="mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
-<li><a href="mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
-<li><a href="mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
-<li><a href="mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
-<li><a href="mongo_dart/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
-<li><a href="mongo_dart/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
-<li><a href="mongo_dart/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
-<li><a href="mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
-<li><a href="mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
-<li><a href="mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
-<li><a href="mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
-<li><a href="mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
-</ul>
 </div>
 <div class="content">
 <h2><strong>mongo_dart</strong> library</h2>
 <div>
-<h3>Properties</h3>
-<div class="field"><h4 id="modify">
-<button class="show-code">Code</button>
-final <a href="mongo_dart/ModifierBuilder.html">ModifierBuilder</a>         <strong>modify</strong> <a class="anchor-link"
-            href="#modify"
-            title="Permalink to modify">#</a>
-        </h4>
-        <div class="doc">
-<pre class="source">
-ModifierBuilder get modify =&gt; new ModifierBuilder();
-</pre>
-</div>
-</div>
-<div class="field"><h4 id="where">
-<button class="show-code">Code</button>
-final <a href="mongo_dart/SelectorBuilder.html">SelectorBuilder</a>         <strong>where</strong> <a class="anchor-link"
-            href="#where"
-            title="Permalink to where">#</a>
-        </h4>
-        <div class="doc">
-<pre class="source">
-SelectorBuilder get where =&gt; new SelectorBuilder();
-</pre>
-</div>
-</div>
-</div>
-<div>
-<h3>Functions</h3>
-<div class="method"><h4 id="query">
-<button class="show-code">Code</button>
-<a href="mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>query</strong>() <a class="anchor-link" href="#query"
-              title="Permalink to query">#</a></h4>
-<div class="doc">
-<pre class="source">
-SelectorBuilder query(){
- return new SelectorBuilder();
-}
-</pre>
-</div>
-</div>
-</div>
-<div>
 <h3>Classes</h3>
           <div class="type">
           <h4>
-            <a href="mongo_dart/Connection.html"><strong>Connection</strong></a>
+            <a href="mongo_dart/ChunkTransformer.html"><strong>ChunkTransformer</strong></a>
           </h4>
           </div>
           
@@ -151,18 +85,6 @@ SelectorBuilder query(){
           
           <div class="type">
           <h4>
-            <a href="mongo_dart/MapProxy.html"><strong>MapProxy&lt;K, V&gt;</strong></a>
-          </h4>
-          </div>
-          
-          <div class="type">
-          <h4>
-            <a href="mongo_dart/ModifierBuilder.html"><strong>ModifierBuilder</strong></a>
-          </h4>
-          </div>
-          
-          <div class="type">
-          <h4>
             <a href="mongo_dart/MongoGetMoreMessage.html"><strong>MongoGetMoreMessage</strong></a>
           </h4>
           </div>
@@ -182,6 +104,12 @@ SelectorBuilder query(){
           <div class="type">
           <h4>
             <a href="mongo_dart/MongoMessage.html"><strong>MongoMessage</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo_dart/MongoMessageTransformer.html"><strong>MongoMessageTransformer</strong></a>
           </h4>
           </div>
           
@@ -211,13 +139,19 @@ SelectorBuilder query(){
           
           <div class="type">
           <h4>
-            <a href="mongo_dart/SelectorBuilder.html"><strong>SelectorBuilder</strong></a>
+            <a href="mongo_dart/PacketConverter.html"><strong>PacketConverter</strong></a>
           </h4>
           </div>
           
           <div class="type">
           <h4>
             <a href="mongo_dart/ServerConfig.html"><strong>ServerConfig</strong></a>
+          </h4>
+          </div>
+          
+          <div class="type">
+          <h4>
+            <a href="mongo_dart/WriteConcern.html"><strong>WriteConcern</strong></a>
           </h4>
           </div>
           
@@ -231,13 +165,21 @@ SelectorBuilder query(){
           </div>
           
 </div>
+<div>
+<h3>Exceptions</h3>
+          <div class="type">
+          <h4>
+            <a href="mongo_dart/MongoDartError.html"><strong>MongoDartError</strong></a>
+          </h4>
+          </div>
+          
+</div>
         </div>
         <div class="clear"></div>
         </div>
-        
         <div class="footer">
-          <div>This page was generated at 2012-12-27 12:26:55.920</div>
+          <div>This page was generated at 2013-08-06 10:39:53.758</div>
         </div>
-        <script async src="client-static.js"></script>
+        <script async src="client-live-nav.js"></script>
         </body></html>
         

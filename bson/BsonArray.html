@@ -5,7 +5,7 @@
         <title>BsonArray class / bson Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="../styles.css">
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
         <link rel="shortcut icon" href="../favicon.ico">
         
         </head>
@@ -24,31 +24,7 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><ul class="icon">
-<li><a href="../bson/BSON.html"><div class="icon-class"></div>BSON</a></li>
-<li><div class="icon-class"></div><strong>BsonArray</strong></li>
-<li><a href="../bson/BsonBinary.html"><div class="icon-class"></div>BsonBinary</a></li>
-<li><a href="../bson/BsonBoolean.html"><div class="icon-class"></div>BsonBoolean</a></li>
-<li><a href="../bson/BsonCode.html"><div class="icon-class"></div>BsonCode</a></li>
-<li><a href="../bson/BsonCString.html"><div class="icon-class"></div>BsonCString</a></li>
-<li><a href="../bson/BsonDate.html"><div class="icon-class"></div>BsonDate</a></li>
-<li><a href="../bson/BsonDouble.html"><div class="icon-class"></div>BsonDouble</a></li>
-<li><a href="../bson/BsonInt.html"><div class="icon-class"></div>BsonInt</a></li>
-<li><a href="../bson/BsonLong.html"><div class="icon-class"></div>BsonLong</a></li>
-<li><a href="../bson/BsonMap.html"><div class="icon-class"></div>BsonMap</a></li>
-<li><a href="../bson/BsonNull.html"><div class="icon-class"></div>BsonNull</a></li>
-<li><a href="../bson/BsonObject.html"><div class="icon-class"></div>BsonObject</a></li>
-<li><a href="../bson/BsonPlatform.html"><div class="icon-class"></div>BsonPlatform</a></li>
-<li><a href="../bson/BsonRegexp.html"><div class="icon-class"></div>BsonRegexp</a></li>
-<li><a href="../bson/BsonString.html"><div class="icon-class"></div>BsonString</a></li>
-<li><a href="../bson/DbRef.html"><div class="icon-class"></div>DbRef</a></li>
-<li><a href="../bson/MaxKey.html"><div class="icon-class"></div>MaxKey</a></li>
-<li><a href="../bson/MinKey.html"><div class="icon-class"></div>MinKey</a></li>
-<li><a href="../bson/ObjectId.html"><div class="icon-class"></div>ObjectId</a></li>
-<li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
-<li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
-</ul>
-<h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
+</div>
 <div class="content">
         <h2><strong>BsonArray</strong>
           class
@@ -73,7 +49,7 @@ class BsonArray extends BsonObject{
  BsonArray(this.data);
  get value=&gt;data;
  byteLength()=&gt;dataSize()+1+4;
- int get typeByte =&gt; BSON.BSON_DATA_ARRAY;
+ int get typeByte =&gt; _BSON_DATA_ARRAY;
  packValue(BsonBinary buffer){
    buffer.writeInt(byteLength());
      for(var i = 0; i &lt; data.length; i++) {
@@ -102,11 +78,17 @@ class BsonArray extends BsonObject{
 <span class="type-box"><span class="icon-class"></span><a href="../bson/BsonObject.html">BsonObject</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>BsonArray</strong></span></p>
 <div>
 <h3>Constructors</h3>
-<div class="method"><h4 id="BsonArray">
+<div class="method"><h4 id="">
 <button class="show-code">Code</button>
-new <strong>BsonArray</strong>(<a href="http://api.dartlang.org/dart_core/List.html">List</a> data) <a class="anchor-link" href="#BsonArray"
+new <strong>BsonArray</strong>(List data) <a class="anchor-link" href="#"
               title="Permalink to BsonArray.BsonArray">#</a></h4>
 <div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="../dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="../dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="../dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
 BsonArray(this.data);
 </pre>
@@ -117,25 +99,25 @@ BsonArray(this.data);
 <h3>Properties</h3>
 <div class="field"><h4 id="data">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/List.html">List</a>         <strong>data</strong> <a class="anchor-link"
+List         <strong>data</strong> <a class="anchor-link"
             href="#data"
             title="Permalink to BsonArray.data">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-List data;
+List data
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="typeByte">
 <button class="show-code">Code</button>
-final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>typeByte</strong> <a class="anchor-link"
+final int         <strong>typeByte</strong> <a class="anchor-link"
             href="#typeByte"
             title="Permalink to BsonArray.typeByte">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-int get typeByte =&gt; BSON.BSON_DATA_ARRAY;
+int get typeByte =&gt; _BSON_DATA_ARRAY;
 </pre>
 </div>
 </div>
@@ -156,7 +138,7 @@ get value=&gt;data;
 <h3>Methods</h3>
 <div class="method"><h4 id="byteLength">
 <button class="show-code">Code</button>
-<strong>byteLength</strong>() <a class="anchor-link" href="#byteLength"
+dynamic <strong>byteLength</strong>() <a class="anchor-link" href="#byteLength"
               title="Permalink to BsonArray.byteLength">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -166,7 +148,7 @@ byteLength()=&gt;dataSize()+1+4;
 </div>
 <div class="method"><h4 id="dataSize">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>dataSize</strong>() <a class="anchor-link" href="#dataSize"
+int <strong>dataSize</strong>() <a class="anchor-link" href="#dataSize"
               title="Permalink to BsonArray.dataSize">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -184,7 +166,7 @@ int dataSize(){
 </div>
 <div class="method inherited"><h4 id="packElement">
 <button class="show-code">Code</button>
-<strong>packElement</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> name, buffer) <a class="anchor-link" href="#packElement"
+dynamic <strong>packElement</strong>(String name, buffer) <a class="anchor-link" href="#packElement"
               title="Permalink to BsonArray.packElement">#</a></h4>
 <div class="inherited-from">inherited from <a href="../bson/BsonObject.html">BsonObject</a> </div><div class="doc">
 <pre class="source">
@@ -200,7 +182,7 @@ packElement(String name, var buffer){
 </div>
 <div class="method"><h4 id="packValue">
 <button class="show-code">Code</button>
-<strong>packValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#packValue"
+dynamic <strong>packValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#packValue"
               title="Permalink to BsonArray.packValue">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -232,7 +214,7 @@ _ElementPair unpackElement(buffer){
 </div>
 <div class="method"><h4 id="unpackValue">
 <button class="show-code">Code</button>
-<strong>unpackValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#unpackValue"
+dynamic <strong>unpackValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#unpackValue"
               title="Permalink to BsonArray.unpackValue">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -254,10 +236,9 @@ unpackValue(BsonBinary buffer){
         </div>
         <div class="clear"></div>
         </div>
-        
         <div class="footer">
-          <div>This page was generated at 2012-12-27 12:26:55.813</div>
+          <div>This page was generated at 2013-08-06 10:39:53.281</div>
         </div>
-        <script async src="../client-static.js"></script>
+        <script async src="../client-live-nav.js"></script>
         </body></html>
         

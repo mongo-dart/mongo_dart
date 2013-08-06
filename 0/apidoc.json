@@ -1,0 +1,1 @@
+{"dependencies":[],"name":"dart:","revision":"0","libraries":[{"refId":"bson","name":"package:bson/bson.dart"},{"refId":"mongo_dart"},{"refId":"mongo_dart_query","name":"package:mongo_dart_query/mongo_dart_query.dart"}],"description":"Dart System Libraries"}

@@ -1,0 +1,205 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>ChunkTransformer class / mongo_dart Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart" data-type="ChunkTransformer">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/ChunkTransformer.html">ChunkTransformer</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>ChunkTransformer</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class ChunkTransformer extends StreamEventTransformer&lt;List&lt;int&gt;, List&lt;int&gt;&gt; {
+ int chunkSize; 
+ List&lt;int&gt; carry;
+
+ ChunkTransformer([this.chunkSize = 1024 * 256]);
+
+ void _handle(List&lt;int&gt; data, EventSink&lt;List&lt;int&gt;&gt; sink, bool isClosing) { 
+     if (carry != null) {
+       carry.addAll(data);
+       data = carry;
+       carry = null;
+     }
+     int startPos = 0;
+     int pos = 0;
+     while (pos + chunkSize &lt; data.length) {        
+       sink.add(data.sublist(pos,pos + chunkSize));  
+       pos += chunkSize;
+     }        
+     if (data.length &gt; pos) {
+       carry = new List&lt;int&gt;();
+       carry.addAll(data.sublist(pos));
+       if (isClosing) {
+         sink.add(carry);
+       }
+     }
+   }
+
+ void handleData(List&lt;int&gt; data, EventSink&lt;List&lt;int&gt;&gt; sink) {
+   _handle(data, sink, false);
+ }
+
+ void handleDone(EventSink&lt;List&lt;int&gt;&gt; sink) {
+   _handle([], sink, true);
+   sink.close();
+ }
+
+}
+</pre>
+</div>
+<h3>Extends</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../dart_async/StreamEventTransformer.html">StreamEventTransformer&lt;List&lt;int&gt;, List&lt;int&gt;&gt;</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>ChunkTransformer</strong></span></p>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="">
+<button class="show-code">Code</button>
+new <strong>ChunkTransformer</strong>([int chunkSize = 1024*256]) <a class="anchor-link" href="#"
+              title="Permalink to ChunkTransformer.ChunkTransformer">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Create a <a class="crossref" href="../dart_async/StreamTransformer.html">StreamTransformer</a> that delegates events to the given functions.</p>
+<p>This is actually a <a class="crossref" href="../dart_async/StreamEventTransformer.html">StreamEventTransformer</a> where the event handling is
+performed by the function arguments.
+If an argument is omitted, it acts as the corresponding default method from
+<a class="crossref" href="../dart_async/StreamEventTransformer.html">StreamEventTransformer</a>.</p>
+<p>Example use:</p>
+<pre><code>stringStream.transform(new StreamTransformer&lt;String, String&gt;(
+    handleData: (Strung value, EventSink&lt;String&gt; sink) {
+      sink.add(value);
+      sink.add(value);  // Duplicate the incoming events.
+    }));
+</code></pre>
+<div class="docs-inherited-from">docs inherited from StreamTransformer&lt;<a href="../mongo_dart/ChunkTransformer.html">S</a>, <a href="../mongo_dart/ChunkTransformer.html">T</a>&gt; </div></div>
+<pre class="source">
+ChunkTransformer([this.chunkSize = 1024 * 256]);
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="carry">
+<button class="show-code">Code</button>
+List&lt;int&gt;         <strong>carry</strong> <a class="anchor-link"
+            href="#carry"
+            title="Permalink to ChunkTransformer.carry">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+List&lt;int&gt; carry
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="chunkSize">
+<button class="show-code">Code</button>
+int         <strong>chunkSize</strong> <a class="anchor-link"
+            href="#chunkSize"
+            title="Permalink to ChunkTransformer.chunkSize">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int chunkSize
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method inherited"><h4 id="bind">
+<button class="show-code">Code</button>
+Stream&lt;<a href="../mongo_dart/ChunkTransformer.html">T</a>&gt; <strong>bind</strong>(Stream&lt;<a href="../mongo_dart/ChunkTransformer.html">S</a>&gt; source) <a class="anchor-link" href="#bind"
+              title="Permalink to ChunkTransformer.bind">#</a></h4>
+<div class="inherited-from">inherited from StreamEventTransformer </div><div class="doc">
+<pre class="source">
+Stream&lt;T&gt; bind(Stream&lt;S&gt; source) {
+ return new EventTransformStream&lt;S, T&gt;(source, this);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="handleData">
+<button class="show-code">Code</button>
+void <strong>handleData</strong>(List&lt;int&gt; data, EventSink&lt;List&lt;int&gt;&gt; sink) <a class="anchor-link" href="#handleData"
+              title="Permalink to ChunkTransformer.handleData">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Act on incoming data event.</p>
+<p>The method may generate any number of events on the sink, but should
+not throw.</p>
+<div class="docs-inherited-from">docs inherited from StreamEventTransformer&lt;List&lt;int&gt;, List&lt;int&gt;&gt; </div></div>
+<pre class="source">
+void handleData(List&lt;int&gt; data, EventSink&lt;List&lt;int&gt;&gt; sink) {
+ _handle(data, sink, false);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="handleDone">
+<button class="show-code">Code</button>
+void <strong>handleDone</strong>(EventSink&lt;List&lt;int&gt;&gt; sink) <a class="anchor-link" href="#handleDone"
+              title="Permalink to ChunkTransformer.handleDone">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Act on incoming done event.</p>
+<p>The method may generate any number of events on the sink, but should
+not throw.</p>
+<div class="docs-inherited-from">docs inherited from StreamEventTransformer&lt;List&lt;int&gt;, List&lt;int&gt;&gt; </div></div>
+<pre class="source">
+void handleDone(EventSink&lt;List&lt;int&gt;&gt; sink) {
+ _handle([], sink, true);
+ sink.close();
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="handleError">
+<button class="show-code">Code</button>
+void <strong>handleError</strong>(error, EventSink&lt;<a href="../mongo_dart/ChunkTransformer.html">T</a>&gt; sink) <a class="anchor-link" href="#handleError"
+              title="Permalink to ChunkTransformer.handleError">#</a></h4>
+<div class="inherited-from">inherited from StreamEventTransformer </div><div class="doc">
+<p>Act on incoming error event.</p>
+<p>The method may generate any number of events on the sink, but should
+not throw.</p>
+<pre class="source">
+void handleError(error, EventSink&lt;T&gt; sink) {
+ sink.addError(error);
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          <div>This page was generated at 2013-08-06 10:39:53.786</div>
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

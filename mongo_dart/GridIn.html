@@ -5,7 +5,7 @@
         <title>GridIn class / mongo_dart Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="../styles.css">
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
         <link rel="shortcut icon" href="../favicon.ico">
         
         </head>
@@ -24,30 +24,6 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
-<li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
-<li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
-<li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
-<li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
-<li><a href="../mongo_dart/DbCommand.html"><div class="icon-class"></div>DbCommand</a></li>
-<li><a href="../mongo_dart/GridFS.html"><div class="icon-class"></div>GridFS</a></li>
-<li><a href="../mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
-<li><div class="icon-class"></div><strong>GridIn</strong></li>
-<li><a href="../mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
-<li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
-<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
-<li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
-<li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
-<li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
-<li><a href="../mongo_dart/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
-<li><a href="../mongo_dart/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
-<li><a href="../mongo_dart/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
-<li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
-<li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
-<li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
-<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
-<li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
-</ul>
 </div>
 <div class="content">
         <h2><strong>GridIn</strong>
@@ -58,7 +34,7 @@
 <div class="doc">
 <pre class="source">
 class GridIn extends GridFSFile {
- ChunkedInputStream input;
+ Stream&lt;List&lt;int&gt;&gt; input;
  bool savedChunks = false;
  int currentChunkNumber = 0;
  int currentBufferPosition = 0;
@@ -68,16 +44,17 @@ class GridIn extends GridFSFile {
  String filename;
  MD5 messageDigester;
 
- GridIn(this.fs, [this.filename = null, InputStream inputStream = null]) {
-   input = new ChunkedInputStream(inputStream);
+ GridIn(this.fs, [String filename = null, Stream&lt;List&lt;int&gt;&gt; inputStream = null]) {
    id = new ObjectId();
    chunkSize = GridFS.DEFAULT_CHUNKSIZE;
-   uploadDate = new Date.now();
+   input = inputStream.transform(new ChunkTransformer(chunkSize));
+   uploadDate = new DateTime.now();
    messageDigester = new MD5();
+   this.filename = filename;
  }
 
- Future save([int chunkSize = 0]) {
-   if (!?chunkSize) {
+ Future save([int chunkSize]) {
+   if (chunkSize == null) {
      chunkSize = this.chunkSize;
    }
 
@@ -85,38 +62,34 @@ class GridIn extends GridFSFile {
    if (!savedChunks) {
      result = saveChunks(chunkSize);
    } else {
-     result = new Future.immediate({'ok': 1.0});
+     result = new Future.value({'ok': 1.0});
    }
    return result;
  }
 
  Future&lt;Map&gt; saveChunks([int chunkSize = 0]) {
-   if (!?chunkSize) {
-     chunkSize = this.chunkSize;
-   }
-   if (savedChunks) {
-     throw "chunks already saved!";
-   }
-   if (chunkSize &lt;= 0 || chunkSize &gt; GridFS.MAX_CHUNKSIZE) {
-     throw "chunkSize must be greater than zero and less than or equal to GridFS.MAX_CHUNKSIZE";
-   }
-   input.chunkSize = chunkSize;
    List&lt;Future&gt; futures = new List();
    Completer completer = new Completer();
    
-   input.onData = () {
-     List&lt;int&gt; buffer = input.read();
-     futures.add(dumpBuffer(buffer));
-   };
-
-   input.onClosed = () {
-     Futures.wait(futures).chain((list) {
+   _onDone() {
+     Future.wait(futures).then((list) {
        return finishData();
      }).then((map){
        completer.complete({});
      });
-   };
-   
+   }
+   if (chunkSize == null) {
+     chunkSize = this.chunkSize;
+   }
+   if (savedChunks) {
+     throw new MongoDartError('chunks already saved!');
+   }
+   if (chunkSize &lt;= 0 || chunkSize &gt; GridFS.MAX_CHUNKSIZE) {
+     throw new MongoDartError('chunkSize must be greater than zero and less than or equal to GridFS.MAX_CHUNKSIZE');
+   }    
+   input.listen((data) {
+       futures.add(dumpBuffer(data));
+       }, onDone: _onDone);    
    return completer.future;
  }
  // TODO(tsander): OutputStream??
@@ -124,21 +97,21 @@ class GridIn extends GridFSFile {
  Future&lt;Map&gt; dumpBuffer( List&lt;int&gt; writeBuffer ) {
    if (writeBuffer.length == 0) {
      // Chunk is empty, may be last chunk
-     return new Future.immediate({});
+     return new Future.value({});
    }
 
    Map chunk = {"files_id" : id, "n" : currentChunkNumber, "data": new BsonBinary.from(writeBuffer)};
    currentChunkNumber++;
    totalBytes += writeBuffer.length;
-   messageDigester.update(writeBuffer);
+   messageDigester.add(writeBuffer);
    currentBufferPosition = 0;
 
-   return fs.chunks.insert(chunk, safeMode:true);
+   return fs.chunks.insert(chunk);
  }
 
  Future finishData() {
    if (!savedChunks) {
-     md5 = CryptoUtils.bytesToHex(messageDigester.digest());
+     md5 = CryptoUtils.bytesToHex(messageDigester.close());
      length = totalBytes;
      savedChunks = true;
    }
@@ -152,18 +125,25 @@ class GridIn extends GridFSFile {
 <span class="type-box"><span class="icon-class"></span><a href="../mongo_dart/GridFSFile.html">GridFSFile</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>GridIn</strong></span></p>
 <div>
 <h3>Constructors</h3>
-<div class="method"><h4 id="GridIn">
+<div class="method"><h4 id="">
 <button class="show-code">Code</button>
-new <strong>GridIn</strong>(<a href="../mongo_dart/GridFS.html">GridFS</a> fs, [<a href="http://api.dartlang.org/dart_core/String.html">String</a> filename = null, <a href="http://api.dartlang.org/dart_io/InputStream.html">InputStream</a> inputStream = null]) <a class="anchor-link" href="#GridIn"
+new <strong>GridIn</strong>(<a href="../mongo_dart/GridFS.html">GridFS</a> fs, [String filename = null, Stream&lt;List&lt;int&gt;&gt; inputStream = null]) <a class="anchor-link" href="#"
               title="Permalink to GridIn.GridIn">#</a></h4>
 <div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="../dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="../dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="../dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
-GridIn(this.fs, [this.filename = null, InputStream inputStream = null]) {
- input = new ChunkedInputStream(inputStream);
+GridIn(this.fs, [String filename = null, Stream&lt;List&lt;int&gt;&gt; inputStream = null]) {
  id = new ObjectId();
  chunkSize = GridFS.DEFAULT_CHUNKSIZE;
- uploadDate = new Date.now();
+ input = inputStream.transform(new ChunkTransformer(chunkSize));
+ uploadDate = new DateTime.now();
  messageDigester = new MD5();
+ this.filename = filename;
 }
 </pre>
 </div>
@@ -173,7 +153,7 @@ GridIn(this.fs, [this.filename = null, InputStream inputStream = null]) {
 <h3>Properties</h3>
 <div class="field inherited"><h4 id="aliases">
 <button class="show-code">Code</button>
-final <a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt;         <strong>aliases</strong> <a class="anchor-link"
+final List&lt;String&gt;         <strong>aliases</strong> <a class="anchor-link"
             href="#aliases"
             title="Permalink to GridIn.aliases">#</a>
         </h4>
@@ -187,62 +167,62 @@ List&lt;String&gt; get aliases {
 </div>
 <div class="field inherited"><h4 id="chunkSize">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>chunkSize</strong> <a class="anchor-link"
+int         <strong>chunkSize</strong> <a class="anchor-link"
             href="#chunkSize"
             title="Permalink to GridIn.chunkSize">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
 <pre class="source">
-int chunkSize;
+int chunkSize
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="contentType">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>contentType</strong> <a class="anchor-link"
+String         <strong>contentType</strong> <a class="anchor-link"
             href="#contentType"
             title="Permalink to GridIn.contentType">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
 <pre class="source">
-String contentType;
+String contentType
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="currentBufferPosition">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>currentBufferPosition</strong> <a class="anchor-link"
+int         <strong>currentBufferPosition</strong> <a class="anchor-link"
             href="#currentBufferPosition"
             title="Permalink to GridIn.currentBufferPosition">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-int currentBufferPosition = 0;
+int currentBufferPosition = 0
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="currentChunkNumber">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>currentChunkNumber</strong> <a class="anchor-link"
+int         <strong>currentChunkNumber</strong> <a class="anchor-link"
             href="#currentChunkNumber"
             title="Permalink to GridIn.currentChunkNumber">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-int currentChunkNumber = 0;
+int currentChunkNumber = 0
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="data">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>         <strong>data</strong> <a class="anchor-link"
+Map         <strong>data</strong> <a class="anchor-link"
             href="#data"
             title="Permalink to GridIn.data">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
 <pre class="source">
 Map get data {
- return {
+ Map result = {
    "_id" : id,
    "filename" : filename,
    "contentType" : contentType,
@@ -250,45 +230,50 @@ Map get data {
    "chunkSize" : chunkSize,
    "uploadDate" : uploadDate,
    "md5" : md5,
-   // TODO(tsander): Extra Data?? Meta Data??
  };
+ extraData.forEach((String key, Object value) {
+   result[key] = value;
+ });
+ return result;
 }
 </pre>
 <pre class="source">
 set data(Map input) {
- id = input["_id"];
- filename = input["filename"];
- contentType = input["contentType"];
- length = input["length"];
- chunkSize = input["chunkSize"];
- uploadDate = input["uploadDate"];
- md5 = input["md5"];
- // TODO(tsander): Extra Data?? Meta Data??
+ extraData = new Map.from(input);
+
+ // Remove the known keys. Leaving the extraData. 
+ id = extraData.remove("_id");
+ filename = extraData.remove("filename");
+ contentType = extraData.remove("contentType");
+ length = extraData.remove("length");
+ chunkSize = extraData.remove("chunkSize");
+ uploadDate = extraData.remove("uploadDate");
+ md5 = extraData.remove("md5");
 }
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="extraData">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="http://api.dartlang.org/dart_core/Object.html">Object</a>&gt;         <strong>extraData</strong> <a class="anchor-link"
+Map&lt;String, Object&gt;         <strong>extraData</strong> <a class="anchor-link"
             href="#extraData"
             title="Permalink to GridIn.extraData">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
 <pre class="source">
-Map&lt;String, Object&gt; extraData;
+Map&lt;String, Object&gt; extraData
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="filename">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>filename</strong> <a class="anchor-link"
+String         <strong>filename</strong> <a class="anchor-link"
             href="#filename"
             title="Permalink to GridIn.filename">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-String filename;
+String filename
 </pre>
 </div>
 </div>
@@ -300,7 +285,7 @@ String filename;
         </h4>
         <div class="doc">
 <pre class="source">
-GridFS fs;
+GridFS fs
 </pre>
 </div>
 </div>
@@ -312,61 +297,61 @@ GridFS fs;
         </h4>
         <div class="doc">
 <pre class="source">
-ObjectId id;
+ObjectId id
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="input">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_io/ChunkedInputStream.html">ChunkedInputStream</a>         <strong>input</strong> <a class="anchor-link"
+Stream&lt;List&lt;int&gt;&gt;         <strong>input</strong> <a class="anchor-link"
             href="#input"
             title="Permalink to GridIn.input">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-ChunkedInputStream input;
+Stream&lt;List&lt;int&gt;&gt; input
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="length">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>length</strong> <a class="anchor-link"
+int         <strong>length</strong> <a class="anchor-link"
             href="#length"
             title="Permalink to GridIn.length">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
 <pre class="source">
-int length;
+int length
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="md5">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>md5</strong> <a class="anchor-link"
+String         <strong>md5</strong> <a class="anchor-link"
             href="#md5"
             title="Permalink to GridIn.md5">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
 <pre class="source">
-String md5;
+String md5
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="messageDigester">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_crypto/MD5.html">MD5</a>         <strong>messageDigester</strong> <a class="anchor-link"
+MD5         <strong>messageDigester</strong> <a class="anchor-link"
             href="#messageDigester"
             title="Permalink to GridIn.messageDigester">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-MD5 messageDigester;
+MD5 messageDigester
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="metaData">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>         <strong>metaData</strong> <a class="anchor-link"
+Map         <strong>metaData</strong> <a class="anchor-link"
             href="#metaData"
             title="Permalink to GridIn.metaData">#</a>
         </h4>
@@ -385,37 +370,37 @@ set metaData(Map metaData) {
 </div>
 <div class="field"><h4 id="savedChunks">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/bool.html">bool</a>         <strong>savedChunks</strong> <a class="anchor-link"
+bool         <strong>savedChunks</strong> <a class="anchor-link"
             href="#savedChunks"
             title="Permalink to GridIn.savedChunks">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-bool savedChunks = false;
+bool savedChunks = false
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="totalBytes">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>totalBytes</strong> <a class="anchor-link"
+int         <strong>totalBytes</strong> <a class="anchor-link"
             href="#totalBytes"
             title="Permalink to GridIn.totalBytes">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-int totalBytes = 0;
+int totalBytes = 0
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="uploadDate">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Date.html">Date</a>         <strong>uploadDate</strong> <a class="anchor-link"
+DateTime         <strong>uploadDate</strong> <a class="anchor-link"
             href="#uploadDate"
             title="Permalink to GridIn.uploadDate">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
 <pre class="source">
-Date uploadDate;
+DateTime uploadDate
 </pre>
 </div>
 </div>
@@ -424,36 +409,36 @@ Date uploadDate;
 <h3>Methods</h3>
 <div class="method"><h4 id="dumpBuffer">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; <strong>dumpBuffer</strong>(<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html">int</a>&gt; writeBuffer) <a class="anchor-link" href="#dumpBuffer"
+Future&lt;Map&gt; <strong>dumpBuffer</strong>(List&lt;int&gt; writeBuffer) <a class="anchor-link" href="#dumpBuffer"
               title="Permalink to GridIn.dumpBuffer">#</a></h4>
 <div class="doc">
 <pre class="source">
 Future&lt;Map&gt; dumpBuffer( List&lt;int&gt; writeBuffer ) {
  if (writeBuffer.length == 0) {
    // Chunk is empty, may be last chunk
-   return new Future.immediate({});
+   return new Future.value({});
  }
 
  Map chunk = {"files_id" : id, "n" : currentChunkNumber, "data": new BsonBinary.from(writeBuffer)};
  currentChunkNumber++;
  totalBytes += writeBuffer.length;
- messageDigester.update(writeBuffer);
+ messageDigester.add(writeBuffer);
  currentBufferPosition = 0;
 
- return fs.chunks.insert(chunk, safeMode:true);
+ return fs.chunks.insert(chunk);
 }
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="finishData">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>finishData</strong>() <a class="anchor-link" href="#finishData"
+Future <strong>finishData</strong>() <a class="anchor-link" href="#finishData"
               title="Permalink to GridIn.finishData">#</a></h4>
 <div class="doc">
 <pre class="source">
 Future finishData() {
  if (!savedChunks) {
-   md5 = CryptoUtils.bytesToHex(messageDigester.digest());
+   md5 = CryptoUtils.bytesToHex(messageDigester.close());
    length = totalBytes;
    savedChunks = true;
  }
@@ -464,7 +449,7 @@ Future finishData() {
 </div>
 <div class="method inherited"><h4 id="numChunks">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>numChunks</strong>() <a class="anchor-link" href="#numChunks"
+int <strong>numChunks</strong>() <a class="anchor-link" href="#numChunks"
               title="Permalink to GridIn.numChunks">#</a></h4>
 <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
 <pre class="source">
@@ -476,12 +461,12 @@ int numChunks() {
 </div>
 <div class="method"><h4 id="save">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a> <strong>save</strong>([<a href="http://api.dartlang.org/dart_core/int.html">int</a> chunkSize = 0]) <a class="anchor-link" href="#save"
+Future <strong>save</strong>([int chunkSize]) <a class="anchor-link" href="#save"
               title="Permalink to GridIn.save">#</a></h4>
 <div class="doc">
 <pre class="source">
-Future save([int chunkSize = 0]) {
- if (!?chunkSize) {
+Future save([int chunkSize]) {
+ if (chunkSize == null) {
    chunkSize = this.chunkSize;
  }
 
@@ -489,7 +474,7 @@ Future save([int chunkSize = 0]) {
  if (!savedChunks) {
    result = saveChunks(chunkSize);
  } else {
-   result = new Future.immediate({'ok': 1.0});
+   result = new Future.value({'ok': 1.0});
  }
  return result;
 }
@@ -498,37 +483,33 @@ Future save([int chunkSize = 0]) {
 </div>
 <div class="method"><h4 id="saveChunks">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&gt; <strong>saveChunks</strong>([<a href="http://api.dartlang.org/dart_core/int.html">int</a> chunkSize = 0]) <a class="anchor-link" href="#saveChunks"
+Future&lt;Map&gt; <strong>saveChunks</strong>([int chunkSize = 0]) <a class="anchor-link" href="#saveChunks"
               title="Permalink to GridIn.saveChunks">#</a></h4>
 <div class="doc">
 <pre class="source">
 Future&lt;Map&gt; saveChunks([int chunkSize = 0]) {
- if (!?chunkSize) {
-   chunkSize = this.chunkSize;
- }
- if (savedChunks) {
-   throw "chunks already saved!";
- }
- if (chunkSize &lt;= 0 || chunkSize &gt; GridFS.MAX_CHUNKSIZE) {
-   throw "chunkSize must be greater than zero and less than or equal to GridFS.MAX_CHUNKSIZE";
- }
- input.chunkSize = chunkSize;
  List&lt;Future&gt; futures = new List();
  Completer completer = new Completer();
  
- input.onData = () {
-   List&lt;int&gt; buffer = input.read();
-   futures.add(dumpBuffer(buffer));
- };
-
- input.onClosed = () {
-   Futures.wait(futures).chain((list) {
+ _onDone() {
+   Future.wait(futures).then((list) {
      return finishData();
    }).then((map){
      completer.complete({});
    });
- };
- 
+ }
+ if (chunkSize == null) {
+   chunkSize = this.chunkSize;
+ }
+ if (savedChunks) {
+   throw new MongoDartError('chunks already saved!');
+ }
+ if (chunkSize &lt;= 0 || chunkSize &gt; GridFS.MAX_CHUNKSIZE) {
+   throw new MongoDartError('chunkSize must be greater than zero and less than or equal to GridFS.MAX_CHUNKSIZE');
+ }    
+ input.listen((data) {
+     futures.add(dumpBuffer(data));
+     }, onDone: _onDone);    
  return completer.future;
 }
 </pre>
@@ -548,16 +529,16 @@ void setGridFS( GridFS fs ) {
 </div>
 <div class="method inherited"><h4 id="validate">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Future.html">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/bool.html">bool</a>&gt; <strong>validate</strong>() <a class="anchor-link" href="#validate"
+Future&lt;bool&gt; <strong>validate</strong>() <a class="anchor-link" href="#validate"
               title="Permalink to GridIn.validate">#</a></h4>
 <div class="inherited-from">inherited from <a href="../mongo_dart/GridFSFile.html">GridFSFile</a> </div><div class="doc">
 <pre class="source">
 Future&lt;bool&gt; validate() {
  if (fs == null) {
-   throw "no fs";
+   throw new MongoDartError('no fs');
  }
  if (md5 == null) {
-   throw "no md5 stored";
+   throw new MongoDartError('no md5 stored');
  }
 
  Completer completer = new Completer();
@@ -580,10 +561,9 @@ Future&lt;bool&gt; validate() {
         </div>
         <div class="clear"></div>
         </div>
-        
         <div class="footer">
-          <div>This page was generated at 2012-12-27 12:26:55.977</div>
+          <div>This page was generated at 2013-08-06 10:39:53.848</div>
         </div>
-        <script async src="../client-static.js"></script>
+        <script async src="../client-live-nav.js"></script>
         </body></html>
         

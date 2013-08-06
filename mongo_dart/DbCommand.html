@@ -5,7 +5,7 @@
         <title>DbCommand class / mongo_dart Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="../styles.css">
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
         <link rel="shortcut icon" href="../favicon.ico">
         
         </head>
@@ -24,30 +24,6 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2><ul class="icon">
-<li><a href="../mongo_dart/Connection.html"><div class="icon-class"></div>Connection</a></li>
-<li><a href="../mongo_dart/Cursor.html"><div class="icon-class"></div>Cursor</a></li>
-<li><a href="../mongo_dart/Db.html"><div class="icon-class"></div>Db</a></li>
-<li><a href="../mongo_dart/DbCollection.html"><div class="icon-class"></div>DbCollection</a></li>
-<li><div class="icon-class"></div><strong>DbCommand</strong></li>
-<li><a href="../mongo_dart/GridFS.html"><div class="icon-class"></div>GridFS</a></li>
-<li><a href="../mongo_dart/GridFSFile.html"><div class="icon-class"></div>GridFSFile</a></li>
-<li><a href="../mongo_dart/GridIn.html"><div class="icon-class"></div>GridIn</a></li>
-<li><a href="../mongo_dart/GridOut.html"><div class="icon-class"></div>GridOut</a></li>
-<li><a href="../mongo_dart/MapProxy.html"><div class="icon-class"></div>MapProxy&lt;K, V&gt;</a></li>
-<li><a href="../mongo_dart/ModifierBuilder.html"><div class="icon-class"></div>ModifierBuilder</a></li>
-<li><a href="../mongo_dart/MonadicBlock.html"><div class="icon-interface"></div>MonadicBlock</a></li>
-<li><a href="../mongo_dart/MongoGetMoreMessage.html"><div class="icon-class"></div>MongoGetMoreMessage</a></li>
-<li><a href="../mongo_dart/MongoInsertMessage.html"><div class="icon-class"></div>MongoInsertMessage</a></li>
-<li><a href="../mongo_dart/MongoKillCursorsMessage.html"><div class="icon-class"></div>MongoKillCursorsMessage</a></li>
-<li><a href="../mongo_dart/MongoMessage.html"><div class="icon-class"></div>MongoMessage</a></li>
-<li><a href="../mongo_dart/MongoQueryMessage.html"><div class="icon-class"></div>MongoQueryMessage</a></li>
-<li><a href="../mongo_dart/MongoRemoveMessage.html"><div class="icon-class"></div>MongoRemoveMessage</a></li>
-<li><a href="../mongo_dart/MongoReplyMessage.html"><div class="icon-class"></div>MongoReplyMessage</a></li>
-<li><a href="../mongo_dart/MongoUpdateMessage.html"><div class="icon-class"></div>MongoUpdateMessage</a></li>
-<li><a href="../mongo_dart/SelectorBuilder.html"><div class="icon-class"></div>SelectorBuilder</a></li>
-<li><a href="../mongo_dart/ServerConfig.html"><div class="icon-class"></div>ServerConfig</a></li>
-</ul>
 </div>
 <div class="content">
         <h2><strong>DbCommand</strong>
@@ -90,8 +66,8 @@ class DbCommand extends MongoQueryMessage{
    return createQueryDBCommand(db, {'getnonce':1});
  }
 
- static DbCommand createGetLastErrorCommand(Db db) {
-   return createQueryDBCommand(db, {"getlasterror":1});
+ static DbCommand createGetLastErrorCommand(Db db, {bool j: false, int w: 0}) {
+   return createQueryDBCommand(db, {"getlasterror":1, "j": j, "w": w});
  }
  static DbCommand createCountCommand(Db db, String collectionName, [Map selector = const {}]) {
    var finalQuery = new Map();
@@ -101,15 +77,24 @@ class DbCommand extends MongoQueryMessage{
  }
  static DbCommand createAuthenticationCommand(Db db, String userName, String password, String nonce) {
    var md5 = new MD5();
-   md5.update("${userName}:mongo:${password}".charCodes);
-   var hashed_password = new BsonBinary.from(md5.digest()).hexString;
+   md5.add("${userName}:mongo:${password}".codeUnits);
+   var hashed_password = new BsonBinary.from(md5.close()).hexString;
    md5 = new MD5();
-   md5.update("${nonce}${userName}${hashed_password}".charCodes);
-   var key = new BsonBinary.from(md5.digest()).hexString;
+   md5.add("${nonce}${userName}${hashed_password}".codeUnits);
+   var key = new BsonBinary.from(md5.close()).hexString;
    var selector = {'authenticate':1, 'user':userName, 'nonce':nonce, 'key':key};
    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NONE, 0, -1, selector, null);
  }
-
+ 
+ static DbCommand createDistinctCommand(Db db, String collectionName, String field, [Map selector = const {}]) {
+   return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, 
+     {'distinct': collectionName, 'key': field, 'query': selector }, null);
+ }
+ 
+ static DbCommand createAggregateCommand(Db db, String collectionName, List pipeline) {
+   return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, 
+     {'aggregate': collectionName, 'pipeline': pipeline }, null);
+ }
 }
 </pre>
 </div>
@@ -126,7 +111,7 @@ final         <strong>SYSTEM_COMMAND_COLLECTION</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final SYSTEM_COMMAND_COLLECTION = "\$cmd";
+static final SYSTEM_COMMAND_COLLECTION = "\$cmd"
 </pre>
 </div>
 </div>
@@ -138,7 +123,7 @@ final         <strong>SYSTEM_INDEX_COLLECTION</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final SYSTEM_INDEX_COLLECTION = "system.indexes";
+static final SYSTEM_INDEX_COLLECTION = "system.indexes"
 </pre>
 </div>
 </div>
@@ -150,7 +135,7 @@ final         <strong>SYSTEM_NAMESPACE_COLLECTION</strong> <a class="anchor-link
         </h4>
         <div class="doc">
 <pre class="source">
-static final SYSTEM_NAMESPACE_COLLECTION = "system.namespaces";
+static final SYSTEM_NAMESPACE_COLLECTION = "system.namespaces"
 </pre>
 </div>
 </div>
@@ -162,7 +147,7 @@ final         <strong>SYSTEM_PROFILE_COLLECTION</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final SYSTEM_PROFILE_COLLECTION = "system.profile";
+static final SYSTEM_PROFILE_COLLECTION = "system.profile"
 </pre>
 </div>
 </div>
@@ -174,7 +159,7 @@ final         <strong>SYSTEM_USER_COLLECTION</strong> <a class="anchor-link"
         </h4>
         <div class="doc">
 <pre class="source">
-static final SYSTEM_USER_COLLECTION = "system.users";
+static final SYSTEM_USER_COLLECTION = "system.users"
 </pre>
 </div>
 </div>
@@ -183,7 +168,7 @@ static final SYSTEM_USER_COLLECTION = "system.users";
 <h3>Static Methods</h3>
 <div class="method"><h4 id="createDropCollectionCommand">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createDropCollectionCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, <a href="http://api.dartlang.org/dart_core/String.html">String</a> collectionName) <a class="anchor-link" href="#createDropCollectionCommand"
+<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createDropCollectionCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, String collectionName) <a class="anchor-link" href="#createDropCollectionCommand"
               title="Permalink to DbCommand.createDropCollectionCommand">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -207,7 +192,7 @@ static DbCommand createDropDatabaseCommand(Db db) {
 </div>
 <div class="method"><h4 id="createQueryDBCommand">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createQueryDBCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, <a href="http://api.dartlang.org/dart_core/Map.html">Map</a> command) <a class="anchor-link" href="#createQueryDBCommand"
+<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createQueryDBCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, Map command) <a class="anchor-link" href="#createQueryDBCommand"
               title="Permalink to DbCommand.createQueryDBCommand">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -219,7 +204,7 @@ static DbCommand createQueryDBCommand(Db db, Map command) {
 </div>
 <div class="method"><h4 id="createDBSlaveOKCommand">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createDBSlaveOKCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, <a href="http://api.dartlang.org/dart_core/Map.html">Map</a> command) <a class="anchor-link" href="#createDBSlaveOKCommand"
+<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createDBSlaveOKCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, Map command) <a class="anchor-link" href="#createDBSlaveOKCommand"
               title="Permalink to DbCommand.createDBSlaveOKCommand">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -255,19 +240,19 @@ static DbCommand createGetNonceCommand(Db db) {
 </div>
 <div class="method"><h4 id="createGetLastErrorCommand">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createGetLastErrorCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db) <a class="anchor-link" href="#createGetLastErrorCommand"
+<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createGetLastErrorCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, {bool j: false, int w: 0}) <a class="anchor-link" href="#createGetLastErrorCommand"
               title="Permalink to DbCommand.createGetLastErrorCommand">#</a></h4>
 <div class="doc">
 <pre class="source">
-static DbCommand createGetLastErrorCommand(Db db) {
- return createQueryDBCommand(db, {"getlasterror":1});
+static DbCommand createGetLastErrorCommand(Db db, {bool j: false, int w: 0}) {
+ return createQueryDBCommand(db, {"getlasterror":1, "j": j, "w": w});
 }
 </pre>
 </div>
 </div>
 <div class="method"><h4 id="createCountCommand">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createCountCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, <a href="http://api.dartlang.org/dart_core/String.html">String</a> collectionName, [<a href="http://api.dartlang.org/dart_core/Map.html">Map</a> selector = const{}]) <a class="anchor-link" href="#createCountCommand"
+<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createCountCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, String collectionName, [Map selector = const{}]) <a class="anchor-link" href="#createCountCommand"
               title="Permalink to DbCommand.createCountCommand">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -282,19 +267,45 @@ static DbCommand createCountCommand(Db db, String collectionName, [Map selector 
 </div>
 <div class="method"><h4 id="createAuthenticationCommand">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createAuthenticationCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, <a href="http://api.dartlang.org/dart_core/String.html">String</a> userName, <a href="http://api.dartlang.org/dart_core/String.html">String</a> password, <a href="http://api.dartlang.org/dart_core/String.html">String</a> nonce) <a class="anchor-link" href="#createAuthenticationCommand"
+<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createAuthenticationCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, String userName, String password, String nonce) <a class="anchor-link" href="#createAuthenticationCommand"
               title="Permalink to DbCommand.createAuthenticationCommand">#</a></h4>
 <div class="doc">
 <pre class="source">
 static DbCommand createAuthenticationCommand(Db db, String userName, String password, String nonce) {
  var md5 = new MD5();
- md5.update("${userName}:mongo:${password}".charCodes);
- var hashed_password = new BsonBinary.from(md5.digest()).hexString;
+ md5.add("${userName}:mongo:${password}".codeUnits);
+ var hashed_password = new BsonBinary.from(md5.close()).hexString;
  md5 = new MD5();
- md5.update("${nonce}${userName}${hashed_password}".charCodes);
- var key = new BsonBinary.from(md5.digest()).hexString;
+ md5.add("${nonce}${userName}${hashed_password}".codeUnits);
+ var key = new BsonBinary.from(md5.close()).hexString;
  var selector = {'authenticate':1, 'user':userName, 'nonce':nonce, 'key':key};
  return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NONE, 0, -1, selector, null);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="createDistinctCommand">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createDistinctCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, String collectionName, String field, [Map selector = const{}]) <a class="anchor-link" href="#createDistinctCommand"
+              title="Permalink to DbCommand.createDistinctCommand">#</a></h4>
+<div class="doc">
+<pre class="source">
+static DbCommand createDistinctCommand(Db db, String collectionName, String field, [Map selector = const {}]) {
+ return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, 
+   {'distinct': collectionName, 'key': field, 'query': selector }, null);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="createAggregateCommand">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/DbCommand.html">DbCommand</a> <strong>createAggregateCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, String collectionName, List pipeline) <a class="anchor-link" href="#createAggregateCommand"
+              title="Permalink to DbCommand.createAggregateCommand">#</a></h4>
+<div class="doc">
+<pre class="source">
+static DbCommand createAggregateCommand(Db db, String collectionName, List pipeline) {
+ return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, 
+   {'aggregate': collectionName, 'pipeline': pipeline }, null);
 }
 </pre>
 </div>
@@ -302,11 +313,17 @@ static DbCommand createAuthenticationCommand(Db db, String userName, String pass
 </div>
 <div>
 <h3>Constructors</h3>
-<div class="method"><h4 id="DbCommand">
+<div class="method"><h4 id="">
 <button class="show-code">Code</button>
-new <strong>DbCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, collectionName, flags, numberToSkip, numberToReturn, query, fields) <a class="anchor-link" href="#DbCommand"
+new <strong>DbCommand</strong>(<a href="../mongo_dart/Db.html">Db</a> db, collectionName, flags, numberToSkip, numberToReturn, query, fields) <a class="anchor-link" href="#"
               title="Permalink to DbCommand.DbCommand">#</a></h4>
 <div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="../dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="../dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="../dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
 DbCommand(this.db, collectionName, flags, numberToSkip, numberToReturn, query, fields)
  :super(collectionName,flags, numberToSkip, numberToReturn, query, fields){
@@ -338,25 +355,25 @@ BsonCString get collectionNameBson =&gt; _collectionFullName;
         </h4>
         <div class="doc">
 <pre class="source">
-Db db;
+Db db
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="flags">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>flags</strong> <a class="anchor-link"
+int         <strong>flags</strong> <a class="anchor-link"
             href="#flags"
             title="Permalink to DbCommand.flags">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/MongoQueryMessage.html">MongoQueryMessage</a> </div><div class="doc">
 <pre class="source">
-int flags;
+int flags
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="messageLength">
 <button class="show-code">Code</button>
-final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>messageLength</strong> <a class="anchor-link"
+final int         <strong>messageLength</strong> <a class="anchor-link"
             href="#messageLength"
             title="Permalink to DbCommand.messageLength">#</a>
         </h4>
@@ -374,43 +391,43 @@ int get messageLength{
 </div>
 <div class="field inherited"><h4 id="numberToReturn">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>numberToReturn</strong> <a class="anchor-link"
+int         <strong>numberToReturn</strong> <a class="anchor-link"
             href="#numberToReturn"
             title="Permalink to DbCommand.numberToReturn">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/MongoQueryMessage.html">MongoQueryMessage</a> </div><div class="doc">
 <pre class="source">
-int numberToReturn;
+int numberToReturn
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="numberToSkip">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>numberToSkip</strong> <a class="anchor-link"
+int         <strong>numberToSkip</strong> <a class="anchor-link"
             href="#numberToSkip"
             title="Permalink to DbCommand.numberToSkip">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/MongoQueryMessage.html">MongoQueryMessage</a> </div><div class="doc">
 <pre class="source">
-int numberToSkip;
+int numberToSkip
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="opcode">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>opcode</strong> <a class="anchor-link"
+int         <strong>opcode</strong> <a class="anchor-link"
             href="#opcode"
             title="Permalink to DbCommand.opcode">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
 <pre class="source">
-int opcode = MongoMessage.Reply;
+int opcode = MongoMessage.Reply
 </pre>
 </div>
 </div>
 <div class="field inherited"><h4 id="requestId">
 <button class="show-code">Code</button>
-final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>requestId</strong> <a class="anchor-link"
+final int         <strong>requestId</strong> <a class="anchor-link"
             href="#requestId"
             title="Permalink to DbCommand.requestId">#</a>
         </h4>
@@ -418,7 +435,7 @@ final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <stro
 <pre class="source">
 int get requestId{
  if (_requestId == null){
-   _requestId = Statics.nextRequestId;
+   _requestId = _Statics.nextRequestId;
  }
  return _requestId;
 }
@@ -427,13 +444,13 @@ int get requestId{
 </div>
 <div class="field inherited"><h4 id="responseTo">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>responseTo</strong> <a class="anchor-link"
+int         <strong>responseTo</strong> <a class="anchor-link"
             href="#responseTo"
             title="Permalink to DbCommand.responseTo">#</a>
         </h4>
         <div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
 <pre class="source">
-int responseTo;
+int responseTo
 </pre>
 </div>
 </div>
@@ -447,14 +464,14 @@ int responseTo;
 <div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
 <pre class="source">
 MongoMessage deserialize(BsonBinary buffer){
- throw "Must be implemented";
+ throw new MongoDartError('Must be implemented');
 }
 </pre>
 </div>
 </div>
 <div class="method inherited"><h4 id="readMessageHeaderFrom">
 <button class="show-code">Code</button>
-<strong>readMessageHeaderFrom</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#readMessageHeaderFrom"
+dynamic <strong>readMessageHeaderFrom</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#readMessageHeaderFrom"
               title="Permalink to DbCommand.readMessageHeaderFrom">#</a></h4>
 <div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
 <pre class="source">
@@ -463,9 +480,10 @@ readMessageHeaderFrom(BsonBinary buffer)
    _messageLength = buffer.readInt32();
    _requestId = buffer.readInt32();
    responseTo = buffer.readInt32();
-   if (buffer.readInt32() != opcode)
+   int opcodeFromWire = buffer.readInt32();
+   if (opcodeFromWire != opcode)
    {
-       throw "Message header opcode is not the expected one.";
+       throw new MongoDartError('Expected $opcode in Message header. Got $opcodeFromWire');
    }
 }
 </pre>
@@ -485,6 +503,9 @@ BsonBinary serialize(){
  buffer.writeInt(numberToSkip);
  buffer.writeInt(numberToReturn);
  _query.packValue(buffer);
+ if (_fields != null){
+   _fields.packValue(buffer);
+ }
  buffer.offset = 0;
  return buffer;
 }
@@ -493,12 +514,12 @@ BsonBinary serialize(){
 </div>
 <div class="method inherited"><h4 id="toString">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+String <strong>toString</strong>() <a class="anchor-link" href="#toString"
               title="Permalink to DbCommand.toString">#</a></h4>
 <div class="inherited-from">inherited from <a href="../mongo_dart/MongoQueryMessage.html">MongoQueryMessage</a> </div><div class="doc">
 <div class="inherited">
 <p>Returns a string representation of this object.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
 String toString(){
  return "MongoQueryMessage($requestId, ${_collectionFullName.value},numberToReturn:$numberToReturn, ${_query.value})";
@@ -508,7 +529,7 @@ String toString(){
 </div>
 <div class="method inherited"><h4 id="writeMessageHeaderTo">
 <button class="show-code">Code</button>
-<strong>writeMessageHeaderTo</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#writeMessageHeaderTo"
+dynamic <strong>writeMessageHeaderTo</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#writeMessageHeaderTo"
               title="Permalink to DbCommand.writeMessageHeaderTo">#</a></h4>
 <div class="inherited-from">inherited from <a href="../mongo_dart/MongoMessage.html">MongoMessage</a> </div><div class="doc">
 <pre class="source">
@@ -519,7 +540,7 @@ writeMessageHeaderTo(BsonBinary buffer)
    buffer.writeInt(0); // responseTo not used in requests sent by client
    buffer.writeInt(opcode);
    if (messageLength &lt; 0){
-     throw "Error in message length";
+     throw new MongoDartError('Error in message length');
    }
 }
 </pre>
@@ -529,10 +550,9 @@ writeMessageHeaderTo(BsonBinary buffer)
         </div>
         <div class="clear"></div>
         </div>
-        
         <div class="footer">
-          <div>This page was generated at 2012-12-27 12:26:56.105</div>
+          <div>This page was generated at 2013-08-06 10:39:54.087</div>
         </div>
-        <script async src="../client-static.js"></script>
+        <script async src="../client-live-nav.js"></script>
         </body></html>
         

@@ -5,7 +5,7 @@
         <title>DbRef class / bson Library / Dart Documentation</title>
         <link rel="stylesheet" type="text/css"
             href="../styles.css">
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
         <link rel="shortcut icon" href="../favicon.ico">
         
         </head>
@@ -24,31 +24,7 @@
       
         <div class="nav">
         
-<h2><div class="icon-library"></div><a href="../bson.html">bson</a></h2><ul class="icon">
-<li><a href="../bson/BSON.html"><div class="icon-class"></div>BSON</a></li>
-<li><a href="../bson/BsonArray.html"><div class="icon-class"></div>BsonArray</a></li>
-<li><a href="../bson/BsonBinary.html"><div class="icon-class"></div>BsonBinary</a></li>
-<li><a href="../bson/BsonBoolean.html"><div class="icon-class"></div>BsonBoolean</a></li>
-<li><a href="../bson/BsonCode.html"><div class="icon-class"></div>BsonCode</a></li>
-<li><a href="../bson/BsonCString.html"><div class="icon-class"></div>BsonCString</a></li>
-<li><a href="../bson/BsonDate.html"><div class="icon-class"></div>BsonDate</a></li>
-<li><a href="../bson/BsonDouble.html"><div class="icon-class"></div>BsonDouble</a></li>
-<li><a href="../bson/BsonInt.html"><div class="icon-class"></div>BsonInt</a></li>
-<li><a href="../bson/BsonLong.html"><div class="icon-class"></div>BsonLong</a></li>
-<li><a href="../bson/BsonMap.html"><div class="icon-class"></div>BsonMap</a></li>
-<li><a href="../bson/BsonNull.html"><div class="icon-class"></div>BsonNull</a></li>
-<li><a href="../bson/BsonObject.html"><div class="icon-class"></div>BsonObject</a></li>
-<li><a href="../bson/BsonPlatform.html"><div class="icon-class"></div>BsonPlatform</a></li>
-<li><a href="../bson/BsonRegexp.html"><div class="icon-class"></div>BsonRegexp</a></li>
-<li><a href="../bson/BsonString.html"><div class="icon-class"></div>BsonString</a></li>
-<li><div class="icon-class"></div><strong>DbRef</strong></li>
-<li><a href="../bson/MaxKey.html"><div class="icon-class"></div>MaxKey</a></li>
-<li><a href="../bson/MinKey.html"><div class="icon-class"></div>MinKey</a></li>
-<li><a href="../bson/ObjectId.html"><div class="icon-class"></div>ObjectId</a></li>
-<li><a href="../bson/Statics.html"><div class="icon-class"></div>Statics</a></li>
-<li><a href="../bson/Timestamp.html"><div class="icon-class"></div>Timestamp</a></li>
-</ul>
-<h2><div class="icon-library"></div><a href="../mongo_dart.html">mongo_dart</a></h2></div>
+</div>
 <div class="content">
         <h2><strong>DbRef</strong>
           class
@@ -66,7 +42,7 @@ class DbRef extends BsonObject{
    bsonCollection = new BsonString(collection);
  }
  get value=&gt;this;
- int get typeByte =&gt; BSON.BSON_DATA_DBPOINTER;
+ int get typeByte =&gt; _BSON_DATA_DBREF;
  byteLength()=&gt;bsonCollection.byteLength()+id.byteLength();
  unpackValue(BsonBinary buffer){
    bsonCollection = new BsonString(null);
@@ -75,7 +51,7 @@ class DbRef extends BsonObject{
    id = new ObjectId();
    id.unpackValue(buffer);
  }
- toString()=&gt;'BsonDbPointer(collection: $collection, id: $id)';
+ toString()=&gt;'DbRef(collection: $collection, id: $id)';
  packValue(BsonBinary buffer){
     bsonCollection.packValue(buffer);
     id.packValue(buffer);
@@ -91,11 +67,17 @@ class DbRef extends BsonObject{
 <span class="type-box"><span class="icon-class"></span><a href="../bson/BsonObject.html">BsonObject</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>DbRef</strong></span></p>
 <div>
 <h3>Constructors</h3>
-<div class="method"><h4 id="DbRef">
+<div class="method"><h4 id="">
 <button class="show-code">Code</button>
-new <strong>DbRef</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> collection, <a href="../bson/ObjectId.html">ObjectId</a> id) <a class="anchor-link" href="#DbRef"
+new <strong>DbRef</strong>(String collection, <a href="../bson/ObjectId.html">ObjectId</a> id) <a class="anchor-link" href="#"
               title="Permalink to DbRef.DbRef">#</a></h4>
 <div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="../dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="../dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="../dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
 DbRef(this.collection, this.id)
 {
@@ -115,19 +97,19 @@ DbRef(this.collection, this.id)
         </h4>
         <div class="doc">
 <pre class="source">
-BsonString bsonCollection;
+BsonString bsonCollection
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="collection">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>collection</strong> <a class="anchor-link"
+String         <strong>collection</strong> <a class="anchor-link"
             href="#collection"
             title="Permalink to DbRef.collection">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-String collection;
+String collection
 </pre>
 </div>
 </div>
@@ -147,7 +129,7 @@ the hash codes. They will not be consistent between runs and
 there are no distribution guarantees.</p>
 <p>If a subclass overrides <a class="crossref" href="../bson/DbRef.html#hashCode">hashCode</a> it should override the
 equality operator as well to maintain consistency.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
 get hashCode =&gt; '${collection}.${id.toHexString()}'.hashCode;
 </pre>
@@ -161,19 +143,19 @@ get hashCode =&gt; '${collection}.${id.toHexString()}'.hashCode;
         </h4>
         <div class="doc">
 <pre class="source">
-ObjectId id;
+ObjectId id
 </pre>
 </div>
 </div>
 <div class="field"><h4 id="typeByte">
 <button class="show-code">Code</button>
-final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>typeByte</strong> <a class="anchor-link"
+final int         <strong>typeByte</strong> <a class="anchor-link"
             href="#typeByte"
             title="Permalink to DbRef.typeByte">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-int get typeByte =&gt; BSON.BSON_DATA_DBPOINTER;
+int get typeByte =&gt; _BSON_DATA_DBREF;
 </pre>
 </div>
 </div>
@@ -194,17 +176,17 @@ get value=&gt;this;
 <h3>Operators</h3>
 <div class="method"><h4 id="==">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>operator ==</strong>(other) <a class="anchor-link" href="#=="
+bool <strong>operator ==</strong>(other) <a class="anchor-link" href="#=="
               title="Permalink to DbRef.operator ==">#</a></h4>
 <div class="doc">
 <div class="inherited">
 <p>The equality operator.</p>
-<p>The default behavior for all <code>Object</code>s is to return true if and
+<p>The default behavior for all <a class="crossref" href="../dart_core/Object.html">Object</a>s is to return true if and
 only if <code>this</code> and 
 <span class="param">other</span> are the same object.</p>
 <p>If a subclass overrides the equality operator it should override
 the <a class="crossref" href="../bson/DbRef.html#hashCode">hashCode</a> method as well to maintain consistency.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
 bool operator ==(other) =&gt; other is DbRef &amp;&amp; collection == other.collection &amp;&amp; id.toHexString() == other.id.toHexString();
 </pre>
@@ -215,7 +197,7 @@ bool operator ==(other) =&gt; other is DbRef &amp;&amp; collection == other.coll
 <h3>Methods</h3>
 <div class="method"><h4 id="byteLength">
 <button class="show-code">Code</button>
-<strong>byteLength</strong>() <a class="anchor-link" href="#byteLength"
+dynamic <strong>byteLength</strong>() <a class="anchor-link" href="#byteLength"
               title="Permalink to DbRef.byteLength">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -225,7 +207,7 @@ byteLength()=&gt;bsonCollection.byteLength()+id.byteLength();
 </div>
 <div class="method inherited"><h4 id="packElement">
 <button class="show-code">Code</button>
-<strong>packElement</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> name, buffer) <a class="anchor-link" href="#packElement"
+dynamic <strong>packElement</strong>(String name, buffer) <a class="anchor-link" href="#packElement"
               title="Permalink to DbRef.packElement">#</a></h4>
 <div class="inherited-from">inherited from <a href="../bson/BsonObject.html">BsonObject</a> </div><div class="doc">
 <pre class="source">
@@ -241,7 +223,7 @@ packElement(String name, var buffer){
 </div>
 <div class="method"><h4 id="packValue">
 <button class="show-code">Code</button>
-<strong>packValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#packValue"
+dynamic <strong>packValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#packValue"
               title="Permalink to DbRef.packValue">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -254,14 +236,14 @@ packValue(BsonBinary buffer){
 </div>
 <div class="method"><h4 id="toString">
 <button class="show-code">Code</button>
-<strong>toString</strong>() <a class="anchor-link" href="#toString"
+dynamic <strong>toString</strong>() <a class="anchor-link" href="#toString"
               title="Permalink to DbRef.toString">#</a></h4>
 <div class="doc">
 <div class="inherited">
 <p>Returns a string representation of this object.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<div class="docs-inherited-from">docs inherited from Object </div></div>
 <pre class="source">
-toString()=&gt;'BsonDbPointer(collection: $collection, id: $id)';
+toString()=&gt;'DbRef(collection: $collection, id: $id)';
 </pre>
 </div>
 </div>
@@ -283,7 +265,7 @@ _ElementPair unpackElement(buffer){
 </div>
 <div class="method"><h4 id="unpackValue">
 <button class="show-code">Code</button>
-<strong>unpackValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#unpackValue"
+dynamic <strong>unpackValue</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#unpackValue"
               title="Permalink to DbRef.unpackValue">#</a></h4>
 <div class="doc">
 <pre class="source">
@@ -301,10 +283,9 @@ unpackValue(BsonBinary buffer){
         </div>
         <div class="clear"></div>
         </div>
-        
         <div class="footer">
-          <div>This page was generated at 2012-12-27 12:26:55.779</div>
+          <div>This page was generated at 2013-08-06 10:39:53.191</div>
         </div>
-        <script async src="../client-static.js"></script>
+        <script async src="../client-live-nav.js"></script>
         </body></html>
         
