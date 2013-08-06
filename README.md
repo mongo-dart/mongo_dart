@@ -1,16 +1,46 @@
 #Mongo-dart - MongoDB driver for Dart programming language.
 
-It is a server-side library with minimalistic support of MongoDb. At the moment driver supports basic CRUD operations, authentication.
+It is a server-side driver library for MongoDb.
 
-Some samples are in directory **examples**. Also Chris Buckett gave a realistic use case scenario in two part blog post:
+Simple usage example on base of [JSON ZIPS dataset] (http://media.mongodb.org/zips.json)
 
- - [Building a client / server Dart App Part 1 server side](http://blog.dartwatch.com/2012/03/building-client-server-dart-app-part-1.html)
- - [Building a client / server Dart App Part 2 client (browser) side](http://blog.dartwatch.com/2012/03/building-client-server-dart-app-part-2.html)
 
-See also:
+    import 'package:mongo_dart/mongo_dart.dart';
+    main(){
+      void displayZip(Map zip) {
+        print('state: ${zip["state"]}, city: ${zip["city"]}, zip: ${zip["id"]}, population: ${zip["pop"]}'    );
+      }
+      Db db = new Db("mongodb://reader:vHm459fU@ds037468.mongolab.com:37468/samlple");
+      var zips = db.collection('zip');
+      db.open().then((_){
+        print('******************** Zips for state NY, with population between 14000 and 16000, reverse     ordered by population');
+        return zips.find(
+            where.eq('state','NY').inRange('pop',14000,16000).sortBy('pop', descending: true))
+              .forEach(displayZip);
+      }).then((_) {
+        print('******************** Find ZIP for code 78829 (BATESVILLE)');
+        return zips.findOne(where.eq('id','78829'));
+      }).then((batesville) {
+        displayZip(batesville);
+        print('******************** Find 10 ZIP closest to BATESVILLE');
+        return zips.find(
+            where.near('loc',batesville["loc"]).limit(10))
+              .forEach(displayZip);
+      }).then((_) {
+        print('closing db');
+        db.close();
+      });
+    }
 
-[API Doc](http://vadimtsushko.github.com/mongo_dart/)
 
-[Feature check list](https://github.com/vadimtsushko/mongo_dart/blob/master/doc/feature_checklist.md)
+###See also:
 
-[Recent change notes](https://github.com/vadimtsushko/mongo_dart/blob/master/doc/change_notes.md)
+- [API Doc](http://vadimtsushko.github.com/mongo_dart/)
+
+- [Feature check list](https://github.com/vadimtsushko/mongo_dart/blob/master/doc/feature_checklist.md)
+
+- [Recent change notes](https://github.com/vadimtsushko/mongo_dart/blob/master/doc/change_notes.md)
+
+- Additional [examples](https://github.com/vadimtsushko/mongo_dart/tree/master/example) and [tests](https://github.com/vadimtsushko/mongo_dart/tree/master/test)
+
+- For more structured approach to communication with MongoDB: [Objectory](https://github.com/vadimtsushko/objectory)
