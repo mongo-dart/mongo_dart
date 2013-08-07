@@ -1,5 +1,5 @@
 name: mongo_dart
-version: 0.1.27-dev
+version: 0.1.27
 authors:
 - Vadim Tsushko <vadimtsushko@gmail.com>
 - Ted Sander <ted@tedsander.com>
@@ -14,5 +14,5 @@ dependencies:
   meta: '>=0.6.5 <0.7.0'
   mongo_dart_query: '>=0.1.5 <0.2.0'
 dev_dependencies:
-  unittest: any
   ghpages_generator: any
+  unittest: any
