@@ -7,5 +7,5 @@ import 'packet_converter_tests.dart' as converter;
 main(){
   converter.main();
   database.main();
-//  gridfs.main();
+  gridfs.main();
 }

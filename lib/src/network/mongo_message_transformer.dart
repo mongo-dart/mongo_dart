@@ -3,7 +3,7 @@ class MongoMessageTransformer extends StreamEventTransformer<List<int>, MongoRep
   final _log = new Logger('MongoMessageTransformer');
   final converter = new PacketConverter();
 //  final debugData = new File('debug_data1.bin').openSync(mode: FileMode.WRITE);
-void handleData(List<int> data, EventSink<List<int>> sink) {
+void handleData(List<int> data, EventSink<MongoReplyMessage> sink) {
   //    debugData.writeFromSync(data);
   //    debugData.flushSync();
   //_log.fine('handleData length=${data.length} $data');
@@ -16,7 +16,7 @@ void handleData(List<int> data, EventSink<List<int>> sink) {
       sink.add(reply);
     }
   }
-  void handleDone(EventSink<List<int>> sink) {
+  void handleDone(EventSink<MongoReplyMessage> sink) {
     if (!converter.isClear) {
       _log.warning('Invalid state of PacketConverter in handleDone: $converter');
     }

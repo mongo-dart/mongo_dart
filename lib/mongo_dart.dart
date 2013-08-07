@@ -1,3 +1,7 @@
+/// Server-side driver library for MongoDb implemented in pure Dart.
+/// As most of IO in Dart, mongo_dart is totally async -using Futures and Streams.
+/// .
+
 library mongo_dart;
 import 'dart:isolate';
 import 'dart:io';
