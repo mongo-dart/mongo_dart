@@ -2,7 +2,7 @@
 
 [![Build Status](https://drone.io/vadimtsushko/mongo_dart/status.png)](https://drone.io/vadimtsushko/mongo_dart/latest)
 
-It is a server-side driver library for MongoDb implemented in pure Dart.
+Server-side driver library for MongoDb implemented in pure Dart.
 
 Simple usage example on base of [JSON ZIPS dataset] (http://media.mongodb.org/zips.json)
 
