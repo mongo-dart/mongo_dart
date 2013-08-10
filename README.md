@@ -1,6 +1,6 @@
 #Mongo-dart - MongoDB driver for Dart programming language.
 
-[![Build Status](https://drone.io/vadimtsushko/mongo_dart/status.png)](https://drone.io/vadimtsushko/mongo_dart/latest)
+[![Build Status](https://drone.io/github.com/vadimtsushko/mongo_dart/status.png)](https://drone.io/github.com/vadimtsushko/mongo_dart/latest)
 
 Server-side driver library for MongoDb implemented in pure Dart.
 
