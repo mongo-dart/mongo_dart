@@ -8,95 +8,95 @@ import 'package:logging/logging.dart';
 
 const DefaultUri = 'mongodb://127.0.0.1/';
 
-testCollectionInfoCursor(){
+Future testCollectionInfoCursor(){
   Db db = new Db('mongodb://127.0.0.1/mongo_dart-test','testCollectionInfoCursor');
   DbCollection newColl;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     newColl = db.collection("new_collecion");
     return newColl.remove();
-  })).then(expectAsync1((v){    
+  }).then((v){    
     return newColl.insertAll([{"a":1}]);
-  })).then(expectAsync1((v){
+  }).then((v){
     return db.collectionsInfoCursor("new_collecion").toList();
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v,hasLength(1));
     db.close();
-  }));
+  });
 }
-testRemove(){
+Future testRemove(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection newColl;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     db.removeFromCollection("new_collecion_to_remove");
     newColl = db.collection("new_collecion_to_remove");
     newColl.insertAll([{"a":1}]);
   return db.collectionsInfoCursor("new_collecion_to_remove").toList();
-  })).then(expectAsync1((v){
+  }).then((v){
 //    expect(v,hasLength(1));
     db.removeFromCollection("new_collecion_to_remove");
-  })).then(expectAsync1((v){  
-    newColl.find().toList().then(expectAsync1((v1){
+  }).then((v){  
+    newColl.find().toList().then((v1){
       expect(v1,isEmpty);
       newColl.drop();
       db.close();
-    }));
-  }));
+    });
+  });
 }
-testDropDatabase(){
+Future testDropDatabase(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  db.open().then((c){
+  return db.open().then((c){
     return db.drop();
   }).then((v){
      db.close();
   });
 }
-testGetNonce(){
+Future testGetNonce(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     return db.getNonce();
-  })).then(expectAsync1((v){
+  }).then((v){
       expect(v["ok"],1);
       db.close();
-  }));
+  });
 }
-testPwd(){
+Future testPwd(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection coll;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     coll = db.collection("system.users");
     return coll.find().forEach((user)=>print(user));
-  })).then(expectAsync1((v){
+  }).then((v){
       db.close();
-  }));
+  });
 }
 
 testCollectionCreation(){
   Db db = new Db('${DefaultUri}db');
   DbCollection collection = db.collection('student');
 }
-testEachOnEmptyCollection(){
+Future testEachOnEmptyCollection(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testEachOnEmptyCollection');
   int count = 0;
   int sum = 0;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection newColl = db.collection('newColl1');
     return newColl.find().forEach((v)
       {sum += v["a"]; count++;});
-  })).then(expectAsync1((v) {
+  }).then((v) {
     expect(sum, 0);
     expect(count, 0);
     db.close();
-  }));
+  });
 }
-testFindEachWithThenClause(){
+Future testFindEachWithThenClause(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
   int sum = 0;
   DbCollection students;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     students = db.collection('students');
     return students.drop();
-  })).then(expectAsync1((c){
+  }).then((c){
     students.insertAll(
       [
       {"name":"Vadim","score":4},
@@ -106,17 +106,17 @@ testFindEachWithThenClause(){
     );
     return students.find().forEach((v)
       {sum += v["score"]; count++;});
-   })).then(expectAsync1((v){
+   }).then((v){
     expect(sum,13);
     expect(count,3);
     db.close();
-  }));
+  });
 }
-testFindEach(){
+Future testFindEach(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
   int sum = 0;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection students = db.collection('students');
     students.remove();
     students.insertAll(
@@ -128,18 +128,18 @@ testFindEach(){
    return students.find().forEach((v1){
     count++;
     sum += v1["score"];});
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(count,3);
     expect(sum,13);
     db.close();
-   }));
+   });
 }
 
-testFindStream(){
+Future testFindStream(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
   int sum = 0;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection students = db.collection('students');
     students.remove();
     students.insertAll(
@@ -151,29 +151,29 @@ testFindStream(){
    return students.find().stream.forEach((v1){
     count++;
     sum += v1["score"];});
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(count,3);
     expect(sum,13);
     db.close();
-   }));
+   });
 }
 
-testDrop(){
+Future testDrop(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  db.open().then(expectAsync1((_){
+  return db.open().then((_){
     return db.dropCollection("testDrop");
-  })).then(expectAsync1((v) {
+  }).then((v) {
       return db.dropCollection("testDrop");
-  })).then(expectAsync1((__){
+  }).then((__){
       db.close();
-  }));
+  });
 }
 
-testSaveWithIntegerId(){
+Future testSaveWithIntegerId(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection coll;
   var id;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     coll = db.collection('testSaveWithIntegerId');
     coll.remove();
     List toInsert = [
@@ -184,23 +184,23 @@ testSaveWithIntegerId(){
                  ];
     coll.insertAll(toInsert);
     return coll.findOne({"name":"c"});
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v["value"],30);
     return coll.findOne({"_id":3});
-    })).then(expectAsync1((v){
+    }).then((v){
     v["value"] = 2;
     coll.save(v);
     return coll.findOne({"_id":3});
-  })).then(expectAsync1((v1){
+  }).then((v1){
     expect(v1["value"],2);
     db.close();
-  }));
+  });
 }
-testSaveWithObjectId(){
+Future testSaveWithObjectId(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testSaveWithObjectId');
   DbCollection coll;
   var id;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     coll = db.collection('testSaveWithObjectId');
     coll.remove();
     List toInsert = [
@@ -211,59 +211,59 @@ testSaveWithObjectId(){
                  ];
     coll.insertAll(toInsert);
     return coll.findOne({"name":"c"});
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v["value"],30);
     id = v["_id"];
     return coll.findOne({"_id":id});
-    })).then(expectAsync1((v){
+    }).then((v){
     expect(v["value"],30);
     v["value"] = 1;
     coll.save(v);
     return coll.findOne({"_id":id});
-  })).then(expectAsync1((v1){
+  }).then((v1){
     expect(v1["value"],1);
     db.close();
-  }));
+  });
 }
 
-testInsertWithObjectId(){
+Future testInsertWithObjectId(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection coll;
   var id;
   var objectToSave;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     coll = db.collection('testInsertWithObjectId');
     coll.remove();
     objectToSave = {"_id": new ObjectId(),"name":"a", "value": 10};
     id = objectToSave["_id"];
     coll.insert(objectToSave);
     return coll.findOne(where.eq("name","a"));
-  })).then(expectAsync1((v1){
+  }).then((v1){
     expect(v1["_id"],id);
     expect(v1["value"],10);
     db.close();
-  }));
+  });
 }
 
 
-testCount(){
+Future testCount(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection coll = db.collection('testCount');
     coll.remove();
     for(int n=0;n<167;n++){
       coll.insert({"a":n});
         }
     return coll.count();
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v,167);
     db.close();
-  }));
+  });
 }
 
-testDistinct() {
+Future testDistinct() {
   Db db = new Db('${DefaultUri}mongo_dart-test','testDistinct');
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection coll = db.collection('testDistinct');
     coll.remove();
     coll.insert({"foo":1});
@@ -273,18 +273,18 @@ testDistinct() {
     coll.insert({"foo":3});
     coll.insert({"foo":3});        
     return coll.distinct("foo");
-  })).then(expectAsync1((v){
+  }).then((v){
     List values = v['values'];
     expect(values[0],1);
     expect(values[1],2);
     expect(values[2],3);
     db.close();
-  }));
+  });
 }
 
-testAggregate() {
+Future testAggregate() {
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection coll = db.collection('testAggregate');
     coll.remove();
     
@@ -346,63 +346,63 @@ db.runCommand(
     expect(p1["\$group"], isNotNull);
     
     return coll.aggregate(pipeline);
-  }))
-  .then(expectAsync1((v){    
+  })
+  .then((v){    
     List result = v['result'];
     expect(result[0]["_id"], "Age of Steam");
     expect(result[0]["avgRating"], 3);
     db.close();
-  }));
+  });
 }
 
-testSkip(){
+Future testSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testSkip');
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection coll = db.collection('testSkip');
     coll.remove();
     for(int n=0;n<600;n++){
       coll.insert({"a":n});
         }
     return coll.findOne(where.sortBy('a').skip(300));
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v["a"],300);
     db.close();
-  }));
+  });
 }
 
-testUpdateWithUpsert() {
+Future testUpdateWithUpsert() {
   Db db = new Db('${DefaultUri}update');
   DbCollection collection = db.collection('testupdate');
-  db.open().then(expectAsync1((c) {
-    return collection.drop().then(expectAsync1((_) {
+  return db.open().then((c) {
+    return collection.drop().then((_) {
       return collection.insert({'name': 'a', 'value': 10});
-    })).then(expectAsync1((result) {
+    }).then((result) {
       expect(result['n'], 0);
       return collection.find({'name': 'a'}).toList();
-    })).then(expectAsync1((results) {
+    }).then((results) {
       expect(results.length, 1);
       expect(results.first['name'], 'a');
       expect(results.first['value'], 10);
-    })).then(expectAsync1((result) {
+    }).then((result) {
       var objectUpdate = {r'$set': {'value': 20}};
       return collection.update({'name': 'a'}, objectUpdate);
-    })).then(expectAsync1((result) {
+    }).then((result) {
       expect(result['updatedExisting'], true);
       expect(result['n'], 1);
       return collection.find({'name': 'a'}).toList();
-    })).then(expectAsync1((results) {
+    }).then((results) {
       expect(results.length, 1);
       expect(results.first['value'], 20);
       db.close();
-    }));
-  }));
+    });
+  });
 }
 
-testLimitWithSortByAndSkip(){
+Future testLimitWithSortByAndSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testLimitWithSortByAndSkip');
   int counter = 0;
   Cursor cursor;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection coll = db.collection('testLimit');
     coll.remove();
     for(int n=0;n<600;n++){
@@ -410,19 +410,19 @@ testLimitWithSortByAndSkip(){
     }
     cursor = coll.find(where.sortBy('a').skip(300).limit(10));
     return cursor.forEach((e)=>counter++);
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(counter,10);
     expect(cursor.state,Cursor.CLOSED);
     expect(cursor.cursorId,0);
     db.close();
-  }));
+  });
 }
 
-testLimit(){
+Future testLimit(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testLimit');
   int counter = 0;
   Cursor cursor;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection coll = db.collection('testLimit');
     coll.remove();
     for(int n=0;n<600;n++){
@@ -430,12 +430,12 @@ testLimit(){
     }
     cursor = coll.find(where.limit(10));
     return cursor.forEach((e)=>counter++);
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(counter,10);
     expect(cursor.state,Cursor.CLOSED);
     expect(cursor.cursorId,0);
     db.close();
-  }));
+  });
 }
 
 testCursorCreation(){
@@ -444,35 +444,35 @@ testCursorCreation(){
   Cursor cursor = new Cursor(db, collection, null);
 }
 
-testPingRaw(){
+Future testPingRaw(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection collection = db.collection('\$cmd');
     Cursor cursor = new Cursor(db,collection,where.eq('ping',1).limit(1));
     MongoQueryMessage queryMessage = cursor.generateQueryMessage();
     Future mapFuture = db.connection.query(queryMessage);
     return mapFuture;
-  })).then(expectAsync1((msg) {
+  }).then((msg) {
     expect(msg.documents[0],containsPair('ok', 1));
     db.close();
-  }));
+  });
 }
-testNextObject(){
+Future testNextObject(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection collection = db.collection('\$cmd');
     Cursor cursor = new Cursor(db,collection,where.eq('ping',1).limit(1));
     return cursor.nextObject();
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v,containsPair('ok', 1));
     db.close();
-  }));
+  });
 }
-testNextObjectToEnd(){
+Future testNextObjectToEnd(){
   var res;
   Db db = new Db('${DefaultUri}mongo_dart-test');
   Cursor cursor;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection collection = db.collection('testNextObjectToEnd');
     collection.remove();
     collection.insert({"a":1});
@@ -480,28 +480,28 @@ testNextObjectToEnd(){
     collection.insert({"a":3});
     cursor = new Cursor(db,collection,where.limit(10));
     return cursor.nextObject();
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v,isNotNull);
     res = cursor.nextObject();
-    res.then(expectAsync1((v1){
+    res.then((v1){
       expect(v1,isNotNull);
       res = cursor.nextObject();
-      res.then(expectAsync1((v2){
+      res.then((v2){
         expect(v2,isNotNull);
         res = cursor.nextObject();
-        res.then(expectAsync1((v3){
+        res.then((v3){
           expect(v3,isNull);
           db.close();
-        }));
-      }));
-    }));
-  }));
+        });
+      });
+    });
+  });
 }
 
-testCursorWithOpenServerCursor(){
+Future testCursorWithOpenServerCursor(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   Cursor cursor;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection collection = db.collection('new_big_collection');
     collection.remove();
     for (int n=0;n < 100; n++){
@@ -509,28 +509,28 @@ testCursorWithOpenServerCursor(){
     }
     cursor = new Cursor(db,collection,where.limit(10));
     return cursor.nextObject();
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(cursor.state, Cursor.OPEN);
     expect(cursor.cursorId, isPositive);
     db.close();
-  }));
+  });
 }
-testCursorGetMore(){
+Future testCursorGetMore(){
   var res;
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection collection;
   int count = 0;
   Cursor cursor;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     collection = db.collection('new_big_collection2');
     collection.remove();
     return db.getLastError();
-  })).then(expectAsync1((_){
+  }).then((_){
     cursor = new Cursor(db,collection,where.limit(10));
     return cursor.forEach((v){
      count++;
     });
-  })).then(expectAsync1((dummy){
+  }).then((dummy){
     expect(count,0);
     List toInsert = new List();
     for (int n=0;n < 1000; n++){
@@ -538,23 +538,23 @@ testCursorGetMore(){
     }
     collection.insertAll(toInsert);
     return db.getLastError();
-  })).then(expectAsync1((_){
+  }).then((_){
     cursor = new Cursor(db,collection,null);
     return cursor.forEach((v)=>count++);
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(count,1000);
     expect(cursor.cursorId,0);
     expect(cursor.state,Cursor.CLOSED);
     collection.remove();
     db.close();
-  }));
+  });
 }
-testCursorClosing(){
+Future testCursorClosing(){
   var res;
   Db db = new Db('${DefaultUri}mongo_dart-test','testCursorClosing');
   DbCollection collection;
   Cursor cursor;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     collection = db.collection('new_big_collection1');
     collection.remove();
     for (int n=0;n < 1000; n++){
@@ -564,17 +564,17 @@ testCursorClosing(){
     cursor = collection.find();
     expect(cursor.state,Cursor.INIT);
     return cursor.nextObject();
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(cursor.state,Cursor.OPEN);
     expect(cursor.cursorId,isPositive);
     cursor.close();
     expect(cursor.state,Cursor.CLOSED);
     expect(cursor.cursorId,0);
-    collection.findOne().then(expectAsync1((v1){
+    collection.findOne().then((v1){
       expect(v,isNotNull);
       db.close();
-    }));
-  }));
+    });
+  });
 }
 
 testDbCommandCreation(){
@@ -582,9 +582,9 @@ testDbCommandCreation(){
   DbCommand dbCommand = new DbCommand(db,"student",0,0,1,{},{});
   expect('mongo_dart-test.student',dbCommand.collectionNameBson.value);
 }
-testPingDbCommand(){
+Future testPingDbCommand(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  db.open().then((d){
+  return db.open().then((d){
     DbCommand pingCommand = DbCommand.createPingCommand(db);
     Future<MongoReplyMessage> mapFuture = db.queryMessage(pingCommand);
     mapFuture.then((msg) {
@@ -593,9 +593,9 @@ testPingDbCommand(){
     });
   });
 }
-testDropDbCommand(){
+Future testDropDbCommand(){
   Db db = new Db('${DefaultUri}mongo_dart-test1');
-  db.open().then((d){
+  return db.open().then((d){
     DbCommand command = DbCommand.createDropDatabaseCommand(db);
     Future<MongoReplyMessage> mapFuture = db.queryMessage(command);
     mapFuture.then((msg) {
@@ -633,27 +633,27 @@ testAuthComponents(){
   expect(key,test_key);
 }
 
-testAuthentication(){
+Future testAuthentication(){
   var db = new Db('mongodb://ds031477.mongolab.com:31477/dart','testAuthentication');
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     return db.authenticate('dart','test');
-  })).then(expectAsync1((v){
+  }).then((v){
     db.close();
-  }));
+  });
 }
-testAuthenticationWithUri(){
+Future testAuthenticationWithUri(){
   var db = new Db('mongodb://dart:test@ds031477.mongolab.com:31477/dart');
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection collection = db.collection('testAuthenticationWithUri');
     collection.remove();
     collection.insert({"a":1});
     collection.insert({"a":2});
     collection.insert({"a":3});
     return collection.findOne();
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v['a'],isNotNull);
     db.close();
-  }));
+  });
 }
 
 testMongoDbUri(){
@@ -673,95 +673,95 @@ testMongoDbUri(){
   expect(db.serverConfig.password,isNull);
 }
 
-testIndexInformation(){
+Future testIndexInformation(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   Cursor cursor;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection collection = db.collection('testcol');
     collection.remove();
     for (int n=0;n < 100; n++){
       collection.insert({"a":n});
     }
     return db.indexInformation('testcol');
-  })).then(expectAsync1((indexInfo){
+  }).then((indexInfo){
     expect(indexInfo.length,1);
     db.close();
-  }));
+  });
 }
 
-testIndexCreation(){    
+Future testIndexCreation(){
   Db db = new Db('${DefaultUri}index_creation');
   Cursor cursor;
   DbCollection collection;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     collection = db.collection('testcol');
     return collection.drop();
-  })).then(expectAsync1((res){
+  }).then((res){
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
     }      
     expect(() => db.createIndex('testcol'),throws, reason: 'Invalid number of arguments');
     expect(() => db.createIndex('testcol',key: 'a', keys:{'a':-1}),throws, reason: 'Invalid number of arguments');
     return db.createIndex('testcol',key:'a');
-  })).then(expectAsync1((res){
+  }).then((res){
     expect(res['ok'],1.0);
     return db.createIndex('testcol',keys:{'a':-1,'embedded.c': 1});
-  })).then(expectAsync1((res){
+  }).then((res){
     expect(res['ok'],1.0);
     return db.indexInformation('testcol');
-  })).then(expectAsync1((res){
+  }).then((res){
     expect(res.length, 3);
     return db.ensureIndex('testcol',keys:{'a':-1,'embedded.c': 1});
-  })).then(expectAsync1((res){
+  }).then((res){
     expect(res['ok'],1.0);
     expect(res['result'],'index preexists');
     db.close();
-  }));
+  });
 }
 
-testEnsureIndexWithIndexCreation(){    
+Future testEnsureIndexWithIndexCreation(){
   Db db = new Db('${DefaultUri}ensureIndex_indexCreation');
   Cursor cursor;
   DbCollection collection;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     collection = db.collection('testcol');
     return collection.drop();
-  })).then(expectAsync1((res){
+  }).then((res){
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
     }   
     return db.ensureIndex('testcol',keys:{'a':-1,'embedded.c': 1});
-  })).then(expectAsync1((res){
+  }).then((res){
     expect(res['ok'],1.0);
     expect(res['err'],isNull);
     db.close();
-  }));
+  });
 }
-testSafeModeUpdate(){
+Future testSafeModeUpdate(){
   Db db = new Db('${DefaultUri}safe_mode');
   Cursor cursor;
   DbCollection collection = db.collection('testcol');
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     collection.remove();
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
     }
     return collection.update({'a': 200}, {'a':100});
-  })).then(expectAsync1((res){
+  }).then((res){
     expect(res['updatedExisting'], false);
     expect(res['n'], 0);
     return collection.update({'a': 3}, {'a':100});
-  })).then(expectAsync1((res){
+  }).then((res){
     expect(res['updatedExisting'], true);
     expect(res['n'], 1);
     db.close();
-  }));
+  });
 }
-testFindWithFieldsClause(){
+Future testFindWithFieldsClause(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testFindWithFieldsClause');
   int count = 0;
   int sum = 0;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     DbCollection students = db.collection('students');
     students.remove();
     students.insertAll(
@@ -771,95 +771,95 @@ testFindWithFieldsClause(){
       {"name": "Nick", "score": 5}
     ]);
    return students.findOne(where.eq('name','Vadim').fields(['score']));
- })).then(expectAsync1((v){
+ }).then((v){
     expect(v['name'],isNull);
     expect(v['score'],4);
     db.close();
-   }));
+   });
 }
 
-testSimpleQuery(){
+Future testSimpleQuery(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
   int sum = 0;
   ObjectId id;
   DbCollection coll;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     coll = db.collection("simple_data");
     coll.remove();
     for (var n = 0; n<10; n++){
       coll.insert({"my_field":n,"str_field":"str_$n"});
     }
     return coll.find(where.gt("my_field", 5).sortBy('my_field')).toList();
-  })).then(expectAsync1((result){
+  }).then((result){
     expect(result.length,4);
     expect(result[0]['my_field'],6);
     return coll.findOne(where.eq('my_field', 3));
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v,isNotNull);
     expect(v['my_field'], 3);
     id = v['_id'];
     return coll.findOne(where.id(id));
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v,isNotNull);
     expect(v['my_field'], 3);
     coll.remove(where.id(id));
     return coll.findOne(where.eq('my_field', 3));
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v,isNull);
     db.close();
-   }));
+   });
 }
 
-testCompoundQuery(){
+Future testCompoundQuery(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testCompoundQuery');
   int count = 0;
   int sum = 0;
   ObjectId id;
   DbCollection coll;
-  db.open().then(expectAsync1((c){
+  return db.open().then((c){
     coll = db.collection("simple_data");
     coll.remove();
     for (var n = 0; n<10; n++){
       coll.insert({"my_field":n,"str_field":"str_$n"});
     }
     return coll.find(where.gt("my_field", 8).or(where.lt('my_field', 2))).toList();
-  })).then(expectAsync1((result){
+  }).then((result){
     expect(result.length,3);
     return coll.findOne(where.gt("my_field", 8).or(where.lt('my_field', 2)).and(where.eq('str_field','str_1')));
-  })).then(expectAsync1((v){
+  }).then((v){
     expect(v,isNotNull);
     expect(v['my_field'], 1);
     db.close();
-   }));
+   });
 }
 
-testFieldLevelUpdateSimple() {
+Future testFieldLevelUpdateSimple() {
   ObjectId id;
   Db db = new Db('${DefaultUri}update');
   DbCollection collection = db.collection('testupdate');
-  db.open().then(expectAsync1((c) {
-    return collection.drop().then(expectAsync1((_) {
+  return db.open().then((c) {
+    return collection.drop().then((_) {
       return collection.insert({
         'name': 'a', 'value': 10});
-    })).then(expectAsync1((result) {
+    }).then((result) {
       expect(result['n'], 0);
       return collection.findOne({'name': 'a'});
-    })).then(expectAsync1((result) {
+    }).then((result) {
       expect(result, isNotNull);
       id = result['_id'];
       var objectUpdate = {r'$set': {'value': 20}};
       return collection.update(where.id(id), modify.set('name', 'BBB'));
-    })).then(expectAsync1((result) {
+    }).then((result) {
       expect(result['updatedExisting'], true);
       expect(result['n'], 1);
       return collection.findOne(where.id(id));
-    })).then(expectAsync1((result) {
+    }).then((result) {
       expect(result, isNotNull);
       expect(result['name'], 'BBB');
       db.close();
-    }));
-  }));
+    });
+  });
 }
 
 
