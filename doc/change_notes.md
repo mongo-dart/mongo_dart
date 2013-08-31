@@ -1,5 +1,13 @@
 #Recent change notes
 
+###0.1.28
+
+- Bugfix for count() method
+
+###0.1.27 
+
+- New sample added. Readme rewritten.
+
 ###0.1.26
 
 - Network data packets to MongoDb messages conversion refactored.

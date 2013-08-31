@@ -36,9 +36,9 @@ class DbCommand extends MongoQueryMessage{
     return createQueryDBCommand(db, {"getlasterror":1, "j": j, "w": w});
   }
   static DbCommand createCountCommand(Db db, String collectionName, [Map selector = const {}]) {
-    var finalQuery = new Map();
-    finalQuery["query"] = selector;
+    var finalQuery = {};
     finalQuery["count"] = collectionName;
+    finalQuery["query"] = selector;
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, finalQuery, null);
   }
   static DbCommand createAuthenticationCommand(Db db, String userName, String password, String nonce) {
