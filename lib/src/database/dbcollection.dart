@@ -4,7 +4,7 @@ class DbCollection{
   String collectionName;
   DbCollection(this.db, this.collectionName){}
   String fullName() => "${db.databaseName}.$collectionName";
-  void save(Map document, {WriteConcern writeConcern}){
+  Future save(Map document, {WriteConcern writeConcern}){
     var id;
     bool createId = false;
     if (document.containsKey("_id")){
@@ -14,13 +14,13 @@ class DbCollection{
       }
     }
     if (id != null){
-      update({"_id": id}, document, writeConcern: writeConcern);
+      return update({"_id": id}, document, writeConcern: writeConcern);
     }
     else{
       if (createId) {
         document["_id"] = new ObjectId();
       }
-      insert(document, writeConcern: writeConcern);
+      return insert(document, writeConcern: writeConcern);
     }
   }
  Future insertAll(List<Map> documents, {WriteConcern writeConcern}){
@@ -69,23 +69,12 @@ class DbCollection{
     return completer.future;
   }
   
-  Future distinct(String field, [selector]){
-    Completer completer = new Completer();
-    db.executeDbCommand(DbCommand.createDistinctCommand(db,collectionName,field,_selectorBuilder2Map(selector))).then((reply){
-      completer.complete(reply);
-    });
-    return completer.future;
-  }
+  Future distinct(String field, [selector]) =>
+    db.executeDbCommand(DbCommand.createDistinctCommand(db,collectionName,field,_selectorBuilder2Map(selector)))
   
   Future aggregate(List pipeline){
-    Completer completer = new Completer();
     var cmd = DbCommand.createAggregateCommand(db,collectionName,pipeline);
-    db.executeDbCommand(cmd)
-      .then((reply){
-      completer.complete(reply);
-    });
-    
-    return completer.future;
+    return db.executeDbCommand(cmd);
   }
   
   Future insert(Map document, {WriteConcern writeConcern}) => insertAll([document], writeConcern: writeConcern);
