@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.29
+
+- Merge pull request from analogic. Added Future to save and removed unnecessary completers
+
 ###0.1.28
 
 - Bugfix for count() method
