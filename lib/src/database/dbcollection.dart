@@ -70,7 +70,7 @@ class DbCollection{
   }
   
   Future distinct(String field, [selector]) =>
-    db.executeDbCommand(DbCommand.createDistinctCommand(db,collectionName,field,_selectorBuilder2Map(selector)))
+    db.executeDbCommand(DbCommand.createDistinctCommand(db,collectionName,field,_selectorBuilder2Map(selector)));
   
   Future aggregate(List pipeline){
     var cmd = DbCommand.createAggregateCommand(db,collectionName,pipeline);
