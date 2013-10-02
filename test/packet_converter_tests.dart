@@ -1,5 +1,4 @@
 library packet_converter_test;
-import 'dart:io';
 import 'package:unittest/unittest.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 

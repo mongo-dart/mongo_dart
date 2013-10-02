@@ -1,9 +1,7 @@
 library database_tests;
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:io';
-import 'package:crypto/crypto.dart';
 import 'dart:async';
-import 'package:unittest/unittest.dart';
 import 'package:logging/logging.dart';
 Logger _log = new Logger('Tester');
 int counter = 0;

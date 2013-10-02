@@ -3,7 +3,6 @@
 /// .
 
 library mongo_dart;
-import 'dart:isolate';
 import 'dart:io';
 import 'dart:async';
 import 'dart:math';
