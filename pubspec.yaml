@@ -1,5 +1,5 @@
 name: mongo_dart
-version: 0.1.29
+version: 0.1.30
 authors:
 - Vadim Tsushko <vadimtsushko@gmail.com>
 - Ted Sander <ted@tedsander.com>
@@ -7,12 +7,12 @@ authors:
 description: MongoDB driver for Dart
 homepage: https://github.com/vadimtsushko/mongo_dart
 dependencies:
-  args: '>=0.6.5 <0.7.0'
-  bson: '>=0.1.7 <0.2.0'
-  crypto: '>=0.6.5 <0.7.0'
-  logging: '>=0.6.5 <0.7.0'
-  meta: '>=0.6.5 <0.7.0'
-  mongo_dart_query: '>=0.1.5 <0.2.0'
+  args: any
+  bson: any
+  crypto: any
+  logging: any
+  meta: any
+  mongo_dart_query: any
 dev_dependencies:
   hop: any
   unittest: any

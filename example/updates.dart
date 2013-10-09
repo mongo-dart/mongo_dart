@@ -39,17 +39,39 @@ main(){
     return coll.findOne({"name":"c"})
   .then((v1){
       print("Record c: $v1");
-      v1["value"] = 31;
       coll.update(where.eq('name', 'c'), modify.set('value',31));
       return coll.findOne({"name":"c"});
     }).then((v2){
       print("Record c after field level update: $v2");
-      return db.close();
+      return new Future.value(null);
     });
   };
 
-  
+  fieldLevelIncrement() {
+    DbCollection coll = db.collection('collection-for-save');
+    coll.remove();
+    List toInsert = [
+                     {"name":"a", "value": 10},
+                     {"name":"b", "value": 20},
+                     {"name":"c", "value": 30},
+                     {"name":"d", "value": 40}
+                   ];
+    coll.insertAll(toInsert);
+    return coll.findOne({"name":"c"})
+  .then((v1){
+      print("Record c: $v1");
+      coll.update(where.eq('name', 'c'), modify.inc('value',1));
+      return coll.findOne({"name":"c"});
+    }).then((v2){
+      print("Record c after field level increment by one: $v2");
+      return db.close();
+    });
+  };
   db.open().then((_) {
     return simpleUpdate();
-  }).then((_)=>fieldLevelUpdate());
+  }).then((_) {
+    return fieldLevelUpdate(); 
+  }).then((_) {
+    return fieldLevelIncrement();
+  });   
 }
