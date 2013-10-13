@@ -1,10 +1,10 @@
 part of mongo_dart;
 
-class ChunkTransformer extends StreamEventTransformer<List<int>, List<int>> {
+class ChunkHandler {
   int chunkSize; 
   List<int> carry;
 
-  ChunkTransformer([this.chunkSize = 1024 * 256]);
+  ChunkHandler([this.chunkSize = 1024 * 256]);
 
   void _handle(List<int> data, EventSink<List<int>> sink, bool isClosing) { 
       if (carry != null) {
@@ -30,10 +30,14 @@ class ChunkTransformer extends StreamEventTransformer<List<int>, List<int>> {
   void handleData(List<int> data, EventSink<List<int>> sink) {
     _handle(data, sink, false);
   }
-
+  void handleError(Object error, StackTrace stackTrace, EventSink<List<int>> sink) {
+    print(error);
+    print(stackTrace);
+  }
   void handleDone(EventSink<List<int>> sink) {
     _handle([], sink, true);
     sink.close();
   }
-
+  StreamTransformer<List<int>,List<int>> get transformer => new StreamTransformer<List<int>,List<int>>.fromHandlers(
+      handleData: handleData,handleDone: handleDone);
 }

@@ -1,5 +1,14 @@
 #Recent change notes
 
+###0.1.31
+
+- Upgrade for braking changes in dart:async (StreamEventTransformed removed from API). 
+Ready for Dart SDK version 0.1.2.0_r28569
+
+###0.1.30
+
+- Version contraints removed from pubspec
+
 ###0.1.29
 
 - Merge pull request from analogic. Added Future to save and removed unnecessary completers

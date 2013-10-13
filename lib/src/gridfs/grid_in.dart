@@ -14,7 +14,7 @@ class GridIn extends GridFSFile {
   GridIn(this.fs, [String filename = null, Stream<List<int>> inputStream = null]) {
     id = new ObjectId();
     chunkSize = GridFS.DEFAULT_CHUNKSIZE;
-    input = inputStream.transform(new ChunkTransformer(chunkSize));
+    input = inputStream.transform(new ChunkHandler(chunkSize).transformer);
     uploadDate = new DateTime.now();
     messageDigester = new MD5();
     this.filename = filename;

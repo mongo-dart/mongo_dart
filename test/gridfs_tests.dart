@@ -116,7 +116,7 @@ Future<List<int>> getInitialState(GridFS gridFS) {
 }
 
 Future testChunkTransformerOneChunk(){
-  return new Stream.fromIterable([[1,2,3,4,5,6,7,8,9,10,11]]).transform(new ChunkTransformer(3))
+  return new Stream.fromIterable([[1,2,3,4,5,6,7,8,9,10,11]]).transform(new ChunkHandler(3).transformer)
   .toList().then((chunkedList){    
     expect(chunkedList[0],orderedEquals([1,2,3]));
     expect(chunkedList[1],orderedEquals([4,5,6]));
@@ -125,7 +125,7 @@ Future testChunkTransformerOneChunk(){
   });    
 }
 Future testChunkTransformerSeveralChunks(){
-  return new Stream.fromIterable([[1,2,3,4],[5],[6,7],[8,9,10,11]]).transform(new ChunkTransformer(3))
+  return new Stream.fromIterable([[1,2,3,4],[5],[6,7],[8,9,10,11]]).transform(new ChunkHandler(3).transformer)
   .toList().then((chunkedList){
     expect(chunkedList[0],orderedEquals([1,2,3]));
     expect(chunkedList[1],orderedEquals([4,5,6]));

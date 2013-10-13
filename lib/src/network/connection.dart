@@ -21,7 +21,7 @@ class _Connection{
 /* Socket connected. */
       socket = _socket;
       _socketSubscription = socket
-        .transform(new MongoMessageTransformer())
+        .transform(new MongoMessageHandler().transformer)
         .listen(_receiveReply,onError: (e) {
         print("Socket error ${e}");
         completer.completeError(e);

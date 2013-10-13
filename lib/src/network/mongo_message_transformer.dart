@@ -1,5 +1,5 @@
 part of mongo_dart;
-class MongoMessageTransformer extends StreamEventTransformer<List<int>, MongoReplyMessage>{
+class MongoMessageHandler {
   final _log = new Logger('MongoMessageTransformer');
   final converter = new PacketConverter();
 //  final debugData = new File('debug_data1.bin').openSync(mode: FileMode.WRITE);
@@ -22,5 +22,6 @@ void handleData(List<int> data, EventSink<MongoReplyMessage> sink) {
     }
     sink.close();
   }
-  
+  StreamTransformer<List<int>, MongoReplyMessage> get transformer => new StreamTransformer<List<int>, MongoReplyMessage>.fromHandlers(
+      handleData: handleData,handleDone: handleDone);
 }
