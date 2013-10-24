@@ -3,7 +3,7 @@
 ###0.1.31
 
 - Upgrade for braking changes in dart:async (StreamEventTransformed removed from API). 
-Ready for Dart SDK version 0.1.2.0_r28569
+Ready for Dart SDK version 0.8.5.1_r28990
 
 ###0.1.30
 
