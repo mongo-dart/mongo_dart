@@ -1,5 +1,5 @@
 name: mongo_dart
-version: 0.1.31
+version: 0.1.32
 authors:
 - Vadim Tsushko <vadimtsushko@gmail.com>
 - Ted Sander <ted@tedsander.com>
@@ -11,7 +11,6 @@ dependencies:
   bson: any
   crypto: any
   logging: any
-  meta: any
   mongo_dart_query: any
 dev_dependencies:
   hop: any
