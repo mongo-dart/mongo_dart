@@ -1,5 +1,13 @@
 #Recent change notes
 
+###0.1.33
+
+- Upgrade for Dart SDK version 0.8.10.3_r29803
+
+###0.1.3
+
+- Meta lib removed.
+ 
 ###0.1.31
 
 - Upgrade for braking changes in dart:async (StreamEventTransformed removed from API). 

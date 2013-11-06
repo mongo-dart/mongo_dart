@@ -137,7 +137,7 @@ Future testChunkTransformerSeveralChunks(){
 Future testFileToGridFSToFile() {
   GridFS.DEFAULT_CHUNKSIZE = 30;  
   GridIn input;
-  String dir = path.dirname(new Options().script);
+  String dir = path.dirname(path.fromUri(Platform.script));
   var inputStream = new File('$dir/gridfs_testdata_in.txt').openRead();
   Db db = new Db('${DefaultUri}mongo_dart-test');
   return db.open().then((c){
