@@ -369,8 +369,8 @@ Future testSkip(){
 }
 
 Future testUpdateWithUpsert() {
-  Db db = new Db('${DefaultUri}update');
-  DbCollection collection = db.collection('testupdate');
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  DbCollection collection = db.collection('testupdateWithUpsert');
   return db.open().then((c) {
     return collection.drop().then((_) {
       return collection.insert({'name': 'a', 'value': 10});
@@ -395,6 +395,58 @@ Future testUpdateWithUpsert() {
     });
   });
 }
+
+Future testUpdateWithMultiUpdate() {
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  DbCollection collection = db.collection('testupdateWitMultiUpdate');
+  return db.open().then((c) {
+    return collection.drop().then((_) {
+      return collection.insertAll([{'key': 'a', 'value': 'initial_value1'}, {'key': 'a', 'value': 'initial_value2'}, {'key': 'b', 'value': 'initial_value_b'}]);
+    }).then((result) {
+      expect(result['n'], 0);
+      return collection.find({'key': 'a'}).toList();
+    }).then((results) {
+      expect(results.length, 2);
+      expect(results.first['key'], 'a');
+      expect(results.first['value'], 'initial_value1');
+    }).then((result) {
+      return collection.update(where.eq('key', 'a'), 
+          modify.set('value', 'value_modified_for_only_one_with_default'));
+    }).then((result) {
+      expect(result['updatedExisting'], true);
+      expect(result['n'], 1);
+      return collection.find({'value': 'value_modified_for_only_one_with_default'}).toList();
+    }).then((results) {
+      expect(results.length, 1);
+    }).then((result) {
+      return collection.update(where.eq('key', 'a'), 
+          modify.set('value', 'value_modified_for_only_one_with_multiupdate_false'),
+          multiUpdate:false);
+    }).then((result) {
+      expect(result['updatedExisting'], true);
+      expect(result['n'], 1);
+      return collection.find({'value': 'value_modified_for_only_one_with_multiupdate_false'}).toList();
+    }).then((results) {
+      expect(results.length, 1);
+    }).then((result) {
+      return collection.update(where.eq('key', 'a'), 
+          modify.set('value', 'new_value'),
+          multiUpdate:true);
+    }).then((result) {
+      expect(result['updatedExisting'], true);
+      expect(result['n'], 2);
+      return collection.find({'value': 'new_value'}).toList();
+    }).then((results) {
+      expect(results.length, 2);
+      return collection.find({'key': 'b'}).toList();
+    }).then((results) {
+      expect(results.length, 1);
+      expect(results.first['value'],'initial_value_b');
+      db.close();
+    });
+  });
+}
+
 
 Future testLimitWithSortByAndSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testLimitWithSortByAndSkip');
@@ -908,6 +960,7 @@ main(){
     test('testInsertWithObjectId',testSaveWithObjectId);    
     test('testSkip',testSkip);
     test('testUpdateWithUpsert', testUpdateWithUpsert);
+    test('testUpdateWithMultiUpdate', testUpdateWithMultiUpdate);
     test('testFindWithFieldsClause',testFindWithFieldsClause);
   });
   group('Cursor tests:', (){

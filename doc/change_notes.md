@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.34
+
+- adding multiupdate support
+
 ###0.1.33
 
 - Upgrade for Dart SDK version 0.8.10.3_r29803
