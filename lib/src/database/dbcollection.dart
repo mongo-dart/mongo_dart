@@ -28,10 +28,13 @@ class DbCollection{
     db.executeMessage(insertMessage);
     return db._getAcknowledgement(writeConcern: writeConcern);
   }
-  Future update(selector, document, {bool upsert: false, WriteConcern writeConcern}){
+  Future update(selector, document, {bool upsert: false, bool multiUpdate: false, WriteConcern writeConcern}){
     int flags = 0;
     if (upsert) {
       flags |= 0x1;
+    }
+    if (multiUpdate) {
+      flags |= 0x2;
     }
 
     MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
