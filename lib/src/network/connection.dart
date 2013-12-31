@@ -33,7 +33,7 @@ class _Connection{
     });
     return completer.future;
   }
-  
+
   void close(){
     _closing = true;
     while (!_sendQueue.isEmpty){
@@ -45,25 +45,31 @@ class _Connection{
   }
   _sendBuffer(){
     _log.fine('_sendBuffer ${!_sendQueue.isEmpty}');
-    if (!_sendQueue.isEmpty) {
-      var mongoMessage = _sendQueue.removeFirst();
-      socket.add(mongoMessage.serialize().byteList);
-    }  
+    List<int> message = [];
+    while (!_sendQueue.isEmpty) {
+      MongoMessage mongoMessage = _sendQueue.removeFirst();
+      message.addAll(mongoMessage.serialize().byteList);
+    }
+    socket.add(message);
   }
+
   Future<MongoReplyMessage> query(MongoMessage queryMessage){
     Completer completer = new Completer();
-    _replyCompleters[queryMessage.requestId] = completer;    
+    _replyCompleters[queryMessage.requestId] = completer;
     _log.fine('Query $queryMessage');
     _sendQueue.addLast(queryMessage);
     _sendBuffer();
     return completer.future;
   }
-  void execute(MongoMessage mongoMessage){
+
+  void execute(MongoMessage mongoMessage, {runImmediately: true}){
     _log.fine('Execute $mongoMessage');
     _sendQueue.addLast(mongoMessage);
-    _sendBuffer();
+    if(runImmediately){
+      _sendBuffer();
+    }
   }
-  
+
   void _receiveReply(MongoReplyMessage reply) {
     _log.fine(reply.toString());
     Completer completer = _replyCompleters.remove(reply.responseTo);

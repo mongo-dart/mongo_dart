@@ -1,4 +1,5 @@
 part of mongo_dart;
+
 class DbCollection{
   Db db;
   String collectionName;
@@ -23,11 +24,14 @@ class DbCollection{
       return insert(document, writeConcern: writeConcern);
     }
   }
+
  Future insertAll(List<Map> documents, {WriteConcern writeConcern}){
     MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
-    db.executeMessage(insertMessage);
+    bool runImmediately = (writeConcern == WriteConcern.ERRORS_IGNORED);
+    db.executeMessage(insertMessage, runImmediately: runImmediately);
     return db._getAcknowledgement(writeConcern: writeConcern);
   }
+
   Future update(selector, document, {bool upsert: false, bool multiUpdate: false, WriteConcern writeConcern}){
     int flags = 0;
     if (upsert) {
@@ -37,7 +41,7 @@ class DbCollection{
       flags |= 0x2;
     }
 
-    MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
+    MongoUpdateMessage message = new MongoUpdateMessage(fullName(),
         _selectorBuilder2Map(selector), document, flags);
     db.executeMessage(message);
     return db._getAcknowledgement(writeConcern: writeConcern);
@@ -71,15 +75,15 @@ class DbCollection{
     });
     return completer.future;
   }
-  
+
   Future distinct(String field, [selector]) =>
     db.executeDbCommand(DbCommand.createDistinctCommand(db,collectionName,field,_selectorBuilder2Map(selector)));
-  
+
   Future aggregate(List pipeline){
     var cmd = DbCommand.createAggregateCommand(db,collectionName,pipeline);
     return db.executeDbCommand(cmd);
   }
-  
+
   Future insert(Map document, {WriteConcern writeConcern}) => insertAll([document], writeConcern: writeConcern);
 
   Map _selectorBuilder2Map(selector) {
