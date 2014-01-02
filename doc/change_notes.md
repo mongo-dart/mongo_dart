@@ -1,5 +1,16 @@
 #Recent change notes
 
+###0.1.36
+
+- Optimization in networking protocol: insert, update and remove commands now sent in one packet with subsequent 
+getLastError(). See https://github.com/vadimtsushko/mongo_dart/issues/41 
+Speedup on operations with default WriteConcern:ACKNOWLEDGED vary from 50% and more. 
+Many thanks to https://github.com/tomaskulich
+
+###0.1.35
+
+- Ready for Dart 1.0
+
 ###0.1.34
 
 - adding multiupdate support

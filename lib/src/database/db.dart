@@ -62,8 +62,11 @@ class Db{
   Future queryMessage(MongoMessage queryMessage){
     return connection.query(queryMessage);
   }
-  executeMessage(MongoMessage message){
-    connection.execute(message);
+  executeMessage(MongoMessage message, WriteConcern writeConcern){
+    if (writeConcern == null) {
+      writeConcern = _writeConcern;
+    }
+    connection.execute(message,writeConcern == WriteConcern.ERRORS_IGNORED);
   }
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
     
@@ -124,7 +127,7 @@ class Db{
   }
 
   Future removeFromCollection(String collectionName, [Map selector = const {}, WriteConcern writeConcern]){
-    executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector));
+    executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector),writeConcern);
     return _getAcknowledgement(writeConcern: writeConcern); 
   }
 
@@ -204,7 +207,7 @@ class Db{
     }
     selector['name'] = name;
     MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);
-    executeMessage(insertMessage);
+    executeMessage(insertMessage, _writeConcern);
     return getLastError();
   }
 

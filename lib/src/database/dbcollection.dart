@@ -25,7 +25,7 @@ class DbCollection{
   }
  Future insertAll(List<Map> documents, {WriteConcern writeConcern}){
     MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
-    db.executeMessage(insertMessage);
+    db.executeMessage(insertMessage, writeConcern);
     return db._getAcknowledgement(writeConcern: writeConcern);
   }
   Future update(selector, document, {bool upsert: false, bool multiUpdate: false, WriteConcern writeConcern}){
@@ -39,7 +39,7 @@ class DbCollection{
 
     MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
         _selectorBuilder2Map(selector), document, flags);
-    db.executeMessage(message);
+    db.executeMessage(message, writeConcern);
     return db._getAcknowledgement(writeConcern: writeConcern);
   }
 
