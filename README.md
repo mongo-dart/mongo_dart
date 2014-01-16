@@ -42,7 +42,7 @@ Simple usage example on base of [JSON ZIPS dataset] (http://media.mongodb.org/zi
 
 - [Feature check list](https://github.com/vadimtsushko/mongo_dart/blob/master/doc/feature_checklist.md)
 
-- [Recent change notes](https://github.com/vadimtsushko/mongo_dart/blob/master/doc/change_notes.md)
+- [Recent change notes](https://github.com/vadimtsushko/mongo_dart/blob/master/changelog.md)
 
 - Additional [examples](https://github.com/vadimtsushko/mongo_dart/tree/master/example) and [tests](https://github.com/vadimtsushko/mongo_dart/tree/master/test)
 
