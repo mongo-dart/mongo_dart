@@ -9,5 +9,7 @@ void main(args) {
 
   addTask('analyze_libs', createAnalyzerTask(paths));
 
+  addTask('docs',createDartDocTask(['lib/mongo_dart.dart'], linkApi: true, excludeLibs: ['fixnum']));
+
   runHop(args);
 }
