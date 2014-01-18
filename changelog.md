@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.1.37
+
+- Change log made compatible with pub site preferences, thanks to Andreas Olund.
+- API docs generation set up as hop task.
+
 ###0.1.36
 
 - Optimization in networking protocol: insert, update and remove commands now sent in one packet with subsequent 
