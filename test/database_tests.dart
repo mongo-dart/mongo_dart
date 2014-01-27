@@ -654,6 +654,17 @@ Future testDropDbCommand(){
     });
   });
 }
+Future testIsMasterDbCommand(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  return db.open().then((d){
+    DbCommand isMasterCommand = DbCommand.createIsMasterCommand(db);
+    Future<MongoReplyMessage> mapFuture = db.queryMessage(isMasterCommand);
+    mapFuture.then((msg) {
+      expect(msg.documents[0],containsPair('ok', 1));
+      db.close();
+    });
+  });
+}
 
 testAuthComponents(){
   var hash;
@@ -977,6 +988,7 @@ main(){
     test('testDbCommandCreation',testDbCommandCreation);
     test('testPingDbCommand',testPingDbCommand);
     test('testDropDbCommand',testDropDbCommand);
+    test('testIsMasterDbCommand',testIsMasterDbCommand);
   });
   group('Safe mode tests:', () {
     test('testSafeModeUpdate',testSafeModeUpdate);
