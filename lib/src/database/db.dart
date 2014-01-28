@@ -15,7 +15,7 @@ class Db{
   String _debugInfo;
   ServerConfig serverConfig;
   _ConnectionManager _connectionManager = new _ConnectionManager();
-  _Connection _masterConnection;
+  get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
   _validateDatabaseName(String dbName) {
     if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
@@ -55,7 +55,7 @@ class Db{
     if (uri.path != '') {
       databaseName = uri.path.replaceAll('/','');
     }
-    _masterConnection = _connectionManager.connection(serverConfig);
+    _connectionManager.addConnection(serverConfig);
   }
   Db.pool(List<String> uriList, [this._debugInfo]) {
     
@@ -75,11 +75,6 @@ class Db{
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
     
     _writeConcern = writeConcern;
-    if (_masterConnection.connected){
-      _masterConnection.close();
-      _masterConnection = _connectionManager.connection(serverConfig);
-    }
-    
     return _masterConnection.connect().then((v) {
       if (serverConfig.userName == null) {
         _log.fine('$this connected');

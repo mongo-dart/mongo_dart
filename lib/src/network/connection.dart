@@ -48,7 +48,7 @@ class _Connection{
     while (!_sendQueue.isEmpty) {
       var mongoMessage = _sendQueue.removeFirst();
       message.addAll(mongoMessage.serialize().byteList);
-    }  
+    }
     socket.add(message);
   }
   Future<MongoReplyMessage> query(MongoMessage queryMessage){
