@@ -137,6 +137,9 @@ class Db{
   Future<Map> getNonce(){
     return executeDbCommand(DbCommand.createGetNonceCommand(this));
   }
+  Future<Map> isMaster(){
+    return executeDbCommand(DbCommand.createIsMasterCommand(this));
+  }
 
   Future<Map> wait(){
     return getLastError();

@@ -67,6 +67,15 @@ Future testPwd(){
       db.close();
   });
 }
+Future testIsMaster(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  return db.open().then((c){
+    return db.isMaster();
+  }).then((v){
+      expect(v["ok"],1);
+      db.close();
+  });
+}
 
 testCollectionCreation(){
   Db db = new Db('${DefaultUri}db');
@@ -953,6 +962,7 @@ main(){
     test('testRemove',testRemove);
     test('testGetNonce',testGetNonce);
     test('testPwd',testPwd);
+    test('testIsMaster',testIsMaster);
   });
   group('DbCollection tests:', (){
     test('testLimitWithSortByAndSkip',testLimitWithSortByAndSkip);
