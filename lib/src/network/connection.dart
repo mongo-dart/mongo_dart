@@ -9,6 +9,7 @@ class _Connection{
   StreamSubscription<List<int>> _socketSubscription;
   bool connected = false;
   bool _closing = false;
+  bool isMaster = false;
   _Connection(this._manager, [this.serverConfig]) {
     if (serverConfig == null){
       serverConfig = new ServerConfig();

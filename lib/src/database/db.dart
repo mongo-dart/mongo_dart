@@ -14,7 +14,7 @@ class Db{
   String databaseName;
   String _debugInfo;
   ServerConfig serverConfig;
-  _ConnectionManager _connectionManager = new _ConnectionManager();
+  _ConnectionManager _connectionManager;
   get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
   _validateDatabaseName(String dbName) {
@@ -34,6 +34,7 @@ class Db{
 *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
 */
   Db(String uriString, [this._debugInfo]){
+    _connectionManager = new _ConnectionManager(this);
     var uri = Uri.parse(uriString);
     if (uri.scheme != 'mongodb') {
       throw new MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
@@ -61,7 +62,7 @@ class Db{
     
   }
   DbCollection collection(String collectionName){
-      return new DbCollection(this,collectionName);
+    return new DbCollection(this,collectionName);
   }
   Future queryMessage(MongoMessage queryMessage){
     return _masterConnection.query(queryMessage);
@@ -73,20 +74,8 @@ class Db{
     _masterConnection.execute(message,writeConcern == WriteConcern.ERRORS_IGNORED);
   }
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
-    
     _writeConcern = writeConcern;
-    return _masterConnection.connect().then((v) {
-      if (serverConfig.userName == null) {
-        _log.fine('$this connected');
-        return v;
-      }
-      else {
-        return authenticate(serverConfig.userName,serverConfig.password).then((v) {
-          _log.fine('$this connected');
-          return v;
-        });
-      }
-    });    
+    return _connectionManager.open(writeConcern);        
   }
   Future executeDbCommand(MongoMessage message){
       Completer<Map> result = new Completer();
@@ -145,7 +134,7 @@ class Db{
   }
   void close(){
     _log.fine('$this closed');
-    _masterConnection.close();
+    _connectionManager.close();
   }
 
   Cursor collectionsInfoCursor([String collectionName]) {
