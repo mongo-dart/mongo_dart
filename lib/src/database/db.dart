@@ -14,7 +14,7 @@ class Db{
   String databaseName;
   String _debugInfo;
   ServerConfig serverConfig;
-  _Connection connection;
+  _Connection _masterConnection;
   WriteConcern _writeConcern;
   _validateDatabaseName(String dbName) {
     if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
@@ -54,29 +54,32 @@ class Db{
     if (uri.path != '') {
       databaseName = uri.path.replaceAll('/','');
     }
-    connection = new _Connection(serverConfig);
+    _masterConnection = new _Connection(serverConfig);
+  }
+  Db.pool(List<String> uriList, [this._debugInfo]) {
+    
   }
   DbCollection collection(String collectionName){
       return new DbCollection(this,collectionName);
   }
   Future queryMessage(MongoMessage queryMessage){
-    return connection.query(queryMessage);
+    return _masterConnection.query(queryMessage);
   }
   executeMessage(MongoMessage message, WriteConcern writeConcern){
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
-    connection.execute(message,writeConcern == WriteConcern.ERRORS_IGNORED);
+    _masterConnection.execute(message,writeConcern == WriteConcern.ERRORS_IGNORED);
   }
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
     
     _writeConcern = writeConcern;
-    if (connection.connected){
-      connection.close();
-      connection = new _Connection(serverConfig);
+    if (_masterConnection.connected){
+      _masterConnection.close();
+      _masterConnection = new _Connection(serverConfig);
     }
     
-    return connection.connect().then((v) {
+    return _masterConnection.connect().then((v) {
       if (serverConfig.userName == null) {
         _log.fine('$this connected');
         return v;
@@ -91,7 +94,7 @@ class Db{
   }
   Future executeDbCommand(MongoMessage message){
       Completer<Map> result = new Completer();
-      connection.query(message).then((replyMessage){
+      _masterConnection.query(message).then((replyMessage){
         String errMsg;
         if (replyMessage.documents.length == 0) {
           errMsg = "Error executing Db command, Document length 0 $replyMessage";
@@ -146,7 +149,7 @@ class Db{
   }
   void close(){
     _log.fine('$this closed');
-    connection.close();
+    _masterConnection.close();
   }
 
   Cursor collectionsInfoCursor([String collectionName]) {

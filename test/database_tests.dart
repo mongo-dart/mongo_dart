@@ -509,7 +509,7 @@ Future testPingRaw(){
     DbCollection collection = db.collection('\$cmd');
     Cursor cursor = new Cursor(db,collection,where.eq('ping',1).limit(1));
     MongoQueryMessage queryMessage = cursor.generateQueryMessage();
-    Future mapFuture = db.connection.query(queryMessage);
+    Future mapFuture = db.queryMessage(queryMessage);
     return mapFuture;
   }).then((msg) {
     expect(msg.documents[0],containsPair('ok', 1));
