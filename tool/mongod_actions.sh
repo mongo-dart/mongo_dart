@@ -2,7 +2,23 @@
 
 RS_NUM=3
 DATA_PATH=/tmp/mongo_dart-unit_test
+
+# OS Detection
+echo $PATH | grep -q /cygdrive
+if [ $? == 0 ]; then
+  UNAME="Cygwin"
+else
+  UNAME=$(uname -s)
+fi
+
 DATA_CFG=$DATA_PATH/configure.js
+case "$UNAME" in
+  "Cygwin")
+    DATA_CFG_MONGO=$(cygpath -w $DATA_CFG)
+    ;;
+  *)
+    DATA_CFG_MONGO=$DATA_CFG
+esac
 
 make_env() {
   for i in $(seq 1 $RS_NUM); do
@@ -57,31 +73,68 @@ start() {
   
   for i in $(seq 1 $RS_NUM); do
     echo "### Start mongod $i instance"
-    mongod --fork --logpath $DATA_PATH/$i.log --pidfilepath $DATA_PATH/$i.pid --smallfiles --oplogSize 50 --port $((27000 + $i)) --dbpath $DATA_PATH/db/$i --replSet rs
+    case "$UNAME" in
+      "Cygwin")
+        cygstart mongod --smallfiles --oplogSize 50 --replSet rs \
+          --logpath $(cygpath -w $DATA_PATH/$i.log) \
+          --pidfilepath $(cygpath -w $DATA_PATH/$i.pid) \
+          --dbpath $(cygpath -w $DATA_PATH/db/$i) \
+          --port $((27000 + $i))
+        ;;
+      *)
+        mongod --fork --smallfiles --oplogSize 50 --replSet rs \
+          --logpath $DATA_PATH/$i.log \
+          --pidfilepath $DATA_PATH/$i.pid \
+          --dbpath $DATA_PATH/db/$i \
+          --port $((27000 + $i))
+    esac
   done
   
   script_init
   script_configure_rs
   script_wait_rs
   
-  mongo localhost:27001 $DATA_CFG
+  mongo localhost:27001 $DATA_CFG_MONGO
   
   script_init
   script_wait_rs
 
   for i in $(seq 2 $RS_NUM); do
-    mongo localhost:$((27000 + $i)) $DATA_CFG
+    mongo localhost:$((27000 + $i)) $DATA_CFG_MONGO
   done
+}
+
+check_pid() {
+  PID=$( echo $1 | tr -d "\r")
+  case "$UNAME" in
+    "Cygwin")
+      FILTER="PID eq $PID"
+      tasklist.exe /FI "$FILTER" | grep -q $PID
+      ;;
+    *)
+      ps -p $PID &> /dev/null
+  esac
+}
+
+kill_pid() {
+  PID=$( echo $1 | tr -d "\r")
+  case "$UNAME" in
+    "Cygwin")
+      taskkill.exe /PID $PID
+      ;;
+    *)
+      kill $PID
+  esac
 }
 
 stop() {
   for i in $(seq 1 $RS_NUM); do
     if [ -f $DATA_PATH/$i.pid ]; then
       PID=$(cat $DATA_PATH/$i.pid)
-      ps -p $PID &> /dev/null
+      check_pid $PID
       if [ $? == 0 ]; then
         echo "### Stop mongod $i instance"
-        kill $PID
+        kill_pid $PID
       fi
     fi
   done
@@ -94,10 +147,10 @@ status() {
   for i in $(seq 1 $RS_NUM); do
     if [ -f $DATA_PATH/$i.pid ]; then
       PID=$(cat $DATA_PATH/$i.pid)
-      ps -p $PID &> /dev/null
+      check_pid $PID
       if [ $? == 0 ]; then
         echo "### mongod $i instance is running (PID=$PID)"
-        mongo localhost:$((27000 + $i)) $DATA_CFG
+        mongo localhost:$((27000 + $i)) $DATA_CFG_MONGO
       else
         echo "### mongod $i instance is stopped"
       fi
