@@ -14,6 +14,7 @@ class Db{
   String databaseName;
   String _debugInfo;
   ServerConfig serverConfig;
+  _ConnectionManager _connectionManager = new _ConnectionManager();
   _Connection _masterConnection;
   WriteConcern _writeConcern;
   _validateDatabaseName(String dbName) {
@@ -54,7 +55,7 @@ class Db{
     if (uri.path != '') {
       databaseName = uri.path.replaceAll('/','');
     }
-    _masterConnection = new _Connection(serverConfig);
+    _masterConnection = _connectionManager.connection(serverConfig);
   }
   Db.pool(List<String> uriList, [this._debugInfo]) {
     
@@ -76,7 +77,7 @@ class Db{
     _writeConcern = writeConcern;
     if (_masterConnection.connected){
       _masterConnection.close();
-      _masterConnection = new _Connection(serverConfig);
+      _masterConnection = _connectionManager.connection(serverConfig);
     }
     
     return _masterConnection.connect().then((v) {

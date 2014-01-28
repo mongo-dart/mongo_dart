@@ -1,16 +1,15 @@
 part of mongo_dart;
 class _Connection{
   final _log= new Logger('Connection');
-  static const int HEADER_SIZE = 16;
-  final _replyCompleters = new Map<int,Completer<MongoReplyMessage>>();
+  _ConnectionManager _manager;
   ServerConfig serverConfig;
-  BsonBinary _bufferToSend;
   Socket socket;
-  final _sendQueue = new Queue<MongoMessage>();
+  get _replyCompleters => _manager.replyCompleters;
+  get _sendQueue => _manager.sendQueue;
   StreamSubscription<List<int>> _socketSubscription;
   bool connected = false;
   bool _closing = false;
-  _Connection([this.serverConfig]) {
+  _Connection(this._manager, [this.serverConfig]) {
     if (serverConfig == null){
       serverConfig = new ServerConfig();
     }

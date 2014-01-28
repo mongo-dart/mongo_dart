@@ -16,6 +16,7 @@ export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_dart_query.dart';
 
 part 'src/network/packet_converter.dart';
+part 'src/network/connection_manager.dart';
 part 'src/network/connection.dart';
 part 'src/network/message_header.dart';
 part 'src/network/mongo_message_transformer.dart';
