@@ -21,9 +21,9 @@ class MockConsumer<S> implements StreamConsumer<S> {
     var completer = new Completer();
     stream.listen(_onData, onDone: () => completer.complete(null));
     return completer.future;
-  }  
+  }
   Future close() {
-  }   
+  }
 }
 clearFSCollections(GridFS gridFS) {
   gridFS.files.remove();
@@ -37,7 +37,7 @@ Future testSmall(){
     clearFSCollections(gridFS);
     return testInOut(data, gridFS);
   }).then((c){
-    db.close();
+    return db.close();
   });
 }
 
@@ -55,7 +55,7 @@ Future testBig(){
     clearFSCollections(gridFS);
     return testInOut(data, gridFS);
   }).then((c){
-    db.close();
+    return db.close();
   });
 }
 
@@ -73,13 +73,13 @@ Future tesSomeChunks(){
     clearFSCollections(gridFS);
     return testInOut(data, gridFS);
   }).then((c){
-    db.close();
+    return db.close();
   });
 }
 Future testInOut(List<int> data, GridFS gridFS, [Map extraData = null]) {
   var consumer = new MockConsumer();
   var out = new IOSink(consumer);
-  return getInitialState(gridFS).then((List<int> initialState){    
+  return getInitialState(gridFS).then((List<int> initialState){
     var inputStream = new Stream.fromIterable([data]);
     GridIn input = gridFS.createFile(inputStream, "test");
     if (extraData != null) {
@@ -117,12 +117,12 @@ Future<List<int>> getInitialState(GridFS gridFS) {
 
 Future testChunkTransformerOneChunk(){
   return new Stream.fromIterable([[1,2,3,4,5,6,7,8,9,10,11]]).transform(new ChunkHandler(3).transformer)
-  .toList().then((chunkedList){    
+  .toList().then((chunkedList){
     expect(chunkedList[0],orderedEquals([1,2,3]));
     expect(chunkedList[1],orderedEquals([4,5,6]));
     expect(chunkedList[2],orderedEquals([7,8,9]));
-    expect(chunkedList[3],orderedEquals([10,11]));    
-  });    
+    expect(chunkedList[3],orderedEquals([10,11]));
+  });
 }
 Future testChunkTransformerSeveralChunks(){
   return new Stream.fromIterable([[1,2,3,4],[5],[6,7],[8,9,10,11]]).transform(new ChunkHandler(3).transformer)
@@ -130,12 +130,12 @@ Future testChunkTransformerSeveralChunks(){
     expect(chunkedList[0],orderedEquals([1,2,3]));
     expect(chunkedList[1],orderedEquals([4,5,6]));
     expect(chunkedList[2],orderedEquals([7,8,9]));
-    expect(chunkedList[3],orderedEquals([10,11]));    
+    expect(chunkedList[3],orderedEquals([10,11]));
   });
 }
 
 Future testFileToGridFSToFile() {
-  GridFS.DEFAULT_CHUNKSIZE = 30;  
+  GridFS.DEFAULT_CHUNKSIZE = 30;
   GridIn input;
   String dir = path.dirname(path.fromUri(Platform.script));
   var inputStream = new File('$dir/gridfs_testdata_in.txt').openRead();
@@ -143,18 +143,18 @@ Future testFileToGridFSToFile() {
   return db.open().then((c){
     var gridFS = new GridFS(db);
     clearFSCollections(gridFS);
-    input = gridFS.createFile(inputStream, "test");  
+    input = gridFS.createFile(inputStream, "test");
     return input.save();
-  }).then((c) { 
+  }).then((c) {
     var gridFS = new GridFS(db);
     return gridFS.getFile('test');
-  }).then((GridOut gridOut) {   
+  }).then((GridOut gridOut) {
     return gridOut.writeToFilename('$dir/gridfs_testdata_out.txt');
   }).then((c){
     List<int> dataIn = new File('$dir/gridfs_testdata_in.txt').readAsBytesSync();
     List<int> dataOut = new File('$dir/gridfs_testdata_out.txt').readAsBytesSync();
     expect(dataOut, orderedEquals(dataIn));
-    db.close();
+    return db.close();
   });
 }
 
@@ -173,19 +173,19 @@ Future testExtraData() {
     };
     return testInOut(data, gridFS, extraData);
   }).then((c){
-    db.close();
+    return db.close();
   });
 }
 
 main(){
-  group('ChunkTransformer tests:', (){    
+  group('ChunkTransformer tests:', (){
     test('testChunkTransformer',testChunkTransformerOneChunk);
-    test('testChunkTransformerSeveralChunks',testChunkTransformerSeveralChunks);    
-  });    
+    test('testChunkTransformerSeveralChunks',testChunkTransformerSeveralChunks);
+  });
   group('GridFS tests:', (){
     setUp(() => GridFS.DEFAULT_CHUNKSIZE = 256 * 1024);
     test('testSmall',testSmall);
-    test('tesSomeChunks',tesSomeChunks);    
+    test('tesSomeChunks',tesSomeChunks);
     test('testBig',testBig);
     test('testFileToGridFSToFile',testFileToGridFSToFile);
     test('testExtraData', testExtraData);

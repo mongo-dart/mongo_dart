@@ -12,13 +12,13 @@ Future testCollectionInfoCursor(){
   return db.open().then((c){
     newColl = db.collection("new_collecion");
     return newColl.remove();
-  }).then((v){    
+  }).then((v){
     return newColl.insertAll([{"a":1}]);
   }).then((v){
     return db.collectionsInfoCursor("new_collecion").toList();
   }).then((v){
     expect(v,hasLength(1));
-    db.close();
+    return db.close();
   });
 }
 Future testRemove(){
@@ -32,11 +32,11 @@ Future testRemove(){
   }).then((v){
 //    expect(v,hasLength(1));
     db.removeFromCollection("new_collecion_to_remove");
-  }).then((v){  
+  }).then((v){
     newColl.find().toList().then((v1){
       expect(v1,isEmpty);
       newColl.drop();
-      db.close();
+      return db.close();
     });
   });
 }
@@ -45,7 +45,7 @@ Future testDropDatabase(){
   return db.open().then((c){
     return db.drop();
   }).then((v){
-     db.close();
+     return db.close();
   });
 }
 Future testGetNonce(){
@@ -54,7 +54,7 @@ Future testGetNonce(){
     return db.getNonce();
   }).then((v){
       expect(v["ok"],1);
-      db.close();
+      return db.close();
   });
 }
 Future testPwd(){
@@ -64,7 +64,7 @@ Future testPwd(){
     coll = db.collection("system.users");
     return coll.find().forEach((user)=>print(user));
   }).then((v){
-      db.close();
+      return db.close();
   });
 }
 Future testIsMaster(){
@@ -73,7 +73,7 @@ Future testIsMaster(){
     return db.isMaster();
   }).then((v){
       expect(v["ok"],1);
-      db.close();
+      return db.close();
   });
 }
 
@@ -92,7 +92,7 @@ Future testEachOnEmptyCollection(){
   }).then((v) {
     expect(sum, 0);
     expect(count, 0);
-    db.close();
+    return db.close();
   });
 }
 Future testFindEachWithThenClause(){
@@ -116,7 +116,7 @@ Future testFindEachWithThenClause(){
    }).then((v){
     expect(sum,13);
     expect(count,3);
-    db.close();
+    return db.close();
   });
 }
 Future testFindEach(){
@@ -138,7 +138,7 @@ Future testFindEach(){
   }).then((v){
     expect(count,3);
     expect(sum,13);
-    db.close();
+    return db.close();
    });
 }
 
@@ -161,7 +161,7 @@ Future testFindStream(){
   }).then((v){
     expect(count,3);
     expect(sum,13);
-    db.close();
+    return db.close();
    });
 }
 
@@ -172,7 +172,7 @@ Future testDrop(){
   }).then((v) {
       return db.dropCollection("testDrop");
   }).then((__){
-      db.close();
+      return db.close();
   });
 }
 
@@ -200,7 +200,7 @@ Future testSaveWithIntegerId(){
     return coll.findOne({"_id":3});
   }).then((v1){
     expect(v1["value"],2);
-    db.close();
+    return db.close();
   });
 }
 Future testSaveWithObjectId(){
@@ -229,7 +229,7 @@ Future testSaveWithObjectId(){
     return coll.findOne({"_id":id});
   }).then((v1){
     expect(v1["value"],1);
-    db.close();
+    return db.close();
   });
 }
 
@@ -248,7 +248,7 @@ Future testInsertWithObjectId(){
   }).then((v1){
     expect(v1["_id"],id);
     expect(v1["value"],10);
-    db.close();
+    return db.close();
   });
 }
 
@@ -264,7 +264,7 @@ Future testCount(){
     return coll.count();
   }).then((v){
     expect(v,167);
-    db.close();
+    return db.close();
   });
 }
 
@@ -278,14 +278,14 @@ Future testDistinct() {
     coll.insert({"foo":2});
     coll.insert({"foo":3});
     coll.insert({"foo":3});
-    coll.insert({"foo":3});        
+    coll.insert({"foo":3});
     return coll.distinct("foo");
   }).then((v){
     List values = v['values'];
     expect(values[0],1);
     expect(values[1],2);
     expect(values[2],3);
-    db.close();
+    return db.close();
   });
 }
 
@@ -294,33 +294,33 @@ Future testAggregate() {
   return db.open().then((c){
     DbCollection coll = db.collection('testAggregate');
     coll.remove();
-    
+
     // Avg 1 with 1 rating
     coll.insert({"game":"At the Gates of Loyang", "player": "Dallas", "rating": 1, "v": 1});
-    
+
     // Avg 3 with 1 rating
     coll.insert({"game":"Age of Steam", "player": "Paul", "rating": 3, "v": 1});
-    
+
     // Avg 2 with 2 ratings
     coll.insert({"game":"Fresco", "player": "Erin", "rating": 3, "v": 1});
     coll.insert({"game":"Fresco", "player": "Dallas", "rating": 1, "v": 1});
-    
+
     // Avg 3.5 with 4 ratings
     coll.insert({"game":"Ticket To Ride", "player": "Paul", "rating": 4, "v": 1});
     coll.insert({"game":"Ticket To Ride", "player": "Erin", "rating": 5, "v": 1});
     coll.insert({"game":"Ticket To Ride", "player": "Dallas", "rating": 4, "v": 1});
     coll.insert({"game":"Ticket To Ride", "player": "Anthony", "rating": 2, "v": 1});
-    
+
     // Avg 4.5 with 4 ratings (counting only highest v)
-    coll.insert({"game":"Dominion", "player": "Paul", "rating": 5, "v": 2});    
+    coll.insert({"game":"Dominion", "player": "Paul", "rating": 5, "v": 2});
     coll.insert({"game":"Dominion", "player": "Erin", "rating": 4, "v": 1});
     coll.insert({"game":"Dominion", "player": "Dallas", "rating": 4, "v": 1});
-    coll.insert({"game":"Dominion", "player": "Anthony", "rating": 5, "v": 1});   
-    
+    coll.insert({"game":"Dominion", "player": "Anthony", "rating": 5, "v": 1});
+
     // Avg 5 with 2 ratings
     coll.insert({"game":"Pandemic", "player": "Erin", "rating": 5, "v": 1});
     coll.insert({"game":"Pandemic", "player": "Dallas", "rating": 5, "v": 1});
-    
+
     // Avg player ratings
     // Dallas = 3, Anthony 3.5, Paul = 4, Erin = 4.25
 /* We want equivalent of this when used on the mongo shell.
@@ -334,7 +334,7 @@ db.runCommand(
         "_id": "$_id.game",
         "avgRating": { "$avg": "$rating" } } },
 { "$sort": { "_id": 1 } }
-]});    
+]});
  */
     List pipeline = new List();
     var p1 = {"\$group": {
@@ -344,21 +344,21 @@ db.runCommand(
         "_id": "\$_id.game",
         "avgRating": { "\$avg": "\$rating" } } };
     var p3 = { "\$sort": { "_id": 1 } };
-    
+
     pipeline.add(p1);
     pipeline.add(p2);
     pipeline.add(p3);
-    
+
     expect(p1["\u0024group"], isNotNull);
     expect(p1["\$group"], isNotNull);
-    
+
     return coll.aggregate(pipeline);
   })
-  .then((v){    
+  .then((v){
     List result = v['result'];
     expect(result[0]["_id"], "Age of Steam");
     expect(result[0]["avgRating"], 3);
-    db.close();
+    return db.close();
   });
 }
 
@@ -373,7 +373,7 @@ Future testSkip(){
     return coll.findOne(where.sortBy('a').skip(300));
   }).then((v){
     expect(v["a"],300);
-    db.close();
+    return db.close();
   });
 }
 
@@ -400,7 +400,7 @@ Future testUpdateWithUpsert() {
     }).then((results) {
       expect(results.length, 1);
       expect(results.first['value'], 20);
-      db.close();
+      return db.close();
     });
   });
 }
@@ -419,7 +419,7 @@ Future testUpdateWithMultiUpdate() {
       expect(results.first['key'], 'a');
       expect(results.first['value'], 'initial_value1');
     }).then((result) {
-      return collection.update(where.eq('key', 'a'), 
+      return collection.update(where.eq('key', 'a'),
           modify.set('value', 'value_modified_for_only_one_with_default'));
     }).then((result) {
       expect(result['updatedExisting'], true);
@@ -428,7 +428,7 @@ Future testUpdateWithMultiUpdate() {
     }).then((results) {
       expect(results.length, 1);
     }).then((result) {
-      return collection.update(where.eq('key', 'a'), 
+      return collection.update(where.eq('key', 'a'),
           modify.set('value', 'value_modified_for_only_one_with_multiupdate_false'),
           multiUpdate:false);
     }).then((result) {
@@ -438,7 +438,7 @@ Future testUpdateWithMultiUpdate() {
     }).then((results) {
       expect(results.length, 1);
     }).then((result) {
-      return collection.update(where.eq('key', 'a'), 
+      return collection.update(where.eq('key', 'a'),
           modify.set('value', 'new_value'),
           multiUpdate:true);
     }).then((result) {
@@ -451,7 +451,7 @@ Future testUpdateWithMultiUpdate() {
     }).then((results) {
       expect(results.length, 1);
       expect(results.first['value'],'initial_value_b');
-      db.close();
+      return db.close();
     });
   });
 }
@@ -473,7 +473,7 @@ Future testLimitWithSortByAndSkip(){
     expect(counter,10);
     expect(cursor.state,Cursor.CLOSED);
     expect(cursor.cursorId,0);
-    db.close();
+    return db.close();
   });
 }
 
@@ -493,7 +493,7 @@ Future testLimit(){
     expect(counter,10);
     expect(cursor.state,Cursor.CLOSED);
     expect(cursor.cursorId,0);
-    db.close();
+    return db.close();
   });
 }
 
@@ -513,7 +513,7 @@ Future testPingRaw(){
     return mapFuture;
   }).then((msg) {
     expect(msg.documents[0],containsPair('ok', 1));
-    db.close();
+    return db.close();
   });
 }
 Future testNextObject(){
@@ -524,7 +524,7 @@ Future testNextObject(){
     return cursor.nextObject();
   }).then((v){
     expect(v,containsPair('ok', 1));
-    db.close();
+    return db.close();
   });
 }
 Future testNextObjectToEnd(){
@@ -550,7 +550,7 @@ Future testNextObjectToEnd(){
         res = cursor.nextObject();
         res.then((v3){
           expect(v3,isNull);
-          db.close();
+          return db.close();
         });
       });
     });
@@ -571,7 +571,7 @@ Future testCursorWithOpenServerCursor(){
   }).then((v){
     expect(cursor.state, Cursor.OPEN);
     expect(cursor.cursorId, isPositive);
-    db.close();
+    return db.close();
   });
 }
 Future testCursorGetMore(){
@@ -605,7 +605,7 @@ Future testCursorGetMore(){
     expect(cursor.cursorId,0);
     expect(cursor.state,Cursor.CLOSED);
     collection.remove();
-    db.close();
+    return db.close();
   });
 }
 Future testCursorClosing(){
@@ -631,7 +631,7 @@ Future testCursorClosing(){
     expect(cursor.cursorId,0);
     collection.findOne().then((v1){
       expect(v,isNotNull);
-      db.close();
+      return db.close();
     });
   });
 }
@@ -648,7 +648,7 @@ Future testPingDbCommand(){
     Future<MongoReplyMessage> mapFuture = db.queryMessage(pingCommand);
     mapFuture.then((msg) {
       expect(msg.documents[0],containsPair('ok', 1));
-      db.close();
+      return db.close();
     });
   });
 }
@@ -659,7 +659,7 @@ Future testDropDbCommand(){
     Future<MongoReplyMessage> mapFuture = db.queryMessage(command);
     mapFuture.then((msg) {
       expect(msg.documents[0]["ok"],1);
-      db.close();
+      return db.close();
     });
   });
 }
@@ -670,7 +670,7 @@ Future testIsMasterDbCommand(){
     Future<MongoReplyMessage> mapFuture = db.queryMessage(isMasterCommand);
     mapFuture.then((msg) {
       expect(msg.documents[0],containsPair('ok', 1));
-      db.close();
+      return db.close();
     });
   });
 }
@@ -708,7 +708,7 @@ Future testAuthentication(){
   return db.open().then((c){
     return db.authenticate('dart','test');
   }).then((v){
-    db.close();
+    return db.close();
   });
 }
 Future testAuthenticationWithUri(){
@@ -722,7 +722,7 @@ Future testAuthenticationWithUri(){
     return collection.findOne();
   }).then((v){
     expect(v['a'],isNotNull);
-    db.close();
+    return db.close();
   });
 }
 
@@ -755,7 +755,7 @@ Future testIndexInformation(){
     return db.indexInformation('testcol');
   }).then((indexInfo){
     expect(indexInfo.length,1);
-    db.close();
+    return db.close();
   });
 }
 
@@ -769,7 +769,7 @@ Future testIndexCreation(){
   }).then((res){
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
-    }      
+    }
     expect(() => db.createIndex('testcol'),throws, reason: 'Invalid number of arguments');
     expect(() => db.createIndex('testcol',key: 'a', keys:{'a':-1}),throws, reason: 'Invalid number of arguments');
     return db.createIndex('testcol',key:'a');
@@ -785,7 +785,7 @@ Future testIndexCreation(){
   }).then((res){
     expect(res['ok'],1.0);
     expect(res['result'],'index preexists');
-    db.close();
+    return db.close();
   });
 }
 
@@ -799,12 +799,12 @@ Future testEnsureIndexWithIndexCreation(){
   }).then((res){
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
-    }   
+    }
     return db.ensureIndex('testcol',keys:{'a':-1,'embedded.c': 1});
   }).then((res){
     expect(res['ok'],1.0);
     expect(res['err'],isNull);
-    db.close();
+    return db.close();
   });
 }
 Future testSafeModeUpdate(){
@@ -824,7 +824,7 @@ Future testSafeModeUpdate(){
   }).then((res){
     expect(res['updatedExisting'], true);
     expect(res['n'], 1);
-    db.close();
+    return db.close();
   });
 }
 Future testFindWithFieldsClause(){
@@ -844,7 +844,7 @@ Future testFindWithFieldsClause(){
  }).then((v){
     expect(v['name'],isNull);
     expect(v['score'],4);
-    db.close();
+    return db.close();
    });
 }
 
@@ -877,7 +877,7 @@ Future testSimpleQuery(){
     return coll.findOne(where.eq('my_field', 3));
   }).then((v){
     expect(v,isNull);
-    db.close();
+    return db.close();
    });
 }
 
@@ -900,7 +900,7 @@ Future testCompoundQuery(){
   }).then((v){
     expect(v,isNotNull);
     expect(v['my_field'], 1);
-    db.close();
+    return db.close();
    });
 }
 
@@ -927,7 +927,7 @@ Future testFieldLevelUpdateSimple() {
     }).then((result) {
       expect(result, isNotNull);
       expect(result['name'], 'BBB');
-      db.close();
+      return db.close();
     });
   });
 }
@@ -949,7 +949,7 @@ main(){
 //  };
 //  Logger.root.onRecord.listen(listener);
 //
-  
+
   group('DbCollection tests:', (){
     test('testAuthComponents',testAuthComponents);
     test('testMongoDbUri',testMongoDbUri);
@@ -966,19 +966,19 @@ main(){
   });
   group('DbCollection tests:', (){
     test('testLimitWithSortByAndSkip',testLimitWithSortByAndSkip);
-    test('testLimitWithSkip',testLimit);    
+    test('testLimitWithSkip',testLimit);
     test('testFindEachWithThenClause',testFindEachWithThenClause);
     test('testSimpleQuery',testSimpleQuery);
     test('testCompoundQuery',testCompoundQuery);
     test('testCount',testCount);
-    test('testDistinct',testDistinct);    
+    test('testDistinct',testDistinct);
     test('testAggregate',testAggregate);
     test('testFindEach',testFindEach);
     test('testEach',testEachOnEmptyCollection);
     test('testDrop',testDrop);
     test('testSaveWithIntegerId',testSaveWithIntegerId);
     test('testSaveWithObjectId',testSaveWithObjectId);
-    test('testInsertWithObjectId',testSaveWithObjectId);    
+    test('testInsertWithObjectId',testSaveWithObjectId);
     test('testSkip',testSkip);
     test('testUpdateWithUpsert', testUpdateWithUpsert);
     test('testUpdateWithMultiUpdate', testUpdateWithMultiUpdate);
@@ -993,7 +993,7 @@ main(){
     test('testCursorWithOpenServerCursor',testCursorWithOpenServerCursor);
     test('testCursorGetMore',testCursorGetMore);
     test('testFindStream',testFindStream);
-  });  
+  });
   group('DBCommand tests:', (){
     test('testDbCommandCreation',testDbCommandCreation);
     test('testPingDbCommand',testPingDbCommand);
@@ -1002,7 +1002,7 @@ main(){
   });
   group('Safe mode tests:', () {
     test('testSafeModeUpdate',testSafeModeUpdate);
-  });  
+  });
   group('Indexes tests:', () {
     test('testIndexInformation',testIndexInformation);
     test('testIndexCreation',testIndexCreation);
@@ -1013,5 +1013,5 @@ main(){
     test('testFieldLevelUpdateSimple',testFieldLevelUpdateSimple);
   });
 
-  
+
 }

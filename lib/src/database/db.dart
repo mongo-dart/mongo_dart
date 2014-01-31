@@ -1,13 +1,13 @@
 part of mongo_dart;
 
-class WriteConcern { 
-  static const ERRORS_IGNORED = const WriteConcern._(-1);   
-  static const UNACKNOWLEDGED = const WriteConcern._(0); 
-  static const ACKNOWLEDGED = const WriteConcern._(1); 
-  static const JOURNALED = const WriteConcern._(2);  
-  const WriteConcern._(this.value); 
-  final int value; 
-} 
+class WriteConcern {
+  static const ERRORS_IGNORED = const WriteConcern._(-1);
+  static const UNACKNOWLEDGED = const WriteConcern._(0);
+  static const ACKNOWLEDGED = const WriteConcern._(1);
+  static const JOURNALED = const WriteConcern._(2);
+  const WriteConcern._(this.value);
+  final int value;
+}
 
 class Db{
   final _log = new Logger('Db');
@@ -25,7 +25,7 @@ class Db{
     }
   }
   String toString() => 'Db($databaseName,$_debugInfo)';
-  
+
 /**
 * Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
 * For example next code points to local mongodb server on default mongodb port, database *testdb*
@@ -59,7 +59,7 @@ class Db{
     _connectionManager.addConnection(serverConfig);
   }
   Db.pool(List<String> uriList, [this._debugInfo]) {
-    
+
   }
   DbCollection collection(String collectionName){
     return new DbCollection(this,collectionName);
@@ -75,7 +75,7 @@ class Db{
   }
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
     _writeConcern = writeConcern;
-    return _connectionManager.open(writeConcern);        
+    return _connectionManager.open(writeConcern);
   }
   Future executeDbCommand(MongoMessage message){
       Completer<Map> result = new Completer();
@@ -116,7 +116,7 @@ class Db{
 
   Future removeFromCollection(String collectionName, [Map selector = const {}, WriteConcern writeConcern]){
     executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector),writeConcern);
-    return _getAcknowledgement(writeConcern: writeConcern); 
+    return _getAcknowledgement(writeConcern: writeConcern);
   }
 
   Future<Map> getLastError({bool j: false, int w: 0}){
@@ -132,9 +132,9 @@ class Db{
   Future<Map> wait(){
     return getLastError();
   }
-  void close(){
+  Future close(){
     _log.fine('$this closed');
-    _connectionManager.close();
+    return _connectionManager.close();
   }
 
   Cursor collectionsInfoCursor([String collectionName]) {
@@ -231,18 +231,18 @@ class Db{
     });
     return completer.future;
   }
-  
+
   Future _getAcknowledgement({WriteConcern writeConcern}) {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
     if (writeConcern == WriteConcern.ERRORS_IGNORED) {
-      return new Future.value({'ok': 1.0});            
+      return new Future.value({'ok': 1.0});
     }
     else
     {
       return getLastError(j: writeConcern == WriteConcern.JOURNALED, w: min(1, writeConcern.value));
-    }   
+    }
   }
 }
 
