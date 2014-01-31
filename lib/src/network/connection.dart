@@ -33,15 +33,10 @@ class _Connection{
     });
     return completer.future;
   }
-  
-  void close(){
+
+  Future close(){
     _closing = true;
-    while (!_sendQueue.isEmpty){
-      _sendBuffer();
-    }
-    _sendQueue.clear();
-    socket.close();
-    _replyCompleters.clear();
+    return socket.close();
   }
   _sendBuffer(){
     _log.fine('_sendBuffer ${!_sendQueue.isEmpty}');
@@ -54,27 +49,27 @@ class _Connection{
   }
   Future<MongoReplyMessage> query(MongoMessage queryMessage){
     Completer completer = new Completer();
-    _replyCompleters[queryMessage.requestId] = completer;    
+    _replyCompleters[queryMessage.requestId] = completer;
     _log.fine('Query $queryMessage');
     _sendQueue.addLast(queryMessage);
     _sendBuffer();
     return completer.future;
   }
-  
+
 ///   If runImmediately is set to false, the message is joined into one packet with
 ///   other messages that follows. This is used for joining insert, update and remove commands with
 ///   getLastError query (according to MongoDB docs, for some reason, these should
 ///   be sent 'together')
- 
+
   void execute(MongoMessage mongoMessage, bool runImmediately){
     _log.fine('Execute $mongoMessage');
     _sendQueue.addLast(mongoMessage);
     if (runImmediately)
-    {  
+    {
       _sendBuffer();
     }
   }
-  
+
   void _receiveReply(MongoReplyMessage reply) {
     _log.fine(reply.toString());
     Completer completer = _replyCompleters.remove(reply.responseTo);
