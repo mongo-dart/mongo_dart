@@ -17,7 +17,7 @@ class _ConnectionManager {
         _log.fine('$db: ${connection.serverConfig.hostUrl} connected');
         return v;
       } else {
-        return db.authenticate(connection.serverConfig.userName, connection.serverConfig.password).then((v) {
+        return db.authenticate(connection.serverConfig.userName, connection.serverConfig.password, connection: connection).then((v) {
           _log.fine('$db: ${connection.serverConfig.hostUrl} connected');
           return v;
         });

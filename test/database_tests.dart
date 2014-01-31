@@ -952,7 +952,7 @@ main(){
 
   group('DbCollection tests:', (){
     test('testAuthComponents',testAuthComponents);
-    test('testMongoDbUri',testMongoDbUri);
+    skip_test('testMongoDbUri',testMongoDbUri);
   });
   group('DBCommand:', (){
     test('testAuthentication',testAuthentication);
