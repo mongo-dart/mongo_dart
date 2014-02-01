@@ -61,4 +61,8 @@ class DbCommand extends MongoQueryMessage{
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, 
       {'aggregate': collectionName, 'pipeline': pipeline }, null);
   }
+  
+  static DbCommand createIsMasterCommand(Db db) {
+    return createQueryDBCommand(db, {'ismaster':1});
+  }
 }

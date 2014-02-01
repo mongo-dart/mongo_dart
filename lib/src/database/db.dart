@@ -1,20 +1,20 @@
 part of mongo_dart;
 
-class WriteConcern { 
-  static const ERRORS_IGNORED = const WriteConcern._(-1);   
-  static const UNACKNOWLEDGED = const WriteConcern._(0); 
-  static const ACKNOWLEDGED = const WriteConcern._(1); 
-  static const JOURNALED = const WriteConcern._(2);  
-  const WriteConcern._(this.value); 
-  final int value; 
-} 
+class WriteConcern {
+  static const ERRORS_IGNORED = const WriteConcern._(-1);
+  static const UNACKNOWLEDGED = const WriteConcern._(0);
+  static const ACKNOWLEDGED = const WriteConcern._(1);
+  static const JOURNALED = const WriteConcern._(2);
+  const WriteConcern._(this.value);
+  final int value;
+}
 
 class Db{
   final _log = new Logger('Db');
   String databaseName;
   String _debugInfo;
-  ServerConfig serverConfig;
-  _Connection connection;
+  _ConnectionManager _connectionManager;
+  get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
   _validateDatabaseName(String dbName) {
     if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
@@ -24,7 +24,7 @@ class Db{
     }
   }
   String toString() => 'Db($databaseName,$_debugInfo)';
-  
+
 /**
 * Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
 * For example next code points to local mongodb server on default mongodb port, database *testdb*
@@ -33,11 +33,22 @@ class Db{
 *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
 */
   Db(String uriString, [this._debugInfo]){
+    _connectionManager = new _ConnectionManager(this);
+    _connectionManager.addConnection(_parseUri(uriString));
+  }
+  Db.pool(List<String> uriList, [this._debugInfo]) {
+    _connectionManager = new _ConnectionManager(this);
+    uriList.forEach((uri) {
+      _connectionManager.addConnection(_parseUri(uri));
+    });
+  }
+
+  ServerConfig _parseUri(String uriString) {
     var uri = Uri.parse(uriString);
     if (uri.scheme != 'mongodb') {
       throw new MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
     }
-    serverConfig = new ServerConfig();
+    var serverConfig = new ServerConfig();
     serverConfig.host = uri.host;
     serverConfig.port = uri.port;
     if (serverConfig.port == null || serverConfig.port == 0){
@@ -54,57 +65,50 @@ class Db{
     if (uri.path != '') {
       databaseName = uri.path.replaceAll('/','');
     }
-    connection = new _Connection(serverConfig);
+    return serverConfig;
   }
+
   DbCollection collection(String collectionName){
-      return new DbCollection(this,collectionName);
+    return new DbCollection(this,collectionName);
   }
-  Future queryMessage(MongoMessage queryMessage){
+  Future queryMessage(MongoMessage queryMessage, {_Connection connection}){
+    if (connection == null) {
+      connection = _masterConnection;
+    }
     return connection.query(queryMessage);
   }
-  executeMessage(MongoMessage message, WriteConcern writeConcern){
+  executeMessage(MongoMessage message, WriteConcern writeConcern, {_Connection connection}){
+    if (connection == null) {
+      connection = _masterConnection;
+    }
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
     connection.execute(message,writeConcern == WriteConcern.ERRORS_IGNORED);
   }
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
-    
     _writeConcern = writeConcern;
-    if (connection.connected){
-      connection.close();
-      connection = new _Connection(serverConfig);
-    }
-    
-    return connection.connect().then((v) {
-      if (serverConfig.userName == null) {
-        _log.fine('$this connected');
-        return v;
-      }
-      else {
-        return authenticate(serverConfig.userName,serverConfig.password).then((v) {
-          _log.fine('$this connected');
-          return v;
-        });
-      }
-    });    
+    return _connectionManager.open(writeConcern);
   }
-  Future executeDbCommand(MongoMessage message){
-      Completer<Map> result = new Completer();
-      connection.query(message).then((replyMessage){
-        String errMsg;
-        if (replyMessage.documents.length == 0) {
-          errMsg = "Error executing Db command, Document length 0 $replyMessage";
-          print("Error: $errMsg");
-          var m = new Map();
-          m["errmsg"]=errMsg;
-          result.completeError(m);
-        } else  if (replyMessage.documents[0]['ok'] == 1.0 && replyMessage.documents[0]['err'] == null){
-          result.complete(replyMessage.documents[0]);
-        } else {
-          result.completeError(replyMessage.documents[0]);
-        }
-      });
+  Future executeDbCommand(MongoMessage message, {_Connection connection}){
+    if (connection == null) {
+      connection = _masterConnection;
+    }
+    Completer<Map> result = new Completer();
+    connection.query(message).then((replyMessage){
+      String errMsg;
+      if (replyMessage.documents.length == 0) {
+        errMsg = "Error executing Db command, Document length 0 $replyMessage";
+        print("Error: $errMsg");
+        var m = new Map();
+        m["errmsg"]=errMsg;
+        result.completeError(m);
+      } else  if (replyMessage.documents[0]['ok'] == 1.0 && replyMessage.documents[0]['err'] == null){
+        result.complete(replyMessage.documents[0]);
+      } else {
+        result.completeError(replyMessage.documents[0]);
+      }
+    });
     return result.future;
   }
   Future dropCollection(String collectionName){
@@ -128,22 +132,25 @@ class Db{
 
   Future removeFromCollection(String collectionName, [Map selector = const {}, WriteConcern writeConcern]){
     executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector),writeConcern);
-    return _getAcknowledgement(writeConcern: writeConcern); 
+    return _getAcknowledgement(writeConcern: writeConcern);
   }
 
   Future<Map> getLastError({bool j: false, int w: 0}){
     return executeDbCommand(DbCommand.createGetLastErrorCommand(this, j: j, w: w));
   }
-  Future<Map> getNonce(){
-    return executeDbCommand(DbCommand.createGetNonceCommand(this));
+  Future<Map> getNonce({_Connection connection}){
+    return executeDbCommand(DbCommand.createGetNonceCommand(this), connection: connection);
+  }
+  Future<Map> isMaster({_Connection connection}){
+    return executeDbCommand(DbCommand.createIsMasterCommand(this), connection: connection);
   }
 
   Future<Map> wait(){
     return getLastError();
   }
-  void close(){
+  Future close(){
     _log.fine('$this closed');
-    connection.close();
+    return _connectionManager.close();
   }
 
   Cursor collectionsInfoCursor([String collectionName]) {
@@ -156,12 +163,11 @@ class Db{
       return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
   }
 
-  Future<bool> authenticate(String userName, String password){
-    return getNonce().then((msg) {
+  Future<bool> authenticate(String userName, String password, {_Connection connection}){
+    return getNonce(connection: connection).then((msg) {
       var nonce = msg["nonce"];
       var command = DbCommand.createAuthenticationCommand(this,userName,password,nonce);
-      serverConfig.password = '***********';
-      return executeDbCommand(command);
+      return executeDbCommand(command, connection: connection);
     }).then( (res) => res["ok"]==1 );
   }
   Future<List> indexInformation([String collectionName]) {
@@ -240,18 +246,18 @@ class Db{
     });
     return completer.future;
   }
-  
+
   Future _getAcknowledgement({WriteConcern writeConcern}) {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
     if (writeConcern == WriteConcern.ERRORS_IGNORED) {
-      return new Future.value({'ok': 1.0});            
+      return new Future.value({'ok': 1.0});
     }
     else
     {
       return getLastError(j: writeConcern == WriteConcern.JOURNALED, w: min(1, writeConcern.value));
-    }   
+    }
   }
 }
 
