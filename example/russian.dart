@@ -3,7 +3,6 @@ import 'package:mongo_dart/mongo_dart.dart';
 main(){
   Db db = new Db("mongodb://127.0.0.1/mongo_dart-test");
   DbCollection collection;
-  print("Connecting to ${db.serverConfig.host}:${db.serverConfig.port}");
   db.open().then((c){
     collection = db.collection('test-utf8');
     collection.remove();
