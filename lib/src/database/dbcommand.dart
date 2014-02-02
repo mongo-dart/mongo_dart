@@ -32,8 +32,8 @@ class DbCommand extends MongoQueryMessage{
     return createQueryDBCommand(db, {'getnonce':1});
   }
 
-  static DbCommand createGetLastErrorCommand(Db db, {bool j: false, int w: 0}) {
-    return createQueryDBCommand(db, {"getlasterror":1, "j": j, "w": w});
+  static DbCommand createGetLastErrorCommand(Db db, WriteConcern concern) {
+    return createQueryDBCommand(db, concern.command);
   }
   static DbCommand createCountCommand(Db db, String collectionName, [Map selector = const {}]) {
     var finalQuery = {};
@@ -51,17 +51,17 @@ class DbCommand extends MongoQueryMessage{
     var selector = {'authenticate':1, 'user':userName, 'nonce':nonce, 'key':key};
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NONE, 0, -1, selector, null);
   }
-  
+
   static DbCommand createDistinctCommand(Db db, String collectionName, String field, [Map selector = const {}]) {
-    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, 
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1,
       {'distinct': collectionName, 'key': field, 'query': selector }, null);
   }
-  
+
   static DbCommand createAggregateCommand(Db db, String collectionName, List pipeline) {
-    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, 
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1,
       {'aggregate': collectionName, 'pipeline': pipeline }, null);
   }
-  
+
   static DbCommand createIsMasterCommand(Db db) {
     return createQueryDBCommand(db, {'ismaster':1});
   }

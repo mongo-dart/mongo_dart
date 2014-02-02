@@ -1,12 +1,99 @@
 part of mongo_dart;
 
+/**
+ * [WriteConcern] control the acknowledgment of write operations with various paramaters.
+ */
 class WriteConcern {
-  static const ERRORS_IGNORED = const WriteConcern._(-1);
-  static const UNACKNOWLEDGED = const WriteConcern._(0);
-  static const ACKNOWLEDGED = const WriteConcern._(1);
-  static const JOURNALED = const WriteConcern._(2);
-  const WriteConcern._(this.value);
-  final int value;
+  /**
+   * Denotes the Write Concern level that takes the following values ([int] or [String]):
+   *
+   * * -1 Disables all acknowledgment of write operations, and suppresses all errors, including network and socket errors.
+   * * 0: Disables basic acknowledgment of write operations, but returns information about socket exceptions and networking errors to the application.
+   * * 1: Provides acknowledgment of write operations on a standalone mongod or the primary in a replica set.
+   * * A number greater than 1: Guarantees that write operations have propagated successfully to the specified number of replica set members including the primary.
+   * * "majority": Confirms that write operations have propagated to the majority of configured replica set
+   * * A tag set: Fine-grained control over which replica set members must acknowledge a write operation
+   */
+  final w;
+  /**
+   * Specifies a timeout for this Write Concern in milliseconds, or infinite if equal to 0.
+   */
+  final int wtimeout;
+  /**
+   * Enables or disable fsync() operation before acknowledgement of the requested write operation.
+   * If [true], wait for mongod instance to write data to disk before returning.
+   */
+  final bool fsync;
+  /**
+   * Enables or disable journaling of the requested write operation before acknowledgement.
+   * If [true], wait for mongod instance to write data to the on-disk journal before returning.
+   */
+  final bool j;
+
+  /**
+   * Creates a WriteConcern object
+   */
+  const WriteConcern({this.w, this.wtimeout, this.fsync, this.j});
+
+  /**
+   * No exceptions are raised, even for network issues.
+   */
+  static const ERRORS_IGNORED = const WriteConcern(w: -1, wtimeout: 0, fsync: false, j:false);
+
+  /**
+   * Write operations that use this write concern will return as soon as the message is written to the socket.
+   * Exceptions are raised for network issues, but not server errors.
+   */
+  static const UNACKNOWLEDGED = const WriteConcern(w: 0, wtimeout: 0, fsync: false, j:false);
+
+  /**
+   * Write operations that use this write concern will wait for acknowledgement from the primary server before returning.
+   * Exceptions are raised for network issues, and server errors.
+   */
+  static const ACKNOWLEDGED = const WriteConcern(w: 1, wtimeout: 0, fsync: false, j:false);
+
+  /**
+   * Exceptions are raised for network issues, and server errors; waits for at least 2 servers for the write operation.
+   */
+  static const REPLICA_ACKNOWLEDGED= const WriteConcern(w: 2, wtimeout: 0, fsync: false, j:false);
+
+  /**
+   * Exceptions are raised for network issues, and server errors; the write operation waits for the server to flush
+   * the data to disk.
+   */
+  static const FSYNCED = const WriteConcern(w: 1, wtimeout: 0, fsync: true, j: false);
+
+  /**
+   * Exceptions are raised for network issues, and server errors; the write operation waits for the server to
+   * group commit to the journal file on disk.
+   */
+  static const JOURNALED = const WriteConcern(w: 1, wtimeout: 0, fsync: false, j: true);
+
+  /**
+   * Exceptions are raised for network issues, and server errors; waits on a majority of servers for the write operation.
+   */
+  static const MAJORITY = const WriteConcern(w: "majority", wtimeout: 0, fsync: false, j: false);
+
+  /**
+   * Gets the getlasterror command for this write concern.
+   */
+  Map get command {
+    var map = new Map();
+    map["getlasterror"] = 1;
+    if (w != null) {
+      map["w"] = w;
+    }
+    if (wtimeout != null) {
+      map["wtimeout"] = wtimeout;
+    }
+    if (fsync != null) {
+      map["fsync"] = fsync;
+    }
+    if (j != null) {
+      map["j"] = j;
+    }
+    return map;
+  }
 }
 
 class Db{
@@ -135,8 +222,11 @@ class Db{
     return _getAcknowledgement(writeConcern: writeConcern);
   }
 
-  Future<Map> getLastError({bool j: false, int w: 0}){
-    return executeDbCommand(DbCommand.createGetLastErrorCommand(this, j: j, w: w));
+  Future<Map> getLastError([WriteConcern writeConcern]){
+    if (writeConcern == null) {
+      writeConcern = _writeConcern;
+    }
+    return executeDbCommand(DbCommand.createGetLastErrorCommand(this, writeConcern));
   }
   Future<Map> getNonce({_Connection connection}){
     return executeDbCommand(DbCommand.createGetNonceCommand(this), connection: connection);
@@ -253,14 +343,10 @@ class Db{
     }
     if (writeConcern == WriteConcern.ERRORS_IGNORED) {
       return new Future.value({'ok': 1.0});
-    }
-    else
-    {
-      return getLastError(j: writeConcern == WriteConcern.JOURNALED, w: min(1, writeConcern.value));
+    } else {
+      return getLastError(writeConcern);
     }
   }
 }
-
-
 
 

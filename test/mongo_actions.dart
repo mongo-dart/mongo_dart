@@ -78,7 +78,8 @@ ProcessResult _startMongod(int port, [String rs]) {
               "--logpath", "$DATA_PATH/$port.log",
               "--pidfilepath", "$DATA_PATH/$port.pid",
               "--dbpath", "$DATA_PATH/$port",
-              "--port", "$port"
+              "--port", "$port",
+              "-v"
   ];
   if (rs != null) {
     args.addAll(["--replSet", rs]);
