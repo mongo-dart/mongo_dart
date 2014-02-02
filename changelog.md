@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.38
+
+- Initial support for replica set added by [sestegra](https://github.com/sestegra)
+
 ###0.1.37
 
 - Change log made compatible with pub site preferences, thanks to Andreas Olund.

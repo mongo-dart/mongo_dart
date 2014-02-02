@@ -3,7 +3,7 @@ authors:
 - Vadim Tsushko <vadimtsushko@gmail.com>
 - Ted Sander <ted@tedsander.com>
 - Paul Evans <pevans@sonardesign.com>
-version: 0.1.37
+version: 0.1.38
 homepage: https://github.com/vadimtsushko/mongo_dart
 description: MongoDB driver for Dart
 environment:
