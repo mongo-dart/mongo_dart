@@ -15,15 +15,18 @@ class WriteConcern {
    * * A tag set: Fine-grained control over which replica set members must acknowledge a write operation
    */
   final w;
+  
   /**
    * Specifies a timeout for this Write Concern in milliseconds, or infinite if equal to 0.
    */
   final int wtimeout;
+  
   /**
    * Enables or disable fsync() operation before acknowledgement of the requested write operation.
    * If [true], wait for mongod instance to write data to disk before returning.
    */
   final bool fsync;
+  
   /**
    * Enables or disable journaling of the requested write operation before acknowledgement.
    * If [true], wait for mongod instance to write data to the on-disk journal before returning.
@@ -96,7 +99,7 @@ class WriteConcern {
   }
 }
 
-class Db{
+class Db {
   final _log = new Logger('Db');
   String databaseName;
   String _debugInfo;
@@ -112,17 +115,18 @@ class Db{
   }
   String toString() => 'Db($databaseName,$_debugInfo)';
 
-/**
-* Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
-* For example next code points to local mongodb server on default mongodb port, database *testdb*
-*     var db = new Db('mongodb://127.0.0.1/testdb');
-* And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
-*     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
-*/
-  Db(String uriString, [this._debugInfo]){
+  /**
+  * Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
+  * For example next code points to local mongodb server on default mongodb port, database *testdb*
+  *     var db = new Db('mongodb://127.0.0.1/testdb');
+  * And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
+  *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
+  */
+  Db(String uriString, [this._debugInfo]) {
     _connectionManager = new _ConnectionManager(this);
     _connectionManager.addConnection(_parseUri(uriString));
   }
+  
   Db.pool(List<String> uriList, [this._debugInfo]) {
     _connectionManager = new _ConnectionManager(this);
     uriList.forEach((uri) {
@@ -138,7 +142,7 @@ class Db{
     var serverConfig = new ServerConfig();
     serverConfig.host = uri.host;
     serverConfig.port = uri.port;
-    if (serverConfig.port == null || serverConfig.port == 0){
+    if (serverConfig.port == null || serverConfig.port == 0) {
       serverConfig.port = 27017;
     }
     if (uri.userInfo != '') {
@@ -155,16 +159,18 @@ class Db{
     return serverConfig;
   }
 
-  DbCollection collection(String collectionName){
+  DbCollection collection(String collectionName) {
     return new DbCollection(this,collectionName);
   }
-  Future queryMessage(MongoMessage queryMessage, {_Connection connection}){
+  
+  Future queryMessage(MongoMessage queryMessage, {_Connection connection}) {
     if (connection == null) {
       connection = _masterConnection;
     }
     return connection.query(queryMessage);
   }
-  executeMessage(MongoMessage message, WriteConcern writeConcern, {_Connection connection}){
+  
+  executeMessage(MongoMessage message, WriteConcern writeConcern, {_Connection connection}) {
     if (connection == null) {
       connection = _masterConnection;
     }
@@ -173,16 +179,18 @@ class Db{
     }
     connection.execute(message,writeConcern == WriteConcern.ERRORS_IGNORED);
   }
+  
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
     _writeConcern = writeConcern;
     return _connectionManager.open(writeConcern);
   }
-  Future executeDbCommand(MongoMessage message, {_Connection connection}){
+  
+  Future executeDbCommand(MongoMessage message, {_Connection connection}) {
     if (connection == null) {
       connection = _masterConnection;
     }
     Completer<Map> result = new Completer();
-    connection.query(message).then((replyMessage){
+    connection.query(message).then((replyMessage) {
       String errMsg;
       if (replyMessage.documents.length == 0) {
         errMsg = "Error executing Db command, Document length 0 $replyMessage";
@@ -190,7 +198,7 @@ class Db{
         var m = new Map();
         m["errmsg"]=errMsg;
         result.completeError(m);
-      } else  if (replyMessage.documents[0]['ok'] == 1.0 && replyMessage.documents[0]['err'] == null){
+      } else if (replyMessage.documents[0]['ok'] == 1.0 && replyMessage.documents[0]['err'] == null) {
         result.complete(replyMessage.documents[0]);
       } else {
         result.completeError(replyMessage.documents[0]);
@@ -198,47 +206,52 @@ class Db{
     });
     return result.future;
   }
-  Future dropCollection(String collectionName){
+  
+  Future dropCollection(String collectionName) {
     Completer completer = new Completer();
-    collectionsInfoCursor(collectionName).toList().then((v){
-      if (v.length == 1){
+    collectionsInfoCursor(collectionName).toList().then((v) {
+      if (v.length == 1) {
         executeDbCommand(DbCommand.createDropCollectionCommand(this,collectionName))
           .then((res)=>completer.complete(res));
-        } else{
-          completer.complete(true);
-        }
+      } else {
+        completer.complete(true);
+      }
     });
     return completer.future;
   }
-/**
-*   Drop current database
-*/
+  
+  /**
+  *   Drop current database
+  */
   Future drop(){
     return executeDbCommand(DbCommand.createDropDatabaseCommand(this));
   }
 
-  Future removeFromCollection(String collectionName, [Map selector = const {}, WriteConcern writeConcern]){
+  Future removeFromCollection(String collectionName, [Map selector = const {}, WriteConcern writeConcern]) {
     executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector),writeConcern);
     return _getAcknowledgement(writeConcern: writeConcern);
   }
 
-  Future<Map> getLastError([WriteConcern writeConcern]){
+  Future<Map> getLastError([WriteConcern writeConcern]) {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
     return executeDbCommand(DbCommand.createGetLastErrorCommand(this, writeConcern));
   }
-  Future<Map> getNonce({_Connection connection}){
+  
+  Future<Map> getNonce({_Connection connection}) {
     return executeDbCommand(DbCommand.createGetNonceCommand(this), connection: connection);
   }
-  Future<Map> isMaster({_Connection connection}){
+  
+  Future<Map> isMaster({_Connection connection}) {
     return executeDbCommand(DbCommand.createIsMasterCommand(this), connection: connection);
   }
 
-  Future<Map> wait(){
+  Future<Map> wait() {
     return getLastError();
   }
-  Future close(){
+  
+  Future close() {
     _log.fine('$this closed');
     return _connectionManager.close();
   }
@@ -246,20 +259,21 @@ class Db{
   Cursor collectionsInfoCursor([String collectionName]) {
     Map selector = {};
     // If we are limiting the access to a specific collection name
-    if(collectionName != null){
+    if(collectionName != null) {
       selector["name"] = "${this.databaseName}.$collectionName";
     }
     // Return Cursor
-      return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
+    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
   }
 
-  Future<bool> authenticate(String userName, String password, {_Connection connection}){
+  Future<bool> authenticate(String userName, String password, {_Connection connection}) {
     return getNonce(connection: connection).then((msg) {
       var nonce = msg["nonce"];
       var command = DbCommand.createAuthenticationCommand(this,userName,password,nonce);
       return executeDbCommand(command, connection: connection);
     }).then( (res) => res["ok"]==1 );
   }
+  
   Future<List> indexInformation([String collectionName]) {
     var selector = {};
     if (collectionName != null) {
@@ -267,6 +281,7 @@ class Db{
     }
     return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();
   }
+  
   String _createIndexName(Map keys) {
     var name = '';
     keys.forEach((key,value) {
@@ -274,6 +289,7 @@ class Db{
     });
     return name;
   }
+  
   Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
     var selector = {};
     selector['ns'] = '$databaseName.$collectionName';
@@ -320,6 +336,7 @@ class Db{
     }
     return keys;
   }
+  
   Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
     keys = _setKeys(key, keys);
     var completer = new Completer();
@@ -348,5 +365,3 @@ class Db{
     }
   }
 }
-
-

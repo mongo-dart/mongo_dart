@@ -1,5 +1,6 @@
 part of mongo_dart;
-class _Connection{
+
+class _Connection {
   final _log= new Logger('Connection');
   _ConnectionManager _manager;
   ServerConfig serverConfig;
@@ -10,15 +11,17 @@ class _Connection{
   bool connected = false;
   bool _closing = false;
   bool isMaster = false;
+  
   _Connection(this._manager, [this.serverConfig]) {
-    if (serverConfig == null){
+    if (serverConfig == null) {
       serverConfig = new ServerConfig();
     }
   }
-  Future<bool> connect(){
+  
+  Future<bool> connect() {
     Completer completer = new Completer();
     Socket.connect(serverConfig.host, serverConfig.port).then((Socket _socket) {
-/* Socket connected. */
+      // Socket connected. 
       socket = _socket;
       _socketSubscription = socket
         .transform(new MongoMessageHandler().transformer)
@@ -34,11 +37,12 @@ class _Connection{
     return completer.future;
   }
 
-  Future close(){
+  Future close() {
     _closing = true;
     return socket.close();
   }
-  _sendBuffer(){
+  
+  _sendBuffer() {
     _log.fine('_sendBuffer ${!_sendQueue.isEmpty}');
     List<int> message = [];
     while (!_sendQueue.isEmpty) {
@@ -47,7 +51,8 @@ class _Connection{
     }
     socket.add(message);
   }
-  Future<MongoReplyMessage> query(MongoMessage queryMessage){
+  
+  Future<MongoReplyMessage> query(MongoMessage queryMessage) {
     Completer completer = new Completer();
     _replyCompleters[queryMessage.requestId] = completer;
     _log.fine('Query $queryMessage');
@@ -56,16 +61,15 @@ class _Connection{
     return completer.future;
   }
 
-///   If runImmediately is set to false, the message is joined into one packet with
-///   other messages that follows. This is used for joining insert, update and remove commands with
-///   getLastError query (according to MongoDB docs, for some reason, these should
-///   be sent 'together')
+  ///   If runImmediately is set to false, the message is joined into one packet with
+  ///   other messages that follows. This is used for joining insert, update and remove commands with
+  ///   getLastError query (according to MongoDB docs, for some reason, these should
+  ///   be sent 'together')
 
-  void execute(MongoMessage mongoMessage, bool runImmediately){
+  void execute(MongoMessage mongoMessage, bool runImmediately) {
     _log.fine('Execute $mongoMessage');
     _sendQueue.addLast(mongoMessage);
-    if (runImmediately)
-    {
+    if (runImmediately) {
       _sendBuffer();
     }
   }
@@ -76,8 +80,7 @@ class _Connection{
     if (completer != null){
       _log.fine('Completing $reply');
       completer.complete(reply);
-    }
-    else {
+    } else {
       if (!_closing) {
         _log.info("Unexpected respondTo: ${reply.responseTo} $reply");
       }

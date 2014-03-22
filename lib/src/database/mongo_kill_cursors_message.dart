@@ -1,15 +1,17 @@
 part of mongo_dart;
-class MongoKillCursorsMessage extends MongoMessage{
+
+class MongoKillCursorsMessage extends MongoMessage {
   int cursorId;
-  MongoKillCursorsMessage(
-            this.cursorId
-            ){
+  
+  MongoKillCursorsMessage(this.cursorId) {
     opcode = MongoMessage.KillCursors;
   }
-  int get messageLength{
+  
+  int get messageLength {
     return 16+4+4+8;
   }
-  BsonBinary serialize(){
+  
+  BsonBinary serialize() {
     BsonBinary buffer = new BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
@@ -18,8 +20,8 @@ class MongoKillCursorsMessage extends MongoMessage{
     buffer.offset = 0;
     return buffer;
   }
-  String toString(){
+  
+  String toString() {
     return "MongoKillCursorsMessage($requestId, $cursorId)";
   }
-
 }

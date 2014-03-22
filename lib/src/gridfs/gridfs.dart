@@ -40,5 +40,3 @@ class GridFS {
     return new GridIn(this, filename, input);
   }
 }
-
-
