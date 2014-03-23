@@ -1,34 +1,37 @@
 part of mongo_dart;
-class DbCollection{
+
+class DbCollection {
   Db db;
   String collectionName;
-  DbCollection(this.db, this.collectionName){}
+  DbCollection(this.db, this.collectionName) {}
   String fullName() => "${db.databaseName}.$collectionName";
-  Future save(Map document, {WriteConcern writeConcern}){
+  
+  Future save(Map document, {WriteConcern writeConcern}) {
     var id;
     bool createId = false;
-    if (document.containsKey("_id")){
+    if (document.containsKey("_id")) {
       id = document["_id"];
-      if (id == null){
+      if (id == null) {
         createId = true;
       }
     }
-    if (id != null){
+    if (id != null) {
       return update({"_id": id}, document, writeConcern: writeConcern);
-    }
-    else{
+    } else {
       if (createId) {
         document["_id"] = new ObjectId();
       }
       return insert(document, writeConcern: writeConcern);
     }
   }
- Future insertAll(List<Map> documents, {WriteConcern writeConcern}){
+  
+  Future insertAll(List<Map> documents, {WriteConcern writeConcern}) {
     MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
     db.executeMessage(insertMessage, writeConcern);
     return db._getAcknowledgement(writeConcern: writeConcern);
   }
-  Future update(selector, document, {bool upsert: false, bool multiUpdate: false, WriteConcern writeConcern}){
+  
+  Future update(selector, document, {bool upsert: false, bool multiUpdate: false, WriteConcern writeConcern}) {
     int flags = 0;
     if (upsert) {
       flags |= 0x1;
@@ -43,7 +46,7 @@ class DbCollection{
     return db._getAcknowledgement(writeConcern: writeConcern);
   }
 
- /**
+  /**
   * Creates a cursor for a query that can be used to iterate over results from MongoDB
   * ##[selector]
   * parameter represents query to locate objects. If omitted as in `find()` then query matches all documents in colleciton.
@@ -56,15 +59,18 @@ class DbCollection{
     return new Cursor(db, this, selector);
   }
 
-  Future<Map> findOne([selector]){
+  Future<Map> findOne([selector]) {
     Cursor cursor = new Cursor(db, this, selector);
     Future<Map> result = cursor.nextObject();
     cursor.close();
     return result;
   }
+  
   Future drop() => db.dropCollection(collectionName);
+  
   Future remove([selector, WriteConcern writeConcern]) => db.removeFromCollection(collectionName, _selectorBuilder2Map(selector), writeConcern);
-  Future<int> count([selector]){
+  
+  Future<int> count([selector]) {
     Completer completer = new Completer();
     db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuilder2Map(selector))).then((reply){
       completer.complete(reply["n"].toInt());

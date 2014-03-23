@@ -1,4 +1,5 @@
 part of mongo_dart;
+
 class PacketConverter {
   final _log = new Logger('PacketConverter');
   final packets = new ListQueue<List<int>>();
@@ -21,7 +22,8 @@ class PacketConverter {
       handleBody();
     }
   }
-  handleHeader(){
+  
+  handleHeader() {
     if (bytesAvailable()>=4) {
       headerMode = false;
       lengthBuffer.rewind();
@@ -34,7 +36,8 @@ class PacketConverter {
       handleBody();
     }
   }
-  handleBody(){
+  
+  handleBody() {
     if (bytesAvailable()>=messageBuffer.length-4) {
       headerMode = true;
       messageBuffer.setRange(0,4,lengthBuffer.byteList);
@@ -44,8 +47,10 @@ class PacketConverter {
       handleHeader();
     }
   }
+  
   /// Length of all packets with current read position on first packet subtracted
-  int bytesAvailable() => packets.fold(- readPos,(value, element) => value + element.length) ;
+  int bytesAvailable() => packets.fold(- readPos,(value, element) => value + element.length);
+  
   void readIntoBuffer(List<int> buffer, int pos) {
     if(buffer.length - pos > bytesAvailable()) {
 //      print('$this $buffer $pos');
@@ -59,6 +64,7 @@ class PacketConverter {
       throw new MongoDartError('Bad state. Buffer was not written fully');
     }
   }
+  
   int _readPacketIntoBuffer(List<int> buffer, int pos) {
     int bytesRead = min(buffer.length - pos,packets.first.length - readPos);
     buffer.setRange(pos,pos+bytesRead,packets.first,readPos);
@@ -70,6 +76,8 @@ class PacketConverter {
     }
     return bytesRead;
   }
+  
   String toString() => 'PacketConverter(readPos: $readPos, headerMode: $headerMode, packets: $packets)';
+  
   bool get isClear => this.packets.isEmpty && messages.isEmpty && headerMode;
 }

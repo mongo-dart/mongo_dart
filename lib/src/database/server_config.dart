@@ -1,5 +1,6 @@
 part of mongo_dart;
-class ServerConfig{
+
+class ServerConfig {
   String host;
   int port;
   String userName;

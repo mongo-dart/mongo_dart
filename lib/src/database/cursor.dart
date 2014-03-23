@@ -1,10 +1,12 @@
 part of mongo_dart;
-typedef void MonadicBlock(Map value);
-class Cursor{
 
-static const INIT = 0;
-static const OPEN = 1;
-static const CLOSED = 2;
+typedef void MonadicBlock(Map value);
+
+class Cursor {
+  static const INIT = 0;
+  static const OPEN = 1;
+  static const CLOSED = 2;
+  
   final _log= new Logger('Cursor');
   int state = INIT;
   int cursorId = 0;
@@ -24,8 +26,8 @@ static const CLOSED = 2;
   int flags = 0;
   var controller = new StreamController<Map>();
 
-  Cursor(this.db, this.collection, selectorBuilderOrMap){
-    if (selectorBuilderOrMap == null){
+  Cursor(this.db, this.collection, selectorBuilderOrMap) {
+    if (selectorBuilderOrMap == null) {
       selector = {};
     } else if (selectorBuilderOrMap is SelectorBuilder) {
       selector = selectorBuilderOrMap.map;
@@ -43,7 +45,8 @@ static const CLOSED = 2;
 //    }
     items = new Queue();
   }
-  MongoQueryMessage generateQueryMessage(){
+  
+  MongoQueryMessage generateQueryMessage() {
     return new  MongoQueryMessage(collection.fullName(),
             flags,
             skip,
@@ -51,43 +54,39 @@ static const CLOSED = 2;
             selector,
             fields);
   }
-  MongoGetMoreMessage generateGetMoreMessage(){
-    return new  MongoGetMoreMessage(collection.fullName(),
-            cursorId);
+  
+  MongoGetMoreMessage generateGetMoreMessage() {
+    return new MongoGetMoreMessage(collection.fullName(), cursorId);
   }
 
-
-  Map _getNextItem(){
+  Map _getNextItem() {
     _returnedCount++;
     return items.removeFirst();
   }
-  Future<Map> nextObject(){
-    if (state == INIT){
+  
+  Future<Map> nextObject() {
+    if (state == INIT) {
       Completer<Map> nextItem = new Completer<Map>();
       MongoQueryMessage qm = generateQueryMessage();
       Future<MongoReplyMessage> reply = db.queryMessage(qm);
-      reply.then((replyMessage){
+      reply.then((replyMessage) {
         state = OPEN;
         cursorId = replyMessage.cursorId;
         items.addAll(replyMessage.documents);
-        if (items.length > 0){
+        if (items.length > 0) {
           Map nextDoc = _getNextItem();
           ////_log.finer("Cursor _getNextItem $nextDoc");
           nextItem.complete(nextDoc);
-        }
-        else{
+        } else{
           nextItem.complete(null);
         }
       });
       return nextItem.future;
-    }
-    else if (state == OPEN && limit > 0 && _returnedCount == limit){
+    } else if (state == OPEN && limit > 0 && _returnedCount == limit){
       return this.close();
-    }
-    else if (state == OPEN && items.length > 0){
+    } else if (state == OPEN && items.length > 0){
       return new Future.value(_getNextItem());
-    }
-    else if (state == OPEN && cursorId > 0){
+    } else if (state == OPEN && cursorId > 0){
       Completer nextItem = new Completer();
       var qm = generateGetMoreMessage();
       Future<MongoReplyMessage> reply = db.queryMessage(qm);
@@ -97,22 +96,21 @@ static const CLOSED = 2;
         items.addAll(replyMessage.documents);
         if (items.length > 0){
           nextItem.complete(_getNextItem());
-        }
-        else{
+        } else {
           state = CLOSED;
           nextItem.complete(null);
         }
       });
       return nextItem.future;
-    }
-    else {
+    } else {
       state = CLOSED;
       return new Future.value(null);
     }
   }
-  void _nextEach(){
-    nextObject().then((val){
-      if (val == null){
+  
+  void _nextEach() {
+    nextObject().then((val) {
+      if (val == null) {
         eachCallback = null;
         eachComplete.complete(true);
       } else {
@@ -121,23 +119,25 @@ static const CLOSED = 2;
       }
     });
   }
+  
   @deprecated
   Future<bool> each(MonadicBlock callback) => forEach(callback);
   
-  
-  Future<bool> forEach(MonadicBlock callback){
+  Future<bool> forEach(MonadicBlock callback) {
     eachCallback = callback;
     eachComplete = new Completer();
     _nextEach();
     return eachComplete.future;
   }
-  Future<List<Map>> toList(){
+  
+  Future<List<Map>> toList() {
     List<Map> result = [];
     Completer completer = new Completer();
     this.forEach((v)=>result.add(v)).then((v)=>completer.complete(result));
     return completer.future;
   }
-  Future close(){
+  
+  Future close() {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
     state = CLOSED;
     if (cursorId != 0){
@@ -147,6 +147,7 @@ static const CLOSED = 2;
     }
     return new Future.value(null);
   }
+  
   Stream<Map> get stream {
     forEach(controller.add).then((_) => controller.close());
     return controller.stream; 

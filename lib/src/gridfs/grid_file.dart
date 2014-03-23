@@ -12,7 +12,7 @@ class GridFSFile {
   String md5;
 
   GridFSFile([Map data = const {}]) {
-      this.data = data;
+    this.data = data;
   }
 
   Future<Map> save() {
@@ -90,7 +90,7 @@ class GridFSFile {
     md5 = extraData.remove("md5");
   }
 
-  void setGridFS( GridFS fs ) {
+  void setGridFS(GridFS fs) {
     this.fs = fs;
   }
 }
