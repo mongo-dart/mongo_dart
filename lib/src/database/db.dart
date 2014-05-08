@@ -208,16 +208,12 @@ class Db {
   }
   
   Future dropCollection(String collectionName) {
-    Completer completer = new Completer();
-    collectionsInfoCursor(collectionName).toList().then((v) {
+    return collectionsInfoCursor(collectionName).toList().then((v) {
       if (v.length == 1) {
-        executeDbCommand(DbCommand.createDropCollectionCommand(this,collectionName))
-          .then((res)=>completer.complete(res));
-      } else {
-        completer.complete(true);
+        return executeDbCommand(DbCommand.createDropCollectionCommand(this,collectionName));
       }
+      return new Future.value(true);
     });
-    return completer.future;
   }
   
   /**
@@ -339,19 +335,15 @@ class Db {
   
   Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
     keys = _setKeys(key, keys);
-    var completer = new Completer();
-    indexInformation(collectionName).then((indexInfos) {
+    return indexInformation(collectionName).then((indexInfos) {
       if (name == null) {
         name = _createIndexName(keys);
       }
       if (indexInfos.any((info) => info['name'] == name)) {
-        completer.complete({'ok': 1.0, 'result': 'index preexists'});
-      } else {
-        createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name)
-          .then((res)=>completer.complete(res));
+        return new Future.value({'ok': 1.0, 'result': 'index preexists'});
       }
+      return createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name);
     });
-    return completer.future;
   }
 
   Future _getAcknowledgement({WriteConcern writeConcern}) {

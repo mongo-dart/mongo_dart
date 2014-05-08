@@ -1,11 +1,11 @@
 name: mongo_dart
+version: 0.1.38
 authors:
 - Vadim Tsushko <vadimtsushko@gmail.com>
 - Ted Sander <ted@tedsander.com>
 - Paul Evans <pevans@sonardesign.com>
-version: 0.1.38
-homepage: https://github.com/vadimtsushko/mongo_dart
 description: MongoDB driver for Dart
+homepage: https://github.com/vadimtsushko/mongo_dart
 environment:
   sdk: '>=0.8.10+6 <2.0.0'
 dependencies:
@@ -15,4 +15,5 @@ dependencies:
   mongo_dart_query: any
 dev_dependencies:
   hop: any
+  hop_docgen: any
   unittest: '>=0.9.0 <0.10.0'

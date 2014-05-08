@@ -71,11 +71,9 @@ class DbCollection {
   Future remove([selector, WriteConcern writeConcern]) => db.removeFromCollection(collectionName, _selectorBuilder2Map(selector), writeConcern);
   
   Future<int> count([selector]) {
-    Completer completer = new Completer();
-    db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuilder2Map(selector))).then((reply){
-      completer.complete(reply["n"].toInt());
+    return db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuilder2Map(selector))).then((reply){
+      return new Future.value(reply["n"].toInt());
     });
-    return completer.future;
   }
   
   Future distinct(String field, [selector]) =>

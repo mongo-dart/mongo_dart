@@ -66,42 +66,34 @@ class Cursor {
   
   Future<Map> nextObject() {
     if (state == INIT) {
-      Completer<Map> nextItem = new Completer<Map>();
       MongoQueryMessage qm = generateQueryMessage();
-      Future<MongoReplyMessage> reply = db.queryMessage(qm);
-      reply.then((replyMessage) {
+      return db.queryMessage(qm).then((replyMessage) {
         state = OPEN;
         cursorId = replyMessage.cursorId;
         items.addAll(replyMessage.documents);
         if (items.length > 0) {
-          Map nextDoc = _getNextItem();
-          ////_log.finer("Cursor _getNextItem $nextDoc");
-          nextItem.complete(nextDoc);
+          return new Future.value(_getNextItem());
         } else{
-          nextItem.complete(null);
+          return new Future.value(null);
         }
       });
-      return nextItem.future;
     } else if (state == OPEN && limit > 0 && _returnedCount == limit){
       return this.close();
     } else if (state == OPEN && items.length > 0){
       return new Future.value(_getNextItem());
     } else if (state == OPEN && cursorId > 0){
-      Completer nextItem = new Completer();
       var qm = generateGetMoreMessage();
-      Future<MongoReplyMessage> reply = db.queryMessage(qm);
-      reply.then((replyMessage){
+      return db.queryMessage(qm).then((replyMessage){
         state = OPEN;
         cursorId = replyMessage.cursorId;
         items.addAll(replyMessage.documents);
         if (items.length > 0){
-          nextItem.complete(_getNextItem());
+          return new Future.value(_getNextItem());
         } else {
           state = CLOSED;
-          nextItem.complete(null);
+          return new Future.value(null);
         }
       });
-      return nextItem.future;
     } else {
       state = CLOSED;
       return new Future.value(null);
@@ -132,9 +124,7 @@ class Cursor {
   
   Future<List<Map>> toList() {
     List<Map> result = [];
-    Completer completer = new Completer();
-    this.forEach((v)=>result.add(v)).then((v)=>completer.complete(result));
-    return completer.future;
+    return this.forEach((v)=>result.add(v)).then((v)=> new Future.value(result));
   }
   
   Future close() {

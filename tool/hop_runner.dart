@@ -2,6 +2,7 @@ library hop_runner;
 
 import 'package:hop/hop.dart';
 import 'package:hop/hop_tasks.dart';
+import 'package:hop_docgen/hop_docgen.dart';
 
 void main(args) {
 
@@ -9,7 +10,7 @@ void main(args) {
 
   addTask('analyze_libs', createAnalyzerTask(paths));
 
-//  addTask('docs',createDartDocTask(['lib/mongo_dart.dart'], linkApi: true, excludeLibs: ['fixnum']));
+ addTask('docs',  createDocGenTask(r'..\dartdoc-viewer'));
 
   runHop(args);
 }

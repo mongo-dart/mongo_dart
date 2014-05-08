@@ -807,6 +807,30 @@ Future testEnsureIndexWithIndexCreation(){
     return db.close();
   });
 }
+Future testIndexCreationErrorHandling(){
+  Db db = new Db('${DefaultUri}IndexCreationErrorHandling');
+  Cursor cursor;
+  DbCollection collection;
+  bool errorHandled = false; 
+  return db.open().then((c){
+    collection = db.collection('testcol');
+    return collection.drop();
+  }).then((res){
+    for (int n=0;n < 6; n++){
+      collection.insert({'a':n});
+    }
+    // Insert dublicate
+    collection.insert({'a':3});
+    return db.ensureIndex('testcol',key:'a', unique: true).catchError((e) {
+      errorHandled = true;
+    });
+  }).then((res){
+    expect(errorHandled,isTrue);
+    return db.close();
+  });
+}
+
+
 Future testSafeModeUpdate(){
   Db db = new Db('${DefaultUri}safe_mode');
   Cursor cursor;
@@ -1007,6 +1031,7 @@ main(){
     test('testIndexInformation',testIndexInformation);
     test('testIndexCreation',testIndexCreation);
     test('testEnsureIndexWithIndexCreation',testEnsureIndexWithIndexCreation);
+    test('testIndexCreationErrorHandling',testIndexCreationErrorHandling);
   });
 
   group('Field level update tests:', () {

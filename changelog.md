@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.39
+
+- Better error handling. Bugfix for [issue 49](https://github.com/vadimtsushko/mongo_dart/issues/49)
+
 ###0.1.38
 
 - Initial support for replica set added by [sestegra](https://github.com/sestegra)
