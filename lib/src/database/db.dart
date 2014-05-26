@@ -203,7 +203,7 @@ class Db {
       } else {
         result.completeError(replyMessage.documents[0]);
       }
-    });
+    }).catchError((e) => result.completeError(e));
     return result.future;
   }
   
