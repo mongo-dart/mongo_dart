@@ -22,24 +22,29 @@ class DbCommand extends MongoQueryMessage {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'dropDatabase':1}, null);
   }
   
-  static DbCommand createQueryDBCommand(Db db, Map command) {
+  static DbCommand createQueryDbCommand(Db db, Map command) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, command, null);
   }
+
+  static MongoQueryMessage createQueryAdminCommand(Map command) {
+    return new MongoQueryMessage("admin.$SYSTEM_COMMAND_COLLECTION", MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, command, null);
+  }
+
   
   static DbCommand createDBSlaveOKCommand(Db db, Map command) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT | MongoQueryMessage.OPTS_SLAVE, 0, -1, command, null);
   }
 
   static DbCommand createPingCommand(Db db) {
-    return createQueryDBCommand(db, {'ping':1});
+    return createQueryDbCommand(db, {'ping':1});
   }
   
   static DbCommand createGetNonceCommand(Db db) {
-    return createQueryDBCommand(db, {'getnonce':1});
+    return createQueryDbCommand(db, {'getnonce':1});
   }
 
   static DbCommand createGetLastErrorCommand(Db db, WriteConcern concern) {
-    return createQueryDBCommand(db, concern.command);
+    return createQueryDbCommand(db, concern.command);
   }
   
   static DbCommand createCountCommand(Db db, String collectionName, [Map selector = const {}]) {
@@ -71,6 +76,6 @@ class DbCommand extends MongoQueryMessage {
   }
 
   static DbCommand createIsMasterCommand(Db db) {
-    return createQueryDBCommand(db, {'ismaster':1});
+    return createQueryDbCommand(db, {'ismaster':1});
   }
 }

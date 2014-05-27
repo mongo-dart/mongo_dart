@@ -106,7 +106,7 @@ class _Connection {
     _closed = true;
     var ex = const ConnectionException("connection closed.");
     _pendingQueries.forEach((id) {
-      Completer completer = _replyCompleters.remove(reply.responseTo);
+      Completer completer = _replyCompleters.remove(id);
       completer.completeError(ex);
     });
     _pendingQueries.clear();

@@ -261,7 +261,22 @@ class Db {
     // Return Cursor
     return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
   }
-
+  
+  /// Analogue to shell's `show collections`
+  Future<List<String>> listCollections() {
+    return collectionsInfoCursor().stream.map((map) => map['name'].split('.')).where((arr)=> arr.length == 2).map((arr)=> arr.last).toList();
+  }
+  /// Analogue to shell's `show dbs`. Helper for `listDatabases` mongodb command.
+  Future<List> listDatabases() {
+    return executeDbCommand(DbCommand.createQueryAdminCommand({"listDatabases":1})).then((val) {
+      var res = [];
+      for (var each in val["databases"]) {
+        res.add(each["name"]);
+      }
+      return new Future.value(res);
+    });
+  }  
+  
   Future<bool> authenticate(String userName, String password, {_Connection connection}) {
     return getNonce(connection: connection).then((msg) {
       var nonce = msg["nonce"];

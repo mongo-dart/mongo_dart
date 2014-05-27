@@ -726,22 +726,6 @@ Future testAuthenticationWithUri(){
   });
 }
 
-testMongoDbUri(){
-  var connStr = 'mongodb://dart:test@ds031477.mongolab.com:31477/dart';
-  var db = new Db(connStr);
-  expect(db.serverConfig.userName,'dart');
-  expect(db.databaseName,'dart');
-  expect(db.serverConfig.host,'ds031477.mongolab.com');
-  expect(db.serverConfig.port,31477);
-  expect(db.serverConfig.password,'test');
-  connStr = "mongodb://127.0.0.1/DartTest";
-  db = new Db(connStr);
-  expect(db.serverConfig.userName,isNull);
-  expect(db.serverConfig.host,'127.0.0.1');
-  expect(db.serverConfig.port,27017);
-  expect(db.databaseName,'DartTest');
-  expect(db.serverConfig.password,isNull);
-}
 
 Future testIndexInformation(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
@@ -1004,7 +988,6 @@ main(){
 
   group('DbCollection tests:', (){
     test('testAuthComponents',testAuthComponents);
-    skip_test('testMongoDbUri',testMongoDbUri);
   });
   group('DBCommand:', (){
     test('testAuthentication',testAuthentication);

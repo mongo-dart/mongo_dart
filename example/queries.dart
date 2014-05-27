@@ -57,6 +57,12 @@ main(){
     return coll.count(where.gt("my_field", 995));
   }).then((count){
     print('Count of records with my_field > 995: $count');
+    return db.listDatabases();
+  }).then((databases){
+    print('List of databases: $databases');
+    return db.listCollections();    
+  }).then((collections){
+    print('List of collections: $collections');
     db.close();
   });
 }

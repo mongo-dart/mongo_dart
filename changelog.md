@@ -1,5 +1,12 @@
 #Recent change notes
 
+
+###0.1.39
+
+- Better error handling when a connection with the database is lost. Thanks to [luizmineo](https://github.com/luizmineo) [PR 50](https://github.com/vadimtsushko/mongo_dart/pull/50). 
+- `Future(List<String>) listCollections()` helper added to Db 
+- `Future(List<String>) listDatabases()` helper added to Db 
+
 ###0.1.39
 
 - Better error handling. Bugfix for [issue 49](https://github.com/vadimtsushko/mongo_dart/issues/49)
