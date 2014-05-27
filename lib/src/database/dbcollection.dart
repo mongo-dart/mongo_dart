@@ -26,24 +26,28 @@ class DbCollection {
   }
   
   Future insertAll(List<Map> documents, {WriteConcern writeConcern}) {
-    MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
-    db.executeMessage(insertMessage, writeConcern);
-    return db._getAcknowledgement(writeConcern: writeConcern);
+    return new Future.sync(() {
+      MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
+      db.executeMessage(insertMessage, writeConcern);
+      return db._getAcknowledgement(writeConcern: writeConcern);
+    });
   }
   
   Future update(selector, document, {bool upsert: false, bool multiUpdate: false, WriteConcern writeConcern}) {
-    int flags = 0;
-    if (upsert) {
-      flags |= 0x1;
-    }
-    if (multiUpdate) {
-      flags |= 0x2;
-    }
+    return new Future.sync(() {
+      int flags = 0;
+      if (upsert) {
+        flags |= 0x1;
+      }
+      if (multiUpdate) {
+        flags |= 0x2;
+      }
 
-    MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
-        _selectorBuilder2Map(selector), document, flags);
-    db.executeMessage(message, writeConcern);
-    return db._getAcknowledgement(writeConcern: writeConcern);
+      MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
+          _selectorBuilder2Map(selector), document, flags);
+      db.executeMessage(message, writeConcern);
+      return db._getAcknowledgement(writeConcern: writeConcern);
+    });
   }
 
   /**

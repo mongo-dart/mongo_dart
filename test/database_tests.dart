@@ -956,6 +956,34 @@ Future testFieldLevelUpdateSimple() {
   });
 }
 
+Future testQueryOnClosedConnection() {
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  return db.open().then((c) {
+    return db.close().then((_) {
+      return db.collection("test").find().toList().catchError((e) {
+        expect(e is ConnectionException, isTrue);
+        return "error_received";
+      }).then((msg) {
+        expect(msg, equals("error_received"));
+      });
+    });
+  });
+}
+
+Future testUpdateOnClosedConnection() {
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  return db.open().then((c) {
+    return db.close().then((_) {
+      return db.collection("test").save({"test": "test"}).catchError((e) {
+        expect(e is ConnectionException, isTrue);
+        return "error_received";
+      }).then((msg) {
+        expect(msg, equals("error_received"));
+      });
+    });
+  });
+}
+
 
 main(){
 //  hierarchicalLoggingEnabled = true;
@@ -1038,5 +1066,9 @@ main(){
     test('testFieldLevelUpdateSimple',testFieldLevelUpdateSimple);
   });
 
+  group('Socket error handling:', () {
+    test('testQueryOnClosedConnection', testQueryOnClosedConnection);
+    test("testUpdateOnClosedConnection", testUpdateOnClosedConnection);
+  });
 
 }

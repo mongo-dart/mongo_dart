@@ -109,6 +109,9 @@ class Cursor {
         eachCallback(val);
         _nextEach();
       }
+    }).catchError((e) {
+      eachCallback = null;
+      eachComplete.completeError(e);
     });
   }
   
@@ -133,13 +136,15 @@ class Cursor {
     if (cursorId != 0){
       MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);
       cursorId = 0;
-      db.queryMessage(msg);
+      db.queryMessage(msg).catchError((e) => null);
     }
     return new Future.value(null);
   }
   
   Stream<Map> get stream {
-    forEach(controller.add).then((_) => controller.close());
+    forEach(controller.add)
+      .catchError((e) => controller.addError(e))
+      .then((_) => controller.close());
     return controller.stream; 
   }
 }
