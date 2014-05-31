@@ -38,7 +38,7 @@ Simple usage example on base of [JSON ZIPS dataset] (http://media.mongodb.org/zi
 
 ###See also:
 
-- [API Doc](http://vadimtsushko.github.com/mongo_dart/)
+- [API Doc](http://www.dartdocs.org/documentation/mongo_dart/0.1.39)
 
 - [Feature check list](https://github.com/vadimtsushko/mongo_dart/blob/master/doc/feature_checklist.md)
 
