@@ -1,7 +1,11 @@
 #Recent change notes
 
+###0.1.41
 
-###0.1.39
+- Bugfix for [Issue 51] (https://github.com/vadimtsushko/mongo_dart/issues/51) Can't reopen a closed database
+- API docs redirected to dartdocs.org [Issue 48] (https://github.com/vadimtsushko/mongo_dart/issues/48)
+
+###0.1.40
 
 - Better error handling when a connection with the database is lost. Thanks to [luizmineo](https://github.com/luizmineo) [PR 50](https://github.com/vadimtsushko/mongo_dart/pull/50). 
 - `Future(List<String>) listCollections()` helper added to Db 

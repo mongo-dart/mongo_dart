@@ -103,6 +103,7 @@ class Db {
   final _log = new Logger('Db');
   String databaseName;
   String _debugInfo;
+  ServerConfig serverConfig;
   _ConnectionManager _connectionManager;
   get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
@@ -123,8 +124,7 @@ class Db {
   *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
   */
   Db(String uriString, [this._debugInfo]) {
-    _connectionManager = new _ConnectionManager(this);
-    _connectionManager.addConnection(_parseUri(uriString));
+    serverConfig = _parseUri(uriString);
   }
   
   Db.pool(List<String> uriList, [this._debugInfo]) {
@@ -181,6 +181,8 @@ class Db {
   }
   
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
+    _connectionManager = new _ConnectionManager(this);
+    _connectionManager.addConnection(serverConfig);
     _writeConcern = writeConcern;
     return _connectionManager.open(writeConcern);
   }

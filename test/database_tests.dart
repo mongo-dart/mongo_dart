@@ -968,7 +968,23 @@ Future testUpdateOnClosedConnection() {
   });
 }
 
-
+Future testReopeningDb() {
+  var db = new Db('mongodb://127.0.0.1/testdb');
+  return db.open().then((_) {
+    var coll = db.collection('test');
+    return coll.insert({'one':'test'});
+  }).then((_) {
+    return db.close();
+  }).then((_) {
+    return db.open();
+  }).then((_) {
+    var coll = db.collection('test');
+    return coll.findOne();
+  }).then((res) {
+    expect(res,isNotNull);
+    return db.close();
+  });
+}
 main(){
 //  hierarchicalLoggingEnabled = true;
 //  Logger.root.level = Level.OFF;
@@ -1052,6 +1068,7 @@ main(){
   group('Socket error handling:', () {
     test('testQueryOnClosedConnection', testQueryOnClosedConnection);
     test("testUpdateOnClosedConnection", testUpdateOnClosedConnection);
+    test('testReopeningDb',testReopeningDb);
   });
 
 }
