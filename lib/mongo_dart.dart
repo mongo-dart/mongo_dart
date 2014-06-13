@@ -32,6 +32,7 @@ part 'src/database/server_config.dart';
 part 'src/database/dbcommand.dart';
 part 'src/database/db.dart';
 part 'src/database/error.dart';
+part 'src/database/state.dart';
 part 'src/database/dbcollection.dart';
 part 'src/database/cursor.dart';
 part 'src/gridfs/gridfs.dart';

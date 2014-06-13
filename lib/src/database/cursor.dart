@@ -3,12 +3,10 @@ part of mongo_dart;
 typedef void MonadicBlock(Map value);
 
 class Cursor {
-  static const INIT = 0;
-  static const OPEN = 1;
-  static const CLOSED = 2;
+
   
   final _log= new Logger('Cursor');
-  int state = INIT;
+  State state = State.INIT;
   int cursorId = 0;
   Db db;
   Queue items;
@@ -65,10 +63,10 @@ class Cursor {
   }
   
   Future<Map> nextObject() {
-    if (state == INIT) {
+    if (state == State.INIT) {
       MongoQueryMessage qm = generateQueryMessage();
       return db.queryMessage(qm).then((replyMessage) {
-        state = OPEN;
+        state = State.OPEN;
         cursorId = replyMessage.cursorId;
         items.addAll(replyMessage.documents);
         if (items.length > 0) {
@@ -77,25 +75,25 @@ class Cursor {
           return new Future.value(null);
         }
       });
-    } else if (state == OPEN && limit > 0 && _returnedCount == limit){
+    } else if (state == State.OPEN && limit > 0 && _returnedCount == limit){
       return this.close();
-    } else if (state == OPEN && items.length > 0){
+    } else if (state == State.OPEN && items.length > 0){
       return new Future.value(_getNextItem());
-    } else if (state == OPEN && cursorId > 0){
+    } else if (state == State.OPEN && cursorId > 0){
       var qm = generateGetMoreMessage();
       return db.queryMessage(qm).then((replyMessage){
-        state = OPEN;
+        state = State.OPEN;
         cursorId = replyMessage.cursorId;
         items.addAll(replyMessage.documents);
         if (items.length > 0){
           return new Future.value(_getNextItem());
         } else {
-          state = CLOSED;
+          state = State.CLOSED;
           return new Future.value(null);
         }
       });
     } else {
-      state = CLOSED;
+      state = State.CLOSED;
       return new Future.value(null);
     }
   }
@@ -132,7 +130,7 @@ class Cursor {
   
   Future close() {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
-    state = CLOSED;
+    state = State.CLOSED;
     if (cursorId != 0){
       MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);
       cursorId = 0;

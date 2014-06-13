@@ -471,7 +471,7 @@ Future testLimitWithSortByAndSkip(){
     return cursor.forEach((e)=>counter++);
   }).then((v){
     expect(counter,10);
-    expect(cursor.state,Cursor.CLOSED);
+    expect(cursor.state,State.CLOSED);
     expect(cursor.cursorId,0);
     return db.close();
   });
@@ -491,7 +491,7 @@ Future testLimit(){
     return cursor.forEach((e)=>counter++);
   }).then((v){
     expect(counter,10);
-    expect(cursor.state,Cursor.CLOSED);
+    expect(cursor.state,State.CLOSED);
     expect(cursor.cursorId,0);
     return db.close();
   });
@@ -569,7 +569,7 @@ Future testCursorWithOpenServerCursor(){
     cursor = new Cursor(db,collection,where.limit(10));
     return cursor.nextObject();
   }).then((v){
-    expect(cursor.state, Cursor.OPEN);
+    expect(cursor.state, State.OPEN);
     expect(cursor.cursorId, isPositive);
     return db.close();
   });
@@ -603,7 +603,7 @@ Future testCursorGetMore(){
   }).then((v){
     expect(count,1000);
     expect(cursor.cursorId,0);
-    expect(cursor.state,Cursor.CLOSED);
+    expect(cursor.state,State.CLOSED);
     collection.remove();
     return db.close();
   });
@@ -621,13 +621,13 @@ Future testCursorClosing(){
       }
     int count = 0;
     cursor = collection.find();
-    expect(cursor.state,Cursor.INIT);
+    expect(cursor.state,State.INIT);
     return cursor.nextObject();
   }).then((v){
-    expect(cursor.state,Cursor.OPEN);
+    expect(cursor.state,State.OPEN);
     expect(cursor.cursorId,isPositive);
     cursor.close();
-    expect(cursor.state,Cursor.CLOSED);
+    expect(cursor.state,State.CLOSED);
     expect(cursor.cursorId,0);
     collection.findOne().then((v1){
       expect(v,isNotNull);
@@ -636,10 +636,13 @@ Future testCursorClosing(){
   });
 }
 
-testDbCommandCreation(){
+Future testDbCommandCreation(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  DbCommand dbCommand = new DbCommand(db,"student",0,0,1,{},{});
-  expect('mongo_dart-test.student',dbCommand.collectionNameBson.value);
+  return db.open().then((d){
+    DbCommand dbCommand = new DbCommand(db,"student",0,0,1,{},{});
+    expect('mongo_dart-test.student',dbCommand.collectionNameBson.value);
+    db.close();
+  });
 }
 Future testPingDbCommand(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
@@ -985,6 +988,19 @@ Future testReopeningDb() {
     return db.close();
   });
 }
+
+Future testDbNotOpen(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  DbCollection coll = db.collection('test');
+  return coll.findOne().catchError((e) {
+      expect(e is ConnectionException, isTrue);
+      return "error_received";
+  }).then((msg) {
+      expect(msg, equals("error_received"));
+  });
+}
+
+
 main(){
 //  hierarchicalLoggingEnabled = true;
 //  Logger.root.level = Level.OFF;
@@ -1065,10 +1081,11 @@ main(){
     test('testFieldLevelUpdateSimple',testFieldLevelUpdateSimple);
   });
 
-  group('Socket error handling:', () {
+  group('Error handling:', () {
     test('testQueryOnClosedConnection', testQueryOnClosedConnection);
     test("testUpdateOnClosedConnection", testUpdateOnClosedConnection);
     test('testReopeningDb',testReopeningDb);
+    test('testDbNotOpen',testDbNotOpen);
   });
 
 }

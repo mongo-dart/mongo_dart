@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.42
+
+- Additional checks and descriptive error message against querying closed db
+
 ###0.1.41
 
 - Bugfix for [Issue 51] (https://github.com/vadimtsushko/mongo_dart/issues/51) Can't reopen a closed database

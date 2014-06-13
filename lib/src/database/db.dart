@@ -100,10 +100,13 @@ class WriteConcern {
 }
 
 class Db {
+
+  State state = State.INIT;
   final _log = new Logger('Db');
   String databaseName;
   String _debugInfo;
-  ServerConfig serverConfig;
+  //ServerConfig serverConfig;
+  final List<String> _uriList = new List<String>();
   _ConnectionManager _connectionManager;
   get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
@@ -124,14 +127,12 @@ class Db {
   *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
   */
   Db(String uriString, [this._debugInfo]) {
-    serverConfig = _parseUri(uriString);
+    _uriList.add(uriString);
+//    serverConfig = _parseUri(uriString);
   }
   
   Db.pool(List<String> uriList, [this._debugInfo]) {
-    _connectionManager = new _ConnectionManager(this);
-    uriList.forEach((uri) {
-      _connectionManager.addConnection(_parseUri(uri));
-    });
+    _uriList.addAll(uriList);
   }
 
   ServerConfig _parseUri(String uriString) {
@@ -148,7 +149,7 @@ class Db {
     if (uri.userInfo != '') {
       var userInfo = uri.userInfo.split(':');
       if (userInfo.length != 2) {
-        throw new MongoDartError('Неверный формат поля userInfo: $uri.userInfo');
+        throw new MongoDartError('Invalid format of userInfo field: $uri.userInfo');
       }
       serverConfig.userName = userInfo[0];
       serverConfig.password = userInfo[1];
@@ -164,6 +165,9 @@ class Db {
   }
   
   Future queryMessage(MongoMessage queryMessage, {_Connection connection}) {
+    if (state != State.OPEN) {
+      return new Future.error(new ConnectionException('Bad state: DB is not open'));
+    }
     if (connection == null) {
       connection = _masterConnection;
     }
@@ -171,6 +175,9 @@ class Db {
   }
   
   executeMessage(MongoMessage message, WriteConcern writeConcern, {_Connection connection}) {
+    if (state != State.OPEN) {
+      throw new ConnectionException('Bad state: DB is not open');
+    }
     if (connection == null) {
       connection = _masterConnection;
     }
@@ -182,8 +189,11 @@ class Db {
   
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
     _connectionManager = new _ConnectionManager(this);
-    _connectionManager.addConnection(serverConfig);
+    _uriList.forEach((uri) {
+      _connectionManager.addConnection(_parseUri(uri));
+    });
     _writeConcern = writeConcern;
+    state = State.OPEN;
     return _connectionManager.open(writeConcern);
   }
   
@@ -226,8 +236,10 @@ class Db {
   }
 
   Future removeFromCollection(String collectionName, [Map selector = const {}, WriteConcern writeConcern]) {
-    executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector),writeConcern);
-    return _getAcknowledgement(writeConcern: writeConcern);
+    return new Future.sync(() {
+      executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector),writeConcern);
+      return _getAcknowledgement(writeConcern: writeConcern);
+    });
   }
 
   Future<Map> getLastError([WriteConcern writeConcern]) {
@@ -251,7 +263,10 @@ class Db {
   
   Future close() {
     _log.fine('$this closed');
-    return _connectionManager.close();
+    state = State.CLOSED;
+    var _cm = _connectionManager;
+    _connectionManager = null;
+    return _cm.close();
   }
 
   Cursor collectionsInfoCursor([String collectionName]) {
@@ -305,35 +320,35 @@ class Db {
   
   Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
     var selector = {};
-    selector['ns'] = '$databaseName.$collectionName';
-    keys = _setKeys(key, keys);
-    selector['key'] = keys;
-    for (final order in keys.values) {
-      if (order != 1 && order != -1) {
-        throw new ArgumentError('Keys may contain only 1 or -1');
+      selector['ns'] = '$databaseName.$collectionName';
+      keys = _setKeys(key, keys);
+      selector['key'] = keys;
+      for (final order in keys.values) {
+        if (order != 1 && order != -1) {
+          throw new ArgumentError('Keys may contain only 1 or -1');
+        }
       }
-    }
-    if (unique == true) {
-      selector['unique'] = true;
-    } else {
-      selector['unique'] = false;
-    }
-    if (sparse == true) {
-      selector['sparse'] = true;
-    }
-    if (background == true) {
-      selector['background'] = true;
-    }
-    if (dropDups == true) {
-      selector['dropDups'] = true;
-    }
-    if (name ==  null) {
-      name = _createIndexName(keys);
-    }
-    selector['name'] = name;
-    MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);
-    executeMessage(insertMessage, _writeConcern);
-    return getLastError();
+      if (unique == true) {
+        selector['unique'] = true;
+      } else {
+        selector['unique'] = false;
+      }
+      if (sparse == true) {
+        selector['sparse'] = true;
+      }
+      if (background == true) {
+        selector['background'] = true;
+      }
+      if (dropDups == true) {
+        selector['dropDups'] = true;
+      }
+      if (name ==  null) {
+        name = _createIndexName(keys);
+      }
+      selector['name'] = name;
+      MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);
+      executeMessage(insertMessage, _writeConcern);
+      return getLastError();
   }
 
   Map _setKeys(String key, Map keys) {
