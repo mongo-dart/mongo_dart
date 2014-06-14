@@ -757,8 +757,8 @@ Future testIndexCreation(){
     for (int n=0;n < 6; n++){
       collection.insert({'a':n, 'embedded': {'b': n, 'c': n * 10}});
     }
-    expect(() => db.createIndex('testcol'),throws, reason: 'Invalid number of arguments');
-    expect(() => db.createIndex('testcol',key: 'a', keys:{'a':-1}),throws, reason: 'Invalid number of arguments');
+//    expect(() => db.createIndex('testcol'),throws, reason: 'Invalid number of arguments');
+//    expect(() => db.createIndex('testcol',key: 'a', keys:{'a':-1}),throws, reason: 'Invalid number of arguments');
     return db.createIndex('testcol',key:'a');
   }).then((res){
     expect(res['ok'],1.0);
@@ -948,7 +948,7 @@ Future testQueryOnClosedConnection() {
   return db.open().then((c) {
     return db.close().then((_) {
       return db.collection("test").find().toList().catchError((e) {
-        expect(e is ConnectionException, isTrue);
+        expect(e is MongoDartError, isTrue);
         return "error_received";
       }).then((msg) {
         expect(msg, equals("error_received"));
@@ -962,7 +962,8 @@ Future testUpdateOnClosedConnection() {
   return db.open().then((c) {
     return db.close().then((_) {
       return db.collection("test").save({"test": "test"}).catchError((e) {
-        expect(e is ConnectionException, isTrue);
+        expect(e is MongoDartError, isTrue);
+        print(e);
         return "error_received";
       }).then((msg) {
         expect(msg, equals("error_received"));
@@ -993,12 +994,77 @@ Future testDbNotOpen(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection coll = db.collection('test');
   return coll.findOne().catchError((e) {
-      expect(e is ConnectionException, isTrue);
+      expect(e is MongoDartError, isTrue);
       return "error_received";
   }).then((msg) {
       expect(msg, equals("error_received"));
   });
 }
+
+Future testDbOpenWhileStateIsOpening(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  return new Future.sync((){
+    db.open().then((_) {
+        return db.collection('Dubmmy').findOne();
+    }).then((res) {
+        expect(res,isNull);
+        db.close();
+    });
+    db.open().then((_) {
+        return db.collection('Dubmmy').findOne();
+    }).then((res) {
+      expect(res,isNull);;
+    }).catchError((e) {
+        expect(e is MongoDartError, isTrue);
+        expect(db.state == State.OPENING,isTrue);
+    });
+  });
+}
+
+Future testInvalidIndexCreationErrorHandling(){
+  Db db = new Db('${DefaultUri}index_creation');
+  return new Future.sync((){
+    db.open().then((_) {
+        return db.createIndex('testcol',key:'a');
+    }).catchError((e) {
+      expect(e is ArgumentError, isTrue);
+    }).whenComplete((){
+      db.close();
+    });
+  });
+}
+
+Future testInvalidIndexCreationErrorHandling1(){
+  Db db = new Db('${DefaultUri}index_creation');
+  return new Future.sync((){
+    db.open().then((_) {
+        return db.createIndex('testcol',key: 'a', keys:{'a':-1});
+    }).catchError((e) {
+      expect(e is ArgumentError, isTrue);
+    }).whenComplete((){
+      db.close();
+    });
+  });
+}
+
+Future testFindOneWhileStateIsOpening(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  return new Future.sync((){
+    db.open().then((_) {
+        return db.collection('Dubmmy').findOne();
+    }).then((res) {
+      expect(res,isNull);
+      db.close();
+    });
+    db.collection('Dubmmy').findOne().then((res) {
+      expect(res,isNull);
+    }).catchError((e) {
+      expect(e is MongoDartError, isTrue);
+      expect(db.state == State.OPENING,isTrue);
+    });
+  });
+} 
+  
 
 
 main(){
@@ -1086,6 +1152,11 @@ main(){
     test("testUpdateOnClosedConnection", testUpdateOnClosedConnection);
     test('testReopeningDb',testReopeningDb);
     test('testDbNotOpen',testDbNotOpen);
+    test('testDbOpenWhileStateIsOpening',testDbOpenWhileStateIsOpening);
+    test('testFindOneWhileStateIsOpening',testFindOneWhileStateIsOpening);
+    test('testInvalidIndexCreationErrorHandling',testInvalidIndexCreationErrorHandling);  
+    test('testInvalidIndexCreationErrorHandling1',testInvalidIndexCreationErrorHandling1);  
+
   });
 
 }

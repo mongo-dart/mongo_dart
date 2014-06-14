@@ -39,6 +39,9 @@ class _ConnectionManager {
     return Future.forEach(_connectionPool.keys, (hostUrl) {
       var connection = _connectionPool[hostUrl];
       return _connect(connection);
+    }).then((_) {
+      db.state = State.OPEN;
+      return new Future.value(true);
     });
   }
 

@@ -165,18 +165,20 @@ class Db {
   }
   
   Future queryMessage(MongoMessage queryMessage, {_Connection connection}) {
-    if (state != State.OPEN) {
-      return new Future.error(new ConnectionException('Bad state: DB is not open'));
-    }
-    if (connection == null) {
-      connection = _masterConnection;
-    }
-    return connection.query(queryMessage);
+    return new Future.sync(() {
+      if (state != State.OPEN) {
+        throw new MongoDartError('Db is in the wrong state: $state');
+      }
+      if (connection == null) {
+        connection = _masterConnection;
+      }
+      return connection.query(queryMessage);
+    });
   }
   
   executeMessage(MongoMessage message, WriteConcern writeConcern, {_Connection connection}) {
     if (state != State.OPEN) {
-      throw new ConnectionException('Bad state: DB is not open');
+      throw new MongoDartError('DB is not open. $state');
     }
     if (connection == null) {
       connection = _masterConnection;
@@ -188,13 +190,18 @@ class Db {
   }
   
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
-    _connectionManager = new _ConnectionManager(this);
-    _uriList.forEach((uri) {
-      _connectionManager.addConnection(_parseUri(uri));
+    return new Future.sync(() {
+      if (state == State.OPENING) {
+        throw new MongoDartError('Attempt to open db in state $state');
+      }
+      state = State.OPENING;
+      _connectionManager = new _ConnectionManager(this);
+      _uriList.forEach((uri) {
+        _connectionManager.addConnection(_parseUri(uri));
+      });
+      _writeConcern = writeConcern;
+      return _connectionManager.open(writeConcern);
     });
-    _writeConcern = writeConcern;
-    state = State.OPEN;
-    return _connectionManager.open(writeConcern);
   }
   
   Future executeDbCommand(MongoMessage message, {_Connection connection}) {
@@ -319,7 +326,8 @@ class Db {
   }
   
   Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
-    var selector = {};
+    return new Future.sync((){
+      var selector = {};
       selector['ns'] = '$databaseName.$collectionName';
       keys = _setKeys(key, keys);
       selector['key'] = keys;
@@ -349,6 +357,7 @@ class Db {
       MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);
       executeMessage(insertMessage, _writeConcern);
       return getLastError();
+    });
   }
 
   Map _setKeys(String key, Map keys) {
@@ -366,15 +375,17 @@ class Db {
   }
   
   Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
-    keys = _setKeys(key, keys);
-    return indexInformation(collectionName).then((indexInfos) {
-      if (name == null) {
-        name = _createIndexName(keys);
-      }
-      if (indexInfos.any((info) => info['name'] == name)) {
-        return new Future.value({'ok': 1.0, 'result': 'index preexists'});
-      }
-      return createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name);
+    return new Future.sync((){
+      keys = _setKeys(key, keys);
+      return indexInformation(collectionName).then((indexInfos) {
+        if (name == null) {
+          name = _createIndexName(keys);
+        }
+        if (indexInfos.any((info) => info['name'] == name)) {
+          return new Future.value({'ok': 1.0, 'result': 'index preexists'});
+        }
+        return createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name);
+      });
     });
   }
 

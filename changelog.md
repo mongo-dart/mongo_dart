@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.43
+
+- Additional checks and descriptive error message against opening db in opening state, additional tests
+
 ###0.1.42
 
 - Additional checks and descriptive error message against querying closed db
