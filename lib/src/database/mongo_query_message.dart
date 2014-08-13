@@ -8,6 +8,7 @@ class MongoQueryMessage extends MongoMessage {
   static final OPTS_NO_CURSOR_TIMEOUT = 16;
   static final OPTS_AWAIT_DATA = 32;
   static final OPTS_EXHAUST = 64;
+  static final OPTS_PARTIAL = 128;
 
   BsonCString _collectionFullName;
   int flags;
@@ -16,7 +17,7 @@ class MongoQueryMessage extends MongoMessage {
   BsonMap _query;
   BsonMap _fields;
   BsonCString get collectionNameBson => _collectionFullName;
-  
+
   MongoQueryMessage(String collectionFullName,
                     this.flags,
                     this.numberToSkip,
@@ -30,7 +31,7 @@ class MongoQueryMessage extends MongoMessage {
     }
     opcode = MongoMessage.Query;
   }
-  
+
   int get messageLength {
     int result = 16+4+_collectionFullName.byteLength()+4+4+_query.byteLength();
     if (_fields != null){
@@ -38,7 +39,7 @@ class MongoQueryMessage extends MongoMessage {
     }
     return result;
   }
-  
+
   BsonBinary serialize() {
     BsonBinary buffer = new BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
@@ -53,7 +54,7 @@ class MongoQueryMessage extends MongoMessage {
     buffer.offset = 0;
     return buffer;
   }
-  
+
   String toString() {
     return "MongoQueryMessage($requestId, ${_collectionFullName.value},numberToReturn:$numberToReturn, ${_query.value})";
   }
