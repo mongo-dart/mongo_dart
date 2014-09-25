@@ -105,14 +105,17 @@ class Cursor {
     _returnedCount++;
     return items.removeFirst();
   }
+  void getCursorData(MongoReplyMessage replyMessage) {
+    cursorId = replyMessage.cursorId;
+    items.addAll(replyMessage.documents);
+  }
 
   Future<Map> nextObject() {
     if (state == State.INIT) {
       MongoQueryMessage qm = generateQueryMessage();
       return db.queryMessage(qm).then((replyMessage) {
         state = State.OPEN;
-        cursorId = replyMessage.cursorId;
-        items.addAll(replyMessage.documents);
+        getCursorData(replyMessage);
         if (items.length > 0) {
           return new Future.value(_getNextItem());
         } else{
@@ -127,8 +130,7 @@ class Cursor {
       var qm = generateGetMoreMessage();
       return db.queryMessage(qm).then((replyMessage){
         state = State.OPEN;
-        cursorId = replyMessage.cursorId;
-        items.addAll(replyMessage.documents);
+        getCursorData(replyMessage);
         var isDead = (replyMessage.responseFlags == MongoReplyMessage.FLAGS_CURSOR_NOT_FOUND) && (cursorId == 0);
         if (items.length > 0){
           return new Future.value(_getNextItem());
@@ -197,5 +199,29 @@ class Cursor {
       .catchError((e) => controller.addError(e))
       .then((_) => controller.close());
     return controller.stream;
+  }
+}
+
+class AggregateCursor extends Cursor {
+  List pipeline;
+  Map cursorOptions;
+  bool firstBatch = true;
+  AggregateCursor(db, collection, this.pipeline, this.cursorOptions): super(db, collection, {});
+  MongoQueryMessage generateQueryMessage() {
+    return new DbCommand(db, DbCommand.SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1,
+        {'aggregate': collection.collectionName, 'pipeline': pipeline, 'cursor': cursorOptions }, null);
+  }
+
+  void getCursorData(MongoReplyMessage replyMessage) {
+    if (firstBatch) {
+      firstBatch = false;
+      var cursorMap = replyMessage.documents.first['cursor']; 
+      if (cursorMap != null) {
+        cursorId = cursorMap['id'];
+        items.addAll(cursorMap['firstBatch']);
+      }      
+    } else {
+      super.getCursorData(replyMessage);
+    }
   }
 }

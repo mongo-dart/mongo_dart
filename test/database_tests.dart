@@ -362,6 +362,80 @@ db.runCommand(
   });
 }
 
+Future testAggregateToStream() {
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  List<Map> result = [];
+  return db.open().then((c){
+    DbCollection coll = db.collection('testAggregate');
+    coll.remove();
+
+    // Avg 1 with 1 rating
+    coll.insert({"game":"At the Gates of Loyang", "player": "Dallas", "rating": 1, "v": 1});
+
+    // Avg 3 with 1 rating
+    coll.insert({"game":"Age of Steam", "player": "Paul", "rating": 3, "v": 1});
+
+    // Avg 2 with 2 ratings
+    coll.insert({"game":"Fresco", "player": "Erin", "rating": 3, "v": 1});
+    coll.insert({"game":"Fresco", "player": "Dallas", "rating": 1, "v": 1});
+
+    // Avg 3.5 with 4 ratings
+    coll.insert({"game":"Ticket To Ride", "player": "Paul", "rating": 4, "v": 1});
+    coll.insert({"game":"Ticket To Ride", "player": "Erin", "rating": 5, "v": 1});
+    coll.insert({"game":"Ticket To Ride", "player": "Dallas", "rating": 4, "v": 1});
+    coll.insert({"game":"Ticket To Ride", "player": "Anthony", "rating": 2, "v": 1});
+
+    // Avg 4.5 with 4 ratings (counting only highest v)
+    coll.insert({"game":"Dominion", "player": "Paul", "rating": 5, "v": 2});
+    coll.insert({"game":"Dominion", "player": "Erin", "rating": 4, "v": 1});
+    coll.insert({"game":"Dominion", "player": "Dallas", "rating": 4, "v": 1});
+    coll.insert({"game":"Dominion", "player": "Anthony", "rating": 5, "v": 1});
+
+    // Avg 5 with 2 ratings
+    coll.insert({"game":"Pandemic", "player": "Erin", "rating": 5, "v": 1});
+    coll.insert({"game":"Pandemic", "player": "Dallas", "rating": 5, "v": 1});
+
+    // Avg player ratings
+    // Dallas = 3, Anthony 3.5, Paul = 4, Erin = 4.25
+/* We want equivalent of this when used on the mongo shell.
+ * (Should be able to just copy and paste below once test is run and failed once)
+db.runCommand(
+{ aggregate : "testAggregate", pipeline : [
+{"$group": {
+      "_id": { "game": "$game", "player": "$player" },
+      "rating": { "$sum": "$rating" } } },
+{"$group": {
+        "_id": "$_id.game",
+        "avgRating": { "$avg": "$rating" } } },
+{ "$sort": { "_id": 1 } }
+]});
+ */
+    List pipeline = new List();
+    var p1 = {"\$group": {
+      "_id": { "game": "\$game", "player": "\$player" },
+      "rating": { "\$sum": "\$rating" } } };
+    var p2 = {"\$group": {
+        "_id": "\$_id.game",
+        "avgRating": { "\$avg": "\$rating" } } };
+    var p3 = { "\$sort": { "_id": 1 } };
+
+    pipeline.add(p1);
+    pipeline.add(p2);
+    pipeline.add(p3);
+
+    expect(p1["\u0024group"], isNotNull);
+    expect(p1["\$group"], isNotNull);
+    // set batchSize parameter to split responce to 2 chunks 
+    return coll.aggregateToStream(pipeline, cursorOptions: {'batchSize': 1}).toList();
+  })
+  .then((v){
+    expect(v[0]["_id"], "Age of Steam");
+    expect(v[0]["avgRating"], 3);
+    return db.close();
+  });
+}
+
+
 Future testSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testSkip');
   return db.open().then((c){
@@ -1105,7 +1179,6 @@ main(){
     test('testCompoundQuery',testCompoundQuery);
     test('testCount',testCount);
     test('testDistinct',testDistinct);
-    test('testAggregate',testAggregate);
     test('testFindEach',testFindEach);
     test('testEach',testEachOnEmptyCollection);
     test('testDrop',testDrop);
@@ -1146,7 +1219,10 @@ main(){
   group('Field level update tests:', () {
     test('testFieldLevelUpdateSimple',testFieldLevelUpdateSimple);
   });
-
+  group('Aggregate:', () {
+    test('testAggregate',testAggregate);
+    test('testAggregateToStream',testAggregateToStream);
+  });
   group('Error handling:', () {
     test('testQueryOnClosedConnection', testQueryOnClosedConnection);
     test("testUpdateOnClosedConnection", testUpdateOnClosedConnection);

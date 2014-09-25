@@ -87,7 +87,9 @@ class DbCollection {
     var cmd = DbCommand.createAggregateCommand(db,collectionName,pipeline);
     return db.executeDbCommand(cmd);
   }
-  
+  Stream<Map> aggregateToStream(List pipeline, {Map cursorOptions: const {}}) {
+    return new AggregateCursor(db, this, pipeline, cursorOptions).stream;
+  }
   Future insert(Map document, {WriteConcern writeConcern}) => insertAll([document], writeConcern: writeConcern);
 
   Map _selectorBuilder2Map(selector) {

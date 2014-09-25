@@ -1,5 +1,12 @@
 #Recent change notes
 
+
+
+###0.1.44
+
+- Tailable cursor support added by sestegra
+
+
 ###0.1.43
 
 - Additional checks and descriptive error message against opening db in opening state, additional tests
