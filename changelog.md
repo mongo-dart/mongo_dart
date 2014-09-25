@@ -4,8 +4,8 @@
 
 ###0.1.44
 
-- Tailable cursor support added by sestegra
-
+- Tailable cursor support added by sestegra. See tailable_cursor.dart in example directory.
+- Preliminary support for streaming in Aggregate framerork. Added method aggregateToStream
 
 ###0.1.43
 
