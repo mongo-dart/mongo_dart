@@ -387,6 +387,7 @@ Future testAggregateToStream() {
     var versionNum = versionArray[0] * 100 + versionArray[1]; 
     if (versionNum < 206) { // Skip test for MongoDb server older then version 2.6 
       skipTest = true;
+      print('testAggregateToStream skipped as server is older then version 2.6: ${v["version"]}');
     }
     DbCollection coll = db.collection('testAggregate');
     coll.remove();
@@ -1248,7 +1249,7 @@ main(){
   });
   group('Aggregate:', () {
     test('testAggregate',testAggregate);
-    solo_test('testAggregateToStream - if server older then version 2.6 test would be skipped',testAggregateToStream);
+    test('testAggregateToStream - if server older then version 2.6 test would be skipped',testAggregateToStream);
   });
   group('Error handling:', () {
     test('testQueryOnClosedConnection', testQueryOnClosedConnection);
