@@ -259,7 +259,11 @@ class Db {
   Future<Map> getNonce({_Connection connection}) {
     return executeDbCommand(DbCommand.createGetNonceCommand(this), connection: connection);
   }
-  
+
+  Future<Map> getBuildInfo({_Connection connection}) {
+    return executeDbCommand(DbCommand.createBuildInfoCommand(this), connection: connection);
+  }
+
   Future<Map> isMaster({_Connection connection}) {
     return executeDbCommand(DbCommand.createIsMasterCommand(this), connection: connection);
   }

@@ -57,6 +57,20 @@ Future testGetNonce(){
       return db.close();
   });
 }
+Future getBuildInfo(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  return db.open().then((c){
+    return db.getBuildInfo();
+  }).then((v){
+//      print(v);
+//      var versionArray = v['versionArray'];
+//      var versionNum = versionArray[0] * 100 + versionArray[1]; 
+//      print(versionNum);
+      expect(v["ok"],1);
+      return db.close();
+  });
+}
+
 Future testPwd(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection coll;
@@ -366,6 +380,13 @@ Future testAggregateToStream() {
   Db db = new Db('${DefaultUri}mongo_dart-test');
   List<Map> result = [];
   return db.open().then((c){
+    return db.getBuildInfo();
+  }).then((v){
+    var versionArray = v['versionArray'];
+    var versionNum = versionArray[0] * 100 + versionArray[1]; 
+    if (versionNum < 206) { // Skip test for MongoDb server older then version 2.6 
+      return db.close();
+    }
     DbCollection coll = db.collection('testAggregate');
     coll.remove();
 
@@ -429,6 +450,7 @@ db.runCommand(
     return coll.aggregateToStream(pipeline, cursorOptions: {'batchSize': 1}).toList();
   })
   .then((v){
+    expect(v.isNotEmpty, isTrue);
     expect(v[0]["_id"], "Age of Steam");
     expect(v[0]["avgRating"], 3);
     return db.close();
@@ -1168,6 +1190,8 @@ main(){
     test('testCollectionInfoCursor',testCollectionInfoCursor);
     test('testRemove',testRemove);
     test('testGetNonce',testGetNonce);
+    test('getBuildInfo',getBuildInfo);
+
     test('testPwd',testPwd);
     test('testIsMaster',testIsMaster);
   });
@@ -1221,7 +1245,7 @@ main(){
   });
   group('Aggregate:', () {
     test('testAggregate',testAggregate);
-    test('testAggregateToStream',testAggregateToStream);
+    test('testAggregateToStream - if server older then version 2.6 test would be skipped',testAggregateToStream);
   });
   group('Error handling:', () {
     test('testQueryOnClosedConnection', testQueryOnClosedConnection);

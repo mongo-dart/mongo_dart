@@ -43,6 +43,10 @@ class DbCommand extends MongoQueryMessage {
     return createQueryDbCommand(db, {'getnonce':1});
   }
 
+  static DbCommand createBuildInfoCommand(Db db) {
+    return createQueryDbCommand(db, {'buildInfo':1});
+  }
+  
   static DbCommand createGetLastErrorCommand(Db db, WriteConcern concern) {
     return createQueryDbCommand(db, concern.command);
   }
