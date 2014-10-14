@@ -133,6 +133,40 @@ Future testFindEachWithThenClause(){
     return db.close();
   });
 }
+
+Future testDateTime(){
+  Db db = new Db('${DefaultUri}mongo_dart-test');
+  int count = 0;
+  int sum = 0;
+  DbCollection testDates;
+  return db.open().then((c){
+    testDates = db.collection('testDates');
+    return testDates.drop();
+  }).then((c){
+    return testDates.insertAll(
+      [
+      {"day":1,"posted_on": new DateTime.utc(2013,1,1)},
+      {"day":2,"posted_on": new DateTime.utc(2013,1,2)},
+      {"day":3,"posted_on": new DateTime.utc(2013,1,3)},
+      {"day":4,"posted_on": new DateTime.utc(2013,1,4)},
+      {"day":5,"posted_on": new DateTime.utc(2013,1,5)},
+      {"day":6,"posted_on": new DateTime.utc(2013,1,6)},
+      {"day":7,"posted_on": new DateTime.utc(2013,1,7)},
+      {"day":8,"posted_on": new DateTime.utc(2013,1,8)},
+      {"day":9,"posted_on": new DateTime.utc(2013,1,9)}
+      ]
+    );
+   }).then((_){
+    return testDates.find(where.lt('posted_on', new DateTime.utc(2013,1,5))).toList();
+   }).then((v){
+    expect(v is List,isTrue);
+    expect(v.length,4);
+    return db.close();
+  });
+}
+
+
+
 Future testFindEach(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   int count = 0;
@@ -379,7 +413,7 @@ db.runCommand(
 Future testAggregateToStream() {
   Db db = new Db('${DefaultUri}mongo_dart-test');
   List<Map> result = [];
-  bool skipTest;
+  bool skipTest = false;
   return db.open().then((c){
     return db.getBuildInfo();
   }).then((v){
@@ -1214,6 +1248,7 @@ main(){
     test('testSaveWithObjectId',testSaveWithObjectId);
     test('testInsertWithObjectId',testSaveWithObjectId);
     test('testSkip',testSkip);
+    test('testDateTime',testDateTime);
     test('testUpdateWithUpsert', testUpdateWithUpsert);
     test('testUpdateWithMultiUpdate', testUpdateWithMultiUpdate);
     test('testFindWithFieldsClause',testFindWithFieldsClause);
