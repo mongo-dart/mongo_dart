@@ -335,11 +335,7 @@ class Db {
       selector['ns'] = '$databaseName.$collectionName';
       keys = _setKeys(key, keys);
       selector['key'] = keys;
-      for (final order in keys.values) {
-        if (order != 1 && order != -1) {
-          throw new ArgumentError('Keys may contain only 1 or -1');
-        }
-      }
+
       if (unique == true) {
         selector['unique'] = true;
       } else {
