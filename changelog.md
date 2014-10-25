@@ -1,6 +1,8 @@
 #Recent change notes
 
+###0.1.45
 
+- Remove validation for index keys.
 
 ###0.1.44
 
