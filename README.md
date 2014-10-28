@@ -7,16 +7,16 @@ Mongo Dart (mongo_dart) is a client library and driver for connecting to MongoDB
 By using the [MongoClient] you can easily perform common CRUD operations.
 
 ```dart 
-var usaDb1 = new MongoClient('accounts', 'A-E');
+var bankDb = new MongoClient('accounts', 'A-E');
 
-usaDb1
+bankDb
   .openDb()
   .then((_) {
-    db
+    bankDb
       .findOne(where.match('customerName' : 'Julie'))
       .then((doc) {
         getAccountInfo(doc);
-        db.close();
+        bankDb.close();
       });
   });
 ```
@@ -25,7 +25,7 @@ Every CRUD operation has a convenience version that will automatically close the
 ```dart
 var mongoQuery = where.gte('balance' : 100000).limit(500)
 
-db
+bankDb
   .openDbFind(mongoQuery)
   .then((docList) {
     for (Map doc in docList) {
@@ -43,7 +43,7 @@ var docList = [
   {'lastLogOut' :  currentTime},
 ];
 
-db
+bankDb
   .openDbInsertAll(docList, writeConcern: WriteConcern.ACKNOWLEDGED)
   .then((confirmMsg) {
     logIt(confirmMsg);
