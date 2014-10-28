@@ -8,7 +8,7 @@ import 'package:mongo_dart/mongo_dart.dart';
  */
 
 void main () {
-  MongoClient someDb = new MongoClient('bookstore', 'bookshelf');
+  MongoClient testDb = new MongoClient('bookstore', 'bookshelf');
   bool canInsert = false;
   bool canInsertAll = false;
   bool canFindOne = false;
@@ -21,7 +21,7 @@ void main () {
   bool canRemoveAll = false;
   
   //Insert test
-  var starter = someDb
+  var starter = testDb
     .openDbInsert({'_id' : '1008', 'Practical Living' : 9.99})
     .then((confirmMsg) {
       if (confirmMsg != null ) {
@@ -32,7 +32,7 @@ void main () {
   })
   .then((_) {
     //InsertAll test
-    return someDb
+    return testDb
       .openDbInsertAll([{'_id': '1009', 'Vampire\'s Diary' : 19.99}, {'Understanding Fortran' : 11.99}])
       .then((confirmMsg) {
         if (confirmMsg != null) {
@@ -44,7 +44,7 @@ void main () {
   })
   .then((_) {
     //FindOne test
-   return someDb
+   return testDb
       .openDbFindOne(where.eq('_id', '1008'))
       .then((doc) {
         if (doc != null) {
@@ -56,7 +56,7 @@ void main () {
   })
   .then((_) {
     //Find test
-    return someDb
+    return testDb
       .openDbFind(where.eq('Practical Living', 9.99))
       .then((docList) {
         if (docList != null) {
@@ -68,7 +68,7 @@ void main () {
   })
   .then((_) {
     //Update test
-    return someDb
+    return testDb
       .openDbUpdate(where.eq('Practical Living', 9.99), {'Practical Living' : 23.99})
       .then((confirmMsg) {
         if (confirmMsg != null ) {
@@ -90,7 +90,7 @@ void main () {
       {query2 : doc2},
     ];
     
-    return someDb
+    return testDb
       .openDbUpdateAll(queryDocList)
       .then((confirmMsg) {
         if (confirmMsg != null) {
@@ -102,7 +102,7 @@ void main () {
   })
   .then((_) {
     //Save test
-    return someDb
+    return testDb
       .openDbSave({'Outernet' : 8.99})
       .then((confirmMsg) {
         if (confirmMsg != null ) {
@@ -119,7 +119,7 @@ void main () {
       {'_id': '1009', 'Vampire\'s Diary' : 0.99},
     ];
     
-    return someDb
+    return testDb
       .openDbSaveAll(documents)
       .then((confirmMsg) {
         if (confirmMsg != null) {
@@ -131,7 +131,7 @@ void main () {
   })
   .then((_) {
     //Remove test
-    return someDb
+    return testDb
       .openDbRemove(where.eq('Practical Living', 15.99))
       .then((confirmMsg) {
         if (confirmMsg != null) {
@@ -148,7 +148,7 @@ void main () {
       where.eq('Understanding Fortran', 11.99)
     ];
     
-    return someDb
+    return testDb
       .openDbRemoveAll(queryList)
       .then((List msgList) {
         if (msgList != null) {
@@ -160,10 +160,14 @@ void main () {
   })
   .then((_) {
     //Reopens and drops test db
-    someDb
+    testDb
       .openDb()
-      .then((_) => someDb.db.drop())
+      .then((_) { 
+        testDb.db.drop();
+        testDb.close();
+      })
       .then((_) {
+        
         //Pass Check
         if (canInsert && canInsert && canFindOne && canFind && canUpdate && canSaveAll &&
             canSave && canRemove && canRemoveAll) {
