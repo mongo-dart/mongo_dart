@@ -45,10 +45,8 @@ var docList = [
 
 db
   .openDbInsertAll(docList, writeConcern: WriteConcern.ACKNOWLEDGED)
-  .then((docList) {
-    for (Map doc in docList) {
-      primerAccountRequest(doc['customerName']);
-    }
+  .then((confirmMsg) {
+    logIt(confirmMsg);
   });
 ```
 
