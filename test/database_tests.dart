@@ -248,6 +248,9 @@ Future testSaveWithIntegerId(){
     return coll.findOne({"_id":3});
   }).then((v1){
     expect(v1["value"],2);
+    return coll.findOne(where.eq("_id",3));
+  }).then((v1){
+    expect(v1["value"],2);
     return db.close();
   });
 }
@@ -1244,7 +1247,7 @@ main(){
     test('testFindEach',testFindEach);
     test('testEach',testEachOnEmptyCollection);
     test('testDrop',testDrop);
-    test('testSaveWithIntegerId',testSaveWithIntegerId);
+    solo_test('testSaveWithIntegerId',testSaveWithIntegerId);
     test('testSaveWithObjectId',testSaveWithObjectId);
     test('testInsertWithObjectId',testSaveWithObjectId);
     test('testSkip',testSkip);
