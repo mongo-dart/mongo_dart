@@ -1,42 +1,56 @@
-#Mongo-dart - MongoDB driver for Dart programming language.
+#mongo_dart - A MongoDB driver for the Dart programming language.
 
 [![Build Status](https://drone.io/github.com/vadimtsushko/mongo_dart/status.png)](https://drone.io/github.com/vadimtsushko/mongo_dart/latest)
 
-Server-side driver library for MongoDb implemented in pure Dart.
+Mongo Dart (mongo_dart) is a client library and driver for connecting to MongoDB instances. It is written purely in Dart and thus makes heavy use of it's asynchronous facilities.
 
-Simple usage example on base of [JSON ZIPS dataset] (http://media.mongodb.org/zips.json)
+By using the [MongoClient] you can easily perform common CRUD operations.
 
+```dart 
+var bankDb = new MongoClient('accounts', 'A-E');
 
-    import 'package:mongo_dart/mongo_dart.dart';
-    main(){
-      void displayZip(Map zip) {
-        print('state: ${zip["state"]}, city: ${zip["city"]}, zip: ${zip["id"]}, population: ${zip["pop"]}'    );
-      }
-      Db db = new Db("mongodb://reader:vHm459fU@ds037468.mongolab.com:37468/samlple");
-      var zips = db.collection('zip');
-      db.open().then((_){
-        print('''
-    ******************** Zips for state NY, with population between 14000 and 16000,
-    ******************** reverse ordered by population''');
-        return zips.find(
-            where.eq('state','NY').inRange('pop',14000,16000).sortBy('pop', descending: true))
-              .forEach(displayZip);
-      }).then((_) {
-        print('\n******************** Find ZIP for code 78829 (BATESVILLE)');
-        return zips.findOne(where.eq('id','78829'));
-      }).then((batesville) {
-        displayZip(batesville);
-        print('******************** Find 10 ZIP closest to BATESVILLE');
-        return zips.find(
-            where.near('loc',batesville["loc"]).limit(10))
-              .forEach(displayZip);
-      }).then((_) {
-        print('closing db');
-        db.close();
+bankDb
+  .openDb()
+  .then((_) {
+    bankDb
+      .findOne(where.match('customerName' : 'Julie'))
+      .then((doc) {
+        getAccountInfo(doc);
+        bankDb.close();
       });
-    }
+  });
+```
+Every CRUD operation has a convenience version that will automatically close the connection to database after completion.
 
-###See also:
+```dart
+var mongoQuery = where.gte('balance' : 100000).limit(500)
+
+bankDb
+  .openDbFind(mongoQuery)
+  .then((docList) {
+    for (Map doc in docList) {
+      primerAccountRequest(doc['customerID']);
+    }
+  });
+  .
+```
+Mongo Client also includes methods to help ease operations on a collection.
+
+```dart 
+DateTime currentTime = new DateTime.now().toUtc().toLocal();
+var docList = [
+  {'withdrawDate' :  currentTime},
+  {'lastLogOut' :  currentTime},
+];
+
+bankDb
+  .openDbInsertAll(docList, writeConcern: WriteConcern.ACKNOWLEDGED)
+  .then((confirmMsg) {
+    logIt(confirmMsg);
+  });
+```
+
+###Other Documentation:
 
 - [API Doc](http://www.dartdocs.org/documentation/mongo_dart/0.1.39)
 
@@ -47,3 +61,27 @@ Simple usage example on base of [JSON ZIPS dataset] (http://media.mongodb.org/zi
 - Additional [examples](https://github.com/vadimtsushko/mongo_dart/tree/master/example) and [tests](https://github.com/vadimtsushko/mongo_dart/tree/master/test)
 
 - For more structured approach to communication with MongoDB: [Objectory](https://github.com/vadimtsushko/objectory)
+ 
+###License
+(The MIT License)
+
+Copyright (c) 2012 Vadim Tsushko (vadimtsushko@gmail.com)
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
