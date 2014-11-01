@@ -40,4 +40,3 @@ part 'src/gridfs/grid_file.dart';
 part 'src/gridfs/grid_in.dart';
 part 'src/gridfs/grid_out.dart';
 part 'src/gridfs/chunk_handler.dart';
-part 'mongo_client.dart';
