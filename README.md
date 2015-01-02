@@ -48,4 +48,4 @@ Simple usage example on base of [JSON ZIPS dataset] (http://media.mongodb.org/zi
 
 - For more structured approach to communication with MongoDB: [Objectory](https://github.com/vadimtsushko/objectory)
 
-- Checkout [redstone_mapper_mongo](https://github.com/luizmineo/redstone.dart/wiki/redstone_mapper_mongo) for easy transformations between Mongo Maps <==> Objects <==> JSON Strings, and integretions with the [redstone](https://github.com/luizmineo/redstone.dart) framework.
+- Checkout [redstone_mapper_mongo](https://github.com/luizmineo/redstone.dart/wiki/redstone_mapper_mongo) for easy transformations between Mongo Maps <==> Objects <==> JSON Strings, and integrations with the [redstone](https://github.com/luizmineo/redstone.dart) server framework.
