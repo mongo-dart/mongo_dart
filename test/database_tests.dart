@@ -251,6 +251,11 @@ Future testSaveWithIntegerId(){
     return coll.findOne(where.eq("_id",3));
   }).then((v1){
     expect(v1["value"],2);
+    final notThere = {"_id":5,"name":"d", "value": 50};
+    coll.save(notThere);
+    return coll.findOne(where.eq("_id",5));
+  }).then((v5){
+    expect(v5["value"],50);
     return db.close();
   });
 }
