@@ -16,7 +16,7 @@ class DbCollection {
       }
     }
     if (id != null) {
-      return update({"_id": id}, document, writeConcern: writeConcern);
+      return update({"_id": id}, document, upsert:true, writeConcern: writeConcern);
     } else {
       if (createId) {
         document["_id"] = new ObjectId();
