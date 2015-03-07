@@ -1252,7 +1252,7 @@ main(){
     test('testFindEach',testFindEach);
     test('testEach',testEachOnEmptyCollection);
     test('testDrop',testDrop);
-    solo_test('testSaveWithIntegerId',testSaveWithIntegerId);
+    test('testSaveWithIntegerId',testSaveWithIntegerId);
     test('testSaveWithObjectId',testSaveWithObjectId);
     test('testInsertWithObjectId',testSaveWithObjectId);
     test('testSkip',testSkip);
