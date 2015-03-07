@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.46
+
+- Save method use `upsert` flag in accordance with [mongodb docs](http://docs.mongodb.org/manual/reference/method/db.collection.save/)
+
 ###0.1.45
 
 - Remove validation for index keys.
