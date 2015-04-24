@@ -1,5 +1,5 @@
 name: mongo_dart
-version: 0.1.46
+version: 0.1.47-dev
 authors:
 - Vadim Tsushko <vadimtsushko@gmail.com>
 - Ted Sander <ted@tedsander.com>
@@ -17,4 +17,4 @@ dependencies:
 dev_dependencies:
   hop: any
   hop_docgen: any
-  unittest: '>=0.9.0 <0.10.0'
+  unittest: '>=0.9.0 <0.12.0'

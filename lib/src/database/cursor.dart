@@ -225,3 +225,28 @@ class AggregateCursor extends Cursor {
     }
   }
 }
+
+class ListCollectionsCursor extends Cursor {
+  bool firstBatch = true;
+  ListCollectionsCursor(Db db, selector): super(db,null, selector) {
+    collection = db.collection(r'$cmd.listCollections');
+  }
+  MongoQueryMessage generateQueryMessage() {
+    return new DbCommand(db, DbCommand.SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1,
+        {'listCollections':1, 'filter': selector}, null);
+  }
+
+  void getCursorData(MongoReplyMessage replyMessage) {
+    if (firstBatch) {
+      firstBatch = false;
+      var cursorMap = replyMessage.documents.first['cursor']; 
+      if (cursorMap != null) {
+        cursorId = cursorMap['id'];
+        items.addAll(cursorMap['firstBatch']);
+      }      
+    } else {
+      super.getCursorData(replyMessage);
+    }
+  }
+}
+

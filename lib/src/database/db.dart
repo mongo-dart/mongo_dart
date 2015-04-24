@@ -304,6 +304,14 @@ class Db {
       return new Future.value(res);
     });
   }  
+  Future<List<Map>> getCollectionInfos([Map filter = const {}]) {
+    return new ListCollectionsCursor(this,filter).toList();
+  }
+  
+  Future<List<String>> getCollectionNames([Map filter = const {}]) {
+      return new ListCollectionsCursor(this,filter).stream.map((map) => map['name']).toList();
+  }
+    
   
   Future<bool> authenticate(String userName, String password, {_Connection connection}) {
     return getNonce(connection: connection).then((msg) {

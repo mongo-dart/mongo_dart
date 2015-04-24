@@ -18,7 +18,6 @@ export 'package:mongo_dart_query/mongo_dart_query.dart';
 part 'src/network/packet_converter.dart';
 part 'src/network/connection_manager.dart';
 part 'src/network/connection.dart';
-part 'src/network/message_header.dart';
 part 'src/network/mongo_message_transformer.dart';
 part 'src/database/mongo_message.dart';
 part 'src/database/mongo_query_message.dart';

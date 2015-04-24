@@ -22,8 +22,7 @@ class MockConsumer<S> implements StreamConsumer<S> {
     stream.listen(_onData, onDone: () => completer.complete(null));
     return completer.future;
   }
-  Future close() {
-  }
+  Future close() => new Future.value(true);
 }
 clearFSCollections(GridFS gridFS) {
   gridFS.files.remove();

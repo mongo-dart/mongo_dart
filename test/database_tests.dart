@@ -94,6 +94,7 @@ Future testIsMaster(){
 testCollectionCreation(){
   Db db = new Db('${DefaultUri}db');
   DbCollection collection = db.collection('student');
+  return collection;
 }
 Future testEachOnEmptyCollection(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testEachOnEmptyCollection');
@@ -136,8 +137,6 @@ Future testFindEachWithThenClause(){
 
 Future testDateTime(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  int count = 0;
-  int sum = 0;
   DbCollection testDates;
   return db.open().then((c){
     testDates = db.collection('testDates');
@@ -227,7 +226,6 @@ Future testDrop(){
 Future testSaveWithIntegerId(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection coll;
-  var id;
   return db.open().then((c){
     coll = db.collection('testSaveWithIntegerId');
     coll.remove();
@@ -420,7 +418,6 @@ db.runCommand(
 
 Future testAggregateToStream() {
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  List<Map> result = [];
   bool skipTest = false;
   return db.open().then((c){
     return db.getBuildInfo();
@@ -643,6 +640,7 @@ testCursorCreation(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection collection = db.collection('student');
   Cursor cursor = new Cursor(db, collection, null);
+  return cursor;
 }
 
 Future testPingRaw(){
@@ -717,7 +715,6 @@ Future testCursorWithOpenServerCursor(){
   });
 }
 Future testCursorGetMore(){
-  var res;
   Db db = new Db('${DefaultUri}mongo_dart-test');
   DbCollection collection;
   int count = 0;
@@ -751,7 +748,6 @@ Future testCursorGetMore(){
   });
 }
 Future testCursorClosing(){
-  var res;
   Db db = new Db('${DefaultUri}mongo_dart-test','testCursorClosing');
   DbCollection collection;
   Cursor cursor;
@@ -761,7 +757,6 @@ Future testCursorClosing(){
     for (int n=0;n < 1000; n++){
       collection.insert({"a":n});
       }
-    int count = 0;
     cursor = collection.find();
     expect(cursor.state,State.INIT);
     return cursor.nextObject();
@@ -874,7 +869,6 @@ Future testAuthenticationWithUri(){
 
 Future testIndexInformation(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  Cursor cursor;
   return db.open().then((c){
     DbCollection collection = db.collection('testcol');
     collection.remove();
@@ -890,7 +884,6 @@ Future testIndexInformation(){
 
 Future testIndexCreation(){
   Db db = new Db('${DefaultUri}index_creation');
-  Cursor cursor;
   DbCollection collection;
   return db.open().then((c){
     collection = db.collection('testcol');
@@ -920,7 +913,6 @@ Future testIndexCreation(){
 
 Future testEnsureIndexWithIndexCreation(){
   Db db = new Db('${DefaultUri}ensureIndex_indexCreation');
-  Cursor cursor;
   DbCollection collection;
   return db.open().then((c){
     collection = db.collection('testcol');
@@ -938,7 +930,6 @@ Future testEnsureIndexWithIndexCreation(){
 }
 Future testIndexCreationErrorHandling(){
   Db db = new Db('${DefaultUri}IndexCreationErrorHandling');
-  Cursor cursor;
   DbCollection collection;
   bool errorHandled = false; 
   return db.open().then((c){
@@ -962,7 +953,6 @@ Future testIndexCreationErrorHandling(){
 
 Future testSafeModeUpdate(){
   Db db = new Db('${DefaultUri}safe_mode');
-  Cursor cursor;
   DbCollection collection = db.collection('testcol');
   return db.open().then((c){
     collection.remove();
@@ -982,8 +972,6 @@ Future testSafeModeUpdate(){
 }
 Future testFindWithFieldsClause(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testFindWithFieldsClause');
-  int count = 0;
-  int sum = 0;
   return db.open().then((c){
     DbCollection students = db.collection('students');
     students.remove();
@@ -1003,8 +991,6 @@ Future testFindWithFieldsClause(){
 
 Future testSimpleQuery(){
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  int count = 0;
-  int sum = 0;
   ObjectId id;
   DbCollection coll;
   return db.open().then((c){
@@ -1036,9 +1022,6 @@ Future testSimpleQuery(){
 
 Future testCompoundQuery(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testCompoundQuery');
-  int count = 0;
-  int sum = 0;
-  ObjectId id;
   DbCollection coll;
   return db.open().then((c){
     coll = db.collection("simple_data");
@@ -1071,7 +1054,6 @@ Future testFieldLevelUpdateSimple() {
     }).then((result) {
       expect(result, isNotNull);
       id = result['_id'];
-      var objectUpdate = {r'$set': {'value': 20}};
       return collection.update(where.id(id), modify.set('name', 'BBB'));
     }).then((result) {
       expect(result['updatedExisting'], true);
@@ -1233,7 +1215,7 @@ main(){
     test('testAuthentication',testAuthentication);
     test('testAuthenticationWithUri',testAuthenticationWithUri);
     test('testDropDatabase',testDropDatabase);
-    test('testCollectionInfoCursor',testCollectionInfoCursor);
+    solo_test('testCollectionInfoCursor',testCollectionInfoCursor);
     test('testRemove',testRemove);
     test('testGetNonce',testGetNonce);
     test('getBuildInfo',getBuildInfo);

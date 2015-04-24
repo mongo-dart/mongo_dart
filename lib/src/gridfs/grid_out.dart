@@ -9,7 +9,6 @@ class GridOut extends GridFSFile {
   }
 
   Future writeToFile(File file) {
-    var completer = new Completer();
     var sink = file.openWrite(mode: FileMode.WRITE);    
     writeTo(sink).then((int length) {
       sink.close();

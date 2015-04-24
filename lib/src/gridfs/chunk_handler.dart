@@ -12,7 +12,6 @@ class ChunkHandler {
       data = carry;
       carry = null;
     }
-    int startPos = 0;
     int pos = 0;
     while (pos + chunkSize < data.length) {        
       sink.add(data.sublist(pos,pos + chunkSize));  

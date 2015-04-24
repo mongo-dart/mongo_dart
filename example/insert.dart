@@ -3,7 +3,6 @@ import 'dart:async';
 main(){
 //  Db db = new Db("mongodb://127.0.0.1/test_insert");//
   Db db = new Db("mongodb://test:test@ds061298.mongolab.com:61298/test_insert");
-  ObjectId id;
   Stopwatch stopwatch = new Stopwatch()..start();
   DbCollection test;
   db.open().then((_){
