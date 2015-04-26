@@ -2,7 +2,7 @@ library replica_tests;
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:async';
 //import 'package:logging/logging.dart';
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 
 const DefaultUri1 = 'mongodb://127.0.0.1:27001';
 const DefaultUri2 = 'mongodb://127.0.0.1:27002';
@@ -21,7 +21,7 @@ Future testCollectionInfoCursor(){
   }).then((v){
     return newColl.insertAll([{"a":1}]);
   }).then((v){
-    return db.collectionsInfoCursor("new_collecion").toList();
+    return db.getCollectionInfos({'name':'new_collecion'});
   }).then((v){
     expect(v,hasLength(1));
     return db.close();

@@ -32,6 +32,7 @@ class _ConnectionManager {
       if (master) {
         _masterConnection = connection;
       }
+      connection.serverCapabilities.getParamsFromIstMaster(replyMessage.documents[0]);
     });
   }
 

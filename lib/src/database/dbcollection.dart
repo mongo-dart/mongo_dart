@@ -59,10 +59,9 @@ class DbCollection {
   * Here our selector will match every document where the last_name attribute is 'Smith.'
   *
   */
-  Cursor find([selector]) {
-    return new Cursor(db, this, selector);
-  }
-
+  Cursor find([selector]) => new Cursor(db, this, selector);
+  
+  
   Future<Map> findOne([selector]) {
     Cursor cursor = new Cursor(db, this, selector);
     Future<Map> result = cursor.nextObject();
@@ -92,6 +91,19 @@ class DbCollection {
   }
   Future insert(Map document, {WriteConcern writeConcern}) => insertAll([document], writeConcern: writeConcern);
 
+  /// Analogue of mongodb shell method `db.collection.getIndexes()`
+  /// Returns an array that holds a list of documents that identify and describe 
+  /// the existing indexes on the collection. You must call `getIndexes()`
+  ///  on a collection
+  Future<List<Map>> getIndexes() {
+    if (db._masterConnection.serverCapabilities.listIndexes) {
+      return new ListIndexesCursor(db, this).toList();
+    } else { /// Pre MongoDB v3.0 API
+      var selector = {};
+      selector['ns'] = this.fullName();
+      return new Cursor(db, new DbCollection(db, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();
+    }
+  }
   Map _selectorBuilder2Map(selector) {
     if (selector == null) {
       return {};

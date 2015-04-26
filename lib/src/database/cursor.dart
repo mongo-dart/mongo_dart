@@ -202,51 +202,52 @@ class Cursor {
   }
 }
 
-class AggregateCursor extends Cursor {
+class CommandCursor extends Cursor {
+  CommandCursor(db, collection, selectorBuilderOrMap): super(db,collection,selectorBuilderOrMap);
+  bool firstBatch = true;
+  @override
+  MongoQueryMessage generateQueryMessage() {
+    throw new UnimplementedError();  
+  }
+  void getCursorData(MongoReplyMessage replyMessage) {
+    if (firstBatch) {
+      firstBatch = false;
+      var cursorMap = replyMessage.documents.first['cursor']; 
+      if (cursorMap != null) {
+        cursorId = cursorMap['id'];
+        items.addAll(cursorMap['firstBatch']);
+      }      
+    } else {
+      super.getCursorData(replyMessage);
+    }
+  }
+}
+
+class AggregateCursor extends CommandCursor {
   List pipeline;
   Map cursorOptions;
-  bool firstBatch = true;
   AggregateCursor(db, collection, this.pipeline, this.cursorOptions): super(db, collection, {});
+  @override
   MongoQueryMessage generateQueryMessage() {
     return new DbCommand(db, DbCommand.SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1,
         {'aggregate': collection.collectionName, 'pipeline': pipeline, 'cursor': cursorOptions }, null);
   }
-
-  void getCursorData(MongoReplyMessage replyMessage) {
-    if (firstBatch) {
-      firstBatch = false;
-      var cursorMap = replyMessage.documents.first['cursor']; 
-      if (cursorMap != null) {
-        cursorId = cursorMap['id'];
-        items.addAll(cursorMap['firstBatch']);
-      }      
-    } else {
-      super.getCursorData(replyMessage);
-    }
-  }
 }
 
-class ListCollectionsCursor extends Cursor {
-  bool firstBatch = true;
-  ListCollectionsCursor(Db db, selector): super(db,null, selector) {
-    collection = db.collection(r'$cmd.listCollections');
-  }
+
+class ListCollectionsCursor extends CommandCursor {
+  ListCollectionsCursor(Db db, selector): super(db,null, selector);
+  @override
   MongoQueryMessage generateQueryMessage() {
     return new DbCommand(db, DbCommand.SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1,
         {'listCollections':1, 'filter': selector}, null);
   }
-
-  void getCursorData(MongoReplyMessage replyMessage) {
-    if (firstBatch) {
-      firstBatch = false;
-      var cursorMap = replyMessage.documents.first['cursor']; 
-      if (cursorMap != null) {
-        cursorId = cursorMap['id'];
-        items.addAll(cursorMap['firstBatch']);
-      }      
-    } else {
-      super.getCursorData(replyMessage);
-    }
+}
+class ListIndexesCursor extends CommandCursor {
+  ListIndexesCursor(Db db, DbCollection collection): super(db,collection, const {});
+  @override
+  MongoQueryMessage generateQueryMessage() {
+    return new DbCommand(db, DbCommand.SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1,
+        { "listIndexes": collection.collectionName}, null);
   }
 }
-

@@ -17,4 +17,4 @@ dependencies:
 dev_dependencies:
   hop: any
   hop_docgen: any
-  unittest: '>=0.9.0 <0.12.0'
+  test: "^0.12.0-rc.1"

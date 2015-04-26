@@ -108,7 +108,7 @@ class Db {
   //ServerConfig serverConfig;
   final List<String> _uriList = new List<String>();
   _ConnectionManager _connectionManager;
-  get _masterConnection => _connectionManager.masterConnection;
+  _Connection get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
   _validateDatabaseName(String dbName) {
     if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
@@ -227,7 +227,7 @@ class Db {
   }
   
   Future dropCollection(String collectionName) {
-    return collectionsInfoCursor(collectionName).toList().then((v) {
+    return getCollectionInfos({'name': collectionName}).then((v) {
       if (v.length == 1) {
         return executeDbCommand(DbCommand.createDropCollectionCommand(this,collectionName));
       }
@@ -280,20 +280,6 @@ class Db {
     return _cm.close();
   }
 
-  Cursor collectionsInfoCursor([String collectionName]) {
-    Map selector = {};
-    // If we are limiting the access to a specific collection name
-    if(collectionName != null) {
-      selector["name"] = "${this.databaseName}.$collectionName";
-    }
-    // Return Cursor
-    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
-  }
-  
-  /// Analogue to shell's `show collections`
-  Future<List<String>> listCollections() {
-    return collectionsInfoCursor().stream.map((map) => map['name'].split('.')).where((arr)=> arr.length == 2).map((arr)=> arr.last).toList();
-  }
   /// Analogue to shell's `show dbs`. Helper for `listDatabases` mongodb command.
   Future<List> listDatabases() {
     return executeDbCommand(DbCommand.createQueryAdminCommand({"listDatabases":1})).then((val) {
@@ -303,13 +289,34 @@ class Db {
       }
       return new Future.value(res);
     });
-  }  
+  }
+
+  Cursor _listCollectionsCursor([Map filter = const {}]) {
+    if (this._masterConnection.serverCapabilities.listCollections) {
+      return new ListCollectionsCursor(this,filter);
+    } else { // Using system collections (pre v3.0 API)
+      Map selector = {};
+      // If we are limiting the access to a specific collection name
+      if(filter.containsKey('name')) {
+        selector["name"] = "${this.databaseName}.${filter['name']}";
+      }
+      return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
+    }
+  }
+  
+  /// Analogue to shell's `show collections`
+  @deprecated
+  Future<List<String>> listCollections() {
+    return _listCollectionsCursor().stream.map((map) => map['name'].split('.')).where((arr)=> arr.length == 2).map((arr)=> arr.last).toList();
+  }
+
+  
   Future<List<Map>> getCollectionInfos([Map filter = const {}]) {
-    return new ListCollectionsCursor(this,filter).toList();
+    return _listCollectionsCursor(filter).toList();
   }
   
   Future<List<String>> getCollectionNames([Map filter = const {}]) {
-      return new ListCollectionsCursor(this,filter).stream.map((map) => map['name']).toList();
+      return _listCollectionsCursor(filter).stream.map((map) => map['name']).toList();
   }
     
   
@@ -320,7 +327,10 @@ class Db {
       return executeDbCommand(command, connection: connection);
     }).then( (res) => res["ok"]==1 );
   }
-  
+  /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
+  /// with WiredTiger
+  /// Use `DbCollection.getIndexes()` instead
+  @deprecated
   Future<List> indexInformation([String collectionName]) {
     var selector = {};
     if (collectionName != null) {

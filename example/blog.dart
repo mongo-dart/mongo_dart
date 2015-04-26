@@ -56,7 +56,7 @@ main(){
       print("[${article['title']}]:[${article['body']}]:[author_id: ${article['author_id']}]");
     });
   }).then((v){
-    return db.collectionsInfoCursor().forEach((col) => col);
+    return db.getCollectionInfos();
   }).then((dummy){
     db.close();
   });

@@ -1,7 +1,34 @@
 part of mongo_dart;
+class _ServerCapabilities {
+  int maxWireVersion = 0;
+  bool aggregationCursor = false;
+  bool writeCommands = false;
+  bool authCommands = false;
+  bool listCollections = false;
+  bool listIndexes = false;
+  int maxNumberOfDocsInBatch = 1000;
+  
+  getParamsFromIstMaster(Map isMaster) {
+    if (isMaster.containsKey('maxWireVersion')) {
+      maxWireVersion = isMaster['maxWireVersion'];
+    }
+    if(maxWireVersion >= 1) {
+      aggregationCursor = true;
+      authCommands = true;
+    }
+    if(maxWireVersion >= 2) {
+      writeCommands = true;
+    }
+    if(maxWireVersion >= 3) {
+      listCollections = true;
+      listIndexes = true;
+    }
+  }
+
+}
 
 class _Connection {
-  final _log= new Logger('Connection');
+  final Logger _log= new Logger('Connection');
   _ConnectionManager _manager;
   ServerConfig serverConfig;
   Socket socket;
@@ -12,6 +39,7 @@ class _Connection {
   bool connected = false;
   bool _closed = false;
   bool isMaster = false;
+  final _ServerCapabilities serverCapabilities = new _ServerCapabilities();
   
   _Connection(this._manager, [this.serverConfig]) {
     if (serverConfig == null) {
@@ -27,8 +55,7 @@ class _Connection {
       _socketSubscription = socket
         .transform(new MongoMessageHandler().transformer)
         .listen(_receiveReply,onError: (e) {
-        print("Socket error ${e}");
-
+        _log.severe("Socket error ${e}");
         //completer.completeError(e);
       }, onDone: () {
         if (!_closed) {
@@ -101,7 +128,6 @@ class _Connection {
       }
     }
   }
-
   void _onSocketError() {
     _closed = true;
     var ex = const ConnectionException("connection closed.");
@@ -111,6 +137,7 @@ class _Connection {
     });
     _pendingQueries.clear();
   }
+  
 }
 
 class ConnectionException implements Exception {
