@@ -1,5 +1,13 @@
 #Recent change notes
 
+###0.1.47
+
+- compatibility with MongoDB 3.0 and WiredTiger. New `db.getCollectionNames()`,
+ `db.getCollectionInfos()`, `collection.getIndexes()` methods, backward compatible with earlier versions of MongoDb.
+- `collectionsInfoCursor`, `listCollections`, `indexInformation` methods of Db deprecated
+- use `test` instead of `unittest` package
+
+
 ###0.1.46
 
 - Save method use `upsert` flag in accordance with [mongodb docs](http://docs.mongodb.org/manual/reference/method/db.collection.save/)
