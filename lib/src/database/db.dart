@@ -303,11 +303,26 @@ class Db {
       return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
     }
   }
-  
+  /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
+  /// with WiredTiger
+  /// Use `getCollectionInfos` instead
+  @deprecated
+  Cursor collectionsInfoCursor([String collectionName]) {
+    Map selector = {};
+    // If we are limiting the access to a specific collection name
+    if(collectionName != null) {
+      selector["name"] = "${this.databaseName}.$collectionName";
+    }
+    // Return Cursor
+    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
+  }
   /// Analogue to shell's `show collections`
+  /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
+  /// with WiredTiger
+  /// Use `getCollectionNames` instead
   @deprecated
   Future<List<String>> listCollections() {
-    return _listCollectionsCursor().stream.map((map) => map['name'].split('.')).where((arr)=> arr.length == 2).map((arr)=> arr.last).toList();
+    return collectionsInfoCursor().stream.map((map) => map['name'].split('.')).where((arr)=> arr.length == 2).map((arr)=> arr.last).toList();
   }
 
   
@@ -395,7 +410,7 @@ class Db {
   Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
     return new Future.sync((){
       keys = _setKeys(key, keys);
-      return indexInformation(collectionName).then((indexInfos) {
+      return collection(collectionName).getIndexes().then((indexInfos) {
         if (name == null) {
           name = _createIndexName(keys);
         }
