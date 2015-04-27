@@ -11,8 +11,8 @@ environment:
   sdk: '>=0.8.10+6 <2.0.0'
 dependencies:
   bson: any
-  crypto: '>=0.9.0 <0.10.0'
-  logging: '>=0.9.0 <0.10.0'
+  crypto: '^0.9.0'
+  logging: '>=0.9.0 <0.11.0'
   mongo_dart_query: any
 dev_dependencies:
   hop: any
