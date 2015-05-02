@@ -16,5 +16,4 @@ dependencies:
   mongo_dart_query: any
 dev_dependencies:
   hop: any
-  hop_docgen: any
-  test: "^0.12.0-rc.1"
+  test: ">=0.12.0-rc.1 <2.0.0"
