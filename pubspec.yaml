@@ -8,12 +8,13 @@ authors:
 description: MongoDB driver for Dart
 homepage: https://github.com/vadimtsushko/mongo_dart
 environment:
-  sdk: '>=0.8.10+6 <2.0.0'
+  sdk: '>=1.4.0 <2.0.0'
 dependencies:
   bson: any
-  crypto: '^0.9.0'
+  crypto: '>=0.9.0 <0.11.0'
   logging: '>=0.9.0 <0.11.0'
   mongo_dart_query: any
 dev_dependencies:
   hop: any
-  test: ">=0.12.0-rc.1 <2.0.0"
+  hop_docgen: any
+  test: '>=0.12.0-rc.1 <0.14.0'
