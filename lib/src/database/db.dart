@@ -110,13 +110,13 @@ class Db {
   _ConnectionManager _connectionManager;
   _Connection get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
-  _validateDatabaseName(String dbName) {
-    if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
-    var invalidChars = [" ", ".", "\$", "/", "\\"];
-    for(var i = 0; i < invalidChars.length; i++) {
-      if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
-    }
-  }
+//  _validateDatabaseName(String dbName) {
+//    if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
+//    var invalidChars = [" ", ".", "\$", "/", "\\"];
+//    for(var i = 0; i < invalidChars.length; i++) {
+//      if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
+//    }
+//  }
   String toString() => 'Db($databaseName,$_debugInfo)';
 
   /**
@@ -308,6 +308,9 @@ class Db {
   /// Use `getCollectionInfos` instead
   @deprecated
   Cursor collectionsInfoCursor([String collectionName]) {
+    return _collectionsInfoCursor(collectionName);
+  }
+  Cursor _collectionsInfoCursor([String collectionName]) {
     Map selector = {};
     // If we are limiting the access to a specific collection name
     if(collectionName != null) {
@@ -316,13 +319,14 @@ class Db {
     // Return Cursor
     return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
   }
+
   /// Analogue to shell's `show collections`
   /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
   /// with WiredTiger
   /// Use `getCollectionNames` instead
   @deprecated
   Future<List<String>> listCollections() {
-    return collectionsInfoCursor().stream.map((map) => map['name'].split('.')).where((arr)=> arr.length == 2).map((arr)=> arr.last).toList();
+    return _collectionsInfoCursor().stream.map((map) => map['name'].split('.')).where((arr)=> arr.length == 2).map((arr)=> arr.last).toList();
   }
 
   

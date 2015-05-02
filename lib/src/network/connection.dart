@@ -36,6 +36,8 @@ class _Connection {
   get _replyCompleters => _manager.replyCompleters;
   get _sendQueue => _manager.sendQueue;
   StreamSubscription<List<int>> _socketSubscription;
+  StreamSubscription<List<int>> get socketSubscription => _socketSubscription;
+
   bool connected = false;
   bool _closed = false;
   bool isMaster = false;

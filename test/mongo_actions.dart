@@ -1,6 +1,5 @@
 library mongo_actions;
 
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:logging/logging.dart';
@@ -25,9 +24,9 @@ _makeEnv([int rsLength = RS_LENGTH]) {
   }
 }
 
-_removeEnv() {
-  new Directory(DATA_PATH).deleteSync(recursive: true);
-}
+//_removeEnv() {
+//  new Directory(DATA_PATH).deleteSync(recursive: true);
+//}
 
 _configureRs(StringBuffer buffer, [int rsLength = RS_LENGTH]) {
   buffer.write('var x = rs.initiate({');
@@ -126,7 +125,7 @@ statusStandalone() {
 startRs([int rsLength = RS_LENGTH]) {
   _makeEnv(rsLength);
 
-  var futures = new List<Future<Process>>();
+  //var futures = new List<Future<Process>>();
   for (var i=1; i<=rsLength; i++) {
     var port = PORT_BASE + i;
     _startMongod(port, RS_NAME);

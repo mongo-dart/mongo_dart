@@ -14,5 +14,6 @@ void main() {
         (value) => print(value),
         onError: (err) => print("error: $err"),
         onDone: () => print("done"));
+    return subscription;
   });
 }

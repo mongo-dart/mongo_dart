@@ -60,15 +60,12 @@ main(){
     return db.listDatabases();
   }).then((databases){
     print('List of databases: $databases');
-    return db.listCollections();    
+    return db.getCollectionNames();
   }).then((collections){
-    print('List of collections (MongoDB v2 API: $collections');
-    return db.getCollectionNames();    
-  }).then((collections){
-    print('List of collections (MongoDB v3 API: $collections');
+    print('List of collections : $collections');
     return db.getCollectionInfos();    
   }).then((collections){
-    print('List of collections (MongoDB v3 API: $collections');
+    print('List of collection\'s infos: $collections');
     db.close();
   });
 }
