@@ -10,11 +10,11 @@ homepage: https://github.com/vadimtsushko/mongo_dart
 environment:
   sdk: '>=1.4.0 <2.0.0'
 dependencies:
-  bson: any
+  bson: '^0.1.23'
   crypto: '>=0.9.0 <0.11.0'
   logging: '>=0.9.0 <0.11.0'
-  mongo_dart_query: any
+  mongo_dart_query: '^0.1.14'
 dev_dependencies:
   hop: any
   hop_docgen: any
-  test: '>=0.12.0-rc.1 <0.14.0'
+  test: '^0.12.0-rc.1'
