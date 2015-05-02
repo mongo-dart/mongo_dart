@@ -6,7 +6,7 @@
  `db.getCollectionInfos()`, `collection.getIndexes()` methods, backward compatible with earlier versions of MongoDb.
 - `collectionsInfoCursor`, `listCollections`, `indexInformation` methods of Db deprecated
 - use `test` instead of `unittest` package
-
+- add code coverage metrix with coveralls.io
 
 ###0.1.46
 
