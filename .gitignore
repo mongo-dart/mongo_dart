@@ -6,3 +6,5 @@ packages
 /*.project
 /.idea/
 /out/
+/.pub/
+*.json
