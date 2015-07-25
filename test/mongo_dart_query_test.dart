@@ -68,7 +68,7 @@ testGetQueryString() {
   expect(selector.getQueryString(), r'{"$query":{"foo":{"$lt":2}}}');
   var id = new ObjectId();
   selector = where.id(id);
-  expect(selector.getQueryString(),'{"\$query":{"_id":$id}}');
+  expect(selector.getQueryString(),'{"\$query":{"_id":"${id.toHexString()}"}}');
 //  var dbPointer = new DbRef('Dummy',id);
 //  selector = where.eq('foo',dbPointer);
 //  expect(selector.getQueryString(),'{"\$query":{"foo":$dbPointer}}');
