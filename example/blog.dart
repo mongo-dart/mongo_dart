@@ -1,19 +1,18 @@
 import 'package:mongo_dart/mongo_dart.dart';
+import 'dart:io' show Platform;
+
+var host = Platform.environment['MONGO_DART_DRIVER_HOST'] ?? '127.0.0.1';
+var port = Platform.environment['MONGO_DART_DRIVER_PORT'] ?? '27017';
 
 main() async {
-  Db db = new Db("mongodb://127.0.0.1/mongo_dart-blog");
-  DbCollection collection;
-  DbCollection usersCollection;
-  DbCollection articlesCollection;
+  Db db = new Db("mongodb://$host:$port/mongo_dart-blog");
   Map<String, Map> authors = new Map<String, Map>();
   Map<String, Map> users = new Map<String, Map>();
   await db.open();
-  print(">> Dropping mongo_dart-blog db");
   await db.drop();
-  print(
-      "===================================================================================");
+  print("====================================================================");
   print(">> Adding Authors");
-  collection = db.collection('authors');
+  var collection = db.collection('authors');
   await collection.insertAll([
     {
       'name': 'William Shakespeare',
@@ -22,35 +21,36 @@ main() async {
     },
     {'name': 'Jorge Luis Borges', 'email': 'jorge@borges.com', 'age': 123}
   ]);
+  await db.ensureIndex('authors',
+      name: 'meta', keys: {'_id': 1, 'name': 1, 'age': 1});
   await collection.find().forEach((v) {
+    print(v);
     authors[v["name"]] = v;
   });
-  print(
-      "===================================================================================");
+  print("====================================================================");
   print(">> Authors ordered by age ascending");
-  await db.ensureIndex('authors', key: 'age');
   await collection.find(where.sortBy('age')).forEach(
       (auth) => print("[${auth['name']}]:[${auth['email']}]:[${auth['age']}]"));
-  print(
-      "===================================================================================");
+  print("====================================================================");
   print(">> Adding Users");
-  usersCollection = db.collection("users");
+  var usersCollection = db.collection("users");
   await usersCollection.insertAll([
     {'login': 'jdoe', 'name': 'John Doe', 'email': 'john@doe.com'},
     {'login': 'lsmith', 'name': 'Lucy Smith', 'email': 'lucy@smith.com'}
   ]);
   await db.ensureIndex('users', keys: {'login': -1});
-  await usersCollection.find().forEach((user) => users[user["login"]] = user);
-  print(
-      "===================================================================================");
+  await usersCollection.find().forEach((user) {
+    users[user["login"]] = user;
+    print(user);
+  });
+  print("====================================================================");
   print(">> Users ordered by login descending");
   await usersCollection.find(where.sortBy('login', descending: true)).forEach(
       (user) =>
           print("[${user['login']}]:[${user['name']}]:[${user['email']}]"));
-  print(
-      "===================================================================================");
+  print("====================================================================");
   print(">> Adding articles");
-  articlesCollection = db.collection("articles");
+  var articlesCollection = db.collection("articles");
   await articlesCollection.insertAll([
     {
       'title': 'Caminando por Buenos Aires',
@@ -64,12 +64,11 @@ main() async {
       'comments': [{'user_id': users['jdoe']["_id"], 'body': "great article!"}]
     }
   ]);
-  print(
-      "===================================================================================");
+  print("====================================================================");
   print(">> Articles ordered by title ascending");
   await articlesCollection.find(where.sortBy('title')).forEach((article) {
     print(
-        "[${article['title']}]:[${article['body']}]:[author_id: ${article['author_id']}]");
+        "[${article['title']}]:[${article['body']}]:[${article['author_id'].toHexString()}]");
   });
   await db.close();
 }
