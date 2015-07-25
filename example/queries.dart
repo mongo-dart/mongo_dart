@@ -41,7 +41,7 @@ main() async {
           .sortBy('my_field'))
       .forEach((v) => print(v));
   print("Filtered by my_field gt 700, lte 703");
-  return coll
+  await coll
       .find(where
           .inRange("my_field", 700, 703, minInclude: false)
           .sortBy('my_field'))

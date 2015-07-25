@@ -11,6 +11,4 @@ analyze() {
   new PubApp.global('tuneup')..run(['check']);
 }
 
-@Task()
-testConsole() => Tests.runCliTests(testFile: 'all_tests.dart');
 

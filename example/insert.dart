@@ -1,5 +1,4 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'dart:async';
 
 main() async {
   Db db = new Db("mongodb://127.0.0.1/test_insert"); //
