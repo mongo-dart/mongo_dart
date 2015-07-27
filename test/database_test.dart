@@ -595,19 +595,19 @@ Future testUpdateWithMultiUpdate() {
 Future testLimitWithSortByAndSkip(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testLimitWithSortByAndSkip');
   int counter = 0;
-  Cursor cursor;
+  CursorStream stream;
   return db.open().then((c){
     DbCollection coll = db.collection('testLimit');
     coll.remove();
     for(int n=0;n<600;n++){
       coll.insert({"a":n});
     }
-    cursor = coll.find(where.sortBy('a').skip(300).limit(10));
-    return cursor.forEach((e)=>counter++);
+    stream = coll.find(where.sortBy('a').skip(300).limit(10));
+    return stream.forEach((e)=>counter++);
   }).then((v){
     expect(counter,10);
-    expect(cursor.state,State.CLOSED);
-    expect(cursor.cursorId,0);
+    expect(stream.cursor.state,State.CLOSED);
+    expect(stream.cursor.cursorId,0);
     return db.close();
   });
 }
@@ -615,19 +615,19 @@ Future testLimitWithSortByAndSkip(){
 Future testLimit(){
   Db db = new Db('${DefaultUri}mongo_dart-test','testLimit');
   int counter = 0;
-  Cursor cursor;
+  CursorStream stream;
   return db.open().then((c){
     DbCollection coll = db.collection('testLimit');
     coll.remove();
     for(int n=0;n<600;n++){
       coll.insert({"a":n});
     }
-    cursor = coll.find(where.limit(10));
-    return cursor.forEach((e)=>counter++);
+    stream = coll.find(where.limit(10));
+    return stream.forEach((e)=>counter++);
   }).then((v){
     expect(counter,10);
-    expect(cursor.state,State.CLOSED);
-    expect(cursor.cursorId,0);
+    expect(stream.cursor.state,State.CLOSED);
+    expect(stream.cursor.cursorId,0);
     return db.close();
   });
 }
@@ -753,7 +753,7 @@ Future testCursorClosing(){
     for (int n=0;n < 1000; n++){
       collection.insert({"a":n});
       }
-    cursor = collection.find();
+    cursor = collection.find().cursor;
     expect(cursor.state,State.INIT);
     return cursor.nextObject();
   }).then((v){

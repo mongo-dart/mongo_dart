@@ -198,7 +198,7 @@ class Cursor {
     forEach(controller.add)
       .catchError((e) => controller.addError(e))
       .then((_) => controller.close());
-    return controller.stream;
+    return new CursorStream(controller.stream, this);
   }
 }
 
@@ -251,3 +251,5 @@ class ListIndexesCursor extends CommandCursor {
         { "listIndexes": collection.collectionName}, null);
   }
 }
+
+

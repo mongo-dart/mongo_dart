@@ -34,6 +34,7 @@ part 'src/database/error.dart';
 part 'src/database/state.dart';
 part 'src/database/dbcollection.dart';
 part 'src/database/cursor.dart';
+part 'src/database/cursor_stream.dart';
 part 'src/gridfs/gridfs.dart';
 part 'src/gridfs/grid_file.dart';
 part 'src/gridfs/grid_in.dart';

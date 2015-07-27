@@ -59,7 +59,7 @@ class DbCollection {
   * Here our selector will match every document where the last_name attribute is 'Smith.'
   *
   */
-  Cursor find([selector]) => new Cursor(db, this, selector);
+  Stream<Map> find([selector]) => new Cursor(db, this, selector).stream;
   
   
   Future<Map> findOne([selector]) {
