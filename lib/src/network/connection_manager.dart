@@ -14,11 +14,11 @@ class _ConnectionManager {
   Future _connect(_Connection connection) {
     return connection.connect().then((v) {
       if (connection.serverConfig.userName == null) {
-        _log.fine('$db: ${connection.serverConfig.hostUrl} connected');
+        _log.fine(()=>'$db: ${connection.serverConfig.hostUrl} connected');
         return v;
       } else {
         return db.authenticate(connection.serverConfig.userName, connection.serverConfig.password, connection: connection).then((v) {
-          _log.fine('$db: ${connection.serverConfig.hostUrl} connected');
+          _log.fine(()=>'$db: ${connection.serverConfig.hostUrl} connected');
           return v;
         });
       }
@@ -26,7 +26,7 @@ class _ConnectionManager {
       DbCommand isMasterCommand = DbCommand.createIsMasterCommand(db);
       return connection.query(isMasterCommand);
     }).then((replyMessage) {
-      _log.fine(replyMessage.documents[0].toString());
+      _log.fine(()=>replyMessage.documents[0].toString());
       var master = replyMessage.documents[0]["ismaster"];
       connection.isMaster = master;
       if (master) {
@@ -54,7 +54,7 @@ class _ConnectionManager {
 
     return Future.forEach(_connectionPool.keys, (hostUrl) {
       var connection = _connectionPool[hostUrl];
-      _log.fine('$db: ${connection.serverConfig.hostUrl} closed');
+      _log.fine(()=>'$db: ${connection.serverConfig.hostUrl} closed');
       return connection.close();
     }).then((_) {
       replyCompleters.clear();

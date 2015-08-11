@@ -78,7 +78,7 @@ class _Connection {
   }
   
   _sendBuffer() {
-    _log.fine('_sendBuffer ${!_sendQueue.isEmpty}');
+    _log.fine(()=>'_sendBuffer ${!_sendQueue.isEmpty}');
     List<int> message = [];
     while (!_sendQueue.isEmpty) {
       var mongoMessage = _sendQueue.removeFirst();
@@ -92,7 +92,7 @@ class _Connection {
     if (!_closed) {
       _replyCompleters[queryMessage.requestId] = completer;
       _pendingQueries.add(queryMessage.requestId);
-      _log.fine('Query $queryMessage');
+      _log.fine(()=>'Query $queryMessage');
       _sendQueue.addLast(queryMessage);
       _sendBuffer();
     } else {
@@ -110,7 +110,7 @@ class _Connection {
     if (_closed) {
       throw const ConnectionException("Invalid state: Connection already closed.");
     }
-    _log.fine('Execute $mongoMessage');
+    _log.fine(()=>'Execute $mongoMessage');
     _sendQueue.addLast(mongoMessage);
     if (runImmediately) {
       _sendBuffer();
@@ -118,15 +118,15 @@ class _Connection {
   }
 
   void _receiveReply(MongoReplyMessage reply) {
-    _log.fine(reply.toString());
+    _log.fine(()=>reply.toString());
     Completer completer = _replyCompleters.remove(reply.responseTo);
     _pendingQueries.remove(reply.responseTo);
     if (completer != null){
-      _log.fine('Completing $reply');
+      _log.fine(()=>'Completing $reply');
       completer.complete(reply);
     } else {
       if (!_closed) {
-        _log.info("Unexpected respondTo: ${reply.responseTo} $reply");
+        _log.info(()=>"Unexpected respondTo: ${reply.responseTo} $reply");
       }
     }
   }

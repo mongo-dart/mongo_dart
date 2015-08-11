@@ -2,6 +2,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 main() async {
   Db db = new Db('mongodb://127.0.0.1/mongo_dart-test');
+  await db.open();
   ///// Simple update
   DbCollection coll = db.collection('collection-for-save');
   await coll.remove();

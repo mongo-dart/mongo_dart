@@ -273,7 +273,7 @@ class Db {
   }
   
   Future close() {
-    _log.fine('$this closed');
+    _log.fine(()=>'$this closed');
     state = State.CLOSED;
     var _cm = _connectionManager;
     _connectionManager = null;
@@ -291,33 +291,33 @@ class Db {
     });
   }
 
-  Cursor _listCollectionsCursor([Map filter = const {}]) {
+  Stream<Map> _listCollectionsCursor([Map filter = const {}]) {
     if (this._masterConnection.serverCapabilities.listCollections) {
-      return new ListCollectionsCursor(this,filter);
+      return new ListCollectionsCursor(this,filter).stream;
     } else { // Using system collections (pre v3.0 API)
       Map selector = {};
       // If we are limiting the access to a specific collection name
       if(filter.containsKey('name')) {
         selector["name"] = "${this.databaseName}.${filter['name']}";
       }
-      return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
+      return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector).stream;
     }
   }
   /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
   /// with WiredTiger
   /// Use `getCollectionInfos` instead
   @deprecated
-  Cursor collectionsInfoCursor([String collectionName]) {
-    return _collectionsInfoCursor(collectionName);
+  Stream<Map> collectionsInfoCursor([String collectionName]) {
+    return _collectionsInfoCursor(collectionName).stream;
   }
-  Cursor _collectionsInfoCursor([String collectionName]) {
+  Stream<Map>  _collectionsInfoCursor([String collectionName]) {
     Map selector = {};
     // If we are limiting the access to a specific collection name
     if(collectionName != null) {
       selector["name"] = "${this.databaseName}.$collectionName";
     }
     // Return Cursor
-    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
+    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector).stream;
   }
 
   /// Analogue to shell's `show collections`

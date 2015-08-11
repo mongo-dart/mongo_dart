@@ -198,7 +198,7 @@ Future testFindStream(){
        {"name": "Daniil","score":4},
       {"name": "Nick", "score": 5}
     ]);
-   return students.find().stream.forEach((v1){
+   return students.find().forEach((v1){
     count++;
     sum += v1["score"];});
   }).then((v){
@@ -734,7 +734,7 @@ Future testCursorGetMore(){
     return db.getLastError();
   }).then((_){
     cursor = new Cursor(db,collection,null);
-    return cursor.forEach((v)=>count++);
+    return cursor.stream.forEach((v)=>count++);
   }).then((v){
     expect(count,1000);
     expect(cursor.cursorId,0);
@@ -753,7 +753,7 @@ Future testCursorClosing(){
     for (int n=0;n < 1000; n++){
       collection.insert({"a":n});
       }
-    cursor = collection.find().cursor;
+    cursor = (collection.find() as CursorStream).cursor;
     expect(cursor.state,State.INIT);
     return cursor.nextObject();
   }).then((v){

@@ -155,6 +155,7 @@ class Cursor {
     nextObject().then((val) {
       if (val == null && state == State.CLOSED) {
         eachCallback = null;
+        controller.close();
         eachComplete.complete(true);
       } else {
         if (val != null) {
@@ -168,8 +169,6 @@ class Cursor {
     });
   }
 
-  @deprecated
-  Future<bool> each(MonadicBlock callback) => forEach(callback);
 
   Future<bool> forEach(MonadicBlock callback) {
     eachCallback = callback;
@@ -178,10 +177,6 @@ class Cursor {
     return eachComplete.future;
   }
 
-  Future<List<Map>> toList() {
-    List<Map> result = [];
-    return this.forEach((v)=>result.add(v)).then((v)=> new Future.value(result));
-  }
 
   Future close() {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
@@ -196,8 +191,7 @@ class Cursor {
 
   Stream<Map> get stream {
     forEach(controller.add)
-      .catchError((e) => controller.addError(e))
-      .then((_) => controller.close());
+      .catchError((e) => controller.addError(e));
     return new CursorStream(controller.stream, this);
   }
 }

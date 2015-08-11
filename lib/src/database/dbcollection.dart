@@ -60,7 +60,7 @@ class DbCollection {
   *
   */
   Stream<Map> find([selector]) => new Cursor(db, this, selector).stream;
-  
+  Cursor createCursor([selector]) => new Cursor(db, this, selector);
   
   Future<Map> findOne([selector]) {
     Cursor cursor = new Cursor(db, this, selector);
@@ -97,11 +97,11 @@ class DbCollection {
   ///  on a collection
   Future<List<Map>> getIndexes() {
     if (db._masterConnection.serverCapabilities.listIndexes) {
-      return new ListIndexesCursor(db, this).toList();
+      return new ListIndexesCursor(db, this).stream.toList();
     } else { /// Pre MongoDB v3.0 API
       var selector = {};
       selector['ns'] = this.fullName();
-      return new Cursor(db, new DbCollection(db, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();
+      return new Cursor(db, new DbCollection(db, DbCommand.SYSTEM_INDEX_COLLECTION), selector).stream.toList();
     }
   }
   Map _selectorBuilder2Map(selector) {

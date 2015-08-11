@@ -71,7 +71,7 @@ _initStatus() {
 }
 
 ProcessResult _startMongod(int port, [String rs]) {
-  _log.info("### Start mongod $port instance");
+  _log.info(()=>"### Start mongod $port instance");
   var args = [
               "--fork", "--smallfiles", "--oplogSize", "50",
               "--logpath", "$DATA_PATH/$port.log",
@@ -89,7 +89,7 @@ ProcessResult _startMongod(int port, [String rs]) {
 _stopMongod(int port) {
   var pid = _readPidFile("$DATA_PATH/$port.pid");
   if (_checkPid(pid)) {
-    _log.info("### Stop mongod $port instance");
+    _log.info(()=>"### Stop mongod $port instance");
     _killPid(pid);
   }
 }
@@ -99,11 +99,11 @@ _statusMongod(int port) {
   if (_checkPid(pid)) {
     var args = [ "localhost:$port", DATA_CFG ];
     var result = Process.runSync(MONGO, args);
-    _log.info("### mongod $port instance is running (PID=$pid)");
-    _log.info(result.stderr);
-    _log.info(result.stdout);
+    _log.info(()=>"### mongod $port instance is running (PID=$pid)");
+    _log.info(()=>result.stderr);
+    _log.info(()=>result.stdout);
   } else {
-    _log.info("### mongod $port instance is stopped");
+    _log.info(()=>"### mongod $port instance is stopped");
   }
 }
 
@@ -141,8 +141,8 @@ startRs([int rsLength = RS_LENGTH]) {
   var port = PORT_BASE + 1;
   var args = [ "localhost:$port", DATA_CFG ];
   var result = Process.runSync(MONGO, args);
-  _log.info(result.stderr);
-  _log.info(result.stdout);
+  _log.info(()=>result.stderr);
+  _log.info(()=>result.stdout);
 
   script = new File(DATA_CFG);
   buffer = new StringBuffer();
@@ -154,8 +154,8 @@ startRs([int rsLength = RS_LENGTH]) {
     var port = PORT_BASE + i;
     var args = [ "localhost:$port", DATA_CFG ];
     var result = Process.runSync(MONGO, args);
-    _log.info(result.stderr);
-    _log.info(result.stdout);
+    _log.info(()=>result.stderr);
+    _log.info(()=>result.stdout);
   }
 }
 

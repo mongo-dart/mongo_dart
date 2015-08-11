@@ -5,7 +5,7 @@ void main() {
 
   db.open().then((_) {
     var oplog = new DbCollection(db, "oplog.rs");
-    var cursor = oplog.find()
+    Cursor cursor = oplog.createCursor()
         ..tailable  = true
         ..timeout   = false
         ..awaitData = true;

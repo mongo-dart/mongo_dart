@@ -10,7 +10,7 @@ class MongoMessageHandler {
       var buffer = new BsonBinary.from(converter.messages.removeFirst());
       MongoReplyMessage reply = new MongoReplyMessage();
       reply.deserialize(buffer);
-      _log.fine(reply.toString());
+      _log.fine(()=>reply.toString());
       sink.add(reply);
     }
   }
