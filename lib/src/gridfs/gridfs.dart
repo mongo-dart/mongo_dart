@@ -17,7 +17,7 @@ class GridFS {
     // TODO(tsander): Ensure index.
   }
 
-  Cursor getFileList(SelectorBuilder selectorBuilder) {
+  Stream<Map> getFileList(SelectorBuilder selectorBuilder) {
     return files.find(selectorBuilder.sortBy("filename", descending:true));
   }
 
