@@ -8,6 +8,16 @@
 - use `test` instead of `unittest` package
 - add code coverage metrix with coveralls.io
 
+###0.2.1
+
+  - Fix issue [71](https://github.com/vadimtsushko/mongo_dart/issues/71) - Logger allocates lot of strings
+
+
+###0.2.0
+
+- Relatively non-backward compatible things (TODO - describe all this)
+
+
 ###0.1.46
 
 - Save method use `upsert` flag in accordance with [mongodb docs](http://docs.mongodb.org/manual/reference/method/db.collection.save/)
