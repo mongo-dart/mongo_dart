@@ -308,7 +308,7 @@ class Db {
   /// Use `getCollectionInfos` instead
   @deprecated
   Stream<Map> collectionsInfoCursor([String collectionName]) {
-    return _collectionsInfoCursor(collectionName).stream;
+    return _collectionsInfoCursor(collectionName);
   }
   Stream<Map>  _collectionsInfoCursor([String collectionName]) {
     Map selector = {};
@@ -326,7 +326,7 @@ class Db {
   /// Use `getCollectionNames` instead
   @deprecated
   Future<List<String>> listCollections() {
-    return _collectionsInfoCursor().stream.map((map) => map['name'].split('.')).where((arr)=> arr.length == 2).map((arr)=> arr.last).toList();
+    return _collectionsInfoCursor().map((map) => map['name'].split('.')).where((arr)=> arr.length == 2).map((arr)=> arr.last).toList();
   }
 
   
@@ -335,7 +335,7 @@ class Db {
   }
   
   Future<List<String>> getCollectionNames([Map filter = const {}]) {
-      return _listCollectionsCursor(filter).stream.map((map) => map['name']).toList();
+      return _listCollectionsCursor(filter).map((map) => map['name']).toList();
   }
     
   
@@ -355,7 +355,7 @@ class Db {
     if (collectionName != null) {
       selector['ns'] = '$databaseName.$collectionName';
     }
-    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();
+    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).stream.toList();
   }
   
   String _createIndexName(Map keys) {
