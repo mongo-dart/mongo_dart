@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.2.2
+
+- Loosening parameter type in CursorStream in accordance with sdk 1.13.0
+- README update with basic usage
 
 ###0.2.1
 
