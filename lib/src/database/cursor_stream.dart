@@ -15,7 +15,7 @@ class CursorStream extends Stream<Map> {
   }
 
   StreamSubscription<Map> listen(void onData(Map line),
-                                    { void onError(Error error),
+                                    {Function onError,
                                     void onDone(),
                                     bool cancelOnError }) {
     return _controller.stream.listen(onData,
@@ -23,7 +23,9 @@ class CursorStream extends Stream<Map> {
     onDone: onDone,
     cancelOnError: cancelOnError);
   }
-
+  void _onError(error) {
+    _controller.addError(error);
+  }
   void _onListen() {
     _subscription = _source.listen(_onData,
     onError: _controller.addError,

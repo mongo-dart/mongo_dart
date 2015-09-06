@@ -5,8 +5,91 @@
 
 Server-side driver library for MongoDb implemented in pure Dart.
 
-Simple usage example on base of [JSON ZIPS dataset] (http://media.mongodb.org/zips.json)
+##Basic usage
 
+###Obtaining connection
+
+```dart
+
+  Db db = new Db("mongodb://localhost:27017/mongo_dart-blog");
+  await db.open();
+```
+
+###Querying
+
+
+Method `find` returns stream of maps and accept query parameters, usually build by fluent API query builder 
+provided by [mongo_dart_query](https://github.com/vadimtsushko/mongo_dart_query) as top level getter `where`
+
+```dart
+
+  var collection = db.collection('user');
+  await collection.find(where.lt("age", 18)).toList();
+  
+  //....
+  
+  await coll
+      .find(where.gt("my_field", 995).sortBy('my_field'))
+      .forEach((v) => print(v));
+      
+  //....
+  
+  await coll.find(where.sortBy('itemId').skip(300).limit(25)).toList();
+  
+```
+
+Method `findOne` take the same parameter and returns `Future` of just one map (mongo document)
+
+```dart
+
+  val = await coll.findOne(where.eq("my_field", 17).fields(['str_field','my_field']));
+```
+
+
+Take notice in these samples that unlike mongo shell such parameters as projection (`fields`), `limit` and `skip`
+are passed as part of regular query through query builder
+
+###Inserting documents
+
+```dart
+
+  await usersCollection.insertAll([
+    {'login': 'jdoe', 'name': 'John Doe', 'email': 'john@doe.com'},
+    {'login': 'lsmith', 'name': 'Lucy Smith', 'email': 'lucy@smith.com'}
+  ]);
+```
+
+###Updating documents
+
+You can update whole document with method `save`
+
+```dart
+
+  var v1 = await coll.findOne({"name": "c"});
+  v1["value"] = 31;
+  await coll.save(v1);
+```
+
+or you can perform field level updates with top level getter `modify` for ModifierBuilder fluent API   
+
+```dart
+
+  coll.update(where.eq('name', 'Daniel Robinson'), modify.set('age', 31));
+
+```
+
+###Removing documents
+
+```dart
+
+  students.remove(where.id(id));
+  /// or, to remove all documents from collection
+  students.remove();    
+    
+```
+
+
+Simple app on base of [JSON ZIPS dataset] (http://media.mongodb.org/zips.json)
 
 
 ```dart
