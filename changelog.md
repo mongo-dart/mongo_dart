@@ -1,12 +1,5 @@
 #Recent change notes
 
-###0.1.47
-
-- compatibility with MongoDB 3.0 and WiredTiger. New `db.getCollectionNames()`,
- `db.getCollectionInfos()`, `collection.getIndexes()` methods, backward compatible with earlier versions of MongoDb.
-- `collectionsInfoCursor`, `listCollections`, `indexInformation` methods of Db deprecated
-- use `test` instead of `unittest` package
-- add code coverage metrix with coveralls.io
 
 ###0.2.1
 
@@ -15,7 +8,23 @@
 
 ###0.2.0
 
-- Relatively non-backward compatible things (TODO - describe all this)
+- Breaking change: DbCollection `find` method now returns Stream<Map> instead of Cursor. 
+  Cursor have had compatible with Stream<Map> `toList` and `forEach` quite some time already, so in case you used these methods only,
+  you should be covered. On the other hand if you used `find().stream` to get a stream it is not valid anymore. In that case you
+  should change your code to plain `find()`
+- Breaking change: This version use upgraded version of `bson`. `ObjectId.toJson` now converts `ObjectId` to simple hex string representation.
+  Earlier it was something like `ObjectId('a29d3ae24...aa')` New behaviour would be more useful when you serialize `bson` map to json be default
+  conversion. With new behaviour serialized ObjectId value could be passed to `ObjecdId.parse` method.
+  But if your code currently depends on old behaviour (if you now use something like `id.substring(10, 34)` to get hex part of the 
+  string representation, you should change your code.
+
+###0.1.47
+
+- compatibility with MongoDB 3.0 and WiredTiger. New `db.getCollectionNames()`,
+ `db.getCollectionInfos()`, `collection.getIndexes()` methods, backward compatible with earlier versions of MongoDb.
+- `collectionsInfoCursor`, `listCollections`, `indexInformation` methods of Db deprecated
+- use `test` instead of `unittest` package
+- add code coverage metrix with coveralls.io
 
 
 ###0.1.46
