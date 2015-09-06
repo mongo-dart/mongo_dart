@@ -23,9 +23,7 @@ class CursorStream extends Stream<Map> {
     onDone: onDone,
     cancelOnError: cancelOnError);
   }
-  void _onError(error) {
-    _controller.addError(error);
-  }
+
   void _onListen() {
     _subscription = _source.listen(_onData,
     onError: _controller.addError,
