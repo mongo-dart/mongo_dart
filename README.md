@@ -70,7 +70,7 @@ You can update whole document with method `save`
   await coll.save(v1);
 ```
 
-or you can perform field level updates with top level getter `modify` for ModifierBuilder fluent API   
+or you can perform field level updates with method `update` and top level getter `modify` for ModifierBuilder fluent API   
 
 ```dart
 
