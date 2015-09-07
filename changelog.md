@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.2.3
+
+- Swithed to travis from drone.io
+- Can use null-aware operators in example (blog)
+
 ###0.2.2
 
 - Loosening parameter type in CursorStream in accordance with sdk 1.13.0
