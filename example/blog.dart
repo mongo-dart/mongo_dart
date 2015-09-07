@@ -1,12 +1,8 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:io' show Platform;
 
-var host = Platform.environment['MONGO_DART_DRIVER_HOST'] == null
-    ? '127.0.0.1'
-    : Platform.environment['MONGO_DART_DRIVER_HOST'];
-var port = Platform.environment['MONGO_DART_DRIVER_PORT'] == null
-    ? '27017'
-    : Platform.environment['MONGO_DART_DRIVER_PORT'];
+var host = Platform.environment['MONGO_DART_DRIVER_HOST'] ?? '127.0.0.1';
+var port = Platform.environment['MONGO_DART_DRIVER_PORT'] ?? '27017';
 
 main() async {
   Db db = new Db("mongodb://$host:$port/mongo_dart-blog");
