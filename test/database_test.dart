@@ -4,10 +4,10 @@ import 'package:crypto/crypto.dart';
 import 'dart:async';
 import 'package:test/test.dart';
 
-const DefaultUri = 'mongodb://127.0.0.1/';
+const DefaultUri = 'mongodb://127.0.0.1:27017/';
 
 Future testGetCollectionInfos(){
-  Db db = new Db('mongodb://127.0.0.1/mongo_dart-test','testCollectionInfoCursor');
+  Db db = new Db('mongodb://127.0.0.1:27017/mongo_dart-test','testCollectionInfoCursor');
   DbCollection newColl;
   return db.open().then((c){
     newColl = db.collection("new_collecion");
@@ -1093,7 +1093,7 @@ Future testUpdateOnClosedConnection() {
 }
 
 Future testReopeningDb() {
-  var db = new Db('mongodb://127.0.0.1/testdb');
+  var db = new Db('mongodb://127.0.0.1:27017/testdb');
   return db.open().then((_) {
     var coll = db.collection('test');
     return coll.insert({'one':'test'});

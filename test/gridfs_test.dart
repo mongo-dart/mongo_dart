@@ -5,7 +5,7 @@ import 'dart:async';
 import 'package:test/test.dart';
 import 'package:path/path.dart' as path;
 
-const DefaultUri = 'mongodb://127.0.0.1/';
+const DefaultUri = 'mongodb://127.0.0.1:27017/';
 
 class MockConsumer<S> implements StreamConsumer<S> {
   List<S> data = <S>[];
