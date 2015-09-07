@@ -28,16 +28,14 @@ clearFSCollections(GridFS gridFS) {
   gridFS.files.remove();
   gridFS.chunks.remove();
 }
-Future testSmall(){
+Future testSmall() async {
   Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((c){
+  await db.open();
     List<int> data = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
     GridFS gridFS = new GridFS(db);
     clearFSCollections(gridFS);
-    return testInOut(data, gridFS);
-  }).then((c){
-    return db.close();
-  });
+    await testInOut(data, gridFS);
+    await db.close();
 }
 
 Future testBig(){
@@ -75,30 +73,6 @@ Future tesSomeChunks(){
     return db.close();
   });
 }
-Future testInOut(List<int> data, GridFS gridFS, [Map extraData = null]) {
-  var consumer = new MockConsumer();
-  var out = new IOSink(consumer);
-  return getInitialState(gridFS).then((List<int> initialState){
-    var inputStream = new Stream.fromIterable([data]);
-    GridIn input = gridFS.createFile(inputStream, "test");
-    if (extraData != null) {
-      input.extraData = extraData;
-    }
-    return input.save().then((c) {
-      return gridFS.findOne(where.eq("_id", input.id)).then((GridOut gridOut) {
-        expect(gridOut,isNotNull, reason: "Did not find file by Id");
-        expect(input.id, gridOut.id, reason: "Ids not equal.");
-        expect(GridFS.DEFAULT_CHUNKSIZE, gridOut.chunkSize, reason: "Chunk size not the same.");
-        expect("test", gridOut.filename, reason: "Filename not equal");
-        expect(input.extraData, gridOut.extraData);
-        return gridOut.writeTo(out);
-      }).then((c){
-        expect(data, orderedEquals(consumer.data));
-        return getInitialState(gridFS);
-      });
-    });
-  });
-}
 
 Future<List<int>> getInitialState(GridFS gridFS) {
   Completer completer = new Completer();
@@ -113,6 +87,28 @@ Future<List<int>> getInitialState(GridFS gridFS) {
   });
   return completer.future;
 }
+
+Future testInOut(List<int> data, GridFS gridFS, [Map extraData = null]) async {
+  var consumer = new MockConsumer();
+  var out = new IOSink(consumer);
+  List<int> initialState = await getInitialState(gridFS);
+  var inputStream = new Stream.fromIterable([data]);
+    GridIn input = gridFS.createFile(inputStream, "test");
+    if (extraData != null) {
+      input.extraData = extraData;
+      await input.save();
+      GridOut gridOut = await gridFS.findOne(where.eq("_id", input.id));
+      expect(gridOut, isNotNull, reason: "Did not find file by Id");
+      expect(input.id, gridOut.id, reason: "Ids not equal.");
+      expect(GridFS.DEFAULT_CHUNKSIZE, gridOut.chunkSize,
+          reason: "Chunk size not the same.");
+      expect("test", gridOut.filename, reason: "Filename not equal");
+      expect(input.extraData, gridOut.extraData);
+      await gridOut.writeTo(out);
+      expect(consumer.data, orderedEquals(data));
+    }
+}
+
 
 Future testChunkTransformerOneChunk(){
   return new Stream.fromIterable([[1,2,3,4,5,6,7,8,9,10,11]]).transform(new ChunkHandler(3).transformer)
