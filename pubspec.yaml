@@ -1,5 +1,5 @@
 name: mongo_dart
-version: 0.2.3
+version: 0.2.4
 authors:
 - Vadim Tsushko <vadimtsushko@gmail.com>
 - Ted Sander <ted@tedsander.com>
@@ -11,9 +11,9 @@ environment:
   sdk: '>=1.10.0 <2.0.0'
 dependencies:
   bson: '^0.2.0'
-  crypto: '>=0.9.0 <0.10.0'
-  logging: '>=0.9.0 <0.11.0'
-  mongo_dart_query: '^0.1.14'
+  crypto: '^0.9.0'
+  logging: '^0.11.0'
+  mongo_dart_query: '^0.2.0'
 dev_dependencies:
   test: '^0.12.0-rc.1'
-  grinder: '>=0.7.0 <0.8.0'
+  grinder: '^0.7.0'
