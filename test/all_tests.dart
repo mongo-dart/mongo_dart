@@ -6,7 +6,7 @@ import 'packet_converter_test.dart' as converter;
 import 'mongo_dart_query_test.dart' as mongo_dart_query;
 //import 'replica_tests.dart' as replica;
 
-main(){
+main() {
   converter.main();
   database.main();
   gridfs.main();

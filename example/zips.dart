@@ -1,5 +1,8 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
+
+//////Sample is broken now. Mongolab free accounts upgraded to MongoDb 3.0
+///// and support for 3.0 default authentication scheme not implemented yet
 main() async {
   void displayZip(Map zip) {
     print(

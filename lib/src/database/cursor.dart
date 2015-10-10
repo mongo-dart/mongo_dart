@@ -20,7 +20,6 @@ class Cursor {
   var eachComplete;
   bool explain;
   int flags = 0;
-  var controller = new StreamController<Map>();
 
   /// Tailable means cursor is not closed when the last data is retrieved
   set tailable(bool value) =>
@@ -151,32 +150,6 @@ class Cursor {
     }
   }
 
-  void _nextEach() {
-    nextObject().then((val) {
-      if (val == null && state == State.CLOSED) {
-        eachCallback = null;
-        controller.close();
-        eachComplete.complete(true);
-      } else {
-        if (val != null) {
-          eachCallback(val);
-        }
-        _nextEach();
-      }
-    }).catchError((e) {
-      eachCallback = null;
-      eachComplete.completeError(e);
-    });
-  }
-
-
-  Future<bool> forEach(MonadicBlock callback) {
-    eachCallback = callback;
-    eachComplete = new Completer();
-    _nextEach();
-    return eachComplete.future;
-  }
-
 
   Future close() {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
@@ -189,11 +162,20 @@ class Cursor {
     return new Future.value(null);
   }
 
-  Stream<Map> get stream {
-    forEach(controller.add)
-      .catchError((e) => controller.addError(e));
-    return new CursorStream(controller.stream, this);
+//  Stream<Map> get stream {
+//    forEach(controller.add)
+//      .catchError((e) => controller.addError(e));
+//    return new CursorStream(controller.stream, this);
+//  }
+
+  Stream<Map> get stream async* {
+    Map doc = await nextObject();
+    while (doc != null) {
+      yield doc;
+      doc = await nextObject();
+    }
   }
+
 }
 
 class CommandCursor extends Cursor {
