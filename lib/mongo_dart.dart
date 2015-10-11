@@ -11,6 +11,9 @@ import 'dart:collection';
 import 'package:bson/bson.dart';
 import 'package:logging/logging.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:collection/equality.dart';
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_dart_query.dart';
@@ -40,3 +43,4 @@ part 'src/gridfs/grid_file.dart';
 part 'src/gridfs/grid_in.dart';
 part 'src/gridfs/grid_out.dart';
 part 'src/gridfs/chunk_handler.dart';
+part 'src/database/auth.dart';
