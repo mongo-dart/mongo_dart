@@ -73,7 +73,7 @@ class DbCommand extends MongoQueryMessage {
     var command = {
       'saslStart': 1,
       'mechanism': mechanismName,
-      'payload': UTF8.decode(bytesToSendToServer)
+      'payload': BASE64.encode(bytesToSendToServer)
     };
 
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NONE, 0, -1, command, null);

@@ -47,8 +47,11 @@ class SaslAuthenticator extends Authenticator {
         break;
       }
 
-      var payload = UTF8.encode(result['payload']);
-      currentStep = currentStep.transition(conversation, payload);
+      var payload = result['payload'];
+
+      var payloadAsBytes = BASE64.decode(payload);
+
+      currentStep = currentStep.transition(conversation, payloadAsBytes);
 
       if (result['done'] == false && currentStep.isComplete) {
         break;
@@ -113,10 +116,11 @@ class ClientFirst extends SaslStep {
     var encoding = new Utf8Codec();
 
     String serverFirstMessage = encoding.decode(bytesReceivedFromServer);
+
     Map decodedMessage = parsePayload(serverFirstMessage);
 
     String r = decodedMessage['r'];
-    if (!r.startsWith(rPrefix)) {
+    if (r == null || !r.startsWith(rPrefix)) {
       throw new MongoDartError("Server sent an invalid nonce.");
     }
 

@@ -348,8 +348,7 @@ class Db {
     try {
       await authenticator.authenticate(connection);
     } catch (e) {
-      throw e;
-      return false;
+      rethrow; // TODO: Manage this maybe
     }
 
     return true;
