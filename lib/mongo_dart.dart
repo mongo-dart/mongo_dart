@@ -44,3 +44,5 @@ part 'src/gridfs/grid_in.dart';
 part 'src/gridfs/grid_out.dart';
 part 'src/gridfs/chunk_handler.dart';
 part 'src/database/auth.dart';
+part 'src/database/sasl_authenticator.dart';
+part 'src/database/scram_sha1_authenticator.dart';
