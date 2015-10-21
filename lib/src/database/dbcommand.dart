@@ -30,7 +30,6 @@ class DbCommand extends MongoQueryMessage {
     return new MongoQueryMessage("admin.$SYSTEM_COMMAND_COLLECTION", MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, command, null);
   }
 
-
   static DbCommand createDBSlaveOKCommand(Db db, Map command) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT | MongoQueryMessage.OPTS_SLAVE, 0, -1, command, null);
   }
@@ -56,17 +55,6 @@ class DbCommand extends MongoQueryMessage {
     finalQuery["count"] = collectionName;
     finalQuery["query"] = selector;
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, finalQuery, null);
-  }
-
-  static DbCommand createAuthenticationCommand(Db db, String userName, String password, String nonce) {
-    var md5 = new MD5();
-    md5.add("${userName}:mongo:${password}".codeUnits);
-    var hashed_password = new BsonBinary.from(md5.close()).hexString;
-    md5 = new MD5();
-    md5.add("${nonce}${userName}${hashed_password}".codeUnits);
-    var key = new BsonBinary.from(md5.close()).hexString;
-    var selector = {'authenticate':1, 'user':userName, 'nonce':nonce, 'key':key};
-    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NONE, 0, -1, selector, null);
   }
 
   static DbCommand createSaslStartCommand(Db db, String mechanismName, Uint8List bytesToSendToServer) {

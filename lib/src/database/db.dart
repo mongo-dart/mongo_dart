@@ -110,6 +110,7 @@ class Db {
   _ConnectionManager _connectionManager;
   _Connection get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
+  AuthenticationScheme _authenticationScheme;
 //  _validateDatabaseName(String dbName) {
 //    if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
 //    var invalidChars = [" ", ".", "\$", "/", "\\"];
@@ -157,6 +158,24 @@ class Db {
     if (uri.path != '') {
       databaseName = uri.path.replaceAll('/','');
     }
+
+    final authMechanismParameter = 'authMechanism';
+    uri.queryParameters.forEach((String k, String v) {
+      if (k == authMechanismParameter) {
+        if (v == 'SCRAM-SHA-1') {
+          _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
+        } else if (v == 'MONGODB-CR') {
+          _authenticationScheme = AuthenticationScheme.MONGODB_CR;
+        } else {
+          throw new MongoDartError("Provided authentication scheme is not supported : $v");
+        }
+      }
+    });
+
+    if(!uri.queryParameters.containsKey(authMechanismParameter)) {
+      _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
+    }
+
     return serverConfig;
   }
 
@@ -335,20 +354,20 @@ class Db {
   }
 
   Future<List<String>> getCollectionNames([Map filter = const {}]) {
-      return _listCollectionsCursor(filter).map((map) => map['name']).toList();
+    return _listCollectionsCursor(filter).map((map) => map['name']).toList();
   }
-
 
   Future<bool> authenticate(String userName, String password, {_Connection connection}) async {
     var credential = new UsernamePasswordCredential()
       ..username = userName
       ..password = password;
 
-    var authenticator = new ScramSha1Authenticator(credential, this);
+    var authenticator = createAuthenticator(_authenticationScheme, this, credential);
+
     try {
       await authenticator.authenticate(connection);
     } catch (e) {
-      rethrow; // TODO: Manage this maybe
+      rethrow;
     }
 
     return true;

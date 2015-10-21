@@ -1,9 +1,23 @@
 part of mongo_dart;
 
+enum AuthenticationScheme {
+  MONGODB_CR, SCRAM_SHA_1
+}
+
+Authenticator createAuthenticator(AuthenticationScheme authenticationScheme, Db db, UsernamePasswordCredential credentials) {
+  switch (authenticationScheme) {
+    case AuthenticationScheme.MONGODB_CR:
+      return new MongoDbCRAuthenticator(db, credentials);
+    case AuthenticationScheme.SCRAM_SHA_1:
+      return new ScramSha1Authenticator(credentials, db);
+    default:
+      throw new MongoDartError("Authenticator wasn't specified");
+  }
+}
+
 class UsernamePasswordCredential {
   String username;
   String password; // TODO: Encrypt this to secureString
-  String source; // Database name
 }
 
 abstract class RandomStringGenerator {
@@ -27,7 +41,6 @@ Map<String, String> parsePayload(String payload) {
   var parts = payload.split(',');
 
   for (var i = 0; i < parts.length; i++) {
-    var valueParts = parts[i].split('=');
     var key = parts[i][0];
     var value = parts[i].substring(2);
     dict[key] = value;

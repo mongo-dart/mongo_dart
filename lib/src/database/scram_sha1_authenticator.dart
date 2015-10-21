@@ -33,7 +33,7 @@ class ClientFirst extends SaslStep {
     var clientFinalMessageWithoutProof = '$channelBinding,$nonce';
 
     var passwordDigest =
-    md5DigestPassword(credential.username, credential.password);
+        md5DigestPassword(credential.username, credential.password);
     var salt = BASE64.decode(s);
 
     var saltedPassword = hi(passwordDigest, salt, i);
