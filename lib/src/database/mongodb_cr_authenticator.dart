@@ -1,6 +1,9 @@
 part of mongo_dart;
 
 class MongoDbCRAuthenticator extends Authenticator {
+  @override
+  static final String name = 'MONGODB-CR';
+
   final Db db;
   final UsernamePasswordCredential credentials;
 

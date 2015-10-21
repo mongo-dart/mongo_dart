@@ -161,9 +161,9 @@ class Db {
     final authMechanismParameter = 'authMechanism';
     uri.queryParameters.forEach((String k, String v) {
       if (k == authMechanismParameter) {
-        if (v == 'SCRAM-SHA-1') {
+        if (v == ScramSha1Authenticator.name) {
           _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
-        } else if (v == 'MONGODB-CR') {
+        } else if (v == MongoDbCRAuthenticator.name) {
           _authenticationScheme = AuthenticationScheme.MONGODB_CR;
         } else {
           throw new MongoDartError("Provided authentication scheme is not supported : $v");

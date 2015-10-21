@@ -179,14 +179,12 @@ class ScramSha1Mechanism extends SaslMechanism {
   }
 
   @override
-  String get name => ScramSha1Authenticator.SCRAM;
+  String get name => ScramSha1Authenticator.name;
 }
 
 class ScramSha1Authenticator extends SaslAuthenticator {
-  static final String SCRAM = 'SCRAM-SHA-1';
-
   @override
-  String get name => SCRAM;
+  static String name = 'SCRAM-SHA-1';
 
   ScramSha1Authenticator(UsernamePasswordCredential credential, Db db)
       : super(

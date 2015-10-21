@@ -3,6 +3,11 @@ part of mongo_dart;
 enum AuthenticationScheme {
   MONGODB_CR, SCRAM_SHA_1
 }
+abstract class Authenticator {
+  static String name;
+
+  Future authenticate(_Connection connection);
+}
 
 Authenticator createAuthenticator(AuthenticationScheme authenticationScheme, Db db, UsernamePasswordCredential credentials) {
   switch (authenticationScheme) {

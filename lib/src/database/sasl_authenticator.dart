@@ -1,10 +1,5 @@
 part of mongo_dart;
 
-abstract class Authenticator {
-  String name;
-  Future authenticate(_Connection connection);
-}
-
 abstract class SaslMechanism {
   String get name;
 
@@ -24,7 +19,7 @@ class SaslConversation {
   SaslConversation(this.connection);
 }
 
-class SaslAuthenticator extends Authenticator {
+abstract class SaslAuthenticator extends Authenticator {
   SaslMechanism mechanism;
   Db db;
 

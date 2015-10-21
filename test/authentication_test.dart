@@ -1,12 +1,12 @@
 import 'package:test/test.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-final String mongoDb3Uri =
+final String mongoDbUri =
     'mongodb://test:test@ds031477.mongolab.com:31477/dart';
 
 main() {
   test("Should be able to connect and authenticate", () async {
-    Db db = new Db(mongoDb3Uri, 'test scram sha1');
+    Db db = new Db(mongoDbUri, 'test scram sha1');
 
     await db.open();
 
@@ -16,7 +16,7 @@ main() {
   test(
       "Should be able to connect and authenticate with auth mechanism specified",
       () async {
-    Db db = new Db('$mongoDb3Uri?authMechanism=SCRAM-SHA-1');
+    Db db = new Db('$mongoDbUri?authMechanism=${ScramSha1Authenticator.name}');
 
     await db.open();
 
@@ -24,7 +24,7 @@ main() {
   });
 
   test("Can't connect with mongodb-cr on a db without that scheme", () async {
-    Db db = new Db('$mongoDb3Uri/?authMechanism=MONGODB-CR');
+    Db db = new Db('$mongoDbUri/?authMechanism=${MongoDbCRAuthenticator.name}');
 
     var sut = () async => await db.open();
 
@@ -36,7 +36,7 @@ main() {
 
   test("Throw exception when auth mechanism isn't supported", () async {
     final String authMechanism = 'Anything';
-    Db db = new Db('$mongoDb3Uri?authMechanism=$authMechanism');
+    Db db = new Db('$mongoDbUri?authMechanism=$authMechanism');
 
     var sut = () async => await db.open();
 
