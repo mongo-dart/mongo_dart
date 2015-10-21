@@ -15,7 +15,6 @@ class ClientFirst extends SaslStep {
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
     String serverFirstMessage = UTF8.decode(bytesReceivedFromServer);
-
     Map decodedMessage = parsePayload(serverFirstMessage);
 
     String r = decodedMessage['r'];
@@ -24,6 +23,7 @@ class ClientFirst extends SaslStep {
     }
 
     var s = decodedMessage['s'];
+    var paddedSMessage = padWithEqualsForBase64(s);
     var i = int.parse(decodedMessage['i']);
 
     final String gs2Header = 'n,,';
@@ -34,8 +34,9 @@ class ClientFirst extends SaslStep {
 
     var passwordDigest =
     md5DigestPassword(credential.username, credential.password);
-    var saltedPassword = hi(passwordDigest, BASE64.decode(s + '=='), i);
+    var salt = BASE64.decode(paddedSMessage);
 
+    var saltedPassword = hi(passwordDigest, salt, i);
     var clientKey = computeHMAC(saltedPassword, 'Client Key');
     var storedKey = h(clientKey);
     var authMessage =
@@ -88,10 +89,8 @@ class ClientFirst extends SaslStep {
   }
 
   static Uint8List hi(String password, Uint8List salt, int iterations) {
-    List<int> passwordDigest = [];
-
     var digest = (msg) {
-      var hmac = new HMAC(new SHA1(), passwordDigest);
+      var hmac = new HMAC(new SHA1(), password.codeUnits);
       hmac.add(msg);
       return new Uint8List.fromList(hmac.close());
     };
@@ -122,7 +121,8 @@ class ClientLast extends SaslStep {
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
     Map decodedMessage = parsePayload(UTF8.decode(bytesReceivedFromServer));
-    var serverSignature = BASE64.decode(decodedMessage['v']);
+    var paddedVMessage = padWithEqualsForBase64(decodedMessage['v']);
+    var serverSignature = BASE64.decode(paddedVMessage);
 
     if (!const ListEquality().equals(serverSignature64, serverSignature)) {
       throw new MongoDartError("Server signature was invalid.");
@@ -134,7 +134,7 @@ class ClientLast extends SaslStep {
 
 class CompletedStep extends SaslStep {
   CompletedStep() {
-    this.bytesToSendToServer = [];
+    this.bytesToSendToServer = null;
     isComplete = true;
   }
 
@@ -158,6 +158,7 @@ class ScramSha1Mechanism extends SaslMechanism {
     final String gs2Header = 'n,,';
     var username = 'n=${prepUsername(credential.username)}';
     var r = randomStringGenerator.generate(20, ""); // TODO Change this
+
     var nonce = 'r=$r';
 
     var clientFirstMessageBare = '$username,$nonce';
@@ -192,4 +193,17 @@ class ScramSha1Authenticator extends SaslAuthenticator {
       db) {
     this.db = db;
   }
+}
+
+String padWithEqualsForBase64(String s) {
+  int paddingToAdd = (4 - (s.length % 4)) % 4;
+  StringBuffer sb = new StringBuffer();
+
+  sb.write(s);
+
+  for (int i = 0 ; i < paddingToAdd; ++i) {
+    sb.write("=");
+  }
+
+  return sb.toString();
 }
