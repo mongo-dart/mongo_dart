@@ -15,7 +15,7 @@ class ClientFirst extends SaslStep {
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
     String serverFirstMessage = UTF8.decode(bytesReceivedFromServer);
-
+//    serverFirstMessage = 'r=fyko+d2lbbFgONRv9qkxdawLHo+Vgk7qvUOKUwuWLIWg4l/9SraGMHEE,s=rQ9ZY3MntBeuP3E1TDVC4w==,i=10000';
     Map decodedMessage = parsePayload(serverFirstMessage);
 
     String r = decodedMessage['r'];
@@ -34,8 +34,9 @@ class ClientFirst extends SaslStep {
 
     var passwordDigest =
     md5DigestPassword(credential.username, credential.password);
-    var saltedPassword = hi(passwordDigest, BASE64.decode(s + '=='), i);
+    var salt = BASE64.decode(s);
 
+    var saltedPassword = hi(passwordDigest, salt, i);
     var clientKey = computeHMAC(saltedPassword, 'Client Key');
     var storedKey = h(clientKey);
     var authMessage =
@@ -91,7 +92,7 @@ class ClientFirst extends SaslStep {
     List<int> passwordDigest = [];
 
     var digest = (msg) {
-      var hmac = new HMAC(new SHA1(), passwordDigest);
+      var hmac = new HMAC(new SHA1(), password.codeUnits);
       hmac.add(msg);
       return new Uint8List.fromList(hmac.close());
     };
@@ -134,7 +135,7 @@ class ClientLast extends SaslStep {
 
 class CompletedStep extends SaslStep {
   CompletedStep() {
-    this.bytesToSendToServer = [];
+    this.bytesToSendToServer = null;
     isComplete = true;
   }
 
@@ -158,6 +159,8 @@ class ScramSha1Mechanism extends SaslMechanism {
     final String gs2Header = 'n,,';
     var username = 'n=${prepUsername(credential.username)}';
     var r = randomStringGenerator.generate(20, ""); // TODO Change this
+//    var r = 'fyko+d2lbbFgONRv9qkxdawL';
+
     var nonce = 'r=$r';
 
     var clientFirstMessageBare = '$username,$nonce';
