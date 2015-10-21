@@ -1,20 +1,23 @@
 import 'package:mongo_dart/mongo_dart.dart';
-
+import 'dart:async';
 
 //////// I guess tailable cursor does not work in that example
-void main() {
+main() async {
   var db = new Db("mongodb://127.0.0.1/local");
 
-  db.open().then((_) {
+  await db.open();
     var oplog = new DbCollection(db, "log");
     Cursor cursor = oplog.createCursor()
         ..tailable  = true
         ..timeout   = false
-        ..awaitData = true;
+        ..awaitData = false;
+   while (true) {
+      var doc = await cursor.nextObject();
+      if (doc == null) {
+        await new Future.delayed(new Duration(seconds: 1), () => null);
+      } else {
+        print(doc);
+      }
+   }
 
-    return cursor.stream.listen(
-        (value) => print(value),
-        onError: (err) => print("error: $err"),
-        onDone: () => print("done"));
-  });
 }
