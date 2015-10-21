@@ -100,7 +100,6 @@ class WriteConcern {
 }
 
 class Db {
-
   State state = State.INIT;
   final _log = new Logger('Db');
   String databaseName;
