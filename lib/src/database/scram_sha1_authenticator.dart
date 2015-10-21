@@ -15,6 +15,7 @@ class ClientFirst extends SaslStep {
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
     String serverFirstMessage = UTF8.decode(bytesReceivedFromServer);
+
     Map decodedMessage = parsePayload(serverFirstMessage);
 
     String r = decodedMessage['r'];
@@ -23,7 +24,6 @@ class ClientFirst extends SaslStep {
     }
 
     var s = decodedMessage['s'];
-    var paddedSMessage = padWithEqualsForBase64(s);
     var i = int.parse(decodedMessage['i']);
 
     final String gs2Header = 'n,,';
@@ -33,8 +33,8 @@ class ClientFirst extends SaslStep {
     var clientFinalMessageWithoutProof = '$channelBinding,$nonce';
 
     var passwordDigest =
-        md5DigestPassword(credential.username, credential.password);
-    var salt = BASE64.decode(paddedSMessage);
+    md5DigestPassword(credential.username, credential.password);
+    var salt = BASE64.decode(s);
 
     var saltedPassword = hi(passwordDigest, salt, i);
     var clientKey = computeHMAC(saltedPassword, 'Client Key');
@@ -122,8 +122,7 @@ class ClientLast extends SaslStep {
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
     Map decodedMessage = parsePayload(UTF8.decode(bytesReceivedFromServer));
-    var paddedVMessage = padWithEqualsForBase64(decodedMessage['v']);
-    var serverSignature = BASE64.decode(paddedVMessage);
+    var serverSignature = BASE64.decode(decodedMessage['v']);
 
     if (!const ListEquality().equals(serverSignature64, serverSignature)) {
       throw new MongoDartError("Server signature was invalid.");
@@ -195,17 +194,4 @@ class ScramSha1Authenticator extends SaslAuthenticator {
             db) {
     this.db = db;
   }
-}
-
-String padWithEqualsForBase64(String s) {
-  int paddingToAdd = (4 - (s.length % 4)) % 4;
-  StringBuffer sb = new StringBuffer();
-
-  sb.write(s);
-
-  for (int i = 0; i < paddingToAdd; ++i) {
-    sb.write("=");
-  }
-
-  return sb.toString();
 }

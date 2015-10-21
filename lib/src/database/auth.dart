@@ -28,7 +28,9 @@ Map<String, String> parsePayload(String payload) {
 
   for (var i = 0; i < parts.length; i++) {
     var valueParts = parts[i].split('=');
-    dict[valueParts[0]] = valueParts[1];
+    var key = parts[i][0];
+    var value = parts[i].substring(2);
+    dict[key] = value;
   }
 
   return dict;
