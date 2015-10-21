@@ -33,7 +33,7 @@ class ClientFirst extends SaslStep {
     var clientFinalMessageWithoutProof = '$channelBinding,$nonce';
 
     var passwordDigest =
-    md5DigestPassword(credential.username, credential.password);
+        md5DigestPassword(credential.username, credential.password);
     var salt = BASE64.decode(paddedSMessage);
 
     var saltedPassword = hi(passwordDigest, salt, i);
@@ -95,7 +95,8 @@ class ClientFirst extends SaslStep {
       return new Uint8List.fromList(hmac.close());
     };
 
-    Uint8List newSalt = new Uint8List.fromList(new List.from(salt)..addAll([0,0,0,1]));
+    Uint8List newSalt =
+        new Uint8List.fromList(new List.from(salt)..addAll([0, 0, 0, 1]));
 
     var ui = digest(newSalt);
     var u1 = ui;
@@ -189,8 +190,9 @@ class ScramSha1Authenticator extends SaslAuthenticator {
   String get name => SCRAM;
 
   ScramSha1Authenticator(UsernamePasswordCredential credential, Db db)
-      : super(new ScramSha1Mechanism(credential, new WeakRandomStringGenerator()),
-      db) {
+      : super(
+            new ScramSha1Mechanism(credential, new WeakRandomStringGenerator()),
+            db) {
     this.db = db;
   }
 }
@@ -201,7 +203,7 @@ String padWithEqualsForBase64(String s) {
 
   sb.write(s);
 
-  for (int i = 0 ; i < paddingToAdd; ++i) {
+  for (int i = 0; i < paddingToAdd; ++i) {
     sb.write("=");
   }
 
