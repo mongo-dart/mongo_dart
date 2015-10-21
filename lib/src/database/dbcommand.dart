@@ -13,15 +13,15 @@ class DbCommand extends MongoQueryMessage {
     :super(collectionName,flags, numberToSkip, numberToReturn, query, fields) {
     _collectionFullName = new BsonCString("${db.databaseName}.$collectionName");
   }
-  
+
   static DbCommand createDropCollectionCommand(Db db, String collectionName) {
     return new DbCommand(db,SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'drop':collectionName}, null);
   }
-  
+
   static DbCommand createDropDatabaseCommand(Db db) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'dropDatabase':1}, null);
   }
-  
+
   static DbCommand createQueryDbCommand(Db db, Map command) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, command, null);
   }
@@ -30,7 +30,6 @@ class DbCommand extends MongoQueryMessage {
     return new MongoQueryMessage("admin.$SYSTEM_COMMAND_COLLECTION", MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, command, null);
   }
 
-  
   static DbCommand createDBSlaveOKCommand(Db db, Map command) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT | MongoQueryMessage.OPTS_SLAVE, 0, -1, command, null);
   }
@@ -38,7 +37,7 @@ class DbCommand extends MongoQueryMessage {
   static DbCommand createPingCommand(Db db) {
     return createQueryDbCommand(db, {'ping':1});
   }
-  
+
   static DbCommand createGetNonceCommand(Db db) {
     return createQueryDbCommand(db, {'getnonce':1});
   }
@@ -46,27 +45,36 @@ class DbCommand extends MongoQueryMessage {
   static DbCommand createBuildInfoCommand(Db db) {
     return createQueryDbCommand(db, {'buildInfo':1});
   }
-  
+
   static DbCommand createGetLastErrorCommand(Db db, WriteConcern concern) {
     return createQueryDbCommand(db, concern.command);
   }
-  
+
   static DbCommand createCountCommand(Db db, String collectionName, [Map selector = const {}]) {
     var finalQuery = {};
     finalQuery["count"] = collectionName;
     finalQuery["query"] = selector;
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, finalQuery, null);
   }
-  
-  static DbCommand createAuthenticationCommand(Db db, String userName, String password, String nonce) {
-    var md5 = new MD5();
-    md5.add("${userName}:mongo:${password}".codeUnits);
-    var hashed_password = new BsonBinary.from(md5.close()).hexString;
-    md5 = new MD5();
-    md5.add("${nonce}${userName}${hashed_password}".codeUnits);
-    var key = new BsonBinary.from(md5.close()).hexString;
-    var selector = {'authenticate':1, 'user':userName, 'nonce':nonce, 'key':key};
-    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NONE, 0, -1, selector, null);
+
+  static DbCommand createSaslStartCommand(Db db, String mechanismName, Uint8List bytesToSendToServer) {
+    var command = {
+      'saslStart': 1,
+      'mechanism': mechanismName,
+      'payload': BASE64.encode(bytesToSendToServer)
+    };
+
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NONE, 0, -1, command, null);
+  }
+
+  static DbCommand createSaslContinueCommand(Db db, int conversationId, Uint8List bytesToSendToServer) {
+    var command = {
+      'saslContinue': 1,
+      'conversationId': conversationId,
+      'payload': BASE64.encode(bytesToSendToServer)
+    };
+
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NONE, 0, -1, command, null);
   }
 
   static DbCommand createDistinctCommand(Db db, String collectionName, String field, [Map selector = const {}]) {

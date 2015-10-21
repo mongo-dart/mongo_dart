@@ -15,18 +15,18 @@ class WriteConcern {
    * * A tag set: Fine-grained control over which replica set members must acknowledge a write operation
    */
   final w;
-  
+
   /**
    * Specifies a timeout for this Write Concern in milliseconds, or infinite if equal to 0.
    */
   final int wtimeout;
-  
+
   /**
    * Enables or disable fsync() operation before acknowledgement of the requested write operation.
    * If [true], wait for mongod instance to write data to disk before returning.
    */
   final bool fsync;
-  
+
   /**
    * Enables or disable journaling of the requested write operation before acknowledgement.
    * If [true], wait for mongod instance to write data to the on-disk journal before returning.
@@ -100,7 +100,6 @@ class WriteConcern {
 }
 
 class Db {
-
   State state = State.INIT;
   final _log = new Logger('Db');
   String databaseName;
@@ -110,6 +109,7 @@ class Db {
   _ConnectionManager _connectionManager;
   _Connection get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
+  AuthenticationScheme _authenticationScheme;
 //  _validateDatabaseName(String dbName) {
 //    if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
 //    var invalidChars = [" ", ".", "\$", "/", "\\"];
@@ -130,7 +130,7 @@ class Db {
     _uriList.add(uriString);
 //    serverConfig = _parseUri(uriString);
   }
-  
+
   Db.pool(List<String> uriList, [this._debugInfo]) {
     _uriList.addAll(uriList);
   }
@@ -157,13 +157,31 @@ class Db {
     if (uri.path != '') {
       databaseName = uri.path.replaceAll('/','');
     }
+
+    final authMechanismParameter = 'authMechanism';
+    uri.queryParameters.forEach((String k, String v) {
+      if (k == authMechanismParameter) {
+        if (v == ScramSha1Authenticator.name) {
+          _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
+        } else if (v == MongoDbCRAuthenticator.name) {
+          _authenticationScheme = AuthenticationScheme.MONGODB_CR;
+        } else {
+          throw new MongoDartError("Provided authentication scheme is not supported : $v");
+        }
+      }
+    });
+
+    if(!uri.queryParameters.containsKey(authMechanismParameter)) {
+      _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
+    }
+
     return serverConfig;
   }
 
   DbCollection collection(String collectionName) {
     return new DbCollection(this,collectionName);
   }
-  
+
   Future queryMessage(MongoMessage queryMessage, {_Connection connection}) {
     return new Future.sync(() {
       if (state != State.OPEN) {
@@ -175,7 +193,7 @@ class Db {
       return connection.query(queryMessage);
     });
   }
-  
+
   executeMessage(MongoMessage message, WriteConcern writeConcern, {_Connection connection}) {
     if (state != State.OPEN) {
       throw new MongoDartError('DB is not open. $state');
@@ -188,7 +206,7 @@ class Db {
     }
     connection.execute(message,writeConcern == WriteConcern.ERRORS_IGNORED);
   }
-  
+
   Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
     return new Future.sync(() {
       if (state == State.OPENING) {
@@ -203,7 +221,7 @@ class Db {
       return _connectionManager.open(writeConcern);
     });
   }
-  
+
   Future executeDbCommand(MongoMessage message, {_Connection connection}) {
     if (connection == null) {
       connection = _masterConnection;
@@ -225,7 +243,7 @@ class Db {
     }).catchError((e) => result.completeError(e));
     return result.future;
   }
-  
+
   Future dropCollection(String collectionName) {
     return getCollectionInfos({'name': collectionName}).then((v) {
       if (v.length == 1) {
@@ -234,7 +252,7 @@ class Db {
       return new Future.value(true);
     });
   }
-  
+
   /**
   *   Drop current database
   */
@@ -255,7 +273,7 @@ class Db {
     }
     return executeDbCommand(DbCommand.createGetLastErrorCommand(this, writeConcern));
   }
-  
+
   Future<Map> getNonce({_Connection connection}) {
     return executeDbCommand(DbCommand.createGetNonceCommand(this), connection: connection);
   }
@@ -271,7 +289,7 @@ class Db {
   Future<Map> wait() {
     return getLastError();
   }
-  
+
   Future close() {
     _log.fine(()=>'$this closed');
     state = State.CLOSED;
@@ -329,22 +347,29 @@ class Db {
     return _collectionsInfoCursor().map((map) => map['name'].split('.')).where((arr)=> arr.length == 2).map((arr)=> arr.last).toList();
   }
 
-  
+
   Future<List<Map>> getCollectionInfos([Map filter = const {}]) {
     return _listCollectionsCursor(filter).toList();
   }
-  
+
   Future<List<String>> getCollectionNames([Map filter = const {}]) {
-      return _listCollectionsCursor(filter).map((map) => map['name']).toList();
+    return _listCollectionsCursor(filter).map((map) => map['name']).toList();
   }
-    
-  
-  Future<bool> authenticate(String userName, String password, {_Connection connection}) {
-    return getNonce(connection: connection).then((msg) {
-      var nonce = msg["nonce"];
-      var command = DbCommand.createAuthenticationCommand(this,userName,password,nonce);
-      return executeDbCommand(command, connection: connection);
-    }).then( (res) => res["ok"]==1 );
+
+  Future<bool> authenticate(String userName, String password, {_Connection connection}) async {
+    var credential = new UsernamePasswordCredential()
+      ..username = userName
+      ..password = password;
+
+    var authenticator = createAuthenticator(_authenticationScheme, this, credential);
+
+    try {
+      await authenticator.authenticate(connection);
+    } catch (e) {
+      rethrow;
+    }
+
+    return true;
   }
   /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
   /// with WiredTiger
@@ -357,7 +382,7 @@ class Db {
     }
     return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).stream.toList();
   }
-  
+
   String _createIndexName(Map keys) {
     var name = '';
     keys.forEach((key,value) {
@@ -365,7 +390,7 @@ class Db {
     });
     return name;
   }
-  
+
   Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
     return new Future.sync((){
       var selector = {};
@@ -410,7 +435,7 @@ class Db {
     }
     return keys;
   }
-  
+
   Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
     return new Future.sync((){
       keys = _setKeys(key, keys);
