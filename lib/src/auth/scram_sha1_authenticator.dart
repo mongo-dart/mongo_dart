@@ -134,7 +134,7 @@ class ClientLast extends SaslStep {
 
 class CompletedStep extends SaslStep {
   CompletedStep() {
-    this.bytesToSendToServer = null;
+    this.bytesToSendToServer = new Uint8List(0);
     isComplete = true;
   }
 

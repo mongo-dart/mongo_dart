@@ -903,14 +903,14 @@ Future testAuthentication() {
   var db = new Db(
       'mongodb://ds031477.mongolab.com:31477/dart', 'testAuthentication');
   return db.open().then((c) {
-    return db.authenticate('dart', 'test');
+    return db.authenticate('test', 'test');
   }).then((v) {
     return db.close();
   });
 }
 
 Future testAuthenticationWithUri() {
-  var db = new Db('mongodb://dart:test@ds031477.mongolab.com:31477/dart');
+  var db = new Db('mongodb://test:test@ds031477.mongolab.com:31477/dart');
   return db.open().then((c) {
     DbCollection collection = db.collection('testAuthenticationWithUri');
     collection.remove();
@@ -1281,10 +1281,8 @@ main() {
     test('testAuthComponents', testAuthComponents);
   });
   group('DBCommand:', () {
-    test('testAuthentication', testAuthentication,
-        skip: 'v3.0 default auth scheme not implemented yet');
-    test('testAuthenticationWithUri', testAuthenticationWithUri,
-        skip: 'v3.0 default auth scheme not implemented yet');
+    test('testAuthentication', testAuthentication);
+    test('testAuthenticationWithUri', testAuthenticationWithUri);
     test('testDropDatabase', testDropDatabase);
     test('testGetCollectionInfos', testGetCollectionInfos);
     test('testRemove', testRemove);

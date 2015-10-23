@@ -49,9 +49,6 @@ abstract class SaslAuthenticator extends Authenticator {
 
       currentStep = currentStep.transition(conversation, payloadAsBytes);
 
-      if (result['done'] == false && currentStep.isComplete) {
-        break;
-      }
 
       var conversationId = result['conversationId'];
 

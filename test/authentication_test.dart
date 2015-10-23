@@ -9,7 +9,7 @@ main() {
     Db db = new Db(mongoDbUri, 'test scram sha1');
 
     await db.open();
-
+    await db.collection('test').find().toList();
     await db.close();
   });
 
@@ -19,7 +19,7 @@ main() {
     Db db = new Db('$mongoDbUri?authMechanism=${ScramSha1Authenticator.name}');
 
     await db.open();
-
+    await db.collection('test').find().toList();
     await db.close();
   });
 

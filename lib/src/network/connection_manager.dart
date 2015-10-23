@@ -2,7 +2,7 @@ part of mongo_dart;
 
 class _ConnectionManager {
   final _log = new Logger('ConnectionManager');
-  final db;
+  final Db db;
   final _connectionPool = new Map<String,_Connection>();
   final replyCompleters = new Map<int,Completer<MongoReplyMessage>>();
   final sendQueue       = new Queue<MongoMessage>();
@@ -11,29 +11,32 @@ class _ConnectionManager {
   _ConnectionManager(this.db);
   get masterConnection => _masterConnection;
 
-  Future _connect(_Connection connection) {
-    return connection.connect().then((v) {
-      if (connection.serverConfig.userName == null) {
-        _log.fine(()=>'$db: ${connection.serverConfig.hostUrl} connected');
-        return v;
+  Future _connect(_Connection connection) async {
+    await connection.connect();
+    DbCommand isMasterCommand = DbCommand.createIsMasterCommand(db);
+    MongoReplyMessage replyMessage = await connection.query(isMasterCommand);
+    _log.fine(()=>replyMessage.documents[0].toString());
+    var master = replyMessage.documents[0]["ismaster"];
+    connection.isMaster = master;
+    if (master) {
+      _masterConnection = connection;
+    }
+    connection.serverCapabilities.getParamsFromIstMaster(replyMessage.documents[0]);
+    if (db._authenticationScheme == null) {
+      if (connection.serverCapabilities.maxWireVersion >= 3) {
+        db._authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
       } else {
-        return db.authenticate(connection.serverConfig.userName, connection.serverConfig.password, connection: connection).then((v) {
-          _log.fine(()=>'$db: ${connection.serverConfig.hostUrl} connected');
-          return v;
-        });
+        db._authenticationScheme = AuthenticationScheme.MONGODB_CR;
       }
-    }).then((v) {
-      DbCommand isMasterCommand = DbCommand.createIsMasterCommand(db);
-      return connection.query(isMasterCommand);
-    }).then((replyMessage) {
-      _log.fine(()=>replyMessage.documents[0].toString());
-      var master = replyMessage.documents[0]["ismaster"];
-      connection.isMaster = master;
-      if (master) {
-        _masterConnection = connection;
-      }
-      connection.serverCapabilities.getParamsFromIstMaster(replyMessage.documents[0]);
-    });
+    }
+    if (connection.serverConfig.userName == null) {
+      _log.fine(()=>'$db: ${connection.serverConfig.hostUrl} connected');
+    } else {
+      await db.authenticate(connection.serverConfig.userName, connection.serverConfig.password, connection: connection).then((v) {
+        _log.fine(()=>'$db: ${connection.serverConfig.hostUrl} connected');
+      });
+    }
+    return true;
   }
 
   Future open(WriteConcern writeConcern){

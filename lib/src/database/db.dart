@@ -171,10 +171,6 @@ class Db {
       }
     });
 
-    if(!uri.queryParameters.containsKey(authMechanismParameter)) {
-      _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
-    }
-
     return serverConfig;
   }
 
@@ -363,11 +359,7 @@ class Db {
 
     var authenticator = createAuthenticator(_authenticationScheme, this, credential);
 
-    try {
-      await authenticator.authenticate(connection);
-    } catch (e) {
-      rethrow;
-    }
+    await authenticator.authenticate(connection ?? _masterConnection);
 
     return true;
   }
