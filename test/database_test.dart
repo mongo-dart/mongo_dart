@@ -73,16 +73,6 @@ Future getBuildInfo() {
   });
 }
 
-Future testPwd() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  DbCollection coll;
-  return db.open().then((c) {
-    coll = db.collection("system.users");
-    return coll.find().forEach((user) => print(user));
-  }).then((v) {
-    return db.close();
-  });
-}
 
 Future testIsMaster() {
   Db db = new Db('${DefaultUri}mongo_dart-test');
@@ -1288,8 +1278,6 @@ main() {
     test('testRemove', testRemove);
     test('testGetNonce', testGetNonce);
     test('getBuildInfo', getBuildInfo);
-
-    test('testPwd', testPwd);
     test('testIsMaster', testIsMaster);
   });
   group('DbCollection tests:', () {

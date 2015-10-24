@@ -98,12 +98,16 @@ class WriteConcern {
     return map;
   }
 }
-
+class _UriParameters {
+  static const authMechanism = 'authMechanism';
+  static const authSource = 'authSource';
+}
 class Db {
   State state = State.INIT;
   final _log = new Logger('Db');
   String databaseName;
   String _debugInfo;
+  Db authSourceDb;
   //ServerConfig serverConfig;
   final List<String> _uriList = new List<String>();
   _ConnectionManager _connectionManager;
@@ -134,7 +138,7 @@ class Db {
   Db.pool(List<String> uriList, [this._debugInfo]) {
     _uriList.addAll(uriList);
   }
-
+  Db._authDb(this.databaseName);
   ServerConfig _parseUri(String uriString) {
     var uri = Uri.parse(uriString);
     if (uri.scheme != 'mongodb') {
@@ -158,9 +162,8 @@ class Db {
       databaseName = uri.path.replaceAll('/','');
     }
 
-    final authMechanismParameter = 'authMechanism';
     uri.queryParameters.forEach((String k, String v) {
-      if (k == authMechanismParameter) {
+      if (k == _UriParameters.authMechanism) {
         if (v == ScramSha1Authenticator.name) {
           _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
         } else if (v == MongoDbCRAuthenticator.name) {
@@ -168,6 +171,9 @@ class Db {
         } else {
           throw new MongoDartError("Provided authentication scheme is not supported : $v");
         }
+      }
+      if (k == _UriParameters.authSource) {
+        authSourceDb = new Db._authDb(v);
       }
     });
 

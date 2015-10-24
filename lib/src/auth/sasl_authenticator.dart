@@ -32,7 +32,7 @@ abstract class SaslAuthenticator extends Authenticator {
     var currentStep = mechanism.initialize(connection);
 
     var command = DbCommand.createSaslStartCommand(
-        db, mechanism.name, currentStep.bytesToSendToServer);
+        db.authSourceDb ?? db, mechanism.name, currentStep.bytesToSendToServer);
 
     while (true) {
       Map result;
@@ -53,7 +53,7 @@ abstract class SaslAuthenticator extends Authenticator {
       var conversationId = result['conversationId'];
 
       command = DbCommand.createSaslContinueCommand(
-          db, conversationId, currentStep.bytesToSendToServer);
+          db.authSourceDb ?? db, conversationId, currentStep.bytesToSendToServer);
     }
   }
 }
