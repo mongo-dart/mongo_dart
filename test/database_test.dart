@@ -632,11 +632,12 @@ Future testCursorClosing() async {
   expect(cursor.state, State.CLOSED);
   expect(cursor.cursorId, 0);
 
+  var result = await collection.findOne();
+  expect(newCursor, isNotNull);
   // TODO: I think there's an error with this
   // I believe it should be expect(result, isNotNull)
   // But this seems to be the original behaviour of the test
-  var result = await collection.findOne();
-  expect(newCursor, isNotNull);
+  expect(result, isNotNull); // Added this -- and it passes!
 }
 
 void testDbCommandCreation() {
