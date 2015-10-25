@@ -137,27 +137,23 @@ testFindEach() async {
   expect(sum, 13);
 }
 
-Future testFindStream() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+Future testFindStream() async {
   int count = 0;
   int sum = 0;
-  return db.open().then((c) {
-    DbCollection students = db.collection('students');
-    students.remove();
-    students.insertAll([
-      {"name": "Vadim", "score": 4},
-      {"name": "Daniil", "score": 4},
-      {"name": "Nick", "score": 5}
-    ]);
-    return students.find().forEach((v1) {
-      count++;
-      sum += v1["score"];
-    });
-  }).then((v) {
-    expect(count, 3);
-    expect(sum, 13);
-    return db.close();
+  await collection.remove();
+  await collection.insertAll([
+    {"name": "Vadim", "score": 4},
+    {"name": "Daniil", "score": 4},
+    {"name": "Nick", "score": 5}
+  ]);
+
+  await collection.find().forEach((v1) {
+    count++;
+    sum += v1["score"];
   });
+
+  expect(count, 3);
+  expect(sum, 13);
 }
 
 Future testDrop() async {
@@ -612,34 +608,23 @@ Future testCursorWithOpenServerCursor() async {
 
 Future testCursorGetMore() async {
   int count = 0;
-  Cursor cursor;
-  return db.open().then((c) {
-    collection = db.collection('new_big_collection2');
-    collection.remove();
-    return db.getLastError();
-  }).then((_) {
-    cursor = new Cursor(db, collection, where.limit(10));
-    return cursor.stream.forEach((v) {
-      count++;
-    });
-  }).then((dummy) {
-    expect(count, 0);
-    List toInsert = new List();
-    for (int n = 0; n < 1000; n++) {
-      toInsert.add({"a": n});
-    }
-    collection.insertAll(toInsert);
-    return db.getLastError();
-  }).then((_) {
-    cursor = new Cursor(db, collection, null);
-    return cursor.stream.forEach((v) => count++);
-  }).then((v) {
-    expect(count, 1000);
-    expect(cursor.cursorId, 0);
-    expect(cursor.state, State.CLOSED);
-    collection.remove();
-    return db.close();
+  Cursor cursor = new Cursor(db, collection, where.limit(10));
+  await cursor.stream.forEach((v) {
+    count++;
   });
+  expect(count, 0);
+
+  List toInsert = new List();
+  for (int n = 0; n < 1000; n++) {
+    toInsert.add({"a": n});
+  }
+  await collection.insertAll(toInsert);
+  cursor = new Cursor(db, collection, null);
+  await cursor.stream.forEach((v) => count++);
+
+  expect(count, 1000);
+  expect(cursor.cursorId, 0);
+  expect(cursor.state, State.CLOSED);
 }
 
 Future testCursorClosing() async {
