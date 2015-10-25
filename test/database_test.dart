@@ -493,10 +493,8 @@ Future testUpdateWithMultiUpdate() async {
       .find({'value': 'value_modified_for_only_one_with_default'}).toList();
   expect(results.length, 1);
 
-  result = await collection.update(
-      where.eq('key', 'a'),
-      modify.set(
-          'value', 'value_modified_for_only_one_with_multiupdate_false'),
+  result = await collection.update(where.eq('key', 'a'),
+      modify.set('value', 'value_modified_for_only_one_with_multiupdate_false'),
       multiUpdate: false);
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
@@ -650,56 +648,33 @@ Future testCursorClosing() async {
   expect(newCursor, isNotNull);
 }
 
-Future testDbCommandCreation() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((d) {
-    DbCommand dbCommand = new DbCommand(
-        db,
-        "student",
-        0,
-        0,
-        1,
-        {},
-        {});
-    expect('mongo_dart-test.student', dbCommand.collectionNameBson.value);
-    db.close();
-  });
+void testDbCommandCreation() {
+  DbCommand dbCommand = new DbCommand(db, "student", 0, 0, 1, {}, {});
+  expect('mongo_dart-test.student', dbCommand.collectionNameBson.value);
 }
 
-Future testPingDbCommand() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((d) {
-    DbCommand pingCommand = DbCommand.createPingCommand(db);
-    Future<MongoReplyMessage> mapFuture = db.queryMessage(pingCommand);
-    mapFuture.then((msg) {
-      expect(msg.documents[0], containsPair('ok', 1));
-      return db.close();
-    });
-  });
+Future testPingDbCommand() async {
+  DbCommand pingCommand = DbCommand.createPingCommand(db);
+
+  var result = await db.queryMessage(pingCommand);
+
+  expect(result.documents[0], containsPair('ok', 1));
 }
 
-Future testDropDbCommand() {
-  Db db = new Db('${DefaultUri}mongo_dart-test1');
-  return db.open().then((d) {
-    DbCommand command = DbCommand.createDropDatabaseCommand(db);
-    Future<MongoReplyMessage> mapFuture = db.queryMessage(command);
-    mapFuture.then((msg) {
-      expect(msg.documents[0]["ok"], 1);
-      return db.close();
-    });
-  });
+Future testDropDbCommand() async {
+  DbCommand command = DbCommand.createDropDatabaseCommand(db);
+
+  var result = await db.queryMessage(command);
+
+  expect(result.documents[0]["ok"], 1);
 }
 
-Future testIsMasterDbCommand() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((d) {
-    DbCommand isMasterCommand = DbCommand.createIsMasterCommand(db);
-    Future<MongoReplyMessage> mapFuture = db.queryMessage(isMasterCommand);
-    mapFuture.then((msg) {
-      expect(msg.documents[0], containsPair('ok', 1));
-      return db.close();
-    });
-  });
+Future testIsMasterDbCommand() async {
+  DbCommand isMasterCommand = DbCommand.createIsMasterCommand(db);
+
+  var result = await db.queryMessage(isMasterCommand);
+
+  expect(result.documents[0], containsPair('ok', 1));
 }
 
 testAuthComponents() {
@@ -847,8 +822,8 @@ Future testFindWithFieldsClause() async {
     {"name": "Nick", "score": 5}
   ]);
 
-  var result = await collection.findOne(
-      where.eq('name', 'Vadim').fields(['score']));
+  var result =
+      await collection.findOne(where.eq('name', 'Vadim').fields(['score']));
 
   expect(result['name'], isNull);
   expect(result['score'], 4);
@@ -860,7 +835,8 @@ Future testSimpleQuery() async {
     await collection.insert({"my_field": n, "str_field": "str_$n"});
   }
 
-  var result = await collection.find(where.gt("my_field", 5).sortBy('my_field'))
+  var result = await collection
+      .find(where.gt("my_field", 5).sortBy('my_field'))
       .toList();
   expect(result.length, 4);
   expect(result[0]['my_field'], 6);
