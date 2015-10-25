@@ -9,51 +9,34 @@ const DefaultUri = 'mongodb://127.0.0.1:27017/';
 const String collectionName = 'collectionName';
 
 Db db;
+DbCollection collection;
 
-Future testGetCollectionInfos() {
-  Db db = new Db(
-      'mongodb://127.0.0.1:27017/mongo_dart-test', 'testCollectionInfoCursor');
-  DbCollection newColl;
-  return db.open().then((c) {
-    newColl = db.collection("new_collecion");
-    return newColl.remove();
-  }).then((v) {
-    return newColl.insertAll([
-      {"a": 1}
-    ]);
-  }).then((v) {
-    return db.getCollectionInfos({'name': 'new_collecion'});
-  }).then((v) {
-    expect(v, hasLength(1));
-    return db.close();
-  });
+Future testGetCollectionInfos() async {
+  await collection.insertAll([
+    {"a": 1}
+  ]);
+
+  var collectionInfos = await db.getCollectionInfos({'name': collectionName});
+
+  expect(collectionInfos, hasLength(1));
 }
 
 Future testRemove() async {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  DbCollection newColl;
-  await db.open();
-  db.removeFromCollection("new_collecion_to_remove");
-  newColl = db.collection("new_collecion_to_remove");
-  newColl.insertAll([
+  await collection.insertAll([
     {"a": 1}
   ]);
-  var v = await db.getCollectionInfos({'name': 'new_collecion_to_remove'});
-  expect(v, hasLength(1));
-  await db.removeFromCollection("new_collecion_to_remove");
-  var v1 = await newColl.find().toList();
-  expect(v1, isEmpty);
-  await newColl.drop();
-  await db.close();
+
+  var collectionInfos = await db.getCollectionInfos({'name': collectionName});
+  expect(collectionInfos, hasLength(1));
+
+  await db.removeFromCollection(collectionName);
+
+  var allCollectionDocuments = await collection.find().toList();
+  expect(allCollectionDocuments, isEmpty);
 }
 
-Future testDropDatabase() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((c) {
-    return db.drop();
-  }).then((v) {
-    return db.close();
-  });
+Future testDropDatabase() async {
+  await db.drop();
 }
 
 Future testGetNonce() async {
@@ -622,24 +605,19 @@ Future testUpdateWithMultiUpdate() {
   });
 }
 
-Future testLimitWithSortByAndSkip() {
-  Db db = new Db('${DefaultUri}mongo_dart-test', 'testLimitWithSortByAndSkip');
+Future testLimitWithSortByAndSkip() async {
   int counter = 0;
   Cursor cursor;
-  return db.open().then((c) {
-    DbCollection coll = db.collection('testLimit');
-    coll.remove();
-    for (int n = 0; n < 600; n++) {
-      coll.insert({"a": n});
-    }
-    cursor = coll.createCursor(where.sortBy('a').skip(300).limit(10));
-    return cursor.stream.forEach((e) => counter++);
-  }).then((v) {
-    expect(counter, 10);
-    expect(cursor.state, State.CLOSED);
-    expect(cursor.cursorId, 0);
-    return db.close();
-  });
+  for (int n = 0; n < 600; n++) {
+    coll.insert({"a": n});
+  }
+
+  cursor = coll.createCursor(where.sortBy('a').skip(300).limit(10));
+
+  await cursor.stream.forEach((e) => counter++);
+  expect(counter, 10);
+  expect(cursor.state, State.CLOSED);
+  expect(cursor.cursorId, 0);
 }
 
 Future testLimit() {
@@ -888,7 +866,6 @@ Future testAuthentication() async {
 }
 
 Future testAuthenticationWithUri() async {
-  DbCollection collection = db.collection(collectionName);
   collection.insert({"a": 1});
   collection.insert({"a": 2});
   collection.insert({"a": 3});
@@ -899,7 +876,6 @@ Future testAuthenticationWithUri() async {
 }
 
 Future testGetIndexes() async {
-  DbCollection collection = db.collection(collectionName);
   for (int n = 0; n < 100; n++) {
     collection.insert({"a": n});
   }
@@ -910,7 +886,6 @@ Future testGetIndexes() async {
 }
 
 Future testIndexCreation() async {
-  var collection = await db.collection(collectionName);
   for (int n = 0; n < 6; n++) {
     collection.insert({
       'a': n,
@@ -1220,18 +1195,28 @@ Future testFindOneWhileStateIsOpening() {
 }
 
 main() {
+  Future initializeDatabase() async {
+    db = new Db(DefaultUri);
+    await db.open();
+    collection = db.collection(collectionName);
+  }
+
+  Future cleanupDatabase() async {
+    await collection.drop();
+    await db.close();
+  }
+
   group('DbCollection tests:', () {
     test('testAuthComponents', testAuthComponents);
   });
+
   group('DBCommand:', () {
     setUp(() async {
-      db = new Db(DefaultUri);
-      await db.open();
+      await initializeDatabase();
     });
 
     tearDown(() async {
-      await db.collection(collectionName).drop();
-      await db.close();
+      await cleanupDatabase();
     });
 
     test('testAuthentication', testAuthentication);
@@ -1243,7 +1228,16 @@ main() {
     test('getBuildInfo', getBuildInfo);
     test('testIsMaster', testIsMaster);
   });
+
   group('DbCollection tests:', () {
+    setUp(() async {
+      await initializeDatabase();
+    });
+
+    tearDown(() async {
+      await cleanupDatabase();
+    });
+
     test('testLimitWithSortByAndSkip', testLimitWithSortByAndSkip);
     test('testLimitWithSkip', testLimit);
     test('testFindEachWithThenClause', testFindEachWithThenClause);
