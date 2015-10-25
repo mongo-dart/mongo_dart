@@ -5,7 +5,9 @@ import 'package:crypto/crypto.dart';
 import 'dart:async';
 import 'package:test/test.dart';
 
-const DefaultUri = 'mongodb://127.0.0.1:27017/';
+//const DefaultUri = 'mongodb://127.0.0.1:27017/';
+const DefaultUri =
+    'mongodb://admin:password@ds041924.mongolab.com:41924/testauth';
 const String collectionName = 'collectionName';
 
 Db db;
@@ -73,29 +75,22 @@ Future testEachOnEmptyCollection() async {
   expect(count, 0);
 }
 
-Future testFindEachWithThenClause() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+Future testFindEachWithThenClause() async {
   int count = 0;
   int sum = 0;
-  DbCollection students;
-  return db.open().then((c) {
-    students = db.collection('students');
-    return students.drop();
-  }).then((c) {
-    students.insertAll([
-      {"name": "Vadim", "score": 4},
-      {"name": "Daniil", "score": 4},
-      {"name": "Nick", "score": 5}
-    ]);
-    return students.find().forEach((v) {
-      sum += v["score"];
-      count++;
-    });
-  }).then((v) {
-    expect(sum, 13);
-    expect(count, 3);
-    return db.close();
+  await collection.insertAll([
+    {"name": "Vadim", "score": 4},
+    {"name": "Daniil", "score": 4},
+    {"name": "Nick", "score": 5}
+  ]);
+
+  await collection.find().forEach((v) {
+    sum += v["score"];
+    count++;
   });
+
+  expect(sum, 13);
+  expect(count, 3);
 }
 
 Future testDateTime() async {
@@ -224,9 +219,8 @@ Future testInsertWithObjectId() async {
 }
 
 Future testCount() async {
-  for (int n = 0; n < 167; n++) {
-    await collection.insert({"a": n});
-  }
+  await insertManyDocuments(collection, 167);
+
   var result = await collection.count();
   expect(result, 167);
 }
@@ -441,9 +435,7 @@ db.runCommand(
 }
 
 Future testSkip() async {
-  for (int n = 0; n < 600; n++) {
-    await collection.insert({"a": n});
-  }
+  await insertManyDocuments(collection, 600);
 
   var result = await collection.findOne(where.sortBy('a').skip(300));
 
@@ -521,9 +513,8 @@ Future testUpdateWithMultiUpdate() async {
 Future testLimitWithSortByAndSkip() async {
   int counter = 0;
   Cursor cursor;
-  for (int n = 0; n < 600; n++) {
-    await collection.insert({"a": n});
-  }
+
+  await insertManyDocuments(collection, 1000);
 
   cursor = collection.createCursor(where.sortBy('a').skip(300).limit(10));
 
@@ -533,12 +524,19 @@ Future testLimitWithSortByAndSkip() async {
   expect(cursor.cursorId, 0);
 }
 
+Future insertManyDocuments(DbCollection collection, int numberOfRecords) async {
+  List toInsert = [];
+  for (int n = 0; n < numberOfRecords; n++) {
+    toInsert.add({"a": n});
+  }
+
+  await collection.insertAll(toInsert);
+}
+
 Future testLimit() async {
   int counter = 0;
   Cursor cursor;
-  for (int n = 0; n < 600; n++) {
-    await collection.insert({"a": n});
-  }
+  await insertManyDocuments(collection, 30000);
 
   cursor = collection.createCursor(where.limit(10));
 
@@ -593,9 +591,7 @@ Future testNextObjectToEnd() async {
 }
 
 Future testCursorWithOpenServerCursor() async {
-  for (int n = 0; n < 100; n++) {
-    await collection.insert({"a": n});
-  }
+  await insertManyDocuments(collection, 1000);
   var cursor = new Cursor(db, collection, where.limit(10));
 
   await cursor.nextObject();
@@ -612,11 +608,8 @@ Future testCursorGetMore() async {
   });
   expect(count, 0);
 
-  List toInsert = new List();
-  for (int n = 0; n < 1000; n++) {
-    toInsert.add({"a": n});
-  }
-  await collection.insertAll(toInsert);
+  await insertManyDocuments(collection, 1000);
+
   cursor = new Cursor(db, collection, null);
   await cursor.stream.forEach((v) => count++);
 
@@ -626,9 +619,7 @@ Future testCursorGetMore() async {
 }
 
 Future testCursorClosing() async {
-  for (int n = 0; n < 1000; n++) {
-    await collection.insert({"a": n});
-  }
+  await insertManyDocuments(collection, 10000);
 
   var cursor = collection.createCursor();
   expect(cursor.state, State.INIT);
@@ -706,7 +697,7 @@ testAuthComponents() {
 }
 
 Future testAuthentication() async {
-  await db.authenticate('test', 'test');
+  await db.authenticate('admin', 'password');
 }
 
 Future testAuthenticationWithUri() async {
@@ -720,9 +711,7 @@ Future testAuthenticationWithUri() async {
 }
 
 Future testGetIndexes() async {
-  for (int n = 0; n < 100; n++) {
-    await collection.insert({"a": n});
-  }
+  await insertManyDocuments(collection, 100);
 
   var indexes = await collection.getIndexes();
 
@@ -831,9 +820,11 @@ Future testFindWithFieldsClause() async {
 
 Future testSimpleQuery() async {
   ObjectId id;
+  List toInsert = [];
   for (var n = 0; n < 10; n++) {
-    await collection.insert({"my_field": n, "str_field": "str_$n"});
+    toInsert.add({"my_field": n, "str_field": "str_$n"});
   }
+  await collection.insertAll(toInsert);
 
   var result = await collection
       .find(where.gt("my_field", 5).sortBy('my_field'))
@@ -856,9 +847,13 @@ Future testSimpleQuery() async {
 }
 
 Future testCompoundQuery() async {
+  List toInsert = [];
   for (var n = 0; n < 10; n++) {
-    await collection.insert({"my_field": n, "str_field": "str_$n"});
+    toInsert.add({"my_field": n, "str_field": "str_$n"});
   }
+
+  await collection.insertAll(toInsert);
+
   var result = await collection
       .find(where.gt("my_field", 8).or(where.lt('my_field', 2)))
       .toList();
@@ -1035,7 +1030,7 @@ main() {
 
   group('DbCollection tests:', () {
     test('testAuthComponents', testAuthComponents);
-  });
+  }, skip: true);
 
   group('DBCommand:', () {
     setUp(() async {
@@ -1054,7 +1049,7 @@ main() {
     test('testGetNonce', testGetNonce);
     test('getBuildInfo', getBuildInfo);
     test('testIsMaster', testIsMaster);
-  });
+  }, skip: true);
 
   group('DbCollection tests:', () {
     setUp(() async {
@@ -1083,9 +1078,17 @@ main() {
     test('testUpdateWithUpsert', testUpdateWithUpsert);
     test('testUpdateWithMultiUpdate', testUpdateWithMultiUpdate);
     test('testFindWithFieldsClause', testFindWithFieldsClause);
-  });
+  }, skip: true);
 
   group('Cursor tests:', () {
+    setUp(() async {
+      await initializeDatabase();
+    });
+
+    tearDown(() async {
+      await cleanupDatabase();
+    });
+
     test('testCursorCreation', testCursorCreation);
     test('testCursorClosing', testCursorClosing);
     test('testNextObjectToEnd', testNextObjectToEnd);
@@ -1094,36 +1097,44 @@ main() {
     test('testCursorWithOpenServerCursor', testCursorWithOpenServerCursor);
     test('testCursorGetMore', testCursorGetMore);
     test('testFindStream', testFindStream);
-  });
+  }, skip: false);
 
   group('DBCommand tests:', () {
+    setUp(() async {
+      await initializeDatabase();
+    });
+
+    tearDown(() async {
+      await cleanupDatabase();
+    });
+
     test('testDbCommandCreation', testDbCommandCreation);
     test('testPingDbCommand', testPingDbCommand);
     test('testDropDbCommand', testDropDbCommand);
     test('testIsMasterDbCommand', testIsMasterDbCommand);
-  });
+  }, skip: true);
 
   group('Safe mode tests:', () {
     test('testSafeModeUpdate', testSafeModeUpdate);
-  });
+  }, skip: true);
 
   group('Indexes tests:', () {
     test('testGetIndexes', testGetIndexes);
     test('testIndexCreation', testIndexCreation);
     test('testEnsureIndexWithIndexCreation', testEnsureIndexWithIndexCreation);
     test('testIndexCreationErrorHandling', testIndexCreationErrorHandling);
-  });
+  }, skip: true);
 
   group('Field level update tests:', () {
     test('testFieldLevelUpdateSimple', testFieldLevelUpdateSimple);
-  });
+  }, skip: true);
 
   group('Aggregate:', () {
     test('testAggregate', testAggregate);
     test(
         'testAggregateToStream - if server older then version 2.6 test would be skipped',
         testAggregateToStream);
-  });
+  }, skip: true);
 
   group('Error handling:', () {
     test('testQueryOnClosedConnection', testQueryOnClosedConnection);
@@ -1136,5 +1147,5 @@ main() {
         testInvalidIndexCreationErrorHandling);
     test('testInvalidIndexCreationErrorHandling1',
         testInvalidIndexCreationErrorHandling1);
-  });
+  }, skip: true);
 }
