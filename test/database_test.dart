@@ -200,7 +200,7 @@ Future testSaveWithObjectId() async {
     {"name": "d", "value": 40}
   ];
 
-  collection.insertAll(toInsert);
+  await collection.insertAll(toInsert);
   var result = await collection.findOne({"name": "c"});
   expect(result["value"], 30);
 
@@ -229,19 +229,19 @@ Future testInsertWithObjectId() async {
 
 Future testCount() async {
   for (int n = 0; n < 167; n++) {
-    collection.insert({"a": n});
+    await collection.insert({"a": n});
   }
   var result = await collection.count();
   expect(result, 167);
 }
 
 Future testDistinct() async {
-  collection.insert({"foo": 1});
-  collection.insert({"foo": 2});
-  collection.insert({"foo": 2});
-  collection.insert({"foo": 3});
-  collection.insert({"foo": 3});
-  collection.insert({"foo": 3});
+  await collection.insert({"foo": 1});
+  await collection.insert({"foo": 2});
+  await collection.insert({"foo": 2});
+  await collection.insert({"foo": 3});
+  await collection.insert({"foo": 3});
+  await collection.insert({"foo": 3});
   var result = await collection.distinct("foo");
 
   List values = result['values'];
@@ -528,7 +528,7 @@ Future testLimitWithSortByAndSkip() async {
   int counter = 0;
   Cursor cursor;
   for (int n = 0; n < 600; n++) {
-    collection.insert({"a": n});
+    await collection.insert({"a": n});
   }
 
   cursor = collection.createCursor(where.sortBy('a').skip(300).limit(10));
@@ -543,7 +543,7 @@ Future testLimit() async {
   int counter = 0;
   Cursor cursor;
   for (int n = 0; n < 600; n++) {
-    collection.insert({"a": n});
+    await collection.insert({"a": n});
   }
 
   cursor = collection.createCursor(where.limit(10));
@@ -750,9 +750,9 @@ Future testAuthentication() async {
 }
 
 Future testAuthenticationWithUri() async {
-  collection.insert({"a": 1});
-  collection.insert({"a": 2});
-  collection.insert({"a": 3});
+  await collection.insert({"a": 1});
+  await collection.insert({"a": 2});
+  await collection.insert({"a": 3});
 
   var foundValue = await collection.findOne();
 
@@ -761,7 +761,7 @@ Future testAuthenticationWithUri() async {
 
 Future testGetIndexes() async {
   for (int n = 0; n < 100; n++) {
-    collection.insert({"a": n});
+    await collection.insert({"a": n});
   }
 
   var indexes = await collection.getIndexes();
@@ -771,7 +771,7 @@ Future testGetIndexes() async {
 
 Future testIndexCreation() async {
   for (int n = 0; n < 6; n++) {
-    collection.insert({
+    await collection.insert({
       'a': n,
       'embedded': {'b': n, 'c': n * 10}
     });
@@ -872,7 +872,7 @@ Future testFindWithFieldsClause() async {
 Future testSimpleQuery() async {
   ObjectId id;
   for (var n = 0; n < 10; n++) {
-    collection.insert({"my_field": n, "str_field": "str_$n"});
+    await collection.insert({"my_field": n, "str_field": "str_$n"});
   }
 
   var result = await collection.find(where.gt("my_field", 5).sortBy('my_field'))
@@ -896,7 +896,7 @@ Future testSimpleQuery() async {
 
 Future testCompoundQuery() async {
   for (var n = 0; n < 10; n++) {
-    collection.insert({"my_field": n, "str_field": "str_$n"});
+    await collection.insert({"my_field": n, "str_field": "str_$n"});
   }
   var result = await collection
       .find(where.gt("my_field", 8).or(where.lt('my_field', 2)))
