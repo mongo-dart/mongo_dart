@@ -1163,15 +1163,18 @@ main() {
     test('testCursorGetMore', testCursorGetMore);
     test('testFindStream', testFindStream);
   });
+
   group('DBCommand tests:', () {
     test('testDbCommandCreation', testDbCommandCreation);
     test('testPingDbCommand', testPingDbCommand);
     test('testDropDbCommand', testDropDbCommand);
     test('testIsMasterDbCommand', testIsMasterDbCommand);
   });
+
   group('Safe mode tests:', () {
     test('testSafeModeUpdate', testSafeModeUpdate);
   });
+
   group('Indexes tests:', () {
     test('testGetIndexes', testGetIndexes);
     test('testIndexCreation', testIndexCreation);
@@ -1182,12 +1185,14 @@ main() {
   group('Field level update tests:', () {
     test('testFieldLevelUpdateSimple', testFieldLevelUpdateSimple);
   });
+
   group('Aggregate:', () {
     test('testAggregate', testAggregate);
     test(
         'testAggregateToStream - if server older then version 2.6 test would be skipped',
         testAggregateToStream);
   });
+
   group('Error handling:', () {
     test('testQueryOnClosedConnection', testQueryOnClosedConnection);
     test("testUpdateOnClosedConnection", testUpdateOnClosedConnection);
