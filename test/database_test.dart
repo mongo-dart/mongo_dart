@@ -6,6 +6,9 @@ import 'dart:async';
 import 'package:test/test.dart';
 
 const DefaultUri = 'mongodb://127.0.0.1:27017/';
+const String collectionName = 'collectionName';
+
+Db db;
 
 Future testGetCollectionInfos() {
   Db db = new Db(
@@ -53,35 +56,19 @@ Future testDropDatabase() {
   });
 }
 
-Future testGetNonce() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((c) {
-    return db.getNonce();
-  }).then((v) {
-    expect(v["ok"], 1);
-    return db.close();
-  });
+Future testGetNonce() async {
+  var result = await db.getNonce();
+  expect(result["ok"], 1);
 }
 
-Future getBuildInfo() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((c) {
-    return db.getBuildInfo();
-  }).then((v) {
-    expect(v["ok"], 1);
-    return db.close();
-  });
+Future getBuildInfo() async {
+  var result = await db.getBuildInfo();
+  expect(result["ok"], 1);
 }
 
-
-Future testIsMaster() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((c) {
-    return db.isMaster();
-  }).then((v) {
-    expect(v["ok"], 1);
-    return db.close();
-  });
+Future testIsMaster() async {
+  var result = await db.isMaster();
+  expect(result["ok"], 1);
 }
 
 testCollectionCreation() {
@@ -819,7 +806,14 @@ Future testCursorClosing() {
 Future testDbCommandCreation() {
   Db db = new Db('${DefaultUri}mongo_dart-test');
   return db.open().then((d) {
-    DbCommand dbCommand = new DbCommand(db, "student", 0, 0, 1, {}, {});
+    DbCommand dbCommand = new DbCommand(
+        db,
+        "student",
+        0,
+        0,
+        1,
+        {},
+        {});
     expect('mongo_dart-test.student', dbCommand.collectionNameBson.value);
     db.close();
   });
@@ -889,76 +883,51 @@ testAuthComponents() {
   expect(key, test_key);
 }
 
-Future testAuthentication() {
-  var db = new Db(
-      'mongodb://ds031477.mongolab.com:31477/dart', 'testAuthentication');
-  return db.open().then((c) {
-    return db.authenticate('test', 'test');
-  }).then((v) {
-    return db.close();
-  });
+Future testAuthentication() async {
+  await db.authenticate('test', 'test');
 }
 
-Future testAuthenticationWithUri() {
-  var db = new Db('mongodb://test:test@ds031477.mongolab.com:31477/dart');
-  return db.open().then((c) {
-    DbCollection collection = db.collection('testAuthenticationWithUri');
-    collection.remove();
-    collection.insert({"a": 1});
-    collection.insert({"a": 2});
-    collection.insert({"a": 3});
-    return collection.findOne();
-  }).then((v) {
-    expect(v['a'], isNotNull);
-    return db.close();
-  });
+Future testAuthenticationWithUri() async {
+  DbCollection collection = db.collection(collectionName);
+  collection.insert({"a": 1});
+  collection.insert({"a": 2});
+  collection.insert({"a": 3});
+
+  var foundValue = await collection.findOne();
+
+  expect(foundValue['a'], isNotNull);
 }
 
-Future testGetIndexes() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((c) {
-    DbCollection collection = db.collection('testcol');
-    collection.remove();
-    for (int n = 0; n < 100; n++) {
-      collection.insert({"a": n});
-    }
-    //return db.indexInformation('testcol');
-    return collection.getIndexes();
-  }).then((indexInfo) {
-    expect(indexInfo.length, 1);
-    return db.close();
-  });
+Future testGetIndexes() async {
+  DbCollection collection = db.collection(collectionName);
+  for (int n = 0; n < 100; n++) {
+    collection.insert({"a": n});
+  }
+
+  var indexes = await collection.getIndexes();
+
+  expect(indexes.length, 1);
 }
 
-Future testIndexCreation() {
-  Db db = new Db('${DefaultUri}index_creation');
-  DbCollection collection;
-  return db.open().then((c) {
-    collection = db.collection('testcol');
-    return collection.drop();
-  }).then((res) {
-    for (int n = 0; n < 6; n++) {
-      collection.insert({
-        'a': n,
-        'embedded': {'b': n, 'c': n * 10}
-      });
-    }
-//    expect(() => db.createIndex('testcol'),throws, reason: 'Invalid number of arguments');
-//    expect(() => db.createIndex('testcol',key: 'a', keys:{'a':-1}),throws, reason: 'Invalid number of arguments');
-    return db.createIndex('testcol', key: 'a');
-  }).then((res) {
-    expect(res['ok'], 1.0);
-    return db.createIndex('testcol', keys: {'a': -1, 'embedded.c': 1});
-  }).then((res) {
-    expect(res['ok'], 1.0);
-    return collection.getIndexes();
-  }).then((res) {
-    expect(res.length, 3);
-    return db.ensureIndex('testcol', keys: {'a': -1, 'embedded.c': 1});
-  }).then((res) {
-    expect(res['ok'], 1.0);
-    return db.close();
-  });
+Future testIndexCreation() async {
+  var collection = await db.collection(collectionName);
+  for (int n = 0; n < 6; n++) {
+    collection.insert({
+      'a': n,
+      'embedded': {'b': n, 'c': n * 10}
+    });
+  }
+  var res = await db.createIndex('testcol', key: 'a');
+  expect(res['ok'], 1.0);
+
+  res = await db.createIndex('testcol', keys: {'a': -1, 'embedded.c': 1});
+  expect(res['ok'], 1.0);
+
+  var indexes = await collection.getIndexes();
+  expect(indexes.length, 3);
+
+  res = await db.ensureIndex('testcol', keys: {'a': -1, 'embedded.c': 1});
+  expect(res['ok'], 1.0);
 }
 
 Future testEnsureIndexWithIndexCreation() {
@@ -1251,26 +1220,20 @@ Future testFindOneWhileStateIsOpening() {
 }
 
 main() {
-//  hierarchicalLoggingEnabled = true;
-//  Logger.root.level = Level.OFF;
-//  new Logger('Db').level = Level.ALL;
-//  var listener = (LogRecord r) {
-//    var name = r.loggerName;
-//    if (name.length > 15) {
-//      name = name.substring(0, 15);
-//    }
-//    while (name.length < 15) {
-//      name = "$name ";
-//    }
-//    print("${r.time}: $name: ${r.message}");
-//  };
-//  Logger.root.onRecord.listen(listener);
-//
-
   group('DbCollection tests:', () {
     test('testAuthComponents', testAuthComponents);
   });
   group('DBCommand:', () {
+    setUp(() async {
+      db = new Db(DefaultUri);
+      await db.open();
+    });
+
+    tearDown(() async {
+      await db.collection(collectionName).drop();
+      await db.close();
+    });
+
     test('testAuthentication', testAuthentication);
     test('testAuthenticationWithUri', testAuthenticationWithUri);
     test('testDropDatabase', testDropDatabase);
