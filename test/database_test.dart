@@ -555,89 +555,62 @@ Future testLimit() async {
 }
 
 testCursorCreation() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  DbCollection collection = db.collection('student');
   Cursor cursor = new Cursor(db, collection, null);
   return cursor;
 }
 
-Future testPingRaw() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((c) {
-    DbCollection collection = db.collection('\$cmd');
-    Cursor cursor = new Cursor(db, collection, where.eq('ping', 1).limit(1));
-    MongoQueryMessage queryMessage = cursor.generateQueryMessage();
-    Future mapFuture = db.queryMessage(queryMessage);
-    return mapFuture;
-  }).then((msg) {
-    expect(msg.documents[0], containsPair('ok', 1));
-    return db.close();
-  });
+Future testPingRaw() async {
+  DbCollection collection = db.collection('\$cmd');
+  Cursor cursor = new Cursor(db, collection, where.eq('ping', 1).limit(1));
+  MongoQueryMessage queryMessage = cursor.generateQueryMessage();
+
+  var result = await db.queryMessage(queryMessage);
+
+  expect(result.documents[0], containsPair('ok', 1));
 }
 
-Future testNextObject() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((c) {
-    DbCollection collection = db.collection('\$cmd');
-    Cursor cursor = new Cursor(db, collection, where.eq('ping', 1).limit(1));
-    return cursor.nextObject();
-  }).then((v) {
-    expect(v, containsPair('ok', 1));
-    return db.close();
-  });
+Future testNextObject() async {
+  DbCollection collection = db.collection('\$cmd');
+  Cursor cursor = new Cursor(db, collection, where.eq('ping', 1).limit(1));
+
+  var newCursor = await cursor.nextObject();
+
+  expect(newCursor, containsPair('ok', 1));
 }
 
-Future testNextObjectToEnd() {
-  var res;
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+Future testNextObjectToEnd() async {
   Cursor cursor;
-  return db.open().then((c) {
-    DbCollection collection = db.collection('testNextObjectToEnd');
-    collection.remove();
-    collection.insert({"a": 1});
-    collection.insert({"a": 2});
-    collection.insert({"a": 3});
-    cursor = new Cursor(db, collection, where.limit(10));
-    return cursor.nextObject();
-  }).then((v) {
-    expect(v, isNotNull);
-    res = cursor.nextObject();
-    res.then((v1) {
-      expect(v1, isNotNull);
-      res = cursor.nextObject();
-      res.then((v2) {
-        expect(v2, isNotNull);
-        res = cursor.nextObject();
-        res.then((v3) {
-          expect(v3, isNull);
-          return db.close();
-        });
-      });
-    });
-  });
+  await collection.insert({"a": 1});
+  await collection.insert({"a": 2});
+  await collection.insert({"a": 3});
+
+  cursor = new Cursor(db, collection, where.limit(10));
+  var result = await cursor.nextObject();
+  expect(result, isNotNull);
+
+  result = await cursor.nextObject();
+  expect(result, isNotNull);
+
+  result = await cursor.nextObject();
+  expect(result, isNotNull);
+
+  result = await cursor.nextObject();
+  expect(result, isNull);
 }
 
-Future testCursorWithOpenServerCursor() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  Cursor cursor;
-  return db.open().then((c) {
-    DbCollection collection = db.collection('new_big_collection');
-    collection.remove();
-    for (int n = 0; n < 100; n++) {
-      collection.insert({"a": n});
-    }
-    cursor = new Cursor(db, collection, where.limit(10));
-    return cursor.nextObject();
-  }).then((v) {
-    expect(cursor.state, State.OPEN);
-    expect(cursor.cursorId, isPositive);
-    return db.close();
-  });
+Future testCursorWithOpenServerCursor() async {
+  for (int n = 0; n < 100; n++) {
+    await collection.insert({"a": n});
+  }
+  var cursor = new Cursor(db, collection, where.limit(10));
+
+  await cursor.nextObject();
+
+  expect(cursor.state, State.OPEN);
+  expect(cursor.cursorId, isPositive);
 }
 
-Future testCursorGetMore() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  DbCollection collection;
+Future testCursorGetMore() async {
   int count = 0;
   Cursor cursor;
   return db.open().then((c) {
@@ -669,30 +642,27 @@ Future testCursorGetMore() {
   });
 }
 
-Future testCursorClosing() {
-  Db db = new Db('${DefaultUri}mongo_dart-test', 'testCursorClosing');
-  DbCollection collection;
-  Cursor cursor;
-  return db.open().then((c) {
-    collection = db.collection('new_big_collection1');
-    collection.remove();
-    for (int n = 0; n < 1000; n++) {
-      collection.insert({"a": n});
-    }
-    cursor = collection.createCursor();
-    expect(cursor.state, State.INIT);
-    return cursor.nextObject();
-  }).then((v) {
-    expect(cursor.state, State.OPEN);
-    expect(cursor.cursorId, isPositive);
-    cursor.close();
-    expect(cursor.state, State.CLOSED);
-    expect(cursor.cursorId, 0);
-    collection.findOne().then((v1) {
-      expect(v, isNotNull);
-      return db.close();
-    });
-  });
+Future testCursorClosing() async {
+  for (int n = 0; n < 1000; n++) {
+    await collection.insert({"a": n});
+  }
+
+  var cursor = collection.createCursor();
+  expect(cursor.state, State.INIT);
+
+  var newCursor = await cursor.nextObject();
+  expect(cursor.state, State.OPEN);
+  expect(cursor.cursorId, isPositive);
+
+  await cursor.close();
+  expect(cursor.state, State.CLOSED);
+  expect(cursor.cursorId, 0);
+
+  // TODO: I think there's an error with this
+  // I believe it should be expect(result, isNotNull)
+  // But this seems to be the original behaviour of the test
+  var result = await collection.findOne();
+  expect(newCursor, isNotNull);
 }
 
 Future testDbCommandCreation() {
@@ -886,16 +856,17 @@ Future testSafeModeUpdate() {
 }
 
 Future testFindWithFieldsClause() async {
-    await collection.insertAll([
-      {"name": "Vadim", "score": 4},
-      {"name": "Daniil", "score": 4},
-      {"name": "Nick", "score": 5}
-    ]);
+  await collection.insertAll([
+    {"name": "Vadim", "score": 4},
+    {"name": "Daniil", "score": 4},
+    {"name": "Nick", "score": 5}
+  ]);
 
-    var result = await collection.findOne(where.eq('name', 'Vadim').fields(['score']));
+  var result = await collection.findOne(
+      where.eq('name', 'Vadim').fields(['score']));
 
-    expect(result['name'], isNull);
-    expect(result['score'], 4);
+  expect(result['name'], isNull);
+  expect(result['score'], 4);
 }
 
 Future testSimpleQuery() async {
