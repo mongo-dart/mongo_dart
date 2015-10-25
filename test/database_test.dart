@@ -634,13 +634,21 @@ Future testCursorClosing() async {
 
   var result = await collection.findOne();
   expect(newCursor, isNotNull);
-  // TODO: I think there's an error with this
+  // TODO: I think there was an error in the original test
   // I believe it should be expect(result, isNotNull)
   // But this seems to be the original behaviour of the test
   expect(result, isNotNull); // Added this -- and it passes!
 }
 
 void testDbCommandCreation() {
+  // TODO: This one fails, I don't know why
+  /*
+    Expected: 'testauth.student'
+    Actual: 'mongo_dart-test.student'
+     Which: is different.
+    Expected: testauth.s ...
+    Actual: mongo_dart ...
+   */
   DbCommand dbCommand = new DbCommand(db, "student", 0, 0, 1, {}, {});
   expect('mongo_dart-test.student', dbCommand.collectionNameBson.value);
 }
@@ -719,13 +727,17 @@ Future testGetIndexes() async {
   expect(indexes.length, 1);
 }
 
+// TODO: The original test also fails
 Future testIndexCreation() async {
+  List toInsert = [];
   for (int n = 0; n < 6; n++) {
-    await collection.insert({
+    toInsert.add({
       'a': n,
       'embedded': {'b': n, 'c': n * 10}
     });
   }
+  await collection.insertAll(toInsert);
+
   var res = await db.createIndex('testcol', key: 'a');
   expect(res['ok'], 1.0);
 
@@ -739,70 +751,57 @@ Future testIndexCreation() async {
   expect(res['ok'], 1.0);
 }
 
-Future testEnsureIndexWithIndexCreation() {
-  Db db = new Db('${DefaultUri}ensureIndex_indexCreation');
-  DbCollection collection;
-  return db.open().then((c) {
-    collection = db.collection('testcol');
-    return collection.drop();
-  }).then((res) {
-    for (int n = 0; n < 6; n++) {
-      collection.insert({
-        'a': n,
-        'embedded': {'b': n, 'c': n * 10}
-      });
-    }
-    return db.ensureIndex('testcol', keys: {'a': -1, 'embedded.c': 1});
-  }).then((res) {
-    expect(res['ok'], 1.0);
-    expect(res['err'], isNull);
-    return db.close();
-  });
-}
-
-Future testIndexCreationErrorHandling() {
-  Db db = new Db('${DefaultUri}IndexCreationErrorHandling');
-  DbCollection collection;
-  bool errorHandled = false;
-  return db.open().then((c) {
-    collection = db.collection('testcol');
-    return collection.drop();
-  }).then((res) {
-    for (int n = 0; n < 6; n++) {
-      collection.insert({'a': n});
-    }
-    // Insert dublicate
-    collection.insert({'a': 3});
-    return db.ensureIndex('testcol', key: 'a', unique: true).catchError((e) {
-      errorHandled = true;
+Future testEnsureIndexWithIndexCreation() async {
+  List toInsert = [];
+  for (int n = 0; n < 6; n++) {
+    toInsert.add({
+      'a': n,
+      'embedded': {'b': n, 'c': n * 10}
     });
-  }).then((res) {
-    expect(errorHandled, isTrue);
-    return db.close();
-  });
+  }
+
+  await collection.insertAll(toInsert);
+
+  var result =
+      await db.ensureIndex('testcol', keys: {'a': -1, 'embedded.c': 1});
+  expect(result['ok'], 1.0);
+  expect(result['err'], isNull);
 }
 
-Future testSafeModeUpdate() {
-  Db db = new Db('${DefaultUri}safe_mode');
-  DbCollection collection = db.collection('testcol');
-  return db.open().then((c) {
-    collection.remove();
-    for (int n = 0; n < 6; n++) {
-      collection.insert({
-        'a': n,
-        'embedded': {'b': n, 'c': n * 10}
-      });
-    }
-    return collection.update({'a': 200}, {'a': 100});
-  }).then((res) {
-    expect(res['updatedExisting'], false);
-    expect(res['n'], 0);
-    return collection.update({'a': 3}, {'a': 100});
-  }).then((res) {
-    expect(res['updatedExisting'], true);
-    expect(res['n'], 1);
-    return db.close();
-  });
+Future testIndexCreationErrorHandling() async {
+  List toInsert = [];
+  for (int n = 0; n < 6; n++) {
+    toInsert.add({'a': n});
+  }
+  // Insert duplicate
+  toInsert.add({'a': 3});
+
+  await collection.insertAll(toInsert);
+
+  try {
+    await db.ensureIndex(collectionName, key: 'a', unique: true);
+    fail("Expecting an error, but wasn't thrown");
+  } catch (e) {
+    expect(e['err'],
+        predicate((String msg) => msg.contains("duplicate key error index")));
+  }
+}
+
+Future testSafeModeUpdate() async {
+  for (int n = 0; n < 6; n++) {
+    await collection.insert({
+      'a': n,
+      'embedded': {'b': n, 'c': n * 10}
+    });
+  }
+
+  var result = await collection.update({'a': 200}, {'a': 100});
+  expect(result['updatedExisting'], false);
+  expect(result['n'], 0);
+
+  result = await collection.update({'a': 3}, {'a': 100});
+  expect(result['updatedExisting'], true);
+  expect(result['n'], 1);
 }
 
 Future testFindWithFieldsClause() async {
@@ -1098,7 +1097,7 @@ main() {
     test('testCursorWithOpenServerCursor', testCursorWithOpenServerCursor);
     test('testCursorGetMore', testCursorGetMore);
     test('testFindStream', testFindStream);
-  }, skip: false);
+  }, skip: true);
 
   group('DBCommand tests:', () {
     setUp(() async {
@@ -1116,10 +1115,26 @@ main() {
   }, skip: true);
 
   group('Safe mode tests:', () {
+    setUp(() async {
+      await initializeDatabase();
+    });
+
+    tearDown(() async {
+      await cleanupDatabase();
+    });
+
     test('testSafeModeUpdate', testSafeModeUpdate);
   }, skip: true);
 
   group('Indexes tests:', () {
+    setUp(() async {
+      await initializeDatabase();
+    });
+
+    tearDown(() async {
+      await cleanupDatabase();
+    });
+
     test('testGetIndexes', testGetIndexes);
     test('testIndexCreation', testIndexCreation);
     test('testEnsureIndexWithIndexCreation', testEnsureIndexWithIndexCreation);
@@ -1128,7 +1143,7 @@ main() {
 
   group('Field level update tests:', () {
     test('testFieldLevelUpdateSimple', testFieldLevelUpdateSimple);
-  }, skip: true);
+  }, skip: false);
 
   group('Aggregate:', () {
     test('testAggregate', testAggregate);
