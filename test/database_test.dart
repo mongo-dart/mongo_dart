@@ -956,7 +956,7 @@ Future testFindOneWhileStateIsOpening() {
 main() {
   Future initializeDatabase() async {
     db = new Db(DefaultUri);
-    await db.open(writeConcern: WriteConcern.FSYNCED);
+    await db.open();
     collection = db.collection(collectionName);
   }
 
