@@ -18,7 +18,6 @@ Future testGetCollectionInfos() async {
   await collection.insertAll([
     {"a": 1}
   ]);
-
   var collectionInfos = await db.getCollectionInfos({'name': collectionName});
 
   expect(collectionInfos, hasLength(1));
@@ -58,8 +57,7 @@ Future testIsMaster() async {
 }
 
 testCollectionCreation() {
-  Db db = new Db('${DefaultUri}db');
-  DbCollection collection = db.collection('student');
+  DbCollection collection = db.collection(collectionName);
   return collection;
 }
 
@@ -992,6 +990,7 @@ main() {
     });
 
     group('DbCollection tests:', () {
+      test('testCollectionCreation', testCollectionCreation);
       test('testLimitWithSortByAndSkip', testLimitWithSortByAndSkip);
       test('testLimitWithSkip', testLimit);
       test('testFindEachWithThenClause', testFindEachWithThenClause);

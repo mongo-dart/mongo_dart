@@ -2,11 +2,11 @@ language: dart
 dart:
   - stable
   - dev
-services: mongodb
+#services: mongodb
 before_script:
   - sleep 15
 sudo: false
 cache:
   directories:
   - $HOME/.pub-cache
-script: pub run test -p vm
+script: pub run test
