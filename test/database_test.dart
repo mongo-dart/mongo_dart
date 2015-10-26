@@ -902,24 +902,6 @@ Future testDbNotOpen() async {
           e.message == "Db is in the wrong state: State.CLOSED"));
 }
 
-//
-//Future testDbOpenWhileStateIsOpening() {
-//  return new Future.sync(() async {
-//    var result = await collection.findOne();
-//      expect(result, isNull);
-//      db.close();
-//
-//    try {
-//      await db.open();
-//      result = await collection.findOne();
-//      expect(result, isNull);
-//    } catch (e) {
-//      expect(e is MongoDartError, isTrue);
-//      expect(db.state == State.OPENING, isTrue);
-//    }
-//  });
-//}
-
 Future testDbOpenWhileStateIsOpening() {
   Db db = new Db(DefaultUri);
   return new Future.sync(() {
