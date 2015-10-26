@@ -1084,7 +1084,8 @@ main() {
     test('testReopeningDb', testReopeningDb);
     test('testDbNotOpen', testDbNotOpen);
     test('testInvalidIndexCreationErrorHandling',
-        testInvalidIndexCreationErrorHandling);
+        testInvalidIndexCreationErrorHandling,
+        skip: 'It seems to be perfectly valid code. No source for expected exception. TODO remeber how this test was created in the first plave');
     test('testInvalidIndexCreationErrorHandling1',
         testInvalidIndexCreationErrorHandling1);
   });
