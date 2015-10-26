@@ -1054,6 +1054,11 @@ main() {
     });
   });
 
+  group("Error handling without opening connection before", () {
+    test('testDbOpenWhileStateIsOpening', testDbOpenWhileStateIsOpening);
+    test('testFindOneWhileStateIsOpening', testFindOneWhileStateIsOpening);
+  });
+
   group('Error handling:', () {
     setUp(() async {
       await initializeDatabase();
@@ -1082,10 +1087,5 @@ main() {
         testInvalidIndexCreationErrorHandling);
     test('testInvalidIndexCreationErrorHandling1',
         testInvalidIndexCreationErrorHandling1);
-  });
-
-  group("Error handling without opening connection before", () {
-    test('testDbOpenWhileStateIsOpening', testDbOpenWhileStateIsOpening);
-    test('testFindOneWhileStateIsOpening', testFindOneWhileStateIsOpening);
   });
 }
