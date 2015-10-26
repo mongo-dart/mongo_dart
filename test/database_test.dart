@@ -6,8 +6,9 @@ import 'dart:async';
 import 'package:test/test.dart';
 
 //const DefaultUri = 'mongodb://127.0.0.1:27017/';
+const dbName = 'testauth';
 const DefaultUri =
-    'mongodb://admin:password@ds041924.mongolab.com:41924/testauth';
+    'mongodb://admin:password@ds041924.mongolab.com:41924/$dbName';
 const String collectionName = 'collectionName';
 
 Db db;
@@ -240,50 +241,48 @@ Future testDistinct() async {
   expect(values[2], 3);
 }
 
-Future testAggregate() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((c) {
-    DbCollection coll = db.collection('testAggregate');
-    coll.remove();
+Future testAggregate() async {
+  List toInsert = [];
 
-    // Avg 1 with 1 rating
-    coll.insert({
-      "game": "At the Gates of Loyang",
-      "player": "Dallas",
-      "rating": 1,
-      "v": 1
-    });
+  // Avg 1 with 1 rating
+  toInsert.add({
+    "game": "At the Gates of Loyang",
+    "player": "Dallas",
+    "rating": 1,
+    "v": 1
+  });
 
-    // Avg 3 with 1 rating
-    coll.insert(
-        {"game": "Age of Steam", "player": "Paul", "rating": 3, "v": 1});
+  // Avg 3 with 1 rating
+  toInsert.add({"game": "Age of Steam", "player": "Paul", "rating": 3, "v": 1});
 
-    // Avg 2 with 2 ratings
-    coll.insert({"game": "Fresco", "player": "Erin", "rating": 3, "v": 1});
-    coll.insert({"game": "Fresco", "player": "Dallas", "rating": 1, "v": 1});
+  // Avg 2 with 2 ratings
+  toInsert.add({"game": "Fresco", "player": "Erin", "rating": 3, "v": 1});
+  toInsert.add({"game": "Fresco", "player": "Dallas", "rating": 1, "v": 1});
 
-    // Avg 3.5 with 4 ratings
-    coll.insert(
-        {"game": "Ticket To Ride", "player": "Paul", "rating": 4, "v": 1});
-    coll.insert(
-        {"game": "Ticket To Ride", "player": "Erin", "rating": 5, "v": 1});
-    coll.insert(
-        {"game": "Ticket To Ride", "player": "Dallas", "rating": 4, "v": 1});
-    coll.insert(
-        {"game": "Ticket To Ride", "player": "Anthony", "rating": 2, "v": 1});
+  // Avg 3.5 with 4 ratings
+  toInsert
+      .add({"game": "Ticket To Ride", "player": "Paul", "rating": 4, "v": 1});
+  toInsert
+      .add({"game": "Ticket To Ride", "player": "Erin", "rating": 5, "v": 1});
+  toInsert
+      .add({"game": "Ticket To Ride", "player": "Dallas", "rating": 4, "v": 1});
+  toInsert.add(
+      {"game": "Ticket To Ride", "player": "Anthony", "rating": 2, "v": 1});
 
-    // Avg 4.5 with 4 ratings (counting only highest v)
-    coll.insert({"game": "Dominion", "player": "Paul", "rating": 5, "v": 2});
-    coll.insert({"game": "Dominion", "player": "Erin", "rating": 4, "v": 1});
-    coll.insert({"game": "Dominion", "player": "Dallas", "rating": 4, "v": 1});
-    coll.insert({"game": "Dominion", "player": "Anthony", "rating": 5, "v": 1});
+  // Avg 4.5 with 4 ratings (counting only highest v)
+  toInsert.add({"game": "Dominion", "player": "Paul", "rating": 5, "v": 2});
+  toInsert.add({"game": "Dominion", "player": "Erin", "rating": 4, "v": 1});
+  toInsert.add({"game": "Dominion", "player": "Dallas", "rating": 4, "v": 1});
+  toInsert.add({"game": "Dominion", "player": "Anthony", "rating": 5, "v": 1});
 
-    // Avg 5 with 2 ratings
-    coll.insert({"game": "Pandemic", "player": "Erin", "rating": 5, "v": 1});
-    coll.insert({"game": "Pandemic", "player": "Dallas", "rating": 5, "v": 1});
+  // Avg 5 with 2 ratings
+  toInsert.add({"game": "Pandemic", "player": "Erin", "rating": 5, "v": 1});
+  toInsert.add({"game": "Pandemic", "player": "Dallas", "rating": 5, "v": 1});
 
-    // Avg player ratings
-    // Dallas = 3, Anthony 3.5, Paul = 4, Erin = 4.25
+  await collection.insertAll(toInsert);
+
+  // Avg player ratings
+  // Dallas = 3, Anthony 3.5, Paul = 4, Erin = 4.25
 /* We want equivalent of this when used on the mongo shell.
  * (Should be able to just copy and paste below once test is run and failed once)
 db.runCommand(
@@ -297,94 +296,92 @@ db.runCommand(
 { "$sort": { "_id": 1 } }
 ]});
  */
-    List pipeline = new List();
-    var p1 = {
-      "\$group": {
-        "_id": {"game": "\$game", "player": "\$player"},
-        "rating": {"\$sum": "\$rating"}
-      }
-    };
-    var p2 = {
-      "\$group": {
-        "_id": "\$_id.game",
-        "avgRating": {"\$avg": "\$rating"}
-      }
-    };
-    var p3 = {
-      "\$sort": {"_id": 1}
-    };
+  List pipeline = new List();
+  var p1 = {
+    "\$group": {
+      "_id": {"game": "\$game", "player": "\$player"},
+      "rating": {"\$sum": "\$rating"}
+    }
+  };
+  var p2 = {
+    "\$group": {
+      "_id": "\$_id.game",
+      "avgRating": {"\$avg": "\$rating"}
+    }
+  };
+  var p3 = {
+    "\$sort": {"_id": 1}
+  };
 
-    pipeline.add(p1);
-    pipeline.add(p2);
-    pipeline.add(p3);
+  pipeline.add(p1);
+  pipeline.add(p2);
+  pipeline.add(p3);
 
-    expect(p1["\u0024group"], isNotNull);
-    expect(p1["\$group"], isNotNull);
+  expect(p1["\u0024group"], isNotNull);
+  expect(p1["\$group"], isNotNull);
 
-    return coll.aggregate(pipeline);
-  }).then((v) {
-    List result = v['result'];
-    expect(result[0]["_id"], "Age of Steam");
-    expect(result[0]["avgRating"], 3);
-    return db.close();
-  });
+  var v = await collection.aggregate(pipeline);
+  List result = v['result'];
+  expect(result[0]["_id"], "Age of Steam");
+  expect(result[0]["avgRating"], 3);
 }
 
-Future testAggregateToStream() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+Future testAggregateToStream() async {
   bool skipTest = false;
-  return db.open().then((c) {
-    return db.getBuildInfo();
-  }).then((v) {
-    var versionArray = v['versionArray'];
-    var versionNum = versionArray[0] * 100 + versionArray[1];
-    if (versionNum < 206) {
-      // Skip test for MongoDb server older then version 2.6
-      skipTest = true;
-      print(
-          'testAggregateToStream skipped as server is older then version 2.6: ${v["version"]}');
+  var buildInfo = await db.getBuildInfo();
+  var versionArray = buildInfo['versionArray'];
+  var versionNum = versionArray[0] * 100 + versionArray[1];
+  if (versionNum < 206) {
+    // Skip test for MongoDb server older then version 2.6
+    skipTest = true;
+    print(
+        'testAggregateToStream skipped as server is older then version 2.6: ${buildInfo["version"]}');
+    if (skipTest) {
+      return;
     }
-    DbCollection coll = db.collection('testAggregate');
-    coll.remove();
+  }
 
-    // Avg 1 with 1 rating
-    coll.insert({
-      "game": "At the Gates of Loyang",
-      "player": "Dallas",
-      "rating": 1,
-      "v": 1
-    });
+  List toInsert = [];
 
-    // Avg 3 with 1 rating
-    coll.insert(
-        {"game": "Age of Steam", "player": "Paul", "rating": 3, "v": 1});
+  // Avg 1 with 1 rating
+  toInsert.add({
+    "game": "At the Gates of Loyang",
+    "player": "Dallas",
+    "rating": 1,
+    "v": 1
+  });
 
-    // Avg 2 with 2 ratings
-    coll.insert({"game": "Fresco", "player": "Erin", "rating": 3, "v": 1});
-    coll.insert({"game": "Fresco", "player": "Dallas", "rating": 1, "v": 1});
+  // Avg 3 with 1 rating
+  toInsert.add({"game": "Age of Steam", "player": "Paul", "rating": 3, "v": 1});
 
-    // Avg 3.5 with 4 ratings
-    coll.insert(
-        {"game": "Ticket To Ride", "player": "Paul", "rating": 4, "v": 1});
-    coll.insert(
-        {"game": "Ticket To Ride", "player": "Erin", "rating": 5, "v": 1});
-    coll.insert(
-        {"game": "Ticket To Ride", "player": "Dallas", "rating": 4, "v": 1});
-    coll.insert(
-        {"game": "Ticket To Ride", "player": "Anthony", "rating": 2, "v": 1});
+  // Avg 2 with 2 ratings
+  toInsert.add({"game": "Fresco", "player": "Erin", "rating": 3, "v": 1});
+  toInsert.add({"game": "Fresco", "player": "Dallas", "rating": 1, "v": 1});
 
-    // Avg 4.5 with 4 ratings (counting only highest v)
-    coll.insert({"game": "Dominion", "player": "Paul", "rating": 5, "v": 2});
-    coll.insert({"game": "Dominion", "player": "Erin", "rating": 4, "v": 1});
-    coll.insert({"game": "Dominion", "player": "Dallas", "rating": 4, "v": 1});
-    coll.insert({"game": "Dominion", "player": "Anthony", "rating": 5, "v": 1});
+  // Avg 3.5 with 4 ratings
+  toInsert
+      .add({"game": "Ticket To Ride", "player": "Paul", "rating": 4, "v": 1});
+  toInsert
+      .add({"game": "Ticket To Ride", "player": "Erin", "rating": 5, "v": 1});
+  toInsert
+      .add({"game": "Ticket To Ride", "player": "Dallas", "rating": 4, "v": 1});
+  toInsert.add(
+      {"game": "Ticket To Ride", "player": "Anthony", "rating": 2, "v": 1});
 
-    // Avg 5 with 2 ratings
-    coll.insert({"game": "Pandemic", "player": "Erin", "rating": 5, "v": 1});
-    coll.insert({"game": "Pandemic", "player": "Dallas", "rating": 5, "v": 1});
+  // Avg 4.5 with 4 ratings (counting only highest v)
+  toInsert.add({"game": "Dominion", "player": "Paul", "rating": 5, "v": 2});
+  toInsert.add({"game": "Dominion", "player": "Erin", "rating": 4, "v": 1});
+  toInsert.add({"game": "Dominion", "player": "Dallas", "rating": 4, "v": 1});
+  toInsert.add({"game": "Dominion", "player": "Anthony", "rating": 5, "v": 1});
 
-    // Avg player ratings
-    // Dallas = 3, Anthony 3.5, Paul = 4, Erin = 4.25
+  // Avg 5 with 2 ratings
+  toInsert.add({"game": "Pandemic", "player": "Erin", "rating": 5, "v": 1});
+  toInsert.add({"game": "Pandemic", "player": "Dallas", "rating": 5, "v": 1});
+
+  await collection.insertAll(toInsert);
+
+  // Avg player ratings
+  // Dallas = 3, Anthony 3.5, Paul = 4, Erin = 4.25
 /* We want equivalent of this when used on the mongo shell.
  * (Should be able to just copy and paste below once test is run and failed once)
 db.runCommand(
@@ -398,40 +395,35 @@ db.runCommand(
 { "$sort": { "_id": 1 } }
 ]});
  */
-    List pipeline = new List();
-    var p1 = {
-      "\$group": {
-        "_id": {"game": "\$game", "player": "\$player"},
-        "rating": {"\$sum": "\$rating"}
-      }
-    };
-    var p2 = {
-      "\$group": {
-        "_id": "\$_id.game",
-        "avgRating": {"\$avg": "\$rating"}
-      }
-    };
-    var p3 = {
-      "\$sort": {"_id": 1}
-    };
-
-    pipeline.add(p1);
-    pipeline.add(p2);
-    pipeline.add(p3);
-
-    expect(p1["\u0024group"], isNotNull);
-    expect(p1["\$group"], isNotNull);
-    // set batchSize parameter to split responce to 2 chunks
-    return coll.aggregateToStream(pipeline, cursorOptions: {'batchSize': 1})
-        .toList();
-  }).then((v) {
-    if (!skipTest) {
-      expect(v.isNotEmpty, isTrue);
-      expect(v[0]["_id"], "Age of Steam");
-      expect(v[0]["avgRating"], 3);
+  List pipeline = new List();
+  var p1 = {
+    "\$group": {
+      "_id": {"game": "\$game", "player": "\$player"},
+      "rating": {"\$sum": "\$rating"}
     }
-    return db.close();
-  });
+  };
+  var p2 = {
+    "\$group": {
+      "_id": "\$_id.game",
+      "avgRating": {"\$avg": "\$rating"}
+    }
+  };
+  var p3 = {
+    "\$sort": {"_id": 1}
+  };
+
+  pipeline.add(p1);
+  pipeline.add(p2);
+  pipeline.add(p3);
+
+  expect(p1["\u0024group"], isNotNull);
+  expect(p1["\$group"], isNotNull);
+  // set batchSize parameter to split response to 2 chunks
+  var aggregate = await collection
+      .aggregateToStream(pipeline, cursorOptions: {'batchSize': 1}).toList();
+  expect(aggregate.isNotEmpty, isTrue);
+  expect(aggregate[0]["_id"], "Age of Steam");
+  expect(aggregate[0]["avgRating"], 3);
 }
 
 Future testSkip() async {
@@ -641,16 +633,8 @@ Future testCursorClosing() async {
 }
 
 void testDbCommandCreation() {
-  // TODO: This one fails, I don't know why
-  /*
-    Expected: 'testauth.student'
-    Actual: 'mongo_dart-test.student'
-     Which: is different.
-    Expected: testauth.s ...
-    Actual: mongo_dart ...
-   */
-  DbCommand dbCommand = new DbCommand(db, "student", 0, 0, 1, {}, {});
-  expect('mongo_dart-test.student', dbCommand.collectionNameBson.value);
+  DbCommand dbCommand = new DbCommand(db, collectionName, 0, 0, 1, {}, {});
+  expect(dbCommand.collectionNameBson.value, '$dbName.$collectionName');
 }
 
 Future testPingDbCommand() async {
@@ -727,7 +711,6 @@ Future testGetIndexes() async {
   expect(indexes.length, 1);
 }
 
-// TODO: The original test also fails
 Future testIndexCreation() async {
   List toInsert = [];
   for (int n = 0; n < 6; n++) {
@@ -738,16 +721,16 @@ Future testIndexCreation() async {
   }
   await collection.insertAll(toInsert);
 
-  var res = await db.createIndex('testcol', key: 'a');
+  var res = await db.createIndex(collectionName, key: 'a');
   expect(res['ok'], 1.0);
 
-  res = await db.createIndex('testcol', keys: {'a': -1, 'embedded.c': 1});
+  res = await db.createIndex(collectionName, keys: {'a': -1, 'embedded.c': 1});
   expect(res['ok'], 1.0);
 
   var indexes = await collection.getIndexes();
   expect(indexes.length, 3);
 
-  res = await db.ensureIndex('testcol', keys: {'a': -1, 'embedded.c': 1});
+  res = await db.ensureIndex(collectionName, keys: {'a': -1, 'embedded.c': 1});
   expect(res['ok'], 1.0);
 }
 
@@ -763,7 +746,7 @@ Future testEnsureIndexWithIndexCreation() async {
   await collection.insertAll(toInsert);
 
   var result =
-      await db.ensureIndex('testcol', keys: {'a': -1, 'embedded.c': 1});
+      await db.ensureIndex(collectionName, keys: {'a': -1, 'embedded.c': 1});
   expect(result['ok'], 1.0);
   expect(result['err'], isNull);
 }
@@ -867,104 +850,89 @@ Future testCompoundQuery() async {
   expect(result['my_field'], 1);
 }
 
-Future testFieldLevelUpdateSimple() {
+Future testFieldLevelUpdateSimple() async {
   ObjectId id;
-  Db db = new Db('${DefaultUri}update');
-  DbCollection collection = db.collection('testupdate');
-  return db.open().then((c) {
-    return collection.drop().then((_) {
-      return collection.insert({'name': 'a', 'value': 10});
-    }).then((result) {
-      expect(result['n'], 0);
-      return collection.findOne({'name': 'a'});
-    }).then((result) {
-      expect(result, isNotNull);
-      id = result['_id'];
-      return collection.update(where.id(id), modify.set('name', 'BBB'));
-    }).then((result) {
-      expect(result['updatedExisting'], true);
-      expect(result['n'], 1);
-      return collection.findOne(where.id(id));
-    }).then((result) {
-      expect(result, isNotNull);
-      expect(result['name'], 'BBB');
-      return db.close();
-    });
-  });
+  var result = await collection.insert({'name': 'a', 'value': 10});
+  expect(result['n'], 0);
+
+  result = await collection.findOne({'name': 'a'});
+  expect(result, isNotNull);
+
+  id = result['_id'];
+  result = await collection.update(where.id(id), modify.set('name', 'BBB'));
+  expect(result['updatedExisting'], true);
+  expect(result['n'], 1);
+
+  result = await collection.findOne(where.id(id));
+  expect(result, isNotNull);
+  expect(result['name'], 'BBB');
 }
 
-Future testQueryOnClosedConnection() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((c) {
-    return db.close().then((_) {
-      return db.collection("test").find().toList().catchError((e) {
-        expect(e is MongoDartError, isTrue);
-        return "error_received";
-      }).then((msg) {
-        expect(msg, equals("error_received"));
-      });
-    });
-  });
+Future testQueryOnClosedConnection() async {
+  await db.close();
+  expect(
+      collection.find().toList(),
+      throwsA((MongoDartError e) =>
+          e.message == 'Db is in the wrong state: State.CLOSED'));
 }
 
-Future testUpdateOnClosedConnection() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  return db.open().then((c) {
-    return db.close().then((_) {
-      return db.collection("test").save({"test": "test"}).catchError((e) {
-        expect(e is MongoDartError, isTrue);
-        print(e);
-        return "error_received";
-      }).then((msg) {
-        expect(msg, equals("error_received"));
-      });
-    });
-  });
+Future testUpdateOnClosedConnection() async {
+  await db.close();
+  expect(
+      collection.save({"test": "test"}),
+      throwsA(
+          (MongoDartError e) => e.message == "DB is not open. State.CLOSED"));
 }
 
-Future testReopeningDb() {
-  var db = new Db('mongodb://127.0.0.1:27017/testdb');
-  return db.open().then((_) {
-    var coll = db.collection('test');
-    return coll.insert({'one': 'test'});
-  }).then((_) {
-    return db.close();
-  }).then((_) {
-    return db.open();
-  }).then((_) {
-    var coll = db.collection('test');
-    return coll.findOne();
-  }).then((res) {
-    expect(res, isNotNull);
-    return db.close();
-  });
+Future testReopeningDb() async {
+  await collection.insert({'one': 'test'});
+  await db.close();
+  await db.open();
+
+  var result = await collection.findOne();
+
+  expect(result, isNotNull);
 }
 
-Future testDbNotOpen() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
-  DbCollection coll = db.collection('test');
-  return coll.findOne().catchError((e) {
-    expect(e is MongoDartError, isTrue);
-    return "error_received";
-  }).then((msg) {
-    expect(msg, equals("error_received"));
-  });
+Future testDbNotOpen() async {
+  await db.close();
+  expect(
+      collection.findOne(),
+      throwsA((MongoDartError e) =>
+          e.message == "Db is in the wrong state: State.CLOSED"));
 }
+
+//
+//Future testDbOpenWhileStateIsOpening() {
+//  return new Future.sync(() async {
+//    var result = await collection.findOne();
+//      expect(result, isNull);
+//      db.close();
+//
+//    try {
+//      await db.open();
+//      result = await collection.findOne();
+//      expect(result, isNull);
+//    } catch (e) {
+//      expect(e is MongoDartError, isTrue);
+//      expect(db.state == State.OPENING, isTrue);
+//    }
+//  });
+//}
 
 Future testDbOpenWhileStateIsOpening() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+  Db db = new Db(DefaultUri);
   return new Future.sync(() {
     db.open().then((_) {
-      return db.collection('Dubmmy').findOne();
+      return db.collection(collectionName).findOne();
     }).then((res) {
       expect(res, isNull);
       db.close();
     });
     db.open().then((_) {
-      return db.collection('Dubmmy').findOne();
+      return db.collection(collectionName).findOne();
     }).then((res) {
       expect(res, isNull);
-      ;
     }).catchError((e) {
       expect(e is MongoDartError, isTrue);
       expect(db.state == State.OPENING, isTrue);
@@ -972,42 +940,31 @@ Future testDbOpenWhileStateIsOpening() {
   });
 }
 
-Future testInvalidIndexCreationErrorHandling() {
-  Db db = new Db('${DefaultUri}index_creation');
-  return new Future.sync(() {
-    db.open().then((_) {
-      return db.createIndex('testcol', key: 'a');
-    }).catchError((e) {
-      expect(e is ArgumentError, isTrue);
-    }).whenComplete(() {
-      db.close();
-    });
-  });
+testInvalidIndexCreationErrorHandling() {
+  /*
+   TODO: Verify why this is supposed to be an invalid index because this
+   currently doesn't fail
+    */
+  expect(db.createIndex(collectionName, key: 'a'),
+      throwsA((e) => e is ArgumentError));
 }
 
-Future testInvalidIndexCreationErrorHandling1() {
-  Db db = new Db('${DefaultUri}index_creation');
-  return new Future.sync(() {
-    db.open().then((_) {
-      return db.createIndex('testcol', key: 'a', keys: {'a': -1});
-    }).catchError((e) {
-      expect(e is ArgumentError, isTrue);
-    }).whenComplete(() {
-      db.close();
-    });
-  });
+testInvalidIndexCreationErrorHandling1() {
+  expect(db.createIndex(collectionName, key: 'a', keys: {'a': -1}),
+      throwsA((e) => e is ArgumentError));
 }
 
 Future testFindOneWhileStateIsOpening() {
-  Db db = new Db('${DefaultUri}mongo_dart-test');
+  Db db = new Db(DefaultUri);
   return new Future.sync(() {
     db.open().then((_) {
-      return db.collection('Dubmmy').findOne();
+      return db.collection(collectionName).findOne();
     }).then((res) {
       expect(res, isNull);
       db.close();
     });
-    db.collection('Dubmmy').findOne().then((res) {
+
+    db.collection(collectionName).findOne().then((res) {
       expect(res, isNull);
     }).catchError((e) {
       expect(e is MongoDartError, isTrue);
@@ -1028,11 +985,7 @@ main() {
     await db.close();
   }
 
-  group('DbCollection tests:', () {
-    test('testAuthComponents', testAuthComponents);
-  }, skip: true);
-
-  group('DBCommand:', () {
+  group("A", () {
     setUp(() async {
       await initializeDatabase();
     });
@@ -1041,127 +994,116 @@ main() {
       await cleanupDatabase();
     });
 
-    test('testAuthentication', testAuthentication);
-    test('testAuthenticationWithUri', testAuthenticationWithUri);
-    test('testDropDatabase', testDropDatabase);
-    test('testGetCollectionInfos', testGetCollectionInfos);
-    test('testRemove', testRemove);
-    test('testGetNonce', testGetNonce);
-    test('getBuildInfo', getBuildInfo);
-    test('testIsMaster', testIsMaster);
-  }, skip: true);
-
-  group('DbCollection tests:', () {
-    setUp(() async {
-      await initializeDatabase();
+    group('DbCollection tests:', () {
+      test('testAuthComponents', testAuthComponents);
     });
 
-    tearDown(() async {
-      await cleanupDatabase();
+    group('DBCommand:', () {
+      test('testAuthentication', testAuthentication);
+      test('testAuthenticationWithUri', testAuthenticationWithUri);
+      test('testDropDatabase', testDropDatabase);
+      test('testGetCollectionInfos', testGetCollectionInfos);
+      test('testRemove', testRemove);
+      test('testGetNonce', testGetNonce);
+      test('getBuildInfo', getBuildInfo);
+      test('testIsMaster', testIsMaster);
     });
 
-    test('testLimitWithSortByAndSkip', testLimitWithSortByAndSkip);
-    test('testLimitWithSkip', testLimit);
-    test('testFindEachWithThenClause', testFindEachWithThenClause);
-    test('testSimpleQuery', testSimpleQuery);
-    test('testCompoundQuery', testCompoundQuery);
-    test('testCount', testCount);
-    test('testDistinct', testDistinct);
-    test('testFindEach', testFindEach);
-    test('testEach', testEachOnEmptyCollection);
-    test('testDrop', testDrop);
-    test('testSaveWithIntegerId', testSaveWithIntegerId);
-    test('testSaveWithObjectId', testSaveWithObjectId);
-    test('testInsertWithObjectId', testInsertWithObjectId);
-    test('testSkip', testSkip);
-    test('testDateTime', testDateTime);
-    test('testUpdateWithUpsert', testUpdateWithUpsert);
-    test('testUpdateWithMultiUpdate', testUpdateWithMultiUpdate);
-    test('testFindWithFieldsClause', testFindWithFieldsClause);
-  }, skip: true);
-
-  group('Cursor tests:', () {
-    setUp(() async {
-      await initializeDatabase();
+    group('DbCollection tests:', () {
+      test('testLimitWithSortByAndSkip', testLimitWithSortByAndSkip);
+      test('testLimitWithSkip', testLimit);
+      test('testFindEachWithThenClause', testFindEachWithThenClause);
+      test('testSimpleQuery', testSimpleQuery);
+      test('testCompoundQuery', testCompoundQuery);
+      test('testCount', testCount);
+      test('testDistinct', testDistinct);
+      test('testFindEach', testFindEach);
+      test('testEach', testEachOnEmptyCollection);
+      test('testDrop', testDrop);
+      test('testSaveWithIntegerId', testSaveWithIntegerId);
+      test('testSaveWithObjectId', testSaveWithObjectId);
+      test('testInsertWithObjectId', testInsertWithObjectId);
+      test('testSkip', testSkip);
+      test('testDateTime', testDateTime);
+      test('testUpdateWithUpsert', testUpdateWithUpsert);
+      test('testUpdateWithMultiUpdate', testUpdateWithMultiUpdate);
+      test('testFindWithFieldsClause', testFindWithFieldsClause);
     });
 
-    tearDown(() async {
-      await cleanupDatabase();
+    group('Cursor tests:', () {
+      test('testCursorCreation', testCursorCreation);
+      test('testCursorClosing', testCursorClosing);
+      test('testNextObjectToEnd', testNextObjectToEnd);
+      test('testPingRaw', testPingRaw);
+      test('testNextObject', testNextObject);
+      test('testCursorWithOpenServerCursor', testCursorWithOpenServerCursor);
+      test('testCursorGetMore', testCursorGetMore);
+      test('testFindStream', testFindStream);
     });
 
-    test('testCursorCreation', testCursorCreation);
-    test('testCursorClosing', testCursorClosing);
-    test('testNextObjectToEnd', testNextObjectToEnd);
-    test('testPingRaw', testPingRaw);
-    test('testNextObject', testNextObject);
-    test('testCursorWithOpenServerCursor', testCursorWithOpenServerCursor);
-    test('testCursorGetMore', testCursorGetMore);
-    test('testFindStream', testFindStream);
-  }, skip: true);
-
-  group('DBCommand tests:', () {
-    setUp(() async {
-      await initializeDatabase();
+    group('DBCommand tests:', () {
+      test('testDbCommandCreation', testDbCommandCreation);
+      test('testPingDbCommand', testPingDbCommand);
+      test('testDropDbCommand', testDropDbCommand);
+      test('testIsMasterDbCommand', testIsMasterDbCommand);
     });
 
-    tearDown(() async {
-      await cleanupDatabase();
+    group('Safe mode tests:', () {
+      test('testSafeModeUpdate', testSafeModeUpdate);
     });
 
-    test('testDbCommandCreation', testDbCommandCreation);
-    test('testPingDbCommand', testPingDbCommand);
-    test('testDropDbCommand', testDropDbCommand);
-    test('testIsMasterDbCommand', testIsMasterDbCommand);
-  }, skip: true);
-
-  group('Safe mode tests:', () {
-    setUp(() async {
-      await initializeDatabase();
+    group('Indexes tests:', () {
+      test('testGetIndexes', testGetIndexes);
+      test('testIndexCreation', testIndexCreation);
+      test(
+          'testEnsureIndexWithIndexCreation', testEnsureIndexWithIndexCreation);
+      test('testIndexCreationErrorHandling', testIndexCreationErrorHandling);
     });
 
-    tearDown(() async {
-      await cleanupDatabase();
+    group('Field level update tests:', () {
+      test('testFieldLevelUpdateSimple', testFieldLevelUpdateSimple);
     });
 
-    test('testSafeModeUpdate', testSafeModeUpdate);
-  }, skip: true);
-
-  group('Indexes tests:', () {
-    setUp(() async {
-      await initializeDatabase();
+    group('Aggregate:', () {
+      test('testAggregate', testAggregate);
+      test(
+          'testAggregateToStream - if server older then version 2.6 test would be skipped',
+          testAggregateToStream);
     });
-
-    tearDown(() async {
-      await cleanupDatabase();
-    });
-
-    test('testGetIndexes', testGetIndexes);
-    test('testIndexCreation', testIndexCreation);
-    test('testEnsureIndexWithIndexCreation', testEnsureIndexWithIndexCreation);
-    test('testIndexCreationErrorHandling', testIndexCreationErrorHandling);
-  }, skip: true);
-
-  group('Field level update tests:', () {
-    test('testFieldLevelUpdateSimple', testFieldLevelUpdateSimple);
-  }, skip: false);
-
-  group('Aggregate:', () {
-    test('testAggregate', testAggregate);
-    test(
-        'testAggregateToStream - if server older then version 2.6 test would be skipped',
-        testAggregateToStream);
-  }, skip: true);
+  });
 
   group('Error handling:', () {
+    setUp(() async {
+      await initializeDatabase();
+    });
+
+    tearDown(() async {
+      try {
+        await db.open();
+      } catch (e) {
+        // db possibly already open
+      }
+
+      try {
+        await collection.drop();
+        await db.close();
+      } catch (e) {
+        // db possibly already closed
+      }
+    });
+
     test('testQueryOnClosedConnection', testQueryOnClosedConnection);
     test("testUpdateOnClosedConnection", testUpdateOnClosedConnection);
     test('testReopeningDb', testReopeningDb);
     test('testDbNotOpen', testDbNotOpen);
-    test('testDbOpenWhileStateIsOpening', testDbOpenWhileStateIsOpening);
-    test('testFindOneWhileStateIsOpening', testFindOneWhileStateIsOpening);
     test('testInvalidIndexCreationErrorHandling',
         testInvalidIndexCreationErrorHandling);
     test('testInvalidIndexCreationErrorHandling1',
         testInvalidIndexCreationErrorHandling1);
-  }, skip: true);
+  });
+
+  group("Error handling without opening connection before", () {
+    test('testDbOpenWhileStateIsOpening', testDbOpenWhileStateIsOpening);
+    test('testFindOneWhileStateIsOpening', testFindOneWhileStateIsOpening);
+  });
 }
