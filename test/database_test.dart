@@ -165,17 +165,18 @@ Future testFindStream() async {
 
   int count = 0;
   int sum = 0;
-  await collection.remove();
   await collection.insertAll([
     {"name": "Vadim", "score": 4},
     {"name": "Daniil", "score": 4},
     {"name": "Nick", "score": 5}
   ]);
 
-  await collection.find().forEach((v1) {
+  var results = collection.find();
+
+  await for (var v1 in results) {
     count++;
     sum += v1["score"];
-  });
+  }
 
   expect(count, 3);
   expect(sum, 13);
@@ -574,7 +575,7 @@ Future testLimitWithSortByAndSkip() async {
 
   cursor = collection.createCursor(where.sortBy('a').skip(300).limit(10));
 
-  await cursor.stream.forEach((e) => counter++);
+  counter = await cursor.stream.length;
   expect(counter, 10);
   expect(cursor.state, State.CLOSED);
   expect(cursor.cursorId, 0);
@@ -674,15 +675,13 @@ Future testCursorGetMore() async {
 
   int count = 0;
   Cursor cursor = new Cursor(db, collection, where.limit(10));
-  await cursor.stream.forEach((v) {
-    count++;
-  });
+  count = await cursor.stream.length;
   expect(count, 0);
 
   await insertManyDocuments(collection, 1000);
 
   cursor = new Cursor(db, collection, null);
-  await cursor.stream.forEach((v) => count++);
+  count = await cursor.stream.length;
 
   expect(count, 1000);
   expect(cursor.cursorId, 0);
