@@ -9,4 +9,4 @@ sudo: false
 cache:
   directories:
   - $HOME/.pub-cache
-script: pub run test
+script: pub run test --concurrency=1
