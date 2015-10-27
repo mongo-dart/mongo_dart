@@ -84,10 +84,10 @@ Future testEachOnEmptyCollection() async {
   int count = 0;
   int sum = 0;
 
-  await collection.find().forEach((document) {
+  await for (var document in collection.find()) {
     sum += document["a"];
     count++;
-  });
+  }
 
   expect(sum, 0);
   expect(count, 0);
@@ -105,10 +105,10 @@ Future testFindEachWithThenClause() async {
     {"name": "Nick", "score": 5}
   ]);
 
-  await collection.find().forEach((v) {
-    sum += v["score"];
+  await for (var document in collection.find()) {
+    sum += document["score"];
     count++;
-  });
+  }
 
   expect(sum, 13);
   expect(count, 3);
@@ -150,10 +150,10 @@ testFindEach() async {
     {"name": "Nick", "score": 5}
   ]);
 
-  await collection.find().forEach((document) {
+  await for (var document in collection.find()) {
     count++;
     sum += document["score"];
-  });
+  }
 
   expect(count, 3);
   expect(sum, 13);
