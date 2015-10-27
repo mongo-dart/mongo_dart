@@ -23,6 +23,7 @@ String getRandomCollectionName() {
 
 class MockConsumer<S> implements StreamConsumer<S> {
   List<S> data = <S>[];
+
   Future consume(Stream<S> stream) {
     var completer = new Completer();
     stream.listen(_onData, onDone: () => completer.complete(null));
@@ -242,12 +243,10 @@ main() {
     test('testExtraData', testExtraData);
   });
 
-  tearDownAll(() {
-    tearDownAll(() async {
-      await db.open();
-      await Future.forEach(usedCollectionNames,
-          (String collectionName) => db.collection(collectionName).drop());
-      await db.close();
-    });
+  tearDownAll(() async {
+    await db.open();
+    await Future.forEach(usedCollectionNames,
+        (String collectionName) => db.collection(collectionName).drop());
+    await db.close();
   });
 }
