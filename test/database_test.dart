@@ -171,11 +171,9 @@ Future testFindStream() async {
     {"name": "Nick", "score": 5}
   ]);
 
-  var results = collection.find();
-
-  await for (var v1 in results) {
+  await for (var document in collection.find()) {
     count++;
-    sum += v1["score"];
+    sum += document["score"];
   }
 
   expect(count, 3);
