@@ -10,7 +10,6 @@ import 'package:uuid/uuid.dart';
 const dbName = 'testauth';
 const DefaultUri =
     'mongodb://admin:password@ds041924.mongolab.com:41924/$dbName';
-const String collectionName = 'collectionName';
 
 Db db;
 Uuid uuid = new Uuid();
@@ -183,6 +182,8 @@ Future testFindStream() async {
 }
 
 Future testDrop() async {
+  String collectionName = getRandomCollectionName();
+
   await db.dropCollection(collectionName);
 }
 
@@ -714,6 +715,8 @@ Future testCursorClosing() async {
 }
 
 void testDbCommandCreation() {
+  String collectionName = getRandomCollectionName();
+
   DbCommand dbCommand = new DbCommand(db, collectionName, 0, 0, 1, {}, {});
   expect(dbCommand.collectionNameBson.value, '$dbName.$collectionName');
 }
@@ -1026,6 +1029,8 @@ Future testDbNotOpen() async {
 }
 
 Future testDbOpenWhileStateIsOpening() {
+  String collectionName = getRandomCollectionName();
+
   Db db = new Db(DefaultUri);
   return new Future.sync(() {
     db.open().then((_) {
@@ -1050,16 +1055,22 @@ testInvalidIndexCreationErrorHandling() {
    TODO: Verify why this is supposed to be an invalid index because this
    currently doesn't fail
     */
+  String collectionName = getRandomCollectionName();
+
   expect(db.createIndex(collectionName, key: 'a'),
       throwsA((e) => e is ArgumentError));
 }
 
 testInvalidIndexCreationErrorHandling1() {
+  String collectionName = getRandomCollectionName();
+
   expect(db.createIndex(collectionName, key: 'a', keys: {'a': -1}),
       throwsA((e) => e is ArgumentError));
 }
 
 Future testFindOneWhileStateIsOpening() {
+  String collectionName = getRandomCollectionName();
+
   Db db = new Db(DefaultUri);
   return new Future.sync(() {
     db.open().then((_) {

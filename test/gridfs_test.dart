@@ -11,8 +11,6 @@ const dbName = 'testauth';
 const DefaultUri =
     'mongodb://admin:password@ds041924.mongolab.com:41924/$dbName';
 Db db;
-DbCollection collection;
-const String collectionName = 'collectionName';
 
 class MockConsumer<S> implements StreamConsumer<S> {
   List<S> data = <S>[];
@@ -200,11 +198,9 @@ main() {
   Future initializeDatabase() async {
     db = new Db(DefaultUri);
     await db.open();
-    collection = db.collection(collectionName);
   }
 
   Future cleanupDatabase() async {
-    await collection.drop();
     await db.close();
   }
 
