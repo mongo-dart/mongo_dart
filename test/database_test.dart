@@ -14,9 +14,16 @@ const String collectionName = 'collectionName';
 
 Db db;
 Uuid uuid = new Uuid();
+List<String> usedCollectionNames = [];
+
+String getRandomCollectionName() {
+  String name = uuid.v4();
+  usedCollectionNames.add(name);
+  return name;
+}
 
 Future testGetCollectionInfos() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await collection.insertAll([
@@ -30,7 +37,7 @@ Future testGetCollectionInfos() async {
 }
 
 Future testRemove() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await collection.insertAll([
@@ -66,13 +73,13 @@ Future testIsMaster() async {
 }
 
 testCollectionCreation() {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
   return collection;
 }
 
 Future testEachOnEmptyCollection() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   int count = 0;
@@ -88,7 +95,7 @@ Future testEachOnEmptyCollection() async {
 }
 
 Future testFindEachWithThenClause() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   int count = 0;
@@ -109,7 +116,7 @@ Future testFindEachWithThenClause() async {
 }
 
 Future testDateTime() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await collection.insertAll([
@@ -133,7 +140,7 @@ Future testDateTime() async {
 }
 
 testFindEach() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   int count = 0;
@@ -154,7 +161,7 @@ testFindEach() async {
 }
 
 Future testFindStream() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   int count = 0;
@@ -180,7 +187,7 @@ Future testDrop() async {
 }
 
 Future testSaveWithIntegerId() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   List toInsert = [
@@ -211,7 +218,7 @@ Future testSaveWithIntegerId() async {
 }
 
 Future testSaveWithObjectId() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   List toInsert = [
@@ -236,7 +243,7 @@ Future testSaveWithObjectId() async {
 }
 
 Future testInsertWithObjectId() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   var id;
@@ -252,7 +259,7 @@ Future testInsertWithObjectId() async {
 }
 
 Future testCount() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await insertManyDocuments(collection, 167);
@@ -262,7 +269,7 @@ Future testCount() async {
 }
 
 Future testDistinct() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await collection.insert({"foo": 1});
@@ -280,7 +287,7 @@ Future testDistinct() async {
 }
 
 Future testAggregate() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   List toInsert = [];
@@ -368,7 +375,7 @@ db.runCommand(
 }
 
 Future testAggregateToStream() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   bool skipTest = false;
@@ -471,7 +478,7 @@ db.runCommand(
 }
 
 Future testSkip() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await insertManyDocuments(collection, 600);
@@ -482,7 +489,7 @@ Future testSkip() async {
 }
 
 Future testUpdateWithUpsert() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   var result = await collection.insert({'name': 'a', 'value': 10});
@@ -506,7 +513,7 @@ Future testUpdateWithUpsert() async {
 }
 
 Future testUpdateWithMultiUpdate() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   var result = await collection.insertAll([
@@ -556,7 +563,7 @@ Future testUpdateWithMultiUpdate() async {
 }
 
 Future testLimitWithSortByAndSkip() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   int counter = 0;
@@ -582,7 +589,7 @@ Future insertManyDocuments(DbCollection collection, int numberOfRecords) async {
 }
 
 Future testLimit() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   int counter = 0;
@@ -598,7 +605,7 @@ Future testLimit() async {
 }
 
 testCursorCreation() {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   Cursor cursor = new Cursor(db, collection, null);
@@ -625,7 +632,7 @@ Future testNextObject() async {
 }
 
 Future testNextObjectToEnd() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   Cursor cursor;
@@ -648,7 +655,7 @@ Future testNextObjectToEnd() async {
 }
 
 Future testCursorWithOpenServerCursor() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await insertManyDocuments(collection, 1000);
@@ -661,7 +668,7 @@ Future testCursorWithOpenServerCursor() async {
 }
 
 Future testCursorGetMore() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   int count = 0;
@@ -682,7 +689,7 @@ Future testCursorGetMore() async {
 }
 
 Future testCursorClosing() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await insertManyDocuments(collection, 10000);
@@ -768,7 +775,7 @@ Future testAuthentication() async {
 }
 
 Future testAuthenticationWithUri() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await collection.insert({"a": 1});
@@ -781,7 +788,7 @@ Future testAuthenticationWithUri() async {
 }
 
 Future testGetIndexes() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await insertManyDocuments(collection, 100);
@@ -792,7 +799,7 @@ Future testGetIndexes() async {
 }
 
 Future testIndexCreation() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   List toInsert = [];
@@ -818,7 +825,7 @@ Future testIndexCreation() async {
 }
 
 Future testEnsureIndexWithIndexCreation() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   List toInsert = [];
@@ -838,7 +845,7 @@ Future testEnsureIndexWithIndexCreation() async {
 }
 
 Future testIndexCreationErrorHandling() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   List toInsert = [];
@@ -860,7 +867,7 @@ Future testIndexCreationErrorHandling() async {
 }
 
 Future testSafeModeUpdate() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   for (int n = 0; n < 6; n++) {
@@ -880,7 +887,7 @@ Future testSafeModeUpdate() async {
 }
 
 Future testFindWithFieldsClause() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await collection.insertAll([
@@ -897,7 +904,7 @@ Future testFindWithFieldsClause() async {
 }
 
 Future testSimpleQuery() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   ObjectId id;
@@ -928,7 +935,7 @@ Future testSimpleQuery() async {
 }
 
 Future testCompoundQuery() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   List toInsert = [];
@@ -952,7 +959,7 @@ Future testCompoundQuery() async {
 }
 
 Future testFieldLevelUpdateSimple() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   ObjectId id;
@@ -973,7 +980,7 @@ Future testFieldLevelUpdateSimple() async {
 }
 
 Future testQueryOnClosedConnection() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await db.close();
@@ -984,7 +991,7 @@ Future testQueryOnClosedConnection() async {
 }
 
 Future testUpdateOnClosedConnection() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await db.close();
@@ -995,7 +1002,7 @@ Future testUpdateOnClosedConnection() async {
 }
 
 Future testReopeningDb() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await collection.insert({'one': 'test'});
@@ -1008,7 +1015,7 @@ Future testReopeningDb() async {
 }
 
 Future testDbNotOpen() async {
-  String collectionName = uuid.v4();
+  String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await db.close();
@@ -1199,14 +1206,16 @@ main() {
     test('testDbNotOpen', testDbNotOpen);
     test('testInvalidIndexCreationErrorHandling',
         testInvalidIndexCreationErrorHandling,
-        skip: 'It seems to be perfectly valid code. No source for expected exception. TODO remeber how this test was created in the first plave');
+        skip:
+            'It seems to be perfectly valid code. No source for expected exception. TODO remeber how this test was created in the first plave');
     test('testInvalidIndexCreationErrorHandling1',
         testInvalidIndexCreationErrorHandling1);
   });
 
   tearDownAll(() async {
     await db.open();
-    await db.drop();
+    await Future.forEach(usedCollectionNames,
+        (String collectionName) => db.collection(collectionName).drop());
     await db.close();
   });
 }
