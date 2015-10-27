@@ -4,26 +4,41 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:async';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 //const DefaultUri = 'mongodb://127.0.0.1:27017/';
 const dbName = 'testauth';
 const DefaultUri =
     'mongodb://admin:password@ds041924.mongolab.com:41924/$dbName';
-const String collectionName = 'collectionName';
 
 Db db;
-DbCollection collection;
+Uuid uuid = new Uuid();
+List<String> usedCollectionNames = [];
+
+String getRandomCollectionName() {
+  String name = uuid.v4();
+  usedCollectionNames.add(name);
+  return name;
+}
 
 Future testGetCollectionInfos() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await collection.insertAll([
     {"a": 1}
   ]);
   var collectionInfos = await db.getCollectionInfos({'name': collectionName});
 
   expect(collectionInfos, hasLength(1));
+
+  collection.drop();
 }
 
 Future testRemove() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await collection.insertAll([
     {"a": 1}
   ]);
@@ -57,24 +72,31 @@ Future testIsMaster() async {
 }
 
 testCollectionCreation() {
-  DbCollection collection = db.collection(collectionName);
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
   return collection;
 }
 
 Future testEachOnEmptyCollection() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   int count = 0;
   int sum = 0;
 
-  await collection.find().forEach((document) {
+  await for (var document in collection.find()) {
     sum += document["a"];
     count++;
-  });
+  }
 
   expect(sum, 0);
   expect(count, 0);
 }
 
 Future testFindEachWithThenClause() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   int count = 0;
   int sum = 0;
   await collection.insertAll([
@@ -83,16 +105,19 @@ Future testFindEachWithThenClause() async {
     {"name": "Nick", "score": 5}
   ]);
 
-  await collection.find().forEach((v) {
-    sum += v["score"];
+  await for (var document in collection.find()) {
+    sum += document["score"];
     count++;
-  });
+  }
 
   expect(sum, 13);
   expect(count, 3);
 }
 
 Future testDateTime() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await collection.insertAll([
     {"day": 1, "posted_on": new DateTime.utc(2013, 1, 1)},
     {"day": 2, "posted_on": new DateTime.utc(2013, 1, 2)},
@@ -114,6 +139,9 @@ Future testDateTime() async {
 }
 
 testFindEach() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   int count = 0;
   int sum = 0;
   await collection.insertAll([
@@ -122,39 +150,48 @@ testFindEach() async {
     {"name": "Nick", "score": 5}
   ]);
 
-  await collection.find().forEach((document) {
+  await for (var document in collection.find()) {
     count++;
     sum += document["score"];
-  });
+  }
 
   expect(count, 3);
   expect(sum, 13);
 }
 
 Future testFindStream() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   int count = 0;
   int sum = 0;
-  await collection.remove();
   await collection.insertAll([
     {"name": "Vadim", "score": 4},
     {"name": "Daniil", "score": 4},
     {"name": "Nick", "score": 5}
   ]);
 
-  await collection.find().forEach((v1) {
+  var results = collection.find();
+
+  await for (var v1 in results) {
     count++;
     sum += v1["score"];
-  });
+  }
 
   expect(count, 3);
   expect(sum, 13);
 }
 
 Future testDrop() async {
+  String collectionName = getRandomCollectionName();
+
   await db.dropCollection(collectionName);
 }
 
 Future testSaveWithIntegerId() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   List toInsert = [
     {"_id": 1, "name": "a", "value": 10},
     {"_id": 2, "name": "b", "value": 20},
@@ -183,6 +220,9 @@ Future testSaveWithIntegerId() async {
 }
 
 Future testSaveWithObjectId() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   List toInsert = [
     {"name": "a", "value": 10},
     {"name": "b", "value": 20},
@@ -205,6 +245,9 @@ Future testSaveWithObjectId() async {
 }
 
 Future testInsertWithObjectId() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   var id;
   var objectToSave;
   objectToSave = {"_id": new ObjectId(), "name": "a", "value": 10};
@@ -218,6 +261,9 @@ Future testInsertWithObjectId() async {
 }
 
 Future testCount() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await insertManyDocuments(collection, 167);
 
   var result = await collection.count();
@@ -225,6 +271,9 @@ Future testCount() async {
 }
 
 Future testDistinct() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await collection.insert({"foo": 1});
   await collection.insert({"foo": 2});
   await collection.insert({"foo": 2});
@@ -240,6 +289,9 @@ Future testDistinct() async {
 }
 
 Future testAggregate() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   List toInsert = [];
 
   // Avg 1 with 1 rating
@@ -325,6 +377,9 @@ db.runCommand(
 }
 
 Future testAggregateToStream() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   bool skipTest = false;
   var buildInfo = await db.getBuildInfo();
   var versionArray = buildInfo['versionArray'];
@@ -425,6 +480,9 @@ db.runCommand(
 }
 
 Future testSkip() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await insertManyDocuments(collection, 600);
 
   var result = await collection.findOne(where.sortBy('a').skip(300));
@@ -433,6 +491,9 @@ Future testSkip() async {
 }
 
 Future testUpdateWithUpsert() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   var result = await collection.insert({'name': 'a', 'value': 10});
   expect(result['n'], 0);
 
@@ -454,6 +515,9 @@ Future testUpdateWithUpsert() async {
 }
 
 Future testUpdateWithMultiUpdate() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   var result = await collection.insertAll([
     {'key': 'a', 'value': 'initial_value1'},
     {'key': 'a', 'value': 'initial_value2'},
@@ -501,6 +565,9 @@ Future testUpdateWithMultiUpdate() async {
 }
 
 Future testLimitWithSortByAndSkip() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   int counter = 0;
   Cursor cursor;
 
@@ -508,7 +575,7 @@ Future testLimitWithSortByAndSkip() async {
 
   cursor = collection.createCursor(where.sortBy('a').skip(300).limit(10));
 
-  await cursor.stream.forEach((e) => counter++);
+  counter = await cursor.stream.length;
   expect(counter, 10);
   expect(cursor.state, State.CLOSED);
   expect(cursor.cursorId, 0);
@@ -524,6 +591,9 @@ Future insertManyDocuments(DbCollection collection, int numberOfRecords) async {
 }
 
 Future testLimit() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   int counter = 0;
   Cursor cursor;
   await insertManyDocuments(collection, 30000);
@@ -537,6 +607,9 @@ Future testLimit() async {
 }
 
 testCursorCreation() {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   Cursor cursor = new Cursor(db, collection, null);
   return cursor;
 }
@@ -561,6 +634,9 @@ Future testNextObject() async {
 }
 
 Future testNextObjectToEnd() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   Cursor cursor;
   await collection.insert({"a": 1});
   await collection.insert({"a": 2});
@@ -581,6 +657,9 @@ Future testNextObjectToEnd() async {
 }
 
 Future testCursorWithOpenServerCursor() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await insertManyDocuments(collection, 1000);
   var cursor = new Cursor(db, collection, where.limit(10));
 
@@ -591,17 +670,18 @@ Future testCursorWithOpenServerCursor() async {
 }
 
 Future testCursorGetMore() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   int count = 0;
   Cursor cursor = new Cursor(db, collection, where.limit(10));
-  await cursor.stream.forEach((v) {
-    count++;
-  });
+  count = await cursor.stream.length;
   expect(count, 0);
 
   await insertManyDocuments(collection, 1000);
 
   cursor = new Cursor(db, collection, null);
-  await cursor.stream.forEach((v) => count++);
+  count = await cursor.stream.length;
 
   expect(count, 1000);
   expect(cursor.cursorId, 0);
@@ -609,6 +689,9 @@ Future testCursorGetMore() async {
 }
 
 Future testCursorClosing() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await insertManyDocuments(collection, 10000);
 
   var cursor = collection.createCursor();
@@ -631,6 +714,8 @@ Future testCursorClosing() async {
 }
 
 void testDbCommandCreation() {
+  String collectionName = getRandomCollectionName();
+
   DbCommand dbCommand = new DbCommand(db, collectionName, 0, 0, 1, {}, {});
   expect(dbCommand.collectionNameBson.value, '$dbName.$collectionName');
 }
@@ -692,6 +777,9 @@ Future testAuthentication() async {
 }
 
 Future testAuthenticationWithUri() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await collection.insert({"a": 1});
   await collection.insert({"a": 2});
   await collection.insert({"a": 3});
@@ -702,6 +790,9 @@ Future testAuthenticationWithUri() async {
 }
 
 Future testGetIndexes() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await insertManyDocuments(collection, 100);
 
   var indexes = await collection.getIndexes();
@@ -710,6 +801,9 @@ Future testGetIndexes() async {
 }
 
 Future testIndexCreation() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   List toInsert = [];
   for (int n = 0; n < 6; n++) {
     toInsert.add({
@@ -733,6 +827,9 @@ Future testIndexCreation() async {
 }
 
 Future testEnsureIndexWithIndexCreation() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   List toInsert = [];
   for (int n = 0; n < 6; n++) {
     toInsert.add({
@@ -750,6 +847,9 @@ Future testEnsureIndexWithIndexCreation() async {
 }
 
 Future testIndexCreationErrorHandling() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   List toInsert = [];
   for (int n = 0; n < 6; n++) {
     toInsert.add({'a': n});
@@ -769,6 +869,9 @@ Future testIndexCreationErrorHandling() async {
 }
 
 Future testSafeModeUpdate() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   for (int n = 0; n < 6; n++) {
     await collection.insert({
       'a': n,
@@ -786,6 +889,9 @@ Future testSafeModeUpdate() async {
 }
 
 Future testFindWithFieldsClause() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await collection.insertAll([
     {"name": "Vadim", "score": 4},
     {"name": "Daniil", "score": 4},
@@ -800,6 +906,9 @@ Future testFindWithFieldsClause() async {
 }
 
 Future testSimpleQuery() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   ObjectId id;
   List toInsert = [];
   for (var n = 0; n < 10; n++) {
@@ -828,6 +937,9 @@ Future testSimpleQuery() async {
 }
 
 Future testCompoundQuery() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   List toInsert = [];
   for (var n = 0; n < 10; n++) {
     toInsert.add({"my_field": n, "str_field": "str_$n"});
@@ -849,6 +961,9 @@ Future testCompoundQuery() async {
 }
 
 Future testFieldLevelUpdateSimple() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   ObjectId id;
   var result = await collection.insert({'name': 'a', 'value': 10});
   expect(result['n'], 0);
@@ -867,6 +982,9 @@ Future testFieldLevelUpdateSimple() async {
 }
 
 Future testQueryOnClosedConnection() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await db.close();
   expect(
       collection.find().toList(),
@@ -875,6 +993,9 @@ Future testQueryOnClosedConnection() async {
 }
 
 Future testUpdateOnClosedConnection() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await db.close();
   expect(
       collection.save({"test": "test"}),
@@ -883,6 +1004,9 @@ Future testUpdateOnClosedConnection() async {
 }
 
 Future testReopeningDb() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await collection.insert({'one': 'test'});
   await db.close();
   await db.open();
@@ -893,6 +1017,9 @@ Future testReopeningDb() async {
 }
 
 Future testDbNotOpen() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
   await db.close();
   expect(
       collection.findOne(),
@@ -901,6 +1028,8 @@ Future testDbNotOpen() async {
 }
 
 Future testDbOpenWhileStateIsOpening() {
+  String collectionName = getRandomCollectionName();
+
   Db db = new Db(DefaultUri);
   return new Future.sync(() {
     db.open().then((_) {
@@ -925,16 +1054,22 @@ testInvalidIndexCreationErrorHandling() {
    TODO: Verify why this is supposed to be an invalid index because this
    currently doesn't fail
     */
+  String collectionName = getRandomCollectionName();
+
   expect(db.createIndex(collectionName, key: 'a'),
       throwsA((e) => e is ArgumentError));
 }
 
 testInvalidIndexCreationErrorHandling1() {
+  String collectionName = getRandomCollectionName();
+
   expect(db.createIndex(collectionName, key: 'a', keys: {'a': -1}),
       throwsA((e) => e is ArgumentError));
 }
 
 Future testFindOneWhileStateIsOpening() {
+  String collectionName = getRandomCollectionName();
+
   Db db = new Db(DefaultUri);
   return new Future.sync(() {
     db.open().then((_) {
@@ -957,11 +1092,9 @@ main() {
   Future initializeDatabase() async {
     db = new Db(DefaultUri);
     await db.open();
-    collection = db.collection(collectionName);
   }
 
   Future cleanupDatabase() async {
-    await collection.drop();
     await db.close();
   }
 
@@ -981,7 +1114,8 @@ main() {
     group('DBCommand:', () {
       test('testAuthentication', testAuthentication);
       test('testAuthenticationWithUri', testAuthenticationWithUri);
-      test('testDropDatabase', testDropDatabase);
+      test('testDropDatabase', testDropDatabase,
+          skip: 'this might prevent the tests to pass');
       test('testGetCollectionInfos', testGetCollectionInfos);
       test('testRemove', testRemove);
       test('testGetNonce', testGetNonce);
@@ -1071,7 +1205,6 @@ main() {
       }
 
       try {
-        await collection.drop();
         await db.close();
       } catch (e) {
         // db possibly already closed
@@ -1084,8 +1217,16 @@ main() {
     test('testDbNotOpen', testDbNotOpen);
     test('testInvalidIndexCreationErrorHandling',
         testInvalidIndexCreationErrorHandling,
-        skip: 'It seems to be perfectly valid code. No source for expected exception. TODO remeber how this test was created in the first plave');
+        skip:
+            'It seems to be perfectly valid code. No source for expected exception. TODO remeber how this test was created in the first plave');
     test('testInvalidIndexCreationErrorHandling1',
         testInvalidIndexCreationErrorHandling1);
+  });
+
+  tearDownAll(() async {
+    await db.open();
+    await Future.forEach(usedCollectionNames,
+        (String collectionName) => db.collection(collectionName).drop());
+    await db.close();
   });
 }
