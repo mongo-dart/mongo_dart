@@ -5,15 +5,25 @@ import 'dart:io';
 import 'dart:async';
 import 'package:test/test.dart';
 import 'package:path/path.dart' as path;
+import 'package:uuid/uuid.dart';
 
-//const DefaultUri = 'mongodb://127.0.0.1:27017/';
 const dbName = 'testauth';
 const DefaultUri =
     'mongodb://admin:password@ds041924.mongolab.com:41924/$dbName';
 Db db;
 
+Uuid uuid = new Uuid();
+List<String> usedCollectionNames = [];
+
+String getRandomCollectionName() {
+  String name = uuid.v4();
+  usedCollectionNames.add(name);
+  return name;
+}
+
 class MockConsumer<S> implements StreamConsumer<S> {
   List<S> data = <S>[];
+
   Future consume(Stream<S> stream) {
     var completer = new Completer();
     stream.listen(_onData, onDone: () => completer.complete(null));
@@ -39,13 +49,16 @@ clearFSCollections(GridFS gridFS) {
 }
 
 Future testSmall() async {
+  String collectionName = getRandomCollectionName();
+
   List<int> data = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
-  GridFS gridFS = new GridFS(db);
+  GridFS gridFS = new GridFS(db, collectionName);
   clearFSCollections(gridFS);
   await testInOut(data, gridFS);
 }
 
 Future testBig() {
+  String collectionName = getRandomCollectionName();
   List<int> smallData = [
     0x00,
     0x01,
@@ -64,12 +77,13 @@ Future testBig() {
   while (data.length < target) {
     data.addAll(smallData);
   }
-  GridFS gridFS = new GridFS(db);
+  GridFS gridFS = new GridFS(db, collectionName);
   clearFSCollections(gridFS);
   return testInOut(data, gridFS);
 }
 
 Future tesSomeChunks() async {
+  String collectionName = getRandomCollectionName();
   List<int> smallData = [
     0x00,
     0x01,
@@ -91,7 +105,7 @@ Future tesSomeChunks() async {
     data.addAll(smallData);
   }
 
-  GridFS gridFS = new GridFS(db);
+  GridFS gridFS = new GridFS(db, collectionName);
   clearFSCollections(gridFS);
 
   return testInOut(data, gridFS);
@@ -158,19 +172,20 @@ Future testChunkTransformerSeveralChunks() {
 }
 
 Future testFileToGridFSToFile() async {
+  String collectionName = getRandomCollectionName();
   GridFS.DEFAULT_CHUNKSIZE = 30;
   GridIn input;
   String dir = path.join(path.current, 'test');
 
   var inputStream = new File('$dir/gridfs_testdata_in.txt').openRead();
 
-  var gridFS = new GridFS(db);
+  var gridFS = new GridFS(db, collectionName);
   clearFSCollections(gridFS);
 
   input = gridFS.createFile(inputStream, "test");
   await input.save();
 
-  gridFS = new GridFS(db);
+  gridFS = new GridFS(db, collectionName);
   var gridOut = await gridFS.getFile('test');
   await gridOut.writeToFilename('$dir/gridfs_testdata_out.txt');
 
@@ -182,8 +197,10 @@ Future testFileToGridFSToFile() async {
 }
 
 Future testExtraData() {
+  String collectionName = getRandomCollectionName();
+
   List<int> data = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
-  GridFS gridFS = new GridFS(db);
+  GridFS gridFS = new GridFS(db, collectionName);
   clearFSCollections(gridFS);
   Map extraData = {
     "test": [1, 2, 3],
@@ -224,5 +241,12 @@ main() {
     test('testBig', testBig);
     test('testFileToGridFSToFile', testFileToGridFSToFile);
     test('testExtraData', testExtraData);
+  });
+
+  tearDownAll(() async {
+    await db.open();
+    await Future.forEach(usedCollectionNames,
+        (String collectionName) => db.collection(collectionName).drop());
+    await db.close();
   });
 }
