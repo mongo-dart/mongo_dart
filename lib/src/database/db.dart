@@ -117,19 +117,12 @@ class Db {
   String databaseName;
   String _debugInfo;
   Db authSourceDb;
-  //ServerConfig serverConfig;
   final List<String> _uriList = new List<String>();
   _ConnectionManager _connectionManager;
   _Connection get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
   AuthenticationScheme _authenticationScheme;
-//  _validateDatabaseName(String dbName) {
-//    if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
-//    var invalidChars = [" ", ".", "\$", "/", "\\"];
-//    for(var i = 0; i < invalidChars.length; i++) {
-//      if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
-//    }
-//  }
+
   String toString() => 'Db($databaseName,$_debugInfo)';
 
   /**
@@ -141,7 +134,6 @@ class Db {
   */
   Db(String uriString, [this._debugInfo]) {
     _uriList.add(uriString);
-//    serverConfig = _parseUri(uriString);
   }
 
   Db.pool(List<String> uriList, [this._debugInfo]) {
@@ -231,12 +223,15 @@ class Db {
       if (state == State.OPENING) {
         throw new MongoDartError('Attempt to open db in state $state');
       }
+
       state = State.OPENING;
+      _writeConcern = writeConcern;
       _connectionManager = new _ConnectionManager(this);
+
       _uriList.forEach((uri) {
         _connectionManager.addConnection(_parseUri(uri));
       });
-      _writeConcern = writeConcern;
+
       return _connectionManager.open(writeConcern);
     });
   }
@@ -252,12 +247,16 @@ class Db {
     var replyMessage = await connection.query(message);
     var firstRepliedDocument = replyMessage.documents[0];
     var errorMessage = "";
+
     if (replyMessage.documents.isEmpty) {
       errorMessage =
           "Error executing Db command, documents are empty $replyMessage";
+
       print("Error: $errorMessage");
+
       var m = new Map();
       m["errmsg"] = errorMessage;
+
       result.completeError(m);
     } else if (firstRepliedDocument['ok'] == 1.0 &&
         firstRepliedDocument['err'] == null) {
@@ -268,14 +267,14 @@ class Db {
     return result.future;
   }
 
-  Future dropCollection(String collectionName) {
-    return getCollectionInfos({'name': collectionName}).then((v) {
-      if (v.length == 1) {
-        return executeDbCommand(
-            DbCommand.createDropCollectionCommand(this, collectionName));
-      }
-      return new Future.value(true);
-    });
+  Future dropCollection(String collectionName) async {
+    var collectionInfos = await getCollectionInfos({'name': collectionName});
+    if (collectionInfos.length == 1) {
+      return executeDbCommand(
+          DbCommand.createDropCollectionCommand(this, collectionName));
+    }
+
+    return true;
   }
 
   /**
