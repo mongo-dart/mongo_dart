@@ -330,15 +330,17 @@ class Db {
   }
 
   /// Analogue to shell's `show dbs`. Helper for `listDatabases` mongodb command.
-  Future<List> listDatabases() {
-    return executeDbCommand(
-        DbCommand.createQueryAdminCommand({"listDatabases": 1})).then((val) {
-      var res = [];
-      for (var each in val["databases"]) {
-        res.add(each["name"]);
-      }
-      return new Future.value(res);
-    });
+  Future<List> listDatabases() async {
+    var commandResult = await executeDbCommand(
+        DbCommand.createQueryAdminCommand({"listDatabases": 1}));
+
+    var result = [];
+
+    for (var each in commandResult["databases"]) {
+      result.add(each["name"]);
+    }
+
+    return result;
   }
 
   Stream<Map> _listCollectionsCursor([Map filter = const {}]) {
@@ -445,7 +447,7 @@ class Db {
       bool background,
       bool dropDups,
       String name}) {
-    return new Future.sync(() {
+    return new Future.sync(() async {
       var selector = {};
       selector['ns'] = '$databaseName.$collectionName';
       keys = _setKeys(key, keys);
@@ -471,7 +473,7 @@ class Db {
       selector['name'] = name;
       MongoInsertMessage insertMessage = new MongoInsertMessage(
           '$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}', [selector]);
-      executeMessage(insertMessage, _writeConcern);
+      await executeMessage(insertMessage, _writeConcern);
       return getLastError();
     });
   }
@@ -497,25 +499,27 @@ class Db {
       bool sparse,
       bool background,
       bool dropDups,
-      String name}) {
-    return new Future.sync(() {
-      keys = _setKeys(key, keys);
-      return collection(collectionName).getIndexes().then((indexInfos) {
-        if (name == null) {
-          name = _createIndexName(keys);
-        }
-        if (indexInfos.any((info) => info['name'] == name)) {
-          return new Future.value({'ok': 1.0, 'result': 'index preexists'});
-        }
-        return createIndex(collectionName,
-            keys: keys,
-            unique: unique,
-            sparse: sparse,
-            background: background,
-            dropDups: dropDups,
-            name: name);
-      });
-    });
+      String name}) async {
+    keys = _setKeys(key, keys);
+    var indexInfos = await collection(collectionName).getIndexes();
+
+    if (name == null) {
+      name = _createIndexName(keys);
+    }
+
+    if (indexInfos.any((info) => info['name'] == name)) {
+      return {'ok': 1.0, 'result': 'index preexists'};
+    }
+
+    var createdIndex = await createIndex(collectionName,
+        keys: keys,
+        unique: unique,
+        sparse: sparse,
+        background: background,
+        dropDups: dropDups,
+        name: name);
+
+    return createdIndex;
   }
 
   Future _getAcknowledgement({WriteConcern writeConcern}) {
