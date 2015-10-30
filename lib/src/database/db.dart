@@ -224,25 +224,27 @@ class Db {
     });
   }
 
-  Future executeDbCommand(MongoMessage message, {_Connection connection}) {
+  Future executeDbCommand(MongoMessage message, {_Connection connection}) async {
     if (connection == null) {
       connection = _masterConnection;
     }
+
     Completer<Map> result = new Completer();
-    connection.query(message).then((replyMessage) {
-      String errMsg;
-      if (replyMessage.documents.length == 0) {
-        errMsg = "Error executing Db command, Document length 0 $replyMessage";
-        print("Error: $errMsg");
-        var m = new Map();
-        m["errmsg"]=errMsg;
-        result.completeError(m);
-      } else if (replyMessage.documents[0]['ok'] == 1.0 && replyMessage.documents[0]['err'] == null) {
-        result.complete(replyMessage.documents[0]);
-      } else {
-        result.completeError(replyMessage.documents[0]);
-      }
-    }).catchError((e) => result.completeError(e));
+
+    var replyMessage = await connection.query(message);
+    var firstRepliedDocument = replyMessage.documents[0];
+    var errorMessage = "";
+    if (replyMessage.documents.isEmpty) {
+      errorMessage = "Error executing Db command, documents are empty $replyMessage";
+      print("Error: $errorMessage");
+      var m = new Map();
+      m["errmsg"]=errorMessage;
+      result.completeError(m);
+    } else if (firstRepliedDocument['ok'] == 1.0 && firstRepliedDocument['err'] == null) {
+      result.complete(firstRepliedDocument);
+    } else {
+      result.completeError(firstRepliedDocument);
+    }
     return result.future;
   }
 
