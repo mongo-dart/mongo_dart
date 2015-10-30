@@ -164,13 +164,7 @@ class Db {
 
     uri.queryParameters.forEach((String k, String v) {
       if (k == _UriParameters.authMechanism) {
-        if (v == ScramSha1Authenticator.name) {
-          _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
-        } else if (v == MongoDbCRAuthenticator.name) {
-          _authenticationScheme = AuthenticationScheme.MONGODB_CR;
-        } else {
-          throw new MongoDartError("Provided authentication scheme is not supported : $v");
-        }
+        selectAuthenticationMechanism(v);
       }
       if (k == _UriParameters.authSource) {
         authSourceDb = new Db._authDb(v);
@@ -178,6 +172,16 @@ class Db {
     });
 
     return serverConfig;
+  }
+
+  void selectAuthenticationMechanism(String v) {
+    if (v == ScramSha1Authenticator.name) {
+      _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
+    } else if (v == MongoDbCRAuthenticator.name) {
+      _authenticationScheme = AuthenticationScheme.MONGODB_CR;
+    } else {
+      throw new MongoDartError("Provided authentication scheme is not supported : $v");
+    }
   }
 
   DbCollection collection(String collectionName) {
