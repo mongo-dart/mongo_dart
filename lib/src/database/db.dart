@@ -112,12 +112,14 @@ class _UriParameters {
 }
 
 class Db {
-  State state = State.INIT;
+  final MONGO_DEFAULT_PORT = 27017;
   final _log = new Logger('Db');
+  final List<String> _uriList = new List<String>();
+
+  State state = State.INIT;
   String databaseName;
   String _debugInfo;
   Db authSourceDb;
-  final List<String> _uriList = new List<String>();
   _ConnectionManager _connectionManager;
   _Connection get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
@@ -142,49 +144,57 @@ class Db {
   Db._authDb(this.databaseName);
   ServerConfig _parseUri(String uriString) {
     var uri = Uri.parse(uriString);
+
     if (uri.scheme != 'mongodb') {
       throw new MongoDartError(
           'Invalid scheme in uri: $uriString ${uri.scheme}');
     }
+
     var serverConfig = new ServerConfig();
     serverConfig.host = uri.host;
     serverConfig.port = uri.port;
+
     if (serverConfig.port == null || serverConfig.port == 0) {
-      serverConfig.port = 27017;
+      serverConfig.port = MONGO_DEFAULT_PORT;
     }
-    if (uri.userInfo != '') {
+
+    if (uri.userInfo.isNotEmpty) {
       var userInfo = uri.userInfo.split(':');
+
       if (userInfo.length != 2) {
         throw new MongoDartError(
             'Invalid format of userInfo field: $uri.userInfo');
       }
+
       serverConfig.userName = userInfo[0];
       serverConfig.password = userInfo[1];
     }
-    if (uri.path != '') {
+
+    if (uri.path.isNotEmpty) {
       databaseName = uri.path.replaceAll('/', '');
     }
 
-    uri.queryParameters.forEach((String k, String v) {
-      if (k == _UriParameters.authMechanism) {
-        selectAuthenticationMechanism(v);
+    uri.queryParameters.forEach((String queryParam, String value) {
+      if (queryParam == _UriParameters.authMechanism) {
+        selectAuthenticationMechanism(value);
       }
-      if (k == _UriParameters.authSource) {
-        authSourceDb = new Db._authDb(v);
+
+      if (queryParam == _UriParameters.authSource) {
+        authSourceDb = new Db._authDb(value);
       }
     });
 
     return serverConfig;
   }
 
-  void selectAuthenticationMechanism(String v) {
-    if (v == ScramSha1Authenticator.name) {
+  void selectAuthenticationMechanism(String authenticationSchemeName) {
+    if (authenticationSchemeName == ScramSha1Authenticator.name) {
       _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
-    } else if (v == MongoDbCRAuthenticator.name) {
+    } else if (authenticationSchemeName == MongoDbCRAuthenticator.name) {
       _authenticationScheme = AuthenticationScheme.MONGODB_CR;
     } else {
       throw new MongoDartError(
-          "Provided authentication scheme is not supported : $v");
+          "Provided authentication scheme is not supported : $authenticationSchemeName");
     }
   }
 
@@ -197,9 +207,11 @@ class Db {
       if (state != State.OPEN) {
         throw new MongoDartError('Db is in the wrong state: $state');
       }
+
       if (connection == null) {
         connection = _masterConnection;
       }
+
       return connection.query(queryMessage);
     });
   }
@@ -209,12 +221,15 @@ class Db {
     if (state != State.OPEN) {
       throw new MongoDartError('DB is not open. $state');
     }
+
     if (connection == null) {
       connection = _masterConnection;
     }
+
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
+
     connection.execute(message, writeConcern == WriteConcern.ERRORS_IGNORED);
   }
 
@@ -258,8 +273,7 @@ class Db {
       m["errmsg"] = errorMessage;
 
       result.completeError(m);
-    } else if (firstRepliedDocument['ok'] == 1.0 &&
-        firstRepliedDocument['err'] == null) {
+    } else if (documentIsNotAnError(firstRepliedDocument)) {
       result.complete(firstRepliedDocument);
     } else {
       result.completeError(firstRepliedDocument);
@@ -267,8 +281,12 @@ class Db {
     return result.future;
   }
 
+  bool documentIsNotAnError(firstRepliedDocument) =>
+      firstRepliedDocument['ok'] == 1.0 && firstRepliedDocument['err'] == null;
+
   Future dropCollection(String collectionName) async {
     var collectionInfos = await getCollectionInfos({'name': collectionName});
+
     if (collectionInfos.length == 1) {
       return executeDbCommand(
           DbCommand.createDropCollectionCommand(this, collectionName));
@@ -422,9 +440,11 @@ class Db {
   @deprecated
   Future<List> indexInformation([String collectionName]) {
     var selector = {};
+
     if (collectionName != null) {
       selector['ns'] = '$databaseName.$collectionName';
     }
+
     return new Cursor(
         this,
         new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION),
@@ -433,9 +453,11 @@ class Db {
 
   String _createIndexName(Map keys) {
     var name = '';
+
     keys.forEach((key, value) {
       name = '${name}_${key}_$value';
     });
+
     return name;
   }
 
@@ -482,13 +504,16 @@ class Db {
     if (key != null && keys != null) {
       throw new ArgumentError('Only one parameter must be set: key or keys');
     }
+
     if (key != null) {
       keys = new Map();
       keys['$key'] = 1;
     }
+
     if (keys == null) {
       throw new ArgumentError('key or keys parameter must be set');
     }
+
     return keys;
   }
 
@@ -526,6 +551,7 @@ class Db {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
+
     if (writeConcern == WriteConcern.ERRORS_IGNORED) {
       return new Future.value({'ok': 1.0});
     } else {
