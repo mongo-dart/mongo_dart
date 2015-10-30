@@ -41,41 +41,48 @@ class WriteConcern {
   /**
    * No exceptions are raised, even for network issues.
    */
-  static const ERRORS_IGNORED = const WriteConcern(w: -1, wtimeout: 0, fsync: false, j:false);
+  static const ERRORS_IGNORED =
+      const WriteConcern(w: -1, wtimeout: 0, fsync: false, j: false);
 
   /**
    * Write operations that use this write concern will return as soon as the message is written to the socket.
    * Exceptions are raised for network issues, but not server errors.
    */
-  static const UNACKNOWLEDGED = const WriteConcern(w: 0, wtimeout: 0, fsync: false, j:false);
+  static const UNACKNOWLEDGED =
+      const WriteConcern(w: 0, wtimeout: 0, fsync: false, j: false);
 
   /**
    * Write operations that use this write concern will wait for acknowledgement from the primary server before returning.
    * Exceptions are raised for network issues, and server errors.
    */
-  static const ACKNOWLEDGED = const WriteConcern(w: 1, wtimeout: 0, fsync: false, j:false);
+  static const ACKNOWLEDGED =
+      const WriteConcern(w: 1, wtimeout: 0, fsync: false, j: false);
 
   /**
    * Exceptions are raised for network issues, and server errors; waits for at least 2 servers for the write operation.
    */
-  static const REPLICA_ACKNOWLEDGED= const WriteConcern(w: 2, wtimeout: 0, fsync: false, j:false);
+  static const REPLICA_ACKNOWLEDGED =
+      const WriteConcern(w: 2, wtimeout: 0, fsync: false, j: false);
 
   /**
    * Exceptions are raised for network issues, and server errors; the write operation waits for the server to flush
    * the data to disk.
    */
-  static const FSYNCED = const WriteConcern(w: 1, wtimeout: 0, fsync: true, j: false);
+  static const FSYNCED =
+      const WriteConcern(w: 1, wtimeout: 0, fsync: true, j: false);
 
   /**
    * Exceptions are raised for network issues, and server errors; the write operation waits for the server to
    * group commit to the journal file on disk.
    */
-  static const JOURNALED = const WriteConcern(w: 1, wtimeout: 0, fsync: false, j: true);
+  static const JOURNALED =
+      const WriteConcern(w: 1, wtimeout: 0, fsync: false, j: true);
 
   /**
    * Exceptions are raised for network issues, and server errors; waits on a majority of servers for the write operation.
    */
-  static const MAJORITY = const WriteConcern(w: "majority", wtimeout: 0, fsync: false, j: false);
+  static const MAJORITY =
+      const WriteConcern(w: "majority", wtimeout: 0, fsync: false, j: false);
 
   /**
    * Gets the getlasterror command for this write concern.
@@ -98,10 +105,12 @@ class WriteConcern {
     return map;
   }
 }
+
 class _UriParameters {
   static const authMechanism = 'authMechanism';
   static const authSource = 'authSource';
 }
+
 class Db {
   State state = State.INIT;
   final _log = new Logger('Db');
@@ -142,7 +151,8 @@ class Db {
   ServerConfig _parseUri(String uriString) {
     var uri = Uri.parse(uriString);
     if (uri.scheme != 'mongodb') {
-      throw new MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
+      throw new MongoDartError(
+          'Invalid scheme in uri: $uriString ${uri.scheme}');
     }
     var serverConfig = new ServerConfig();
     serverConfig.host = uri.host;
@@ -153,13 +163,14 @@ class Db {
     if (uri.userInfo != '') {
       var userInfo = uri.userInfo.split(':');
       if (userInfo.length != 2) {
-        throw new MongoDartError('Invalid format of userInfo field: $uri.userInfo');
+        throw new MongoDartError(
+            'Invalid format of userInfo field: $uri.userInfo');
       }
       serverConfig.userName = userInfo[0];
       serverConfig.password = userInfo[1];
     }
     if (uri.path != '') {
-      databaseName = uri.path.replaceAll('/','');
+      databaseName = uri.path.replaceAll('/', '');
     }
 
     uri.queryParameters.forEach((String k, String v) {
@@ -169,7 +180,8 @@ class Db {
         } else if (v == MongoDbCRAuthenticator.name) {
           _authenticationScheme = AuthenticationScheme.MONGODB_CR;
         } else {
-          throw new MongoDartError("Provided authentication scheme is not supported : $v");
+          throw new MongoDartError(
+              "Provided authentication scheme is not supported : $v");
         }
       }
       if (k == _UriParameters.authSource) {
@@ -181,7 +193,7 @@ class Db {
   }
 
   DbCollection collection(String collectionName) {
-    return new DbCollection(this,collectionName);
+    return new DbCollection(this, collectionName);
   }
 
   Future queryMessage(MongoMessage queryMessage, {_Connection connection}) {
@@ -196,7 +208,8 @@ class Db {
     });
   }
 
-  executeMessage(MongoMessage message, WriteConcern writeConcern, {_Connection connection}) {
+  executeMessage(MongoMessage message, WriteConcern writeConcern,
+      {_Connection connection}) {
     if (state != State.OPEN) {
       throw new MongoDartError('DB is not open. $state');
     }
@@ -206,10 +219,10 @@ class Db {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
-    connection.execute(message,writeConcern == WriteConcern.ERRORS_IGNORED);
+    connection.execute(message, writeConcern == WriteConcern.ERRORS_IGNORED);
   }
 
-  Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
+  Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}) {
     return new Future.sync(() {
       if (state == State.OPENING) {
         throw new MongoDartError('Attempt to open db in state $state');
@@ -235,9 +248,10 @@ class Db {
         errMsg = "Error executing Db command, Document length 0 $replyMessage";
         print("Error: $errMsg");
         var m = new Map();
-        m["errmsg"]=errMsg;
+        m["errmsg"] = errMsg;
         result.completeError(m);
-      } else if (replyMessage.documents[0]['ok'] == 1.0 && replyMessage.documents[0]['err'] == null) {
+      } else if (replyMessage.documents[0]['ok'] == 1.0 &&
+          replyMessage.documents[0]['err'] == null) {
         result.complete(replyMessage.documents[0]);
       } else {
         result.completeError(replyMessage.documents[0]);
@@ -249,7 +263,8 @@ class Db {
   Future dropCollection(String collectionName) {
     return getCollectionInfos({'name': collectionName}).then((v) {
       if (v.length == 1) {
-        return executeDbCommand(DbCommand.createDropCollectionCommand(this,collectionName));
+        return executeDbCommand(
+            DbCommand.createDropCollectionCommand(this, collectionName));
       }
       return new Future.value(true);
     });
@@ -258,13 +273,16 @@ class Db {
   /**
   *   Drop current database
   */
-  Future drop(){
+  Future drop() {
     return executeDbCommand(DbCommand.createDropDatabaseCommand(this));
   }
 
-  Future removeFromCollection(String collectionName, [Map selector = const {}, WriteConcern writeConcern]) {
+  Future removeFromCollection(String collectionName,
+      [Map selector = const {}, WriteConcern writeConcern]) {
     return new Future.sync(() {
-      executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector),writeConcern);
+      executeMessage(
+          new MongoRemoveMessage("$databaseName.$collectionName", selector),
+          writeConcern);
       return _getAcknowledgement(writeConcern: writeConcern);
     });
   }
@@ -273,19 +291,23 @@ class Db {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
-    return executeDbCommand(DbCommand.createGetLastErrorCommand(this, writeConcern));
+    return executeDbCommand(
+        DbCommand.createGetLastErrorCommand(this, writeConcern));
   }
 
   Future<Map> getNonce({_Connection connection}) {
-    return executeDbCommand(DbCommand.createGetNonceCommand(this), connection: connection);
+    return executeDbCommand(DbCommand.createGetNonceCommand(this),
+        connection: connection);
   }
 
   Future<Map> getBuildInfo({_Connection connection}) {
-    return executeDbCommand(DbCommand.createBuildInfoCommand(this), connection: connection);
+    return executeDbCommand(DbCommand.createBuildInfoCommand(this),
+        connection: connection);
   }
 
   Future<Map> isMaster({_Connection connection}) {
-    return executeDbCommand(DbCommand.createIsMasterCommand(this), connection: connection);
+    return executeDbCommand(DbCommand.createIsMasterCommand(this),
+        connection: connection);
   }
 
   Future<Map> wait() {
@@ -293,7 +315,7 @@ class Db {
   }
 
   Future close() {
-    _log.fine(()=>'$this closed');
+    _log.fine(() => '$this closed');
     state = State.CLOSED;
     var _cm = _connectionManager;
     _connectionManager = null;
@@ -302,7 +324,8 @@ class Db {
 
   /// Analogue to shell's `show dbs`. Helper for `listDatabases` mongodb command.
   Future<List> listDatabases() {
-    return executeDbCommand(DbCommand.createQueryAdminCommand({"listDatabases":1})).then((val) {
+    return executeDbCommand(
+        DbCommand.createQueryAdminCommand({"listDatabases": 1})).then((val) {
       var res = [];
       for (var each in val["databases"]) {
         res.add(each["name"]);
@@ -313,16 +336,21 @@ class Db {
 
   Stream<Map> _listCollectionsCursor([Map filter = const {}]) {
     if (this._masterConnection.serverCapabilities.listCollections) {
-      return new ListCollectionsCursor(this,filter).stream;
-    } else { // Using system collections (pre v3.0 API)
+      return new ListCollectionsCursor(this, filter).stream;
+    } else {
+      // Using system collections (pre v3.0 API)
       Map selector = {};
       // If we are limiting the access to a specific collection name
-      if(filter.containsKey('name')) {
+      if (filter.containsKey('name')) {
         selector["name"] = "${this.databaseName}.${filter['name']}";
       }
-      return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector).stream;
+      return new Cursor(
+          this,
+          new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION),
+          selector).stream;
     }
   }
+
   /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
   /// with WiredTiger
   /// Use `getCollectionInfos` instead
@@ -330,14 +358,18 @@ class Db {
   Stream<Map> collectionsInfoCursor([String collectionName]) {
     return _collectionsInfoCursor(collectionName);
   }
-  Stream<Map>  _collectionsInfoCursor([String collectionName]) {
+
+  Stream<Map> _collectionsInfoCursor([String collectionName]) {
     Map selector = {};
     // If we are limiting the access to a specific collection name
-    if(collectionName != null) {
+    if (collectionName != null) {
       selector["name"] = "${this.databaseName}.$collectionName";
     }
     // Return Cursor
-    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector).stream;
+    return new Cursor(
+        this,
+        new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION),
+        selector).stream;
   }
 
   /// Analogue to shell's `show collections`
@@ -346,9 +378,12 @@ class Db {
   /// Use `getCollectionNames` instead
   @deprecated
   Future<List<String>> listCollections() {
-    return _collectionsInfoCursor().map((map) => map['name'].split('.')).where((arr)=> arr.length == 2).map((arr)=> arr.last).toList();
+    return _collectionsInfoCursor()
+        .map((map) => map['name'].split('.'))
+        .where((arr) => arr.length == 2)
+        .map((arr) => arr.last)
+        .toList();
   }
-
 
   Future<List<Map>> getCollectionInfos([Map filter = const {}]) {
     return _listCollectionsCursor(filter).toList();
@@ -358,17 +393,20 @@ class Db {
     return _listCollectionsCursor(filter).map((map) => map['name']).toList();
   }
 
-  Future<bool> authenticate(String userName, String password, {_Connection connection}) async {
+  Future<bool> authenticate(String userName, String password,
+      {_Connection connection}) async {
     var credential = new UsernamePasswordCredential()
       ..username = userName
       ..password = password;
 
-    var authenticator = createAuthenticator(_authenticationScheme, this, credential);
+    var authenticator =
+        createAuthenticator(_authenticationScheme, this, credential);
 
     await authenticator.authenticate(connection ?? _masterConnection);
 
     return true;
   }
+
   /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
   /// with WiredTiger
   /// Use `DbCollection.getIndexes()` instead
@@ -378,19 +416,29 @@ class Db {
     if (collectionName != null) {
       selector['ns'] = '$databaseName.$collectionName';
     }
-    return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).stream.toList();
+    return new Cursor(
+        this,
+        new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION),
+        selector).stream.toList();
   }
 
   String _createIndexName(Map keys) {
     var name = '';
-    keys.forEach((key,value) {
+    keys.forEach((key, value) {
       name = '${name}_${key}_$value';
     });
     return name;
   }
 
-  Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
-    return new Future.sync((){
+  Future createIndex(String collectionName,
+      {String key,
+      Map keys,
+      bool unique,
+      bool sparse,
+      bool background,
+      bool dropDups,
+      String name}) {
+    return new Future.sync(() {
       var selector = {};
       selector['ns'] = '$databaseName.$collectionName';
       keys = _setKeys(key, keys);
@@ -410,11 +458,12 @@ class Db {
       if (dropDups == true) {
         selector['dropDups'] = true;
       }
-      if (name ==  null) {
+      if (name == null) {
         name = _createIndexName(keys);
       }
       selector['name'] = name;
-      MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);
+      MongoInsertMessage insertMessage = new MongoInsertMessage(
+          '$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}', [selector]);
       executeMessage(insertMessage, _writeConcern);
       return getLastError();
     });
@@ -434,8 +483,15 @@ class Db {
     return keys;
   }
 
-  Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
-    return new Future.sync((){
+  Future ensureIndex(String collectionName,
+      {String key,
+      Map keys,
+      bool unique,
+      bool sparse,
+      bool background,
+      bool dropDups,
+      String name}) {
+    return new Future.sync(() {
       keys = _setKeys(key, keys);
       return collection(collectionName).getIndexes().then((indexInfos) {
         if (name == null) {
@@ -444,7 +500,13 @@ class Db {
         if (indexInfos.any((info) => info['name'] == name)) {
           return new Future.value({'ok': 1.0, 'result': 'index preexists'});
         }
-        return createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name);
+        return createIndex(collectionName,
+            keys: keys,
+            unique: unique,
+            sparse: sparse,
+            background: background,
+            dropDups: dropDups,
+            name: name);
       });
     });
   }
