@@ -191,7 +191,8 @@ class Db {
     } else if (v == MongoDbCRAuthenticator.name) {
       _authenticationScheme = AuthenticationScheme.MONGODB_CR;
     } else {
-      throw new MongoDartError("Provided authentication scheme is not supported : $v");
+      throw new MongoDartError(
+          "Provided authentication scheme is not supported : $v");
     }
   }
 
@@ -240,7 +241,8 @@ class Db {
     });
   }
 
-  Future executeDbCommand(MongoMessage message, {_Connection connection}) async {
+  Future executeDbCommand(MongoMessage message,
+      {_Connection connection}) async {
     if (connection == null) {
       connection = _masterConnection;
     }
@@ -251,12 +253,14 @@ class Db {
     var firstRepliedDocument = replyMessage.documents[0];
     var errorMessage = "";
     if (replyMessage.documents.isEmpty) {
-      errorMessage = "Error executing Db command, documents are empty $replyMessage";
+      errorMessage =
+          "Error executing Db command, documents are empty $replyMessage";
       print("Error: $errorMessage");
       var m = new Map();
-      m["errmsg"]=errorMessage;
+      m["errmsg"] = errorMessage;
       result.completeError(m);
-    } else if (firstRepliedDocument['ok'] == 1.0 && firstRepliedDocument['err'] == null) {
+    } else if (firstRepliedDocument['ok'] == 1.0 &&
+        firstRepliedDocument['err'] == null) {
       result.complete(firstRepliedDocument);
     } else {
       result.completeError(firstRepliedDocument);
