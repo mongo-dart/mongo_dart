@@ -112,24 +112,19 @@ class _UriParameters {
 }
 
 class Db {
-  State state = State.INIT;
+  final MONGO_DEFAULT_PORT = 27017;
   final _log = new Logger('Db');
+  final List<String> _uriList = new List<String>();
+
+  State state = State.INIT;
   String databaseName;
   String _debugInfo;
   Db authSourceDb;
-  //ServerConfig serverConfig;
-  final List<String> _uriList = new List<String>();
   _ConnectionManager _connectionManager;
   _Connection get _masterConnection => _connectionManager.masterConnection;
   WriteConcern _writeConcern;
   AuthenticationScheme _authenticationScheme;
-//  _validateDatabaseName(String dbName) {
-//    if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
-//    var invalidChars = [" ", ".", "\$", "/", "\\"];
-//    for(var i = 0; i < invalidChars.length; i++) {
-//      if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
-//    }
-//  }
+
   String toString() => 'Db($databaseName,$_debugInfo)';
 
   /**
@@ -141,7 +136,6 @@ class Db {
   */
   Db(String uriString, [this._debugInfo]) {
     _uriList.add(uriString);
-//    serverConfig = _parseUri(uriString);
   }
 
   Db.pool(List<String> uriList, [this._debugInfo]) {
@@ -150,46 +144,58 @@ class Db {
   Db._authDb(this.databaseName);
   ServerConfig _parseUri(String uriString) {
     var uri = Uri.parse(uriString);
+
     if (uri.scheme != 'mongodb') {
       throw new MongoDartError(
           'Invalid scheme in uri: $uriString ${uri.scheme}');
     }
+
     var serverConfig = new ServerConfig();
     serverConfig.host = uri.host;
     serverConfig.port = uri.port;
+
     if (serverConfig.port == null || serverConfig.port == 0) {
-      serverConfig.port = 27017;
+      serverConfig.port = MONGO_DEFAULT_PORT;
     }
-    if (uri.userInfo != '') {
+
+    if (uri.userInfo.isNotEmpty) {
       var userInfo = uri.userInfo.split(':');
+
       if (userInfo.length != 2) {
         throw new MongoDartError(
             'Invalid format of userInfo field: $uri.userInfo');
       }
+
       serverConfig.userName = userInfo[0];
       serverConfig.password = userInfo[1];
     }
-    if (uri.path != '') {
+
+    if (uri.path.isNotEmpty) {
       databaseName = uri.path.replaceAll('/', '');
     }
 
-    uri.queryParameters.forEach((String k, String v) {
-      if (k == _UriParameters.authMechanism) {
-        if (v == ScramSha1Authenticator.name) {
-          _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
-        } else if (v == MongoDbCRAuthenticator.name) {
-          _authenticationScheme = AuthenticationScheme.MONGODB_CR;
-        } else {
-          throw new MongoDartError(
-              "Provided authentication scheme is not supported : $v");
-        }
+    uri.queryParameters.forEach((String queryParam, String value) {
+      if (queryParam == _UriParameters.authMechanism) {
+        selectAuthenticationMechanism(value);
       }
-      if (k == _UriParameters.authSource) {
-        authSourceDb = new Db._authDb(v);
+
+      if (queryParam == _UriParameters.authSource) {
+        authSourceDb = new Db._authDb(value);
       }
     });
 
     return serverConfig;
+  }
+
+  void selectAuthenticationMechanism(String authenticationSchemeName) {
+    if (authenticationSchemeName == ScramSha1Authenticator.name) {
+      _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
+    } else if (authenticationSchemeName == MongoDbCRAuthenticator.name) {
+      _authenticationScheme = AuthenticationScheme.MONGODB_CR;
+    } else {
+      throw new MongoDartError(
+          "Provided authentication scheme is not supported : $authenticationSchemeName");
+    }
   }
 
   DbCollection collection(String collectionName) {
@@ -201,9 +207,11 @@ class Db {
       if (state != State.OPEN) {
         throw new MongoDartError('Db is in the wrong state: $state');
       }
+
       if (connection == null) {
         connection = _masterConnection;
       }
+
       return connection.query(queryMessage);
     });
   }
@@ -213,12 +221,15 @@ class Db {
     if (state != State.OPEN) {
       throw new MongoDartError('DB is not open. $state');
     }
+
     if (connection == null) {
       connection = _masterConnection;
     }
+
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
+
     connection.execute(message, writeConcern == WriteConcern.ERRORS_IGNORED);
   }
 
@@ -227,47 +238,61 @@ class Db {
       if (state == State.OPENING) {
         throw new MongoDartError('Attempt to open db in state $state');
       }
+
       state = State.OPENING;
+      _writeConcern = writeConcern;
       _connectionManager = new _ConnectionManager(this);
+
       _uriList.forEach((uri) {
         _connectionManager.addConnection(_parseUri(uri));
       });
-      _writeConcern = writeConcern;
+
       return _connectionManager.open(writeConcern);
     });
   }
 
-  Future executeDbCommand(MongoMessage message, {_Connection connection}) {
+  Future executeDbCommand(MongoMessage message,
+      {_Connection connection}) async {
     if (connection == null) {
       connection = _masterConnection;
     }
+
     Completer<Map> result = new Completer();
-    connection.query(message).then((replyMessage) {
-      String errMsg;
-      if (replyMessage.documents.length == 0) {
-        errMsg = "Error executing Db command, Document length 0 $replyMessage";
-        print("Error: $errMsg");
-        var m = new Map();
-        m["errmsg"] = errMsg;
-        result.completeError(m);
-      } else if (replyMessage.documents[0]['ok'] == 1.0 &&
-          replyMessage.documents[0]['err'] == null) {
-        result.complete(replyMessage.documents[0]);
-      } else {
-        result.completeError(replyMessage.documents[0]);
-      }
-    }).catchError((e) => result.completeError(e));
+
+    var replyMessage = await connection.query(message);
+    var firstRepliedDocument = replyMessage.documents[0];
+    var errorMessage = "";
+
+    if (replyMessage.documents.isEmpty) {
+      errorMessage =
+          "Error executing Db command, documents are empty $replyMessage";
+
+      print("Error: $errorMessage");
+
+      var m = new Map();
+      m["errmsg"] = errorMessage;
+
+      result.completeError(m);
+    } else if (documentIsNotAnError(firstRepliedDocument)) {
+      result.complete(firstRepliedDocument);
+    } else {
+      result.completeError(firstRepliedDocument);
+    }
     return result.future;
   }
 
-  Future dropCollection(String collectionName) {
-    return getCollectionInfos({'name': collectionName}).then((v) {
-      if (v.length == 1) {
-        return executeDbCommand(
-            DbCommand.createDropCollectionCommand(this, collectionName));
-      }
-      return new Future.value(true);
-    });
+  bool documentIsNotAnError(firstRepliedDocument) =>
+      firstRepliedDocument['ok'] == 1.0 && firstRepliedDocument['err'] == null;
+
+  Future dropCollection(String collectionName) async {
+    var collectionInfos = await getCollectionInfos({'name': collectionName});
+
+    if (collectionInfos.length == 1) {
+      return executeDbCommand(
+          DbCommand.createDropCollectionCommand(this, collectionName));
+    }
+
+    return true;
   }
 
   /**
@@ -323,15 +348,17 @@ class Db {
   }
 
   /// Analogue to shell's `show dbs`. Helper for `listDatabases` mongodb command.
-  Future<List> listDatabases() {
-    return executeDbCommand(
-        DbCommand.createQueryAdminCommand({"listDatabases": 1})).then((val) {
-      var res = [];
-      for (var each in val["databases"]) {
-        res.add(each["name"]);
-      }
-      return new Future.value(res);
-    });
+  Future<List> listDatabases() async {
+    var commandResult = await executeDbCommand(
+        DbCommand.createQueryAdminCommand({"listDatabases": 1}));
+
+    var result = [];
+
+    for (var each in commandResult["databases"]) {
+      result.add(each["name"]);
+    }
+
+    return result;
   }
 
   Stream<Map> _listCollectionsCursor([Map filter = const {}]) {
@@ -413,9 +440,11 @@ class Db {
   @deprecated
   Future<List> indexInformation([String collectionName]) {
     var selector = {};
+
     if (collectionName != null) {
       selector['ns'] = '$databaseName.$collectionName';
     }
+
     return new Cursor(
         this,
         new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION),
@@ -424,9 +453,11 @@ class Db {
 
   String _createIndexName(Map keys) {
     var name = '';
+
     keys.forEach((key, value) {
       name = '${name}_${key}_$value';
     });
+
     return name;
   }
 
@@ -438,7 +469,7 @@ class Db {
       bool background,
       bool dropDups,
       String name}) {
-    return new Future.sync(() {
+    return new Future.sync(() async {
       var selector = {};
       selector['ns'] = '$databaseName.$collectionName';
       keys = _setKeys(key, keys);
@@ -464,7 +495,7 @@ class Db {
       selector['name'] = name;
       MongoInsertMessage insertMessage = new MongoInsertMessage(
           '$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}', [selector]);
-      executeMessage(insertMessage, _writeConcern);
+      await executeMessage(insertMessage, _writeConcern);
       return getLastError();
     });
   }
@@ -473,13 +504,16 @@ class Db {
     if (key != null && keys != null) {
       throw new ArgumentError('Only one parameter must be set: key or keys');
     }
+
     if (key != null) {
       keys = new Map();
       keys['$key'] = 1;
     }
+
     if (keys == null) {
       throw new ArgumentError('key or keys parameter must be set');
     }
+
     return keys;
   }
 
@@ -490,31 +524,34 @@ class Db {
       bool sparse,
       bool background,
       bool dropDups,
-      String name}) {
-    return new Future.sync(() {
-      keys = _setKeys(key, keys);
-      return collection(collectionName).getIndexes().then((indexInfos) {
-        if (name == null) {
-          name = _createIndexName(keys);
-        }
-        if (indexInfos.any((info) => info['name'] == name)) {
-          return new Future.value({'ok': 1.0, 'result': 'index preexists'});
-        }
-        return createIndex(collectionName,
-            keys: keys,
-            unique: unique,
-            sparse: sparse,
-            background: background,
-            dropDups: dropDups,
-            name: name);
-      });
-    });
+      String name}) async {
+    keys = _setKeys(key, keys);
+    var indexInfos = await collection(collectionName).getIndexes();
+
+    if (name == null) {
+      name = _createIndexName(keys);
+    }
+
+    if (indexInfos.any((info) => info['name'] == name)) {
+      return {'ok': 1.0, 'result': 'index preexists'};
+    }
+
+    var createdIndex = await createIndex(collectionName,
+        keys: keys,
+        unique: unique,
+        sparse: sparse,
+        background: background,
+        dropDups: dropDups,
+        name: name);
+
+    return createdIndex;
   }
 
   Future _getAcknowledgement({WriteConcern writeConcern}) {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
+
     if (writeConcern == WriteConcern.ERRORS_IGNORED) {
       return new Future.value({'ok': 1.0});
     } else {
