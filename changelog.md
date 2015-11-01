@@ -1,5 +1,18 @@
 #Recent change notes
 
+#0.2.5-beta
+
+- SCRAM-SHA1 authentication scheme added by Joel Trottier-Hebert. Random string (salt) is generated
+ with standard dart Random, which is not cryptographically strong for now, hence beta marker on version.  
+Secure Random is due in the next version of SDK, so that would be improved soon.
+- `authSource` connection string option added See: https://github.com/vadimtsushko/mongo_dart/issues/72
+- Many refactorings in tests and code with async/await done by Joel Trottier-Hebert
+- Dependency on `logging` package loosen to >=0.9.1 <0.12.0  
+
+###0.2.4
+
+- Small bump up in dependencies
+
 ###0.2.3
 
 - Swithed to travis from drone.io
