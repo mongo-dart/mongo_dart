@@ -1,6 +1,6 @@
 #Recent change notes
 
-#0.2.5-beta
+###0.2.5-beta
 
 - SCRAM-SHA1 authentication scheme added by Joel Trottier-Hebert. Random string (salt) is generated
  with standard dart Random, which is not cryptographically strong for now, hence beta marker on version.  
