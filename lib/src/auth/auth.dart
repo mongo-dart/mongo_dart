@@ -32,18 +32,6 @@ abstract class RandomStringGenerator {
   String generate(int length);
 }
 
-class WeakRandomStringGenerator extends RandomStringGenerator {
-  @override
-  String generate(int length) {
-    var rand = new Random();
-    var codeUnits = new List.generate(length, (_) {
-      return rand.nextInt(33) + 89;
-    });
-
-    return new String.fromCharCodes(codeUnits);
-  }
-}
-
 class CryptoStrengthStringGenerator extends RandomStringGenerator {
   @override
   String generate(int length) {
