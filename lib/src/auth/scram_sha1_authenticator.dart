@@ -181,7 +181,8 @@ class ScramSha1Authenticator extends SaslAuthenticator {
 
   ScramSha1Authenticator(UsernamePasswordCredential credential, Db db)
       : super(
-            new ScramSha1Mechanism(credential, new WeakRandomStringGenerator()),
+            new ScramSha1Mechanism(
+                credential, new CryptoStrengthStringGenerator()),
             db) {
     this.db = db;
   }

@@ -26,7 +26,7 @@ class UsernamePasswordCredential {
 }
 
 abstract class RandomStringGenerator {
-  static const String legalCharacters =
+  static const String allowedCharacters =
       '!"#\'\$%&()*+-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 
   String generate(int length);
@@ -48,16 +48,17 @@ class CryptoStrengthStringGenerator extends RandomStringGenerator {
   @override
   String generate(int length) {
     var random = new Random.secure();
+    var allowedCodeUnits = RandomStringGenerator.allowedCharacters.codeUnits;
 
-    var codeUnits = new List.generate(length, (_) {
-      var codeUnit = random.nextInt(33) + 89;
-      while (!legalCharacters.contains(new String.fromCharCodes([codeUnit]))) {
-        codeUnit = random.nextInt(33) + 89;
-      }
-      return codeUnit;
-    });
+    int max = allowedCodeUnits.length - 1;
 
-    return new String.fromCharCodes(codeUnits);
+    List<int> randomString = [];
+
+    for (int i = 0; i < length; ++i) {
+      randomString.add(allowedCodeUnits.elementAt(random.nextInt(max)));
+    }
+
+    return new String.fromCharCodes(randomString);
   }
 }
 
