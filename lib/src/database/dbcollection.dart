@@ -5,8 +5,8 @@ class DbCollection {
   String collectionName;
   DbCollection(this.db, this.collectionName) {}
   String fullName() => "${db.databaseName}.$collectionName";
-  
-  Future save(Map document, {WriteConcern writeConcern}) {
+
+  Future<Map> save(Map document, {WriteConcern writeConcern}) {
     var id;
     bool createId = false;
     if (document.containsKey("_id")) {
@@ -24,16 +24,16 @@ class DbCollection {
       return insert(document, writeConcern: writeConcern);
     }
   }
-  
-  Future insertAll(List<Map> documents, {WriteConcern writeConcern}) {
+
+  Future<Map> insertAll(List<Map> documents, {WriteConcern writeConcern}) {
     return new Future.sync(() {
       MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
       db.executeMessage(insertMessage, writeConcern);
       return db._getAcknowledgement(writeConcern: writeConcern);
     });
   }
-  
-  Future update(selector, document, {bool upsert: false, bool multiUpdate: false, WriteConcern writeConcern}) {
+
+  Future<Map> update(selector, document, {bool upsert: false, bool multiUpdate: false, WriteConcern writeConcern}) {
     return new Future.sync(() {
       int flags = 0;
       if (upsert) {
@@ -43,7 +43,7 @@ class DbCollection {
         flags |= 0x2;
       }
 
-      MongoUpdateMessage message = new MongoUpdateMessage(fullName(), 
+      MongoUpdateMessage message = new MongoUpdateMessage(fullName(),
           _selectorBuilder2Map(selector), document, flags);
       db.executeMessage(message, writeConcern);
       return db._getAcknowledgement(writeConcern: writeConcern);
@@ -61,38 +61,38 @@ class DbCollection {
   */
   Stream<Map> find([selector]) => new Cursor(db, this, selector).stream;
   Cursor createCursor([selector]) => new Cursor(db, this, selector);
-  
+
   Future<Map> findOne([selector]) {
     Cursor cursor = new Cursor(db, this, selector);
     Future<Map> result = cursor.nextObject();
     cursor.close();
     return result;
   }
-  
-  Future drop() => db.dropCollection(collectionName);
-  
-  Future remove([selector, WriteConcern writeConcern]) => db.removeFromCollection(collectionName, _selectorBuilder2Map(selector), writeConcern);
-  
+
+  Future<bool> drop() => db.dropCollection(collectionName);
+
+  Future<Map> remove([selector, WriteConcern writeConcern]) => db.removeFromCollection(collectionName, _selectorBuilder2Map(selector), writeConcern);
+
   Future<int> count([selector]) {
     return db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuilder2Map(selector))).then((reply){
       return new Future.value(reply["n"].toInt());
     });
   }
-  
-  Future distinct(String field, [selector]) =>
+
+  Future<Map> distinct(String field, [selector]) =>
     db.executeDbCommand(DbCommand.createDistinctCommand(db,collectionName,field,_selectorBuilder2Map(selector)));
-  
-  Future aggregate(List pipeline){
+
+  Future<Map> aggregate(List pipeline){
     var cmd = DbCommand.createAggregateCommand(db,collectionName,pipeline);
     return db.executeDbCommand(cmd);
   }
   Stream<Map> aggregateToStream(List pipeline, {Map cursorOptions: const {}}) {
     return new AggregateCursor(db, this, pipeline, cursorOptions).stream;
   }
-  Future insert(Map document, {WriteConcern writeConcern}) => insertAll([document], writeConcern: writeConcern);
+  Future<Map> insert(Map document, {WriteConcern writeConcern}) => insertAll([document], writeConcern: writeConcern);
 
   /// Analogue of mongodb shell method `db.collection.getIndexes()`
-  /// Returns an array that holds a list of documents that identify and describe 
+  /// Returns an array that holds a list of documents that identify and describe
   /// the existing indexes on the collection. You must call `getIndexes()`
   ///  on a collection
   Future<List<Map>> getIndexes() {
@@ -104,6 +104,7 @@ class DbCollection {
       return new Cursor(db, new DbCollection(db, DbCommand.SYSTEM_INDEX_COLLECTION), selector).stream.toList();
     }
   }
+
   Map _selectorBuilder2Map(selector) {
     if (selector == null) {
       return {};
