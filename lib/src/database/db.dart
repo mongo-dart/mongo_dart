@@ -302,7 +302,7 @@ class Db {
     return executeDbCommand(DbCommand.createDropDatabaseCommand(this));
   }
 
-  Future removeFromCollection(String collectionName,
+  Future<Map> removeFromCollection(String collectionName,
       [Map selector = const {}, WriteConcern writeConcern]) {
     return new Future.sync(() {
       executeMessage(
@@ -461,7 +461,7 @@ class Db {
     return name;
   }
 
-  Future createIndex(String collectionName,
+  Future<Map> createIndex(String collectionName,
       {String key,
       Map keys,
       bool unique,
@@ -547,7 +547,7 @@ class Db {
     return createdIndex;
   }
 
-  Future _getAcknowledgement({WriteConcern writeConcern}) {
+  Future<Map> _getAcknowledgement({WriteConcern writeConcern}) {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
