@@ -138,4 +138,4 @@ main() async {
 
 - For more structured approach to communication with MongoDB: [Objectory](https://github.com/vadimtsushko/objectory)
 
-- Checkout [redstone_mapper_mongo](https://github.com/luizmineo/redstone.dart/wiki/redstone_mapper_mongo) for easy transformations between Mongo Dart Maps <==> Objects <==> JSON Strings, and integrations with the [redstone](https://github.com/luizmineo/redstone.dart) server framework.
+- Checkout [redstone_mapper_mongo](https://github.com/redstone-dart/redstone/wiki/redstone_mapper_mongo) for easy transformations between Mongo Dart Maps <==> Objects <==> JSON Strings, and integrations with the [redstone](https://github.com/luizmineo/redstone.dart) server framework.
