@@ -24,8 +24,8 @@ provided by [mongo_dart_query](https://github.com/vadimtsushko/mongo_dart_query)
 
 ```dart
 
-  var collection = db.collection('user');
-  await collection.find(where.lt("age", 18)).toList();
+  var coll = db.collection('user');
+  await coll.find(where.lt("age", 18)).toList();
   
   //....
   
