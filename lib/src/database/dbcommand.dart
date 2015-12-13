@@ -14,8 +14,22 @@ class DbCommand extends MongoQueryMessage {
     _collectionFullName = new BsonCString("${db.databaseName}.$collectionName");
   }
 
+  static DbCommand createFindAndModifyCommand(Db db, String collectionName, {Map query, Map sort, bool remove, Map update, bool returnNew, Map fields, bool upsert}) {
+    var command = {
+      "findandmodify": collectionName
+    };
+    if (query != null)     { command['query']  = query;  }
+    if (sort != null)      { command['sort']   = sort;   }
+    if (remove != null)    { command['remove'] = remove; }
+    if (update != null)    { command['update'] = update; }
+    if (returnNew != null) { command['new']    = returnNew; }
+    if (fields != null)    { command['fields'] = fields; }
+    if (upsert != null)    { command['upsert'] = upsert; }
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, command, null);
+  }
+
   static DbCommand createDropCollectionCommand(Db db, String collectionName) {
-    return new DbCommand(db,SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'drop':collectionName}, null);
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'drop':collectionName}, null);
   }
 
   static DbCommand createDropDatabaseCommand(Db db) {

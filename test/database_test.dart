@@ -903,6 +903,66 @@ Future testFindWithFieldsClause() async {
   expect(result['score'], 4);
 }
 
+Future testFindAndModify() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
+  await collection.insertAll([
+    {"name": "Vadim", "score": 4},
+    {"name": "Daniil", "score": 4},
+    {"name": "Nick", "score": 5}
+  ]);
+
+  var result = await collection.findAndModify(query: where.eq('name', 'Vadim'), returnNew: true, update: modify.inc('score', 10), fields: where.fields(['score']).excludeFields(['_id']));
+
+  expect(result['_id'], isNull);
+  expect(result['name'], isNull);
+  expect(result['score'], 14);
+}
+
+Future testFindAndModify() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+  var result;
+
+  await collection.insertAll([
+    {"name": "Bob", "score": 2},
+    {"name": "Vadim", "score": 4},
+    {"name": "Daniil", "score": 4},
+    {"name": "Nick", "score": 5},
+    {"name": "Alice", "score": 1},
+  ]);
+
+  result = await collection.findAndModify(query: where.eq('name', 'Vadim'), update: modify.inc('score', 10), fields: where.fields(['score']).excludeFields(['_id']));
+  expect(result['_id'], isNull);
+  expect(result['name'], isNull);
+  expect(result['score'], 4);
+
+  result = await collection.findAndModify(query: where.eq('name', 'Daniil'), returnNew: true, update: modify.inc('score', 3));
+  expect(result['_id'], isNotNull);
+  expect(result['name'], 'Daniil');
+  expect(result['score'], 7);
+
+  result = await collection.findAndModify(query: where.eq('name', 'Nick'), remove: true);
+  expect(result['_id'], isNotNull);
+  expect(result['name'], 'Nick');
+  expect(result['score'], 5);
+
+  result = await collection.findAndModify(query: where.eq('name', 'Unknown'), update: modify.inc('score', 3));
+  expect(result, isNull);
+
+  result = await collection.findAndModify(query: where.eq('name', 'Unknown'), returnNew: true, update: modify.inc('score', 3));
+  expect(result, isNull);
+
+  result = await collection.findAndModify(sort: where.sortBy('score'), returnNew: true, update: modify.inc('score', 100));
+  expect(result['name'], 'Alice');
+  expect(result['score'], 101);
+
+  result = await collection.findAndModify(query: where.eq('name', 'New Comer'), returnNew: true, upsert: true, update: modify.inc('score', 100));
+  expect(result['name'], 'New Comer');
+  expect(result['score'], 100);
+}
+
 Future testSimpleQuery() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
@@ -1141,6 +1201,7 @@ main() {
       test('testUpdateWithUpsert', testUpdateWithUpsert);
       test('testUpdateWithMultiUpdate', testUpdateWithMultiUpdate);
       test('testFindWithFieldsClause', testFindWithFieldsClause);
+      test('testFindAndModify', testFindAndModify);
     });
 
     group('Cursor tests:', () {

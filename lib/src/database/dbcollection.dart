@@ -69,6 +69,22 @@ class DbCollection {
     return result;
   }
 
+  /**
+   * Modifies and returns a single document.
+   * By default, the returned document does not include the modifications made on the update.
+   * To return the document with the modifications made on the update, use the returnNew option.
+   */
+  Future<Map> findAndModify({query, sort, bool remove, update, bool returnNew, fields, bool upsert}) {
+    query  = _queryBuilder2Map(query);
+    sort   = _sortBuilder2Map(sort);
+    update = _updateBuilder2Map(update);
+    fields = _fieldsBuilder2Map(fields);
+    return db.executeDbCommand(DbCommand.createFindAndModifyCommand(db, collectionName,
+        query: query, sort: sort, remove: remove, update: update, returnNew: returnNew, fields: fields, upsert: upsert)).then((reply) {
+      return new Future.value(reply["value"]);
+    });
+  }
+
   Future<bool> drop() => db.dropCollection(collectionName);
 
   Future<Map> remove([selector, WriteConcern writeConcern]) => db.removeFromCollection(collectionName, _selectorBuilder2Map(selector), writeConcern);
@@ -113,5 +129,33 @@ class DbCollection {
       return selector.map['\$query'];
     }
     return selector;
+  }
+
+  Map _queryBuilder2Map(query) {
+    if (query is SelectorBuilder) {
+      query = query.map['\$query'];
+    }
+    return query;
+  }
+
+  Map _sortBuilder2Map(query) {
+    if (query is SelectorBuilder) {
+      query = query.map['orderby'];
+    }
+    return query;
+  }
+
+  Map _fieldsBuilder2Map(fields) {
+    if (fields is SelectorBuilder) {
+      return fields.paramFields;
+    }
+    return fields;
+  }
+
+  Map _updateBuilder2Map(update) {
+    if (update is ModifierBuilder) {
+      update = update.map;
+    }
+    return update;
   }
 }
