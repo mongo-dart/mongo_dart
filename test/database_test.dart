@@ -906,23 +906,6 @@ Future testFindWithFieldsClause() async {
 Future testFindAndModify() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
-
-  await collection.insertAll([
-    {"name": "Vadim", "score": 4},
-    {"name": "Daniil", "score": 4},
-    {"name": "Nick", "score": 5}
-  ]);
-
-  var result = await collection.findAndModify(query: where.eq('name', 'Vadim'), returnNew: true, update: modify.inc('score', 10), fields: where.fields(['score']).excludeFields(['_id']));
-
-  expect(result['_id'], isNull);
-  expect(result['name'], isNull);
-  expect(result['score'], 14);
-}
-
-Future testFindAndModify() async {
-  String collectionName = getRandomCollectionName();
-  var collection = db.collection(collectionName);
   var result;
 
   await collection.insertAll([
