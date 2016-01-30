@@ -1,5 +1,11 @@
 #Recent change notes
 
+###0.2.6
+- Moved mongo_dart project to a new organization on [GitHub](https://github.com/mongo-dart/mongo_dart).
+- Authentication schemes now use Secure Random coming from `dart:math` since 1.14. ** Note that this version now
+required SDK version >= 1.14 because of this **
+- Added sort by text score to the query builders.
+
 ###0.2.5-beta
 
 - SCRAM-SHA1 authentication scheme added by Joel Trottier-Hebert. Random string (salt) is generated
