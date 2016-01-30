@@ -52,7 +52,7 @@ main() {
 
       var results = {};
 
-      for (int i = 0; i < 10000000; ++i) {
+      for (int i = 0; i < 100000; ++i) {
         var generatedString = generator.generate(20);
         if (results.containsKey(generatedString)) {
           fail("Shouldn't have generated 2 identical strings");
