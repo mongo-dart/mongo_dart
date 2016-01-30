@@ -157,7 +157,7 @@ class ScramSha1Mechanism extends SaslMechanism {
 
     final String gs2Header = 'n,,';
     var username = 'n=${prepUsername(credential.username)}';
-    var r = randomStringGenerator.generate(20, ""); // TODO Change this
+    var r = randomStringGenerator.generate(20); // TODO Change this
 
     var nonce = 'r=$r';
 
@@ -171,13 +171,6 @@ class ScramSha1Mechanism extends SaslMechanism {
   String prepUsername(String username) =>
       username.replaceAll('=', '=3D').replaceAll(',', '=2C');
 
-  String generateRandomString() {
-    const String legalCharacters =
-        '!"#\'\$%&()*+-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
-
-    return randomStringGenerator.generate(20, legalCharacters);
-  }
-
   @override
   String get name => ScramSha1Authenticator.name;
 }
@@ -188,7 +181,8 @@ class ScramSha1Authenticator extends SaslAuthenticator {
 
   ScramSha1Authenticator(UsernamePasswordCredential credential, Db db)
       : super(
-            new ScramSha1Mechanism(credential, new WeakRandomStringGenerator()),
+            new ScramSha1Mechanism(
+                credential, new CryptoStrengthStringGenerator()),
             db) {
     this.db = db;
   }

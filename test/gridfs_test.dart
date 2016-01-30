@@ -128,7 +128,7 @@ Future<List<int>> getInitialState(GridFS gridFS) {
 Future testInOut(List<int> data, GridFS gridFS, [Map extraData = null]) async {
   var consumer = new MockConsumer();
   var out = new IOSink(consumer);
-  List<int> initialState = await getInitialState(gridFS);
+  await getInitialState(gridFS);
   var inputStream = new Stream.fromIterable([data]);
   GridIn input = gridFS.createFile(inputStream, "test");
   if (extraData != null) {

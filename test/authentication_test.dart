@@ -45,4 +45,21 @@ main() {
         throwsA(predicate((MongoDartError e) => e.message ==
             'Provided authentication scheme is not supported : $authMechanism')));
   });
+
+  group('RandomStringGenerator', () {
+    test("Shouldn't produce twice the same string", () {
+      var generator = new CryptoStrengthStringGenerator();
+
+      var results = {};
+
+      for (int i = 0; i < 100000; ++i) {
+        var generatedString = generator.generate(20);
+        if (results.containsKey(generatedString)) {
+          fail("Shouldn't have generated 2 identical strings");
+        } else {
+          results[generatedString] = 1;
+        }
+      }
+    });
+  });
 }

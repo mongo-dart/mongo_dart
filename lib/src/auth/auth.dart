@@ -1,15 +1,15 @@
 part of mongo_dart;
 
-enum AuthenticationScheme {
-  MONGODB_CR, SCRAM_SHA_1
-}
+enum AuthenticationScheme { MONGODB_CR, SCRAM_SHA_1 }
+
 abstract class Authenticator {
   static String name;
 
   Future authenticate(_Connection connection);
 }
 
-Authenticator createAuthenticator(AuthenticationScheme authenticationScheme, Db db, UsernamePasswordCredential credentials) {
+Authenticator createAuthenticator(AuthenticationScheme authenticationScheme,
+    Db db, UsernamePasswordCredential credentials) {
   switch (authenticationScheme) {
     case AuthenticationScheme.MONGODB_CR:
       return new MongoDbCRAuthenticator(db, credentials);
@@ -26,18 +26,27 @@ class UsernamePasswordCredential {
 }
 
 abstract class RandomStringGenerator {
-  String generate(int length, String legalCharacters);
+  static const String allowedCharacters =
+      '!"#\'\$%&()*+-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
+
+  String generate(int length);
 }
 
-class WeakRandomStringGenerator extends RandomStringGenerator {
+class CryptoStrengthStringGenerator extends RandomStringGenerator {
   @override
-  String generate(int length, String legalCharacters) {
-    var rand = new Random();
-    var codeUnits = new List.generate(length, (index) {
-      return rand.nextInt(33) + 89;
-    });
+  String generate(int length) {
+    var random = new Random.secure();
+    var allowedCodeUnits = RandomStringGenerator.allowedCharacters.codeUnits;
 
-    return new String.fromCharCodes(codeUnits);
+    int max = allowedCodeUnits.length - 1;
+
+    List<int> randomString = [];
+
+    for (int i = 0; i < length; ++i) {
+      randomString.add(allowedCodeUnits.elementAt(random.nextInt(max)));
+    }
+
+    return new String.fromCharCodes(randomString);
   }
 }
 
