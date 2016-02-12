@@ -1,5 +1,4 @@
-#Mongo-dart - MongoDB driver for Dart programming language.
-
+# Mongo-dart - MongoDB driver for Dart programming language.
 
 [![Build Status](https://travis-ci.org/mongo-dart/mongo_dart.svg?branch=master)](https://travis-ci.org/mongo-dart/mongo_dart)
 
@@ -7,9 +6,9 @@
 
 Server-side driver library for MongoDb implemented in pure Dart.
 
-##Basic usage
+## Basic usage
 
-###Obtaining connection
+### Obtaining connection
 
 ```dart
 
@@ -17,7 +16,7 @@ Server-side driver library for MongoDb implemented in pure Dart.
   await db.open();
 ```
 
-###Querying
+### Querying
 
 
 Method `find` returns stream of maps and accept query parameters, usually build by fluent API query builder 
@@ -51,7 +50,7 @@ Method `findOne` take the same parameter and returns `Future` of just one map (m
 Take notice in these samples that unlike mongo shell such parameters as projection (`fields`), `limit` and `skip`
 are passed as part of regular query through query builder
 
-###Inserting documents
+### Inserting documents
 
 ```dart
 
@@ -61,7 +60,7 @@ are passed as part of regular query through query builder
   ]);
 ```
 
-###Updating documents
+### Updating documents
 
 You can update whole document with method `save`
 
@@ -80,7 +79,7 @@ or you can perform field level updates with method `update` and top level getter
 
 ```
 
-###Removing documents
+### Removing documents
 
 ```dart
 
@@ -127,7 +126,7 @@ main() async {
 }
 ```
 
-###See also:
+### See also
 
 - [API Doc](http://www.dartdocs.org/documentation/mongo_dart/0.1.39)
 
