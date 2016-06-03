@@ -9,14 +9,14 @@ class GridIn extends GridFSFile {
   ObjectId id;
   GridFS fs;
   String filename;
-  MD5 messageDigester;
-
+  ///TODO Review that code. Currently it sums all file's content in one (potentially big) List, to get MD5 hash
+  /// Probably we should use some Stream api here
+  List<int> contentToDigest = new List<int>();
   GridIn(this.fs, [String filename = null, Stream<List<int>> inputStream = null]) {
     id = new ObjectId();
     chunkSize = GridFS.DEFAULT_CHUNKSIZE;
     input = inputStream.transform(new ChunkHandler(chunkSize).transformer);
     uploadDate = new DateTime.now();
-    messageDigester = new MD5();
     this.filename = filename;
   }
 
@@ -62,6 +62,7 @@ class GridIn extends GridFSFile {
   // TODO(tsander): OutputStream??
 
   Future<Map> dumpBuffer( List<int> writeBuffer ) {
+    contentToDigest.addAll(writeBuffer);
     if (writeBuffer.length == 0) {
       // Chunk is empty, may be last chunk
       return new Future.value({});
@@ -70,7 +71,7 @@ class GridIn extends GridFSFile {
     Map chunk = {"files_id" : id, "n" : currentChunkNumber, "data": new BsonBinary.from(writeBuffer)};
     currentChunkNumber++;
     totalBytes += writeBuffer.length;
-    messageDigester.add(writeBuffer);
+    contentToDigest.addAll(writeBuffer);
     currentBufferPosition = 0;
 
     return fs.chunks.insert(chunk);
@@ -78,7 +79,7 @@ class GridIn extends GridFSFile {
 
   Future finishData() {
     if (!savedChunks) {
-      md5 = CryptoUtils.bytesToHex(messageDigester.close());
+      md5 = crypto.md5.convert(contentToDigest).toString();
       length = totalBytes;
       savedChunks = true;
     }

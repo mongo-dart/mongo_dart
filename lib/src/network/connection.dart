@@ -87,7 +87,8 @@ class _Connection {
     socket.add(message);
   }
   
-  Future<MongoReplyMessage> query(MongoMessage queryMessage) {
+//  Future<MongoReplyMessage>
+  query(MongoMessage queryMessage) {
     Completer completer = new Completer();
     if (!_closed) {
       _replyCompleters[queryMessage.requestId] = completer;

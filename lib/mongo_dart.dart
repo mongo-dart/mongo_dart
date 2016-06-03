@@ -6,7 +6,7 @@ library mongo_dart;
 import 'dart:io';
 import 'dart:async';
 import 'dart:math';
-import 'package:crypto/crypto.dart';
+import 'package:crypto/crypto.dart' as crypto;
 import 'dart:collection';
 import 'package:bson/bson.dart';
 import 'package:logging/logging.dart';

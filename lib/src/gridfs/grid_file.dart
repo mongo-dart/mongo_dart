@@ -9,6 +9,7 @@ class GridFSFile {
   int chunkSize;
   DateTime uploadDate;
   Map<String, Object> extraData;
+  StringBuffer fullContent;
   String md5;
 
   GridFSFile([Map data = const {}]) {

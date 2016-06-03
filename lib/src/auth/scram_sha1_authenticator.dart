@@ -54,22 +54,22 @@ class ClientFirst extends SaslStep {
   }
 
   static Uint8List computeHMAC(Uint8List data, String key) {
-    var sha1 = new SHA1();
-    var hmac = new HMAC(sha1, data);
-    hmac.add(UTF8.encode(key));
-    return new Uint8List.fromList(hmac.close());
+    //var sha1 = new SHA1();
+    var sha1 = crypto.sha1;
+//    crypto.Hmac
+    var hmac = new crypto.Hmac(sha1, data);
+    hmac.convert(UTF8.encode(key));
+    return new Uint8List.fromList(hmac.convert(UTF8.encode(key)).bytes);
   }
 
   static Uint8List h(Uint8List data) {
-    var sha1 = new SHA1();
-    sha1.add(data);
-    return new Uint8List.fromList(sha1.close());
+//    var sha1 = crypto.sha1;
+//    sha1.add(data);
+    return new Uint8List.fromList(crypto.sha1.convert(data).bytes);
   }
 
   static String md5DigestPassword(username, password) {
-    var md5 = new MD5()..add(UTF8.encode('$username:mongo:$password'));
-    List<int> bytes = md5.close();
-    return CryptoUtils.bytesToHex(bytes);
+    return crypto.md5.convert(UTF8.encode('$username:mongo:$password')).toString();
   }
 
   static Uint8List xor(Uint8List a, Uint8List b) {
@@ -90,9 +90,9 @@ class ClientFirst extends SaslStep {
 
   static Uint8List hi(String password, Uint8List salt, int iterations) {
     var digest = (msg) {
-      var hmac = new HMAC(new SHA1(), password.codeUnits);
-      hmac.add(msg);
-      return new Uint8List.fromList(hmac.close());
+      var hmac = new crypto.Hmac(crypto.sha1, password.codeUnits);
+//      hmac.add(msg);
+      return new Uint8List.fromList(hmac.convert(msg).bytes);
     };
 
     Uint8List newSalt =

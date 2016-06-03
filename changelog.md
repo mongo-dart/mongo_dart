@@ -1,9 +1,16 @@
 #Recent change notes
 
+###0.2.6
+
+- update for new sdk (with 1.17.0 [MongoMessageHandler] was broken in checked mode)
+- upgrade to current version of `crypto` package, and it's new (Converter based) API 
+
 ###0.2.5+1
-Fixed markdown for pub.
+
+- Fixed markdown for pub.
 
 ###0.2.5
+
 - Moved mongo_dart project to a new organization on [GitHub](https://github.com/mongo-dart/mongo_dart).
 - Authentication schemes now use Secure Random coming from `dart:math` since 1.14. ** Note that this version now
 required SDK version >= 1.14 because of this **
