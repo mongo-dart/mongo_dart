@@ -9,14 +9,14 @@ authors:
 description: MongoDB driver for Dart
 homepage: https://github.com/mongo-dart/mongo_dart
 environment:
-  sdk: '>=1.16.0<2.0.0'
+  sdk: '>=1.10.0<2.0.0'
 dependencies:
   bson: '^0.2.0'
-  crypto: '^1.1.1'
+  crypto: '>=1.0.0'
   logging: '^0.11.3'
   mongo_dart_query: '^0.2.2'
   collection: "^1.8.0"
 dev_dependencies:
-  test: "^0.12.10+2"
+  test: ">=0.11.0"
   grinder: '^0.7.0'
   uuid: "^0.5.0"
