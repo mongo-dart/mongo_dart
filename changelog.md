@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.2.7
+
+- Minor changes, commented out code removed
+- Big chunk of tests was commented out in 0.2.6 by error. All tests restored. 
+
 ###0.2.6
 
 - update for new sdk (with 1.17.0 [MongoMessageHandler] was broken in checked mode)

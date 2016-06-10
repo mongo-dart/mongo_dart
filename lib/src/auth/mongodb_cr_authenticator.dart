@@ -13,7 +13,6 @@ class MongoDbCRAuthenticator extends Authenticator {
   Future authenticate(_Connection connection) {
     return db.getNonce(connection: connection).then((msg) {
       var nonce = msg["nonce"];
-//      nonce = 'acb5dde67bf24659';
       var command =
           createMongoDbCrAuthenticationCommand(db, credentials, nonce);
       return db.executeDbCommand(command, connection: connection);
@@ -23,7 +22,7 @@ class MongoDbCRAuthenticator extends Authenticator {
   static DbCommand createMongoDbCrAuthenticationCommand(
       Db db, UsernamePasswordCredential credentials, String nonce) {
     var hashed_password = crypto.md5.convert("${credentials.username}:mongo:${credentials.password}".codeUnits).toString();
-    var key = crypto.md5.convert("${nonce}${credentials.username}${hashed_password}".codeUnits).toString();
+    var key = crypto.md5.convert("$nonce${credentials.username}$hashed_password".codeUnits).toString();
     var selector = {
       'authenticate': 1,
       'user': credentials.username,

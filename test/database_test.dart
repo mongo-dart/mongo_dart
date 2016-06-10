@@ -6,7 +6,6 @@ import 'dart:async';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
-//const DefaultUri = 'mongodb://127.0.0.1:27017/';
 const dbName = 'testauth';
 const DefaultUri =
     'mongodb://admin:password@ds041924.mongolab.com:41924/$dbName';
@@ -136,7 +135,7 @@ Future testDateTime() async {
 
   expect(result is List, isTrue);
   expect(result.length, 4);
-}
+  }
 
 testFindEach() async {
   String collectionName = getRandomCollectionName();
@@ -743,9 +742,6 @@ Future testIsMasterDbCommand() async {
 }
 String _md5(String value) => crypto.md5.convert(value.codeUnits).toString();
 testAuthComponents() {
-  var hash;
-  var digest;
-  digest = _md5('');
   expect(_md5(''), 'd41d8cd98f00b204e9800998ecf8427e');
   expect(_md5('md4'), 'c93d3bf7a7c4afe94b64e30c2ce39f4f');
   expect(_md5('md5'), '1bc29b36f623ba82aaf6724fd3b16718');
@@ -1128,18 +1124,17 @@ main() {
   }
 
   group("A", () {
-//    setUp(() async {
-//      await initializeDatabase();
-//    });
-//
-//    tearDown(() async {
-//      await cleanupDatabase();
-//    });
+    setUp(() async {
+      await initializeDatabase();
+    });
+
+    tearDown(() async {
+      await cleanupDatabase();
+    });
 
     group('DbCollection tests:', () {
       test('testAuthComponents', testAuthComponents);
     });
-    return;
     group('DBCommand:', () {
       test('testAuthentication', testAuthentication);
       test('testAuthenticationWithUri', testAuthenticationWithUri);

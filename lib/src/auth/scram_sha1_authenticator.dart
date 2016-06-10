@@ -54,17 +54,13 @@ class ClientFirst extends SaslStep {
   }
 
   static Uint8List computeHMAC(Uint8List data, String key) {
-    //var sha1 = new SHA1();
     var sha1 = crypto.sha1;
-//    crypto.Hmac
     var hmac = new crypto.Hmac(sha1, data);
     hmac.convert(UTF8.encode(key));
     return new Uint8List.fromList(hmac.convert(UTF8.encode(key)).bytes);
   }
 
   static Uint8List h(Uint8List data) {
-//    var sha1 = crypto.sha1;
-//    sha1.add(data);
     return new Uint8List.fromList(crypto.sha1.convert(data).bytes);
   }
 
@@ -91,7 +87,6 @@ class ClientFirst extends SaslStep {
   static Uint8List hi(String password, Uint8List salt, int iterations) {
     var digest = (msg) {
       var hmac = new crypto.Hmac(crypto.sha1, password.codeUnits);
-//      hmac.add(msg);
       return new Uint8List.fromList(hmac.convert(msg).bytes);
     };
 
