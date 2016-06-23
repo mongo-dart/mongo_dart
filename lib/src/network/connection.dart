@@ -35,8 +35,8 @@ class _Connection {
   Set<int> _pendingQueries = new Set();
   get _replyCompleters => _manager.replyCompleters;
   get _sendQueue => _manager.sendQueue;
-  StreamSubscription<List<int>> _socketSubscription;
-  StreamSubscription<List<int>> get socketSubscription => _socketSubscription;
+  StreamSubscription<MongoReplyMessage> _socketSubscription;
+  StreamSubscription<MongoReplyMessage> get socketSubscription => _socketSubscription;
 
   bool connected = false;
   bool _closed = false;
