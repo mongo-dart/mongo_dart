@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.2.8
+
+- Fix bad type in _Connection class
+
 ###0.2.7
 
 - Minor changes, commented out code removed

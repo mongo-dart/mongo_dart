@@ -35,9 +35,9 @@ class _Connection {
   Set<int> _pendingQueries = new Set();
   get _replyCompleters => _manager.replyCompleters;
   get _sendQueue => _manager.sendQueue;
-  StreamSubscription<MongoReplyMessage> _socketSubscription;
-  StreamSubscription<MongoReplyMessage> get socketSubscription =>
-      _socketSubscription;
+  StreamSubscription<MongoReplyMessage> _repliesSubscription;
+  StreamSubscription<MongoReplyMessage> get repliesSubscription =>
+      _repliesSubscription;
 
   bool connected = false;
   bool _closed = false;
@@ -55,7 +55,7 @@ class _Connection {
     Socket.connect(serverConfig.host, serverConfig.port).then((Socket _socket) {
       // Socket connected.
       socket = _socket;
-      _socketSubscription = socket
+      _repliesSubscription = socket
           .transform(new MongoMessageHandler().transformer)
           .listen(_receiveReply, onError: (e) {
         _log.severe("Socket error ${e}");
