@@ -122,6 +122,7 @@ class Db {
   Db authSourceDb;
   _ConnectionManager _connectionManager;
   _Connection get _masterConnection => _connectionManager.masterConnection;
+  _Connection get _masterConnectionVerified => _connectionManager.masterConnectionVerified;
   WriteConcern _writeConcern;
   AuthenticationScheme _authenticationScheme;
 
@@ -209,7 +210,7 @@ class Db {
       }
 
       if (connection == null) {
-        connection = _masterConnection;
+        connection = _masterConnectionVerified;
       }
 
       return connection.query(queryMessage);
@@ -223,7 +224,7 @@ class Db {
     }
 
     if (connection == null) {
-      connection = _masterConnection;
+      connection = _masterConnectionVerified;
     }
 
     if (writeConcern == null) {
@@ -254,7 +255,7 @@ class Db {
   Future executeDbCommand(MongoMessage message,
       {_Connection connection}) async {
     if (connection == null) {
-      connection = _masterConnection;
+      connection = _masterConnectionVerified;
     }
 
     Completer<Map> result = new Completer();
