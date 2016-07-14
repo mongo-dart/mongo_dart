@@ -209,7 +209,12 @@ class Db {
       }
 
       if (connection == null) {
-        connection = _masterConnection;
+        if (_masterConnection != null) {
+          connection = _masterConnection;
+        }
+        else {
+          throw new MongoDartError('No master connection');
+        }
       }
 
       return connection.query(queryMessage);
@@ -223,7 +228,12 @@ class Db {
     }
 
     if (connection == null) {
-      connection = _masterConnection;
+      if (_masterConnection != null) {
+        connection = _masterConnection;
+      }
+      else {
+        throw new MongoDartError('No master connection');
+      }
     }
 
     if (writeConcern == null) {
@@ -254,7 +264,12 @@ class Db {
   Future executeDbCommand(MongoMessage message,
       {_Connection connection}) async {
     if (connection == null) {
-      connection = _masterConnection;
+      if (_masterConnection != null) {
+        connection = _masterConnection;
+      }
+      else {
+        throw new MongoDartError('No master connection');
+      }
     }
 
     Completer<Map> result = new Completer();
