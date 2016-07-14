@@ -11,6 +11,16 @@ class _ConnectionManager {
   _ConnectionManager(this.db);
   get masterConnection => _masterConnection;
 
+  get masterConnectionVerified {
+    if (_masterConnection != null) {
+      return _masterConnection;
+    }
+    else {
+      throw new MongoDartError('No master connection');
+    }
+  }
+
+
   Future _connect(_Connection connection) async {
     await connection.connect();
     DbCommand isMasterCommand = DbCommand.createIsMasterCommand(db);
