@@ -210,7 +210,7 @@ class Db {
       }
 
       if (connection == null) {
-          connection = _masterConnectionVerified;
+        connection = _masterConnectionVerified;
       }
 
       return connection.query(queryMessage);

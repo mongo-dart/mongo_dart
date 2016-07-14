@@ -20,7 +20,6 @@ class _ConnectionManager {
     }
   }
 
-
   Future _connect(_Connection connection) async {
     await connection.connect();
     DbCommand isMasterCommand = DbCommand.createIsMasterCommand(db);
