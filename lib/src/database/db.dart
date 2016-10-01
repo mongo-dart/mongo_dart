@@ -167,8 +167,8 @@ class Db {
             'Invalid format of userInfo field: $uri.userInfo');
       }
 
-      serverConfig.userName = userInfo[0];
-      serverConfig.password = userInfo[1];
+      serverConfig.userName = Uri.decodeComponent(userInfo[0]);
+      serverConfig.password = Uri.decodeComponent(userInfo[1]);
     }
 
     if (uri.path.isNotEmpty) {
