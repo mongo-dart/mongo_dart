@@ -31,6 +31,10 @@ class DbCommand extends MongoQueryMessage {
   static DbCommand createDropCollectionCommand(Db db, String collectionName) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'drop':collectionName}, null);
   }
+  
+  static DbCommand createSetProfilingLevelCommand(int level) {
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'profile':level}, null);
+  }
 
   static DbCommand createDropDatabaseCommand(Db db) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION, MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, {'dropDatabase':1}, null);
