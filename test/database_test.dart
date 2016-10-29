@@ -189,7 +189,7 @@ Future testSaveWithIntegerId() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [
+  var toInsert = <Map>[
     {"_id": 1, "name": "a", "value": 10},
     {"_id": 2, "name": "b", "value": 20},
     {"_id": 3, "name": "c", "value": 30},
@@ -220,7 +220,7 @@ Future testSaveWithObjectId() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [
+  var toInsert = <Map>[
     {"name": "a", "value": 10},
     {"name": "b", "value": 20},
     {"name": "c", "value": 30},
@@ -289,7 +289,7 @@ Future testAggregate() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [];
+  var toInsert = <Map>[];
 
   // Avg 1 with 1 rating
   toInsert.add({
@@ -391,7 +391,7 @@ Future testAggregateToStream() async {
     }
   }
 
-  List toInsert = [];
+  var toInsert = <Map>[];
 
   // Avg 1 with 1 rating
   toInsert.add({
@@ -579,7 +579,7 @@ Future testLimitWithSortByAndSkip() async {
 }
 
 Future insertManyDocuments(DbCollection collection, int numberOfRecords) async {
-  List toInsert = [];
+  var toInsert = <Map>[];
   for (int n = 0; n < numberOfRecords; n++) {
     toInsert.add({"a": n});
   }
@@ -786,7 +786,7 @@ Future testIndexCreation() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [];
+  var toInsert = <Map>[];
   for (int n = 0; n < 6; n++) {
     toInsert.add({
       'a': n,
@@ -812,7 +812,7 @@ Future testEnsureIndexWithIndexCreation() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [];
+  var toInsert = <Map>[];
   for (int n = 0; n < 6; n++) {
     toInsert.add({
       'a': n,
@@ -832,7 +832,7 @@ Future testIndexCreationErrorHandling() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [];
+  var toInsert = <Map>[];
   for (int n = 0; n < 6; n++) {
     toInsert.add({'a': n});
   }
@@ -935,7 +935,7 @@ Future testSimpleQuery() async {
   var collection = db.collection(collectionName);
 
   ObjectId id;
-  List toInsert = [];
+  var toInsert = <Map>[];
   for (var n = 0; n < 10; n++) {
     toInsert.add({"my_field": n, "str_field": "str_$n"});
   }
@@ -947,25 +947,25 @@ Future testSimpleQuery() async {
   expect(result.length, 4);
   expect(result[0]['my_field'], 6);
 
-  result = await collection.findOne(where.eq('my_field', 3));
-  expect(result, isNotNull);
-  expect(result['my_field'], 3);
-  id = result['_id'];
+  var result2 = await collection.findOne(where.eq('my_field', 3));
+  expect(result2, isNotNull);
+  expect(result2['my_field'], 3);
+  id = result2['_id'];
 
-  result = await collection.findOne(where.id(id));
-  expect(result, isNotNull);
-  expect(result['my_field'], 3);
+  var result3 = await collection.findOne(where.id(id));
+  expect(result3, isNotNull);
+  expect(result3['my_field'], 3);
 
   collection.remove(where.id(id));
-  result = await collection.findOne(where.eq('my_field', 3));
-  expect(result, isNull);
+  result3 = await collection.findOne(where.eq('my_field', 3));
+  expect(result3, isNull);
 }
 
 Future testCompoundQuery() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [];
+  var toInsert = <Map>[];
   for (var n = 0; n < 10; n++) {
     toInsert.add({"my_field": n, "str_field": "str_$n"});
   }
@@ -977,12 +977,12 @@ Future testCompoundQuery() async {
       .toList();
   expect(result.length, 3);
 
-  result = await collection.findOne(where
+  var result1 = await collection.findOne(where
       .gt("my_field", 8)
       .or(where.lt('my_field', 2))
       .and(where.eq('str_field', 'str_1')));
-  expect(result, isNotNull);
-  expect(result['my_field'], 1);
+  expect(result1, isNotNull);
+  expect(result1['my_field'], 1);
 }
 
 Future testFieldLevelUpdateSimple() async {

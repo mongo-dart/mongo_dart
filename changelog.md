@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.2.11
+
+- Strong mode compliance.
+
 ###0.2.8
 
 - Fix bad type in _Connection class

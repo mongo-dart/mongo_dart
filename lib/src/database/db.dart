@@ -122,7 +122,8 @@ class Db {
   Db authSourceDb;
   _ConnectionManager _connectionManager;
   _Connection get _masterConnection => _connectionManager.masterConnection;
-  _Connection get _masterConnectionVerified => _connectionManager.masterConnectionVerified;
+  _Connection get _masterConnectionVerified =>
+      _connectionManager.masterConnectionVerified;
   WriteConcern _writeConcern;
   AuthenticationScheme _authenticationScheme;
 
@@ -252,7 +253,7 @@ class Db {
     });
   }
 
-  Future executeDbCommand(MongoMessage message,
+  Future<Map> executeDbCommand(MongoMessage message,
       {_Connection connection}) async {
     if (connection == null) {
       connection = _masterConnectionVerified;
@@ -285,14 +286,14 @@ class Db {
   bool documentIsNotAnError(firstRepliedDocument) =>
       firstRepliedDocument['ok'] == 1.0 && firstRepliedDocument['err'] == null;
 
-  Future dropCollection(String collectionName) async {
+  Future<bool> dropCollection(String collectionName) async {
     var collectionInfos = await getCollectionInfos({'name': collectionName});
 
     if (collectionInfos.length == 1) {
-      return executeDbCommand(
+      await executeDbCommand(
           DbCommand.createDropCollectionCommand(this, collectionName));
+      return true;
     }
-
     return true;
   }
 
@@ -373,9 +374,10 @@ class Db {
         selector["name"] = "${this.databaseName}.${filter['name']}";
       }
       return new Cursor(
-          this,
-          new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION),
-          selector).stream;
+              this,
+              new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION),
+              selector)
+          .stream;
     }
   }
 
@@ -395,9 +397,10 @@ class Db {
     }
     // Return Cursor
     return new Cursor(
-        this,
-        new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION),
-        selector).stream;
+            this,
+            new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION),
+            selector)
+        .stream;
   }
 
   /// Analogue to shell's `show collections`
@@ -446,10 +449,10 @@ class Db {
       selector['ns'] = '$databaseName.$collectionName';
     }
 
-    return new Cursor(
-        this,
-        new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION),
-        selector).stream.toList();
+    return new Cursor(this,
+            new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector)
+        .stream
+        .toList();
   }
 
   String _createIndexName(Map keys) {

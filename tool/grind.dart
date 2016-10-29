@@ -3,7 +3,7 @@ library dart_pad.grind;
 import 'package:grinder/grinder.dart';
 
 
-main(List args) => grind(args);
+main(List<String> args) => grind(args);
 
 @DefaultTask()
 @Task()

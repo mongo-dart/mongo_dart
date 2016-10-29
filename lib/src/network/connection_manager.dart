@@ -78,7 +78,7 @@ class _ConnectionManager {
     _connectionPool[serverConfig.hostUrl] = connection;
   }
 
-  bool removeConnection(_Connection connection) {
+  removeConnection(_Connection connection) {
     return _connectionPool.remove(connection.serverConfig.hostUrl);
   }
 }
