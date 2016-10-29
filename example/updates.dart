@@ -6,7 +6,7 @@ main() async {
   ///// Simple update
   DbCollection coll = db.collection('collection-for-save');
   await coll.remove();
-  List toInsert = [
+  var toInsert = <Map>[
     {"name": "a", "value": 10},
     {"name": "b", "value": 20},
     {"name": "c", "value": 30},

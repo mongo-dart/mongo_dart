@@ -70,7 +70,7 @@ main() async {
   print('List of databases: $databases');
   var collections = await db.getCollectionNames();
   print('List of collections : $collections');
-  collections = await db.getCollectionInfos();
-  print('List of collection\'s infos: $collections');
+  var collectionInfos = await db.getCollectionInfos();
+  print('List of collection\'s infos: $collectionInfos');
   await db.close();
 }

@@ -69,7 +69,7 @@ class ClientFirst extends SaslStep {
   }
 
   static Uint8List xor(Uint8List a, Uint8List b) {
-    var result = [];
+    var result = <int>[];
 
     if (a.length > b.length) {
       for (var i = 0; i < b.length; i++) {
@@ -85,7 +85,7 @@ class ClientFirst extends SaslStep {
   }
 
   static Uint8List hi(String password, Uint8List salt, int iterations) {
-    var digest = (msg) {
+    var digest = (List<int> msg) {
       var hmac = new crypto.Hmac(crypto.sha1, password.codeUnits);
       return new Uint8List.fromList(hmac.convert(msg).bytes);
     };
@@ -171,7 +171,7 @@ class ScramSha1Mechanism extends SaslMechanism {
 }
 
 class ScramSha1Authenticator extends SaslAuthenticator {
-  @override
+
   static String name = 'SCRAM-SHA-1';
 
   ScramSha1Authenticator(UsernamePasswordCredential credential, Db db)

@@ -22,6 +22,6 @@ class MongoMessageHandler {
     sink.close();
   }
   
-  StreamTransformer get transformer => new StreamTransformer.fromHandlers(
+  StreamTransformer<List<int>, dynamic> get transformer => new StreamTransformer.fromHandlers(
       handleData: handleData,handleDone: handleDone);
 }

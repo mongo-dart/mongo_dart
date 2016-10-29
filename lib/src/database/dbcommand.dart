@@ -15,7 +15,7 @@ class DbCommand extends MongoQueryMessage {
   }
 
   static DbCommand createFindAndModifyCommand(Db db, String collectionName, {Map query, Map sort, bool remove, Map update, bool returnNew, Map fields, bool upsert}) {
-    var command = {
+    var command = <String,dynamic>{
       "findandmodify": collectionName
     };
     if (query != null)     { command['query']  = query;  }

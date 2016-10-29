@@ -51,7 +51,7 @@ class _Connection {
   }
 
   Future<bool> connect() {
-    Completer completer = new Completer();
+    var completer = new Completer<bool>();
     Socket.connect(serverConfig.host, serverConfig.port).then((Socket _socket) {
       // Socket connected.
       socket = _socket;
@@ -64,7 +64,7 @@ class _Connection {
         if (!_closed) {
           _onSocketError();
         }
-      });
+      }) as StreamSubscription<MongoReplyMessage>;
       connected = true;
       completer.complete(true);
     }).catchError((err) {
@@ -83,13 +83,13 @@ class _Connection {
     List<int> message = [];
     while (!_sendQueue.isEmpty) {
       var mongoMessage = _sendQueue.removeFirst();
-      message.addAll(mongoMessage.serialize().byteList);
+      message.addAll(mongoMessage.serialize().byteList as Iterable<int>);
     }
     socket.add(message);
   }
 
   Future<MongoReplyMessage> query(MongoMessage queryMessage) {
-    Completer completer = new Completer();
+    var completer = new Completer<MongoReplyMessage>();
     if (!_closed) {
       _replyCompleters[queryMessage.requestId] = completer;
       _pendingQueries.add(queryMessage.requestId);

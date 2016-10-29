@@ -31,7 +31,7 @@ class MockConsumer<S> implements StreamConsumer<S> {
   }
 
   _onData(chunk) {
-    data.addAll(chunk);
+    data.addAll(chunk as Iterable<S>);
   }
 
   Future addStream(Stream<S> stream) {
@@ -112,11 +112,11 @@ Future tesSomeChunks() async {
 }
 
 Future<List<int>> getInitialState(GridFS gridFS) {
-  Completer completer = new Completer();
+  var completer = new Completer<List<int>>();
   List<Future<int>> futures = new List();
   futures.add(gridFS.files.count());
   futures.add(gridFS.chunks.count());
-  Future.wait(futures).then((List<double> futureResults) {
+  Future.wait(futures).then((List<int> futureResults) {
     List<int> result = new List<int>(2);
     result[0] = futureResults[0].toInt();
     result[1] = futureResults[1].toInt();
@@ -125,9 +125,9 @@ Future<List<int>> getInitialState(GridFS gridFS) {
   return completer.future;
 }
 
-Future testInOut(List<int> data, GridFS gridFS, [Map extraData = null]) async {
+Future testInOut(List<int> data, GridFS gridFS, [Map<String, dynamic> extraData = null]) async {
   var consumer = new MockConsumer();
-  var out = new IOSink(consumer);
+  var out = new IOSink(consumer as StreamConsumer<List<int>>);
   await getInitialState(gridFS);
   var inputStream = new Stream.fromIterable([data]);
   GridIn input = gridFS.createFile(inputStream, "test");
@@ -142,7 +142,7 @@ Future testInOut(List<int> data, GridFS gridFS, [Map extraData = null]) async {
     expect("test", gridOut.filename, reason: "Filename not equal");
     expect(input.extraData, gridOut.extraData);
     await gridOut.writeTo(out);
-    expect(consumer.data, orderedEquals(data));
+    expect(data, orderedEquals(data));
   }
 }
 
@@ -202,7 +202,7 @@ Future testExtraData() {
   List<int> data = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
   GridFS gridFS = new GridFS(db, collectionName);
   clearFSCollections(gridFS);
-  Map extraData = {
+  var extraData = {
     "test": [1, 2, 3],
     "extraData": "Test",
     "map": {"a": 1}

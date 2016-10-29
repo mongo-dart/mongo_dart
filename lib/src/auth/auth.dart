@@ -51,7 +51,7 @@ class CryptoStrengthStringGenerator extends RandomStringGenerator {
 }
 
 Map<String, String> parsePayload(String payload) {
-  var dict = {};
+  var dict = <String, String>{};
   var parts = payload.split(',');
 
   for (var i = 0; i < parts.length; i++) {

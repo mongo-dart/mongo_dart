@@ -13,7 +13,7 @@ import 'package:logging/logging.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:collection/equality.dart';
+import 'package:collection/collection.dart';
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_dart_query.dart';

@@ -7,7 +7,7 @@ main() async {
   DbCollection test;
   await db.open();
   test = db.collection('test');
-  var data = [];
+  var data = <Map>[];
   for (num i = 0; i < 1000; i++) {
     data.add({'value': i});
   }
