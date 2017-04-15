@@ -119,13 +119,16 @@ class DbCollection {
       db.executeDbCommand(DbCommand.createDistinctCommand(
           db, collectionName, field, _selectorBuilder2Map(selector)));
 
-  Future<Map> aggregate(List pipeline) {
-    var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline);
+  Future<Map> aggregate(List pipeline, {allowDiskUse: false}) {
+    var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline,
+        allowDiskUse: allowDiskUse);
     return db.executeDbCommand(cmd);
   }
 
-  Stream<Map> aggregateToStream(List pipeline, {Map cursorOptions: const {}}) {
-    return new AggregateCursor(db, this, pipeline, cursorOptions).stream;
+  Stream<Map> aggregateToStream(List pipeline,
+      {Map cursorOptions: const {}, bool allowDiskUse: false}) {
+    return new AggregateCursor(db, this, pipeline, cursorOptions, allowDiskUse)
+        .stream;
   }
 
   Future<Map> insert(Map document, {WriteConcern writeConcern}) =>

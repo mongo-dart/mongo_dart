@@ -203,7 +203,9 @@ class CommandCursor extends Cursor {
 class AggregateCursor extends CommandCursor {
   List pipeline;
   Map cursorOptions;
-  AggregateCursor(db, collection, this.pipeline, this.cursorOptions)
+  bool allowDiskUse;
+  AggregateCursor(
+      db, collection, this.pipeline, this.cursorOptions, this.allowDiskUse)
       : super(db, collection, {});
   @override
   MongoQueryMessage generateQueryMessage() {
@@ -216,7 +218,8 @@ class AggregateCursor extends CommandCursor {
         {
           'aggregate': collection.collectionName,
           'pipeline': pipeline,
-          'cursor': cursorOptions
+          'cursor': cursorOptions,
+          'allowDiskUse': this.allowDiskUse
         },
         null);
   }

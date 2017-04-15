@@ -366,11 +366,12 @@ db.runCommand(
 
   expect(p1["\u0024group"], isNotNull);
   expect(p1["\$group"], isNotNull);
-
-  var v = await collection.aggregate(pipeline);
-  List result = v['result'];
-  expect(result[0]["_id"], "Age of Steam");
-  expect(result[0]["avgRating"], 3);
+  for (var allowDiskUse in [false, true]) {
+    var v = await collection.aggregate(pipeline, allowDiskUse: allowDiskUse);
+    List result = v['result'];
+    expect(result[0]["_id"], "Age of Steam");
+    expect(result[0]["avgRating"], 3);
+  }
 }
 
 Future testAggregateToStream() async {
@@ -469,11 +470,16 @@ db.runCommand(
   expect(p1["\u0024group"], isNotNull);
   expect(p1["\$group"], isNotNull);
   // set batchSize parameter to split response to 2 chunks
-  var aggregate = await collection
-      .aggregateToStream(pipeline, cursorOptions: {'batchSize': 1}).toList();
-  expect(aggregate.isNotEmpty, isTrue);
-  expect(aggregate[0]["_id"], "Age of Steam");
-  expect(aggregate[0]["avgRating"], 3);
+  for (var allowDiskUse in [false, true]) {
+    var aggregate = await collection
+        .aggregateToStream(pipeline,
+            cursorOptions: {'batchSize': 1}, allowDiskUse: allowDiskUse)
+        .toList();
+
+    expect(aggregate.isNotEmpty, isTrue);
+    expect(aggregate[0]["_id"], "Age of Steam");
+    expect(aggregate[0]["avgRating"], 3);
+  }
 }
 
 Future testSkip() async {
