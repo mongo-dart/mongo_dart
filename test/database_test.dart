@@ -6,9 +6,9 @@ import 'dart:async';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
-const dbName = 'testauth';
-const DefaultUri =
-    'mongodb://admin:password@ds041924.mongolab.com:41924/$dbName';
+const dbName = "test-mongo-dart";
+
+const DefaultUri = 'mongodb://localhost:27017/$dbName';
 
 Db db;
 Uuid uuid = new Uuid();
@@ -757,10 +757,6 @@ testAuthComponents() {
   expect(key, test_key);
 }
 
-Future testAuthentication() async {
-  await db.authenticate('admin', 'password');
-}
-
 Future testAuthenticationWithUri() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
@@ -849,7 +845,7 @@ Future testIndexCreationErrorHandling() async {
     fail("Expecting an error, but wasn't thrown");
   } catch (e) {
     expect(e['err'],
-        predicate((String msg) => msg.contains("duplicate key error index")));
+        predicate((String msg) => msg.contains("duplicate key error")));
   }
 }
 
@@ -1157,7 +1153,6 @@ main() {
       test('testAuthComponents', testAuthComponents);
     });
     group('DBCommand:', () {
-      test('testAuthentication', testAuthentication);
       test('testAuthenticationWithUri', testAuthenticationWithUri);
       test('testDropDatabase', testDropDatabase,
           skip: 'this might prevent the tests to pass');

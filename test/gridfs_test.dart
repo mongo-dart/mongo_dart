@@ -8,8 +8,7 @@ import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
 
 const dbName = 'testauth';
-const DefaultUri =
-    'mongodb://admin:password@ds041924.mongolab.com:41924/$dbName';
+const DefaultUri = 'mongodb://localhost:27017/test-mongo-dart';
 Db db;
 
 Uuid uuid = new Uuid();

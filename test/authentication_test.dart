@@ -42,7 +42,8 @@ main() {
 
     expect(
         sut(),
-        throwsA(predicate((MongoDartError e) => e.message ==
+        throwsA(predicate((MongoDartError e) =>
+            e.message ==
             'Provided authentication scheme is not supported : $authMechanism')));
   });
 
@@ -62,4 +63,8 @@ main() {
       }
     });
   });
+}
+
+Future testAuthentication() async {
+  await db.authenticate('admin', 'password');
 }

@@ -2,7 +2,7 @@ language: dart
 dart:
   - stable
   - dev
-#services: mongodb
+services: mongodb
 before_script:
   - sleep 15
 sudo: false
