@@ -1,7 +1,7 @@
 library database_tests;
 
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:crypto/crypto.dart' as  crypto;
+import 'package:crypto/crypto.dart' as crypto;
 import 'dart:async';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
@@ -135,7 +135,7 @@ Future testDateTime() async {
 
   expect(result is List, isTrue);
   expect(result.length, 4);
-  }
+}
 
 testFindEach() async {
   String collectionName = getRandomCollectionName();
@@ -542,9 +542,8 @@ Future testUpdateWithMultiUpdate() async {
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
 
-  results = await collection
-      .find({'value': 'value_modified_for_only_one_with_multiupdate_false'})
-      .toList();
+  results = await collection.find(
+      {'value': 'value_modified_for_only_one_with_multiupdate_false'}).toList();
   expect(results.length, 1);
 
   result = await collection.update(
@@ -740,6 +739,7 @@ Future testIsMasterDbCommand() async {
 
   expect(result.documents[0], containsPair('ok', 1));
 }
+
 String _md5(String value) => crypto.md5.convert(value.codeUnits).toString();
 testAuthComponents() {
   expect(_md5(''), 'd41d8cd98f00b204e9800998ecf8427e');
@@ -900,32 +900,50 @@ Future testFindAndModify() async {
     {"name": "Alice", "score": 1},
   ]);
 
-  result = await collection.findAndModify(query: where.eq('name', 'Vadim'), update: modify.inc('score', 10), fields: where.fields(['score']).excludeFields(['_id']));
+  result = await collection.findAndModify(
+      query: where.eq('name', 'Vadim'),
+      update: modify.inc('score', 10),
+      fields: where.fields(['score']).excludeFields(['_id']));
   expect(result['_id'], isNull);
   expect(result['name'], isNull);
   expect(result['score'], 4);
 
-  result = await collection.findAndModify(query: where.eq('name', 'Daniil'), returnNew: true, update: modify.inc('score', 3));
+  result = await collection.findAndModify(
+      query: where.eq('name', 'Daniil'),
+      returnNew: true,
+      update: modify.inc('score', 3));
   expect(result['_id'], isNotNull);
   expect(result['name'], 'Daniil');
   expect(result['score'], 7);
 
-  result = await collection.findAndModify(query: where.eq('name', 'Nick'), remove: true);
+  result = await collection.findAndModify(
+      query: where.eq('name', 'Nick'), remove: true);
   expect(result['_id'], isNotNull);
   expect(result['name'], 'Nick');
   expect(result['score'], 5);
 
-  result = await collection.findAndModify(query: where.eq('name', 'Unknown'), update: modify.inc('score', 3));
+  result = await collection.findAndModify(
+      query: where.eq('name', 'Unknown'), update: modify.inc('score', 3));
   expect(result, isNull);
 
-  result = await collection.findAndModify(query: where.eq('name', 'Unknown'), returnNew: true, update: modify.inc('score', 3));
+  result = await collection.findAndModify(
+      query: where.eq('name', 'Unknown'),
+      returnNew: true,
+      update: modify.inc('score', 3));
   expect(result, isNull);
 
-  result = await collection.findAndModify(sort: where.sortBy('score'), returnNew: true, update: modify.inc('score', 100));
+  result = await collection.findAndModify(
+      sort: where.sortBy('score'),
+      returnNew: true,
+      update: modify.inc('score', 100));
   expect(result['name'], 'Alice');
   expect(result['score'], 101);
 
-  result = await collection.findAndModify(query: where.eq('name', 'New Comer'), returnNew: true, upsert: true, update: modify.inc('score', 100));
+  result = await collection.findAndModify(
+      query: where.eq('name', 'New Comer'),
+      returnNew: true,
+      upsert: true,
+      update: modify.inc('score', 100));
   expect(result['name'], 'New Comer');
   expect(result['score'], 100);
 }
