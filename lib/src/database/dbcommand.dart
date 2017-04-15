@@ -158,18 +158,14 @@ class DbCommand extends MongoQueryMessage {
   static DbCommand createAggregateCommand(
       Db db, String collectionName, List pipeline,
       {bool allowDiskUse: false}) {
-    return new DbCommand(
-        db,
-        SYSTEM_COMMAND_COLLECTION,
-        MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT,
-        0,
-        -1,
-        {
-          'aggregate': collectionName,
-          'pipeline': pipeline,
-          'allowDiskUse': allowDiskUse
-        },
-        null);
+    var query = {'aggregate': collectionName, 'pipeline': pipeline};
+
+    if (db._masterConnection.serverCapabilities.aggregationCursor) {
+      query["allowDiskUse"] = allowDiskUse;
+    }
+
+    return new DbCommand(db, SYSTEM_COMMAND_COLLECTION,
+        MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, query, null);
   }
 
   static DbCommand createIsMasterCommand(Db db) {

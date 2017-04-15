@@ -64,7 +64,3 @@ main() {
     });
   });
 }
-
-Future testAuthentication() async {
-  await db.authenticate('admin', 'password');
-}
