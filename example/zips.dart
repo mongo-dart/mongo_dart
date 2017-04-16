@@ -1,6 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-
 //////Sample is broken now. Mongolab free accounts upgraded to MongoDb 3.0
 ///// and support for 3.0 default authentication scheme not implemented yet
 main() async {
@@ -8,6 +7,7 @@ main() async {
     print(
         'state: ${zip["state"]}, city: ${zip["city"]}, zip: ${zip["id"]}, population: ${zip["pop"]}');
   }
+
   Db db =
       new Db("mongodb://reader:vHm459fU@ds037468.mongolab.com:37468/samlple");
   var zips = db.collection('zip');

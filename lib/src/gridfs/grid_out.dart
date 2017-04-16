@@ -1,7 +1,6 @@
 part of mongo_dart;
 
 class GridOut extends GridFSFile {
-
   GridOut([Map data]) : super(data);
 
   Future writeToFilename(String filename) {
@@ -9,7 +8,7 @@ class GridOut extends GridFSFile {
   }
 
   Future writeToFile(File file) {
-    var sink = file.openWrite(mode: FileMode.WRITE);    
+    var sink = file.openWrite(mode: FileMode.WRITE);
     writeTo(sink).then((int length) {
       sink.close();
     });
@@ -21,12 +20,14 @@ class GridOut extends GridFSFile {
     Completer completer = new Completer();
     addToSink(Map chunk) {
       BsonBinary data = chunk["data"];
-      out.add(data.byteList);                
+      out.add(data.byteList);
       length += data.byteList.length;
-    }  
-    fs.chunks.find(where.eq("files_id", id).sortBy('n'))
-      .forEach(addToSink)
-      .then((_) => completer.complete(length));
+    }
+
+    fs.chunks
+        .find(where.eq("files_id", id).sortBy('n'))
+        .forEach(addToSink)
+        .then((_) => completer.complete(length));
     return completer.future;
   }
 }

@@ -9,7 +9,7 @@ class MongoReplyMessage extends MongoMessage {
 
   BsonCString _collectionFullName;
   int responseFlags;
-  int cursorId =-1; // 64bit integer
+  int cursorId = -1; // 64bit integer
   int startingFrom;
   int numberReturned = -1;
   List documents;
@@ -21,7 +21,7 @@ class MongoReplyMessage extends MongoMessage {
     startingFrom = buffer.readInt32();
     numberReturned = buffer.readInt32();
     documents = new List(numberReturned);
-    for (int n=0;n<numberReturned;n++) {
+    for (int n = 0; n < numberReturned; n++) {
       BsonMap doc = new BsonMap({});
       doc.unpackValue(buffer);
       documents[n] = doc.value;
