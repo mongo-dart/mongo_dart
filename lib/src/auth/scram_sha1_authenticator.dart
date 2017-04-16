@@ -65,7 +65,9 @@ class ClientFirst extends SaslStep {
   }
 
   static String md5DigestPassword(username, password) {
-    return crypto.md5.convert(UTF8.encode('$username:mongo:$password')).toString();
+    return crypto.md5
+        .convert(UTF8.encode('$username:mongo:$password'))
+        .toString();
   }
 
   static Uint8List xor(Uint8List a, Uint8List b) {
@@ -119,7 +121,7 @@ class ClientLast extends SaslStep {
     Map decodedMessage = parsePayload(UTF8.decode(bytesReceivedFromServer));
     var serverSignature = BASE64.decode(decodedMessage['v']);
 
-    if (!const ListEquality().equals(serverSignature64, serverSignature)) {
+    if (!const IterableEquality().equals(serverSignature64, serverSignature)) {
       throw new MongoDartError("Server signature was invalid.");
     }
 
@@ -171,7 +173,6 @@ class ScramSha1Mechanism extends SaslMechanism {
 }
 
 class ScramSha1Authenticator extends SaslAuthenticator {
-  @override
   static String name = 'SCRAM-SHA-1';
 
   ScramSha1Authenticator(UsernamePasswordCredential credential, Db db)
