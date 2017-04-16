@@ -2,7 +2,6 @@ library dart_pad.grind;
 
 import 'package:grinder/grinder.dart';
 
-
 main(List args) => grind(args);
 
 @DefaultTask()
@@ -10,5 +9,3 @@ main(List args) => grind(args);
 analyze() {
   new PubApp.global('tuneup')..run(['check']);
 }
-
-

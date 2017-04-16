@@ -18,23 +18,20 @@ class MongoQueryMessage extends MongoMessage {
   BsonMap _fields;
   BsonCString get collectionNameBson => _collectionFullName;
 
-  MongoQueryMessage(String collectionFullName,
-                    this.flags,
-                    this.numberToSkip,
-                    this.numberToReturn,
-                    Map query,
-                    Map fields) {
+  MongoQueryMessage(String collectionFullName, this.flags, this.numberToSkip,
+      this.numberToReturn, Map query, Map fields) {
     _collectionFullName = new BsonCString(collectionFullName);
     _query = new BsonMap(query);
-    if (fields != null){
+    if (fields != null) {
       _fields = new BsonMap(fields);
     }
     opcode = MongoMessage.Query;
   }
 
   int get messageLength {
-    int result = 16+4+_collectionFullName.byteLength()+4+4+_query.byteLength();
-    if (_fields != null){
+    int result =
+        16 + 4 + _collectionFullName.byteLength() + 4 + 4 + _query.byteLength();
+    if (_fields != null) {
       result += _fields.byteLength();
     }
     return result;
@@ -48,7 +45,7 @@ class MongoQueryMessage extends MongoMessage {
     buffer.writeInt(numberToSkip);
     buffer.writeInt(numberToReturn);
     _query.packValue(buffer);
-    if (_fields != null){
+    if (_fields != null) {
       _fields.packValue(buffer);
     }
     buffer.offset = 0;

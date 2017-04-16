@@ -4,18 +4,17 @@ class MongoGetMoreMessage extends MongoMessage {
   BsonCString _collectionFullName;
   int cursorId;
   int numberToReturn;
-  
-  MongoGetMoreMessage(String collectionFullName,
-                      this.cursorId,
-                      [this.numberToReturn = 20]){
+
+  MongoGetMoreMessage(String collectionFullName, this.cursorId,
+      [this.numberToReturn = 20]) {
     _collectionFullName = new BsonCString(collectionFullName);
     opcode = MongoMessage.GetMore;
   }
-  
+
   int get messageLength {
-    return 16+4+_collectionFullName.byteLength()+4+8;
+    return 16 + 4 + _collectionFullName.byteLength() + 4 + 8;
   }
-  
+
   BsonBinary serialize() {
     BsonBinary buffer = new BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
@@ -26,7 +25,7 @@ class MongoGetMoreMessage extends MongoMessage {
     buffer.offset = 0;
     return buffer;
   }
-  
+
   String toString() {
     return "MongoGetMoreMessage($requestId, ${_collectionFullName.value}, $cursorId)";
   }

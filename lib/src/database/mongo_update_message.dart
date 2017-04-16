@@ -7,11 +7,9 @@ class MongoUpdateMessage extends MongoMessage {
   int numberToReturn;
   BsonMap _selector;
   BsonMap _document;
-  
-  MongoUpdateMessage(String collectionFullName,
-                     Map selector,
-                     document,
-                     this.flags) {
+
+  MongoUpdateMessage(
+      String collectionFullName, Map selector, document, this.flags) {
     _collectionFullName = new BsonCString(collectionFullName);
     _selector = new BsonMap(selector);
     if (document is ModifierBuilder) {
@@ -20,11 +18,16 @@ class MongoUpdateMessage extends MongoMessage {
     _document = new BsonMap(document);
     opcode = MongoMessage.Update;
   }
-  
+
   int get messageLength {
-    return 16+4+_collectionFullName.byteLength()+4+_selector.byteLength()+_document.byteLength();
+    return 16 +
+        4 +
+        _collectionFullName.byteLength() +
+        4 +
+        _selector.byteLength() +
+        _document.byteLength();
   }
-  
+
   BsonBinary serialize() {
     BsonBinary buffer = new BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
@@ -36,7 +39,7 @@ class MongoUpdateMessage extends MongoMessage {
     buffer.offset = 0;
     return buffer;
   }
-  
+
   String toString() {
     return "MongoUpdateMessage($requestId, ${_collectionFullName.value}, ${_selector.value}, ${_document.value})";
   }

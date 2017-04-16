@@ -4,26 +4,25 @@ class MongoInsertMessage extends MongoMessage {
   BsonCString _collectionFullName;
   int flags;
   List<BsonMap> _documents;
-  MongoInsertMessage(String collectionFullName,
-                     List<Map> documents,
-                     [this.flags = 0]){
+  MongoInsertMessage(String collectionFullName, List<Map> documents,
+      [this.flags = 0]) {
     _collectionFullName = new BsonCString(collectionFullName);
     _documents = new List();
-    for (var document in documents){
+    for (var document in documents) {
       _documents.add(new BsonMap(document));
     }
     opcode = MongoMessage.Insert;
   }
-  
+
   int get messageLength {
     int docsSize = 0;
     for (var _doc in _documents) {
       docsSize += _doc.byteLength();
     }
-    int result = 16+4+_collectionFullName.byteLength()+docsSize;
+    int result = 16 + 4 + _collectionFullName.byteLength() + docsSize;
     return result;
   }
-  
+
   BsonBinary serialize() {
     BsonBinary buffer = new BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
@@ -35,7 +34,7 @@ class MongoInsertMessage extends MongoMessage {
     buffer.offset = 0;
     return buffer;
   }
-  
+
   String toString() {
     if (_documents.length == 1) {
       return "MongoInserMessage($requestId, ${_collectionFullName.value}, ${_documents[0].value})";
