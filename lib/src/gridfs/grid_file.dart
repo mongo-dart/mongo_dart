@@ -35,7 +35,7 @@ class GridFSFile {
     Completer completer = new Completer();
     // query for md5 at filemd5
     DbCommand dbCommand = new DbCommand(
-        fs.database,fs.bucketName,0,0,1,{"filemd5" : id}, {"md5" : 1});
+        fs.database, fs.bucketName, 0, 0, 1, {"filemd5": id}, {"md5": 1});
     fs.database.executeDbCommand(dbCommand).then((Map data) {
       if (data != null && data.containsKey("md5")) {
         completer.complete(md5 == data["md5"]);
@@ -64,13 +64,13 @@ class GridFSFile {
 
   Map get data {
     Map result = {
-      "_id" : id,
-      "filename" : filename,
-      "contentType" : contentType,
-      "length" : length,
-      "chunkSize" : chunkSize,
-      "uploadDate" : uploadDate,
-      "md5" : md5,
+      "_id": id,
+      "filename": filename,
+      "contentType": contentType,
+      "length": length,
+      "chunkSize": chunkSize,
+      "uploadDate": uploadDate,
+      "md5": md5,
     };
     extraData.forEach((String key, Object value) {
       result[key] = value;
@@ -81,7 +81,7 @@ class GridFSFile {
   set data(Map input) {
     extraData = new Map.from(input);
 
-    // Remove the known keys. Leaving the extraData. 
+    // Remove the known keys. Leaving the extraData.
     id = extraData.remove("_id");
     filename = extraData.remove("filename");
     contentType = extraData.remove("contentType");

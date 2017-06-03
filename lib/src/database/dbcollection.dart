@@ -16,7 +16,8 @@ class DbCollection {
       }
     }
     if (id != null) {
-      return update({"_id": id}, document, upsert:true, writeConcern: writeConcern);
+      return update({"_id": id}, document,
+          upsert: true, writeConcern: writeConcern);
     } else {
       if (createId) {
         document["_id"] = new ObjectId();
@@ -27,13 +28,17 @@ class DbCollection {
 
   Future<Map> insertAll(List<Map> documents, {WriteConcern writeConcern}) {
     return new Future.sync(() {
-      MongoInsertMessage insertMessage = new MongoInsertMessage(fullName(),documents);
+      MongoInsertMessage insertMessage =
+          new MongoInsertMessage(fullName(), documents);
       db.executeMessage(insertMessage, writeConcern);
       return db._getAcknowledgement(writeConcern: writeConcern);
     });
   }
 
-  Future<Map> update(selector, document, {bool upsert: false, bool multiUpdate: false, WriteConcern writeConcern}) {
+  Future<Map> update(selector, document,
+      {bool upsert: false,
+      bool multiUpdate: false,
+      WriteConcern writeConcern}) {
     return new Future.sync(() {
       int flags = 0;
       if (upsert) {
@@ -43,8 +48,8 @@ class DbCollection {
         flags |= 0x2;
       }
 
-      MongoUpdateMessage message = new MongoUpdateMessage(fullName(),
-          _selectorBuilder2Map(selector), document, flags);
+      MongoUpdateMessage message = new MongoUpdateMessage(
+          fullName(), _selectorBuilder2Map(selector), document, flags);
       db.executeMessage(message, writeConcern);
       return db._getAcknowledgement(writeConcern: writeConcern);
     });
@@ -74,38 +79,60 @@ class DbCollection {
    * By default, the returned document does not include the modifications made on the update.
    * To return the document with the modifications made on the update, use the returnNew option.
    */
-  Future<Map> findAndModify({query, sort, bool remove, update, bool returnNew, fields, bool upsert}) {
-    query  = _queryBuilder2Map(query);
-    sort   = _sortBuilder2Map(sort);
+  Future<Map> findAndModify(
+      {query, sort, bool remove, update, bool returnNew, fields, bool upsert}) {
+    query = _queryBuilder2Map(query);
+    sort = _sortBuilder2Map(sort);
     update = _updateBuilder2Map(update);
     fields = _fieldsBuilder2Map(fields);
-    return db.executeDbCommand(DbCommand.createFindAndModifyCommand(db, collectionName,
-        query: query, sort: sort, remove: remove, update: update, returnNew: returnNew, fields: fields, upsert: upsert)).then((reply) {
+    return db
+        .executeDbCommand(DbCommand.createFindAndModifyCommand(
+            db, collectionName,
+            query: query,
+            sort: sort,
+            remove: remove,
+            update: update,
+            returnNew: returnNew,
+            fields: fields,
+            upsert: upsert))
+        .then((reply) {
       return new Future.value(reply["value"]);
     });
   }
 
   Future<bool> drop() => db.dropCollection(collectionName);
 
-  Future<Map> remove([selector, WriteConcern writeConcern]) => db.removeFromCollection(collectionName, _selectorBuilder2Map(selector), writeConcern);
+  Future<Map> remove([selector, WriteConcern writeConcern]) =>
+      db.removeFromCollection(
+          collectionName, _selectorBuilder2Map(selector), writeConcern);
 
   Future<int> count([selector]) {
-    return db.executeDbCommand(DbCommand.createCountCommand(db,collectionName,_selectorBuilder2Map(selector))).then((reply){
+    return db
+        .executeDbCommand(DbCommand.createCountCommand(
+            db, collectionName, _selectorBuilder2Map(selector)))
+        .then((reply) {
       return new Future.value(reply["n"].toInt());
     });
   }
 
   Future<Map> distinct(String field, [selector]) =>
-    db.executeDbCommand(DbCommand.createDistinctCommand(db,collectionName,field,_selectorBuilder2Map(selector)));
+      db.executeDbCommand(DbCommand.createDistinctCommand(
+          db, collectionName, field, _selectorBuilder2Map(selector)));
 
-  Future<Map> aggregate(List pipeline){
-    var cmd = DbCommand.createAggregateCommand(db,collectionName,pipeline);
+  Future<Map> aggregate(List pipeline, {allowDiskUse: false}) {
+    var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline,
+        allowDiskUse: allowDiskUse);
     return db.executeDbCommand(cmd);
   }
-  Stream<Map> aggregateToStream(List pipeline, {Map cursorOptions: const {}}) {
-    return new AggregateCursor(db, this, pipeline, cursorOptions).stream;
+
+  Stream<Map> aggregateToStream(List pipeline,
+      {Map cursorOptions: const {}, bool allowDiskUse: false}) {
+    return new AggregateCursor(db, this, pipeline, cursorOptions, allowDiskUse)
+        .stream;
   }
-  Future<Map> insert(Map document, {WriteConcern writeConcern}) => insertAll([document], writeConcern: writeConcern);
+
+  Future<Map> insert(Map document, {WriteConcern writeConcern}) =>
+      insertAll([document], writeConcern: writeConcern);
 
   /// Analogue of mongodb shell method `db.collection.getIndexes()`
   /// Returns an array that holds a list of documents that identify and describe
@@ -114,10 +141,14 @@ class DbCollection {
   Future<List<Map>> getIndexes() {
     if (db._masterConnection.serverCapabilities.listIndexes) {
       return new ListIndexesCursor(db, this).stream.toList();
-    } else { /// Pre MongoDB v3.0 API
+    } else {
+      /// Pre MongoDB v3.0 API
       var selector = {};
       selector['ns'] = this.fullName();
-      return new Cursor(db, new DbCollection(db, DbCommand.SYSTEM_INDEX_COLLECTION), selector).stream.toList();
+      return new Cursor(db,
+              new DbCollection(db, DbCommand.SYSTEM_INDEX_COLLECTION), selector)
+          .stream
+          .toList();
     }
   }
 

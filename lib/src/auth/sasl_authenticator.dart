@@ -49,11 +49,10 @@ abstract class SaslAuthenticator extends Authenticator {
 
       currentStep = currentStep.transition(conversation, payloadAsBytes);
 
-
       var conversationId = result['conversationId'];
 
-      command = DbCommand.createSaslContinueCommand(
-          db.authSourceDb ?? db, conversationId, currentStep.bytesToSendToServer);
+      command = DbCommand.createSaslContinueCommand(db.authSourceDb ?? db,
+          conversationId, currentStep.bytesToSendToServer);
     }
   }
 }

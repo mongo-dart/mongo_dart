@@ -2,7 +2,13 @@ language: dart
 dart:
   - stable
   - dev
-#services: mongodb
+addons:
+  apt:
+    sources:
+    - mongodb-3.0-precise
+    packages:
+    - mongodb-org-server
+services: mongodb
 before_script:
   - sleep 15
 sudo: false

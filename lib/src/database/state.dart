@@ -1,4 +1,5 @@
 part of mongo_dart;
+
 class State {
   final _value;
   const State._internal(this._value);
