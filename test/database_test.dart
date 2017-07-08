@@ -800,8 +800,15 @@ Future testIndexCreation() async {
   res = await db.createIndex(collectionName, keys: {'a': -1, 'embedded.c': 1});
   expect(res['ok'], 1.0);
 
+  res = await db.createIndex(collectionName, keys: {
+    'a': -1
+  }, partialFilterExpression: {
+    "embedded.c": {r"$exists": true}
+  });
+  expect(res['ok'], 1.0);
+
   var indexes = await collection.getIndexes();
-  expect(indexes.length, 3);
+  expect(indexes.length, 4);
 
   res = await db.ensureIndex(collectionName, keys: {'a': -1, 'embedded.c': 1});
   expect(res['ok'], 1.0);

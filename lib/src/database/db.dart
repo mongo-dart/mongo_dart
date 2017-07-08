@@ -472,6 +472,7 @@ class Db {
       bool sparse,
       bool background,
       bool dropDups,
+      Map partialFilterExpression,
       String name}) {
     return new Future.sync(() async {
       var selector = {};
@@ -492,6 +493,9 @@ class Db {
       }
       if (dropDups == true) {
         selector['dropDups'] = true;
+      }
+      if (partialFilterExpression != null) {
+        selector['partialFilterExpression'] = partialFilterExpression;
       }
       if (name == null) {
         name = _createIndexName(keys);
@@ -528,6 +532,7 @@ class Db {
       bool sparse,
       bool background,
       bool dropDups,
+      Map partialFilterExpression,
       String name}) async {
     keys = _setKeys(key, keys);
     var indexInfos = await collection(collectionName).getIndexes();
@@ -546,6 +551,7 @@ class Db {
         sparse: sparse,
         background: background,
         dropDups: dropDups,
+        partialFilterExpression: partialFilterExpression,
         name: name);
 
     return createdIndex;
