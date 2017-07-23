@@ -136,7 +136,7 @@ class Cursor {
         } else if (tailable && !isDead && awaitData) {
           return new Future.value(null);
         } else if (tailable && !isDead) {
-          var completer = new Completer();
+          var completer = new Completer<Map>();
           new Timer(new Duration(milliseconds: tailableRetryInterval),
               () => completer.complete(null));
           return completer.future;

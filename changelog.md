@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.3.0
+
+- Strong mode compliance. Preparing for Dart 2.0
+
 ###0.2.8
 
 - Fix bad type in _Connection class

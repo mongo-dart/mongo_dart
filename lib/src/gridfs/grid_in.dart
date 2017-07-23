@@ -6,7 +6,6 @@ class GridIn extends GridFSFile {
   int currentChunkNumber = 0;
   int currentBufferPosition = 0;
   int totalBytes = 0;
-  ObjectId id;
   GridFS fs;
   String filename;
 
@@ -22,7 +21,7 @@ class GridIn extends GridFSFile {
     this.filename = filename;
   }
 
-  Future save([int chunkSize]) {
+  Future<Map> save([int chunkSize]) {
     if (chunkSize == null) {
       chunkSize = this.chunkSize;
     }

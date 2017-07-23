@@ -2,7 +2,6 @@
 
 [![Build Status](https://travis-ci.org/mongo-dart/mongo_dart.svg?branch=master)](https://travis-ci.org/mongo-dart/mongo_dart)
 
-[![Coverage Status](https://coveralls.io/repos/github/mongo-dart/mongo_dart/badge.svg?branch=master)](https://coveralls.io/github/mongo-dart/mongo_dart?branch=master)
 
 Server-side driver library for MongoDb implemented in pure Dart.
 

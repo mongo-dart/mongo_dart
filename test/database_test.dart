@@ -971,18 +971,18 @@ Future testSimpleQuery() async {
   expect(result.length, 4);
   expect(result[0]['my_field'], 6);
 
-  result = await collection.findOne(where.eq('my_field', 3));
-  expect(result, isNotNull);
-  expect(result['my_field'], 3);
-  id = result['_id'];
+  var result1 = await collection.findOne(where.eq('my_field', 3));
+  expect(result1, isNotNull);
+  expect(result1['my_field'], 3);
+  id = result1['_id'];
 
-  result = await collection.findOne(where.id(id));
-  expect(result, isNotNull);
-  expect(result['my_field'], 3);
+  var result2 = await collection.findOne(where.id(id));
+  expect(result2, isNotNull);
+  expect(result2['my_field'], 3);
 
   collection.remove(where.id(id));
-  result = await collection.findOne(where.eq('my_field', 3));
-  expect(result, isNull);
+  var result3 = await collection.findOne(where.eq('my_field', 3));
+  expect(result3, isNull);
 }
 
 Future testCompoundQuery() async {
@@ -1001,12 +1001,12 @@ Future testCompoundQuery() async {
       .toList();
   expect(result.length, 3);
 
-  result = await collection.findOne(where
+  var result1 = await collection.findOne(where
       .gt("my_field", 8)
       .or(where.lt('my_field', 2))
       .and(where.eq('str_field', 'str_1')));
-  expect(result, isNotNull);
-  expect(result['my_field'], 1);
+  expect(result1, isNotNull);
+  expect(result1['my_field'], 1);
 }
 
 Future testFieldLevelUpdateSimple() async {

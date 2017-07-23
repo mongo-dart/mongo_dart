@@ -24,7 +24,7 @@ class DbCommand extends MongoQueryMessage {
       bool returnNew,
       Map fields,
       bool upsert}) {
-    var command = {"findandmodify": collectionName};
+    Map command = {"findandmodify": collectionName};
     if (query != null) {
       command['query'] = query;
     }
