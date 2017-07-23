@@ -20,20 +20,20 @@ String getRandomCollectionName() {
   return name;
 }
 
-class MockConsumer<S> implements StreamConsumer<S> {
-  List<S> data = <S>[];
+class MockConsumer implements StreamConsumer<List<int>> {
+  List<int> data = [];
 
-  Future consume(Stream<S> stream) {
+  Future consume(Stream<List<int>> stream) {
     var completer = new Completer();
     stream.listen(_onData, onDone: () => completer.complete(null));
     return completer.future;
   }
 
-  _onData(chunk) {
+  _onData(List<int> chunk) {
     data.addAll(chunk);
   }
 
-  Future addStream(Stream<S> stream) {
+  Future addStream(Stream<List<int>> stream) {
     var completer = new Completer();
     stream.listen(_onData, onDone: () => completer.complete(null));
     return completer.future;
@@ -115,7 +115,7 @@ Future<List<int>> getInitialState(GridFS gridFS) {
   List<Future<int>> futures = new List();
   futures.add(gridFS.files.count());
   futures.add(gridFS.chunks.count());
-  Future.wait(futures).then((List<double> futureResults) {
+  Future.wait(futures).then((List<int> futureResults) {
     List<int> result = new List<int>(2);
     result[0] = futureResults[0].toInt();
     result[1] = futureResults[1].toInt();
