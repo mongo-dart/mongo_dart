@@ -136,5 +136,3 @@ main() async {
 
 - Additional [examples](https://github.com/vadimtsushko/mongo_dart/tree/master/example) and [tests](https://github.com/vadimtsushko/mongo_dart/tree/master/test)
 
-
-- Checkout [redstone_mapper_mongo](https://github.com/redstone-dart/redstone/wiki/redstone_mapper_mongo) for easy transformations between Mongo Dart Maps <==> Objects <==> JSON Strings, and integrations with the [redstone](https://github.com/luizmineo/redstone.dart) server framework.
