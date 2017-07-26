@@ -1,5 +1,6 @@
 # Mongo-dart - MongoDB driver for Dart programming language.
 
+[![Pub](https://img.shields.io/pub/v/mongo_dart.svg)](https://pub.dartlang.org/packages/mongo_dart)
 [![Build Status](https://travis-ci.org/mongo-dart/mongo_dart.svg?branch=master)](https://travis-ci.org/mongo-dart/mongo_dart)
 
 
@@ -127,7 +128,7 @@ main() async {
 
 ### See also
 
-- [API Doc](http://www.dartdocs.org/documentation/mongo_dart/0.1.39)
+- [API Doc](http://www.dartdocs.org/documentation/mongo_dart/latest)
 
 - [Feature check list](https://github.com/vadimtsushko/mongo_dart/blob/master/doc/feature_checklist.md)
 
