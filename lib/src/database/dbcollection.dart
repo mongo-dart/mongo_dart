@@ -102,7 +102,7 @@ class DbCollection {
 
   Future<bool> drop() => db.dropCollection(collectionName);
 
-  Future<Map> remove([selector, WriteConcern writeConcern]) =>
+  Future<Map> remove(selector, {WriteConcern writeConcern}) =>
       db.removeFromCollection(
           collectionName, _selectorBuilder2Map(selector), writeConcern);
 

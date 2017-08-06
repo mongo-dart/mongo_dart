@@ -14,7 +14,7 @@ main() async {
   await db.open();
   await db.authenticate('test', 'test');
   DbCollection collection = db.collection('testAuthenticationWithUri');
-  await collection.remove();
+  await collection.remove({});
   await collection.insert({"a": 1});
   await collection.insert({"a": 2});
   await collection.insert({"a": 3});

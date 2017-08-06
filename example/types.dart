@@ -4,7 +4,7 @@ main() async {
   Db db = new Db("mongodb://127.0.0.1/mongo_dart-blog");
   await db.open();
   DbCollection collection = db.collection('test-types');
-  await collection.remove();
+  await collection.remove({});
   await collection.insert({
     'array': [1, 2, 3],
     'string': 'hello',

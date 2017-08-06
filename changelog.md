@@ -1,5 +1,15 @@
 #Recent change notes
 
+### 0.4.0
+- Changed the signature of `DbCollection.remove`; its `selector` parameter is now required,
+while `writeConcern` is now a named optional parameter.
+
+```dart
+Future remove(selector, {WriteConcern writeConcern});
+```
+
+Resolves [#73](https://github.com/mongo-dart/mongo_dart/issues/73).
+
 ###0.3.0
 
 - Strong mode compliance. Preparing for Dart 2.0

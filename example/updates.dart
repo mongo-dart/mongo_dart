@@ -5,7 +5,7 @@ main() async {
   await db.open();
   ///// Simple update
   DbCollection coll = db.collection('collection-for-save');
-  await coll.remove();
+  await coll.remove({});
   List toInsert = [
     {"name": "a", "value": 10},
     {"name": "b", "value": 20},
@@ -22,7 +22,7 @@ main() async {
 
   /////// Field level update
   coll = db.collection('collection-for-save');
-  await coll.remove();
+  await coll.remove({});
   toInsert = [
     {"name": "a", "value": 10},
     {"name": "b", "value": 20},
@@ -39,7 +39,7 @@ main() async {
   //// Field level increment
 
   coll = db.collection('collection-for-save');
-  await coll.remove();
+  await coll.remove({});
   toInsert = [
     {"name": "a", "value": 10},
     {"name": "b", "value": 20},
