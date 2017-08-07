@@ -17,6 +17,7 @@ dependencies:
   mongo_dart_query: '^0.3.0'
   collection: ">=1.4.0 <2.0.0"
   path: ">=1.3.0 <2.0.0"
+  pool: ">=1.0.0 <2.0.0"
   uuid: "^0.5.0"
 dev_dependencies:
   test: ">=0.12.0"
