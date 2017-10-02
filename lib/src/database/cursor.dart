@@ -157,7 +157,7 @@ class Cursor {
     if (cursorId != 0) {
       MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);
       cursorId = 0;
-      db.queryMessage(msg).catchError((e) => null);
+      db.executeMessage(msg, WriteConcern.UNACKNOWLEDGED);
     }
     return new Future.value(null);
   }
