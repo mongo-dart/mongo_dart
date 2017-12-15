@@ -119,9 +119,10 @@ class DbCollection {
       db.executeDbCommand(DbCommand.createDistinctCommand(
           db, collectionName, field, _selectorBuilder2Map(selector)));
 
-  Future<Map> aggregate(List pipeline, {allowDiskUse: false}) {
+  Future<Map> aggregate(List pipeline, {allowDiskUse: false,
+    Map<String, dynamic> cursor}) {
     var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline,
-        allowDiskUse: allowDiskUse);
+        allowDiskUse: allowDiskUse, cursor: cursor);
     return db.executeDbCommand(cmd);
   }
 

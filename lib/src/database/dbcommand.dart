@@ -157,8 +157,9 @@ class DbCommand extends MongoQueryMessage {
 
   static DbCommand createAggregateCommand(
       Db db, String collectionName, List pipeline,
-      {bool allowDiskUse: false}) {
-    var query = {'aggregate': collectionName, 'pipeline': pipeline};
+      {bool allowDiskUse: false, Map<String, dynamic> cursor}) {
+    var query = {'aggregate': collectionName, 'pipeline': pipeline,
+    'cursor': cursor ?? {}};
 
     if (db._masterConnection.serverCapabilities.aggregationCursor) {
       query["allowDiskUse"] = allowDiskUse;
