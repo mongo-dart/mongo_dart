@@ -60,7 +60,11 @@ class _Connection {
           .listen(_receiveReply, onError: (e) {
         _log.severe("Socket error ${e}");
         //completer.completeError(e);
-      }, onDone: () {
+        if (!_closed) {
+          _onSocketError();
+        }
+      }, cancelOnError: true,
+         onDone: () {
         if (!_closed) {
           _onSocketError();
         }
