@@ -23,14 +23,12 @@ class PacketConverter {
 
     while (hasMoreData) {
       hasMoreData = false;
-
       if (headerMode) {
         if (bytesAvailable() >= 4) {
           handleHeader();
         }
       }
-
-      if (! headerMode) {
+      if (!headerMode) {
         if (bytesAvailable() >= messageBuffer.length - 4) {
           handleBody();
           if (bytesAvailable() >= 4) {
