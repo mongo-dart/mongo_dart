@@ -96,5 +96,24 @@ main() {
       expect(converter.packets.length, 1);
       expect(converter.bytesAvailable(), 2);
     });
+    test('Many message in one packet', () {
+      var packet = [7, 0, 0, 0, 0, 1, 2, 7, 0, 0, 0, 0, 1, 2];
+      for (int i = 0; i < 8000; i++) {
+        packet.add(7);
+        packet.add(0);
+        packet.add(0);
+        packet.add(0);
+        packet.add(0);
+        packet.add(1);
+        packet.add(2);
+      }
+
+      var converter = new PacketConverter();
+      converter.addPacket(packet);
+      expect(converter.messages.length, 8002);
+      expect(converter.messages.first, [7, 0, 0, 0, 0, 1, 2]);
+      expect(converter.packets.length, 0);
+      expect(converter.bytesAvailable(), 0);
+    });
   });
 }

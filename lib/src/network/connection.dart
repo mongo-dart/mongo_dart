@@ -57,14 +57,20 @@ class _Connection {
       socket = _socket;
       _repliesSubscription = socket
           .transform(new MongoMessageHandler().transformer)
-          .listen(_receiveReply, onError: (e) {
-        _log.severe("Socket error ${e}");
-        //completer.completeError(e);
-      }, onDone: () {
-        if (!_closed) {
-          _onSocketError();
-        }
-      });
+          .listen(_receiveReply,
+              onError: (e, st) {
+                _log.severe("Socket error ${e} ${st}");
+                //completer.completeError(e);
+                if (!_closed) {
+                  _onSocketError();
+                }
+              },
+              cancelOnError: true,
+              onDone: () {
+                if (!_closed) {
+                  _onSocketError();
+                }
+              });
       connected = true;
       completer.complete(true);
     }).catchError((err) {

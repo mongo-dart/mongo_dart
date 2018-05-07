@@ -15,38 +15,48 @@ class PacketConverter {
 
   addPacket(List<int> packet) {
     packets.addLast(packet);
-    //print('addPacket to $this');
-    if (headerMode) {
-      handleHeader();
-    } else {
-      handleBody();
+    handleHeaderAndBody();
+  }
+
+  handleHeaderAndBody() {
+    bool hasMoreData = true;
+
+    while (hasMoreData) {
+      hasMoreData = false;
+      if (headerMode) {
+        if (bytesAvailable() >= 4) {
+          handleHeader();
+        }
+      }
+      if (!headerMode) {
+        if (bytesAvailable() >= messageBuffer.length - 4) {
+          handleBody();
+          if (bytesAvailable() >= 4) {
+            hasMoreData = true;
+          }
+        }
+      }
     }
   }
 
   handleHeader() {
-    if (bytesAvailable() >= 4) {
-      headerMode = false;
-      lengthBuffer.rewind();
-      readIntoBuffer(lengthBuffer.byteList, 0);
-      int len = lengthBuffer.readInt32();
-      if (len > MAX_DOC_SIZE) {
-        throw new MongoDartError(
-            'Message length $len over maximum document size');
-      }
-      messageBuffer = new List<int>(len);
-      handleBody();
+    headerMode = false;
+    lengthBuffer.rewind();
+    readIntoBuffer(lengthBuffer.byteList, 0);
+    int len = lengthBuffer.readInt32();
+    if (len > MAX_DOC_SIZE) {
+      throw new MongoDartError(
+          'Message length $len over maximum document size');
     }
+    messageBuffer = new List<int>(len);
   }
 
   handleBody() {
-    if (bytesAvailable() >= messageBuffer.length - 4) {
-      headerMode = true;
-      messageBuffer.setRange(0, 4, lengthBuffer.byteList);
-      readIntoBuffer(messageBuffer, 4);
-      messagesConverted++;
-      messages.addLast(messageBuffer);
-      handleHeader();
-    }
+    headerMode = true;
+    messageBuffer.setRange(0, 4, lengthBuffer.byteList);
+    readIntoBuffer(messageBuffer, 4);
+    messagesConverted++;
+    messages.addLast(messageBuffer);
   }
 
   /// Length of all packets with current read position on first packet subtracted
