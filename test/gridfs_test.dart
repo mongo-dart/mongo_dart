@@ -43,8 +43,8 @@ class MockConsumer implements StreamConsumer<List<int>> {
 }
 
 clearFSCollections(GridFS gridFS) {
-  gridFS.files.remove({});
-  gridFS.chunks.remove({});
+  gridFS.files.remove(<String, dynamic>{});
+  gridFS.chunks.remove(<String, dynamic>{});
 }
 
 Future testSmall() async {
@@ -111,7 +111,7 @@ Future tesSomeChunks() async {
 }
 
 Future<List<int>> getInitialState(GridFS gridFS) {
-  Completer completer = new Completer();
+  Completer<List<int>> completer = new Completer();
   List<Future<int>> futures = new List();
   futures.add(gridFS.files.count());
   futures.add(gridFS.chunks.count());
@@ -124,7 +124,8 @@ Future<List<int>> getInitialState(GridFS gridFS) {
   return completer.future;
 }
 
-Future testInOut(List<int> data, GridFS gridFS, [Map extraData = null]) async {
+Future testInOut(List<int> data, GridFS gridFS,
+    [Map<String, dynamic> extraData = null]) async {
   var consumer = new MockConsumer();
   var out = new IOSink(consumer);
   await getInitialState(gridFS);
@@ -201,7 +202,7 @@ Future testExtraData() {
   List<int> data = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
   GridFS gridFS = new GridFS(db, collectionName);
   clearFSCollections(gridFS);
-  Map extraData = {
+  Map<String, dynamic> extraData = {
     "test": [1, 2, 3],
     "extraData": "Test",
     "map": {"a": 1}

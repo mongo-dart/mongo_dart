@@ -17,13 +17,13 @@ class GridFS {
     // TODO(tsander): Ensure index.
   }
 
-  Stream<Map> getFileList(SelectorBuilder selectorBuilder) {
+  Stream<Map<String, dynamic>> getFileList(SelectorBuilder selectorBuilder) {
     return files.find(selectorBuilder.sortBy("filename", descending: true));
   }
 
-  Future<GridOut> findOne(dynamic selector) {
-    Completer completer = new Completer();
-    files.findOne(selector).then((Map file) {
+  Future<GridOut> findOne(selector) {
+    Completer<GridOut> completer = new Completer();
+    files.findOne(selector).then((file) {
       GridOut result = null;
       if (file != null) {
         result = new GridOut(file);

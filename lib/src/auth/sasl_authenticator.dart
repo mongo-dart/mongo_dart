@@ -35,7 +35,7 @@ abstract class SaslAuthenticator extends Authenticator {
         db.authSourceDb ?? db, mechanism.name, currentStep.bytesToSendToServer);
 
     while (true) {
-      Map result;
+      Map<String, dynamic> result;
 
       result = await db.executeDbCommand(command, connection: connection);
 

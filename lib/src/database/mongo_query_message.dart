@@ -18,8 +18,13 @@ class MongoQueryMessage extends MongoMessage {
   BsonMap _fields;
   BsonCString get collectionNameBson => _collectionFullName;
 
-  MongoQueryMessage(String collectionFullName, this.flags, this.numberToSkip,
-      this.numberToReturn, Map query, Map fields) {
+  MongoQueryMessage(
+      String collectionFullName,
+      this.flags,
+      this.numberToSkip,
+      this.numberToReturn,
+      Map<String, dynamic> query,
+      Map<String, dynamic> fields) {
     _collectionFullName = new BsonCString(collectionFullName);
     _query = new BsonMap(query);
     if (fields != null) {

@@ -189,7 +189,7 @@ Future testSaveWithIntegerId() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [
+  List<Map<String, dynamic>> toInsert = [
     {"_id": 1, "name": "a", "value": 10},
     {"_id": 2, "name": "b", "value": 20},
     {"_id": 3, "name": "c", "value": 30},
@@ -220,7 +220,7 @@ Future testSaveWithObjectId() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [
+  List<Map<String, dynamic>> toInsert = [
     {"name": "a", "value": 10},
     {"name": "b", "value": 20},
     {"name": "c", "value": 30},
@@ -289,7 +289,7 @@ Future testAggregate() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [];
+  List<Map<String, dynamic>> toInsert = [];
 
   // Avg 1 with 1 rating
   toInsert.add({
@@ -391,7 +391,7 @@ Future testAggregateToStream() async {
     }
   }
 
-  List toInsert = [];
+  List<Map<String, dynamic>> toInsert = [];
 
   // Avg 1 with 1 rating
   toInsert.add({
@@ -581,7 +581,7 @@ Future testLimitWithSortByAndSkip() async {
 }
 
 Future insertManyDocuments(DbCollection collection, int numberOfRecords) async {
-  List toInsert = [];
+  List<Map<String, dynamic>> toInsert = [];
   for (int n = 0; n < numberOfRecords; n++) {
     toInsert.add({"a": n});
   }
@@ -785,7 +785,7 @@ Future testIndexCreation() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [];
+  List<Map<String, dynamic>> toInsert = [];
   for (int n = 0; n < 6; n++) {
     toInsert.add({
       'a': n,
@@ -818,7 +818,7 @@ Future testEnsureIndexWithIndexCreation() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [];
+  List<Map<String, dynamic>> toInsert = [];
   for (int n = 0; n < 6; n++) {
     toInsert.add({
       'a': n,
@@ -838,7 +838,7 @@ Future testIndexCreationErrorHandling() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [];
+  List<Map<String, dynamic>> toInsert = [];
   for (int n = 0; n < 6; n++) {
     toInsert.add({'a': n});
   }
@@ -959,7 +959,7 @@ Future testSimpleQuery() async {
   var collection = db.collection(collectionName);
 
   ObjectId id;
-  List toInsert = [];
+  List<Map<String, dynamic>> toInsert = [];
   for (var n = 0; n < 10; n++) {
     toInsert.add({"my_field": n, "str_field": "str_$n"});
   }
@@ -989,7 +989,7 @@ Future testCompoundQuery() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  List toInsert = [];
+  List<Map<String, dynamic>> toInsert = [];
   for (var n = 0; n < 10; n++) {
     toInsert.add({"my_field": n, "str_field": "str_$n"});
   }

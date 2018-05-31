@@ -16,7 +16,7 @@ class ClientFirst extends SaslStep {
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
     String serverFirstMessage = UTF8.decode(bytesReceivedFromServer);
 
-    Map decodedMessage = parsePayload(serverFirstMessage);
+    Map<String, dynamic> decodedMessage = parsePayload(serverFirstMessage);
 
     String r = decodedMessage['r'];
     if (r == null || !r.startsWith(rPrefix)) {
@@ -71,7 +71,7 @@ class ClientFirst extends SaslStep {
   }
 
   static Uint8List xor(Uint8List a, Uint8List b) {
-    var result = [];
+    var result = <int>[];
 
     if (a.length > b.length) {
       for (var i = 0; i < b.length; i++) {
@@ -118,7 +118,7 @@ class ClientLast extends SaslStep {
   @override
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
-    Map decodedMessage = parsePayload(UTF8.decode(bytesReceivedFromServer));
+    Map<String, dynamic> decodedMessage = parsePayload(UTF8.decode(bytesReceivedFromServer));
     var serverSignature = BASE64.decode(decodedMessage['v']);
 
     if (!const IterableEquality().equals(serverSignature64, serverSignature)) {
