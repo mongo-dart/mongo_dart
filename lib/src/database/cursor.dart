@@ -193,7 +193,7 @@ class CommandCursor extends Cursor {
       if (cursorMap != null) {
         cursorId = cursorMap['id'];
         List firstBatch = cursorMap['firstBatch'];
-        items.addAll(firstBatch.cast());
+        items.addAll(List.from(firstBatch.cast()));
       }
     } else {
       super.getCursorData(replyMessage);
