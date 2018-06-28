@@ -6,7 +6,8 @@ class DbCollection {
   DbCollection(this.db, this.collectionName) {}
   String fullName() => "${db.databaseName}.$collectionName";
 
-  Future<Map> save(Map document, {WriteConcern writeConcern}) {
+  Future<Map<String, dynamic>> save(Map<String, dynamic> document,
+      {WriteConcern writeConcern}) {
     var id;
     bool createId = false;
     if (document.containsKey("_id")) {
@@ -26,7 +27,8 @@ class DbCollection {
     }
   }
 
-  Future<Map> insertAll(List<Map> documents, {WriteConcern writeConcern}) {
+  Future<Map<String, dynamic>> insertAll(List<Map<String, dynamic>> documents,
+      {WriteConcern writeConcern}) {
     return new Future.sync(() {
       MongoInsertMessage insertMessage =
           new MongoInsertMessage(fullName(), documents);
@@ -35,7 +37,7 @@ class DbCollection {
     });
   }
 
-  Future<Map> update(selector, document,
+  Future<Map<String, dynamic>> update(selector, document,
       {bool upsert: false,
       bool multiUpdate: false,
       WriteConcern writeConcern}) {
@@ -64,12 +66,14 @@ class DbCollection {
   * Here our selector will match every document where the last_name attribute is 'Smith.'
   *
   */
-  Stream<Map> find([selector]) => new Cursor(db, this, selector).stream;
-  Cursor createCursor([selector]) => new Cursor(db, this, selector);
+  Stream<Map<String, dynamic>> find([selector]) =>
+      new Cursor(db, this, selector).stream;
+  Cursor createCursor([selector]) =>
+      new Cursor(db, this, selector);
 
-  Future<Map> findOne([selector]) {
+  Future<Map<String, dynamic>> findOne([selector]) {
     Cursor cursor = new Cursor(db, this, selector);
-    Future<Map> result = cursor.nextObject();
+    Future<Map<String, dynamic>> result = cursor.nextObject();
     cursor.close();
     return result;
   }
@@ -79,7 +83,7 @@ class DbCollection {
    * By default, the returned document does not include the modifications made on the update.
    * To return the document with the modifications made on the update, use the returnNew option.
    */
-  Future<Map> findAndModify(
+  Future<Map<String, dynamic>> findAndModify(
       {query, sort, bool remove, update, bool returnNew, fields, bool upsert}) {
     query = _queryBuilder2Map(query);
     sort = _sortBuilder2Map(sort);
@@ -102,7 +106,7 @@ class DbCollection {
 
   Future<bool> drop() => db.dropCollection(collectionName);
 
-  Future<Map> remove(selector, {WriteConcern writeConcern}) =>
+  Future<Map<String, dynamic>> remove(selector, {WriteConcern writeConcern}) =>
       db.removeFromCollection(
           collectionName, _selectorBuilder2Map(selector), writeConcern);
 
@@ -115,35 +119,37 @@ class DbCollection {
     });
   }
 
-  Future<Map> distinct(String field, [selector]) =>
+  Future<Map<String, dynamic>> distinct(String field, [selector]) =>
       db.executeDbCommand(DbCommand.createDistinctCommand(
           db, collectionName, field, _selectorBuilder2Map(selector)));
 
-  Future<Map> aggregate(List pipeline, {allowDiskUse: false}) {
+  Future<Map<String, dynamic>> aggregate(List pipeline, {allowDiskUse: false}) {
     var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline,
         allowDiskUse: allowDiskUse);
     return db.executeDbCommand(cmd);
   }
 
-  Stream<Map> aggregateToStream(List pipeline,
-      {Map cursorOptions: const {}, bool allowDiskUse: false}) {
+  Stream<Map<String, dynamic>> aggregateToStream(List pipeline,
+      {Map<String, dynamic> cursorOptions: const {},
+      bool allowDiskUse: false}) {
     return new AggregateCursor(db, this, pipeline, cursorOptions, allowDiskUse)
         .stream;
   }
 
-  Future<Map> insert(Map document, {WriteConcern writeConcern}) =>
+  Future<Map<String, dynamic>> insert(Map<String, dynamic> document,
+          {WriteConcern writeConcern}) =>
       insertAll([document], writeConcern: writeConcern);
 
   /// Analogue of mongodb shell method `db.collection.getIndexes()`
   /// Returns an array that holds a list of documents that identify and describe
   /// the existing indexes on the collection. You must call `getIndexes()`
   ///  on a collection
-  Future<List<Map>> getIndexes() {
+  Future<List<Map<String, dynamic>>> getIndexes() {
     if (db._masterConnection.serverCapabilities.listIndexes) {
       return new ListIndexesCursor(db, this).stream.toList();
     } else {
       /// Pre MongoDB v3.0 API
-      var selector = {};
+      var selector = <String, dynamic>{};
       selector['ns'] = this.fullName();
       return new Cursor(db,
               new DbCollection(db, DbCommand.SYSTEM_INDEX_COLLECTION), selector)
@@ -152,9 +158,9 @@ class DbCollection {
     }
   }
 
-  Map _selectorBuilder2Map(selector) {
+  Map<String, dynamic> _selectorBuilder2Map(selector) {
     if (selector == null) {
-      return {};
+      return <String, dynamic>{};
     }
     if (selector is SelectorBuilder) {
       return selector.map['\$query'];
@@ -162,28 +168,28 @@ class DbCollection {
     return selector;
   }
 
-  Map _queryBuilder2Map(query) {
+  Map<String, dynamic> _queryBuilder2Map(query) {
     if (query is SelectorBuilder) {
       query = query.map['\$query'];
     }
     return query;
   }
 
-  Map _sortBuilder2Map(query) {
+  Map<String, dynamic> _sortBuilder2Map(query) {
     if (query is SelectorBuilder) {
       query = query.map['orderby'];
     }
     return query;
   }
 
-  Map _fieldsBuilder2Map(fields) {
+  Map<String, dynamic> _fieldsBuilder2Map(fields) {
     if (fields is SelectorBuilder) {
       return fields.paramFields;
     }
     return fields;
   }
 
-  Map _updateBuilder2Map(update) {
+  Map<String, dynamic> _updateBuilder2Map(update) {
     if (update is ModifierBuilder) {
       update = update.map;
     }

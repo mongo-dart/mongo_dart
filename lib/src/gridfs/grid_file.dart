@@ -12,15 +12,15 @@ class GridFSFile {
   StringBuffer fullContent;
   String md5;
 
-  GridFSFile([Map data = const {}]) {
+  GridFSFile([Map<String, dynamic> data = const {}]) {
     this.data = data;
   }
 
-  Future<Map> save() {
+  Future<Map<String, dynamic>> save() {
     if (fs == null) {
       throw new MongoDartError('Need fs');
     }
-    Map tempData = data;
+    Map<String, dynamic> tempData = data;
     return fs.files.insert(tempData);
   }
 
@@ -36,7 +36,7 @@ class GridFSFile {
     // query for md5 at filemd5
     DbCommand dbCommand = new DbCommand(
         fs.database, fs.bucketName, 0, 0, 1, {"filemd5": id}, {"md5": 1});
-    fs.database.executeDbCommand(dbCommand).then((Map data) {
+    fs.database.executeDbCommand(dbCommand).then((data) {
       if (data != null && data.containsKey("md5")) {
         completer.complete(md5 == data["md5"]);
       } else {
@@ -54,16 +54,16 @@ class GridFSFile {
     return extraData["aliases"];
   }
 
-  Map get metaData {
+  Map<String, dynamic> get metaData {
     return extraData["metadata"];
   }
 
-  set metaData(Map metaData) {
+  set metaData(Map<String, dynamic> metaData) {
     extraData["metadata"] = metaData;
   }
 
-  Map get data {
-    Map result = {
+  Map<String, dynamic> get data {
+    Map<String, dynamic> result = {
       "_id": id,
       "filename": filename,
       "contentType": contentType,
@@ -78,7 +78,7 @@ class GridFSFile {
     return result;
   }
 
-  set data(Map input) {
+  set data(Map<String, dynamic> input) {
     extraData = new Map.from(input);
 
     // Remove the known keys. Leaving the extraData.

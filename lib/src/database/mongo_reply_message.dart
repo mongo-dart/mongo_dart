@@ -12,7 +12,7 @@ class MongoReplyMessage extends MongoMessage {
   int cursorId = -1; // 64bit integer
   int startingFrom;
   int numberReturned = -1;
-  List documents;
+  List<Map<String, dynamic>> documents;
 
   deserialize(BsonBinary buffer) {
     readMessageHeaderFrom(buffer);

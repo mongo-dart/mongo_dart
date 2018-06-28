@@ -6,7 +6,7 @@ class MongoRemoveMessage extends MongoMessage {
   BsonMap _selector;
 
   MongoRemoveMessage(String collectionFullName,
-      [Map selector = const {}, this.flags = 0]) {
+      [Map<String, dynamic> selector = const {}, this.flags = 0]) {
     _collectionFullName = new BsonCString(collectionFullName);
     _selector = new BsonMap(selector);
     opcode = MongoMessage.Delete;

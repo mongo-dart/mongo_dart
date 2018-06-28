@@ -9,7 +9,7 @@ class _ServerCapabilities {
   bool listIndexes = false;
   int maxNumberOfDocsInBatch = 1000;
 
-  getParamsFromIstMaster(Map isMaster) {
+  getParamsFromIstMaster(Map<String, dynamic> isMaster) {
     if (isMaster.containsKey('maxWireVersion')) {
       maxWireVersion = isMaster['maxWireVersion'];
     }
@@ -51,7 +51,7 @@ class _Connection {
   }
 
   Future<bool> connect() {
-    Completer completer = new Completer();
+    Completer<bool> completer = new Completer();
     Socket.connect(serverConfig.host, serverConfig.port).then((Socket _socket) {
       // Socket connected.
       socket = _socket;
@@ -95,7 +95,7 @@ class _Connection {
   }
 
   Future<MongoReplyMessage> query(MongoMessage queryMessage) {
-    Completer completer = new Completer();
+    Completer<MongoReplyMessage> completer = new Completer();
     if (!_closed) {
       _replyCompleters[queryMessage.requestId] = completer;
       _pendingQueries.add(queryMessage.requestId);

@@ -1,21 +1,21 @@
 part of mongo_dart;
 
-typedef void MonadicBlock(Map value);
+typedef void MonadicBlock(Map<String, dynamic> value);
 
 class Cursor {
   final _log = new Logger('Cursor');
   State state = State.INIT;
   int cursorId = 0;
   Db db;
-  Queue items;
+  Queue<Map<String, dynamic>> items;
   DbCollection collection;
-  Map selector;
-  Map fields;
+  Map<String, dynamic> selector;
+  Map<String, dynamic> fields;
   int skip = 0;
   int limit = 0;
   int _returnedCount = 0;
-  Map sort;
-  Map hint;
+  Map<String, dynamic> sort;
+  Map<String, dynamic> hint;
   MonadicBlock eachCallback;
   var eachComplete;
   bool explain;
@@ -76,7 +76,7 @@ class Cursor {
       limit = selectorBuilderOrMap.paramLimit;
       skip = selectorBuilderOrMap.paramSkip;
     } else if (selectorBuilderOrMap is Map) {
-      selector = selectorBuilderOrMap;
+      selector = selectorBuilderOrMap as Map<String, dynamic>;
     } else {
       throw new ArgumentError(
           'Expected SelectorBuilder or Map, got $selectorBuilderOrMap');
@@ -97,7 +97,7 @@ class Cursor {
     return new MongoGetMoreMessage(collection.fullName(), cursorId);
   }
 
-  Map _getNextItem() {
+  Map<String, dynamic> _getNextItem() {
     _returnedCount++;
     return items.removeFirst();
   }
@@ -107,7 +107,7 @@ class Cursor {
     items.addAll(replyMessage.documents);
   }
 
-  Future<Map> nextObject() {
+  Future<Map<String, dynamic>> nextObject() {
     if (state == State.INIT) {
       MongoQueryMessage qm = generateQueryMessage();
       return db.queryMessage(qm).then((replyMessage) {
@@ -120,7 +120,7 @@ class Cursor {
         }
       });
     } else if (state == State.OPEN && limit > 0 && _returnedCount == limit) {
-      return this.close();
+      return close();
     } else if (state == State.OPEN && items.length > 0) {
       return new Future.value(_getNextItem());
     } else if (state == State.OPEN && cursorId > 0) {
@@ -136,7 +136,7 @@ class Cursor {
         } else if (tailable && !isDead && awaitData) {
           return new Future.value(null);
         } else if (tailable && !isDead) {
-          var completer = new Completer<Map>();
+          var completer = new Completer<Map<String, dynamic>>();
           new Timer(new Duration(milliseconds: tailableRetryInterval),
               () => completer.complete(null));
           return completer.future;
@@ -151,7 +151,7 @@ class Cursor {
     }
   }
 
-  Future close() {
+  Future<Null> close() {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
     state = State.CLOSED;
     if (cursorId != 0) {
@@ -168,8 +168,8 @@ class Cursor {
 //    return new CursorStream(controller.stream, this);
 //  }
 
-  Stream<Map> get stream async* {
-    Map doc = await nextObject();
+  Stream<Map<String, dynamic>> get stream async* {
+    Map<String, dynamic> doc = await nextObject();
     while (doc != null) {
       yield doc;
       doc = await nextObject();
@@ -192,7 +192,8 @@ class CommandCursor extends Cursor {
       var cursorMap = replyMessage.documents.first['cursor'];
       if (cursorMap != null) {
         cursorId = cursorMap['id'];
-        items.addAll(cursorMap['firstBatch']);
+        List firstBatch = cursorMap['firstBatch'];
+        items.addAll(new List.from(firstBatch));
       }
     } else {
       super.getCursorData(replyMessage);
@@ -202,11 +203,11 @@ class CommandCursor extends Cursor {
 
 class AggregateCursor extends CommandCursor {
   List pipeline;
-  Map cursorOptions;
+  Map<String, dynamic> cursorOptions;
   bool allowDiskUse;
   AggregateCursor(
       db, collection, this.pipeline, this.cursorOptions, this.allowDiskUse)
-      : super(db, collection, {});
+      : super(db, collection, <String, dynamic>{});
   @override
   MongoQueryMessage generateQueryMessage() {
     return new DbCommand(
@@ -226,7 +227,7 @@ class AggregateCursor extends CommandCursor {
 }
 
 class ListCollectionsCursor extends CommandCursor {
-  ListCollectionsCursor(Db db, selector) : super(db, null, selector);
+  ListCollectionsCursor(db, selector) : super(db, null, selector);
   @override
   MongoQueryMessage generateQueryMessage() {
     return new DbCommand(
@@ -242,7 +243,7 @@ class ListCollectionsCursor extends CommandCursor {
 
 class ListIndexesCursor extends CommandCursor {
   ListIndexesCursor(Db db, DbCollection collection)
-      : super(db, collection, const {});
+      : super(db, collection, <String, dynamic>{});
   @override
   MongoQueryMessage generateQueryMessage() {
     return new DbCommand(

@@ -9,22 +9,28 @@ class DbCommand extends MongoQueryMessage {
   static final SYSTEM_COMMAND_COLLECTION = "\$cmd";
 
   Db db;
-  DbCommand(this.db, collectionName, flags, numberToSkip, numberToReturn, query,
-      fields)
+  DbCommand(
+      this.db,
+      String collectionName,
+      int flags,
+      int numberToSkip,
+      int numberToReturn,
+      Map<String, dynamic> query,
+      Map<String, dynamic> fields)
       : super(collectionName, flags, numberToSkip, numberToReturn, query,
             fields) {
     _collectionFullName = new BsonCString("${db.databaseName}.$collectionName");
   }
 
   static DbCommand createFindAndModifyCommand(Db db, String collectionName,
-      {Map query,
-      Map sort,
+      {Map<String, dynamic> query,
+      Map<String, dynamic> sort,
       bool remove,
-      Map update,
+      Map<String, dynamic> update,
       bool returnNew,
-      Map fields,
+      Map<String, dynamic> fields,
       bool upsert}) {
-    Map command = {"findandmodify": collectionName};
+    Map<String, dynamic> command = {"findandmodify": collectionName};
     if (query != null) {
       command['query'] = query;
     }
@@ -72,17 +78,17 @@ class DbCommand extends MongoQueryMessage {
         null);
   }
 
-  static DbCommand createQueryDbCommand(Db db, Map command) {
+  static DbCommand createQueryDbCommand(Db db, Map<String, dynamic> command) {
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION,
         MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, command, null);
   }
 
-  static MongoQueryMessage createQueryAdminCommand(Map command) {
+  static MongoQueryMessage createQueryAdminCommand(Map<String, dynamic> command) {
     return new MongoQueryMessage("admin.$SYSTEM_COMMAND_COLLECTION",
         MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, command, null);
   }
 
-  static DbCommand createDBSlaveOKCommand(Db db, Map command) {
+  static DbCommand createDBSlaveOKCommand(Db db, Map<String, dynamic> command) {
     return new DbCommand(
         db,
         SYSTEM_COMMAND_COLLECTION,
@@ -110,8 +116,8 @@ class DbCommand extends MongoQueryMessage {
   }
 
   static DbCommand createCountCommand(Db db, String collectionName,
-      [Map selector = const {}]) {
-    var finalQuery = {};
+      [Map<String, dynamic> selector = const {}]) {
+    var finalQuery = <String, dynamic>{};
     finalQuery["count"] = collectionName;
     finalQuery["query"] = selector;
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION,
@@ -144,7 +150,7 @@ class DbCommand extends MongoQueryMessage {
 
   static DbCommand createDistinctCommand(
       Db db, String collectionName, String field,
-      [Map selector = const {}]) {
+      [Map<String, dynamic> selector = const {}]) {
     return new DbCommand(
         db,
         SYSTEM_COMMAND_COLLECTION,

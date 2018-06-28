@@ -87,8 +87,8 @@ class WriteConcern {
   /**
    * Gets the getlasterror command for this write concern.
    */
-  Map get command {
-    var map = new Map();
+  Map<String, dynamic> get command {
+    var map = new Map<String, dynamic>();
     map["getlasterror"] = 1;
     if (w != null) {
       map["w"] = w;
@@ -253,13 +253,13 @@ class Db {
     });
   }
 
-  Future executeDbCommand(MongoMessage message,
+  Future<Map<String, dynamic>> executeDbCommand(MongoMessage message,
       {_Connection connection}) async {
     if (connection == null) {
       connection = _masterConnectionVerified;
     }
 
-    Completer<Map> result = new Completer();
+    Completer<Map<String, dynamic>> result = new Completer();
 
     var replyMessage = await connection.query(message);
     var firstRepliedDocument = replyMessage.documents[0];
@@ -271,7 +271,7 @@ class Db {
 
       print("Error: $errorMessage");
 
-      var m = new Map();
+      var m = new Map<String, dynamic>();
       m["errmsg"] = errorMessage;
 
       result.completeError(m);
@@ -286,12 +286,13 @@ class Db {
   bool documentIsNotAnError(firstRepliedDocument) =>
       firstRepliedDocument['ok'] == 1.0 && firstRepliedDocument['err'] == null;
 
-  Future dropCollection(String collectionName) async {
+  Future<bool> dropCollection(String collectionName) async {
     var collectionInfos = await getCollectionInfos({'name': collectionName});
 
     if (collectionInfos.length == 1) {
       return executeDbCommand(
-          DbCommand.createDropCollectionCommand(this, collectionName));
+              DbCommand.createDropCollectionCommand(this, collectionName))
+          .then((_) => true);
     }
 
     return true;
@@ -304,8 +305,8 @@ class Db {
     return executeDbCommand(DbCommand.createDropDatabaseCommand(this));
   }
 
-  Future<Map> removeFromCollection(String collectionName,
-      [Map selector = const {}, WriteConcern writeConcern]) {
+  Future<Map<String, dynamic>> removeFromCollection(String collectionName,
+      [Map<String, dynamic> selector = const {}, WriteConcern writeConcern]) {
     return new Future.sync(() {
       executeMessage(
           new MongoRemoveMessage("$databaseName.$collectionName", selector),
@@ -314,7 +315,7 @@ class Db {
     });
   }
 
-  Future<Map> getLastError([WriteConcern writeConcern]) {
+  Future<Map<String, dynamic>> getLastError([WriteConcern writeConcern]) {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
@@ -322,22 +323,22 @@ class Db {
         DbCommand.createGetLastErrorCommand(this, writeConcern));
   }
 
-  Future<Map> getNonce({_Connection connection}) {
+  Future<Map<String, dynamic>> getNonce({_Connection connection}) {
     return executeDbCommand(DbCommand.createGetNonceCommand(this),
         connection: connection);
   }
 
-  Future<Map> getBuildInfo({_Connection connection}) {
+  Future<Map<String, dynamic>> getBuildInfo({_Connection connection}) {
     return executeDbCommand(DbCommand.createBuildInfoCommand(this),
         connection: connection);
   }
 
-  Future<Map> isMaster({_Connection connection}) {
+  Future<Map<String, dynamic>> isMaster({_Connection connection}) {
     return executeDbCommand(DbCommand.createIsMasterCommand(this),
         connection: connection);
   }
 
-  Future<Map> wait() {
+  Future<Map<String, dynamic>> wait() {
     return getLastError();
   }
 
@@ -363,12 +364,13 @@ class Db {
     return result;
   }
 
-  Stream<Map> _listCollectionsCursor([Map filter = const {}]) {
+  Stream<Map<String, dynamic>> _listCollectionsCursor(
+      [Map<String, dynamic> filter = const {}]) {
     if (this._masterConnection.serverCapabilities.listCollections) {
       return new ListCollectionsCursor(this, filter).stream;
     } else {
       // Using system collections (pre v3.0 API)
-      Map selector = {};
+      Map<String, dynamic> selector = {};
       // If we are limiting the access to a specific collection name
       if (filter.containsKey('name')) {
         selector["name"] = "${this.databaseName}.${filter['name']}";
@@ -385,12 +387,12 @@ class Db {
   /// with WiredTiger
   /// Use `getCollectionInfos` instead
   @deprecated
-  Stream<Map> collectionsInfoCursor([String collectionName]) {
+  Stream<Map<String, dynamic>> collectionsInfoCursor([String collectionName]) {
     return _collectionsInfoCursor(collectionName);
   }
 
-  Stream<Map> _collectionsInfoCursor([String collectionName]) {
-    Map selector = {};
+  Stream<Map<String, dynamic>> _collectionsInfoCursor([String collectionName]) {
+    Map<String, dynamic> selector = {};
     // If we are limiting the access to a specific collection name
     if (collectionName != null) {
       selector["name"] = "${this.databaseName}.$collectionName";
@@ -416,11 +418,13 @@ class Db {
         .toList();
   }
 
-  Future<List<Map>> getCollectionInfos([Map filter = const {}]) {
+  Future<List<Map<String, dynamic>>> getCollectionInfos(
+      [Map<String, dynamic> filter = const {}]) {
     return _listCollectionsCursor(filter).toList();
   }
 
-  Future<List<String>> getCollectionNames([Map filter = const {}]) {
+  Future<List<String>> getCollectionNames(
+      [Map<String, dynamic> filter = const {}]) {
     return _listCollectionsCursor(filter).map((map) => map['name']).toList();
   }
 
@@ -455,7 +459,7 @@ class Db {
         .toList();
   }
 
-  String _createIndexName(Map keys) {
+  String _createIndexName(Map<String, dynamic> keys) {
     var name = '';
 
     keys.forEach((key, value) {
@@ -465,17 +469,17 @@ class Db {
     return name;
   }
 
-  Future<Map> createIndex(String collectionName,
+  Future<Map<String, dynamic>> createIndex(String collectionName,
       {String key,
-      Map keys,
+      Map<String, dynamic> keys,
       bool unique,
       bool sparse,
       bool background,
       bool dropDups,
-      Map partialFilterExpression,
+      Map<String, dynamic> partialFilterExpression,
       String name}) {
     return new Future.sync(() async {
-      var selector = {};
+      var selector = <String, dynamic>{};
       selector['ns'] = '$databaseName.$collectionName';
       keys = _setKeys(key, keys);
       selector['key'] = keys;
@@ -508,7 +512,7 @@ class Db {
     });
   }
 
-  Map _setKeys(String key, Map keys) {
+  Map<String, dynamic> _setKeys(String key, Map<String, dynamic> keys) {
     if (key != null && keys != null) {
       throw new ArgumentError('Only one parameter must be set: key or keys');
     }
@@ -527,12 +531,12 @@ class Db {
 
   Future ensureIndex(String collectionName,
       {String key,
-      Map keys,
+      Map<String, dynamic> keys,
       bool unique,
       bool sparse,
       bool background,
       bool dropDups,
-      Map partialFilterExpression,
+      Map<String, dynamic> partialFilterExpression,
       String name}) async {
     keys = _setKeys(key, keys);
     var indexInfos = await collection(collectionName).getIndexes();
@@ -557,7 +561,7 @@ class Db {
     return createdIndex;
   }
 
-  Future<Map> _getAcknowledgement({WriteConcern writeConcern}) {
+  Future<Map<String, dynamic>> _getAcknowledgement({WriteConcern writeConcern}) {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }
