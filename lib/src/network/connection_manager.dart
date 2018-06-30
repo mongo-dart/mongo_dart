@@ -9,9 +9,9 @@ class _ConnectionManager {
   _Connection _masterConnection;
 
   _ConnectionManager(this.db);
-  get masterConnection => _masterConnection;
+  _Connection get masterConnection => _masterConnection;
 
-  get masterConnectionVerified {
+  _Connection get masterConnectionVerified {
     if (_masterConnection != null) {
       return _masterConnection;
     } else {
