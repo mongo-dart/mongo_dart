@@ -14,7 +14,7 @@ class ClientFirst extends SaslStep {
   @override
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
-    String serverFirstMessage = UTF8.decode(bytesReceivedFromServer);
+    String serverFirstMessage = utf8.decode(bytesReceivedFromServer);
 
     Map<String, dynamic> decodedMessage = parsePayload(serverFirstMessage);
 
@@ -27,14 +27,14 @@ class ClientFirst extends SaslStep {
     var i = int.parse(decodedMessage['i']);
 
     final String gs2Header = 'n,,';
-    String encodedHeader = BASE64.encode(UTF8.encode(gs2Header));
+    String encodedHeader = base64.encode(utf8.encode(gs2Header));
     var channelBinding = 'c=$encodedHeader';
     var nonce = 'r=$r';
     var clientFinalMessageWithoutProof = '$channelBinding,$nonce';
 
     var passwordDigest =
         md5DigestPassword(credential.username, credential.password);
-    var salt = BASE64.decode(s);
+    var salt = base64.decode(s);
 
     var saltedPassword = hi(passwordDigest, salt, i);
     var clientKey = computeHMAC(saltedPassword, 'Client Key');
@@ -46,18 +46,18 @@ class ClientFirst extends SaslStep {
     var serverKey = computeHMAC(saltedPassword, 'Server Key');
     var serverSignature = computeHMAC(serverKey, authMessage);
 
-    var base64clientProof = BASE64.encode(clientProof);
+    var base64clientProof = base64.encode(clientProof);
     var proof = 'p=$base64clientProof';
     var clientFinalMessage = '$clientFinalMessageWithoutProof,$proof';
 
-    return new ClientLast(UTF8.encode(clientFinalMessage), serverSignature);
+    return new ClientLast(utf8.encode(clientFinalMessage), serverSignature);
   }
 
   static Uint8List computeHMAC(Uint8List data, String key) {
     var sha1 = crypto.sha1;
     var hmac = new crypto.Hmac(sha1, data);
-    hmac.convert(UTF8.encode(key));
-    return new Uint8List.fromList(hmac.convert(UTF8.encode(key)).bytes);
+    hmac.convert(utf8.encode(key));
+    return new Uint8List.fromList(hmac.convert(utf8.encode(key)).bytes);
   }
 
   static Uint8List h(Uint8List data) {
@@ -66,7 +66,7 @@ class ClientFirst extends SaslStep {
 
   static String md5DigestPassword(username, password) {
     return crypto.md5
-        .convert(UTF8.encode('$username:mongo:$password'))
+        .convert(utf8.encode('$username:mongo:$password'))
         .toString();
   }
 
@@ -118,8 +118,8 @@ class ClientLast extends SaslStep {
   @override
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
-    Map<String, dynamic> decodedMessage = parsePayload(UTF8.decode(bytesReceivedFromServer));
-    var serverSignature = BASE64.decode(decodedMessage['v']);
+    Map<String, dynamic> decodedMessage = parsePayload(utf8.decode(bytesReceivedFromServer));
+    var serverSignature = base64.decode(decodedMessage['v']);
 
     if (!const IterableEquality().equals(serverSignature64, serverSignature)) {
       throw new MongoDartError("Server signature was invalid.");
@@ -162,7 +162,7 @@ class ScramSha1Mechanism extends SaslMechanism {
     var clientFirstMessage = '$gs2Header$clientFirstMessageBare';
 
     return new ClientFirst(
-        UTF8.encode(clientFirstMessage), credential, clientFirstMessageBare, r);
+        utf8.encode(clientFirstMessage), credential, clientFirstMessageBare, r);
   }
 
   String prepUsername(String username) =>

@@ -129,7 +129,7 @@ class DbCommand extends MongoQueryMessage {
     var command = {
       'saslStart': 1,
       'mechanism': mechanismName,
-      'payload': BASE64.encode(bytesToSendToServer)
+      'payload': base64.encode(bytesToSendToServer)
     };
 
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION,
@@ -141,7 +141,7 @@ class DbCommand extends MongoQueryMessage {
     var command = {
       'saslContinue': 1,
       'conversationId': conversationId,
-      'payload': BASE64.encode(bytesToSendToServer)
+      'payload': base64.encode(bytesToSendToServer)
     };
 
     return new DbCommand(db, SYSTEM_COMMAND_COLLECTION,
