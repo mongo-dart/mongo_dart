@@ -6,7 +6,7 @@ main() async {
   ///// Simple update
   DbCollection coll = db.collection('collection-for-save');
   await coll.remove({});
-  List toInsert = [
+  var toInsert = <Map<String, dynamic>>[
     {"name": "a", "value": 10},
     {"name": "b", "value": 20},
     {"name": "c", "value": 30},
@@ -23,7 +23,7 @@ main() async {
   /////// Field level update
   coll = db.collection('collection-for-save');
   await coll.remove({});
-  toInsert = [
+  toInsert = <Map<String, dynamic>>[
     {"name": "a", "value": 10},
     {"name": "b", "value": 20},
     {"name": "c", "value": 30},
@@ -40,7 +40,7 @@ main() async {
 
   coll = db.collection('collection-for-save');
   await coll.remove({});
-  toInsert = [
+  toInsert = <Map<String, dynamic>>[
     {"name": "a", "value": 10},
     {"name": "b", "value": 20},
     {"name": "c", "value": 30},

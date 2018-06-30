@@ -7,7 +7,7 @@ main() async {
   DbCollection test;
   await db.open();
   test = db.collection('test');
-  var data = [];
+  var data = <Map<String, dynamic>>[];
   for (num i = 0; i < 1000; i++) {
     data.add({'value': i});
   }
@@ -16,7 +16,7 @@ main() async {
   for (var elem in data) {
     await test.insert(elem, writeConcern: WriteConcern.ACKNOWLEDGED);
   }
-  ;
+
   print(stopwatch.elapsed);
   print('Inserting array of 1000 records with aknowledgment');
   var res = await test.insertAll(data, writeConcern: WriteConcern.ACKNOWLEDGED);

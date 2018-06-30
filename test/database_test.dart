@@ -246,8 +246,7 @@ Future testInsertWithObjectId() async {
   var collection = db.collection(collectionName);
 
   var id;
-  var objectToSave;
-  objectToSave = {"_id": new ObjectId(), "name": "a", "value": 10};
+  var objectToSave = <String, dynamic>{"_id": new ObjectId(), "name": "a", "value": 10};
   id = objectToSave["_id"];
   await collection.insert(objectToSave);
 
@@ -810,7 +809,7 @@ Future testIndexCreation() async {
   var indexes = await collection.getIndexes();
   expect(indexes.length, 4);
 
-  res = await db.ensureIndex(collectionName, keys: {'a': -1, 'embedded.c': 1});
+  res = (await db.ensureIndex(collectionName, keys: {'a': -1, 'embedded.c': 1})) as Map<String, dynamic>;
   expect(res['ok'], 1.0);
 }
 

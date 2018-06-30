@@ -91,15 +91,15 @@ class DbCollection {
     return db
         .executeDbCommand(DbCommand.createFindAndModifyCommand(
             db, collectionName,
-            query: query,
-            sort: sort,
+            query: query as Map<String, dynamic>,
+            sort: sort as Map<String, dynamic>,
             remove: remove,
-            update: update,
+            update: update as Map<String, dynamic>,
             returnNew: returnNew,
-            fields: fields,
+            fields: fields as Map<String, dynamic>,
             upsert: upsert))
         .then((reply) {
-      return new Future.value(reply["value"]);
+      return new Future.value(reply["value"] as Map<String, dynamic>);
     });
   }
 
@@ -162,36 +162,36 @@ class DbCollection {
       return <String, dynamic>{};
     }
     if (selector is SelectorBuilder) {
-      return selector.map['\$query'];
+      return selector.map['\$query'] as Map<String, dynamic>;
     }
-    return selector;
+    return selector as Map<String, dynamic>;
   }
 
   Map<String, dynamic> _queryBuilder2Map(query) {
     if (query is SelectorBuilder) {
       query = query.map['\$query'];
     }
-    return query;
+    return query as Map<String, dynamic>;
   }
 
   Map<String, dynamic> _sortBuilder2Map(query) {
     if (query is SelectorBuilder) {
       query = query.map['orderby'];
     }
-    return query;
+    return query as Map<String, dynamic>;
   }
 
   Map<String, dynamic> _fieldsBuilder2Map(fields) {
     if (fields is SelectorBuilder) {
       return fields.paramFields;
     }
-    return fields;
+    return fields as Map<String, dynamic>;
   }
 
   Map<String, dynamic> _updateBuilder2Map(update) {
     if (update is ModifierBuilder) {
       update = update.map;
     }
-    return update;
+    return update as Map<String, dynamic>;
   }
 }

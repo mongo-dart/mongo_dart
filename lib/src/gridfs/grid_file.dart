@@ -55,7 +55,7 @@ class GridFSFile {
   }
 
   Map<String, dynamic> get metaData {
-    return extraData["metadata"];
+    return extraData["metadata"] as Map<String, dynamic>;
   }
 
   set metaData(Map<String, dynamic> metaData) {

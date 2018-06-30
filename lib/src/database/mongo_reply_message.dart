@@ -24,7 +24,7 @@ class MongoReplyMessage extends MongoMessage {
     for (int n = 0; n < numberReturned; n++) {
       BsonMap doc = new BsonMap({});
       doc.unpackValue(buffer);
-      documents[n] = doc.value;
+      documents[n] = doc.value as Map<String, dynamic>;
     }
   }
 

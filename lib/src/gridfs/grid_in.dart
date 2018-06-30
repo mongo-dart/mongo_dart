@@ -26,7 +26,7 @@ class GridIn extends GridFSFile {
       chunkSize = this.chunkSize;
     }
 
-    Future result;
+    Future<Map<String, dynamic>> result;
     if (!savedChunks) {
       result = saveChunks(chunkSize);
     } else {

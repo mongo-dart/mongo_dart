@@ -15,7 +15,7 @@ class MongoUpdateMessage extends MongoMessage {
     if (document is ModifierBuilder) {
       document = document.map;
     }
-    _document = new BsonMap(document);
+    _document = new BsonMap(document as Map<String, dynamic>);
     opcode = MongoMessage.Update;
   }
 
