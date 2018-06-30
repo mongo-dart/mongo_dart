@@ -561,7 +561,8 @@ class Db {
     return createdIndex;
   }
 
-  Future<Map<String, dynamic>> _getAcknowledgement({WriteConcern writeConcern}) {
+  Future<Map<String, dynamic>> _getAcknowledgement(
+      {WriteConcern writeConcern}) {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }

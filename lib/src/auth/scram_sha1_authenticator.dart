@@ -118,7 +118,8 @@ class ClientLast extends SaslStep {
   @override
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
-    Map<String, dynamic> decodedMessage = parsePayload(utf8.decode(bytesReceivedFromServer));
+    Map<String, dynamic> decodedMessage =
+        parsePayload(utf8.decode(bytesReceivedFromServer));
     var serverSignature = base64.decode(decodedMessage['v'].toString());
 
     if (!const IterableEquality().equals(serverSignature64, serverSignature)) {

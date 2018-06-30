@@ -83,7 +83,8 @@ class DbCommand extends MongoQueryMessage {
         MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, command, null);
   }
 
-  static MongoQueryMessage createQueryAdminCommand(Map<String, dynamic> command) {
+  static MongoQueryMessage createQueryAdminCommand(
+      Map<String, dynamic> command) {
     return new MongoQueryMessage("admin.$SYSTEM_COMMAND_COLLECTION",
         MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, command, null);
   }

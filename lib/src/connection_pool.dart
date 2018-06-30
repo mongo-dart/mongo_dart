@@ -48,8 +48,7 @@ class ConnectionPool {
 
   /// Closes all active database connections.
   Future close() {
-    return Future
-        .wait(_connections.map<Future>((c) => c.close()))
+    return Future.wait(_connections.map<Future>((c) => c.close()))
         .then((_) => _pool.close());
   }
 }

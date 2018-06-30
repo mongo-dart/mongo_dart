@@ -68,8 +68,7 @@ class DbCollection {
   */
   Stream<Map<String, dynamic>> find([selector]) =>
       new Cursor(db, this, selector).stream;
-  Cursor createCursor([selector]) =>
-      new Cursor(db, this, selector);
+  Cursor createCursor([selector]) => new Cursor(db, this, selector);
 
   Future<Map<String, dynamic>> findOne([selector]) {
     Cursor cursor = new Cursor(db, this, selector);
