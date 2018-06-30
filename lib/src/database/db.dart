@@ -204,7 +204,8 @@ class Db {
     return new DbCollection(this, collectionName);
   }
 
-  Future<MongoReplyMessage> queryMessage(MongoMessage queryMessage, {_Connection connection}) {
+  Future<MongoReplyMessage> queryMessage(MongoMessage queryMessage,
+      {_Connection connection}) {
     return new Future.sync(() {
       if (state != State.OPEN) {
         throw new MongoDartError('Db is in the wrong state: $state');
@@ -425,7 +426,9 @@ class Db {
 
   Future<List<String>> getCollectionNames(
       [Map<String, dynamic> filter = const {}]) {
-    return _listCollectionsCursor(filter).map((map) => map['name']?.toString()).toList();
+    return _listCollectionsCursor(filter)
+        .map((map) => map['name']?.toString())
+        .toList();
   }
 
   Future<bool> authenticate(String userName, String password,

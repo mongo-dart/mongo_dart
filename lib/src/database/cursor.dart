@@ -205,8 +205,8 @@ class AggregateCursor extends CommandCursor {
   List pipeline;
   Map<String, dynamic> cursorOptions;
   bool allowDiskUse;
-  AggregateCursor(
-     Db db, DbCollection collection, this.pipeline, this.cursorOptions, this.allowDiskUse)
+  AggregateCursor(Db db, DbCollection collection, this.pipeline,
+      this.cursorOptions, this.allowDiskUse)
       : super(db, collection, <String, dynamic>{});
   @override
   MongoQueryMessage generateQueryMessage() {
