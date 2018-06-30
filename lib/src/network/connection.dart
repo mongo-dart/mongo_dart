@@ -33,8 +33,8 @@ class _Connection {
   ServerConfig serverConfig;
   Socket socket;
   Set<int> _pendingQueries = new Set();
-  get _replyCompleters => _manager.replyCompleters;
-  get _sendQueue => _manager.sendQueue;
+  Map<int, Completer<MongoReplyMessage>> get _replyCompleters => _manager.replyCompleters;
+  Queue<MongoMessage> get _sendQueue => _manager.sendQueue;
   StreamSubscription<MongoReplyMessage> _repliesSubscription;
   StreamSubscription<MongoReplyMessage> get repliesSubscription =>
       _repliesSubscription;
