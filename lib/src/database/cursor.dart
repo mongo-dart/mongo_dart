@@ -178,7 +178,7 @@ class Cursor {
 }
 
 class CommandCursor extends Cursor {
-  CommandCursor(db, collection, selectorBuilderOrMap)
+  CommandCursor(Db db, DbCollection collection, selectorBuilderOrMap)
       : super(db, collection, selectorBuilderOrMap);
   bool firstBatch = true;
   @override
@@ -206,7 +206,7 @@ class AggregateCursor extends CommandCursor {
   Map<String, dynamic> cursorOptions;
   bool allowDiskUse;
   AggregateCursor(
-      db, collection, this.pipeline, this.cursorOptions, this.allowDiskUse)
+     Db db, DbCollection collection, this.pipeline, this.cursorOptions, this.allowDiskUse)
       : super(db, collection, <String, dynamic>{});
   @override
   MongoQueryMessage generateQueryMessage() {
@@ -227,7 +227,7 @@ class AggregateCursor extends CommandCursor {
 }
 
 class ListCollectionsCursor extends CommandCursor {
-  ListCollectionsCursor(db, selector) : super(db, null, selector);
+  ListCollectionsCursor(Db db, selector) : super(db, null, selector);
   @override
   MongoQueryMessage generateQueryMessage() {
     return new DbCommand(

@@ -204,7 +204,7 @@ class Db {
     return new DbCollection(this, collectionName);
   }
 
-  Future queryMessage(MongoMessage queryMessage, {_Connection connection}) {
+  Future<MongoReplyMessage> queryMessage(MongoMessage queryMessage, {_Connection connection}) {
     return new Future.sync(() {
       if (state != State.OPEN) {
         throw new MongoDartError('Db is in the wrong state: $state');
