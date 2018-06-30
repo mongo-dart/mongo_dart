@@ -85,9 +85,9 @@ class GridFSFile {
     id = extraData.remove("_id");
     filename = extraData.remove("filename")?.toString();
     contentType = extraData.remove("contentType")?.toString();
-    length = extraData.remove("length");
-    chunkSize = extraData.remove("chunkSize");
-    uploadDate = extraData.remove("uploadDate");
+    length = extraData.remove("length") as int;
+    chunkSize = extraData.remove("chunkSize") as int;
+    uploadDate = extraData.remove("uploadDate") as DateTime;
     md5 = extraData.remove("md5")?.toString();
   }
 

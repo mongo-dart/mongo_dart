@@ -11,7 +11,7 @@ class _ServerCapabilities {
 
   getParamsFromIstMaster(Map<String, dynamic> isMaster) {
     if (isMaster.containsKey('maxWireVersion')) {
-      maxWireVersion = isMaster['maxWireVersion'];
+      maxWireVersion = isMaster['maxWireVersion'] as int;
     }
     if (maxWireVersion >= 1) {
       aggregationCursor = true;

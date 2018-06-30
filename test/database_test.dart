@@ -84,7 +84,7 @@ Future testEachOnEmptyCollection() async {
   int sum = 0;
 
   await for (var document in collection.find()) {
-    sum += document["a"];
+    sum += document["a"] as int;
     count++;
   }
 
@@ -105,7 +105,7 @@ Future testFindEachWithThenClause() async {
   ]);
 
   await for (var document in collection.find()) {
-    sum += document["score"];
+    sum += document["score"] as int;
     count++;
   }
 
@@ -151,7 +151,7 @@ testFindEach() async {
 
   await for (var document in collection.find()) {
     count++;
-    sum += document["score"];
+    sum += document["score"] as int;
   }
 
   expect(count, 3);
@@ -172,7 +172,7 @@ Future testFindStream() async {
 
   await for (var document in collection.find()) {
     count++;
-    sum += document["score"];
+    sum += document["score"] as int;
   }
 
   expect(count, 3);
@@ -380,7 +380,7 @@ Future testAggregateToStream() async {
   bool skipTest = false;
   var buildInfo = await db.getBuildInfo();
   var versionArray = buildInfo['versionArray'];
-  var versionNum = versionArray[0] * 100 + versionArray[1];
+  var versionNum = (versionArray[0] as num) * 100 + (versionArray[1] as num);
   if (versionNum < 206) {
     // Skip test for MongoDb server older then version 2.6
     skipTest = true;

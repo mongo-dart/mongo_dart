@@ -24,7 +24,7 @@ class _ConnectionManager {
     DbCommand isMasterCommand = DbCommand.createIsMasterCommand(db);
     MongoReplyMessage replyMessage = await connection.query(isMasterCommand);
     _log.fine(() => replyMessage.documents[0].toString());
-    var master = replyMessage.documents[0]["ismaster"];
+    var master = replyMessage.documents[0]["ismaster"] == true;
     connection.isMaster = master;
     if (master) {
       _masterConnection = connection;
