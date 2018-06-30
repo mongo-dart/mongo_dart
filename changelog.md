@@ -1,6 +1,11 @@
 #Recent change notes
 
-### 0.4.0
+### 0.3.2
+* Cast fixes, for compatibility with Dart 2.
+* Moved from `dart:convert` usage to `package:dart2_constant`, for the sake
+of backwards compatibility.
+
+### 0.3.1
 - Changed the signature of `DbCollection.remove`; its `selector` parameter is now required,
 while `writeConcern` is now a named optional parameter.
 

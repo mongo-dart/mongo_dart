@@ -18,7 +18,7 @@ main() async {
       .forEach((v) => print(v));
   var val = await coll.findOne(where.eq("my_field", 17));
   print("Filtered by my_field=17 $val");
-  id = val["_id"];
+  id = val["_id"] as ObjectId;
   val = await coll.findOne(where.eq("my_field", 17).fields(['str_field']));
   print("findOne with fields clause 'str_field' $val");
   val = await coll.findOne(where.id(id));

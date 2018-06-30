@@ -84,7 +84,7 @@ Future testEachOnEmptyCollection() async {
   int sum = 0;
 
   await for (var document in collection.find()) {
-    sum += document["a"];
+    sum += document["a"] as int;
     count++;
   }
 
@@ -105,7 +105,7 @@ Future testFindEachWithThenClause() async {
   ]);
 
   await for (var document in collection.find()) {
-    sum += document["score"];
+    sum += document["score"] as int;
     count++;
   }
 
@@ -151,7 +151,7 @@ testFindEach() async {
 
   await for (var document in collection.find()) {
     count++;
-    sum += document["score"];
+    sum += document["score"] as int;
   }
 
   expect(count, 3);
@@ -172,7 +172,7 @@ Future testFindStream() async {
 
   await for (var document in collection.find()) {
     count++;
-    sum += document["score"];
+    sum += document["score"] as int;
   }
 
   expect(count, 3);
@@ -246,8 +246,11 @@ Future testInsertWithObjectId() async {
   var collection = db.collection(collectionName);
 
   var id;
-  var objectToSave;
-  objectToSave = {"_id": new ObjectId(), "name": "a", "value": 10};
+  var objectToSave = <String, dynamic>{
+    "_id": new ObjectId(),
+    "name": "a",
+    "value": 10
+  };
   id = objectToSave["_id"];
   await collection.insert(objectToSave);
 
@@ -380,7 +383,7 @@ Future testAggregateToStream() async {
   bool skipTest = false;
   var buildInfo = await db.getBuildInfo();
   var versionArray = buildInfo['versionArray'];
-  var versionNum = versionArray[0] * 100 + versionArray[1];
+  var versionNum = (versionArray[0] as num) * 100 + (versionArray[1] as num);
   if (versionNum < 206) {
     // Skip test for MongoDb server older then version 2.6
     skipTest = true;
@@ -810,7 +813,8 @@ Future testIndexCreation() async {
   var indexes = await collection.getIndexes();
   expect(indexes.length, 4);
 
-  res = await db.ensureIndex(collectionName, keys: {'a': -1, 'embedded.c': 1});
+  res = (await db.ensureIndex(collectionName, keys: {'a': -1, 'embedded.c': 1}))
+      as Map<String, dynamic>;
   expect(res['ok'], 1.0);
 }
 
@@ -974,7 +978,7 @@ Future testSimpleQuery() async {
   var result1 = await collection.findOne(where.eq('my_field', 3));
   expect(result1, isNotNull);
   expect(result1['my_field'], 3);
-  id = result1['_id'];
+  id = result1['_id'] as ObjectId;
 
   var result2 = await collection.findOne(where.id(id));
   expect(result2, isNotNull);
@@ -1020,7 +1024,7 @@ Future testFieldLevelUpdateSimple() async {
   result = await collection.findOne({'name': 'a'});
   expect(result, isNotNull);
 
-  id = result['_id'];
+  id = result['_id'] as ObjectId;
   result = await collection.update(where.id(id), modify.set('name', 'BBB'));
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);

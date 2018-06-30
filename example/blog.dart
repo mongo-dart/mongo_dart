@@ -25,7 +25,7 @@ main() async {
       name: 'meta', keys: {'_id': 1, 'name': 1, 'age': 1});
   await collection.find().forEach((v) {
     print(v);
-    authors[v["name"]] = v;
+    authors[v["name"].toString()] = v;
   });
   print("====================================================================");
   print(">> Authors ordered by age ascending");
@@ -40,7 +40,7 @@ main() async {
   ]);
   await db.ensureIndex('users', keys: {'login': -1});
   await usersCollection.find().forEach((user) {
-    users[user["login"]] = user;
+    users[user["login"].toString()] = user;
     print(user);
   });
   print("====================================================================");

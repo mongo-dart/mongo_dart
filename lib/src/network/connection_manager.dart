@@ -9,9 +9,9 @@ class _ConnectionManager {
   _Connection _masterConnection;
 
   _ConnectionManager(this.db);
-  get masterConnection => _masterConnection;
+  _Connection get masterConnection => _masterConnection;
 
-  get masterConnectionVerified {
+  _Connection get masterConnectionVerified {
     if (_masterConnection != null) {
       return _masterConnection;
     } else {
@@ -24,7 +24,7 @@ class _ConnectionManager {
     DbCommand isMasterCommand = DbCommand.createIsMasterCommand(db);
     MongoReplyMessage replyMessage = await connection.query(isMasterCommand);
     _log.fine(() => replyMessage.documents[0].toString());
-    var master = replyMessage.documents[0]["ismaster"];
+    var master = replyMessage.documents[0]["ismaster"] == true;
     connection.isMaster = master;
     if (master) {
       _masterConnection = connection;

@@ -45,11 +45,11 @@ abstract class SaslAuthenticator extends Authenticator {
 
       var payload = result['payload'];
 
-      var payloadAsBytes = BASE64.decode(payload);
+      var payloadAsBytes = base64.decode(payload.toString());
 
       currentStep = currentStep.transition(conversation, payloadAsBytes);
 
-      var conversationId = result['conversationId'];
+      var conversationId = result['conversationId'] as int;
 
       command = DbCommand.createSaslContinueCommand(db.authSourceDb ?? db,
           conversationId, currentStep.bytesToSendToServer);

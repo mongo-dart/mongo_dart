@@ -1,7 +1,7 @@
 library mongo_actions;
 
-import 'dart:convert';
 import 'dart:io';
+import 'package:dart2_constant/convert.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 
@@ -183,7 +183,7 @@ statusRs([int rsLength = RS_LENGTH]) {
 int _readPidFile(String path) {
   var file = new File(path);
   if (file.existsSync()) {
-    var pid = file.readAsStringSync(encoding: UTF8).trim();
+    var pid = file.readAsStringSync(encoding: utf8).trim();
     return int.parse(pid);
   } else {
     return -1;

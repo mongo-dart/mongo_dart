@@ -12,8 +12,8 @@ class MongoDbCRAuthenticator extends Authenticator {
   Future authenticate(_Connection connection) {
     return db.getNonce(connection: connection).then((msg) {
       var nonce = msg["nonce"];
-      var command =
-          createMongoDbCrAuthenticationCommand(db, credentials, nonce);
+      var command = createMongoDbCrAuthenticationCommand(
+          db, credentials, nonce.toString());
       return db.executeDbCommand(command, connection: connection);
     }).then((res) => res["ok"] == 1);
   }

@@ -204,7 +204,8 @@ class Db {
     return new DbCollection(this, collectionName);
   }
 
-  Future queryMessage(MongoMessage queryMessage, {_Connection connection}) {
+  Future<MongoReplyMessage> queryMessage(MongoMessage queryMessage,
+      {_Connection connection}) {
     return new Future.sync(() {
       if (state != State.OPEN) {
         throw new MongoDartError('Db is in the wrong state: $state');
@@ -412,7 +413,7 @@ class Db {
   @deprecated
   Future<List<String>> listCollections() {
     return _collectionsInfoCursor()
-        .map((map) => map['name'].split('.'))
+        .map((map) => map['name']?.toString()?.split('.'))
         .where((arr) => arr.length == 2)
         .map((arr) => arr.last)
         .toList();
@@ -425,7 +426,9 @@ class Db {
 
   Future<List<String>> getCollectionNames(
       [Map<String, dynamic> filter = const {}]) {
-    return _listCollectionsCursor(filter).map((map) => map['name']).toList();
+    return _listCollectionsCursor(filter)
+        .map((map) => map['name']?.toString())
+        .toList();
   }
 
   Future<bool> authenticate(String userName, String password,
@@ -561,7 +564,8 @@ class Db {
     return createdIndex;
   }
 
-  Future<Map<String, dynamic>> _getAcknowledgement({WriteConcern writeConcern}) {
+  Future<Map<String, dynamic>> _getAcknowledgement(
+      {WriteConcern writeConcern}) {
     if (writeConcern == null) {
       writeConcern = _writeConcern;
     }

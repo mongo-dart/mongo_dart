@@ -25,27 +25,27 @@ class Cursor {
   set tailable(bool value) => value
       ? flags |= MongoQueryMessage.OPTS_TAILABLE_CURSOR
       : flags &= ~(MongoQueryMessage.OPTS_TAILABLE_CURSOR);
-  get tailable => (flags & MongoQueryMessage.OPTS_TAILABLE_CURSOR) != 0;
+  bool get tailable => (flags & MongoQueryMessage.OPTS_TAILABLE_CURSOR) != 0;
 
   /// Allow query of replica slave. Normally these return an error except for namespace “local”.
   set slaveOk(bool value) => value
       ? flags |= MongoQueryMessage.OPTS_SLAVE
       : flags &= ~(MongoQueryMessage.OPTS_SLAVE);
-  get slaveOk => (flags & MongoQueryMessage.OPTS_SLAVE) != 0;
+  bool get slaveOk => (flags & MongoQueryMessage.OPTS_SLAVE) != 0;
 
   /// The server normally times out idle cursors after an inactivity period (10 minutes)
   /// to prevent excess memory use. Unset this option to prevent that.
   set timeout(bool value) => !value
       ? flags |= MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT
       : flags &= ~(MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT);
-  get timeout => (flags & MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT) == 0;
+  bool get timeout => (flags & MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT) == 0;
 
   /// If we are at the end of the data, block for a while rather than returning no data.
   /// After a timeout period, we do return as normal, only applicable for tailable cursor.
   set awaitData(bool value) => value
       ? flags |= MongoQueryMessage.OPTS_AWAIT_DATA
       : flags &= ~(MongoQueryMessage.OPTS_AWAIT_DATA);
-  get awaitData => (flags & MongoQueryMessage.OPTS_AWAIT_DATA) != 0;
+  bool get awaitData => (flags & MongoQueryMessage.OPTS_AWAIT_DATA) != 0;
 
   /// Stream the data down full blast in multiple “more” packages,
   /// on the assumption that the client will fully read all data queried.
@@ -55,13 +55,13 @@ class Cursor {
   set exhaust(bool value) => value
       ? flags |= MongoQueryMessage.OPTS_EXHAUST
       : flags &= ~(MongoQueryMessage.OPTS_EXHAUST);
-  get exhaust => (flags & MongoQueryMessage.OPTS_EXHAUST) != 0;
+  bool get exhaust => (flags & MongoQueryMessage.OPTS_EXHAUST) != 0;
 
   /// Get partial results from a mongos if some shards are down (instead of throwing an error)
   set partial(bool value) => value
       ? flags |= MongoQueryMessage.OPTS_PARTIAL
       : flags &= ~(MongoQueryMessage.OPTS_PARTIAL);
-  get partial => (flags & MongoQueryMessage.OPTS_PARTIAL) != 0;
+  bool get partial => (flags & MongoQueryMessage.OPTS_PARTIAL) != 0;
 
   /// Specify the miliseconds between getMore on tailable cursor, only applicable when awaitData isn't set.
   /// Default value is 100 ms
@@ -178,7 +178,7 @@ class Cursor {
 }
 
 class CommandCursor extends Cursor {
-  CommandCursor(db, collection, selectorBuilderOrMap)
+  CommandCursor(Db db, DbCollection collection, selectorBuilderOrMap)
       : super(db, collection, selectorBuilderOrMap);
   bool firstBatch = true;
   @override
@@ -191,7 +191,7 @@ class CommandCursor extends Cursor {
       firstBatch = false;
       var cursorMap = replyMessage.documents.first['cursor'];
       if (cursorMap != null) {
-        cursorId = cursorMap['id'];
+        cursorId = cursorMap['id'] as int;
         List firstBatch = cursorMap['firstBatch'];
         items.addAll(new List.from(firstBatch));
       }
@@ -205,8 +205,8 @@ class AggregateCursor extends CommandCursor {
   List pipeline;
   Map<String, dynamic> cursorOptions;
   bool allowDiskUse;
-  AggregateCursor(
-      db, collection, this.pipeline, this.cursorOptions, this.allowDiskUse)
+  AggregateCursor(Db db, DbCollection collection, this.pipeline,
+      this.cursorOptions, this.allowDiskUse)
       : super(db, collection, <String, dynamic>{});
   @override
   MongoQueryMessage generateQueryMessage() {
@@ -227,7 +227,7 @@ class AggregateCursor extends CommandCursor {
 }
 
 class ListCollectionsCursor extends CommandCursor {
-  ListCollectionsCursor(db, selector) : super(db, null, selector);
+  ListCollectionsCursor(Db db, selector) : super(db, null, selector);
   @override
   MongoQueryMessage generateQueryMessage() {
     return new DbCommand(
