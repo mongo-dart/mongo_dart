@@ -24,7 +24,7 @@ class ClientFirst extends SaslStep {
     }
 
     var s = decodedMessage['s'];
-    var i = int.parse(decodedMessage['i']);
+    var i = int.parse(decodedMessage['i'].toString());
 
     final String gs2Header = 'n,,';
     String encodedHeader = base64.encode(utf8.encode(gs2Header));
@@ -34,7 +34,7 @@ class ClientFirst extends SaslStep {
 
     var passwordDigest =
         md5DigestPassword(credential.username, credential.password);
-    var salt = base64.decode(s);
+    var salt = base64.decode(s.toString());
 
     var saltedPassword = hi(passwordDigest, salt, i);
     var clientKey = computeHMAC(saltedPassword, 'Client Key');
@@ -119,7 +119,7 @@ class ClientLast extends SaslStep {
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
     Map<String, dynamic> decodedMessage = parsePayload(utf8.decode(bytesReceivedFromServer));
-    var serverSignature = base64.decode(decodedMessage['v']);
+    var serverSignature = base64.decode(decodedMessage['v'].toString());
 
     if (!const IterableEquality().equals(serverSignature64, serverSignature)) {
       throw new MongoDartError("Server signature was invalid.");

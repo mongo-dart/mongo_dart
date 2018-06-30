@@ -83,12 +83,12 @@ class GridFSFile {
 
     // Remove the known keys. Leaving the extraData.
     id = extraData.remove("_id");
-    filename = extraData.remove("filename");
-    contentType = extraData.remove("contentType");
+    filename = extraData.remove("filename")?.toString();
+    contentType = extraData.remove("contentType")?.toString();
     length = extraData.remove("length");
     chunkSize = extraData.remove("chunkSize");
     uploadDate = extraData.remove("uploadDate");
-    md5 = extraData.remove("md5");
+    md5 = extraData.remove("md5")?.toString();
   }
 
   void setGridFS(GridFS fs) {
