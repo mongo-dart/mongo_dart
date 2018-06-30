@@ -6,12 +6,13 @@ library mongo_dart;
 
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
-import 'dart:io';
+import 'dart:io' hide FileMode;
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:crypto/crypto.dart' as crypto;
+import 'package:dart2_constant/convert.dart';
+import 'package:dart2_constant/io.dart';
 import 'package:bson/bson.dart';
 import 'package:logging/logging.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
