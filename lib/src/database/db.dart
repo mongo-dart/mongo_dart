@@ -412,7 +412,7 @@ class Db {
   @deprecated
   Future<List<String>> listCollections() {
     return _collectionsInfoCursor()
-        .map((map) => map['name'].split('.'))
+        .map((map) => map['name']?.toString()?.split('.'))
         .where((arr) => arr.length == 2)
         .map((arr) => arr.last)
         .toList();
@@ -425,7 +425,7 @@ class Db {
 
   Future<List<String>> getCollectionNames(
       [Map<String, dynamic> filter = const {}]) {
-    return _listCollectionsCursor(filter).map((map) => map['name']).toList();
+    return _listCollectionsCursor(filter).map((map) => map['name']?.toString()).toList();
   }
 
   Future<bool> authenticate(String userName, String password,

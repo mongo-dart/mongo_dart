@@ -3,7 +3,9 @@ part of mongo_dart;
 class DbCollection {
   Db db;
   String collectionName;
+
   DbCollection(this.db, this.collectionName) {}
+
   String fullName() => "${db.databaseName}.$collectionName";
 
   Future<Map<String, dynamic>> save(Map<String, dynamic> document,
@@ -58,16 +60,17 @@ class DbCollection {
   }
 
   /**
-  * Creates a cursor for a query that can be used to iterate over results from MongoDB
-  * ##[selector]
-  * parameter represents query to locate objects. If omitted as in `find()` then query matches all documents in colleciton.
-  * Here's a more selective example:
-  *     find({'last_name': 'Smith'})
-  * Here our selector will match every document where the last_name attribute is 'Smith.'
-  *
-  */
+   * Creates a cursor for a query that can be used to iterate over results from MongoDB
+   * ##[selector]
+   * parameter represents query to locate objects. If omitted as in `find()` then query matches all documents in colleciton.
+   * Here's a more selective example:
+   *     find({'last_name': 'Smith'})
+   * Here our selector will match every document where the last_name attribute is 'Smith.'
+   *
+   */
   Stream<Map<String, dynamic>> find([selector]) =>
       new Cursor(db, this, selector).stream;
+
   Cursor createCursor([selector]) => new Cursor(db, this, selector);
 
   Future<Map<String, dynamic>> findOne([selector]) {
@@ -114,7 +117,7 @@ class DbCollection {
         .executeDbCommand(DbCommand.createCountCommand(
             db, collectionName, _selectorBuilder2Map(selector)))
         .then((reply) {
-      return new Future.value(reply["n"].toInt());
+      return new Future.value((reply["n"] as num)?.toInt());
     });
   }
 
@@ -122,7 +125,8 @@ class DbCollection {
       db.executeDbCommand(DbCommand.createDistinctCommand(
           db, collectionName, field, _selectorBuilder2Map(selector)));
 
-  Future<Map<String, dynamic>> aggregate(List pipeline, {bool allowDiskUse: false}) {
+  Future<Map<String, dynamic>> aggregate(List pipeline,
+      {bool allowDiskUse: false}) {
     var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline,
         allowDiskUse: allowDiskUse);
     return db.executeDbCommand(cmd);

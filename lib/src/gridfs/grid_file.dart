@@ -32,7 +32,7 @@ class GridFSFile {
       throw new MongoDartError('no md5 stored');
     }
 
-    Completer completer = new Completer();
+    var completer = new Completer<bool>();
     // query for md5 at filemd5
     DbCommand dbCommand = new DbCommand(
         fs.database, fs.bucketName, 0, 0, 1, {"filemd5": id}, {"md5": 1});
@@ -51,7 +51,7 @@ class GridFSFile {
   }
 
   List<String> get aliases {
-    return extraData["aliases"];
+    return extraData["aliases"] as List<String>;
   }
 
   Map<String, dynamic> get metaData {
