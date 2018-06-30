@@ -13,7 +13,7 @@ main() async {
   }
   var val = await coll.findOne({"my_field": 17});
   print("Filtered by my_field=17 $val");
-  id = val["_id"];
+  id = val["_id"] as ObjectId;
   val = await coll.findOne({"_id": id});
   print("Filtered by _id=$id: $val");
   print("Removing doc with _id=$id");

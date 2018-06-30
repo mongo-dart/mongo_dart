@@ -974,7 +974,7 @@ Future testSimpleQuery() async {
   var result1 = await collection.findOne(where.eq('my_field', 3));
   expect(result1, isNotNull);
   expect(result1['my_field'], 3);
-  id = result1['_id'];
+  id = result1['_id'] as ObjectId;
 
   var result2 = await collection.findOne(where.id(id));
   expect(result2, isNotNull);
@@ -1020,7 +1020,7 @@ Future testFieldLevelUpdateSimple() async {
   result = await collection.findOne({'name': 'a'});
   expect(result, isNotNull);
 
-  id = result['_id'];
+  id = result['_id'] as ObjectId;
   result = await collection.update(where.id(id), modify.set('name', 'BBB'));
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
