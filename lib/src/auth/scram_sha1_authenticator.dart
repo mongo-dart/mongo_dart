@@ -50,7 +50,8 @@ class ClientFirst extends SaslStep {
     var proof = 'p=$base64clientProof';
     var clientFinalMessage = '$clientFinalMessageWithoutProof,$proof';
 
-    return new ClientLast(utf8.encode(clientFinalMessage), serverSignature);
+    return new ClientLast(
+        _coerceUint8List(utf8.encode(clientFinalMessage)), serverSignature);
   }
 
   static Uint8List computeHMAC(Uint8List data, String key) {
@@ -87,7 +88,7 @@ class ClientFirst extends SaslStep {
   }
 
   static Uint8List hi(String password, Uint8List salt, int iterations) {
-    var digest = (msg) {
+    var digest = (List<int> msg) {
       var hmac = new crypto.Hmac(crypto.sha1, password.codeUnits);
       return new Uint8List.fromList(hmac.convert(msg).bytes);
     };
@@ -143,6 +144,9 @@ class CompletedStep extends SaslStep {
   }
 }
 
+Uint8List _coerceUint8List(List<int> list) =>
+    list is Uint8List ? list : new Uint8List.fromList(list);
+
 class ScramSha1Mechanism extends SaslMechanism {
   final UsernamePasswordCredential credential;
   final RandomStringGenerator randomStringGenerator;
@@ -162,8 +166,8 @@ class ScramSha1Mechanism extends SaslMechanism {
     var clientFirstMessageBare = '$username,$nonce';
     var clientFirstMessage = '$gs2Header$clientFirstMessageBare';
 
-    return new ClientFirst(
-        utf8.encode(clientFirstMessage), credential, clientFirstMessageBare, r);
+    return new ClientFirst(_coerceUint8List(utf8.encode(clientFirstMessage)),
+        credential, clientFirstMessageBare, r);
   }
 
   String prepUsername(String username) =>
