@@ -112,6 +112,10 @@ class DbCommand extends MongoQueryMessage {
     return createQueryDbCommand(db, {'buildInfo': 1});
   }
 
+  static DbCommand createStatusCommand(Db db) {
+    return createQueryDbCommand(db, {'replSetGetStatus': 1 });
+  }
+
   static DbCommand createGetLastErrorCommand(Db db, WriteConcern concern) {
     return createQueryDbCommand(db, concern.command);
   }

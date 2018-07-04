@@ -334,6 +334,11 @@ class Db {
         connection: connection);
   }
 
+  Future<Map<String, dynamic>> getStatus({_Connection connection}) {
+    return executeDbCommand(DbCommand.createStatusCommand(this),
+        connection: connection);
+  }
+
   Future<Map<String, dynamic>> isMaster({_Connection connection}) {
     return executeDbCommand(DbCommand.createIsMasterCommand(this),
         connection: connection);
