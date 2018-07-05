@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 const dbName = "test-mongo-dart";
 
 const DefaultUri = 'mongodb://localhost:27017/$dbName';
+const DefaultAdminUri = 'mongodb://localhost:27017/admin';
 
 Db db;
 Uuid uuid = new Uuid();
@@ -62,6 +63,11 @@ Future testGetNonce() async {
 
 Future getBuildInfo() async {
   var result = await db.getBuildInfo();
+  expect(result["ok"], 1);
+}
+
+Future getStatus() async {
+  var result = await db.getStatus();
   expect(result["ok"], 1);
 }
 
@@ -1142,6 +1148,11 @@ Future testFindOneWhileStateIsOpening() {
 }
 
 main() {
+  Future initializeAdminDatabase() async {
+    db = new Db(DefaultAdminUri);
+    await db.open();
+  }
+
   Future initializeDatabase() async {
     db = new Db(DefaultUri);
     await db.open();
@@ -1150,6 +1161,20 @@ main() {
   Future cleanupDatabase() async {
     await db.close();
   }
+
+  group("Admin", () {
+    setUp(() async {
+      await initializeAdminDatabase();
+    });
+
+    tearDown(() async {
+      await cleanupDatabase();
+    });
+
+    group('DBCommand:', () {
+      test('getStatus', getStatus);
+    });
+  });
 
   group("A", () {
     setUp(() async {
