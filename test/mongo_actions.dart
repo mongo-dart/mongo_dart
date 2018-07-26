@@ -1,7 +1,7 @@
 library mongo_actions;
 
+import 'dart:convert' show utf8;
 import 'dart:io';
-import 'package:dart2_constant/convert.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 
