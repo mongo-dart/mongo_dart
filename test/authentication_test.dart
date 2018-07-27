@@ -25,6 +25,7 @@ main() {
 
   test("Can't connect with mongodb-cr on a db without that scheme", () async {
     Db db = new Db('$mongoDbUri/?authMechanism=${MongoDbCRAuthenticator.name}');
+
     var expectedError = {
       'ok': 0.0,
       'errmsg': 'auth failed',
@@ -32,9 +33,22 @@ main() {
       'codeName': 'AuthenticationFailed',
     };
 
-    var sut = () async => await db.open();
+    var err;
 
-    expect(sut(), throwsA(expectedError));
+    try {
+      await db.open();
+    } catch (e) {
+      err = e;
+    }
+
+    bool result = (
+      (err['ok'] == expectedError['ok']) &&
+      (err['errmsg'] == expectedError['errmsg']) &&
+      (err['code'] == expectedError['code']) &&
+      (err['codeName'] == expectedError['codeName'])
+    );
+
+    expect (result, true);
   });
 
   test("Throw exception when auth mechanism isn't supported", () async {
