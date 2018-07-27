@@ -48,7 +48,7 @@ main() {
       (err['codeName'] == expectedError['codeName'])
     );
 
-    expect (result, true);
+    expect(result, true);
   });
 
   test("Throw exception when auth mechanism isn't supported", () async {
