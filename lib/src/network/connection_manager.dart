@@ -26,9 +26,9 @@ class _ConnectionManager {
     _log.fine(() => replyMessage.documents[0].toString());
     var master = replyMessage.documents[0]["ismaster"] == true;
     connection.isMaster = master;
-    if (master) {
+    //if (master) {
       _masterConnection = connection;
-    }
+    //}
     connection.serverCapabilities
         .getParamsFromIstMaster(replyMessage.documents[0]);
     if (db._authenticationScheme == null) {
