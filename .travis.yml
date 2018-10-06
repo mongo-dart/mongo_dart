@@ -1,6 +1,6 @@
 language: dart
 dart:
-#  - stable
+  - stable
   - dev
 addons:
   apt:
