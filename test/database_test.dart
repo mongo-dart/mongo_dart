@@ -376,6 +376,97 @@ db.runCommand(
   expect(result[0]["avgRating"], 3);
 }
 
+Future testAggregateWithCursor() async {
+  String collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
+  List<Map<String, dynamic>> toInsert = [];
+
+  // Avg 1 with 1 rating
+  toInsert.add({
+    "game": "At the Gates of Loyang",
+    "player": "Dallas",
+    "rating": 1,
+    "v": 1
+  });
+
+  // Avg 3 with 1 rating
+  toInsert.add({"game": "Age of Steam", "player": "Paul", "rating": 3, "v": 1});
+
+  // Avg 2 with 2 ratings
+  toInsert.add({"game": "Fresco", "player": "Erin", "rating": 3, "v": 1});
+  toInsert.add({"game": "Fresco", "player": "Dallas", "rating": 1, "v": 1});
+
+  // Avg 3.5 with 4 ratings
+  toInsert
+      .add({"game": "Ticket To Ride", "player": "Paul", "rating": 4, "v": 1});
+  toInsert
+      .add({"game": "Ticket To Ride", "player": "Erin", "rating": 5, "v": 1});
+  toInsert
+      .add({"game": "Ticket To Ride", "player": "Dallas", "rating": 4, "v": 1});
+  toInsert.add(
+      {"game": "Ticket To Ride", "player": "Anthony", "rating": 2, "v": 1});
+
+  // Avg 4.5 with 4 ratings (counting only highest v)
+  toInsert.add({"game": "Dominion", "player": "Paul", "rating": 5, "v": 2});
+  toInsert.add({"game": "Dominion", "player": "Erin", "rating": 4, "v": 1});
+  toInsert.add({"game": "Dominion", "player": "Dallas", "rating": 4, "v": 1});
+  toInsert.add({"game": "Dominion", "player": "Anthony", "rating": 5, "v": 1});
+
+  // Avg 5 with 2 ratings
+  toInsert.add({"game": "Pandemic", "player": "Erin", "rating": 5, "v": 1});
+  toInsert.add({"game": "Pandemic", "player": "Dallas", "rating": 5, "v": 1});
+
+  await collection.insertAll(toInsert);
+
+  // Avg player ratings
+  // Dallas = 3, Anthony 3.5, Paul = 4, Erin = 4.25
+/* We want equivalent of this when used on the mongo shell.
+ * (Should be able to just copy and paste below once test is run and failed once)
+db.runCommand(
+{ aggregate : "testAggregate", pipeline : [
+{"$group": {
+      "_id": { "game": "$game", "player": "$player" },
+      "rating": { "$sum": "$rating" } } },
+{"$group": {
+        "_id": "$_id.game",
+        "avgRating": { "$avg": "$rating" } } },
+{ "$sort": { "_id": 1 } }
+]});
+ */
+  List pipeline = new List();
+  var p1 = {
+    "\$group": {
+      "_id": {"game": "\$game", "player": "\$player"},
+      "rating": {"\$sum": "\$rating"}
+    }
+  };
+  var p2 = {
+    "\$group": {
+      "_id": "\$_id.game",
+      "avgRating": {"\$avg": "\$rating"}
+    }
+  };
+  var p3 = {
+    "\$sort": {"_id": 1}
+  };
+
+  pipeline.add(p1);
+  pipeline.add(p2);
+  pipeline.add(p3);
+
+  expect(p1["\u0024group"], isNotNull);
+  expect(p1["\$group"], isNotNull);
+
+  var v = await collection.aggregate(pipeline, cursor: {'batchSize': 3});
+  Map cursor = v['cursor'];
+  expect(cursor['id'], const TypeMatcher<int>());
+  expect(cursor['firstBatch'], allOf(const TypeMatcher<List>(), hasLength(3)));
+  List firstBatch = cursor['firstBatch'];
+  expect(firstBatch[0]["_id"], "Age of Steam");
+  expect(firstBatch[0]["avgRating"], 3);
+}
+
 Future testAggregateToStream() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
@@ -1233,6 +1324,7 @@ main() {
 
     group('Aggregate:', () {
       test('testAggregate', testAggregate);
+      test('testAggregateWithCursor', testAggregateWithCursor);
       test(
           'testAggregateToStream - if server older then version 2.6 test would be skipped',
           testAggregateToStream);
