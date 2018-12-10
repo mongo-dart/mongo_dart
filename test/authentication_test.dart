@@ -41,12 +41,10 @@ main() {
       err = e;
     }
 
-    bool result = (
-      (err['ok'] == expectedError['ok']) &&
-      (err['errmsg'] == expectedError['errmsg']) &&
-      (err['code'] == expectedError['code']) &&
-      (err['codeName'] == expectedError['codeName'])
-    );
+    bool result = ((err['ok'] == expectedError['ok']) &&
+        (err['errmsg'] == expectedError['errmsg']) &&
+        (err['code'] == expectedError['code']) &&
+        (err['codeName'] == expectedError['codeName']));
 
     expect(result, true);
   });
