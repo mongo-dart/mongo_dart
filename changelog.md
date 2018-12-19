@@ -1,5 +1,10 @@
 #Recent change notes
 
+### 0.3.4
+* Added `cursor` option to `DbCollection.aggregate`.
+  * Courtesy of @jodinathan, thank you!
+  * See https://github.com/mongo-dart/mongo_dart/pull/139
+
 ### 0.3.2
 * Cast fixes, for compatibility with Dart 2.
 * Moved from `dart:convert` usage to `package:dart2_constant`, for the sake
