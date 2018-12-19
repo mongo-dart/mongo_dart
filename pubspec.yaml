@@ -6,6 +6,7 @@ authors:
 - Paul Evans <pevans@sonardesign.com>
 - Stéphane Este-Gracias <sestegra@gmail.com>
 - Joel Trottier-Hebert <iamquebecois@gmail.com>
+- Tobe O <thosakwe@gmail.com>
 description: MongoDB driver for Dart
 homepage: https://github.com/mongo-dart/mongo_dart
 environment:
