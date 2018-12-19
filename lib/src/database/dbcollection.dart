@@ -126,9 +126,9 @@ class DbCollection {
           db, collectionName, field, _selectorBuilder2Map(selector)));
 
   Future<Map<String, dynamic>> aggregate(List pipeline,
-      {bool allowDiskUse: false}) {
+      {bool allowDiskUse: false, Map<String, dynamic> cursor}) {
     var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline,
-        allowDiskUse: allowDiskUse);
+        allowDiskUse: allowDiskUse, cursor: cursor);
     return db.executeDbCommand(cmd);
   }
 
