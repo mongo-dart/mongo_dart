@@ -3,7 +3,9 @@
 ### 0.3.4
 * Added `cursor` option to `DbCollection.aggregate`.
   * Courtesy of @jodinathan, thank you!
-  * See https://github.com/mongo-dart/mongo_dart/pull/139
+  * Resolves https://github.com/mongo-dart/mongo_dart/issues/120
+  * See PR: https://github.com/mongo-dart/mongo_dart/pull/139
+* Added "Tobe O" to authors in `pubspec.yaml`.
 
 ### 0.3.2
 * Cast fixes, for compatibility with Dart 2.
