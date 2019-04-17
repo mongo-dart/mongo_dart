@@ -282,7 +282,7 @@ Future testDistinct() async {
   await collection.insert({"foo": 3});
   var result = await collection.distinct("foo");
 
-  List values = result['values'];
+  List values = result['values'] as List;
   expect(values[0], 1);
   expect(values[1], 2);
   expect(values[2], 3);
@@ -371,7 +371,7 @@ db.runCommand(
   expect(p1["\$group"], isNotNull);
 
   var v = await collection.aggregate(pipeline);
-  List result = v['result'];
+  List result = v['result'] as List;
   expect(result[0]["_id"], "Age of Steam");
   expect(result[0]["avgRating"], 3);
 }
@@ -459,10 +459,10 @@ db.runCommand(
   expect(p1["\$group"], isNotNull);
 
   var v = await collection.aggregate(pipeline, cursor: {'batchSize': 3});
-  Map cursor = v['cursor'];
+  Map cursor = v['cursor'] as Map;
   expect(cursor['id'], const TypeMatcher<int>());
   expect(cursor['firstBatch'], allOf(const TypeMatcher<List>(), hasLength(3)));
-  List firstBatch = cursor['firstBatch'];
+  List firstBatch = cursor['firstBatch'] as List;
   expect(firstBatch[0]["_id"], "Age of Steam");
   expect(firstBatch[0]["avgRating"], 3);
 }

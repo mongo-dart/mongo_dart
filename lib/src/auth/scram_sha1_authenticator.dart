@@ -18,7 +18,7 @@ class ClientFirst extends SaslStep {
 
     Map<String, dynamic> decodedMessage = parsePayload(serverFirstMessage);
 
-    String r = decodedMessage['r'];
+    String r = decodedMessage['r'] as String;
     if (r == null || !r.startsWith(rPrefix)) {
       throw new MongoDartError("Server sent an invalid nonce.");
     }
