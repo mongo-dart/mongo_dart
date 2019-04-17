@@ -1,5 +1,8 @@
 #Recent change notes
 
+### 0.3.5
+* Upgraded `uuid` constraint to `^2.0.0`.
+
 ### 0.3.4
 * Added `cursor` option to `DbCollection.aggregate`.
   * Courtesy of @jodinathan, thank you!
