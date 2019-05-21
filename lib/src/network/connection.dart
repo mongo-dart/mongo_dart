@@ -53,7 +53,7 @@ class _Connection {
 
   Future<bool> connect() {
     Completer<bool> completer = new Completer();
-    Socket.connect(serverConfig.host, serverConfig.port).then((Socket _socket) {
+    SecureSocket.connect(serverConfig.host, serverConfig.port).then((Socket _socket) {
       // Socket connected.
       socket = _socket;
       _repliesSubscription = socket
