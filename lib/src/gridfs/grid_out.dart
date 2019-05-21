@@ -19,7 +19,7 @@ class GridOut extends GridFSFile {
     int length = 0;
     Completer<int> completer = new Completer();
     addToSink(Map<String, dynamic> chunk) {
-      BsonBinary data = chunk["data"];
+      BsonBinary data = chunk["data"] as BsonBinary;
       out.add(data.byteList);
       length += data.byteList.length;
     }
