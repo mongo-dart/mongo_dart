@@ -121,7 +121,9 @@ class Db {
   String _debugInfo;
   Db authSourceDb;
   _ConnectionManager _connectionManager;
+
   _Connection get _masterConnection => _connectionManager.masterConnection;
+
   _Connection get _masterConnectionVerified =>
       _connectionManager.masterConnectionVerified;
   WriteConcern _writeConcern;
@@ -130,12 +132,12 @@ class Db {
   String toString() => 'Db($databaseName,$_debugInfo)';
 
   /**
-  * Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
-  * For example next code points to local mongodb server on default mongodb port, database *testdb*
-  *     var db = new Db('mongodb://127.0.0.1/testdb');
-  * And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
-  *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
-  */
+   * Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
+   * For example next code points to local mongodb server on default mongodb port, database *testdb*
+   *     var db = new Db('mongodb://127.0.0.1/testdb');
+   * And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
+   *     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
+   */
   Db(String uriString, [this._debugInfo]) {
     _uriList.add(uriString);
   }
@@ -143,7 +145,9 @@ class Db {
   Db.pool(List<String> uriList, [this._debugInfo]) {
     _uriList.addAll(uriList);
   }
+
   Db._authDb(this.databaseName);
+
   ServerConfig _parseUri(String uriString) {
     var uri = Uri.parse(uriString);
 
@@ -236,7 +240,9 @@ class Db {
     connection.execute(message, writeConcern == WriteConcern.ERRORS_IGNORED);
   }
 
-  Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}) {
+  Future open(
+      {WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED,
+      bool secure = false}) {
     return new Future.sync(() {
       if (state == State.OPENING) {
         throw new MongoDartError('Attempt to open db in state $state');
@@ -247,7 +253,7 @@ class Db {
       _connectionManager = new _ConnectionManager(this);
 
       _uriList.forEach((uri) {
-        _connectionManager.addConnection(_parseUri(uri));
+        _connectionManager.addConnection(_parseUri(uri)..isSecure = secure);
       });
 
       return _connectionManager.open(writeConcern);
@@ -300,8 +306,8 @@ class Db {
   }
 
   /**
-  *   Drop current database
-  */
+   *   Drop current database
+   */
   Future drop() {
     return executeDbCommand(DbCommand.createDropDatabaseCommand(this));
   }
