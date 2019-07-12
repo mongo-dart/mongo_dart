@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
 main() async {
-  Db db = new Db("mongodb://127.0.0.1/mongo_dart-test");
+  Db db = Db("mongodb://127.0.0.1/mongo_dart-test");
   await db.open();
   DbCollection collection = db.collection('test-utf8');
   await collection.remove({});
@@ -9,7 +9,7 @@ main() async {
     'Имя': 'Вадим',
     'Фамилия': 'Цушко',
     'Профессия': 'Брадобрей',
-    'Шаблон': new BsonRegexp('^.adim\$')
+    'Шаблон': BsonRegexp('^.adim\$')
   });
   var v = await collection.findOne();
   print(

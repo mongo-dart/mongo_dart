@@ -12,7 +12,7 @@ class MongoKillCursorsMessage extends MongoMessage {
   }
 
   BsonBinary serialize() {
-    BsonBinary buffer = new BsonBinary(messageLength);
+    BsonBinary buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
     buffer.writeInt(1);

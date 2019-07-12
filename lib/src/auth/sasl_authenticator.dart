@@ -27,7 +27,7 @@ abstract class SaslAuthenticator extends Authenticator {
 
   @override
   Future authenticate(_Connection connection) async {
-    var conversation = new SaslConversation(connection);
+    var conversation = SaslConversation(connection);
 
     var currentStep = mechanism.initialize(connection);
 

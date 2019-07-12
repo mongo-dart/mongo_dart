@@ -22,11 +22,11 @@ class GridFS {
   }
 
   Future<GridOut> findOne(selector) {
-    Completer<GridOut> completer = new Completer();
+    Completer<GridOut> completer = Completer();
     files.findOne(selector).then((file) {
       GridOut result = null;
       if (file != null) {
-        result = new GridOut(file);
+        result = GridOut(file);
         result.setGridFS(this);
       }
       completer.complete(result);
@@ -38,6 +38,6 @@ class GridFS {
       findOne(where.eq('filename', fileName));
 
   GridIn createFile(Stream<List<int>> input, String filename) {
-    return new GridIn(this, filename, input);
+    return GridIn(this, filename, input);
   }
 }

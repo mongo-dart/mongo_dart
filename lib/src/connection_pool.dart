@@ -3,7 +3,7 @@ part of mongo_dart;
 /// A function that produces an instance of [Db], whether synchronously or asynchronously.
 ///
 /// This is used in the [ConnectionPool] class to connect to a database on-the-fly.
-typedef FutureOr<Db> _DbFactory();
+typedef _DbFactory = FutureOr<Db> Function();
 
 /// A connection pool that limits the number of concurrent connections to a MongoDB server.
 ///
@@ -25,7 +25,7 @@ class ConnectionPool {
   /// * `maxConnections`: The maximum amount of connections to keep open simultaneously.
   /// * `dbFactory*: a parameterless function that returns a [Db]. The function can be asynchronous if necessary.
   ConnectionPool(this.maxConnections, this.dbFactory) {
-    _pool = new Pool(maxConnections);
+    _pool = Pool(maxConnections);
   }
 
   /// Connects to the database, using an existent connection, only creating a new one if

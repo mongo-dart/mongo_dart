@@ -7,10 +7,10 @@ class MongoInsertMessage extends MongoMessage {
   MongoInsertMessage(
       String collectionFullName, List<Map<String, dynamic>> documents,
       [this.flags = 0]) {
-    _collectionFullName = new BsonCString(collectionFullName);
-    _documents = new List();
+    _collectionFullName = BsonCString(collectionFullName);
+    _documents = List();
     for (var document in documents) {
-      _documents.add(new BsonMap(document));
+      _documents.add(BsonMap(document));
     }
     opcode = MongoMessage.Insert;
   }
@@ -25,7 +25,7 @@ class MongoInsertMessage extends MongoMessage {
   }
 
   BsonBinary serialize() {
-    BsonBinary buffer = new BsonBinary(messageLength);
+    BsonBinary buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(flags);
     _collectionFullName.packValue(buffer);

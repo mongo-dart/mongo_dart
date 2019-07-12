@@ -6,7 +6,7 @@ main() {
   ConnectionPool pool;
 
   setUp(() {
-    pool = new ConnectionPool(3, () => new Db(DefaultUri));
+    pool = ConnectionPool(3, () => Db(DefaultUri));
   });
 
   tearDown(() => pool.close());

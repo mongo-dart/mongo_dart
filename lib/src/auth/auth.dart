@@ -12,11 +12,11 @@ Authenticator createAuthenticator(AuthenticationScheme authenticationScheme,
     Db db, UsernamePasswordCredential credentials) {
   switch (authenticationScheme) {
     case AuthenticationScheme.MONGODB_CR:
-      return new MongoDbCRAuthenticator(db, credentials);
+      return MongoDbCRAuthenticator(db, credentials);
     case AuthenticationScheme.SCRAM_SHA_1:
-      return new ScramSha1Authenticator(credentials, db);
+      return ScramSha1Authenticator(credentials, db);
     default:
-      throw new MongoDartError("Authenticator wasn't specified");
+      throw MongoDartError("Authenticator wasn't specified");
   }
 }
 
@@ -35,7 +35,7 @@ abstract class RandomStringGenerator {
 class CryptoStrengthStringGenerator extends RandomStringGenerator {
   @override
   String generate(int length) {
-    var random = new Random.secure();
+    var random = Random.secure();
     var allowedCodeUnits = RandomStringGenerator.allowedCharacters.codeUnits;
 
     int max = allowedCodeUnits.length - 1;
@@ -46,7 +46,7 @@ class CryptoStrengthStringGenerator extends RandomStringGenerator {
       randomString.add(allowedCodeUnits.elementAt(random.nextInt(max)));
     }
 
-    return new String.fromCharCodes(randomString);
+    return String.fromCharCodes(randomString);
   }
 }
 

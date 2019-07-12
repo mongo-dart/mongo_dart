@@ -18,7 +18,7 @@ class GridFSFile {
 
   Future<Map<String, dynamic>> save() {
     if (fs == null) {
-      throw new MongoDartError('Need fs');
+      throw MongoDartError('Need fs');
     }
     Map<String, dynamic> tempData = data;
     return fs.files.insert(tempData);
@@ -26,15 +26,15 @@ class GridFSFile {
 
   Future<bool> validate() {
     if (fs == null) {
-      throw new MongoDartError('no fs');
+      throw MongoDartError('no fs');
     }
     if (md5 == null) {
-      throw new MongoDartError('no md5 stored');
+      throw MongoDartError('no md5 stored');
     }
 
-    var completer = new Completer<bool>();
+    var completer = Completer<bool>();
     // query for md5 at filemd5
-    DbCommand dbCommand = new DbCommand(
+    DbCommand dbCommand = DbCommand(
         fs.database, fs.bucketName, 0, 0, 1, {"filemd5": id}, {"md5": 1});
     fs.database.executeDbCommand(dbCommand).then((data) {
       if (data != null && data.containsKey("md5")) {
@@ -79,7 +79,7 @@ class GridFSFile {
   }
 
   set data(Map<String, dynamic> input) {
-    extraData = new Map.from(input);
+    extraData = Map.from(input);
 
     // Remove the known keys. Leaving the extraData.
     id = extraData.remove("_id");

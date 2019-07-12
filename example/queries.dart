@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
 main() async {
-  Db db = new Db("mongodb://127.0.0.1/mongo_dart-test");
+  Db db = Db("mongodb://127.0.0.1/mongo_dart-test");
   ObjectId id;
   DbCollection coll;
   await db.open();

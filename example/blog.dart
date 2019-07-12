@@ -5,9 +5,9 @@ String host = Platform.environment['MONGO_DART_DRIVER_HOST'] ?? '127.0.0.1';
 String port = Platform.environment['MONGO_DART_DRIVER_PORT'] ?? '27017';
 
 main() async {
-  Db db = new Db("mongodb://$host:$port/mongo_dart-blog");
-  Map<String, Map> authors = new Map<String, Map>();
-  Map<String, Map> users = new Map<String, Map>();
+  Db db = Db("mongodb://$host:$port/mongo_dart-blog");
+  Map<String, Map> authors = Map<String, Map>();
+  Map<String, Map> users = Map<String, Map>();
   await db.open();
   await db.drop();
   print("====================================================================");

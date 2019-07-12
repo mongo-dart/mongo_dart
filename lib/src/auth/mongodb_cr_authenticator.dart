@@ -33,13 +33,7 @@ class MongoDbCRAuthenticator extends Authenticator {
       'nonce': nonce,
       'key': key
     };
-    return new DbCommand(
-        db.authSourceDb ?? db,
-        DbCommand.SYSTEM_COMMAND_COLLECTION,
-        MongoQueryMessage.OPTS_NONE,
-        0,
-        -1,
-        selector,
-        null);
+    return DbCommand(db.authSourceDb ?? db, DbCommand.SYSTEM_COMMAND_COLLECTION,
+        MongoQueryMessage.OPTS_NONE, 0, -1, selector, null);
   }
 }

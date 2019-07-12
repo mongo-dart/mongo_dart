@@ -7,7 +7,7 @@ class MongoGetMoreMessage extends MongoMessage {
 
   MongoGetMoreMessage(String collectionFullName, this.cursorId,
       [this.numberToReturn = 20]) {
-    _collectionFullName = new BsonCString(collectionFullName);
+    _collectionFullName = BsonCString(collectionFullName);
     opcode = MongoMessage.GetMore;
   }
 
@@ -16,7 +16,7 @@ class MongoGetMoreMessage extends MongoMessage {
   }
 
   BsonBinary serialize() {
-    BsonBinary buffer = new BsonBinary(messageLength);
+    BsonBinary buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
     _collectionFullName.packValue(buffer);

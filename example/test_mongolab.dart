@@ -10,7 +10,7 @@ main() async {
 //  print(await db.collection('test').find().toList());
 //  await db.close();
 
-  var db = new Db('mongodb://ds031477.mongolab.com:31477/dart');
+  var db = Db('mongodb://ds031477.mongolab.com:31477/dart');
   await db.open();
   await db.authenticate('test', 'test');
   DbCollection collection = db.collection('testAuthenticationWithUri');

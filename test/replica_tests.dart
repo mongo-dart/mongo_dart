@@ -10,7 +10,7 @@ const DefaultUri2 = 'mongodb://127.0.0.1:27002';
 const DefaultUri3 = 'mongodb://127.0.0.1:27003';
 
 Future testCollectionInfoCursor() {
-  Db db = new Db.pool([
+  Db db = Db.pool([
     "${DefaultUri1}/mongo_dart-test",
     "${DefaultUri2}/mongo_dart-test",
     "${DefaultUri3}/mongo_dart-test"

@@ -25,10 +25,10 @@ class MongoQueryMessage extends MongoMessage {
       this.numberToReturn,
       Map<String, dynamic> query,
       Map<String, dynamic> fields) {
-    _collectionFullName = new BsonCString(collectionFullName);
-    _query = new BsonMap(query);
+    _collectionFullName = BsonCString(collectionFullName);
+    _query = BsonMap(query);
     if (fields != null) {
-      _fields = new BsonMap(fields);
+      _fields = BsonMap(fields);
     }
     opcode = MongoMessage.Query;
   }
@@ -43,7 +43,7 @@ class MongoQueryMessage extends MongoMessage {
   }
 
   BsonBinary serialize() {
-    BsonBinary buffer = new BsonBinary(messageLength);
+    BsonBinary buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(flags);
     _collectionFullName.packValue(buffer);
