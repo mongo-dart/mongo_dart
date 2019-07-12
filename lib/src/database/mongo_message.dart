@@ -38,7 +38,7 @@ class MongoMessage {
     throw new MongoDartError('Must be implemented');
   }
 
-  MongoMessage deserialize(BsonBinary buffer) {
+  void deserialize(BsonBinary buffer) {
     throw new MongoDartError('Must be implemented');
   }
 

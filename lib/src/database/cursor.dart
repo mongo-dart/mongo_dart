@@ -192,7 +192,7 @@ class CommandCursor extends Cursor {
       var cursorMap = replyMessage.documents.first['cursor'];
       if (cursorMap != null) {
         cursorId = cursorMap['id'] as int;
-        List firstBatch = cursorMap['firstBatch'];
+        final firstBatch = cursorMap['firstBatch'] as List;
         items.addAll(new List.from(firstBatch));
       }
     } else {
