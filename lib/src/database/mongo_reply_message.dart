@@ -14,7 +14,7 @@ class MongoReplyMessage extends MongoMessage {
   int numberReturned = -1;
   List<Map<String, dynamic>> documents;
 
-  deserialize(BsonBinary buffer) {
+  void deserialize(BsonBinary buffer) {
     readMessageHeaderFrom(buffer);
     responseFlags = buffer.readInt32();
     cursorId = buffer.readInt64();
