@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
 main() async {
-  Db db = new Db("mongodb://127.0.0.7/mongo_dart-test");
+  Db db = Db("mongodb://127.0.0.7/mongo_dart-test");
   DbCollection coll;
   ObjectId id;
   await db.open();
@@ -23,7 +23,7 @@ main() async {
   print(
       "Filtered by {'str_field': {'\$regex': new BsonRegexp('^str_(5|7|8)17\$')}");
   await coll.find({
-    'str_field': {'\$regex': new BsonRegexp('^str_(5|7|8)17\$')}
+    'str_field': {'\$regex': BsonRegexp('^str_(5|7|8)17\$')}
   }).forEach((v) => print(v));
   db.close();
 }

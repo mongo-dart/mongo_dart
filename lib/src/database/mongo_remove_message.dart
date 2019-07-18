@@ -7,8 +7,8 @@ class MongoRemoveMessage extends MongoMessage {
 
   MongoRemoveMessage(String collectionFullName,
       [Map<String, dynamic> selector = const {}, this.flags = 0]) {
-    _collectionFullName = new BsonCString(collectionFullName);
-    _selector = new BsonMap(selector);
+    _collectionFullName = BsonCString(collectionFullName);
+    _selector = BsonMap(selector);
     opcode = MongoMessage.Delete;
   }
 
@@ -21,7 +21,7 @@ class MongoRemoveMessage extends MongoMessage {
   }
 
   BsonBinary serialize() {
-    BsonBinary buffer = new BsonBinary(messageLength);
+    BsonBinary buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
     _collectionFullName.packValue(buffer);

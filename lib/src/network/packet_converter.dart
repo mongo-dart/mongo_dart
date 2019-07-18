@@ -1,9 +1,9 @@
 part of mongo_dart;
 
 class PacketConverter {
-  final _log = new Logger('PacketConverter');
-  final packets = new ListQueue<List<int>>();
-  final messages = new ListQueue<List<int>>();
+  final _log = Logger('PacketConverter');
+  final packets = ListQueue<List<int>>();
+  final messages = ListQueue<List<int>>();
   final MAX_DOC_SIZE = 32 * 1024 * 1024;
   bool headerMode = true;
   int bytesToRead = 4;
@@ -11,7 +11,7 @@ class PacketConverter {
   int readPos = 0;
   List<int> messageBuffer;
   int messagesConverted = 0;
-  final lengthBuffer = new BsonBinary(4);
+  final lengthBuffer = BsonBinary(4);
 
   addPacket(List<int> packet) {
     packets.addLast(packet);
@@ -45,10 +45,9 @@ class PacketConverter {
     readIntoBuffer(lengthBuffer.byteList, 0);
     int len = lengthBuffer.readInt32();
     if (len > MAX_DOC_SIZE) {
-      throw new MongoDartError(
-          'Message length $len over maximum document size');
+      throw MongoDartError('Message length $len over maximum document size');
     }
-    messageBuffer = new List<int>(len);
+    messageBuffer = List<int>(len);
   }
 
   handleBody() {
@@ -66,14 +65,14 @@ class PacketConverter {
   void readIntoBuffer(List<int> buffer, int pos) {
     if (buffer.length - pos > bytesAvailable()) {
 //      print('$this $buffer $pos');
-      throw new MongoDartError('Bad state. Read buffer too big');
+      throw MongoDartError('Bad state. Read buffer too big');
     }
     int writePos = pos;
     while (writePos < buffer.length) {
       writePos += _readPacketIntoBuffer(buffer, writePos);
     }
     if (writePos < buffer.length) {
-      throw new MongoDartError('Bad state. Buffer was not written fully');
+      throw MongoDartError('Bad state. Buffer was not written fully');
     }
   }
 

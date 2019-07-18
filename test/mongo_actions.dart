@@ -14,13 +14,13 @@ const RS_NAME = "rs";
 const MONGOD = "mongod";
 const MONGO = "mongo";
 
-final _log = new Logger('MongoActions');
+final _log = Logger('MongoActions');
 
 _makeEnv([int rsLength = RS_LENGTH]) {
-  new Directory("$DATA_PATH/$PORT_STD").createSync(recursive: true);
+  Directory("$DATA_PATH/$PORT_STD").createSync(recursive: true);
   for (var i = 1; i <= rsLength; i++) {
     var port = PORT_BASE + i;
-    new Directory("$DATA_PATH/$port").createSync(recursive: true);
+    Directory("$DATA_PATH/$port").createSync(recursive: true);
   }
 }
 
@@ -63,8 +63,8 @@ _waitDbIsmaster(StringBuffer buffer) {
 }
 
 _initStatus() {
-  var script = new File(DATA_CFG);
-  var buffer = new StringBuffer();
+  var script = File(DATA_CFG);
+  var buffer = StringBuffer();
   _waitDbIsmaster(buffer);
   script.writeAsStringSync(buffer.toString());
   script = null;
@@ -138,8 +138,8 @@ startRs([int rsLength = RS_LENGTH]) {
     _startMongod(port, RS_NAME);
   }
 
-  var script = new File(DATA_CFG);
-  var buffer = new StringBuffer();
+  var script = File(DATA_CFG);
+  var buffer = StringBuffer();
   _configureRs(buffer, rsLength);
   _waitRs(buffer);
   script.writeAsStringSync(buffer.toString());
@@ -151,8 +151,8 @@ startRs([int rsLength = RS_LENGTH]) {
   _log.info(() => result.stderr);
   _log.info(() => result.stdout);
 
-  script = new File(DATA_CFG);
-  buffer = new StringBuffer();
+  script = File(DATA_CFG);
+  buffer = StringBuffer();
   _waitRs(buffer);
   script.writeAsStringSync(buffer.toString());
   script = null;
@@ -181,7 +181,7 @@ statusRs([int rsLength = RS_LENGTH]) {
 }
 
 int _readPidFile(String path) {
-  var file = new File(path);
+  var file = File(path);
   if (file.existsSync()) {
     var pid = file.readAsStringSync(encoding: utf8).trim();
     return int.parse(pid);
@@ -203,7 +203,7 @@ bool _killPid(int pid) {
 void main(List<String> args) {
   hierarchicalLoggingEnabled = true;
   Logger.root.level = Level.OFF;
-  new Logger('MongoActions').level = Level.ALL;
+  Logger('MongoActions').level = Level.ALL;
   var listener = (LogRecord r) {
     var name = r.loggerName;
     print("${r.time}: $name: ${r.message}");
