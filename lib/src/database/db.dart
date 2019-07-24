@@ -100,11 +100,17 @@ class Db {
 
   String toString() => 'Db($databaseName,$_debugInfo)';
 
-  /// Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
+  /// Db constructor expects [valid mongodb URI](https://docs.mongodb.com/manual/reference/connection-string/).
+  ///
   /// For example next code points to local mongodb server on default mongodb port, database *testdb*
-  ///     var db = new Db('mongodb://127.0.0.1/testdb');
+  /// ```dart
+  /// var db = new Db('mongodb://127.0.0.1/testdb');
+  /// ```
+  ///
   /// And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
-  ///     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
+  /// ```dart
+  /// var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
+  /// ```
   Db(String uriString, [this._debugInfo]) {
     _uriList.add(uriString);
   }
