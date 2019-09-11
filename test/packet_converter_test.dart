@@ -121,5 +121,5 @@ main() {
 }
 
 Uint8List toUint8List(List<int> list) {
-  return Uint8List(list.length)..addAll(list);
+  return Uint8List.fromList(list);
 }
