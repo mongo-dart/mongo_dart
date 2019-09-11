@@ -1,7 +1,9 @@
 library packet_converter_test;
 
-import 'package:test/test.dart';
+import 'dart:typed_data';
+
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:test/test.dart';
 
 main() {
   group('Packet converter basics', () {
@@ -46,7 +48,7 @@ main() {
     });
     test('readIntoBuffer 3', () {
       var converter = PacketConverter();
-      var buffer = List<int>(3);
+      var buffer = Uint8List(3);
       converter.packets.addAll([
         [1, 2, 3],
         [4, 5, 6, 7]
@@ -56,7 +58,7 @@ main() {
       expect(buffer, [3, 4, 5]);
       expect(converter.readPos, 2);
       expect(converter.bytesAvailable(), 2);
-      buffer = List<int>(2);
+      buffer = Uint8List(2);
       converter.readIntoBuffer(buffer, 0);
       expect(buffer, [6, 7]);
       expect(converter.packets, isEmpty);
@@ -67,7 +69,7 @@ main() {
     test('Full message in one packet', () {
       // Length of 7 in first four bytes and 3 elements.
       // Full message in one packet
-      var packet = [7, 0, 0, 0, 1, 2, 3];
+      var packet = toUint8List([7, 0, 0, 0, 1, 2, 3]);
       var converter = PacketConverter();
       converter.addPacket(packet);
       expect(converter.messages.length, 1);
@@ -76,19 +78,19 @@ main() {
 
     test('Length part splitted', () {
       var converter = PacketConverter();
-      converter.addPacket([7, 0, 0]);
-      converter.addPacket([0, 1, 2, 3]);
+      converter.addPacket(toUint8List([7, 0, 0]));
+      converter.addPacket(toUint8List(([0, 1, 2, 3])));
       expect(converter.messages.length, 1);
       expect(converter.messages.first, [7, 0, 0, 0, 1, 2, 3]);
     });
     test('Packets not full for message', () {
       var converter = PacketConverter();
-      converter.addPacket([7, 0, 0]);
-      converter.addPacket([0, 1, 2]);
+      converter.addPacket(toUint8List([7, 0, 0]));
+      converter.addPacket(toUint8List([0, 1, 2]));
       expect(converter.messages, isEmpty);
     });
     test('Full message in one packet and some more', () {
-      var packet = [7, 0, 0, 0, 1, 2, 3, 4, 5];
+      var packet = toUint8List([7, 0, 0, 0, 1, 2, 3, 4, 5]);
       var converter = PacketConverter();
       converter.addPacket(packet);
       expect(converter.messages.length, 1);
@@ -107,13 +109,17 @@ main() {
         packet.add(1);
         packet.add(2);
       }
-
+      var uIntPacket = toUint8List(packet);
       var converter = PacketConverter();
-      converter.addPacket(packet);
+      converter.addPacket(uIntPacket);
       expect(converter.messages.length, 8002);
       expect(converter.messages.first, [7, 0, 0, 0, 0, 1, 2]);
       expect(converter.packets.length, 0);
       expect(converter.bytesAvailable(), 0);
     });
   });
+}
+
+Uint8List toUint8List(List<int> list) {
+  return Uint8List(list.length)..addAll(list);
 }

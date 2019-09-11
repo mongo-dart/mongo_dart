@@ -1,5 +1,8 @@
 #Recent change notes
 
+### 0.4.0
+* Dart/Flutter 1.9 compatibility
+
 ### 0.3.4
 * Added `cursor` option to `DbCollection.aggregate`.
   * Courtesy of @jodinathan, thank you!
