@@ -23,7 +23,7 @@ class MongoMessageHandler {
     sink.close();
   }
 
-  StreamTransformer<List<int>, MongoReplyMessage> get transformer =>
-      StreamTransformer<List<int>, MongoReplyMessage>.fromHandlers(
+  StreamTransformer<Uint8List, MongoReplyMessage> get transformer =>
+      StreamTransformer<Uint8List, MongoReplyMessage>.fromHandlers(
           handleData: handleData, handleDone: handleDone);
 }
