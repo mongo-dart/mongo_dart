@@ -4,7 +4,7 @@ class MongoMessageHandler {
   final _log = new Logger('MongoMessageTransformer');
   final converter = new PacketConverter();
 
-  void handleData(List<int> data, EventSink<MongoReplyMessage> sink) {
+  void handleData(Uint8List data, EventSink<MongoReplyMessage> sink) {
     converter.addPacket(data);
     while (!converter.messages.isEmpty) {
       var buffer = new BsonBinary.from(converter.messages.removeFirst());
@@ -23,7 +23,7 @@ class MongoMessageHandler {
     sink.close();
   }
 
-  StreamTransformer<List<int>, MongoReplyMessage> get transformer =>
-      new StreamTransformer<List<int>, MongoReplyMessage>.fromHandlers(
+  StreamTransformer<Uint8List, MongoReplyMessage> get transformer =>
+      new StreamTransformer<Uint8List, MongoReplyMessage>.fromHandlers(
           handleData: handleData, handleDone: handleDone);
 }
