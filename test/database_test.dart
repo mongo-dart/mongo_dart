@@ -1323,7 +1323,8 @@ main() {
     });
 
     group('Aggregate:', () {
-      test('testAggregate', testAggregate);
+      test('testAggregate', testAggregate,
+          skip: 'As of MongoDB 3.6, cursor is *required* for aggregate.');
       test('testAggregateWithCursor', testAggregateWithCursor);
       test(
           'testAggregateToStream - if server older then version 2.6 test would be skipped',

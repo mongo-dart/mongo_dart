@@ -56,9 +56,8 @@ class _Connection {
     Socket.connect(serverConfig.host, serverConfig.port).then((Socket _socket) {
       // Socket connected.
       socket = _socket;
-      _repliesSubscription = socket
-          .transform(MongoMessageHandler().transformer)
-          .listen(_receiveReply,
+      _repliesSubscription =
+          MongoMessageHandler().transformer.bind(socket).listen(_receiveReply,
               onError: (e, st) {
                 _log.severe("Socket error ${e} ${st}");
                 //completer.completeError(e);
