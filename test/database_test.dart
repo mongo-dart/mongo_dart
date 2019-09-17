@@ -282,11 +282,7 @@ Future testDistinct() async {
   await collection.insert({"foo": 3});
   var result = await collection.distinct("foo");
 
-<<<<<<< HEAD
-  List values = result['values'] as List;
-=======
   final values = result['values'] as List;
->>>>>>> d7979a940cc266dcfe9a71787c33a923df9e49d2
   expect(values[0], 1);
   expect(values[1], 2);
   expect(values[2], 3);
@@ -375,11 +371,7 @@ db.runCommand(
   expect(p1["\$group"], isNotNull);
 
   var v = await collection.aggregate(pipeline);
-<<<<<<< HEAD
-  List result = v['result'] as List;
-=======
   final result = v['result'] as List;
->>>>>>> d7979a940cc266dcfe9a71787c33a923df9e49d2
   expect(result[0]["_id"], "Age of Steam");
   expect(result[0]["avgRating"], 3);
 }
@@ -467,17 +459,10 @@ db.runCommand(
   expect(p1["\$group"], isNotNull);
 
   var v = await collection.aggregate(pipeline, cursor: {'batchSize': 3});
-<<<<<<< HEAD
-  Map cursor = v['cursor'] as Map;
-  expect(cursor['id'], const TypeMatcher<int>());
-  expect(cursor['firstBatch'], allOf(const TypeMatcher<List>(), hasLength(3)));
-  List firstBatch = cursor['firstBatch'] as List;
-=======
   final cursor = v['cursor'] as Map;
   expect(cursor['id'], const TypeMatcher<int>());
   expect(cursor['firstBatch'], allOf(const TypeMatcher<List>(), hasLength(3)));
   final firstBatch = cursor['firstBatch'] as List;
->>>>>>> d7979a940cc266dcfe9a71787c33a923df9e49d2
   expect(firstBatch[0]["_id"], "Age of Steam");
   expect(firstBatch[0]["avgRating"], 3);
 }
@@ -1339,11 +1324,7 @@ main() {
 
     group('Aggregate:', () {
       test('testAggregate', testAggregate,
-<<<<<<< HEAD
-          skip: 'As of MongoDB 3.6, cursor is always required.');
-=======
           skip: 'As of MongoDB 3.6, cursor is *required* for aggregate.');
->>>>>>> d7979a940cc266dcfe9a71787c33a923df9e49d2
       test('testAggregateWithCursor', testAggregateWithCursor);
       test(
           'testAggregateToStream - if server older then version 2.6 test would be skipped',
