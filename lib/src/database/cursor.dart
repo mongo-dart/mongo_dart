@@ -1,9 +1,9 @@
 part of mongo_dart;
 
-typedef void MonadicBlock(Map<String, dynamic> value);
+typedef MonadicBlock = void Function(Map<String, dynamic> value);
 
 class Cursor {
-  final _log = new Logger('Cursor');
+  final _log = Logger('Cursor');
   State state = State.INIT;
   int cursorId = 0;
   Db db;
@@ -78,23 +78,23 @@ class Cursor {
     } else if (selectorBuilderOrMap is Map) {
       selector = selectorBuilderOrMap as Map<String, dynamic>;
     } else {
-      throw new ArgumentError(
+      throw ArgumentError(
           'Expected SelectorBuilder or Map, got $selectorBuilderOrMap');
     }
 
 //    if (!selector.isEmpty && !selector.containsKey(r"$query")){
 //        selector = {r"$query": selector};
 //    }
-    items = new Queue();
+    items = Queue();
   }
 
   MongoQueryMessage generateQueryMessage() {
-    return new MongoQueryMessage(
+    return MongoQueryMessage(
         collection.fullName(), flags, skip, limit, selector, fields);
   }
 
   MongoGetMoreMessage generateGetMoreMessage() {
-    return new MongoGetMoreMessage(collection.fullName(), cursorId);
+    return MongoGetMoreMessage(collection.fullName(), cursorId);
   }
 
   Map<String, dynamic> _getNextItem() {
@@ -114,15 +114,15 @@ class Cursor {
         state = State.OPEN;
         getCursorData(replyMessage);
         if (items.length > 0) {
-          return new Future.value(_getNextItem());
+          return Future.value(_getNextItem());
         } else {
-          return new Future.value(null);
+          return Future.value(null);
         }
       });
     } else if (state == State.OPEN && limit > 0 && _returnedCount == limit) {
       return close();
     } else if (state == State.OPEN && items.length > 0) {
-      return new Future.value(_getNextItem());
+      return Future.value(_getNextItem());
     } else if (state == State.OPEN && cursorId > 0) {
       var qm = generateGetMoreMessage();
       return db.queryMessage(qm).then((replyMessage) {
@@ -132,22 +132,22 @@ class Cursor {
                 MongoReplyMessage.FLAGS_CURSOR_NOT_FOUND) &&
             (cursorId == 0);
         if (items.length > 0) {
-          return new Future.value(_getNextItem());
+          return Future.value(_getNextItem());
         } else if (tailable && !isDead && awaitData) {
-          return new Future.value(null);
+          return Future.value(null);
         } else if (tailable && !isDead) {
-          var completer = new Completer<Map<String, dynamic>>();
-          new Timer(new Duration(milliseconds: tailableRetryInterval),
+          var completer = Completer<Map<String, dynamic>>();
+          Timer(Duration(milliseconds: tailableRetryInterval),
               () => completer.complete(null));
           return completer.future;
         } else {
           state = State.CLOSED;
-          return new Future.value(null);
+          return Future.value(null);
         }
       });
     } else {
       state = State.CLOSED;
-      return new Future.value(null);
+      return Future.value(null);
     }
   }
 
@@ -155,11 +155,11 @@ class Cursor {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
     state = State.CLOSED;
     if (cursorId != 0) {
-      MongoKillCursorsMessage msg = new MongoKillCursorsMessage(cursorId);
+      MongoKillCursorsMessage msg = MongoKillCursorsMessage(cursorId);
       cursorId = 0;
       db.executeMessage(msg, WriteConcern.UNACKNOWLEDGED);
     }
-    return new Future.value(null);
+    return Future.value(null);
   }
 
 //  Stream<Map> get stream {
@@ -183,7 +183,7 @@ class CommandCursor extends Cursor {
   bool firstBatch = true;
   @override
   MongoQueryMessage generateQueryMessage() {
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   void getCursorData(MongoReplyMessage replyMessage) {
@@ -192,8 +192,13 @@ class CommandCursor extends Cursor {
       var cursorMap = replyMessage.documents.first['cursor'];
       if (cursorMap != null) {
         cursorId = cursorMap['id'] as int;
+<<<<<<< HEAD
         List firstBatch = cursorMap['firstBatch'] as List;
         items.addAll(new List.from(firstBatch));
+=======
+        final firstBatch = cursorMap['firstBatch'] as List;
+        items.addAll(List.from(firstBatch));
+>>>>>>> d7979a940cc266dcfe9a71787c33a923df9e49d2
       }
     } else {
       super.getCursorData(replyMessage);
@@ -210,7 +215,7 @@ class AggregateCursor extends CommandCursor {
       : super(db, collection, <String, dynamic>{});
   @override
   MongoQueryMessage generateQueryMessage() {
-    return new DbCommand(
+    return DbCommand(
         db,
         DbCommand.SYSTEM_COMMAND_COLLECTION,
         MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT,
@@ -230,7 +235,7 @@ class ListCollectionsCursor extends CommandCursor {
   ListCollectionsCursor(Db db, selector) : super(db, null, selector);
   @override
   MongoQueryMessage generateQueryMessage() {
-    return new DbCommand(
+    return DbCommand(
         db,
         DbCommand.SYSTEM_COMMAND_COLLECTION,
         MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT,
@@ -246,7 +251,7 @@ class ListIndexesCursor extends CommandCursor {
       : super(db, collection, <String, dynamic>{});
   @override
   MongoQueryMessage generateQueryMessage() {
-    return new DbCommand(
+    return DbCommand(
         db,
         DbCommand.SYSTEM_COMMAND_COLLECTION,
         MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT,

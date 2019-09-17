@@ -14,15 +14,15 @@ class MongoReplyMessage extends MongoMessage {
   int numberReturned = -1;
   List<Map<String, dynamic>> documents;
 
-  deserialize(BsonBinary buffer) {
+  void deserialize(BsonBinary buffer) {
     readMessageHeaderFrom(buffer);
     responseFlags = buffer.readInt32();
     cursorId = buffer.readInt64();
     startingFrom = buffer.readInt32();
     numberReturned = buffer.readInt32();
-    documents = new List(numberReturned);
+    documents = List(numberReturned);
     for (int n = 0; n < numberReturned; n++) {
-      BsonMap doc = new BsonMap({});
+      BsonMap doc = BsonMap({});
       doc.unpackValue(buffer);
       documents[n] = doc.value as Map<String, dynamic>;
     }

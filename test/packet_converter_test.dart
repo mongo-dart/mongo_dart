@@ -6,11 +6,11 @@ import 'package:mongo_dart/mongo_dart.dart';
 main() {
   group('Packet converter basics', () {
     test('PacketConverter creation', () {
-      var converter = new PacketConverter();
+      var converter = PacketConverter();
       expect(converter, isNotNull);
     });
     test('bytesAvailable', () {
-      var converter = new PacketConverter();
+      var converter = PacketConverter();
       converter.packets.addAll([
         [1, 2, 3],
         [4, 5, 6, 7]
@@ -20,8 +20,8 @@ main() {
       expect(converter.bytesAvailable(), 5);
     });
     test('readIntoBuffer 1', () {
-      var converter = new PacketConverter();
-      var buffer = new List<int>(7);
+      var converter = PacketConverter();
+      var buffer = List<int>(7);
       converter.packets.addAll([
         [1, 2, 3],
         [4, 5, 6, 7]
@@ -32,8 +32,8 @@ main() {
       expect(converter.packets, isEmpty);
     });
     test('readIntoBuffer 2', () {
-      var converter = new PacketConverter();
-      var buffer = new List<int>(5);
+      var converter = PacketConverter();
+      var buffer = List<int>(5);
       converter.packets.addAll([
         [1, 2, 3],
         [4, 5, 6, 7]
@@ -45,8 +45,8 @@ main() {
       expect(converter.packets, isEmpty);
     });
     test('readIntoBuffer 3', () {
-      var converter = new PacketConverter();
-      var buffer = new List<int>(3);
+      var converter = PacketConverter();
+      var buffer = List<int>(3);
       converter.packets.addAll([
         [1, 2, 3],
         [4, 5, 6, 7]
@@ -56,7 +56,7 @@ main() {
       expect(buffer, [3, 4, 5]);
       expect(converter.readPos, 2);
       expect(converter.bytesAvailable(), 2);
-      buffer = new List<int>(2);
+      buffer = List<int>(2);
       converter.readIntoBuffer(buffer, 0);
       expect(buffer, [6, 7]);
       expect(converter.packets, isEmpty);
@@ -68,28 +68,28 @@ main() {
       // Length of 7 in first four bytes and 3 elements.
       // Full message in one packet
       var packet = [7, 0, 0, 0, 1, 2, 3];
-      var converter = new PacketConverter();
+      var converter = PacketConverter();
       converter.addPacket(packet);
       expect(converter.messages.length, 1);
       expect(converter.messages.first, packet);
     });
 
     test('Length part splitted', () {
-      var converter = new PacketConverter();
+      var converter = PacketConverter();
       converter.addPacket([7, 0, 0]);
       converter.addPacket([0, 1, 2, 3]);
       expect(converter.messages.length, 1);
       expect(converter.messages.first, [7, 0, 0, 0, 1, 2, 3]);
     });
     test('Packets not full for message', () {
-      var converter = new PacketConverter();
+      var converter = PacketConverter();
       converter.addPacket([7, 0, 0]);
       converter.addPacket([0, 1, 2]);
       expect(converter.messages, isEmpty);
     });
     test('Full message in one packet and some more', () {
       var packet = [7, 0, 0, 0, 1, 2, 3, 4, 5];
-      var converter = new PacketConverter();
+      var converter = PacketConverter();
       converter.addPacket(packet);
       expect(converter.messages.length, 1);
       expect(converter.messages.first, [7, 0, 0, 0, 1, 2, 3]);
@@ -108,7 +108,7 @@ main() {
         packet.add(2);
       }
 
-      var converter = new PacketConverter();
+      var converter = PacketConverter();
       converter.addPacket(packet);
       expect(converter.messages.length, 8002);
       expect(converter.messages.first, [7, 0, 0, 0, 0, 1, 2]);

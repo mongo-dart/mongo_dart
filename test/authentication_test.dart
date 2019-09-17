@@ -6,7 +6,7 @@ final String mongoDbUri =
 
 main() {
   test("Should be able to connect and authenticate", () async {
-    Db db = new Db(mongoDbUri, 'test scram sha1');
+    Db db = Db(mongoDbUri, 'test scram sha1');
 
     await db.open();
     await db.collection('test').find().toList();
@@ -16,7 +16,7 @@ main() {
   test(
       "Should be able to connect and authenticate with auth mechanism specified",
       () async {
-    Db db = new Db('$mongoDbUri?authMechanism=${ScramSha1Authenticator.name}');
+    Db db = Db('$mongoDbUri?authMechanism=${ScramSha1Authenticator.name}');
 
     await db.open();
     await db.collection('test').find().toList();
@@ -24,7 +24,7 @@ main() {
   });
 
   test("Can't connect with mongodb-cr on a db without that scheme", () async {
-    Db db = new Db('$mongoDbUri/?authMechanism=${MongoDbCRAuthenticator.name}');
+    Db db = Db('$mongoDbUri/?authMechanism=${MongoDbCRAuthenticator.name}');
 
     var expectedError = {
       'ok': 0.0,
@@ -51,7 +51,7 @@ main() {
 
   test("Throw exception when auth mechanism isn't supported", () async {
     final String authMechanism = 'Anything';
-    Db db = new Db('$mongoDbUri?authMechanism=$authMechanism');
+    Db db = Db('$mongoDbUri?authMechanism=$authMechanism');
 
     var sut = () async => await db.open();
 
@@ -64,7 +64,7 @@ main() {
 
   group('RandomStringGenerator', () {
     test("Shouldn't produce twice the same string", () {
-      var generator = new CryptoStrengthStringGenerator();
+      var generator = CryptoStrengthStringGenerator();
 
       var results = {};
 

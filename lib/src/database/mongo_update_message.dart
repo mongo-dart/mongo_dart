@@ -10,12 +10,12 @@ class MongoUpdateMessage extends MongoMessage {
 
   MongoUpdateMessage(String collectionFullName, Map<String, dynamic> selector,
       document, this.flags) {
-    _collectionFullName = new BsonCString(collectionFullName);
-    _selector = new BsonMap(selector);
+    _collectionFullName = BsonCString(collectionFullName);
+    _selector = BsonMap(selector);
     if (document is ModifierBuilder) {
       document = document.map;
     }
-    _document = new BsonMap(document as Map<String, dynamic>);
+    _document = BsonMap(document as Map<String, dynamic>);
     opcode = MongoMessage.Update;
   }
 
@@ -29,7 +29,7 @@ class MongoUpdateMessage extends MongoMessage {
   }
 
   BsonBinary serialize() {
-    BsonBinary buffer = new BsonBinary(messageLength);
+    BsonBinary buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
     _collectionFullName.packValue(buffer);

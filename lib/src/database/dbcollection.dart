@@ -23,7 +23,7 @@ class DbCollection {
           upsert: true, writeConcern: writeConcern);
     } else {
       if (createId) {
-        document["_id"] = new ObjectId();
+        document["_id"] = ObjectId();
       }
       return insert(document, writeConcern: writeConcern);
     }
@@ -31,19 +31,19 @@ class DbCollection {
 
   Future<Map<String, dynamic>> insertAll(List<Map<String, dynamic>> documents,
       {WriteConcern writeConcern}) {
-    return new Future.sync(() {
+    return Future.sync(() {
       MongoInsertMessage insertMessage =
-          new MongoInsertMessage(fullName(), documents);
+          MongoInsertMessage(fullName(), documents);
       db.executeMessage(insertMessage, writeConcern);
       return db._getAcknowledgement(writeConcern: writeConcern);
     });
   }
 
   Future<Map<String, dynamic>> update(selector, document,
-      {bool upsert: false,
-      bool multiUpdate: false,
+      {bool upsert = false,
+      bool multiUpdate = false,
       WriteConcern writeConcern}) {
-    return new Future.sync(() {
+    return Future.sync(() {
       int flags = 0;
       if (upsert) {
         flags |= 0x1;
@@ -52,39 +52,35 @@ class DbCollection {
         flags |= 0x2;
       }
 
-      MongoUpdateMessage message = new MongoUpdateMessage(
+      MongoUpdateMessage message = MongoUpdateMessage(
           fullName(), _selectorBuilder2Map(selector), document, flags);
       db.executeMessage(message, writeConcern);
       return db._getAcknowledgement(writeConcern: writeConcern);
     });
   }
 
-  /**
-   * Creates a cursor for a query that can be used to iterate over results from MongoDB
-   * ##[selector]
-   * parameter represents query to locate objects. If omitted as in `find()` then query matches all documents in colleciton.
-   * Here's a more selective example:
-   *     find({'last_name': 'Smith'})
-   * Here our selector will match every document where the last_name attribute is 'Smith.'
-   *
-   */
+  /// Creates a cursor for a query that can be used to iterate over results from MongoDB
+  /// ##[selector]
+  /// parameter represents query to locate objects. If omitted as in `find()` then query matches all documents in colleciton.
+  /// Here's a more selective example:
+  ///     find({'last_name': 'Smith'})
+  /// Here our selector will match every document where the last_name attribute is 'Smith.'
+  ///
   Stream<Map<String, dynamic>> find([selector]) =>
-      new Cursor(db, this, selector).stream;
+      Cursor(db, this, selector).stream;
 
-  Cursor createCursor([selector]) => new Cursor(db, this, selector);
+  Cursor createCursor([selector]) => Cursor(db, this, selector);
 
   Future<Map<String, dynamic>> findOne([selector]) {
-    Cursor cursor = new Cursor(db, this, selector);
+    Cursor cursor = Cursor(db, this, selector);
     Future<Map<String, dynamic>> result = cursor.nextObject();
     cursor.close();
     return result;
   }
 
-  /**
-   * Modifies and returns a single document.
-   * By default, the returned document does not include the modifications made on the update.
-   * To return the document with the modifications made on the update, use the returnNew option.
-   */
+  /// Modifies and returns a single document.
+  /// By default, the returned document does not include the modifications made on the update.
+  /// To return the document with the modifications made on the update, use the returnNew option.
   Future<Map<String, dynamic>> findAndModify(
       {query, sort, bool remove, update, bool returnNew, fields, bool upsert}) {
     query = _queryBuilder2Map(query);
@@ -102,7 +98,7 @@ class DbCollection {
             fields: fields as Map<String, dynamic>,
             upsert: upsert))
         .then((reply) {
-      return new Future.value(reply["value"] as Map<String, dynamic>);
+      return Future.value(reply["value"] as Map<String, dynamic>);
     });
   }
 
@@ -117,7 +113,7 @@ class DbCollection {
         .executeDbCommand(DbCommand.createCountCommand(
             db, collectionName, _selectorBuilder2Map(selector)))
         .then((reply) {
-      return new Future.value((reply["n"] as num)?.toInt());
+      return Future.value((reply["n"] as num)?.toInt());
     });
   }
 
@@ -126,16 +122,16 @@ class DbCollection {
           db, collectionName, field, _selectorBuilder2Map(selector)));
 
   Future<Map<String, dynamic>> aggregate(List pipeline,
-      {bool allowDiskUse: false, Map<String, dynamic> cursor}) {
+      {bool allowDiskUse = false, Map<String, dynamic> cursor}) {
     var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline,
         allowDiskUse: allowDiskUse, cursor: cursor);
     return db.executeDbCommand(cmd);
   }
 
   Stream<Map<String, dynamic>> aggregateToStream(List pipeline,
-      {Map<String, dynamic> cursorOptions: const {},
-      bool allowDiskUse: false}) {
-    return new AggregateCursor(db, this, pipeline, cursorOptions, allowDiskUse)
+      {Map<String, dynamic> cursorOptions = const {},
+      bool allowDiskUse = false}) {
+    return AggregateCursor(db, this, pipeline, cursorOptions, allowDiskUse)
         .stream;
   }
 
@@ -149,13 +145,13 @@ class DbCollection {
   ///  on a collection
   Future<List<Map<String, dynamic>>> getIndexes() {
     if (db._masterConnection.serverCapabilities.listIndexes) {
-      return new ListIndexesCursor(db, this).stream.toList();
+      return ListIndexesCursor(db, this).stream.toList();
     } else {
       /// Pre MongoDB v3.0 API
       var selector = <String, dynamic>{};
       selector['ns'] = this.fullName();
-      return new Cursor(db,
-              new DbCollection(db, DbCommand.SYSTEM_INDEX_COLLECTION), selector)
+      return Cursor(
+              db, DbCollection(db, DbCommand.SYSTEM_INDEX_COLLECTION), selector)
           .stream
           .toList();
     }

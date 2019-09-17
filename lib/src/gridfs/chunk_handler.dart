@@ -18,7 +18,7 @@ class ChunkHandler {
       pos += chunkSize;
     }
     if (data.length > pos) {
-      carry = new List<int>();
+      carry = List<int>();
       carry.addAll(data.sublist(pos));
       if (isClosing) {
         sink.add(carry);
@@ -42,6 +42,6 @@ class ChunkHandler {
   }
 
   StreamTransformer<List<int>, List<int>> get transformer =>
-      new StreamTransformer<List<int>, List<int>>.fromHandlers(
+      StreamTransformer<List<int>, List<int>>.fromHandlers(
           handleData: handleData, handleDone: handleDone);
 }

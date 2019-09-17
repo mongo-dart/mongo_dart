@@ -11,7 +11,7 @@ const dbName = "test-mongo-dart";
 const DefaultUri = 'mongodb://localhost:27017/$dbName';
 
 Db db;
-Uuid uuid = new Uuid();
+Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
 String getRandomCollectionName() {
@@ -118,19 +118,19 @@ Future testDateTime() async {
   var collection = db.collection(collectionName);
 
   await collection.insertAll([
-    {"day": 1, "posted_on": new DateTime.utc(2013, 1, 1)},
-    {"day": 2, "posted_on": new DateTime.utc(2013, 1, 2)},
-    {"day": 3, "posted_on": new DateTime.utc(2013, 1, 3)},
-    {"day": 4, "posted_on": new DateTime.utc(2013, 1, 4)},
-    {"day": 5, "posted_on": new DateTime.utc(2013, 1, 5)},
-    {"day": 6, "posted_on": new DateTime.utc(2013, 1, 6)},
-    {"day": 7, "posted_on": new DateTime.utc(2013, 1, 7)},
-    {"day": 8, "posted_on": new DateTime.utc(2013, 1, 8)},
-    {"day": 9, "posted_on": new DateTime.utc(2013, 1, 9)}
+    {"day": 1, "posted_on": DateTime.utc(2013, 1, 1)},
+    {"day": 2, "posted_on": DateTime.utc(2013, 1, 2)},
+    {"day": 3, "posted_on": DateTime.utc(2013, 1, 3)},
+    {"day": 4, "posted_on": DateTime.utc(2013, 1, 4)},
+    {"day": 5, "posted_on": DateTime.utc(2013, 1, 5)},
+    {"day": 6, "posted_on": DateTime.utc(2013, 1, 6)},
+    {"day": 7, "posted_on": DateTime.utc(2013, 1, 7)},
+    {"day": 8, "posted_on": DateTime.utc(2013, 1, 8)},
+    {"day": 9, "posted_on": DateTime.utc(2013, 1, 9)}
   ]);
 
   var result = await collection
-      .find(where.lt('posted_on', new DateTime.utc(2013, 1, 5)))
+      .find(where.lt('posted_on', DateTime.utc(2013, 1, 5)))
       .toList();
 
   expect(result is List, isTrue);
@@ -247,7 +247,7 @@ Future testInsertWithObjectId() async {
 
   var id;
   var objectToSave = <String, dynamic>{
-    "_id": new ObjectId(),
+    "_id": ObjectId(),
     "name": "a",
     "value": 10
   };
@@ -282,7 +282,11 @@ Future testDistinct() async {
   await collection.insert({"foo": 3});
   var result = await collection.distinct("foo");
 
+<<<<<<< HEAD
   List values = result['values'] as List;
+=======
+  final values = result['values'] as List;
+>>>>>>> d7979a940cc266dcfe9a71787c33a923df9e49d2
   expect(values[0], 1);
   expect(values[1], 2);
   expect(values[2], 3);
@@ -346,7 +350,7 @@ db.runCommand(
 { "$sort": { "_id": 1 } }
 ]});
  */
-  List pipeline = new List();
+  List pipeline = List();
   var p1 = {
     "\$group": {
       "_id": {"game": "\$game", "player": "\$player"},
@@ -371,7 +375,11 @@ db.runCommand(
   expect(p1["\$group"], isNotNull);
 
   var v = await collection.aggregate(pipeline);
+<<<<<<< HEAD
   List result = v['result'] as List;
+=======
+  final result = v['result'] as List;
+>>>>>>> d7979a940cc266dcfe9a71787c33a923df9e49d2
   expect(result[0]["_id"], "Age of Steam");
   expect(result[0]["avgRating"], 3);
 }
@@ -434,7 +442,7 @@ db.runCommand(
 { "$sort": { "_id": 1 } }
 ]});
  */
-  List pipeline = new List();
+  List pipeline = List();
   var p1 = {
     "\$group": {
       "_id": {"game": "\$game", "player": "\$player"},
@@ -459,10 +467,17 @@ db.runCommand(
   expect(p1["\$group"], isNotNull);
 
   var v = await collection.aggregate(pipeline, cursor: {'batchSize': 3});
+<<<<<<< HEAD
   Map cursor = v['cursor'] as Map;
   expect(cursor['id'], const TypeMatcher<int>());
   expect(cursor['firstBatch'], allOf(const TypeMatcher<List>(), hasLength(3)));
   List firstBatch = cursor['firstBatch'] as List;
+=======
+  final cursor = v['cursor'] as Map;
+  expect(cursor['id'], const TypeMatcher<int>());
+  expect(cursor['firstBatch'], allOf(const TypeMatcher<List>(), hasLength(3)));
+  final firstBatch = cursor['firstBatch'] as List;
+>>>>>>> d7979a940cc266dcfe9a71787c33a923df9e49d2
   expect(firstBatch[0]["_id"], "Age of Steam");
   expect(firstBatch[0]["avgRating"], 3);
 }
@@ -539,7 +554,7 @@ db.runCommand(
 { "$sort": { "_id": 1 } }
 ]});
  */
-  List pipeline = new List();
+  List pipeline = List();
   var p1 = {
     "\$group": {
       "_id": {"game": "\$game", "player": "\$player"},
@@ -703,13 +718,13 @@ testCursorCreation() {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  Cursor cursor = new Cursor(db, collection, null);
+  Cursor cursor = Cursor(db, collection, null);
   return cursor;
 }
 
 Future testPingRaw() async {
   DbCollection collection = db.collection('\$cmd');
-  Cursor cursor = new Cursor(db, collection, where.eq('ping', 1).limit(1));
+  Cursor cursor = Cursor(db, collection, where.eq('ping', 1).limit(1));
   MongoQueryMessage queryMessage = cursor.generateQueryMessage();
 
   var result = await db.queryMessage(queryMessage);
@@ -719,7 +734,7 @@ Future testPingRaw() async {
 
 Future testNextObject() async {
   DbCollection collection = db.collection('\$cmd');
-  Cursor cursor = new Cursor(db, collection, where.eq('ping', 1).limit(1));
+  Cursor cursor = Cursor(db, collection, where.eq('ping', 1).limit(1));
 
   var newCursor = await cursor.nextObject();
 
@@ -735,7 +750,7 @@ Future testNextObjectToEnd() async {
   await collection.insert({"a": 2});
   await collection.insert({"a": 3});
 
-  cursor = new Cursor(db, collection, where.limit(10));
+  cursor = Cursor(db, collection, where.limit(10));
   var result = await cursor.nextObject();
   expect(result, isNotNull);
 
@@ -754,7 +769,7 @@ Future testCursorWithOpenServerCursor() async {
   var collection = db.collection(collectionName);
 
   await insertManyDocuments(collection, 1000);
-  var cursor = new Cursor(db, collection, where.limit(10));
+  var cursor = Cursor(db, collection, where.limit(10));
 
   await cursor.nextObject();
 
@@ -767,13 +782,13 @@ Future testCursorGetMore() async {
   var collection = db.collection(collectionName);
 
   int count = 0;
-  Cursor cursor = new Cursor(db, collection, where.limit(10));
+  Cursor cursor = Cursor(db, collection, where.limit(10));
   count = await cursor.stream.length;
   expect(count, 0);
 
   await insertManyDocuments(collection, 1000);
 
-  cursor = new Cursor(db, collection, null);
+  cursor = Cursor(db, collection, null);
   count = await cursor.stream.length;
 
   expect(count, 1000);
@@ -809,7 +824,7 @@ Future testCursorClosing() async {
 void testDbCommandCreation() {
   String collectionName = getRandomCollectionName();
 
-  DbCommand dbCommand = new DbCommand(db, collectionName, 0, 0, 1, {}, {});
+  DbCommand dbCommand = DbCommand(db, collectionName, 0, 0, 1, {}, {});
   expect(dbCommand.collectionNameBson.value, '$dbName.$collectionName');
 }
 
@@ -1174,8 +1189,8 @@ Future testDbNotOpen() async {
 Future testDbOpenWhileStateIsOpening() {
   String collectionName = getRandomCollectionName();
 
-  Db db = new Db(DefaultUri);
-  return new Future.sync(() {
+  Db db = Db(DefaultUri);
+  return Future.sync(() {
     db.open().then((_) {
       return db.collection(collectionName).findOne();
     }).then((res) {
@@ -1214,8 +1229,8 @@ testInvalidIndexCreationErrorHandling1() {
 Future testFindOneWhileStateIsOpening() {
   String collectionName = getRandomCollectionName();
 
-  Db db = new Db(DefaultUri);
-  return new Future.sync(() {
+  Db db = Db(DefaultUri);
+  return Future.sync(() {
     db.open().then((_) {
       return db.collection(collectionName).findOne();
     }).then((res) {
@@ -1234,7 +1249,7 @@ Future testFindOneWhileStateIsOpening() {
 
 main() {
   Future initializeDatabase() async {
-    db = new Db(DefaultUri);
+    db = Db(DefaultUri);
     await db.open();
   }
 
@@ -1324,7 +1339,11 @@ main() {
 
     group('Aggregate:', () {
       test('testAggregate', testAggregate,
+<<<<<<< HEAD
           skip: 'As of MongoDB 3.6, cursor is always required.');
+=======
+          skip: 'As of MongoDB 3.6, cursor is *required* for aggregate.');
+>>>>>>> d7979a940cc266dcfe9a71787c33a923df9e49d2
       test('testAggregateWithCursor', testAggregateWithCursor);
       test(
           'testAggregateToStream - if server older then version 2.6 test would be skipped',

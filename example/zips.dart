@@ -8,8 +8,7 @@ main() async {
         'state: ${zip["state"]}, city: ${zip["city"]}, zip: ${zip["id"]}, population: ${zip["pop"]}');
   }
 
-  Db db =
-      new Db("mongodb://reader:vHm459fU@ds037468.mongolab.com:37468/samlple");
+  Db db = Db("mongodb://reader:vHm459fU@ds037468.mongolab.com:37468/samlple");
   var zips = db.collection('zip');
   await db.open();
   print('''
