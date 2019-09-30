@@ -1,5 +1,8 @@
 #Recent change notes
 
+### 0.4.0-dev.1
+* Upgraded to `mongo_dart_query` `0.4.1`. The update adds aggregation pipeline builder.
+
 ### 0.3.6
 * Updates for Dart 2.5 compatibility. As of Dart 2.5, the `Socket` class
 emits `Uint8List`, rather than plain `List<int>`, so some fixes were necessary
