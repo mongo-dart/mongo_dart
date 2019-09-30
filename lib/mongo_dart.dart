@@ -14,10 +14,13 @@ import 'package:collection/collection.dart';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:bson/bson.dart';
 import 'package:logging/logging.dart';
+// ignore: unused_import
+import 'package:mongo_dart_query/mongo_aggregation.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:pool/pool.dart';
 
 export 'package:bson/bson.dart';
+export 'package:mongo_dart_query/mongo_aggregation.dart';
 export 'package:mongo_dart_query/mongo_dart_query.dart';
 
 part 'src/connection_pool.dart';
