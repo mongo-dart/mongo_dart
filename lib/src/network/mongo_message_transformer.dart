@@ -1,14 +1,14 @@
 part of mongo_dart;
 
 class MongoMessageHandler {
-  final _log = new Logger('MongoMessageTransformer');
-  final converter = new PacketConverter();
+  final _log = Logger('MongoMessageTransformer');
+  final converter = PacketConverter();
 
   void handleData(Uint8List data, EventSink<MongoReplyMessage> sink) {
     converter.addPacket(data);
     while (!converter.messages.isEmpty) {
-      var buffer = new BsonBinary.from(converter.messages.removeFirst());
-      MongoReplyMessage reply = new MongoReplyMessage();
+      var buffer = BsonBinary.from(converter.messages.removeFirst());
+      MongoReplyMessage reply = MongoReplyMessage();
       reply.deserialize(buffer);
       _log.fine(() => reply.toString());
       sink.add(reply);

@@ -4,7 +4,7 @@ class GridOut extends GridFSFile {
   GridOut([Map<String, dynamic> data]) : super(data);
 
   Future writeToFilename(String filename) {
-    return writeToFile(new File(filename));
+    return writeToFile(File(filename));
   }
 
   Future writeToFile(File file) {
@@ -17,9 +17,9 @@ class GridOut extends GridFSFile {
 
   Future<int> writeTo(IOSink out) {
     int length = 0;
-    Completer<int> completer = new Completer();
+    Completer<int> completer = Completer();
     addToSink(Map<String, dynamic> chunk) {
-      BsonBinary data = chunk["data"] as BsonBinary;
+      final data = chunk["data"] as BsonBinary;
       out.add(data.byteList);
       length += data.byteList.length;
     }

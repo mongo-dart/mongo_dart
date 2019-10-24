@@ -1,5 +1,18 @@
 #Recent change notes
 
+### 0.4.0-dev.1
+* Upgraded to `mongo_dart_query` `0.4.1`. The update adds aggregation pipeline builder.
+
+### 0.3.6
+* Updates for Dart 2.5 compatibility. As of Dart 2.5, the `Socket` class
+emits `Uint8List`, rather than plain `List<int>`, so some fixes were necessary
+to allow the package to continue to function.
+  * Courtesy of @a14n, thank you!
+  * Resolves https://github.com/mongo-dart/mongo_dart/issues/160, among other issues.
+
+### 0.3.5
+* Upgraded `uuid` constraint to `^2.0.0`.
+
 ### 0.3.4
 * Added `cursor` option to `DbCollection.aggregate`.
   * Courtesy of @jodinathan, thank you!

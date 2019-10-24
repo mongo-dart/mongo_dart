@@ -5,9 +5,9 @@ class State {
   const State._internal(this._value);
   toString() => 'State.$_value';
 
-  static const INIT = const State._internal('INIT');
-  static const OPENING = const State._internal('OPENING');
-  static const OPEN = const State._internal('OPEN');
-  static const CLOSING = const State._internal('CLOSING');
-  static const CLOSED = const State._internal('CLOSED');
+  static const INIT = State._internal('INIT');
+  static const OPENING = State._internal('OPENING');
+  static const OPEN = State._internal('OPEN');
+  static const CLOSING = State._internal('CLOSING');
+  static const CLOSED = State._internal('CLOSED');
 }

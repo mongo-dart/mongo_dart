@@ -1,11 +1,11 @@
 part of mongo_dart;
 
 class _ConnectionManager {
-  final _log = new Logger('ConnectionManager');
+  final _log = Logger('ConnectionManager');
   final Db db;
-  final _connectionPool = new Map<String, _Connection>();
-  final replyCompleters = new Map<int, Completer<MongoReplyMessage>>();
-  final sendQueue = new Queue<MongoMessage>();
+  final _connectionPool = Map<String, _Connection>();
+  final replyCompleters = Map<int, Completer<MongoReplyMessage>>();
+  final sendQueue = Queue<MongoMessage>();
   _Connection _masterConnection;
 
   _ConnectionManager(this.db);
@@ -15,7 +15,7 @@ class _ConnectionManager {
     if (_masterConnection != null) {
       return _masterConnection;
     } else {
-      throw new MongoDartError('No master connection');
+      throw MongoDartError('No master connection');
     }
   }
 
@@ -58,7 +58,7 @@ class _ConnectionManager {
       return _connect(connection);
     }).then((_) {
       db.state = State.OPEN;
-      return new Future.value(true);
+      return Future.value(true);
     });
   }
 
@@ -78,7 +78,7 @@ class _ConnectionManager {
   }
 
   addConnection(ServerConfig serverConfig) {
-    var connection = new _Connection(this, serverConfig);
+    var connection = _Connection(this, serverConfig);
     _connectionPool[serverConfig.hostUrl] = connection;
   }
 

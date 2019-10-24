@@ -28,11 +28,11 @@ class _ServerCapabilities {
 }
 
 class _Connection {
-  final Logger _log = new Logger('Connection');
+  final Logger _log = Logger('Connection');
   _ConnectionManager _manager;
   ServerConfig serverConfig;
   Socket socket;
-  Set<int> _pendingQueries = new Set();
+  Set<int> _pendingQueries = Set();
   Map<int, Completer<MongoReplyMessage>> get _replyCompleters =>
       _manager.replyCompleters;
   Queue<MongoMessage> get _sendQueue => _manager.sendQueue;
@@ -43,11 +43,11 @@ class _Connection {
   bool connected = false;
   bool _closed = false;
   bool isMaster = false;
-  final _ServerCapabilities serverCapabilities = new _ServerCapabilities();
+  final _ServerCapabilities serverCapabilities = _ServerCapabilities();
 
   _Connection(this._manager, [this.serverConfig]) {
     if (serverConfig == null) {
-      serverConfig = new ServerConfig();
+      serverConfig = ServerConfig();
     }
   }
 
@@ -63,9 +63,8 @@ class _Connection {
     _socketConnection.then((Socket _socket) {
       // Socket connected.
       socket = _socket;
-      _repliesSubscription = socket
-          .transform(new MongoMessageHandler().transformer)
-          .listen(_receiveReply,
+      _repliesSubscription =
+          MongoMessageHandler().transformer.bind(socket).listen(_receiveReply,
               onError: (e, st) {
                 _log.severe("Socket error ${e} ${st}");
                 //completer.completeError(e);
@@ -103,7 +102,7 @@ class _Connection {
   }
 
   Future<MongoReplyMessage> query(MongoMessage queryMessage) {
-    Completer<MongoReplyMessage> completer = new Completer();
+    Completer<MongoReplyMessage> completer = Completer();
     if (!_closed) {
       _replyCompleters[queryMessage.requestId] = completer;
       _pendingQueries.add(queryMessage.requestId);

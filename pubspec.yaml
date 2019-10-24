@@ -1,5 +1,5 @@
 name: mongo_dart
-version: 0.3.4+1
+version: 0.4.0-dev.1
 authors:
 - Vadim Tsushko <vadimtsushko@gmail.com>
 - Ted Sander <ted@tedsander.com>
@@ -7,6 +7,7 @@ authors:
 - Stéphane Este-Gracias <sestegra@gmail.com>
 - Joel Trottier-Hebert <iamquebecois@gmail.com>
 - Tobe O <thosakwe@gmail.com>
+- Alexey Danilevsky <alexey.danilevsky@gmail.com>
 description: MongoDB driver for Dart
 homepage: https://github.com/mongo-dart/mongo_dart
 environment:
@@ -15,7 +16,7 @@ dependencies:
   bson: '^0.3.2'
   crypto: '^2.0.6'
   logging: '^0.11.3+2'
-  mongo_dart_query: '^0.3.2'
+  mongo_dart_query: '^0.4.1'
   collection: '^1.14.11'
   path: '^1.6.2'
   pool: ^1.4.0

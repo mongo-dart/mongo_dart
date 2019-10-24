@@ -18,9 +18,9 @@ class ClientFirst extends SaslStep {
 
     Map<String, dynamic> decodedMessage = parsePayload(serverFirstMessage);
 
-    String r = decodedMessage['r'] as String;
+    final r = decodedMessage['r'] as String;
     if (r == null || !r.startsWith(rPrefix)) {
-      throw new MongoDartError("Server sent an invalid nonce.");
+      throw MongoDartError("Server sent an invalid nonce.");
     }
 
     var s = decodedMessage['s'];
@@ -50,19 +50,19 @@ class ClientFirst extends SaslStep {
     var proof = 'p=$base64clientProof';
     var clientFinalMessage = '$clientFinalMessageWithoutProof,$proof';
 
-    return new ClientLast(
+    return ClientLast(
         _coerceUint8List(utf8.encode(clientFinalMessage)), serverSignature);
   }
 
   static Uint8List computeHMAC(Uint8List data, String key) {
     var sha1 = crypto.sha1;
-    var hmac = new crypto.Hmac(sha1, data);
+    var hmac = crypto.Hmac(sha1, data);
     hmac.convert(utf8.encode(key));
-    return new Uint8List.fromList(hmac.convert(utf8.encode(key)).bytes);
+    return Uint8List.fromList(hmac.convert(utf8.encode(key)).bytes);
   }
 
   static Uint8List h(Uint8List data) {
-    return new Uint8List.fromList(crypto.sha1.convert(data).bytes);
+    return Uint8List.fromList(crypto.sha1.convert(data).bytes);
   }
 
   static String md5DigestPassword(username, password) {
@@ -84,17 +84,17 @@ class ClientFirst extends SaslStep {
       }
     }
 
-    return new Uint8List.fromList(result);
+    return Uint8List.fromList(result);
   }
 
   static Uint8List hi(String password, Uint8List salt, int iterations) {
     var digest = (List<int> msg) {
-      var hmac = new crypto.Hmac(crypto.sha1, password.codeUnits);
-      return new Uint8List.fromList(hmac.convert(msg).bytes);
+      var hmac = crypto.Hmac(crypto.sha1, password.codeUnits);
+      return Uint8List.fromList(hmac.convert(msg).bytes);
     };
 
     Uint8List newSalt =
-        new Uint8List.fromList(new List.from(salt)..addAll([0, 0, 0, 1]));
+        Uint8List.fromList(List.from(salt)..addAll([0, 0, 0, 1]));
 
     var ui = digest(newSalt);
     var u1 = ui;
@@ -124,28 +124,28 @@ class ClientLast extends SaslStep {
     var serverSignature = base64.decode(decodedMessage['v'].toString());
 
     if (!const IterableEquality().equals(serverSignature64, serverSignature)) {
-      throw new MongoDartError("Server signature was invalid.");
+      throw MongoDartError("Server signature was invalid.");
     }
 
-    return new CompletedStep();
+    return CompletedStep();
   }
 }
 
 class CompletedStep extends SaslStep {
   CompletedStep() {
-    this.bytesToSendToServer = new Uint8List(0);
+    this.bytesToSendToServer = Uint8List(0);
     isComplete = true;
   }
 
   @override
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
-    throw new MongoDartError("Sasl conversation has completed");
+    throw MongoDartError("Sasl conversation has completed");
   }
 }
 
 Uint8List _coerceUint8List(List<int> list) =>
-    list is Uint8List ? list : new Uint8List.fromList(list);
+    list is Uint8List ? list : Uint8List.fromList(list);
 
 class ScramSha1Mechanism extends SaslMechanism {
   final UsernamePasswordCredential credential;
@@ -155,7 +155,7 @@ class ScramSha1Mechanism extends SaslMechanism {
 
   @override
   SaslStep initialize(_Connection connection) {
-    if (connection == null) throw new ArgumentError("Connection can't be null");
+    if (connection == null) throw ArgumentError("Connection can't be null");
 
     final String gs2Header = 'n,,';
     var username = 'n=${prepUsername(credential.username)}';
@@ -166,7 +166,7 @@ class ScramSha1Mechanism extends SaslMechanism {
     var clientFirstMessageBare = '$username,$nonce';
     var clientFirstMessage = '$gs2Header$clientFirstMessageBare';
 
-    return new ClientFirst(_coerceUint8List(utf8.encode(clientFirstMessage)),
+    return ClientFirst(_coerceUint8List(utf8.encode(clientFirstMessage)),
         credential, clientFirstMessageBare, r);
   }
 
@@ -181,9 +181,7 @@ class ScramSha1Authenticator extends SaslAuthenticator {
   static String name = 'SCRAM-SHA-1';
 
   ScramSha1Authenticator(UsernamePasswordCredential credential, Db db)
-      : super(
-            new ScramSha1Mechanism(
-                credential, new CryptoStrengthStringGenerator()),
+      : super(ScramSha1Mechanism(credential, CryptoStrengthStringGenerator()),
             db) {
     this.db = db;
   }

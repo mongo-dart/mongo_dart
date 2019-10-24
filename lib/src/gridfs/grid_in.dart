@@ -11,13 +11,13 @@ class GridIn extends GridFSFile {
 
   ///TODO Review that code. Currently it sums all file's content in one (potentially big) List, to get MD5 hash
   /// Probably we should use some Stream api here
-  List<int> contentToDigest = new List<int>();
+  List<int> contentToDigest = List<int>();
   GridIn(this.fs,
       [String filename = null, Stream<List<int>> inputStream = null]) {
-    id = new ObjectId();
+    id = ObjectId();
     chunkSize = GridFS.DEFAULT_CHUNKSIZE;
-    input = inputStream.transform(new ChunkHandler(chunkSize).transformer);
-    uploadDate = new DateTime.now();
+    input = ChunkHandler(chunkSize).transformer.bind(inputStream);
+    uploadDate = DateTime.now();
     this.filename = filename;
   }
 
@@ -30,14 +30,14 @@ class GridIn extends GridFSFile {
     if (!savedChunks) {
       result = saveChunks(chunkSize);
     } else {
-      result = new Future.value({'ok': 1.0});
+      result = Future.value({'ok': 1.0});
     }
     return result;
   }
 
   Future<Map<String, dynamic>> saveChunks([int chunkSize = 0]) {
-    List<Future> futures = new List();
-    Completer<Map<String, dynamic>> completer = new Completer();
+    List<Future> futures = List();
+    Completer<Map<String, dynamic>> completer = Completer();
 
     _onDone() {
       Future.wait(futures).then((list) {
@@ -51,10 +51,10 @@ class GridIn extends GridFSFile {
       chunkSize = this.chunkSize;
     }
     if (savedChunks) {
-      throw new MongoDartError('chunks already saved!');
+      throw MongoDartError('chunks already saved!');
     }
     if (chunkSize <= 0 || chunkSize > GridFS.MAX_CHUNKSIZE) {
-      throw new MongoDartError(
+      throw MongoDartError(
           'chunkSize must be greater than zero and less than or equal to GridFS.MAX_CHUNKSIZE');
     }
     input.listen((data) {
@@ -68,13 +68,13 @@ class GridIn extends GridFSFile {
     contentToDigest.addAll(writeBuffer);
     if (writeBuffer.length == 0) {
       // Chunk is empty, may be last chunk
-      return new Future.value({});
+      return Future.value({});
     }
 
     Map<String, dynamic> chunk = {
       "files_id": id,
       "n": currentChunkNumber,
-      "data": new BsonBinary.from(writeBuffer)
+      "data": BsonBinary.from(writeBuffer)
     };
     currentChunkNumber++;
     totalBytes += writeBuffer.length;
