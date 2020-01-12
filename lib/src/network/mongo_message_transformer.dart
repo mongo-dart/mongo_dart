@@ -4,18 +4,23 @@ class MongoMessageHandler {
   final _log = Logger('MongoMessageTransformer');
   final converter = PacketConverter();
 
-  void handleData(List<int> data, EventSink<MongoReplyMessage> sink) {
+  void handleData(List<int> data, EventSink<MongoResponseMessage> sink) {
     converter.addPacket(data);
     while (!converter.messages.isEmpty) {
       var buffer = BsonBinary.from(converter.messages.removeFirst());
-      MongoReplyMessage reply = MongoReplyMessage();
-      reply.deserialize(buffer);
+      int opcodeFromWire = MongoResponseMessage.extractOpcode(buffer);
+      MongoResponseMessage reply;
+      if (opcodeFromWire == MongoMessage.Reply) {
+        reply = MongoReplyMessage()..deserialize(buffer);
+      } else {
+        reply = MongoModernMessage.fromBuffer(buffer);
+      }
       _log.fine(() => reply.toString());
       sink.add(reply);
     }
   }
 
-  void handleDone(EventSink<MongoReplyMessage> sink) {
+  void handleDone(EventSink<MongoResponseMessage> sink) {
     if (!converter.isClear) {
       _log.warning(
           'Invalid state of PacketConverter in handleDone: $converter');
@@ -23,7 +28,7 @@ class MongoMessageHandler {
     sink.close();
   }
 
-  StreamTransformer<List<int>, MongoReplyMessage> get transformer =>
-      StreamTransformer<List<int>, MongoReplyMessage>.fromHandlers(
+  StreamTransformer<List<int>, MongoResponseMessage> get transformer =>
+      StreamTransformer<List<int>, MongoResponseMessage>.fromHandlers(
           handleData: handleData, handleDone: handleDone);
 }

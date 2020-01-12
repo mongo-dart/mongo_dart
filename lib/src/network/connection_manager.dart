@@ -4,11 +4,12 @@ class _ConnectionManager {
   final _log = Logger('ConnectionManager');
   final Db db;
   final _connectionPool = Map<String, _Connection>();
-  final replyCompleters = Map<int, Completer<MongoReplyMessage>>();
+  final replyCompleters = Map<int, Completer<MongoResponseMessage>>();
   final sendQueue = Queue<MongoMessage>();
   _Connection _masterConnection;
 
   _ConnectionManager(this.db);
+
   _Connection get masterConnection => _masterConnection;
 
   _Connection get masterConnectionVerified {
@@ -56,14 +57,16 @@ class _ConnectionManager {
     return Future.forEach(_connectionPool.keys, (hostUrl) {
       var connection = _connectionPool[hostUrl];
       return _connect(connection);
-    }).then((_) {
+    }).then((_) async {
       db.state = State.OPEN;
-      return Future.value(true);
+      db.masterConnection.serverStatus
+          .processServerStatus(await db.serverStatus());
+      return true;
     });
   }
 
   Future close() {
-    while (!sendQueue.isEmpty) {
+    while (sendQueue.isNotEmpty) {
       masterConnection._sendBuffer();
     }
     sendQueue.clear();

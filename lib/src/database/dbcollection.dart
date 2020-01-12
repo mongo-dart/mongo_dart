@@ -3,6 +3,7 @@ part of mongo_dart;
 class DbCollection {
   Db db;
   String collectionName;
+  ReadPreference readPreference = ReadPreference.primary;
 
   DbCollection(this.db, this.collectionName) {}
 
@@ -155,6 +156,98 @@ class DbCollection {
           .stream
           .toList();
     }
+  }
+
+  /// This function is provided for all servers starting from version 3.6
+  /// For previous releases use the same method on Db class.
+  ///
+  /// The modernReply flag allows the caller to receive the result of
+  /// the command without a call to getLastError().
+  /// As the format is different from the getLastError() one, for compatibility
+  /// reasons, if you specify false, the old format is returned
+  /// (but one more getLastError() is performed).
+  /// Example of the new format:
+  /// {createdCollectionAutomatically: false,
+  /// numIndexesBefore: 2,
+  /// numIndexesAfter: 3,
+  /// ok: 1.0}
+  ///
+  /// Example of the old format:
+  /// {"connectionId" -> 11,
+  /// "n" -> 0,
+  /// "syncMillis" -> 0,
+  /// "writtenTo" -> null,
+  /// "err" -> null,
+  /// "ok" -> 1.0}
+  Future<Map<String, dynamic>> createIndex(
+      {String key,
+      Map<String, dynamic> keys,
+      bool unique,
+      bool sparse,
+      bool background,
+      bool dropDups,
+      Map<String, dynamic> partialFilterExpression,
+      String name,
+      bool modernReply}) async {
+    if (!db._masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError('Use createIndex() method on db (before 3.6)');
+    }
+    return Future.sync(() async {
+      modernReply ??= true;
+      CreateIndexOptions indexOptions = CreateIndexOptions(this,
+          uniqueIndex: unique == true,
+          sparseIndex: sparse == true,
+          background: background == true,
+          dropDuplicatedEntries: dropDups == true,
+          partialFilterExpression: partialFilterExpression,
+          indexName: name);
+
+      CreateIndexOperation indexOperation =
+          CreateIndexOperation(db, this, _setKeys(key, keys), indexOptions);
+
+      var res = await indexOperation.execute();
+      if (modernReply) {
+        return res;
+      }
+      return db.getLastError();
+    });
+  }
+
+  // This method has been made available since version 3.2
+  // As we will use this with the new wire message available
+  // since version 3.6, we will check this last version
+  // in order to allow the execution
+  Future<Map<String, dynamic>> insertOne(Map<String, dynamic> document,
+      {WriteConcern writeConcern}) async {
+    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError('This method is not available before release 3.6');
+    }
+    return Future.sync(() {
+      InsertOneOptions insertOneOptions =
+          InsertOneOptions(this, writeConcern: writeConcern);
+
+      InsertOneOperation insertOneOperation =
+          InsertOneOperation(this, document, insertOneOptions);
+
+      return insertOneOperation.execute();
+    });
+  }
+
+  Map<String, dynamic> _setKeys(String key, Map<String, dynamic> keys) {
+    if (key != null && keys != null) {
+      throw ArgumentError('Only one parameter must be set: key or keys');
+    }
+
+    if (key != null) {
+      keys = Map();
+      keys['$key'] = 1;
+    }
+
+    if (keys == null) {
+      throw ArgumentError('key or keys parameter must be set');
+    }
+
+    return keys;
   }
 
   Map<String, dynamic> _selectorBuilder2Map(selector) {

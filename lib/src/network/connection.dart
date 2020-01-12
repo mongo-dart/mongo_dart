@@ -8,6 +8,7 @@ class _ServerCapabilities {
   bool listCollections = false;
   bool listIndexes = false;
   int maxNumberOfDocsInBatch = 1000;
+  bool supportsOpMsg = false;
 
   getParamsFromIstMaster(Map<String, dynamic> isMaster) {
     if (isMaster.containsKey('maxWireVersion')) {
@@ -24,6 +25,9 @@ class _ServerCapabilities {
       listCollections = true;
       listIndexes = true;
     }
+    if (maxWireVersion >= 6) {
+      supportsOpMsg = true;
+    }
   }
 }
 
@@ -33,17 +37,21 @@ class _Connection {
   ServerConfig serverConfig;
   Socket socket;
   Set<int> _pendingQueries = Set();
-  Map<int, Completer<MongoReplyMessage>> get _replyCompleters =>
+
+  Map<int, Completer<MongoResponseMessage>> get _replyCompleters =>
       _manager.replyCompleters;
+
   Queue<MongoMessage> get _sendQueue => _manager.sendQueue;
-  StreamSubscription<MongoReplyMessage> _repliesSubscription;
-  StreamSubscription<MongoReplyMessage> get repliesSubscription =>
+  StreamSubscription<MongoResponseMessage> _repliesSubscription;
+
+  StreamSubscription<MongoResponseMessage> get repliesSubscription =>
       _repliesSubscription;
 
   bool connected = false;
   bool _closed = false;
   bool isMaster = false;
   final _ServerCapabilities serverCapabilities = _ServerCapabilities();
+  final ServerStatus serverStatus = ServerStatus();
 
   _Connection(this._manager, [this.serverConfig]) {
     if (serverConfig == null) {
@@ -87,7 +95,7 @@ class _Connection {
   _sendBuffer() {
     _log.fine(() => '_sendBuffer ${!_sendQueue.isEmpty}');
     List<int> message = [];
-    while (!_sendQueue.isEmpty) {
+    while (_sendQueue.isNotEmpty) {
       var mongoMessage = _sendQueue.removeFirst();
       message.addAll(mongoMessage.serialize().byteList);
     }
@@ -126,7 +134,23 @@ class _Connection {
     }
   }
 
-  void _receiveReply(MongoReplyMessage reply) {
+  Future<MongoModernMessage> executeModernMessage(
+      MongoModernMessage modernMessage) {
+    Completer<MongoModernMessage> completer = Completer();
+    if (!_closed) {
+      _replyCompleters[modernMessage.requestId] = completer;
+      _pendingQueries.add(modernMessage.requestId);
+      _log.fine(() => 'Message $modernMessage');
+      _sendQueue.addLast(modernMessage);
+      _sendBuffer();
+    } else {
+      completer.completeError(const ConnectionException(
+          "Invalid state: Connection already closed."));
+    }
+    return completer.future;
+  }
+
+  void _receiveReply(MongoResponseMessage reply) {
     _log.fine(() => reply.toString());
     Completer completer = _replyCompleters.remove(reply.responseTo);
     _pendingQueries.remove(reply.responseTo);

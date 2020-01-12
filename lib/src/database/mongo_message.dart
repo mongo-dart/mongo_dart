@@ -20,9 +20,13 @@ class MongoMessage {
   static final GetMore = 2005;
   static final Delete = 2006;
   static final KillCursors = 2007;
+  static final ModernMessage = 2013;
+
   int _requestId;
   int _messageLength;
+
   int get messageLength => _messageLength;
+
   int get requestId {
     if (_requestId == null) {
       _requestId = _Statics.nextRequestId;
@@ -38,9 +42,9 @@ class MongoMessage {
     throw MongoDartError('Must be implemented');
   }
 
-  void deserialize(BsonBinary buffer) {
+/*  void deserialize(BsonBinary buffer) {
     throw MongoDartError('Must be implemented');
-  }
+  }*/
 
   readMessageHeaderFrom(BsonBinary buffer) {
     _messageLength = buffer.readInt32();

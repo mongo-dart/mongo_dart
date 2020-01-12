@@ -1,5 +1,8 @@
 #Recent change notes
 
+### 0.4.1-dev.1
+* Fixes problems with createIndex method.
+
 ### 0.4.0-dev.1
 * Upgraded to `mongo_dart_query` `0.4.1`. The update adds aggregation pipeline builder.
 

@@ -1,6 +1,6 @@
 part of mongo_dart;
 
-class MongoReplyMessage extends MongoMessage {
+class MongoReplyMessage extends MongoResponseMessage {
   static final FLAGS_CURSOR_NONE = 0;
   static final FLAGS_CURSOR_NOT_FOUND = 1;
   static final FLAGS_QUERY_FAILURE = 2;
@@ -14,7 +14,7 @@ class MongoReplyMessage extends MongoMessage {
   int numberReturned = -1;
   List<Map<String, dynamic>> documents;
 
-  void deserialize(BsonBinary buffer) {
+  MongoMessage deserialize(BsonBinary buffer) {
     readMessageHeaderFrom(buffer);
     responseFlags = buffer.readInt32();
     cursorId = buffer.readInt64();
@@ -26,12 +26,17 @@ class MongoReplyMessage extends MongoMessage {
       doc.unpackValue(buffer);
       documents[n] = doc.value as Map<String, dynamic>;
     }
+    return this;
   }
 
   String toString() {
     if (documents.length == 1) {
-      return "MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags, ${documents[0]})";
+      return "MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, "
+          "numberReturned:$numberReturned, responseFlags:$responseFlags, "
+          "${documents[0]})";
     }
-    return "MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, numberReturned:$numberReturned, responseFlags:$responseFlags,$documents)";
+    return "MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, "
+        "numberReturned:$numberReturned, responseFlags:$responseFlags, "
+        "$documents)";
   }
 }
