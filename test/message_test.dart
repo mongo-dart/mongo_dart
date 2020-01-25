@@ -184,6 +184,62 @@ Future testCreateSectionType1FromBuffer() async {
       (check.payload as Payload1).documentsByteLength);
 }
 
+Future testCreateModernMessageFromDocument() async {
+  Map<String, Object> data = {
+    keyInsert: 'collectionName',
+    keyDatabaseName: 'databaseName',
+    keyWriteConcern: {'w': 'majority'}
+  };
+  List<Map<String, Object>> documents = <Map<String, Object>>[];
+  for (int idx = 1; idx <= 120; idx++) {
+    documents.add(<String, Object>{'a': idx});
+  }
+  data[keyInsertArgument] = documents;
+
+  MongoModernMessage message = MongoModernMessage(data);
+  expect(message.sections.length, 4);
+  expect(message.opcode, MongoMessage.ModernMessage);
+  int section0Number = 0;
+  int section1Number = 0;
+  int unknownSectionNumber = 0;
+  for (Section section in message.sections) {
+    if (section.payloadType == MongoModernMessage.basePayloadType) {
+      section0Number++;
+    } else if (section.payloadType == MongoModernMessage.documentsPayloadType) {
+      section1Number++;
+    } else {
+      unknownSectionNumber++;
+    }
+  }
+  expect(section0Number, 1);
+  expect(section1Number, 3);
+  expect(unknownSectionNumber, 0);
+
+  expect(message.messageLength, 1595);
+  expect(message.serialize().byteLength(), 1600);
+  expect(message.sections.first.byteLength, 90);
+  expect(message.sections.last.byteLength, 255);
+}
+
+Future testCreateModernMessageFromBuffer() async {
+  Map<String, Object> data = {
+    'insert': 'collectionName',
+    keyDatabaseName: 'databaseName',
+    'writeConcern': {'w': 'majority'}
+  };
+  Section check = Section(MongoModernMessage.basePayloadType, data);
+  BsonBinary buffer = BsonBinary.fromHexString(
+      '005900000002696e73657274000f000000636f6c6c656374696f6e4e616d6500022464'
+      '62000d00000064617461626173654e616d6500037772697465436f6e6365726e001500'
+      '0000027700090000006d616a6f72697479000000');
+  buffer.offset = 0;
+  Section section = Section.fromBuffer(buffer);
+
+  expect(section.byteLength, 90);
+
+  expect(section.byteLength, check.byteLength);
+}
+
 void main() async {
   group("Main", () {
     group('Bson Payload0 Test', () {
@@ -207,6 +263,12 @@ void main() async {
           testCreateSectionType1FromDocument);
       test('create Section Type 1 from buffer',
           testCreateSectionType1FromBuffer);
+    });
+    group('Modern Message Test', () {
+      test('create Moder Message from document',
+          testCreateModernMessageFromDocument);
+      test('create Moder Message from buffer',
+          testCreateModernMessageFromBuffer);
     });
   });
 }

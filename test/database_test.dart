@@ -7,8 +7,9 @@ import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
 const dbName = "test-mongo-dart";
+const dbAddress = '127.0.0.1';
 
-const DefaultUri = 'mongodb://localhost:27017/$dbName';
+const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 Db db;
 Uuid uuid = Uuid();
@@ -31,7 +32,7 @@ Future testGetCollectionInfos() async {
 
   expect(collectionInfos, hasLength(1));
 
-  collection.drop();
+  await collection.drop();
 }
 
 Future testRemove() async {
@@ -68,6 +69,24 @@ Future getBuildInfo() async {
 Future testIsMaster() async {
   var result = await db.isMaster();
   expect(result["ok"], 1);
+}
+
+Future<void> testServerStatus() async {
+  Map<String, dynamic> dbStatus = await db.serverStatus();
+  if (dbStatus != null && dbStatus.isNotEmpty && dbStatus['ok'] == 1.0) {
+    expect(dbStatus['ok'], 1.0);
+    expect(dbStatus['version'], db.masterConnection.serverStatus.version);
+    expect(dbStatus['process'], db.masterConnection.serverStatus.process);
+    expect(dbStatus['host'], db.masterConnection.serverStatus.host);
+    if (dbStatus['storageEngine']['name'] == 'wiredTiger') {
+      expect(dbStatus['storageEngine']['persistent'],
+          db.masterConnection.serverStatus.isPersistent);
+      if (dbStatus['version'].compareTo('4.0') > 0) {
+        expect(dbStatus['wiredTiger']['log']['maximum log file size'] > 0,
+            db.masterConnection.serverStatus.isJournaled);
+      }
+    }
+  }
 }
 
 testCollectionCreation() {
@@ -196,7 +215,7 @@ Future testSaveWithIntegerId() async {
     {"_id": 4, "name": "d", "value": 40}
   ];
 
-  collection.insertAll(toInsert);
+  await collection.insertAll(toInsert);
   var result = await collection.findOne({"name": "c"});
   expect(result["value"], 30);
 
@@ -909,6 +928,52 @@ Future testIndexCreation() async {
   expect(res['ok'], 1.0);
 }
 
+Future testIndexCreationOnCollection() async {
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    String collectionName = getRandomCollectionName();
+    var collection = db.collection(collectionName);
+
+    List<Map<String, dynamic>> toInsert = [];
+    for (int n = 0; n < 6; n++) {
+      toInsert.add({
+        'a': n,
+        'embedded': {'b': n, 'c': n * 10}
+      });
+    }
+    await collection.insertAll(toInsert);
+
+    var resInsert = await collection
+        .insertOne({'a': 200}, writeConcern: WriteConcern.UNACKNOWLEDGED);
+
+    expect(resInsert['ok'], 1.0);
+
+    var res = await collection.createIndex(key: 'a', unique: true);
+    expect(res['ok'], 1.0);
+
+    res = await collection.createIndex(
+        keys: {'a': -1, 'embedded.c': 1}, sparse: true, modernReply: false);
+    expect(res['ok'], 1.0);
+
+    res = await collection.createIndex(keys: {
+      'a': -1
+    }, partialFilterExpression: {
+      "embedded.c": {r"$exists": true}
+    });
+    expect(res['ok'], 1.0);
+
+    var indexes = await collection.getIndexes();
+    expect(indexes.length, 4);
+
+    expect(indexes[1]['unique'], isTrue);
+    expect(indexes[1]['sparse'], isFalse);
+    expect(indexes[2].containsKey('unique'), isFalse);
+    expect(indexes[2]['sparse'], isTrue);
+    expect(indexes[2]['name'], 'a_-1_embedded.c_1');
+    expect(indexes[2].containsKey('partialFilterExpression'), isFalse);
+    expect(indexes[3].containsKey('partialFilterExpression'), isTrue);
+  }
+}
+
 Future testEnsureIndexWithIndexCreation() async {
   String collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
@@ -1075,7 +1140,7 @@ Future testSimpleQuery() async {
   expect(result2, isNotNull);
   expect(result2['my_field'], 3);
 
-  collection.remove(where.id(id));
+  await collection.remove(where.id(id));
   var result3 = await collection.findOne(where.eq('my_field', 3));
   expect(result3, isNull);
 }
@@ -1194,13 +1259,9 @@ Future testDbOpenWhileStateIsOpening() {
 }
 
 testInvalidIndexCreationErrorHandling() {
-  /*
-   TODO: Verify why this is supposed to be an invalid index because this
-   currently doesn't fail
-    */
   String collectionName = getRandomCollectionName();
 
-  expect(db.createIndex(collectionName, key: 'a'),
+  expect(db.createIndex(collectionName /*, key: 'a'*/),
       throwsA((e) => e is ArgumentError));
 }
 
@@ -1232,7 +1293,7 @@ Future testFindOneWhileStateIsOpening() {
   });
 }
 
-main() {
+void main() async {
   Future initializeDatabase() async {
     db = Db(DefaultUri);
     await db.open();
@@ -1263,6 +1324,7 @@ main() {
       test('testGetNonce', testGetNonce);
       test('getBuildInfo', getBuildInfo);
       test('testIsMaster', testIsMaster);
+      test('testServerStatus', testServerStatus);
     });
 
     group('DbCollection tests:', () {
@@ -1313,6 +1375,7 @@ main() {
     group('Indexes tests:', () {
       test('testGetIndexes', testGetIndexes);
       test('testIndexCreation', testIndexCreation);
+      test('testIndexCreationOnCollection', testIndexCreationOnCollection);
       test(
           'testEnsureIndexWithIndexCreation', testEnsureIndexWithIndexCreation);
       test('testIndexCreationErrorHandling', testIndexCreationErrorHandling);
@@ -1361,9 +1424,12 @@ main() {
     test('testReopeningDb', testReopeningDb);
     test('testDbNotOpen', testDbNotOpen);
     test('testInvalidIndexCreationErrorHandling',
-        testInvalidIndexCreationErrorHandling,
+        testInvalidIndexCreationErrorHandling /*,
         skip:
-            'It seems to be perfectly valid code. No source for expected exception. TODO remeber how this test was created in the first plave');
+            'It seems to be perfectly valid code. '
+                'No source for expected exception. '
+                'TODO remeber how this test was created in the first plave'*/
+    );
     test('testInvalidIndexCreationErrorHandling1',
         testInvalidIndexCreationErrorHandling1);
   });

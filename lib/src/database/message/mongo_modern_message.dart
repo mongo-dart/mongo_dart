@@ -15,7 +15,7 @@ class MongoModernMessage extends MongoResponseMessage {
   // It is not clear in the documentation why we can have more than one section
   // of type 1. I assumed that is because of the size.
   // If this assumption is wrong, please remove this logic.
-  static const int maxDocumentsPerPayload1 = 1;
+  static const int maxDocumentsPerPayload1 = 50;
 
   /// Checksum present
   static const int flagCheckSumPresent = 1;
@@ -142,7 +142,7 @@ class MongoModernMessage extends MongoResponseMessage {
   }
 
   List<Section> createSections(Map<String, dynamic> doc) {
-    List<Section> sections = <Section>[];
+    List<Section> ret = <Section>[];
     bool isPulledOutCommand = false;
     List<String> keys = doc?.keys?.toList();
 
@@ -164,8 +164,8 @@ class MongoModernMessage extends MongoResponseMessage {
 
     // Todo more controls
     if (!isPulledOutCommand) {
-      sections.add(Section(basePayloadType, doc));
-      return sections;
+      ret.add(Section(basePayloadType, doc));
+      return ret;
     }
 
     String argumentName = commandArgument[indexOfCommandName];
@@ -176,9 +176,9 @@ class MongoModernMessage extends MongoResponseMessage {
           'key $argumentName');
     }
     doc.remove(argumentName);
-    sections.add(Section(basePayloadType, doc));
+    ret.add(Section(basePayloadType, doc));
     int totalElements = data.length;
-    //int sectionElements = ((totalElements - 1) ~/ maxDocumentsPerPayload1) + 1;
+
     List<Map<String, Object>> sectionList;
     while (totalElements > 0) {
       if (totalElements > maxDocumentsPerPayload1) {
@@ -186,10 +186,10 @@ class MongoModernMessage extends MongoResponseMessage {
       } else {
         sectionList = data.sublist(0, totalElements);
       }
-      sections.add(Section(documentsPayloadType, {argumentName: sectionList}));
+      ret.add(Section(documentsPayloadType, {argumentName: sectionList}));
       totalElements -= maxDocumentsPerPayload1;
     }
-    return sections;
+    return ret;
   }
 
   int get messageLength {
