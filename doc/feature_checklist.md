@@ -2,7 +2,7 @@
 
 From [Feature Checklist for Mongo Drivers](http://www.mongodb.org/display/DOCS/Feature+Checklist+for+Mongo+Drivers)
 
-##Essential
+## Essential
 
 - BSON serialization/deserialization: **Done**
 - Basic operations: query, insert, update, remove, ensureIndex, findOne, limit, sort: **Done**
@@ -11,7 +11,7 @@ From [Feature Checklist for Mongo Drivers](http://www.mongodb.org/display/DOCS/F
 - Convert all strings to utf8: **Done**
 - Authentication: **Done**
 
-##Recommended
+## Recommended
 
 - automatic _id generation: **Done**
 - Database $cmd support and helpers
@@ -21,7 +21,7 @@ From [Feature Checklist for Mongo Drivers](http://www.mongodb.org/display/DOCS/F
 - Support detecting max BSON size on connection (e.g., using buildinfo or isMaster commands) and allowing users to insert docs up to that size.
 
 
-##More Recommended
+## More Recommended
 
 - lasterror helper functions: **Done**
 - count() helper function: **Done**
@@ -31,14 +31,14 @@ From [Feature Checklist for Mongo Drivers](http://www.mongodb.org/display/DOCS/F
 - hint fields **Done**
 - explain helper **Done**
 
-##More Optional
+## More Optional
 
 - addUser, logout helpers
 - Allow client user to specify Option_SlaveOk for a query
 - Tailable cursor support
 - In/out buffer pooling (if implementing in a garbage collected languages)
 
-##More Optional
+## More Optional
 
 - connection pooling
 - Automatic reconnect on connection failure
