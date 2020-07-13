@@ -59,41 +59,40 @@ class _Connection {
     }
   }
 
-  Future<bool> connect() {
-    Completer<bool> completer = Completer();
-    Socket.connect(serverConfig.host, serverConfig.port).then((Socket _socket) {
-      // Socket connected.
-      socket = _socket;
-      _repliesSubscription =
-          MongoMessageHandler().transformer.bind(socket).listen(_receiveReply,
-              onError: (e, st) {
-                _log.severe("Socket error ${e} ${st}");
-                //completer.completeError(e);
-                if (!_closed) {
-                  _onSocketError();
-                }
-              },
-              cancelOnError: true,
-              onDone: () {
-                if (!_closed) {
-                  _onSocketError();
-                }
-              });
-      connected = true;
-      completer.complete(true);
-    }).catchError((err) {
-      completer.completeError(err);
-    });
-    return completer.future;
+  Future<bool> connect() async {
+    var _socket = await Socket.connect(serverConfig.host, serverConfig.port);
+    // ignore: unawaited_futures
+    _socket.done.catchError((error) => _log.info("Socket error ${error}"));
+    socket = _socket;
+
+    _repliesSubscription = socket
+        .transform<MongoResponseMessage /*MongoReplyMessage*/ >(
+            MongoMessageHandler().transformer)
+        .listen(_receiveReply,
+            onError: (e, st) {
+              _log.severe("Socket error ${e} ${st}");
+              if (!_closed) {
+                _onSocketError();
+              }
+            },
+            cancelOnError: true,
+            onDone: () {
+              if (!_closed) {
+                _onSocketError();
+              }
+            });
+    connected = true;
+    return true;
   }
 
   Future close() {
     _closed = true;
+    connected = false;
     return socket.close();
   }
 
   _sendBuffer() {
-    _log.fine(() => '_sendBuffer ${!_sendQueue.isEmpty}');
+    _log.fine(() => '_sendBuffer ${_sendQueue.isNotEmpty}');
     List<int> message = [];
     while (_sendQueue.isNotEmpty) {
       var mongoMessage = _sendQueue.removeFirst();
@@ -166,12 +165,16 @@ class _Connection {
 
   void _onSocketError() {
     _closed = true;
+    connected = false;
     var ex = const ConnectionException("connection closed.");
     _pendingQueries.forEach((id) {
       Completer completer = _replyCompleters.remove(id);
       completer.completeError(ex);
     });
     _pendingQueries.clear();
+    if (isMaster) {
+      _manager.close();
+    }
   }
 }
 

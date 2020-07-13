@@ -13,7 +13,7 @@ class _ConnectionManager {
   _Connection get masterConnection => _masterConnection;
 
   _Connection get masterConnectionVerified {
-    if (_masterConnection != null) {
+    if (_masterConnection != null && !_masterConnection._closed) {
       return _masterConnection;
     } else {
       throw MongoDartError('No master connection');
@@ -32,6 +32,7 @@ class _ConnectionManager {
     }
     connection.serverCapabilities
         .getParamsFromIstMaster(replyMessage.documents[0]);
+
     if (db._authenticationScheme == null) {
       if (connection.serverCapabilities.maxWireVersion >= 3) {
         db._authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
@@ -71,6 +72,8 @@ class _ConnectionManager {
     }
     sendQueue.clear();
 
+    _masterConnection == null;
+
     return Future.forEach(_connectionPool.keys, (hostUrl) {
       var connection = _connectionPool[hostUrl];
       _log.fine(() => '$db: ${connection.serverConfig.hostUrl} closed');
@@ -86,6 +89,10 @@ class _ConnectionManager {
   }
 
   removeConnection(_Connection connection) {
+    connection.close();
+    if (connection.isMaster) {
+      _masterConnection = null;
+    }
     return _connectionPool.remove(connection.serverConfig.hostUrl);
   }
 }
