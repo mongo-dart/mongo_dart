@@ -276,7 +276,7 @@ class Db {
       });
 
       return _connectionManager.open(writeConcern);
-    });
+    }).catchError((error) => throw error);
   }
 
   Future<Map<String, dynamic>> executeDbCommand(MongoMessage message,

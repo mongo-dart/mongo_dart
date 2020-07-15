@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+### 0.4.1-dev.2.1
+
+* Fix - socket error on connect was not catched
+
 ### 0.4.1-dev.2
 
 * Better management of socket error.

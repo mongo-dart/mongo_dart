@@ -63,7 +63,7 @@ class _ConnectionManager {
       db.masterConnection.serverStatus
           .processServerStatus(await db.serverStatus());
       return true;
-    });
+    }).catchError((error) => throw error);
   }
 
   Future close() {

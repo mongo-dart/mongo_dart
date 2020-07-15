@@ -60,7 +60,17 @@ class _Connection {
   }
 
   Future<bool> connect() async {
-    var _socket = await Socket.connect(serverConfig.host, serverConfig.port);
+    Socket _socket;
+    try {
+      _socket = await Socket.connect(serverConfig.host, serverConfig.port);
+    } catch (e, st) {
+      _log.severe("Socket error on connect(): ${e} ${st}");
+      _closed = true;
+      connected = false;
+      var ex = const ConnectionException("Could not connect to the Data Base.");
+      throw ex;
+    }
+
     // ignore: unawaited_futures
     _socket.done.catchError((error) => _log.info("Socket error ${error}"));
     socket = _socket;
