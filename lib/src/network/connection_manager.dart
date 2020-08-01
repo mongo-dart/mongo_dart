@@ -4,15 +4,16 @@ class _ConnectionManager {
   final _log = Logger('ConnectionManager');
   final Db db;
   final _connectionPool = Map<String, _Connection>();
-  final replyCompleters = Map<int, Completer<MongoReplyMessage>>();
+  final replyCompleters = Map<int, Completer<MongoResponseMessage>>();
   final sendQueue = Queue<MongoMessage>();
   _Connection _masterConnection;
 
   _ConnectionManager(this.db);
+
   _Connection get masterConnection => _masterConnection;
 
   _Connection get masterConnectionVerified {
-    if (_masterConnection != null) {
+    if (_masterConnection != null && !_masterConnection._closed) {
       return _masterConnection;
     } else {
       throw MongoDartError('No master connection');
@@ -31,6 +32,7 @@ class _ConnectionManager {
     }
     connection.serverCapabilities
         .getParamsFromIstMaster(replyMessage.documents[0]);
+
     if (db._authenticationScheme == null) {
       if (connection.serverCapabilities.maxWireVersion >= 3) {
         db._authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
@@ -56,17 +58,21 @@ class _ConnectionManager {
     return Future.forEach(_connectionPool.keys, (hostUrl) {
       var connection = _connectionPool[hostUrl];
       return _connect(connection);
-    }).then((_) {
+    }).then((_) async {
       db.state = State.OPEN;
-      return Future.value(true);
-    });
+      db.masterConnection.serverStatus
+          .processServerStatus(await db.serverStatus());
+      return true;
+    }).catchError((error) => throw error);
   }
 
   Future close() {
-    while (!sendQueue.isEmpty) {
+    while (sendQueue.isNotEmpty) {
       masterConnection._sendBuffer();
     }
     sendQueue.clear();
+
+    _masterConnection == null;
 
     return Future.forEach(_connectionPool.keys, (hostUrl) {
       var connection = _connectionPool[hostUrl];
@@ -83,6 +89,10 @@ class _ConnectionManager {
   }
 
   removeConnection(_Connection connection) {
+    connection.close();
+    if (connection.isMaster) {
+      _masterConnection = null;
+    }
     return _connectionPool.remove(connection.serverConfig.hostUrl);
   }
 }

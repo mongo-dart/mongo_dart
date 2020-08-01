@@ -27,6 +27,7 @@ class WriteConcern {
   const WriteConcern({this.w, this.wtimeout, this.fsync, this.j});
 
   /// No exceptions are raised, even for network issues.
+  @deprecated
   static const ERRORS_IGNORED =
       WriteConcern(w: -1, wtimeout: 0, fsync: false, j: false);
 
@@ -46,6 +47,7 @@ class WriteConcern {
 
   /// Exceptions are raised for network issues, and server errors; the write operation waits for the server to flush
   /// the data to disk.
+  @deprecated
   static const FSYNCED = WriteConcern(w: 1, wtimeout: 0, fsync: true, j: false);
 
   /// Exceptions are raised for network issues, and server errors; the write operation waits for the server to
@@ -75,6 +77,37 @@ class WriteConcern {
     }
     return map;
   }
+
+  /// To be used starting with journaled engines (Only Wired Tiger, Journal Only)
+  /// For inMemoryEngine the J option is ignored
+  ///
+  /// We can use before 4.2 testing if the journal is active
+  /// (in this case fsync doesn't make any sense, taken from mongodb Jira:
+  /// "fsync means sync using a journal if present otherwise the datafiles")
+  /// In 4.0 journal cannot be disabled on wiredTiger engine
+  /// In 4.2 only wiredTiger can be used
+  Map<String, Object> asMap(ServerStatus serverStatus) {
+    var ret = <String, Object>{};
+    if (w != null) {
+      ret['w'] = w;
+    }
+    if (wtimeout != null) {
+      ret['wtimeout'] = wtimeout;
+    }
+    if (serverStatus.isPersistent) {
+      if (j != null) {
+        ret['j'] = j;
+      }
+      if (fsync != null && j != true) {
+        if (serverStatus.isJournaled) {
+          ret['j'] = fsync;
+        } else {
+          ret['fsync'] = fsync;
+        }
+      }
+    }
+    return ret;
+  }
 }
 
 class _UriParameters {
@@ -92,11 +125,14 @@ class Db {
   String _debugInfo;
   Db authSourceDb;
   _ConnectionManager _connectionManager;
+
   _Connection get _masterConnection => _connectionManager.masterConnection;
+
   _Connection get _masterConnectionVerified =>
       _connectionManager.masterConnectionVerified;
   WriteConcern _writeConcern;
   AuthenticationScheme _authenticationScheme;
+  ReadPreference readPreference = ReadPreference.primary;
 
   String toString() => 'Db($databaseName,$_debugInfo)';
 
@@ -112,7 +148,13 @@ class Db {
   Db.pool(List<String> uriList, [this._debugInfo]) {
     _uriList.addAll(uriList);
   }
+
   Db._authDb(this.databaseName);
+
+  WriteConcern get writeConcern => _writeConcern;
+
+  _Connection get masterConnection => _connectionManager.masterConnection;
+
   ServerConfig _parseUri(String uriString) {
     var uri = Uri.parse(uriString);
 
@@ -203,6 +245,22 @@ class Db {
     connection.execute(message, writeConcern == WriteConcern.ERRORS_IGNORED);
   }
 
+  Future<Map<String, Object>> executeModernMessage(MongoModernMessage message,
+      {_Connection connection}) async {
+    if (state != State.OPEN) {
+      throw MongoDartError('DB is not open. $state');
+    }
+
+    connection ??= _masterConnectionVerified;
+
+    MongoModernMessage response =
+    await connection.executeModernMessage(message);
+
+    Section section = response.sections.firstWhere((Section _section) =>
+    _section.payloadType == MongoModernMessage.basePayloadType);
+    return section.payload.content;
+  }
+
   Future open({WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED}) {
     return Future.sync(() {
       if (state == State.OPENING) {
@@ -218,7 +276,7 @@ class Db {
       });
 
       return _connectionManager.open(writeConcern);
-    });
+    }).catchError((error) => throw error);
   }
 
   Future<Map<String, dynamic>> executeDbCommand(MongoMessage message,
@@ -429,7 +487,11 @@ class Db {
     var name = '';
 
     keys.forEach((key, value) {
-      name = '${name}_${key}_$value';
+      if (name.isEmpty) {
+        name = '${key}_$value';
+      } else {
+        name = '${name}_${key}_$value';
+      }
     });
 
     return name;
@@ -444,6 +506,18 @@ class Db {
       bool dropDups,
       Map<String, dynamic> partialFilterExpression,
       String name}) {
+    if (_masterConnection.serverCapabilities.supportsOpMsg) {
+      return collection(collectionName).createIndex(
+          key: key,
+          keys: keys,
+          unique: unique,
+          sparse: sparse,
+          background: background,
+          dropDups: dropDups,
+          partialFilterExpression: partialFilterExpression,
+          name: name,
+          modernReply: false);
+    }
     return Future.sync(() async {
       var selector = <String, dynamic>{};
       selector['ns'] = '$databaseName.$collectionName';
@@ -511,7 +585,10 @@ class Db {
       name = _createIndexName(keys);
     }
 
-    if (indexInfos.any((info) => info['name'] == name)) {
+    if (indexInfos.any((info) => info['name'] == name) ||
+        // For compatibility reasons, old indexes where created with
+        // a leading underscore
+        indexInfos.any((info) => info['name'] == '_$name')) {
       return {'ok': 1.0, 'result': 'index preexists'};
     }
 
@@ -525,6 +602,20 @@ class Db {
         name: name);
 
     return createdIndex;
+  }
+
+  /// This method return the status information on the
+  /// connection.
+  ///
+  /// Only works from version 3.6
+  Future<Map<String, Object>> serverStatus(
+      {Map<String, Object> options}) async {
+    if (!_masterConnection.serverCapabilities.supportsOpMsg) {
+      return <String, Object>{};
+    }
+    ServerStatusOperation operation =
+    ServerStatusOperation(this, options: options);
+    return operation.execute();
   }
 
   Future<Map<String, dynamic>> _getAcknowledgement(

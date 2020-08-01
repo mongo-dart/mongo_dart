@@ -1,6 +1,21 @@
-#Recent change notes
+# Changelog
+
+## Recent change notes
+
+### 0.4.1-dev.2.1
+
+* Fix - socket error on connect was not catched
+
+### 0.4.1-dev.2
+
+* Better management of socket error.
+
+### 0.4.1-dev.1
+
+* Fixes problems with createIndex method.
 
 ### 0.4.0-dev.1
+
 * Upgraded to `mongo_dart_query` `0.4.1`. The update adds aggregation pipeline builder.
 
 ### 0.3.6
