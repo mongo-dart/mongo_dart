@@ -57,23 +57,23 @@ class WriteConcern {
 
   /// Exceptions are raised for network issues, and server errors; waits on a majority of servers for the write operation.
   static const MAJORITY =
-      WriteConcern(w: "majority", wtimeout: 0, fsync: false, j: false);
+      WriteConcern(w: 'majority', wtimeout: 0, fsync: false, j: false);
 
   /// Gets the getlasterror command for this write concern.
   Map<String, dynamic> get command {
-    var map = Map<String, dynamic>();
-    map["getlasterror"] = 1;
+    var map = <String, dynamic>{};
+    map['getlasterror'] = 1;
     if (w != null) {
-      map["w"] = w;
+      map['w'] = w;
     }
     if (wtimeout != null) {
-      map["wtimeout"] = wtimeout;
+      map['wtimeout'] = wtimeout;
     }
     if (fsync != null) {
-      map["fsync"] = fsync;
+      map['fsync'] = fsync;
     }
     if (j != null) {
-      map["j"] = j;
+      map['j'] = j;
     }
     return map;
   }
@@ -254,10 +254,10 @@ class Db {
     connection ??= _masterConnectionVerified;
 
     MongoModernMessage response =
-    await connection.executeModernMessage(message);
+        await connection.executeModernMessage(message);
 
     Section section = response.sections.firstWhere((Section _section) =>
-    _section.payloadType == MongoModernMessage.basePayloadType);
+        _section.payloadType == MongoModernMessage.basePayloadType);
     return section.payload.content;
   }
 
@@ -614,7 +614,7 @@ class Db {
       return <String, Object>{};
     }
     ServerStatusOperation operation =
-    ServerStatusOperation(this, options: options);
+        ServerStatusOperation(this, options: options);
     return operation.execute();
   }
 

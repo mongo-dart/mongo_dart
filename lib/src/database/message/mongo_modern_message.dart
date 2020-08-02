@@ -142,9 +142,9 @@ class MongoModernMessage extends MongoResponseMessage {
   }
 
   List<Section> createSections(Map<String, dynamic> doc) {
-    List<Section> ret = <Section>[];
-    bool isPulledOutCommand = false;
-    List<String> keys = doc?.keys?.toList();
+    var ret = <Section>[];
+    var isPulledOutCommand = false;
+    var keys = doc?.keys?.toList();
 
     if (keys == null || keys.isEmpty) {
       throw MongoDartError(
@@ -153,7 +153,7 @@ class MongoModernMessage extends MongoResponseMessage {
 
     /// The command name MUST continue to be the first key of the
     /// command arguments in the Payload Type 0 section.
-    int indexOfCommandName = commandName.indexOf(keys.first);
+    var indexOfCommandName = commandName.indexOf(keys.first);
     if (indexOfCommandName == notFound) {
       throw MongoDartError(
           'The first entry ("${keys.first}") of the document is not a command name');
@@ -168,16 +168,15 @@ class MongoModernMessage extends MongoResponseMessage {
       return ret;
     }
 
-    String argumentName = commandArgument[indexOfCommandName];
-    List<Map<String, Object>> data =
-        doc[argumentName] as List<Map<String, Object>>;
+    var argumentName = commandArgument[indexOfCommandName];
+    var data = doc[argumentName] as List<Map<String, Object>>;
     if (data == null) {
       throw MongoDartError('The command ${keys.first} requires an element with '
           'key $argumentName');
     }
     doc.remove(argumentName);
     ret.add(Section(basePayloadType, doc));
-    int totalElements = data.length;
+    var totalElements = data.length;
 
     List<Map<String, Object>> sectionList;
     while (totalElements > 0) {
@@ -192,8 +191,9 @@ class MongoModernMessage extends MongoResponseMessage {
     return ret;
   }
 
+  @override
   int get messageLength {
-    int sectionsSize = 0;
+    var sectionsSize = 0;
     for (var section in sections) {
       sectionsSize += section.byteLength;
     }
@@ -202,7 +202,7 @@ class MongoModernMessage extends MongoResponseMessage {
 
   @override
   BsonBinary serialize() {
-    BsonBinary buffer = BsonBinary(messageLength);
+    var buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(flags);
     for (var section in sections) {
@@ -230,6 +230,7 @@ class MongoModernMessage extends MongoResponseMessage {
     return this;
   }
 
+  @override
   String toString() {
     if (sections.length == 1) {
       return 'MongoModernMessage($requestId, ${sections[0]})';

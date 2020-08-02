@@ -10,7 +10,7 @@ class _ServerCapabilities {
   int maxNumberOfDocsInBatch = 1000;
   bool supportsOpMsg = false;
 
-  getParamsFromIstMaster(Map<String, dynamic> isMaster) {
+  void getParamsFromIstMaster(Map<String, dynamic> isMaster) {
     if (isMaster.containsKey('maxWireVersion')) {
       maxWireVersion = isMaster['maxWireVersion'] as int;
     }
@@ -33,10 +33,10 @@ class _ServerCapabilities {
 
 class _Connection {
   final Logger _log = Logger('Connection');
-  _ConnectionManager _manager;
+  final _ConnectionManager _manager;
   ServerConfig serverConfig;
   Socket socket;
-  Set<int> _pendingQueries = Set();
+  Set<int> _pendingQueries = {};
 
   Map<int, Completer<MongoResponseMessage>> get _replyCompleters =>
       _manager.replyCompleters;
@@ -54,9 +54,7 @@ class _Connection {
   final ServerStatus serverStatus = ServerStatus();
 
   _Connection(this._manager, [this.serverConfig]) {
-    if (serverConfig == null) {
-      serverConfig = ServerConfig();
-    }
+    serverConfig ??= ServerConfig();
   }
 
   Future<bool> connect() async {
@@ -64,15 +62,15 @@ class _Connection {
     try {
       _socket = await Socket.connect(serverConfig.host, serverConfig.port);
     } catch (e, st) {
-      _log.severe("Socket error on connect(): ${e} ${st}");
+      _log.severe('Socket error on connect(): ${e} ${st}');
       _closed = true;
       connected = false;
-      var ex = const ConnectionException("Could not connect to the Data Base.");
+      var ex = const ConnectionException('Could not connect to the Data Base.');
       throw ex;
     }
 
     // ignore: unawaited_futures
-    _socket.done.catchError((error) => _log.info("Socket error ${error}"));
+    _socket.done.catchError((error) => _log.info('Socket error ${error}'));
     socket = _socket;
 
     _repliesSubscription = socket
@@ -80,7 +78,7 @@ class _Connection {
             MongoMessageHandler().transformer)
         .listen(_receiveReply,
             onError: (e, st) {
-              _log.severe("Socket error ${e} ${st}");
+              _log.severe('Socket error ${e} ${st}');
               if (!_closed) {
                 _onSocketError();
               }
@@ -103,7 +101,7 @@ class _Connection {
 
   _sendBuffer() {
     _log.fine(() => '_sendBuffer ${_sendQueue.isNotEmpty}');
-    List<int> message = [];
+    var message = <int>[];
     while (_sendQueue.isNotEmpty) {
       var mongoMessage = _sendQueue.removeFirst();
       message.addAll(mongoMessage.serialize().byteList);
@@ -112,7 +110,7 @@ class _Connection {
   }
 
   Future<MongoReplyMessage> query(MongoMessage queryMessage) {
-    Completer<MongoReplyMessage> completer = Completer();
+    var completer = Completer<MongoReplyMessage>();
     if (!_closed) {
       _replyCompleters[queryMessage.requestId] = completer;
       _pendingQueries.add(queryMessage.requestId);
@@ -121,7 +119,7 @@ class _Connection {
       _sendBuffer();
     } else {
       completer.completeError(const ConnectionException(
-          "Invalid state: Connection already closed."));
+          'Invalid state: Connection already closed.'));
     }
     return completer.future;
   }

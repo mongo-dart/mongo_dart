@@ -11,7 +11,7 @@ class ServerStatus {
   /// mongod | mongos
   String process;
 
-  processServerStatus(Map<String, dynamic> serverStatus) {
+  void processServerStatus(Map<String, dynamic> serverStatus) {
     if (serverStatus == null ||
         serverStatus.isEmpty ||
         !serverStatus.containsKey(keyOk) ||

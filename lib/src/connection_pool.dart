@@ -10,7 +10,7 @@ typedef _DbFactory = FutureOr<Db> Function();
 /// The connection pool lazily connects to the database; that is to say, it only opens as many
 /// connections as it needs to. If it is only ever called once, then it will only ever connect once.
 class ConnectionPool {
-  List<Db> _connections = [];
+  final List<Db> _connections = [];
   int _index = 0;
   Pool _pool;
 
@@ -32,12 +32,12 @@ class ConnectionPool {
   /// the number of active connections is less than [maxConnections].
   Future<Db> connect() {
     return _pool.withResource(() async {
-      int i = _index;
+      var i = _index;
       if (_index >= maxConnections) _index = 0;
 
-      if (i < _connections.length)
+      if (i < _connections.length) {
         return _connections[i];
-      else {
+      } else {
         var db = await dbFactory();
         await db.open();
         _connections.add(db);

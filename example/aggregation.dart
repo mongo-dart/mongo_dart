@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-main() async {
+void main() async {
   final db = Db('mongodb://127.0.0.1/testdb');
   final pipeline = AggregationPipelineBuilder()
     .addStage(

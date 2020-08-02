@@ -1,9 +1,9 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-main() async {
-  Db db = Db("mongodb://127.0.0.1/test_insert"); //
+void main() async {
+  var db = Db('mongodb://127.0.0.1/test_insert'); //
   //Db db = new Db("mongodb://test:test@ds061298.mongolab.com:61298/test_insert");
-  Stopwatch stopwatch = Stopwatch()..start();
+  var stopwatch = Stopwatch()..start();
   DbCollection test;
   await db.open();
   test = db.collection('test');

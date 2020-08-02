@@ -8,24 +8,26 @@ class MongoInsertMessage extends MongoMessage {
       String collectionFullName, List<Map<String, dynamic>> documents,
       [this.flags = 0]) {
     _collectionFullName = BsonCString(collectionFullName);
-    _documents = List();
+    _documents = [];
     for (var document in documents) {
       _documents.add(BsonMap(document));
     }
     opcode = MongoMessage.Insert;
   }
 
+  @override
   int get messageLength {
-    int docsSize = 0;
+    var docsSize = 0;
     for (var _doc in _documents) {
       docsSize += _doc.byteLength();
     }
-    int result = 16 + 4 + _collectionFullName.byteLength() + docsSize;
+    var result = 16 + 4 + _collectionFullName.byteLength() + docsSize;
     return result;
   }
 
+  @override
   BsonBinary serialize() {
-    BsonBinary buffer = BsonBinary(messageLength);
+    var buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(flags);
     _collectionFullName.packValue(buffer);
@@ -36,10 +38,11 @@ class MongoInsertMessage extends MongoMessage {
     return buffer;
   }
 
+  @override
   String toString() {
     if (_documents.length == 1) {
-      return "MongoInserMessage($requestId, ${_collectionFullName.value}, ${_documents[0].value})";
+      return 'MongoInserMessage($requestId, ${_collectionFullName.value}, ${_documents[0].value})';
     }
-    return "MongoInserMessage($requestId, ${_collectionFullName.value}, ${_documents.length} documents)";
+    return 'MongoInserMessage($requestId, ${_collectionFullName.value}, ${_documents.length} documents)';
   }
 }

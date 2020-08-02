@@ -109,11 +109,11 @@ class Cursor {
 
   Future<Map<String, dynamic>> nextObject() {
     if (state == State.INIT) {
-      MongoQueryMessage qm = generateQueryMessage();
+      var qm = generateQueryMessage();
       return db.queryMessage(qm).then((replyMessage) {
         state = State.OPEN;
         getCursorData(replyMessage);
-        if (items.length > 0) {
+        if (items.isNotEmpty) {
           return Future.value(_getNextItem());
         } else {
           return Future.value(null);
@@ -121,7 +121,7 @@ class Cursor {
       });
     } else if (state == State.OPEN && limit > 0 && _returnedCount == limit) {
       return close();
-    } else if (state == State.OPEN && items.length > 0) {
+    } else if (state == State.OPEN && items.isNotEmpty) {
       return Future.value(_getNextItem());
     } else if (state == State.OPEN && cursorId > 0) {
       var qm = generateGetMoreMessage();
@@ -131,7 +131,7 @@ class Cursor {
         var isDead = (replyMessage.responseFlags ==
                 MongoReplyMessage.FLAGS_CURSOR_NOT_FOUND) &&
             (cursorId == 0);
-        if (items.length > 0) {
+        if (items.isNotEmpty) {
           return Future.value(_getNextItem());
         } else if (tailable && !isDead && awaitData) {
           return Future.value(null);
@@ -155,7 +155,7 @@ class Cursor {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
     state = State.CLOSED;
     if (cursorId != 0) {
-      MongoKillCursorsMessage msg = MongoKillCursorsMessage(cursorId);
+      var msg = MongoKillCursorsMessage(cursorId);
       cursorId = 0;
       db.executeMessage(msg, WriteConcern.UNACKNOWLEDGED);
     }
@@ -169,7 +169,7 @@ class Cursor {
 //  }
 
   Stream<Map<String, dynamic>> get stream async* {
-    Map<String, dynamic> doc = await nextObject();
+    var doc = await nextObject();
     while (doc != null) {
       yield doc;
       doc = await nextObject();
@@ -186,6 +186,7 @@ class CommandCursor extends Cursor {
     throw UnimplementedError();
   }
 
+  @override
   void getCursorData(MongoReplyMessage replyMessage) {
     if (firstBatch) {
       firstBatch = false;
@@ -220,7 +221,7 @@ class AggregateCursor extends CommandCursor {
           'aggregate': collection.collectionName,
           'pipeline': pipeline,
           'cursor': cursorOptions,
-          'allowDiskUse': this.allowDiskUse
+          'allowDiskUse': allowDiskUse
         },
         null);
   }
@@ -252,7 +253,7 @@ class ListIndexesCursor extends CommandCursor {
         MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT,
         0,
         -1,
-        {"listIndexes": collection.collectionName},
+        {'listIndexes': collection.collectionName},
         null);
   }
 }

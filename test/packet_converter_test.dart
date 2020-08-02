@@ -3,7 +3,7 @@ library packet_converter_test;
 import 'package:test/test.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-main() {
+void main() {
   group('Packet converter basics', () {
     test('PacketConverter creation', () {
       var converter = PacketConverter();
@@ -98,7 +98,7 @@ main() {
     });
     test('Many message in one packet', () {
       var packet = [7, 0, 0, 0, 0, 1, 2, 7, 0, 0, 0, 0, 1, 2];
-      for (int i = 0; i < 8000; i++) {
+      for (var i = 0; i < 8000; i++) {
         packet.add(7);
         packet.add(0);
         packet.add(0);

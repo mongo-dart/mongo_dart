@@ -36,8 +36,8 @@ class GridIn extends GridFSFile {
   }
 
   Future<Map<String, dynamic>> saveChunks([int chunkSize = 0]) {
-    List<Future> futures = List();
-    Completer<Map<String, dynamic>> completer = Completer();
+    var futures = <Future>[];
+    var completer = Completer<Map<String, dynamic>>();
 
     _onDone() {
       Future.wait(futures).then((list) {
@@ -47,9 +47,7 @@ class GridIn extends GridFSFile {
       });
     }
 
-    if (chunkSize == null) {
-      chunkSize = this.chunkSize;
-    }
+    chunkSize ??= this.chunkSize;
     if (savedChunks) {
       throw MongoDartError('chunks already saved!');
     }
@@ -66,15 +64,15 @@ class GridIn extends GridFSFile {
 
   Future<Map<String, dynamic>> dumpBuffer(List<int> writeBuffer) {
     contentToDigest.addAll(writeBuffer);
-    if (writeBuffer.length == 0) {
+    if (writeBuffer.isEmpty) {
       // Chunk is empty, may be last chunk
       return Future.value({});
     }
 
-    Map<String, dynamic> chunk = {
-      "files_id": id,
-      "n": currentChunkNumber,
-      "data": BsonBinary.from(writeBuffer)
+    var chunk = <String, dynamic>{
+      'files_id': id,
+      'n': currentChunkNumber,
+      'data': BsonBinary.from(writeBuffer)
     };
     currentChunkNumber++;
     totalBytes += writeBuffer.length;

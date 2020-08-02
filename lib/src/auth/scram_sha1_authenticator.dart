@@ -14,20 +14,20 @@ class ClientFirst extends SaslStep {
   @override
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
-    String serverFirstMessage = utf8.decode(bytesReceivedFromServer);
+    var serverFirstMessage = utf8.decode(bytesReceivedFromServer);
 
     Map<String, dynamic> decodedMessage = parsePayload(serverFirstMessage);
 
     final r = decodedMessage['r'] as String;
     if (r == null || !r.startsWith(rPrefix)) {
-      throw MongoDartError("Server sent an invalid nonce.");
+      throw MongoDartError('Server sent an invalid nonce.');
     }
 
     var s = decodedMessage['s'];
     var i = int.parse(decodedMessage['i'].toString());
 
-    final String gs2Header = 'n,,';
-    String encodedHeader = base64.encode(utf8.encode(gs2Header));
+    final gs2Header = 'n,,';
+    var encodedHeader = base64.encode(utf8.encode(gs2Header));
     var channelBinding = 'c=$encodedHeader';
     var nonce = 'r=$r';
     var clientFinalMessageWithoutProof = '$channelBinding,$nonce';
@@ -93,8 +93,7 @@ class ClientFirst extends SaslStep {
       return Uint8List.fromList(hmac.convert(msg).bytes);
     };
 
-    Uint8List newSalt =
-        Uint8List.fromList(List.from(salt)..addAll([0, 0, 0, 1]));
+    var newSalt = Uint8List.fromList(List.from(salt)..addAll([0, 0, 0, 1]));
 
     var ui = digest(newSalt);
     var u1 = ui;
@@ -124,7 +123,7 @@ class ClientLast extends SaslStep {
     var serverSignature = base64.decode(decodedMessage['v'].toString());
 
     if (!const IterableEquality().equals(serverSignature64, serverSignature)) {
-      throw MongoDartError("Server signature was invalid.");
+      throw MongoDartError('Server signature was invalid.');
     }
 
     return CompletedStep();
@@ -133,14 +132,14 @@ class ClientLast extends SaslStep {
 
 class CompletedStep extends SaslStep {
   CompletedStep() {
-    this.bytesToSendToServer = Uint8List(0);
+    bytesToSendToServer = Uint8List(0);
     isComplete = true;
   }
 
   @override
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer) {
-    throw MongoDartError("Sasl conversation has completed");
+    throw MongoDartError('Sasl conversation has completed');
   }
 }
 
@@ -157,7 +156,7 @@ class ScramSha1Mechanism extends SaslMechanism {
   SaslStep initialize(_Connection connection) {
     if (connection == null) throw ArgumentError("Connection can't be null");
 
-    final String gs2Header = 'n,,';
+    final gs2Header = 'n,,';
     var username = 'n=${prepUsername(credential.username)}';
     var r = randomStringGenerator.generate(20); // TODO Change this
 

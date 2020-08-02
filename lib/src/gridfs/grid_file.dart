@@ -59,18 +59,18 @@ class GridFSFile {
   }
 
   set metaData(Map<String, dynamic> metaData) {
-    extraData["metadata"] = metaData;
+    extraData['metadata'] = metaData;
   }
 
   Map<String, dynamic> get data {
-    Map<String, dynamic> result = {
-      "_id": id,
-      "filename": filename,
-      "contentType": contentType,
-      "length": length,
-      "chunkSize": chunkSize,
-      "uploadDate": uploadDate,
-      "md5": md5,
+    var result = <String, dynamic>{
+      '_id': id,
+      'filename': filename,
+      'contentType': contentType,
+      'length': length,
+      'chunkSize': chunkSize,
+      'uploadDate': uploadDate,
+      'md5': md5,
     };
     extraData.forEach((String key, Object value) {
       result[key] = value;
@@ -82,13 +82,13 @@ class GridFSFile {
     extraData = Map.from(input);
 
     // Remove the known keys. Leaving the extraData.
-    id = extraData.remove("_id");
-    filename = extraData.remove("filename")?.toString();
-    contentType = extraData.remove("contentType")?.toString();
-    length = extraData.remove("length") as int;
-    chunkSize = extraData.remove("chunkSize") as int;
-    uploadDate = extraData.remove("uploadDate") as DateTime;
-    md5 = extraData.remove("md5")?.toString();
+    id = extraData.remove('_id');
+    filename = extraData.remove('filename')?.toString();
+    contentType = extraData.remove('contentType')?.toString();
+    length = extraData.remove('length') as int;
+    chunkSize = extraData.remove('chunkSize') as int;
+    uploadDate = extraData.remove('uploadDate') as DateTime;
+    md5 = extraData.remove('md5')?.toString();
   }
 
   void setGridFS(GridFS fs) {

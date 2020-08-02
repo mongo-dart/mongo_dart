@@ -11,21 +11,21 @@ class MongoDbCRAuthenticator extends Authenticator {
   @override
   Future authenticate(_Connection connection) {
     return db.getNonce(connection: connection).then((msg) {
-      var nonce = msg["nonce"];
+      var nonce = msg['nonce'];
       var command = createMongoDbCrAuthenticationCommand(
           db, credentials, nonce.toString());
       return db.executeDbCommand(command, connection: connection);
-    }).then((res) => res["ok"] == 1);
+    }).then((res) => res['ok'] == 1);
   }
 
   static DbCommand createMongoDbCrAuthenticationCommand(
       Db db, UsernamePasswordCredential credentials, String nonce) {
     var hashed_password = crypto.md5
         .convert(
-            "${credentials.username}:mongo:${credentials.password}".codeUnits)
+            '${credentials.username}:mongo:${credentials.password}'.codeUnits)
         .toString();
     var key = crypto.md5
-        .convert("$nonce${credentials.username}$hashed_password".codeUnits)
+        .convert('$nonce${credentials.username}$hashed_password'.codeUnits)
         .toString();
     var selector = {
       'authenticate': 1,
