@@ -11,12 +11,14 @@ class MongoGetMoreMessage extends MongoMessage {
     opcode = MongoMessage.GetMore;
   }
 
+  @override
   int get messageLength {
     return 16 + 4 + _collectionFullName.byteLength() + 4 + 8;
   }
 
+  @override
   BsonBinary serialize() {
-    BsonBinary buffer = BsonBinary(messageLength);
+    var buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
     _collectionFullName.packValue(buffer);
@@ -26,7 +28,8 @@ class MongoGetMoreMessage extends MongoMessage {
     return buffer;
   }
 
+  @override
   String toString() {
-    return "MongoGetMoreMessage($requestId, ${_collectionFullName.value}, $cursorId)";
+    return 'MongoGetMoreMessage($requestId, ${_collectionFullName.value}, $cursorId)';
   }
 }

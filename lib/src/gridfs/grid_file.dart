@@ -1,7 +1,7 @@
 part of mongo_dart;
 
 class GridFSFile {
-  GridFS fs = null;
+  GridFS fs;
   var id;
   String filename;
   String contentType;
@@ -20,7 +20,7 @@ class GridFSFile {
     if (fs == null) {
       throw MongoDartError('Need fs');
     }
-    Map<String, dynamic> tempData = data;
+    var tempData = data;
     return fs.files.insert(tempData);
   }
 
@@ -34,11 +34,11 @@ class GridFSFile {
 
     var completer = Completer<bool>();
     // query for md5 at filemd5
-    DbCommand dbCommand = DbCommand(
-        fs.database, fs.bucketName, 0, 0, 1, {"filemd5": id}, {"md5": 1});
+    var dbCommand = DbCommand(
+        fs.database, fs.bucketName, 0, 0, 1, {'filemd5': id}, {'md5': 1});
     fs.database.executeDbCommand(dbCommand).then((data) {
-      if (data != null && data.containsKey("md5")) {
-        completer.complete(md5 == data["md5"]);
+      if (data != null && data.containsKey('md5')) {
+        completer.complete(md5 == data['md5']);
       } else {
         completer.complete(false);
       }
@@ -51,11 +51,11 @@ class GridFSFile {
   }
 
   List<String> get aliases {
-    return extraData["aliases"] as List<String>;
+    return extraData['aliases'] as List<String>;
   }
 
   Map<String, dynamic> get metaData {
-    return extraData["metadata"] as Map<String, dynamic>;
+    return extraData['metadata'] as Map<String, dynamic>;
   }
 
   set metaData(Map<String, dynamic> metaData) {

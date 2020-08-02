@@ -11,9 +11,9 @@ class GridIn extends GridFSFile {
 
   ///TODO Review that code. Currently it sums all file's content in one (potentially big) List, to get MD5 hash
   /// Probably we should use some Stream api here
-  List<int> contentToDigest = List<int>();
+  List<int> contentToDigest = <int>[];
   GridIn(this.fs,
-      [String filename = null, Stream<List<int>> inputStream = null]) {
+      [String filename, Stream<List<int>> inputStream]) {
     id = ObjectId();
     chunkSize = GridFS.DEFAULT_CHUNKSIZE;
     input = ChunkHandler(chunkSize).transformer.bind(inputStream);
@@ -21,10 +21,9 @@ class GridIn extends GridFSFile {
     this.filename = filename;
   }
 
+  @override
   Future<Map<String, dynamic>> save([int chunkSize]) {
-    if (chunkSize == null) {
-      chunkSize = this.chunkSize;
-    }
+    chunkSize ??= this.chunkSize;
 
     Future<Map<String, dynamic>> result;
     if (!savedChunks) {

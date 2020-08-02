@@ -16,16 +16,16 @@ class GridOut extends GridFSFile {
   }
 
   Future<int> writeTo(IOSink out) {
-    int length = 0;
-    Completer<int> completer = Completer();
+    var length = 0;
+    var completer = Completer<int>();
     addToSink(Map<String, dynamic> chunk) {
-      final data = chunk["data"] as BsonBinary;
+      final data = chunk['data'] as BsonBinary;
       out.add(data.byteList);
       length += data.byteList.length;
     }
 
     fs.chunks
-        .find(where.eq("files_id", id).sortBy('n'))
+        .find(where.eq('files_id', id).sortBy('n'))
         .forEach(addToSink)
         .then((_) => completer.complete(length));
     return completer.future;

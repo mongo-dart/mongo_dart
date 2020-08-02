@@ -13,13 +13,13 @@ class PacketConverter {
   int messagesConverted = 0;
   final lengthBuffer = BsonBinary(4);
 
-  addPacket(List<int> packet) {
+  void addPacket(List<int> packet) {
     packets.addLast(packet);
     handleHeaderAndBody();
   }
 
-  handleHeaderAndBody() {
-    bool hasMoreData = true;
+  void handleHeaderAndBody() {
+    var hasMoreData = true;
 
     while (hasMoreData) {
       hasMoreData = false;
@@ -39,18 +39,18 @@ class PacketConverter {
     }
   }
 
-  handleHeader() {
+  void handleHeader() {
     headerMode = false;
     lengthBuffer.rewind();
     readIntoBuffer(lengthBuffer.byteList, 0);
-    int len = lengthBuffer.readInt32();
+    var len = lengthBuffer.readInt32();
     if (len > MAX_DOC_SIZE) {
       throw MongoDartError('Message length $len over maximum document size');
     }
     messageBuffer = List<int>(len);
   }
 
-  handleBody() {
+  void handleBody() {
     headerMode = true;
     messageBuffer.setRange(0, 4, lengthBuffer.byteList);
     readIntoBuffer(messageBuffer, 4);
@@ -67,7 +67,7 @@ class PacketConverter {
 //      print('$this $buffer $pos');
       throw MongoDartError('Bad state. Read buffer too big');
     }
-    int writePos = pos;
+    var writePos = pos;
     while (writePos < buffer.length) {
       writePos += _readPacketIntoBuffer(buffer, writePos);
     }
@@ -77,7 +77,7 @@ class PacketConverter {
   }
 
   int _readPacketIntoBuffer(List<int> buffer, int pos) {
-    int bytesRead = min(buffer.length - pos, packets.first.length - readPos);
+    var bytesRead = min(buffer.length - pos, packets.first.length - readPos);
     buffer.setRange(pos, pos + bytesRead, packets.first, readPos);
     if (readPos + bytesRead == packets.first.length) {
       readPos = 0;
@@ -88,8 +88,9 @@ class PacketConverter {
     return bytesRead;
   }
 
+  @override
   String toString() =>
       'PacketConverter(readPos: $readPos, headerMode: $headerMode, packets: $packets)';
 
-  bool get isClear => this.packets.isEmpty && messages.isEmpty && headerMode;
+  bool get isClear => packets.isEmpty && messages.isEmpty && headerMode;
 }

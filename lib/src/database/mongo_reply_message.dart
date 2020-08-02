@@ -7,13 +7,13 @@ class MongoReplyMessage extends MongoResponseMessage {
   static final FLAGS_SHARD_CONFIGSTALE = 4;
   static final FLAGS_AWAIT_CAPABLE = 8;
 
-  BsonCString _collectionFullName;
   int responseFlags;
   int cursorId = -1; // 64bit integer
   int startingFrom;
   int numberReturned = -1;
   List<Map<String, dynamic>> documents;
 
+  @override
   MongoMessage deserialize(BsonBinary buffer) {
     readMessageHeaderFrom(buffer);
     responseFlags = buffer.readInt32();
@@ -21,22 +21,23 @@ class MongoReplyMessage extends MongoResponseMessage {
     startingFrom = buffer.readInt32();
     numberReturned = buffer.readInt32();
     documents = List(numberReturned);
-    for (int n = 0; n < numberReturned; n++) {
-      BsonMap doc = BsonMap({});
+    for (var n = 0; n < numberReturned; n++) {
+      var doc = BsonMap({});
       doc.unpackValue(buffer);
       documents[n] = doc.value as Map<String, dynamic>;
     }
     return this;
   }
 
+  @override
   String toString() {
     if (documents.length == 1) {
-      return "MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, "
-          "numberReturned:$numberReturned, responseFlags:$responseFlags, "
-          "${documents[0]})";
+      return 'MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, '
+          'numberReturned:$numberReturned, responseFlags:$responseFlags, '
+          '${documents[0]})';
     }
-    return "MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, "
-        "numberReturned:$numberReturned, responseFlags:$responseFlags, "
-        "$documents)";
+    return 'MongoReplyMessage(ResponseTo:$responseTo, cursorId: $cursorId, '
+        'numberReturned:$numberReturned, responseFlags:$responseFlags, '
+        '$documents)';
   }
 }

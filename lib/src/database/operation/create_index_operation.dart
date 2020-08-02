@@ -27,7 +27,7 @@ class CreateIndexOperation extends CommandOperation {
       : super(db, indexOptions.options,
             collection: collection, aspect: Aspect.writeOperation) {
     var indexParameters = parseIndexOptions(fieldOrSpec);
-    final String indexName = options != null &&
+    final indexName = options != null &&
             options[keyName] != null &&
             options[keyName] is String
         ? options[keyName] as String
@@ -40,7 +40,7 @@ class CreateIndexOperation extends CommandOperation {
     var indexes = this.indexes;
 
     // merge all the options
-    for (String optionName in options.keys) {
+    for (var optionName in options.keys) {
       if (!keysToOmit.contains(optionName)) {
         indexes[optionName] = options[optionName];
       }
@@ -109,7 +109,7 @@ Map<String, Object> parseIndexOptions(Object fieldOrSpec) {
 // {location:'2d', type:1}
     keys = fieldOrSpec.keys;
     for (String key in keys) {
-      String indexDirection = '${fieldOrSpec[key]}';
+      var indexDirection = '${fieldOrSpec[key]}';
       indexes.add(_fieldIndexName(key, indexDirection));
       fieldHash[key] = fieldOrSpec[key];
     }

@@ -46,7 +46,7 @@ class InsertOneOperation extends CommandOperation {
       throw error;
     }*/
 
-    Map<String, Object> ret = await super.execute();
+    var ret = await super.execute();
     if (ret[keyOk] == 1.0) {
       ret[keyOps] = [document];
       ret[keyInsertedCount] = 1;

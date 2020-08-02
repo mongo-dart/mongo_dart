@@ -33,8 +33,9 @@ class MongoQueryMessage extends MongoMessage {
     opcode = MongoMessage.Query;
   }
 
+  @override
   int get messageLength {
-    int result =
+    var result =
         16 + 4 + _collectionFullName.byteLength() + 4 + 4 + _query.byteLength();
     if (_fields != null) {
       result += _fields.byteLength();
@@ -42,8 +43,9 @@ class MongoQueryMessage extends MongoMessage {
     return result;
   }
 
+  @override
   BsonBinary serialize() {
-    BsonBinary buffer = BsonBinary(messageLength);
+    var buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(flags);
     _collectionFullName.packValue(buffer);
@@ -57,7 +59,8 @@ class MongoQueryMessage extends MongoMessage {
     return buffer;
   }
 
+  @override
   String toString() {
-    return "MongoQueryMessage($requestId, ${_collectionFullName.value},numberToReturn:$numberToReturn, ${_query.value})";
+    return 'MongoQueryMessage($requestId, ${_collectionFullName.value},numberToReturn:$numberToReturn, ${_query.value})';
   }
 }

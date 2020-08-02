@@ -1,8 +1,7 @@
-# Mongo-dart - MongoDB driver for Dart programming language.
+# Mongo-dart - MongoDB driver for Dart programming language
 
 [![Pub](https://img.shields.io/pub/v/mongo_dart.svg)](https://pub.dartlang.org/packages/mongo_dart)
 [![Build Status](https://travis-ci.org/mongo-dart/mongo_dart.svg?branch=master)](https://travis-ci.org/mongo-dart/mongo_dart)
-
 
 Server-side driver library for MongoDb implemented in pure Dart.
 
@@ -18,8 +17,7 @@ Server-side driver library for MongoDb implemented in pure Dart.
 
 ### Querying
 
-
-Method `find` returns stream of maps and accept query parameters, usually build by fluent API query builder 
+Method `find` returns stream of maps and accept query parameters, usually build by fluent API query builder
 provided by [mongo_dart_query](https://github.com/vadimtsushko/mongo_dart_query) as top level getter `where`
 
 ```dart
@@ -32,7 +30,7 @@ provided by [mongo_dart_query](https://github.com/vadimtsushko/mongo_dart_query)
   await coll
       .find(where.gt("my_field", 995).sortBy('my_field'))
       .forEach((v) => print(v));
-      
+
   //....
   
   await coll.find(where.sortBy('itemId').skip(300).limit(25)).toList();
@@ -45,7 +43,6 @@ Method `findOne` take the same parameter and returns `Future` of just one map (m
 
   val = await coll.findOne(where.eq("my_field", 17).fields(['str_field','my_field']));
 ```
-
 
 Take notice in these samples that unlike mongo shell such parameters as projection (`fields`), `limit` and `skip`
 are passed as part of regular query through query builder
@@ -71,7 +68,7 @@ You can update whole document with method `save`
   await coll.save(v1);
 ```
 
-or you can perform field level updates with method `update` and top level getter `modify` for ModifierBuilder fluent API   
+or you can perform field level updates with method `update` and top level getter `modify` for ModifierBuilder fluent API
 
 ```dart
 
@@ -85,13 +82,11 @@ or you can perform field level updates with method `update` and top level getter
 
   students.remove(where.id(id));
   /// or, to remove all documents from collection
-  students.remove();    
-    
+  students.remove();
+
 ```
 
-
-Simple app on base of [JSON ZIPS dataset] (http://media.mongodb.org/zips.json)
-
+Simple app on base of [JSON ZIPS dataset](http://media.mongodb.org/zips.json)
 
 ```dart
 import 'package:mongo_dart/mongo_dart.dart';
@@ -159,4 +154,3 @@ main() async {
 - [Recent change notes](https://github.com/vadimtsushko/mongo_dart/blob/master/changelog.md)
 
 - Additional [examples](https://github.com/vadimtsushko/mongo_dart/tree/master/example) and [tests](https://github.com/vadimtsushko/mongo_dart/tree/master/test)
-

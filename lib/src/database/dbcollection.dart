@@ -5,26 +5,26 @@ class DbCollection {
   String collectionName;
   ReadPreference readPreference = ReadPreference.primary;
 
-  DbCollection(this.db, this.collectionName) {}
+  DbCollection(this.db, this.collectionName);
 
-  String fullName() => "${db.databaseName}.$collectionName";
+  String fullName() => '${db.databaseName}.$collectionName';
 
   Future<Map<String, dynamic>> save(Map<String, dynamic> document,
       {WriteConcern writeConcern}) {
     var id;
-    bool createId = false;
-    if (document.containsKey("_id")) {
-      id = document["_id"];
+    var createId = false;
+    if (document.containsKey('_id')) {
+      id = document['_id'];
       if (id == null) {
         createId = true;
       }
     }
     if (id != null) {
-      return update({"_id": id}, document,
+      return update({'_id': id}, document,
           upsert: true, writeConcern: writeConcern);
     } else {
       if (createId) {
-        document["_id"] = ObjectId();
+        document['_id'] = ObjectId();
       }
       return insert(document, writeConcern: writeConcern);
     }
@@ -33,8 +33,7 @@ class DbCollection {
   Future<Map<String, dynamic>> insertAll(List<Map<String, dynamic>> documents,
       {WriteConcern writeConcern}) {
     return Future.sync(() {
-      MongoInsertMessage insertMessage =
-          MongoInsertMessage(fullName(), documents);
+      var insertMessage = MongoInsertMessage(fullName(), documents);
       db.executeMessage(insertMessage, writeConcern);
       return db._getAcknowledgement(writeConcern: writeConcern);
     });
@@ -45,7 +44,7 @@ class DbCollection {
       bool multiUpdate = false,
       WriteConcern writeConcern}) {
     return Future.sync(() {
-      int flags = 0;
+      var flags = 0;
       if (upsert) {
         flags |= 0x1;
       }
@@ -53,7 +52,7 @@ class DbCollection {
         flags |= 0x2;
       }
 
-      MongoUpdateMessage message = MongoUpdateMessage(
+      var message = MongoUpdateMessage(
           fullName(), _selectorBuilder2Map(selector), document, flags);
       db.executeMessage(message, writeConcern);
       return db._getAcknowledgement(writeConcern: writeConcern);
@@ -73,8 +72,8 @@ class DbCollection {
   Cursor createCursor([selector]) => Cursor(db, this, selector);
 
   Future<Map<String, dynamic>> findOne([selector]) {
-    Cursor cursor = Cursor(db, this, selector);
-    Future<Map<String, dynamic>> result = cursor.nextObject();
+    var cursor = Cursor(db, this, selector);
+    var result = cursor.nextObject();
     cursor.close();
     return result;
   }
@@ -99,7 +98,7 @@ class DbCollection {
             fields: fields as Map<String, dynamic>,
             upsert: upsert))
         .then((reply) {
-      return Future.value(reply["value"] as Map<String, dynamic>);
+      return Future.value(reply['value'] as Map<String, dynamic>);
     });
   }
 
@@ -114,7 +113,7 @@ class DbCollection {
         .executeDbCommand(DbCommand.createCountCommand(
             db, collectionName, _selectorBuilder2Map(selector)))
         .then((reply) {
-      return Future.value((reply["n"] as num)?.toInt());
+      return Future.value((reply['n'] as num)?.toInt());
     });
   }
 
@@ -150,7 +149,7 @@ class DbCollection {
     } else {
       /// Pre MongoDB v3.0 API
       var selector = <String, dynamic>{};
-      selector['ns'] = this.fullName();
+      selector['ns'] = fullName();
       return Cursor(
               db, DbCollection(db, DbCommand.SYSTEM_INDEX_COLLECTION), selector)
           .stream
@@ -194,7 +193,7 @@ class DbCollection {
     }
     return Future.sync(() async {
       modernReply ??= true;
-      CreateIndexOptions indexOptions = CreateIndexOptions(this,
+      var indexOptions = CreateIndexOptions(this,
           uniqueIndex: unique == true,
           sparseIndex: sparse == true,
           background: background == true,
@@ -202,7 +201,7 @@ class DbCollection {
           partialFilterExpression: partialFilterExpression,
           indexName: name);
 
-      CreateIndexOperation indexOperation =
+      var indexOperation =
           CreateIndexOperation(db, this, _setKeys(key, keys), indexOptions);
 
       var res = await indexOperation.execute();
@@ -223,10 +222,10 @@ class DbCollection {
       throw MongoDartError('This method is not available before release 3.6');
     }
     return Future.sync(() {
-      InsertOneOptions insertOneOptions =
+      var insertOneOptions =
           InsertOneOptions(this, writeConcern: writeConcern);
 
-      InsertOneOperation insertOneOperation =
+      var insertOneOperation =
           InsertOneOperation(this, document, insertOneOptions);
 
       return insertOneOperation.execute();
@@ -239,7 +238,7 @@ class DbCollection {
     }
 
     if (key != null) {
-      keys = Map();
+      keys = {};
       keys['$key'] = 1;
     }
 
