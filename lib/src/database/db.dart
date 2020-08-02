@@ -57,23 +57,23 @@ class WriteConcern {
 
   /// Exceptions are raised for network issues, and server errors; waits on a majority of servers for the write operation.
   static const MAJORITY =
-      WriteConcern(w: "majority", wtimeout: 0, fsync: false, j: false);
+      WriteConcern(w: 'majority', wtimeout: 0, fsync: false, j: false);
 
   /// Gets the getlasterror command for this write concern.
   Map<String, dynamic> get command {
-    var map = Map<String, dynamic>();
-    map["getlasterror"] = 1;
+    var map = <String, dynamic>{};
+    map['getlasterror'] = 1;
     if (w != null) {
-      map["w"] = w;
+      map['w'] = w;
     }
     if (wtimeout != null) {
-      map["wtimeout"] = wtimeout;
+      map['wtimeout'] = wtimeout;
     }
     if (fsync != null) {
-      map["fsync"] = fsync;
+      map['fsync'] = fsync;
     }
     if (j != null) {
-      map["j"] = j;
+      map['j'] = j;
     }
     return map;
   }
