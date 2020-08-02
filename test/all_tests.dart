@@ -7,7 +7,7 @@ import 'mongo_dart_query_test.dart' as mongo_dart_query;
 import 'authentication_test.dart' as auth_tests;
 //import 'replica_tests.dart' as replica;
 
-main() {
+void main() {
   converter.main();
   database.main();
   gridfs.main();

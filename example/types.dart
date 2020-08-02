@@ -1,9 +1,9 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-main() async {
-  Db db = Db("mongodb://127.0.0.1/mongo_dart-blog");
+void main() async {
+  var db = Db('mongodb://127.0.0.1/mongo_dart-blog');
   await db.open();
-  DbCollection collection = db.collection('test-types');
+  var collection = db.collection('test-types');
   await collection.remove({});
   await collection.insert({
     'array': [1, 2, 3],
@@ -14,7 +14,7 @@ main() async {
     'binary': BsonBinary.from([0x23, 0x24, 0x25]),
     'int': 42,
     'float': 33.3333,
-    'regexp': BsonRegexp(".?dim"),
+    'regexp': BsonRegexp('.?dim'),
     'boolean': true,
     'where': BsonCode('this.x == 3'),
     'null': null

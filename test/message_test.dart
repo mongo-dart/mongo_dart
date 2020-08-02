@@ -9,37 +9,37 @@ import 'dart:async';
 import 'package:test/test.dart';
 
 Future testCreatePayload0FromDocument() async {
-  Map<String, Object> data = {
+  var data = <String, Object>{
     keyInsert: 'collectionName',
     keyDatabaseName: 'databaseName',
     keyWriteConcern: {'w': 'majority'}
   };
-  Payload0 payload0 = Payload0(data);
+  var payload0 = Payload0(data);
 
   expect(payload0.byteLength, 89);
-  BsonBinary check = BsonBinary.fromHexString(
+  var check = BsonBinary.fromHexString(
       '5900000002696e73657274000f000000636f6c6c656374696f6e4e616d6500022464620'
       '00d00000064617461626173654e616d6500037772697465436f6e6365726e0015000000'
       '027700090000006d616a6f72697479000000');
-  BsonBinary buffer = BsonBinary(payload0.byteLength);
+  var buffer = BsonBinary(payload0.byteLength);
   payload0.packValue(buffer);
   expect(buffer.offset, payload0.byteLength);
   expect(buffer.hexString, check.hexString);
 }
 
 Future testCreatePayload0FromBuffer() async {
-  Map<String, Object> data = {
+  var data = <String, Object>{
     keyInsert: 'collectionName',
     keyDatabaseName: 'databaseName',
     keyWriteConcern: {'w': 'majority'}
   };
-  Payload0 check = Payload0(data);
-  BsonBinary buffer = BsonBinary.fromHexString(
+  var check = Payload0(data);
+  var buffer = BsonBinary.fromHexString(
       '5900000002696e73657274000f000000636f6c6c656374696f6e4e616d6500022464620'
       '00d00000064617461626173654e616d6500037772697465436f6e6365726e0015000000'
       '027700090000006d616a6f72697479000000');
   buffer.offset = 0;
-  Payload0 payload = Payload0.fromBuffer(buffer);
+  var payload = Payload0.fromBuffer(buffer);
 
   expect(payload.byteLength, 89);
 
@@ -47,41 +47,41 @@ Future testCreatePayload0FromBuffer() async {
 }
 
 Future testCreatePayload1FromDocument() async {
-  List<Map<String, Object>> data = [
+  var data = <Map<String, Object>>[
     {keyId: 'Document#1', 'example': 1},
     {keyId: 'Document#2', 'example': 2},
     {keyId: 'Document#3', 'example': 3}
   ];
-  Payload1 payload1 = Payload1('documents', data);
+  var payload1 = Payload1('documents', data);
 
   expect(payload1.identifier.byteLength(), 10);
   expect(payload1.documentsByteLength, 114);
   expect(payload1.byteLength, 128);
-  BsonBinary check = BsonBinary.fromHexString(
+  var check = BsonBinary.fromHexString(
       '80000000646f63756d656e74730026000000025f6964000b000000446f63756d656e74'
       '233100106578616d706c6500010000000026000000025f6964000b000000446f63756d'
       '656e74233200106578616d706c6500020000000026000000025f6964000b000000446f'
       '63756d656e74233300106578616d706c65000300000000');
-  BsonBinary buffer = BsonBinary(payload1.byteLength);
+  var buffer = BsonBinary(payload1.byteLength);
   payload1.packValue(buffer);
   expect(buffer.offset, payload1.byteLength);
   expect(buffer.hexString, check.hexString);
 }
 
 Future testCreatePayload1FromBuffer() async {
-  List<Map<String, Object>> data = [
+  var data = <Map<String, Object>>[
     {keyId: 'Document#1', 'example': 1},
     {keyId: 'Document#2', 'example': 2},
     {keyId: 'Document#3', 'example': 3}
   ];
-  Payload1 check = Payload1("documents", data);
-  BsonBinary buffer = BsonBinary.fromHexString(
+  var check = Payload1('documents', data);
+  var buffer = BsonBinary.fromHexString(
       '80000000646f63756d656e74730026000000025f6964000b000000446f63756d656e74'
       '233100106578616d706c6500010000000026000000025f6964000b000000446f63756d'
       '656e74233200106578616d706c6500020000000026000000025f6964000b000000446f'
       '63756d656e74233300106578616d706c65000300000000');
   buffer.offset = 0;
-  Payload1 payload = Payload1.fromBuffer(buffer);
+  var payload = Payload1.fromBuffer(buffer);
 
   expect(payload.identifier.byteLength(), 10);
   expect(payload.documentsByteLength, 114);
@@ -93,39 +93,39 @@ Future testCreatePayload1FromBuffer() async {
 }
 
 Future testCreateSectionType0FromDocument() async {
-  Map<String, Object> data = {
+  var data = <String, Object>{
     'insert': 'collectionName',
     keyDatabaseName: 'databaseName',
     'writeConcern': {'w': 'majority'}
   };
-  Section section0 = Section(MongoModernMessage.basePayloadType, data);
-  Payload0 payload0 = Payload0(data);
+  var section0 = Section(MongoModernMessage.basePayloadType, data);
+  var payload0 = Payload0(data);
 
   expect(section0.byteLength, 90);
   expect(payload0.byteLength, 89);
-  BsonBinary check = BsonBinary.fromHexString(
+  var check = BsonBinary.fromHexString(
       '005900000002696e73657274000f000000636f6c6c656374696f6e4e616d6500022464'
       '62000d00000064617461626173654e616d6500037772697465436f6e6365726e001500'
       '0000027700090000006d616a6f72697479000000');
-  BsonBinary buffer = BsonBinary(section0.byteLength);
+  var buffer = BsonBinary(section0.byteLength);
   section0.packValue(buffer);
   expect(buffer.offset, section0.byteLength);
   expect(buffer.hexString, check.hexString);
 }
 
 Future testCreateSectionType0FromBuffer() async {
-  Map<String, Object> data = {
+  var data = <String, Object>{
     'insert': 'collectionName',
     keyDatabaseName: 'databaseName',
     'writeConcern': {'w': 'majority'}
   };
-  Section check = Section(MongoModernMessage.basePayloadType, data);
-  BsonBinary buffer = BsonBinary.fromHexString(
+  var check = Section(MongoModernMessage.basePayloadType, data);
+  var buffer = BsonBinary.fromHexString(
       '005900000002696e73657274000f000000636f6c6c656374696f6e4e616d6500022464'
       '62000d00000064617461626173654e616d6500037772697465436f6e6365726e001500'
       '0000027700090000006d616a6f72697479000000');
   buffer.offset = 0;
-  Section section = Section.fromBuffer(buffer);
+  var section = Section.fromBuffer(buffer);
 
   expect(section.byteLength, 90);
 
@@ -133,45 +133,45 @@ Future testCreateSectionType0FromBuffer() async {
 }
 
 Future testCreateSectionType1FromDocument() async {
-  Map<String, Object> data = {
+  var data = <String, Object>{
     'documents': [
       {keyId: 'Document#1', 'example': 1},
       {keyId: 'Document#2', 'example': 2},
       {keyId: 'Document#3', 'example': 3}
     ]
   };
-  Section section = Section(MongoModernMessage.documentsPayloadType, data);
+  var section = Section(MongoModernMessage.documentsPayloadType, data);
 
   expect((section.payload as Payload1).identifier.byteLength(), 10);
   expect((section.payload as Payload1).documentsByteLength, 114);
   expect(section.byteLength, 129);
-  BsonBinary check = BsonBinary.fromHexString(
+  var check = BsonBinary.fromHexString(
       '0180000000646f63756d656e74730026000000025f6964000b000000446f63756d656e74'
       '233100106578616d706c6500010000000026000000025f6964000b000000446f63756d'
       '656e74233200106578616d706c6500020000000026000000025f6964000b000000446f'
       '63756d656e74233300106578616d706c65000300000000');
-  BsonBinary buffer = BsonBinary(section.byteLength);
+  var buffer = BsonBinary(section.byteLength);
   section.packValue(buffer);
   expect(buffer.offset, section.byteLength);
   expect(buffer.hexString, check.hexString);
 }
 
 Future testCreateSectionType1FromBuffer() async {
-  Map<String, Object> data = {
+  var data = <String, Object>{
     'documents': [
       {keyId: 'Document#1', 'example': 1},
       {keyId: 'Document#2', 'example': 2},
       {keyId: 'Document#3', 'example': 3}
     ]
   };
-  Section check = Section(MongoModernMessage.documentsPayloadType, data);
-  BsonBinary buffer = BsonBinary.fromHexString(
+  var check = Section(MongoModernMessage.documentsPayloadType, data);
+  var buffer = BsonBinary.fromHexString(
       '0180000000646f63756d656e74730026000000025f6964000b000000446f63756d656e74'
       '233100106578616d706c6500010000000026000000025f6964000b000000446f63756d'
       '656e74233200106578616d706c6500020000000026000000025f6964000b000000446f'
       '63756d656e74233300106578616d706c65000300000000');
   buffer.offset = 0;
-  Section section = Section.fromBuffer(buffer);
+  var section = Section.fromBuffer(buffer);
 
   expect((section.payload as Payload1).identifier.byteLength(), 10);
   expect((section.payload as Payload1).documentsByteLength, 114);
@@ -185,24 +185,24 @@ Future testCreateSectionType1FromBuffer() async {
 }
 
 Future testCreateModernMessageFromDocument() async {
-  Map<String, Object> data = {
+  var data = <String, Object>{
     keyInsert: 'collectionName',
     keyDatabaseName: 'databaseName',
     keyWriteConcern: {'w': 'majority'}
   };
-  List<Map<String, Object>> documents = <Map<String, Object>>[];
-  for (int idx = 1; idx <= 120; idx++) {
+  var documents = <Map<String, Object>>[];
+  for (var idx = 1; idx <= 120; idx++) {
     documents.add(<String, Object>{'a': idx});
   }
   data[keyInsertArgument] = documents;
 
-  MongoModernMessage message = MongoModernMessage(data);
+  var message = MongoModernMessage(data);
   expect(message.sections.length, 4);
   expect(message.opcode, MongoMessage.ModernMessage);
-  int section0Number = 0;
-  int section1Number = 0;
-  int unknownSectionNumber = 0;
-  for (Section section in message.sections) {
+  var section0Number = 0;
+  var section1Number = 0;
+  var unknownSectionNumber = 0;
+  for (var section in message.sections) {
     if (section.payloadType == MongoModernMessage.basePayloadType) {
       section0Number++;
     } else if (section.payloadType == MongoModernMessage.documentsPayloadType) {
@@ -222,18 +222,18 @@ Future testCreateModernMessageFromDocument() async {
 }
 
 Future testCreateModernMessageFromBuffer() async {
-  Map<String, Object> data = {
+  var data = <String, Object>{
     'insert': 'collectionName',
     keyDatabaseName: 'databaseName',
     'writeConcern': {'w': 'majority'}
   };
-  Section check = Section(MongoModernMessage.basePayloadType, data);
-  BsonBinary buffer = BsonBinary.fromHexString(
+  var check = Section(MongoModernMessage.basePayloadType, data);
+  var buffer = BsonBinary.fromHexString(
       '005900000002696e73657274000f000000636f6c6c656374696f6e4e616d6500022464'
       '62000d00000064617461626173654e616d6500037772697465436f6e6365726e001500'
       '0000027700090000006d616a6f72697479000000');
   buffer.offset = 0;
-  Section section = Section.fromBuffer(buffer);
+  var section = Section.fromBuffer(buffer);
 
   expect(section.byteLength, 90);
 
@@ -241,7 +241,7 @@ Future testCreateModernMessageFromBuffer() async {
 }
 
 void main() async {
-  group("Main", () {
+  group('Main', () {
     group('Bson Payload0 Test', () {
       test('create Payload Type 0 from document',
           testCreatePayload0FromDocument);

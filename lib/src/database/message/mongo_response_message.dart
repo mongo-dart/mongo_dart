@@ -10,7 +10,7 @@ class MongoResponseMessage extends MongoMessage {
     buffer.readInt32();
     buffer.readInt32();
     buffer.readInt32();
-    int opcodeFromWire = buffer.readInt32();
+    var opcodeFromWire = buffer.readInt32();
     buffer.offset -= 16;
     return opcodeFromWire;
   }

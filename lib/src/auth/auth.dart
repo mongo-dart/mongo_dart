@@ -38,11 +38,11 @@ class CryptoStrengthStringGenerator extends RandomStringGenerator {
     var random = Random.secure();
     var allowedCodeUnits = RandomStringGenerator.allowedCharacters.codeUnits;
 
-    int max = allowedCodeUnits.length - 1;
+    var max = allowedCodeUnits.length - 1;
 
-    List<int> randomString = [];
+    var randomString = <int>[];
 
-    for (int i = 0; i < length; ++i) {
+    for (var i = 0; i < length; ++i) {
       randomString.add(allowedCodeUnits.elementAt(random.nextInt(max)));
     }
 

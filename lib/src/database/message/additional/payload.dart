@@ -18,7 +18,7 @@ class Payload0 extends Payload {
           ..unpackValue(buffer..makeByteList());
 
   @override
-  packValue(BsonBinary buffer) => document.packValue(buffer);
+  void packValue(BsonBinary buffer) => document.packValue(buffer);
 
   @override
   int get byteLength => document.byteLength();
@@ -48,18 +48,18 @@ class Payload1 extends Payload {
       4 /* sequence length */ + identifier.byteLength() + documentsByteLength;
 
   int get documentsByteLength {
-    int len = 0;
-    for (BsonMap doc in _documents) {
+    var len = 0;
+    for (var doc in _documents) {
       len += doc.byteLength();
     }
     return len;
   }
 
   @override
-  packValue(BsonBinary buffer) {
+  void packValue(BsonBinary buffer) {
     buffer.writeInt(byteLength);
     identifier.packValue(buffer);
-    for (BsonMap data in _documents) {
+    for (var data in _documents) {
       data.packValue(buffer);
     }
   }
@@ -70,7 +70,7 @@ class Payload1 extends Payload {
 }
 
 List<BsonMap> _createBsonMapList(List<Map<String, Object>> documents) {
-  List<BsonMap> _documents = <BsonMap>[];
+  var _documents = <BsonMap>[];
   for (var document in documents) {
     _documents.add(BsonMap(document));
   }
@@ -78,7 +78,7 @@ List<BsonMap> _createBsonMapList(List<Map<String, Object>> documents) {
 }
 
 List<Map<String, Object>> _extractBsonMapList(List<BsonMap> documents) {
-  List<Map<String, Object>> _documents = <Map<String, Object>>[];
+  var _documents = <Map<String, Object>>[];
   for (var document in documents) {
     _documents.add(document.data);
   }
@@ -86,9 +86,9 @@ List<Map<String, Object>> _extractBsonMapList(List<BsonMap> documents) {
 }
 
 List<BsonMap> _decodeBsonMapList(BsonBinary buffer, int length) {
-  List<BsonMap> _documents = <BsonMap>[];
+  var _documents = <BsonMap>[];
   while (length > 0) {
-    BsonMap map = BsonMap(<String, Object>{});
+    var map = BsonMap(<String, Object>{});
     map.unpackValue(buffer);
     _documents.add(map);
     length -= map.byteLength();

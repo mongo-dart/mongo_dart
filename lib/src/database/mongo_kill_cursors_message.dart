@@ -7,12 +7,14 @@ class MongoKillCursorsMessage extends MongoMessage {
     opcode = MongoMessage.KillCursors;
   }
 
+  @override
   int get messageLength {
     return 16 + 4 + 4 + 8;
   }
 
+  @override
   BsonBinary serialize() {
-    BsonBinary buffer = BsonBinary(messageLength);
+    var buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
     buffer.writeInt(1);
@@ -21,7 +23,8 @@ class MongoKillCursorsMessage extends MongoMessage {
     return buffer;
   }
 
+  @override
   String toString() {
-    return "MongoKillCursorsMessage($requestId, $cursorId)";
+    return 'MongoKillCursorsMessage($requestId, $cursorId)';
   }
 }

@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
-const dbName = "test-mongo-dart";
+const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
 
 const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
@@ -16,13 +16,13 @@ Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
 String getRandomCollectionName() {
-  String name = uuid.v4();
+  var name = uuid.v4();
   usedCollectionNames.add(name);
   return name;
 }
 
 Future testGetCollectionInfos() async {
-  String collectionName = getRandomCollectionName();
+  var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await collection.insertAll([
@@ -36,11 +36,11 @@ Future testGetCollectionInfos() async {
 }
 
 Future testRemove() async {
-  String collectionName = getRandomCollectionName();
+  var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   await collection.insertAll([
-    {"a": 1}
+    {'a': 1}
   ]);
 
   var collectionInfos = await db.getCollectionInfos({'name': collectionName});
@@ -58,7 +58,7 @@ Future testDropDatabase() async {
 
 Future testGetNonce() async {
   var result = await db.getNonce();
-  expect(result["ok"], 1);
+  expect(result['ok'], 1);
 }
 
 Future getBuildInfo() async {
@@ -68,7 +68,7 @@ Future getBuildInfo() async {
 
 Future testIsMaster() async {
   var result = await db.isMaster();
-  expect(result["ok"], 1);
+  expect(result['ok'], 1);
 }
 
 Future<void> testServerStatus() async {
@@ -89,21 +89,21 @@ Future<void> testServerStatus() async {
   }
 }
 
-testCollectionCreation() {
-  String collectionName = getRandomCollectionName();
+DbCollection testCollectionCreation() {
+  var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
   return collection;
 }
 
 Future testEachOnEmptyCollection() async {
-  String collectionName = getRandomCollectionName();
+  var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
   int count = 0;
   int sum = 0;
 
   await for (var document in collection.find()) {
-    sum += document["a"] as int;
+    sum += document['a'] as int;
     count++;
   }
 

@@ -2,13 +2,13 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 //////Sample is broken now. Mongolab free accounts upgraded to MongoDb 3.0
 ///// and support for 3.0 default authentication scheme not implemented yet
-main() async {
+void main() async {
   void displayZip(Map zip) {
     print(
         'state: ${zip["state"]}, city: ${zip["city"]}, zip: ${zip["id"]}, population: ${zip["pop"]}');
   }
 
-  Db db = Db("mongodb://reader:vHm459fU@ds037468.mongolab.com:37468/samlple");
+  var db = Db('mongodb://reader:vHm459fU@ds037468.mongolab.com:37468/samlple');
   var zips = db.collection('zip');
   await db.open();
   print('''
@@ -25,7 +25,7 @@ main() async {
   displayZip(batesville);
   print('******************** Find 10 ZIP closest to BATESVILLE');
   await zips
-      .find(where.near('loc', batesville["loc"]).limit(10))
+      .find(where.near('loc', batesville['loc']).limit(10))
       .forEach(displayZip);
   print('closing db');
   await db.close();

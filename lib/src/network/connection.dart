@@ -10,7 +10,7 @@ class _ServerCapabilities {
   int maxNumberOfDocsInBatch = 1000;
   bool supportsOpMsg = false;
 
-  getParamsFromIstMaster(Map<String, dynamic> isMaster) {
+  void getParamsFromIstMaster(Map<String, dynamic> isMaster) {
     if (isMaster.containsKey('maxWireVersion')) {
       maxWireVersion = isMaster['maxWireVersion'] as int;
     }
@@ -33,10 +33,10 @@ class _ServerCapabilities {
 
 class _Connection {
   final Logger _log = Logger('Connection');
-  _ConnectionManager _manager;
+  final _ConnectionManager _manager;
   ServerConfig serverConfig;
   Socket socket;
-  Set<int> _pendingQueries = Set();
+  Set<int> _pendingQueries = {};
 
   Map<int, Completer<MongoResponseMessage>> get _replyCompleters =>
       _manager.replyCompleters;
@@ -54,9 +54,7 @@ class _Connection {
   final ServerStatus serverStatus = ServerStatus();
 
   _Connection(this._manager, [this.serverConfig]) {
-    if (serverConfig == null) {
-      serverConfig = ServerConfig();
-    }
+    serverConfig ??= ServerConfig();
   }
 
   Future<bool> connect() async {

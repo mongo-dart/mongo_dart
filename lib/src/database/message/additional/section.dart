@@ -20,7 +20,7 @@ abstract class Section {
 
   factory Section.fromBuffer(BsonBinary buffer) {
     _arrangeBuffer(buffer);
-    int payloadType = buffer.readByte();
+    var payloadType = buffer.readByte();
     if (payloadType == MongoModernMessage.basePayloadType) {
       return SectionType0(payloadType, Payload0.fromBuffer(buffer));
     } else if (payloadType == MongoModernMessage.documentsPayloadType) {
@@ -59,9 +59,8 @@ class SectionType1 extends Section {
       throw MongoDartError(
           'The value of the document parameter must be a List of documents');
     }
-    String identifier = document.keys.first;
-    List<Map<String, Object>> documents =
-        document.values.first as List<Map<String, Object>>;
+    var identifier = document.keys.first;
+    var documents = document.values.first as List<Map<String, Object>>;
     payload = Payload1(identifier, documents);
   }
 

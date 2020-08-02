@@ -1,9 +1,9 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-main() async {
+void main() async {
   var db = Db('mongodb://user:pencil@localhost/auth2?authSource=admin');
   await db.open();
-  DbCollection collection = db.collection('test');
+  var collection = db.collection('test');
   print(await collection.find().toList());
   await db.close();
 }

@@ -254,10 +254,10 @@ class Db {
     connection ??= _masterConnectionVerified;
 
     MongoModernMessage response =
-    await connection.executeModernMessage(message);
+        await connection.executeModernMessage(message);
 
     Section section = response.sections.firstWhere((Section _section) =>
-    _section.payloadType == MongoModernMessage.basePayloadType);
+        _section.payloadType == MongoModernMessage.basePayloadType);
     return section.payload.content;
   }
 
@@ -614,7 +614,7 @@ class Db {
       return <String, Object>{};
     }
     ServerStatusOperation operation =
-    ServerStatusOperation(this, options: options);
+        ServerStatusOperation(this, options: options);
     return operation.execute();
   }
 
