@@ -10,18 +10,18 @@ const DefaultUri2 = 'mongodb://127.0.0.1:27002';
 const DefaultUri3 = 'mongodb://127.0.0.1:27003';
 
 Future testCollectionInfoCursor() {
-  Db db = Db.pool([
-    "${DefaultUri1}/mongo_dart-test",
-    "${DefaultUri2}/mongo_dart-test",
-    "${DefaultUri3}/mongo_dart-test"
+  var db = Db.pool([
+    '${DefaultUri1}/mongo_dart-test',
+    '${DefaultUri2}/mongo_dart-test',
+    '${DefaultUri3}/mongo_dart-test'
   ], 'testCollectionInfoCursor');
   DbCollection newColl;
   return db.open(writeConcern: WriteConcern.JOURNALED).then((c) {
-    newColl = db.collection("new_collecion");
+    newColl = db.collection('new_collecion');
     return newColl.remove({});
   }).then((v) {
     return newColl.insertAll([
-      {"a": 1}
+      {'a': 1}
     ]);
   }).then((v) {
     return db.getCollectionInfos({'name': 'new_collecion'});
@@ -31,7 +31,7 @@ Future testCollectionInfoCursor() {
   });
 }
 
-main() {
+void main() {
 //  hierarchicalLoggingEnabled = true;
 //  Logger.root.level = Level.OFF;
 //  new Logger('ConnectionManager').level = Level.ALL;

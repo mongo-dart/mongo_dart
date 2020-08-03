@@ -118,7 +118,7 @@ class _UriParameters {
 class Db {
   final MONGO_DEFAULT_PORT = 27017;
   final _log = Logger('Db');
-  final List<String> _uriList = List<String>();
+  final List<String> _uriList = <String>[];
 
   State state = State.INIT;
   String databaseName;
@@ -134,6 +134,7 @@ class Db {
   AuthenticationScheme _authenticationScheme;
   ReadPreference readPreference = ReadPreference.primary;
 
+  @override
   String toString() => 'Db($databaseName,$_debugInfo)';
 
   /// Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
@@ -205,7 +206,7 @@ class Db {
       _authenticationScheme = AuthenticationScheme.MONGODB_CR;
     } else {
       throw MongoDartError(
-          "Provided authentication scheme is not supported : $authenticationSchemeName");
+          'Provided authentication scheme is not supported : $authenticationSchemeName');
     }
   }
 
@@ -220,27 +221,21 @@ class Db {
         throw MongoDartError('Db is in the wrong state: $state');
       }
 
-      if (connection == null) {
-        connection = _masterConnectionVerified;
-      }
+      connection ??= _masterConnectionVerified;
 
       return connection.query(queryMessage);
     });
   }
 
-  executeMessage(MongoMessage message, WriteConcern writeConcern,
+  void executeMessage(MongoMessage message, WriteConcern writeConcern,
       {_Connection connection}) {
     if (state != State.OPEN) {
       throw MongoDartError('DB is not open. $state');
     }
 
-    if (connection == null) {
-      connection = _masterConnectionVerified;
-    }
+    connection ??= _masterConnectionVerified;
 
-    if (writeConcern == null) {
-      writeConcern = _writeConcern;
-    }
+    writeConcern ??= _writeConcern;
 
     connection.execute(message, writeConcern == WriteConcern.ERRORS_IGNORED);
   }
@@ -253,10 +248,9 @@ class Db {
 
     connection ??= _masterConnectionVerified;
 
-    MongoModernMessage response =
-        await connection.executeModernMessage(message);
+    var response = await connection.executeModernMessage(message);
 
-    Section section = response.sections.firstWhere((Section _section) =>
+    var section = response.sections.firstWhere((Section _section) =>
         _section.payloadType == MongoModernMessage.basePayloadType);
     return section.payload.content;
   }
@@ -281,24 +275,22 @@ class Db {
 
   Future<Map<String, dynamic>> executeDbCommand(MongoMessage message,
       {_Connection connection}) async {
-    if (connection == null) {
-      connection = _masterConnectionVerified;
-    }
+    connection ??= _masterConnectionVerified;
 
-    Completer<Map<String, dynamic>> result = Completer();
+    var result = Completer<Map<String, dynamic>>();
 
     var replyMessage = await connection.query(message);
     var firstRepliedDocument = replyMessage.documents[0];
-    var errorMessage = "";
+    var errorMessage = '';
 
     if (replyMessage.documents.isEmpty) {
       errorMessage =
-          "Error executing Db command, documents are empty $replyMessage";
+          'Error executing Db command, documents are empty $replyMessage';
 
-      print("Error: $errorMessage");
+      print('Error: $errorMessage');
 
-      var m = Map<String, dynamic>();
-      m["errmsg"] = errorMessage;
+      var m = <String, dynamic>{};
+      m['errmsg'] = errorMessage;
 
       result.completeError(m);
     } else if (documentIsNotAnError(firstRepliedDocument)) {
@@ -333,16 +325,14 @@ class Db {
       [Map<String, dynamic> selector = const {}, WriteConcern writeConcern]) {
     return Future.sync(() {
       executeMessage(
-          MongoRemoveMessage("$databaseName.$collectionName", selector),
+          MongoRemoveMessage('$databaseName.$collectionName', selector),
           writeConcern);
       return _getAcknowledgement(writeConcern: writeConcern);
     });
   }
 
   Future<Map<String, dynamic>> getLastError([WriteConcern writeConcern]) {
-    if (writeConcern == null) {
-      writeConcern = _writeConcern;
-    }
+    writeConcern ??= _writeConcern;
     return executeDbCommand(
         DbCommand.createGetLastErrorCommand(this, writeConcern));
   }
@@ -377,12 +367,12 @@ class Db {
   /// Analogue to shell's `show dbs`. Helper for `listDatabases` mongodb command.
   Future<List> listDatabases() async {
     var commandResult = await executeDbCommand(
-        DbCommand.createQueryAdminCommand({"listDatabases": 1}));
+        DbCommand.createQueryAdminCommand({'listDatabases': 1}));
 
     var result = [];
 
-    for (var each in commandResult["databases"]) {
-      result.add(each["name"]);
+    for (var each in commandResult['databases']) {
+      result.add(each['name']);
     }
 
     return result;
@@ -390,14 +380,14 @@ class Db {
 
   Stream<Map<String, dynamic>> _listCollectionsCursor(
       [Map<String, dynamic> filter = const {}]) {
-    if (this._masterConnection.serverCapabilities.listCollections) {
+    if (_masterConnection.serverCapabilities.listCollections) {
       return ListCollectionsCursor(this, filter).stream;
     } else {
       // Using system collections (pre v3.0 API)
-      Map<String, dynamic> selector = {};
+      Map selector = <String, dynamic>{};
       // If we are limiting the access to a specific collection name
       if (filter.containsKey('name')) {
-        selector["name"] = "${this.databaseName}.${filter['name']}";
+        selector['name'] = "${databaseName}.${filter['name']}";
       }
       return Cursor(
               this,
@@ -416,10 +406,10 @@ class Db {
   }
 
   Stream<Map<String, dynamic>> _collectionsInfoCursor([String collectionName]) {
-    Map<String, dynamic> selector = {};
+    var selector = <String, dynamic>{};
     // If we are limiting the access to a specific collection name
     if (collectionName != null) {
-      selector["name"] = "${this.databaseName}.$collectionName";
+      selector['name'] = '${databaseName}.$collectionName';
     }
     // Return Cursor
     return Cursor(this,
@@ -541,11 +531,9 @@ class Db {
       if (partialFilterExpression != null) {
         selector['partialFilterExpression'] = partialFilterExpression;
       }
-      if (name == null) {
-        name = _createIndexName(keys);
-      }
+      name ??= _createIndexName(keys);
       selector['name'] = name;
-      MongoInsertMessage insertMessage = MongoInsertMessage(
+      var insertMessage = MongoInsertMessage(
           '$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}', [selector]);
       await executeMessage(insertMessage, _writeConcern);
       return getLastError();
@@ -558,7 +546,7 @@ class Db {
     }
 
     if (key != null) {
-      keys = Map();
+      keys = {};
       keys['$key'] = 1;
     }
 
@@ -581,9 +569,7 @@ class Db {
     keys = _setKeys(key, keys);
     var indexInfos = await collection(collectionName).getIndexes();
 
-    if (name == null) {
-      name = _createIndexName(keys);
-    }
+    name ??= _createIndexName(keys);
 
     if (indexInfos.any((info) => info['name'] == name) ||
         // For compatibility reasons, old indexes where created with
@@ -613,16 +599,14 @@ class Db {
     if (!_masterConnection.serverCapabilities.supportsOpMsg) {
       return <String, Object>{};
     }
-    ServerStatusOperation operation =
+    var operation =
         ServerStatusOperation(this, options: options);
     return operation.execute();
   }
 
   Future<Map<String, dynamic>> _getAcknowledgement(
       {WriteConcern writeConcern}) {
-    if (writeConcern == null) {
-      writeConcern = _writeConcern;
-    }
+    writeConcern ??= _writeConcern;
 
     if (writeConcern == WriteConcern.ERRORS_IGNORED) {
       return Future.value({'ok': 1.0});

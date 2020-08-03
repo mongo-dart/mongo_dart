@@ -18,15 +18,14 @@ class CommandOperation extends OperationBase {
       {this.collection, this.command, Aspect aspect})
       : super(options) {
     defineAspects(aspect);
-    if (!this.hasAspect(Aspect.writeOperation)) {
+    if (!hasAspect(Aspect.writeOperation)) {
       if (collection != null) {
-        ReadPreference readPreference =
-            resolveReadPreference(collection, options);
+        var readPreference = resolveReadPreference(collection, options);
         if (readPreference != null) {
           this.options[keyReadPreference] = readPreference.toJSON();
         }
       } else {
-        ReadPreference readPreference = resolveReadPreference(db, options);
+        var readPreference = resolveReadPreference(db, options);
         if (readPreference != null) {
           this.options[keyReadPreference] = readPreference.toJSON();
         }
@@ -51,14 +50,14 @@ class CommandOperation extends OperationBase {
       return callback(MongoDartError('topology was destroyed'));
     }*/
 
-    Map<String, Object> command = $buildCommand();
+    var command = $buildCommand();
 
     // Get the db name we are executing against
-    final String dbName = (options[keyDbName] as String) ??
+    final dbName = (options[keyDbName] as String) ??
         ((options[keyAuthdb] as String) ?? db.databaseName);
 
     // Convert the readPreference if its not a write
-    if (this.hasAspect(Aspect.writeOperation)) {
+    if (hasAspect(Aspect.writeOperation)) {
       if (options[keyWriteConcern] != null
           // Todo we have to manage Session
           /*&& (options[keySession] == null ||
@@ -72,7 +71,7 @@ class CommandOperation extends OperationBase {
       command[r'$db'] = dbName;
     }
 
-    MongoModernMessage modernMessage = MongoModernMessage(command);
+    var modernMessage = MongoModernMessage(command);
     return db.executeModernMessage(modernMessage /*, writeConcern*/);
   }
 }

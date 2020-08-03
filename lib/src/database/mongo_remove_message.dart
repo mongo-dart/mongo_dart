@@ -12,6 +12,7 @@ class MongoRemoveMessage extends MongoMessage {
     opcode = MongoMessage.Delete;
   }
 
+  @override
   int get messageLength {
     return 16 +
         4 +
@@ -20,8 +21,9 @@ class MongoRemoveMessage extends MongoMessage {
         _selector.byteLength();
   }
 
+  @override
   BsonBinary serialize() {
-    BsonBinary buffer = BsonBinary(messageLength);
+    var buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
     _collectionFullName.packValue(buffer);
@@ -31,7 +33,8 @@ class MongoRemoveMessage extends MongoMessage {
     return buffer;
   }
 
+  @override
   String toString() {
-    return "MongoRemoveMessage($requestId, ${_collectionFullName.value}, ${_selector.value})";
+    return 'MongoRemoveMessage($requestId, ${_collectionFullName.value}, ${_selector.value})';
   }
 }

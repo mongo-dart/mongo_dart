@@ -9,22 +9,22 @@ class GridFS {
   DbCollection chunks;
   String bucketName;
 
-  GridFS(Db this.database, [String collection = "fs"]) {
-    this.files = database.collection("$collection.files");
-    this.chunks = database.collection("$collection.chunks");
+  GridFS(this.database, [String collection = 'fs']) {
+    files = database.collection('$collection.files');
+    chunks = database.collection('$collection.chunks');
     bucketName = collection;
 
     // TODO(tsander): Ensure index.
   }
 
   Stream<Map<String, dynamic>> getFileList(SelectorBuilder selectorBuilder) {
-    return files.find(selectorBuilder.sortBy("filename", descending: true));
+    return files.find(selectorBuilder.sortBy('filename', descending: true));
   }
 
   Future<GridOut> findOne(selector) {
-    Completer<GridOut> completer = Completer();
+    var completer = Completer<GridOut>();
     files.findOne(selector).then((file) {
-      GridOut result = null;
+      GridOut result;
       if (file != null) {
         result = GridOut(file);
         result.setGridFS(this);

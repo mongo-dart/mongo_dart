@@ -36,7 +36,7 @@ class _Connection {
   final _ConnectionManager _manager;
   ServerConfig serverConfig;
   Socket socket;
-  Set<int> _pendingQueries = {};
+  final Set _pendingQueries = <int>{};
 
   Map<int, Completer<MongoResponseMessage>> get _replyCompleters =>
       _manager.replyCompleters;
@@ -132,7 +132,7 @@ class _Connection {
   void execute(MongoMessage mongoMessage, bool runImmediately) {
     if (_closed) {
       throw const ConnectionException(
-          "Invalid state: Connection already closed.");
+          'Invalid state: Connection already closed.');
     }
     _log.fine(() => 'Execute $mongoMessage');
     _sendQueue.addLast(mongoMessage);
@@ -143,7 +143,7 @@ class _Connection {
 
   Future<MongoModernMessage> executeModernMessage(
       MongoModernMessage modernMessage) {
-    Completer<MongoModernMessage> completer = Completer();
+    Completer completer = Completer<MongoModernMessage>();
     if (!_closed) {
       _replyCompleters[modernMessage.requestId] = completer;
       _pendingQueries.add(modernMessage.requestId);
@@ -152,7 +152,7 @@ class _Connection {
       _sendBuffer();
     } else {
       completer.completeError(const ConnectionException(
-          "Invalid state: Connection already closed."));
+          'Invalid state: Connection already closed.'));
     }
     return completer.future;
   }
@@ -166,7 +166,7 @@ class _Connection {
       completer.complete(reply);
     } else {
       if (!_closed) {
-        _log.info(() => "Unexpected respondTo: ${reply.responseTo} $reply");
+        _log.info(() => 'Unexpected respondTo: ${reply.responseTo} $reply');
       }
     }
   }
@@ -174,7 +174,7 @@ class _Connection {
   void _onSocketError() {
     _closed = true;
     connected = false;
-    var ex = const ConnectionException("connection closed.");
+    var ex = const ConnectionException('connection closed.');
     _pendingQueries.forEach((id) {
       Completer completer = _replyCompleters.remove(id);
       completer.completeError(ex);
@@ -189,7 +189,8 @@ class _Connection {
 class ConnectionException implements Exception {
   final String message;
 
-  const ConnectionException([String this.message = ""]);
+  const ConnectionException([this.message = '']);
 
-  String toString() => "MongoDB ConnectionException: $message";
+  @override
+  String toString() => 'MongoDB ConnectionException: $message';
 }

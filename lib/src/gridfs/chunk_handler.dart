@@ -12,13 +12,13 @@ class ChunkHandler {
       data = carry;
       carry = null;
     }
-    int pos = 0;
+    var pos = 0;
     while (pos + chunkSize < data.length) {
       sink.add(data.sublist(pos, pos + chunkSize));
       pos += chunkSize;
     }
     if (data.length > pos) {
-      carry = List<int>();
+      carry = <int>[];
       carry.addAll(data.sublist(pos));
       if (isClosing) {
         sink.add(carry);

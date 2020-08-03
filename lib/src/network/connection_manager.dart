@@ -3,8 +3,8 @@ part of mongo_dart;
 class _ConnectionManager {
   final _log = Logger('ConnectionManager');
   final Db db;
-  final _connectionPool = Map<String, _Connection>();
-  final replyCompleters = Map<int, Completer<MongoResponseMessage>>();
+  final _connectionPool = <String, _Connection>{};
+  final replyCompleters = <int, Completer<MongoResponseMessage>>{};
   final sendQueue = Queue<MongoMessage>();
   _Connection _masterConnection;
 
@@ -22,10 +22,10 @@ class _ConnectionManager {
 
   Future _connect(_Connection connection) async {
     await connection.connect();
-    DbCommand isMasterCommand = DbCommand.createIsMasterCommand(db);
-    MongoReplyMessage replyMessage = await connection.query(isMasterCommand);
+    var isMasterCommand = DbCommand.createIsMasterCommand(db);
+    var replyMessage = await connection.query(isMasterCommand);
     _log.fine(() => replyMessage.documents[0].toString());
-    var master = replyMessage.documents[0]["ismaster"] == true;
+    var master = replyMessage.documents[0]['ismaster'] == true;
     connection.isMaster = master;
     if (master) {
       _masterConnection = connection;

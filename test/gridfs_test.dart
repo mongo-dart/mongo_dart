@@ -15,7 +15,7 @@ Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
 String getRandomCollectionName() {
-  String name = uuid.v4();
+  var name = uuid.v4();
   usedCollectionNames.add(name);
   return name;
 }
@@ -33,32 +33,34 @@ class MockConsumer implements StreamConsumer<List<int>> {
     data.addAll(chunk);
   }
 
+  @override
   Future addStream(Stream<List<int>> stream) {
     var completer = Completer();
     stream.listen(_onData, onDone: () => completer.complete(null));
     return completer.future;
   }
 
+  @override
   Future close() => Future.value(true);
 }
 
-clearFSCollections(GridFS gridFS) {
+void clearFSCollections(GridFS gridFS) {
   gridFS.files.remove(<String, dynamic>{});
   gridFS.chunks.remove(<String, dynamic>{});
 }
 
 Future testSmall() async {
-  String collectionName = getRandomCollectionName();
+  var collectionName = getRandomCollectionName();
 
-  List<int> data = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
-  GridFS gridFS = GridFS(db, collectionName);
+  var data = <int>[0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
+  var gridFS = GridFS(db, collectionName);
   clearFSCollections(gridFS);
   await testInOut(data, gridFS);
 }
 
 Future testBig() {
-  String collectionName = getRandomCollectionName();
-  List<int> smallData = [
+  var collectionName = getRandomCollectionName();
+  var smallData = <int>[
     0x00,
     0x01,
     0x10,
@@ -71,19 +73,19 @@ Future testBig() {
     0xff
   ];
 
-  int target = GridFS.DEFAULT_CHUNKSIZE * 3;
-  List<int> data = List();
+  var target = GridFS.DEFAULT_CHUNKSIZE * 3;
+  var data = <int>[];
   while (data.length < target) {
     data.addAll(smallData);
   }
-  GridFS gridFS = GridFS(db, collectionName);
+  var gridFS = GridFS(db, collectionName);
   clearFSCollections(gridFS);
   return testInOut(data, gridFS);
 }
 
 Future tesSomeChunks() async {
-  String collectionName = getRandomCollectionName();
-  List<int> smallData = [
+  var collectionName = getRandomCollectionName();
+  var smallData = <int>[
     0x00,
     0x01,
     0x10,
@@ -97,26 +99,26 @@ Future tesSomeChunks() async {
   ];
 
   GridFS.DEFAULT_CHUNKSIZE = 9;
-  int target = GridFS.DEFAULT_CHUNKSIZE * 3;
+  var target = GridFS.DEFAULT_CHUNKSIZE * 3;
 
-  List<int> data = List();
+  var data = <int>[];
   while (data.length < target) {
     data.addAll(smallData);
   }
 
-  GridFS gridFS = GridFS(db, collectionName);
+  var gridFS = GridFS(db, collectionName);
   clearFSCollections(gridFS);
 
   return testInOut(data, gridFS);
 }
 
 Future<List<int>> getInitialState(GridFS gridFS) {
-  Completer<List<int>> completer = Completer();
-  List<Future<int>> futures = List();
+  var completer = Completer<List<int>>();
+  var futures = <Future<int>>[];
   futures.add(gridFS.files.count());
   futures.add(gridFS.chunks.count());
   Future.wait(futures).then((List<int> futureResults) {
-    List<int> result = List<int>(2);
+    var result = List<int>(2);
     result[0] = futureResults[0].toInt();
     result[1] = futureResults[1].toInt();
     completer.complete(result);
@@ -125,21 +127,21 @@ Future<List<int>> getInitialState(GridFS gridFS) {
 }
 
 Future testInOut(List<int> data, GridFS gridFS,
-    [Map<String, dynamic> extraData = null]) async {
+    [Map<String, dynamic> extraData]) async {
   var consumer = MockConsumer();
   var out = IOSink(consumer);
   await getInitialState(gridFS);
   var inputStream = Stream.fromIterable([data]);
-  GridIn input = gridFS.createFile(inputStream, "test");
+  var input = gridFS.createFile(inputStream, 'test');
   if (extraData != null) {
     input.extraData = extraData;
     await input.save();
-    GridOut gridOut = await gridFS.findOne(where.eq("_id", input.id));
-    expect(gridOut, isNotNull, reason: "Did not find file by Id");
-    expect(input.id, gridOut.id, reason: "Ids not equal.");
+    var gridOut = await gridFS.findOne(where.eq('_id', input.id));
+    expect(gridOut, isNotNull, reason: 'Did not find file by Id');
+    expect(input.id, gridOut.id, reason: 'Ids not equal.');
     expect(GridFS.DEFAULT_CHUNKSIZE, gridOut.chunkSize,
-        reason: "Chunk size not the same.");
-    expect("test", gridOut.filename, reason: "Filename not equal");
+        reason: 'Chunk size not the same.');
+    expect('test', gridOut.filename, reason: 'Filename not equal');
     expect(input.extraData, gridOut.extraData);
     await gridOut.writeTo(out);
     expect(consumer.data, orderedEquals(data));
@@ -172,17 +174,17 @@ Future testChunkTransformerSeveralChunks() {
 }
 
 Future testFileToGridFSToFile() async {
-  String collectionName = getRandomCollectionName();
+  var collectionName = getRandomCollectionName();
   GridFS.DEFAULT_CHUNKSIZE = 30;
   GridIn input;
-  String dir = path.join(path.current, 'test');
+  var dir = path.join(path.current, 'test');
 
   var inputStream = File('$dir/gridfs_testdata_in.txt').openRead();
 
   var gridFS = GridFS(db, collectionName);
   clearFSCollections(gridFS);
 
-  input = gridFS.createFile(inputStream, "test");
+  input = gridFS.createFile(inputStream, 'test');
   await input.save();
 
   gridFS = GridFS(db, collectionName);
@@ -196,21 +198,21 @@ Future testFileToGridFSToFile() async {
 }
 
 Future testExtraData() {
-  String collectionName = getRandomCollectionName();
+  var collectionName = getRandomCollectionName();
 
-  List<int> data = [0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
-  GridFS gridFS = GridFS(db, collectionName);
+  var data = <int>[0x00, 0x01, 0x10, 0x11, 0x7e, 0x7f, 0x80, 0x81, 0xfe, 0xff];
+  var gridFS = GridFS(db, collectionName);
   clearFSCollections(gridFS);
-  Map<String, dynamic> extraData = {
-    "test": [1, 2, 3],
-    "extraData": "Test",
-    "map": {"a": 1}
+  var extraData = <String, dynamic>{
+    'test': [1, 2, 3],
+    'extraData': 'Test',
+    'map': {'a': 1}
   };
 
   return testInOut(data, gridFS, extraData);
 }
 
-main() {
+void main() {
   Future initializeDatabase() async {
     db = Db(DefaultUri);
     await db.open();

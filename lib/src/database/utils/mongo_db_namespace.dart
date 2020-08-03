@@ -9,13 +9,13 @@ class MongoDBNamespace {
       throw ArgumentError('Cannot parse namespace from "$namespace"');
     }
 
-    List<String> parts = namespace.split('.');
+    var parts = namespace.split('.');
     return MongoDBNamespace(parts.first, parts.length > 1 ? parts[1] : null);
   }
 
   @override
   String toString() {
-    String collectionName = collection ?? '';
+    var collectionName = collection ?? '';
     if (collectionName.isEmpty) {
       return db;
     }

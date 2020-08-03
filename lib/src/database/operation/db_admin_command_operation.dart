@@ -18,11 +18,11 @@ class DbAdminCommandOperation extends OperationBase {
   Future<Map<String, Object>> execute() async {
     final db = this.db;
     //final options = Map.from(this.options);
-    Map<String, Object> command = $buildCommand();
+    var command = $buildCommand();
 
     command[keyDatabaseName] = 'admin';
 
-    MongoModernMessage modernMessage = MongoModernMessage(command);
+    var modernMessage = MongoModernMessage(command);
     return db.executeModernMessage(modernMessage);
   }
 }

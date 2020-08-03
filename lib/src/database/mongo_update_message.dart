@@ -19,6 +19,7 @@ class MongoUpdateMessage extends MongoMessage {
     opcode = MongoMessage.Update;
   }
 
+  @override
   int get messageLength {
     return 16 +
         4 +
@@ -28,8 +29,9 @@ class MongoUpdateMessage extends MongoMessage {
         _document.byteLength();
   }
 
+  @override
   BsonBinary serialize() {
-    BsonBinary buffer = BsonBinary(messageLength);
+    var buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(0);
     _collectionFullName.packValue(buffer);
@@ -40,7 +42,8 @@ class MongoUpdateMessage extends MongoMessage {
     return buffer;
   }
 
+  @override
   String toString() {
-    return "MongoUpdateMessage($requestId, ${_collectionFullName.value}, ${_selector.value}, ${_document.value})";
+    return 'MongoUpdateMessage($requestId, ${_collectionFullName.value}, ${_selector.value}, ${_document.value})';
   }
 }

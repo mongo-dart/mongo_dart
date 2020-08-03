@@ -2,11 +2,11 @@ part of mongo_dart;
 
 class DbCommand extends MongoQueryMessage {
   // Constants
-  static final SYSTEM_NAMESPACE_COLLECTION = "system.namespaces";
-  static final SYSTEM_INDEX_COLLECTION = "system.indexes";
-  static final SYSTEM_PROFILE_COLLECTION = "system.profile";
-  static final SYSTEM_USER_COLLECTION = "system.users";
-  static final SYSTEM_COMMAND_COLLECTION = "\$cmd";
+  static final SYSTEM_NAMESPACE_COLLECTION = 'system.namespaces';
+  static final SYSTEM_INDEX_COLLECTION = 'system.indexes';
+  static final SYSTEM_PROFILE_COLLECTION = 'system.profile';
+  static final SYSTEM_USER_COLLECTION = 'system.users';
+  static final SYSTEM_COMMAND_COLLECTION = '\$cmd';
 
   Db db;
   DbCommand(
@@ -19,7 +19,7 @@ class DbCommand extends MongoQueryMessage {
       Map<String, dynamic> fields)
       : super(collectionName, flags, numberToSkip, numberToReturn, query,
             fields) {
-    _collectionFullName = BsonCString("${db.databaseName}.$collectionName");
+    _collectionFullName = BsonCString('${db.databaseName}.$collectionName');
   }
 
   static DbCommand createFindAndModifyCommand(Db db, String collectionName,
@@ -30,7 +30,7 @@ class DbCommand extends MongoQueryMessage {
       bool returnNew,
       Map<String, dynamic> fields,
       bool upsert}) {
-    Map<String, dynamic> command = {"findandmodify": collectionName};
+    Map command = <String, dynamic>{'findandmodify': collectionName};
     if (query != null) {
       command['query'] = query;
     }
@@ -85,7 +85,7 @@ class DbCommand extends MongoQueryMessage {
 
   static MongoQueryMessage createQueryAdminCommand(
       Map<String, dynamic> command) {
-    return MongoQueryMessage("admin.$SYSTEM_COMMAND_COLLECTION",
+    return MongoQueryMessage('admin.$SYSTEM_COMMAND_COLLECTION',
         MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, 1, command, null);
   }
 
@@ -119,8 +119,8 @@ class DbCommand extends MongoQueryMessage {
   static DbCommand createCountCommand(Db db, String collectionName,
       [Map<String, dynamic> selector = const {}]) {
     var finalQuery = <String, dynamic>{};
-    finalQuery["count"] = collectionName;
-    finalQuery["query"] = selector;
+    finalQuery['count'] = collectionName;
+    finalQuery['query'] = selector;
     return DbCommand(db, SYSTEM_COMMAND_COLLECTION,
         MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT, 0, -1, finalQuery, null);
   }
@@ -170,7 +170,7 @@ class DbCommand extends MongoQueryMessage {
     if (cursor != null) query['cursor'] = cursor;
 
     if (db._masterConnection.serverCapabilities.aggregationCursor) {
-      query["allowDiskUse"] = allowDiskUse;
+      query['allowDiskUse'] = allowDiskUse;
     }
 
     return DbCommand(db, SYSTEM_COMMAND_COLLECTION,

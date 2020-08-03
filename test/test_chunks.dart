@@ -12,13 +12,13 @@ class ChunkHandler {
       data = carry;
       carry = null;
     }
-    int pos = 0;
+    var pos = 0;
     while (pos + chunkSize < data.length) {
       sink.add(data.sublist(pos, pos + chunkSize));
       pos += chunkSize;
     }
     if (data.length > pos) {
-      carry = List<int>();
+      carry = <int>[];
       carry.addAll(data.sublist(pos));
       if (isClosing) {
         sink.add(carry);
@@ -52,7 +52,7 @@ StreamTransformer<List<int>, List<int>> chunkTransformer(int chunkSize) {
       handleData: chunkHandler.handleData, handleDone: chunkHandler.handleDone);
 }
 
-main() {
+void main() {
   var data = [
     [1, 3, 5, 6, 7, 8, 9, 3, 4, 5, 6, 1, 7],
     [2, 3, 6, 1]
