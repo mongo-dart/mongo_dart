@@ -156,7 +156,7 @@ Resolves [#73](https://github.com/mongo-dart/mongo_dart/issues/73).
 
 ### 0.1.46
 
-* Save method use `upsert` flag in accordance with [mongodb docs](http://docs.mongodb.org/manual/reference/method/db.collection.save/)
+* Save method use `upsert` flag in accordance with [mongodb docs](https://docs.mongodb.com/manual/reference/method/db.collection.save/)
 
 ### 0.1.45
 
@@ -337,7 +337,7 @@ Relevant test and sample (in example/query.dart) added
 ### 0.1.1
 
 * Support of dart:io version 2. (Stream-based).
-* [WriteConcern](http://docs.mongodb.org/manual/core/write-operations/#write-concern) introduced. Db.open method has writeConcern param, as individual modifying operations. Default writeConcern = WriteConcern.AKNOWLEDGED
+* [WriteConcern](https://docs.mongodb.com/manual/crud/#write-concern) introduced. Db.open method has writeConcern param, as individual modifying operations. Default writeConcern = WriteConcern.AKNOWLEDGED
 * writeConcern parameter replaced safeMode parameter on modifying operations
 * GridFS not yet ported to dart:io version 2.
 

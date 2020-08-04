@@ -86,7 +86,7 @@ or you can perform field level updates with method `update` and top level getter
 
 ```
 
-Simple app on base of [JSON ZIPS dataset](http://media.mongodb.org/zips.json)
+Simple app on base of [JSON ZIPS dataset](https://media.mongodb.org/zips.json)
 
 ```dart
 import 'package:mongo_dart/mongo_dart.dart';
@@ -147,7 +147,7 @@ main() async {
 
 ### See also
 
-- [API Doc](http://www.dartdocs.org/documentation/mongo_dart/latest)
+- [API Doc](https://pub.dev/documentation/mongo_dart/latest/)
 
 - [Feature check list](https://github.com/vadimtsushko/mongo_dart/blob/master/doc/feature_checklist.md)
 
