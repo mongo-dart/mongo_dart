@@ -255,7 +255,9 @@ class Db {
     return section.payload.content;
   }
 
-  Future open({WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED}) {
+  Future open(
+      {WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED,
+      bool secure = false}) {
     return Future.sync(() {
       if (state == State.OPENING) {
         throw MongoDartError('Attempt to open db in state $state');
@@ -266,7 +268,7 @@ class Db {
       _connectionManager = _ConnectionManager(this);
 
       _uriList.forEach((uri) {
-        _connectionManager.addConnection(_parseUri(uri));
+        _connectionManager.addConnection(_parseUri(uri)..isSecure = secure);
       });
 
       return _connectionManager.open(writeConcern);
@@ -384,7 +386,7 @@ class Db {
       return ListCollectionsCursor(this, filter).stream;
     } else {
       // Using system collections (pre v3.0 API)
-      Map selector = <String, dynamic>{};
+      var selector = <String, dynamic>{};
       // If we are limiting the access to a specific collection name
       if (filter.containsKey('name')) {
         selector['name'] = "${databaseName}.${filter['name']}";
@@ -599,8 +601,7 @@ class Db {
     if (!_masterConnection.serverCapabilities.supportsOpMsg) {
       return <String, Object>{};
     }
-    var operation =
-        ServerStatusOperation(this, options: options);
+    var operation = ServerStatusOperation(this, options: options);
     return operation.execute();
   }
 

@@ -389,8 +389,11 @@ db.runCommand(
   expect(p1['\u0024group'], isNotNull);
   expect(p1['\$group'], isNotNull);
 
-  var v = await collection.aggregate(pipeline);
-  final result = v['result'] as List;
+  /*  var v = await collection.aggregate(pipeline);
+  final result = v['result'] as List; */
+  var v = await collection.aggregate(pipeline, cursor: {});
+  var cursor = v['cursor'] as Map;
+  var result = cursor['firstBatch'] as List;
   expect(result[0]['_id'], 'Age of Steam');
   expect(result[0]['avgRating'], 3);
 }

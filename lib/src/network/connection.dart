@@ -60,7 +60,12 @@ class _Connection {
   Future<bool> connect() async {
     Socket _socket;
     try {
-      _socket = await Socket.connect(serverConfig.host, serverConfig.port);
+      if (serverConfig.isSecure) {
+        _socket =
+            await SecureSocket.connect(serverConfig.host, serverConfig.port);
+      } else {
+        _socket = await Socket.connect(serverConfig.host, serverConfig.port);
+      }
     } catch (e, st) {
       _log.severe('Socket error on connect(): ${e} ${st}');
       _closed = true;
@@ -74,8 +79,7 @@ class _Connection {
     socket = _socket;
 
     _repliesSubscription = socket
-        .transform<MongoResponseMessage /*MongoReplyMessage*/ >(
-            MongoMessageHandler().transformer)
+        .transform<MongoResponseMessage>(MongoMessageHandler().transformer)
         .listen(_receiveReply,
             onError: (e, st) {
               _log.severe('Socket error ${e} ${st}');
