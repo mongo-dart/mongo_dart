@@ -18,12 +18,11 @@ const Set keysToOmit = <String>{
 };
 
 class CreateIndexOperation extends CommandOperation {
-  DbCollection collection;
   Object fieldOrSpec;
   Map<String, Object> indexes;
 
-  CreateIndexOperation(
-      Db db, this.collection, this.fieldOrSpec, CreateIndexOptions indexOptions)
+  CreateIndexOperation(Db db, DbCollection collection, this.fieldOrSpec,
+      CreateIndexOptions indexOptions)
       : super(db, indexOptions.options,
             collection: collection, aspect: Aspect.writeOperation) {
     var indexParameters = parseIndexOptions(fieldOrSpec);

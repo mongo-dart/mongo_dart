@@ -67,7 +67,8 @@ class _Connection {
         _socket = await Socket.connect(serverConfig.host, serverConfig.port);
       }
     } catch (e, st) {
-      _log.severe('Socket error on connect(): ${e} ${st}');
+      _log.severe(
+          'Socket error on connect to ${serverConfig.hostUrl}: ${e} ${st}');
       _closed = true;
       connected = false;
       var ex = const ConnectionException('Could not connect to the Data Base.');
@@ -84,13 +85,15 @@ class _Connection {
             onError: (e, st) {
               _log.severe('Socket error ${e} ${st}');
               if (!_closed) {
-                _onSocketError();
+                _closeSocketOnError(socketError: e);
               }
             },
             cancelOnError: true,
+            // onDone is not called in any case after onData or OnError,
+            // it is called when the socket closes, i.e. it is an error.
             onDone: () {
               if (!_closed) {
-                _onSocketError();
+                _closeSocketOnError();
               }
             });
     connected = true;
@@ -175,10 +178,11 @@ class _Connection {
     }
   }
 
-  void _onSocketError() {
+  void _closeSocketOnError({dynamic socketError}) {
     _closed = true;
     connected = false;
-    var ex = const ConnectionException('connection closed.');
+    var ex = ConnectionException(
+        'connection closed${socketError == null ? '.' : ': $socketError'}');
     _pendingQueries.forEach((id) {
       Completer completer = _replyCompleters.remove(id);
       completer.completeError(ex);

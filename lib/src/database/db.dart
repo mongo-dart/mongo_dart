@@ -182,8 +182,8 @@ class Db {
       }
     });
 
-    var serverConfig =
-        ServerConfig(uri.host ?? '127.0.0.1', uri.port ?? mongoDefaultPort);
+    var serverConfig = ServerConfig(
+        uri.host ?? '127.0.0.1', uri.port ?? mongoDefaultPort, isSecure);
 
     if (serverConfig.port == 0) {
       serverConfig.port = mongoDefaultPort;
