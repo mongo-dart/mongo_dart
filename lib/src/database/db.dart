@@ -113,10 +113,12 @@ class WriteConcern {
 class _UriParameters {
   static const authMechanism = 'authMechanism';
   static const authSource = 'authSource';
+  static const tls = 'tls';
+  static const ssl = 'ssl';
 }
 
 class Db {
-  final MONGO_DEFAULT_PORT = 27017;
+  static const mongoDefaultPort = 27017;
   final _log = Logger('Db');
   final List<String> _uriList = <String>[];
 
@@ -156,19 +158,35 @@ class Db {
 
   _Connection get masterConnection => _connectionManager.masterConnection;
 
-  ServerConfig _parseUri(String uriString) {
+  ServerConfig _parseUri(String uriString, {bool isSecure}) {
+    isSecure ??= false;
     var uri = Uri.parse(uriString);
 
     if (uri.scheme != 'mongodb') {
       throw MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
     }
 
-    var serverConfig = ServerConfig();
-    serverConfig.host = uri.host;
-    serverConfig.port = uri.port;
+    uri.queryParameters.forEach((String queryParam, String value) {
+      if (queryParam == _UriParameters.authMechanism) {
+        selectAuthenticationMechanism(value);
+      }
 
-    if (serverConfig.port == null || serverConfig.port == 0) {
-      serverConfig.port = MONGO_DEFAULT_PORT;
+      if (queryParam == _UriParameters.authSource) {
+        authSourceDb = Db._authDb(value);
+      }
+
+      if ((queryParam == _UriParameters.tls ||
+              queryParam == _UriParameters.ssl) &&
+          value == 'true') {
+        isSecure = true;
+      }
+    });
+
+    var serverConfig =
+        ServerConfig(uri.host ?? '127.0.0.1', uri.port ?? mongoDefaultPort);
+
+    if (serverConfig.port == 0) {
+      serverConfig.port = mongoDefaultPort;
     }
 
     if (uri.userInfo.isNotEmpty) {
@@ -185,16 +203,6 @@ class Db {
     if (uri.path.isNotEmpty) {
       databaseName = uri.path.replaceAll('/', '');
     }
-
-    uri.queryParameters.forEach((String queryParam, String value) {
-      if (queryParam == _UriParameters.authMechanism) {
-        selectAuthenticationMechanism(value);
-      }
-
-      if (queryParam == _UriParameters.authSource) {
-        authSourceDb = Db._authDb(value);
-      }
-    });
 
     return serverConfig;
   }
@@ -268,7 +276,7 @@ class Db {
       _connectionManager = _ConnectionManager(this);
 
       _uriList.forEach((uri) {
-        _connectionManager.addConnection(_parseUri(uri)..isSecure = secure);
+        _connectionManager.addConnection(_parseUri(uri, isSecure: secure));
       });
 
       return _connectionManager.open(writeConcern);

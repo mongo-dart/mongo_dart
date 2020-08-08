@@ -103,7 +103,7 @@ class _Connection {
     return socket.close();
   }
 
-  _sendBuffer() {
+  void _sendBuffer() {
     _log.fine(() => '_sendBuffer ${_sendQueue.isNotEmpty}');
     var message = <int>[];
     while (_sendQueue.isNotEmpty) {
