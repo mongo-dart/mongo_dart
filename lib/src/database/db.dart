@@ -145,7 +145,11 @@ class Db {
   /// And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
   ///     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
   Db(String uriString, [this._debugInfo]) {
-    _uriList.add(uriString);
+    if (uriString.contains(',')) {
+      _uriList.addAll(_splitServers(uriString));
+    } else {
+      _uriList.add(uriString);
+    }
   }
 
   Db.pool(List<String> uriList, [this._debugInfo]) {
@@ -157,6 +161,30 @@ class Db {
   WriteConcern get writeConcern => _writeConcern;
 
   _Connection get masterConnection => _connectionManager.masterConnection;
+
+  List<String> get uriList => _uriList.toList();
+
+  List<String> _splitServers(String uriString) {
+    String prefix, suffix;
+    var startServersIndex, endServersIndex;
+    if (uriString.startsWith('mongodb://')) {
+      startServersIndex = 10;
+    } else {
+      throw MongoDartError('Unexpected scheme in url $uriString. '
+          'The url is expected to start with "mongodb://"');
+    }
+    endServersIndex = uriString.indexOf('/', startServersIndex);
+    var serversString = uriString.substring(startServersIndex, endServersIndex);
+    var credentialsIndex = serversString.indexOf('@');
+    if (credentialsIndex != -1) {
+      startServersIndex += credentialsIndex + 1;
+      serversString = uriString.substring(startServersIndex, endServersIndex);
+    }
+    prefix = uriString.substring(0, startServersIndex);
+    suffix = uriString.substring(endServersIndex);
+    var parts = serversString.split(',');
+    return [for (var server in parts) '$prefix${server.trim()}$suffix'];
+  }
 
   ServerConfig _parseUri(String uriString, {bool isSecure}) {
     isSecure ??= false;

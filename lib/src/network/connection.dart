@@ -1,5 +1,12 @@
 part of mongo_dart;
 
+const noSecureRequestError = 'The socket connection has been reset by peer.'
+    '\nPossible causes:'
+    '\n- Trying to connect to an ssl/tls encrypted database without specifiyng'
+    '\n  either the query parm tls=true '
+    'or the secure=true parameter in db.open()'
+    '\n- Others';
+
 class _ServerCapabilities {
   int maxWireVersion = 0;
   bool aggregationCursor = false;
@@ -91,9 +98,13 @@ class _Connection {
             cancelOnError: true,
             // onDone is not called in any case after onData or OnError,
             // it is called when the socket closes, i.e. it is an error.
+            // Possible causes:
+            // * Trying to connect to a tls encrypted Database
+            //   without specifing tls=true in the query parms or setting
+            //   the secure parameter to true in db.open()
             onDone: () {
               if (!_closed) {
-                _closeSocketOnError();
+                _closeSocketOnError(socketError: noSecureRequestError);
               }
             });
     connected = true;
