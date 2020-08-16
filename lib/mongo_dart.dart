@@ -7,7 +7,7 @@ library mongo_dart;
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert' show base64, utf8;
-import 'dart:io' show File, FileMode, IOSink, Socket;
+import 'dart:io' show File, FileMode, IOSink, SecureSocket, Socket;
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:collection/collection.dart';

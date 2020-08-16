@@ -11,7 +11,7 @@ Server-side driver library for MongoDb implemented in pure Dart.
 
 ```dart
 
-  Db db = new Db("mongodb://localhost:27017/mongo_dart-blog");
+  var db = Db("mongodb://localhost:27017/mongo_dart-blog");
   await db.open();
 ```
 
@@ -91,13 +91,13 @@ Simple app on base of [JSON ZIPS dataset](http://media.mongodb.org/zips.json)
 ```dart
 import 'package:mongo_dart/mongo_dart.dart';
 
-main() async {
+void main() async {
   void displayZip(Map zip) {
     print(
         'state: ${zip["state"]}, city: ${zip["city"]}, zip: ${zip["id"]}, population: ${zip["pop"]}');
   }
-  Db db =
-      new Db("mongodb://reader:vHm459fU@ds037468.mongolab.com:37468/samlple");
+  var db =
+      Db("mongodb://reader:vHm459fU@ds037468.mongolab.com:37468/samlple");
   var zips = db.collection('zip');
   await db.open();
   print('''
@@ -145,12 +145,66 @@ main() async {
 }
 ```
 
+### Secure connection
+
+You can connect using a secured tls/ssl connection in one of this two ways:
+
+* setting the secure connection parameter to true in db.open()
+
+```dart
+    await db.open(secure: true);
+```
+
+* adding a query parameter => "tls=true" (or "ssl=true").
+
+```dart
+    var db = DB('mongodb://www.example.com:27017/test?tls=true&authSource=admin');
+              or
+    var db = DB('mongodb://www.example.com:27017/test?ssl=true&authSource=admin');
+```
+
+No certificates can be used.
+
+### Atlas (MongoDb cloud service) connection
+
+Atlas requires a tls connection, so now it is possible to connect to this cloud service.
+When creating a cluster Atlas shows you three ways of connecting:
+Mongo shell, driver and MongoDb Compass Application.
+The connection string is in Seedlist Connection Format (starts with mongodb+srv://).
+At present this driver does not support this connection string format.
+You can do the following:
+connect with the mongo shell to the address given by the site, for example:
+
+```bash
+mongo "mongodb+srv://cluster0.xtest.mongodb.net/<database name>" --username <your Atlas user>
+```
+
+The shell will ask you the password, enter it.
+
+immediately after, the shell will show you the connection string in Standard Connection Format (starting with "mongodb://") in a line starting with "connecting to", for example.
+
+```code
+connecting to: mongodb://cluster0-shard-00-00.xtest.mongodb.net:27017,cluster0-shard-00-02.xtest.mongodb.net:27017,cluster0-shard-00-01.xtest.mongodb.net:27017/<database name>?authSource=admin&compressors=disabled&gssapiServiceName=mongodb&replicaSet=atlas-stcn2i-shard-0&ssl=true
+```
+
+Copy that string and add your user and password immediately after the "mongodb://" schema in the format "username:password@", for example
+
+```code
+mongodb://<your user>:<your password>@cluster0-shard-00-00.xtest.mongodb.net:27017,cluster0-shard-00-02.xtest.mongodb.net:27017,cluster0-shard-00-01.xtest.mongodb.net:27017/<database name>?authSource=admin&compressors=disabled&gssapiServiceName=mongodb&replicaSet=atlas-stcn2i-shard-0&ssl=true
+```
+
+Here we are, you can use the latter Connection String in the Db constructor
+
+```dart
+var db = Db("mongodb://dbUser:password@cluster0-shard-00-00.xtest.mongodb.net:27017,cluster0-shard-00-02.xtest.mongodb.net:27017,cluster0-shard-00-01.xtest.mongodb.net:27017/test-db?authSource=admin&compressors=disabled&gssapiServiceName=mongodb&replicaSet=atlas-stcn2i-shard-0&ssl=true");
+```
+
 ### See also
 
-- [API Doc](http://www.dartdocs.org/documentation/mongo_dart/latest)
+* [API Doc](http://www.dartdocs.org/documentation/mongo_dart/latest)
 
-- [Feature check list](https://github.com/vadimtsushko/mongo_dart/blob/master/doc/feature_checklist.md)
+* [Feature check list](https://github.com/vadimtsushko/mongo_dart/blob/master/doc/feature_checklist.md)
 
-- [Recent change notes](https://github.com/vadimtsushko/mongo_dart/blob/master/changelog.md)
+* [Recent change notes](https://github.com/vadimtsushko/mongo_dart/blob/master/changelog.md)
 
-- Additional [examples](https://github.com/vadimtsushko/mongo_dart/tree/master/example) and [tests](https://github.com/vadimtsushko/mongo_dart/tree/master/test)
+* Additional [examples](https://github.com/vadimtsushko/mongo_dart/tree/master/example) and [tests](https://github.com/vadimtsushko/mongo_dart/tree/master/test)

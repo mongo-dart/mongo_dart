@@ -83,12 +83,12 @@ class _ConnectionManager {
     });
   }
 
-  addConnection(ServerConfig serverConfig) {
+  void addConnection(ServerConfig serverConfig) {
     var connection = _Connection(this, serverConfig);
     _connectionPool[serverConfig.hostUrl] = connection;
   }
 
-  removeConnection(_Connection connection) {
+  _Connection removeConnection(_Connection connection) {
     connection.close();
     if (connection.isMaster) {
       _masterConnection = null;

@@ -4,7 +4,9 @@ class MongoMessageHandler {
   final _log = Logger('MongoMessageTransformer');
   final converter = PacketConverter();
 
-  void handleData(List<int> data, EventSink<MongoResponseMessage> sink) {
+  void handleData(
+      /* List<int> */ Uint8List data,
+      EventSink<MongoResponseMessage> sink) {
     converter.addPacket(data);
     while (!converter.messages.isEmpty) {
       var buffer = BsonBinary.from(converter.messages.removeFirst());

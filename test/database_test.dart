@@ -21,6 +21,39 @@ String getRandomCollectionName() {
   return name;
 }
 
+Future testDbConnectionString() async {
+  var db = Db('mongodb://www.example.com');
+  expect(db.uriList.first, 'mongodb://www.example.com');
+  db = Db('mongodb://www.example.com:27317');
+  expect(db.uriList.first, 'mongodb://www.example.com:27317');
+  db = Db.pool([
+    'mongodb://www.example.com:27017',
+    'mongodb://www.example.com:27217',
+    'mongodb://www.example.com:27317'
+  ]);
+  expect(db.uriList.first, 'mongodb://www.example.com:27017');
+  expect(db.uriList[1], 'mongodb://www.example.com:27217');
+  expect(db.uriList.last, 'mongodb://www.example.com:27317');
+  db = Db.pool([
+    'mongodb://www.example.com:27017/test',
+    'mongodb://www.example.com:27217/test',
+    'mongodb://www.example.com:27317/test'
+  ]);
+  expect(db.uriList[1], 'mongodb://www.example.com:27217/test');
+  db = Db('mongodb://www.example.com:27017,www.example.com:27217,'
+      'www.example.com:27317/test');
+  expect(db.uriList.first, 'mongodb://www.example.com:27017/test');
+  expect(db.uriList[1], 'mongodb://www.example.com:27217/test');
+  expect(db.uriList.last, 'mongodb://www.example.com:27317/test');
+  // As a syntactic sugar we accept also blnak after comma,
+  //   even if it should not be correct.
+  db = Db('mongodb://www.example.com:27017, www.example.com:27217, '
+      'www.example.com:27317/test');
+  expect(db.uriList.first, 'mongodb://www.example.com:27017/test');
+  expect(db.uriList[1], 'mongodb://www.example.com:27217/test');
+  expect(db.uriList.last, 'mongodb://www.example.com:27317/test');
+}
+
 Future testGetCollectionInfos() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
@@ -389,8 +422,11 @@ db.runCommand(
   expect(p1['\u0024group'], isNotNull);
   expect(p1['\$group'], isNotNull);
 
-  var v = await collection.aggregate(pipeline);
-  final result = v['result'] as List;
+  /*  var v = await collection.aggregate(pipeline);
+  final result = v['result'] as List; */
+  var v = await collection.aggregate(pipeline, cursor: {});
+  var cursor = v['cursor'] as Map;
+  var result = cursor['firstBatch'] as List;
   expect(result[0]['_id'], 'Age of Steam');
   expect(result[0]['avgRating'], 3);
 }
@@ -1311,6 +1347,9 @@ void main() async {
       await cleanupDatabase();
     });
 
+    group('Db creation tests:', () {
+      test('test connection string', testDbConnectionString);
+    });
     group('DbCollection tests:', () {
       test('testAuthComponents', testAuthComponents);
     });
