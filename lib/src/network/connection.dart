@@ -1,5 +1,12 @@
 part of mongo_dart;
 
+const noSecureRequestError = 'The socket connection has been reset by peer.'
+    '\nPossible causes:'
+    '\n- Trying to connect to an ssl/tls encrypted database without specifiyng'
+    '\n  either the query parm tls=true '
+    'or the secure=true parameter in db.open()'
+    '\n- Others';
+
 class _ServerCapabilities {
   int maxWireVersion = 0;
   bool aggregationCursor = false;
@@ -60,9 +67,15 @@ class _Connection {
   Future<bool> connect() async {
     Socket _socket;
     try {
-      _socket = await Socket.connect(serverConfig.host, serverConfig.port);
+      if (serverConfig.isSecure) {
+        _socket =
+            await SecureSocket.connect(serverConfig.host, serverConfig.port);
+      } else {
+        _socket = await Socket.connect(serverConfig.host, serverConfig.port);
+      }
     } catch (e, st) {
-      _log.severe('Socket error on connect(): ${e} ${st}');
+      _log.severe(
+          'Socket error on connect to ${serverConfig.hostUrl}: ${e} ${st}');
       _closed = true;
       connected = false;
       var ex = const ConnectionException('Could not connect to the Data Base.');
@@ -74,19 +87,24 @@ class _Connection {
     socket = _socket;
 
     _repliesSubscription = socket
-        .transform<MongoResponseMessage /*MongoReplyMessage*/ >(
-            MongoMessageHandler().transformer)
+        .transform<MongoResponseMessage>(MongoMessageHandler().transformer)
         .listen(_receiveReply,
             onError: (e, st) {
               _log.severe('Socket error ${e} ${st}');
               if (!_closed) {
-                _onSocketError();
+                _closeSocketOnError(socketError: e);
               }
             },
             cancelOnError: true,
+            // onDone is not called in any case after onData or OnError,
+            // it is called when the socket closes, i.e. it is an error.
+            // Possible causes:
+            // * Trying to connect to a tls encrypted Database
+            //   without specifing tls=true in the query parms or setting
+            //   the secure parameter to true in db.open()
             onDone: () {
               if (!_closed) {
-                _onSocketError();
+                _closeSocketOnError(socketError: noSecureRequestError);
               }
             });
     connected = true;
@@ -99,7 +117,7 @@ class _Connection {
     return socket.close();
   }
 
-  _sendBuffer() {
+  void _sendBuffer() {
     _log.fine(() => '_sendBuffer ${_sendQueue.isNotEmpty}');
     var message = <int>[];
     while (_sendQueue.isNotEmpty) {
@@ -171,10 +189,11 @@ class _Connection {
     }
   }
 
-  void _onSocketError() {
+  void _closeSocketOnError({dynamic socketError}) {
     _closed = true;
     connected = false;
-    var ex = const ConnectionException('connection closed.');
+    var ex = ConnectionException(
+        'connection closed${socketError == null ? '.' : ': $socketError'}');
     _pendingQueries.forEach((id) {
       Completer completer = _replyCompleters.remove(id);
       completer.completeError(ex);

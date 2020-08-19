@@ -6,6 +6,14 @@ String port = Platform.environment['MONGO_DART_DRIVER_PORT'] ?? '27017';
 
 void main() async {
   var db = Db('mongodb://$host:$port/mongo_dart-blog');
+  // Example url for Atlas connection
+  /* var db = Db('mongodb://<atlas-user>:<atlas-password>@'
+      'cluster0-shard-00-02.xtest.mongodb.net:27017,'
+      'cluster0-shard-00-01.xtest.mongodb.net:27017,'
+      'cluster0-shard-00-00.xtest.mongodb.net:27017/'
+      'mongo_dart-blog?authSource=admin&compressors=disabled'
+      '&gssapiServiceName=mongodb&replicaSet=atlas-stcn2i-shard-0'
+      '&ssl=true'); */
   var authors = <String, Map>{};
   var users = <String, Map>{};
   await db.open();

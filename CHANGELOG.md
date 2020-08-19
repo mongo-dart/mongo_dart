@@ -2,6 +2,15 @@
 
 ## Recent change notes
 
+### 0.4.1
+
+* Secure Connection
+* The connection string now accepts more than one server.
+  * Before: only mongodb://www.example.org/test.
+  * Now it can be: mongodb://www.example.org,www1.example.org,www2.example.org/test
+  * It is equivalent to: db.pool([mongodb://www.example.org/test, mongodb://www1.example.org/test, mongodb://www2.example.org/test]);  
+* Added an "uriList" getter in "Db" class.
+
 ### 0.4.1-dev.2.2
 
 * Lint clean-up
