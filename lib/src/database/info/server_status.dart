@@ -24,7 +24,9 @@ class ServerStatus {
     storageEngineName = serverStatus[keyStorageEngine][keyName];
     isPersistent = serverStatus[keyStorageEngine][keyPersistent] ?? true;
     if (storageEngineName == keyWiredTiger) {
-      if (serverStatus[keyWiredTiger][keyLog][keyMaximumLogFileSize] > 0) {
+      // Atlas service does not return the "wiredTiger" element
+      if (!serverStatus.containsKey(keyWiredTiger) ||
+          serverStatus[keyWiredTiger][keyLog][keyMaximumLogFileSize] > 0) {
         isJournaled = true;
       }
     }

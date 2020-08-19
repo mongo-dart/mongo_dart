@@ -113,10 +113,12 @@ class WriteConcern {
 class _UriParameters {
   static const authMechanism = 'authMechanism';
   static const authSource = 'authSource';
+  static const tls = 'tls';
+  static const ssl = 'ssl';
 }
 
 class Db {
-  final MONGO_DEFAULT_PORT = 27017;
+  static const mongoDefaultPort = 27017;
   final _log = Logger('Db');
   final List<String> _uriList = <String>[];
 
@@ -143,7 +145,11 @@ class Db {
   /// And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
   ///     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
   Db(String uriString, [this._debugInfo]) {
-    _uriList.add(uriString);
+    if (uriString.contains(',')) {
+      _uriList.addAll(_splitServers(uriString));
+    } else {
+      _uriList.add(uriString);
+    }
   }
 
   Db.pool(List<String> uriList, [this._debugInfo]) {
@@ -156,19 +162,59 @@ class Db {
 
   _Connection get masterConnection => _connectionManager.masterConnection;
 
-  ServerConfig _parseUri(String uriString) {
+  List<String> get uriList => _uriList.toList();
+
+  List<String> _splitServers(String uriString) {
+    String prefix, suffix;
+    var startServersIndex, endServersIndex;
+    if (uriString.startsWith('mongodb://')) {
+      startServersIndex = 10;
+    } else {
+      throw MongoDartError('Unexpected scheme in url $uriString. '
+          'The url is expected to start with "mongodb://"');
+    }
+    endServersIndex = uriString.indexOf('/', startServersIndex);
+    var serversString = uriString.substring(startServersIndex, endServersIndex);
+    var credentialsIndex = serversString.indexOf('@');
+    if (credentialsIndex != -1) {
+      startServersIndex += credentialsIndex + 1;
+      serversString = uriString.substring(startServersIndex, endServersIndex);
+    }
+    prefix = uriString.substring(0, startServersIndex);
+    suffix = uriString.substring(endServersIndex);
+    var parts = serversString.split(',');
+    return [for (var server in parts) '$prefix${server.trim()}$suffix'];
+  }
+
+  ServerConfig _parseUri(String uriString, {bool isSecure}) {
+    isSecure ??= false;
     var uri = Uri.parse(uriString);
 
     if (uri.scheme != 'mongodb') {
       throw MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
     }
 
-    var serverConfig = ServerConfig();
-    serverConfig.host = uri.host;
-    serverConfig.port = uri.port;
+    uri.queryParameters.forEach((String queryParam, String value) {
+      if (queryParam == _UriParameters.authMechanism) {
+        selectAuthenticationMechanism(value);
+      }
 
-    if (serverConfig.port == null || serverConfig.port == 0) {
-      serverConfig.port = MONGO_DEFAULT_PORT;
+      if (queryParam == _UriParameters.authSource) {
+        authSourceDb = Db._authDb(value);
+      }
+
+      if ((queryParam == _UriParameters.tls ||
+              queryParam == _UriParameters.ssl) &&
+          value == 'true') {
+        isSecure = true;
+      }
+    });
+
+    var serverConfig = ServerConfig(
+        uri.host ?? '127.0.0.1', uri.port ?? mongoDefaultPort, isSecure);
+
+    if (serverConfig.port == 0) {
+      serverConfig.port = mongoDefaultPort;
     }
 
     if (uri.userInfo.isNotEmpty) {
@@ -185,16 +231,6 @@ class Db {
     if (uri.path.isNotEmpty) {
       databaseName = uri.path.replaceAll('/', '');
     }
-
-    uri.queryParameters.forEach((String queryParam, String value) {
-      if (queryParam == _UriParameters.authMechanism) {
-        selectAuthenticationMechanism(value);
-      }
-
-      if (queryParam == _UriParameters.authSource) {
-        authSourceDb = Db._authDb(value);
-      }
-    });
 
     return serverConfig;
   }
@@ -255,7 +291,9 @@ class Db {
     return section.payload.content;
   }
 
-  Future open({WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED}) {
+  Future open(
+      {WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED,
+      bool secure = false}) {
     return Future.sync(() {
       if (state == State.OPENING) {
         throw MongoDartError('Attempt to open db in state $state');
@@ -266,7 +304,7 @@ class Db {
       _connectionManager = _ConnectionManager(this);
 
       _uriList.forEach((uri) {
-        _connectionManager.addConnection(_parseUri(uri));
+        _connectionManager.addConnection(_parseUri(uri, isSecure: secure));
       });
 
       return _connectionManager.open(writeConcern);
@@ -384,7 +422,7 @@ class Db {
       return ListCollectionsCursor(this, filter).stream;
     } else {
       // Using system collections (pre v3.0 API)
-      Map selector = <String, dynamic>{};
+      var selector = <String, dynamic>{};
       // If we are limiting the access to a specific collection name
       if (filter.containsKey('name')) {
         selector['name'] = "${databaseName}.${filter['name']}";
@@ -599,8 +637,7 @@ class Db {
     if (!_masterConnection.serverCapabilities.supportsOpMsg) {
       return <String, Object>{};
     }
-    var operation =
-        ServerStatusOperation(this, options: options);
+    var operation = ServerStatusOperation(this, options: options);
     return operation.execute();
   }
 
