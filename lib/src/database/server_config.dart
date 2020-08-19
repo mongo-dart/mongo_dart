@@ -8,7 +8,7 @@ class ServerConfig {
   String password;
   ServerConfig(
       [this.host = '127.0.0.1',
-      this.port = Db.mongoDefaultPort,
+      this.port = mongoDefaultPort,
       this.isSecure = false]);
   String get hostUrl => '$host:${port.toString()}';
 }

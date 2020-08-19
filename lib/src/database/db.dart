@@ -117,10 +117,9 @@ class _UriParameters {
   static const ssl = 'ssl';
 }
 
-final mongoDefaultPort = 27017;
+const mongoDefaultPort = 27017;
 
 class Db {
-  static const mongoDefaultPort = 27017;
   final _log = Logger('Db');
   final List<String> _uriList = <String>[];
 
