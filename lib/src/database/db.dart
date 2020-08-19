@@ -115,8 +115,10 @@ class _UriParameters {
   static const authSource = 'authSource';
 }
 
+final mongoDefaultPort = 27017;
+
 class Db {
-  final MONGO_DEFAULT_PORT = 27017;
+  final MONGO_DEFAULT_PORT = mongoDefaultPort;
   final _log = Logger('Db');
   final List<String> _uriList = <String>[];
 
@@ -599,8 +601,7 @@ class Db {
     if (!_masterConnection.serverCapabilities.supportsOpMsg) {
       return <String, Object>{};
     }
-    var operation =
-        ServerStatusOperation(this, options: options);
+    var operation = ServerStatusOperation(this, options: options);
     return operation.execute();
   }
 
