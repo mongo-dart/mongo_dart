@@ -139,14 +139,18 @@ class Db {
   @override
   String toString() => 'Db($databaseName,$_debugInfo)';
 
-  /// Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
+  /// Db constructor expects [valid mongodb URI](https://docs.mongodb.com/manual/reference/connection-string/).
   /// For example next code points to local mongodb server on default mongodb port, database *testdb*
+  ///```dart
   ///     var db = new Db('mongodb://127.0.0.1/testdb');
+  ///```
   /// And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
+  ///```dart
   ///     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
+  ///```
   Db(String uriString, [this._debugInfo]) {
     if (uriString.contains(',')) {
-      _uriList.addAll(_splitServers(uriString));
+      _uriList.addAll(splitHosts(uriString));
     } else {
       _uriList.add(uriString);
     }
@@ -158,33 +162,37 @@ class Db {
 
   Db._authDb(this.databaseName);
 
+  /// This method allow to create a Db object both with the Standard
+  /// Connection String Format (`mongodb://`) or with the DNS Seedlist
+  /// Connection Format (`mongodb+srv://`).
+  /// The former has the format:
+  /// mongodb://[username:password@]host1[:port1]
+  ///      [,...hostN[:portN]][/[defaultauthdb][?options]]
+  /// The latter is available from version 3.6. The format is:
+  /// mongodb+srv://[username:password@]host1[:port1]
+  ///      [/[databaseName][?options]]
+  /// More info are available [here](https://docs.mongodb.com/manual/reference/connection-string/)
+  ///
+  /// This is an asynchronous constructor.
+  /// In order to resolve the Seedlist, a call to a DNS server is needed
+  /// If the DNS server is unreachable, the constructor throws an error.
+  static Future<Db> create(String uriString, [String _debugInfo]) async {
+    if (uriString.startsWith('mongodb://')) {
+      return Db(uriString, _debugInfo);
+    } else if (uriString.startsWith('mongodb+srv://')) {
+      var uriList = await decodeDnsSeedlist(Uri.parse(uriString));
+      return Db.pool(uriList, _debugInfo);
+    } else {
+      throw MongoDartError(
+          'The only valid schemas for Db are: "mongodb" and "mongodb+srv".');
+    }
+  }
+
   WriteConcern get writeConcern => _writeConcern;
 
   _Connection get masterConnection => _connectionManager.masterConnection;
 
   List<String> get uriList => _uriList.toList();
-
-  List<String> _splitServers(String uriString) {
-    String prefix, suffix;
-    var startServersIndex, endServersIndex;
-    if (uriString.startsWith('mongodb://')) {
-      startServersIndex = 10;
-    } else {
-      throw MongoDartError('Unexpected scheme in url $uriString. '
-          'The url is expected to start with "mongodb://"');
-    }
-    endServersIndex = uriString.indexOf('/', startServersIndex);
-    var serversString = uriString.substring(startServersIndex, endServersIndex);
-    var credentialsIndex = serversString.indexOf('@');
-    if (credentialsIndex != -1) {
-      startServersIndex += credentialsIndex + 1;
-      serversString = uriString.substring(startServersIndex, endServersIndex);
-    }
-    prefix = uriString.substring(0, startServersIndex);
-    suffix = uriString.substring(endServersIndex);
-    var parts = serversString.split(',');
-    return [for (var server in parts) '$prefix${server.trim()}$suffix'];
-  }
 
   ServerConfig _parseUri(String uriString, {bool isSecure}) {
     isSecure ??= false;
