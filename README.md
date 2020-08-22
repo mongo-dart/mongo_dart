@@ -15,6 +15,13 @@ Server-side driver library for MongoDb implemented in pure Dart.
   await db.open();
 ```
 
+or
+
+```dart
+  var db = await Db.create("mongodb+srv://<user>:<password>@<host>:<port>/<database-name>?<parameters>");
+  await db.open();
+```
+
 ### Querying
 
 Method `find` returns stream of maps and accept query parameters, usually build by fluent API query builder
@@ -163,40 +170,24 @@ You can connect using a secured tls/ssl connection in one of this two ways:
     var db = DB('mongodb://www.example.com:27017/test?ssl=true&authSource=admin');
 ```
 
+When you use the `mongodb+srv` url schema, the "tls" (or "ssl") parameter is implicitly considered true.
+
 No certificates can be used.
 
 ### Atlas (MongoDb cloud service) connection
 
 Atlas requires a tls connection, so now it is possible to connect to this cloud service.
 When creating a cluster Atlas shows you three ways of connecting:
-Mongo shell, driver and MongoDb Compass Application.
+Mongo shell, Driver and MongoDb Compass Application.
 The connection string is in Seedlist Connection Format (starts with mongodb+srv://).
-At present this driver does not support this connection string format.
-You can do the following:
-connect with the mongo shell to the address given by the site, for example:
 
-```bash
-mongo "mongodb+srv://cluster0.xtest.mongodb.net/<database name>" --username <your Atlas user>
-```
+Take the Url related to the Driver mode and pass it to Db.create().
 
-The shell will ask you the password, enter it.
-
-immediately after, the shell will show you the connection string in Standard Connection Format (starting with "mongodb://") in a line starting with "connecting to", for example.
-
-```code
-connecting to: mongodb://cluster0-shard-00-00.xtest.mongodb.net:27017,cluster0-shard-00-02.xtest.mongodb.net:27017,cluster0-shard-00-01.xtest.mongodb.net:27017/<database name>?authSource=admin&compressors=disabled&gssapiServiceName=mongodb&replicaSet=atlas-stcn2i-shard-0&ssl=true
-```
-
-Copy that string and add your user and password immediately after the "mongodb://" schema in the format "username:password@", for example
-
-```code
-mongodb://<your user>:<your password>@cluster0-shard-00-00.xtest.mongodb.net:27017,cluster0-shard-00-02.xtest.mongodb.net:27017,cluster0-shard-00-01.xtest.mongodb.net:27017/<database name>?authSource=admin&compressors=disabled&gssapiServiceName=mongodb&replicaSet=atlas-stcn2i-shard-0&ssl=true
-```
-
-Here we are, you can use the latter Connection String in the Db constructor
+Please, not that Db.create is an asynchronous constructor, so you have to await for it.
 
 ```dart
-var db = Db("mongodb://dbUser:password@cluster0-shard-00-00.xtest.mongodb.net:27017,cluster0-shard-00-02.xtest.mongodb.net:27017,cluster0-shard-00-01.xtest.mongodb.net:27017/test-db?authSource=admin&compressors=disabled&gssapiServiceName=mongodb&replicaSet=atlas-stcn2i-shard-0&ssl=true");
+  var db = await Db.create("mongodb+srv://<user>:<password>@<host>:<port>/<database>?<parameters>");
+  await db.open();
 ```
 
 ### See also

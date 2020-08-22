@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+### 0.4.2
+
+* New Db constructor (Db.create()) that accepts also the url in DNS Seedlist Connection Format ("mongodb+srv://")
+
 ### 0.4.1
 
 * Secure Connection
