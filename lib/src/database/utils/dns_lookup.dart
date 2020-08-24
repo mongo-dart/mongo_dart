@@ -1,5 +1,9 @@
 import 'package:basic_utils/basic_utils.dart' show DnsUtils, RRecordType;
+import 'package:logging/logging.dart' show Logger;
 import 'package:mongo_dart/mongo_dart.dart' show MongoDartError;
+import 'package:mongo_dart/src/database/utils/check_same_domain.dart';
+
+var _log = Logger('dns_llokup');
 
 /// This method receive an Uri with "mongodb+srv" schema and returns
 /// A List of urls in "mongodb" schema format
@@ -69,5 +73,21 @@ Future<List<String>> decodeDnsSeedlist(Uri dnsSeedlistUri) async {
     }
     addresses.add('$host:${parts[parts.length - 2]}');
   }
-  return <String>[for (var address in addresses) '$prefix$address$suffix'];
+  var ret = <String>[for (var address in addresses) '$prefix$address$suffix'];
+  // check if the returned addresses pertain to the same domain as the
+  // dnsSeedListUri
+  for (var address in ret) {
+    var actualUri = Uri.parse(address);
+    if (!checkSameDomain(actualUri, dnsSeedlistUri)) {
+      var dnsParts = dnsSeedlistUri.host.split('.');
+      var dnsDomain = '${dnsParts[dnsParts.length - 2]}.${dnsParts.last}';
+      var actualParts = actualUri.host.split('.');
+      var actualDomain =
+          '${actualParts[actualParts.length - 2]}.${actualParts.last}';
+      throw MongoDartError('Different domain detected in DNS SRV record: '
+          'required "$dnsDomain", detected "$actualDomain"');
+    }
+    _log.info('Dns host detected: $address');
+  }
+  return ret;
 }

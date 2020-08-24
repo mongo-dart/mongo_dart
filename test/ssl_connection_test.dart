@@ -3,6 +3,8 @@ import 'package:mongo_dart/src/database/utils/dns_lookup.dart';
 import 'package:test/test.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
+import 'utils/throw_utils.dart' show throwsMongoDartError;
+
 const sslDbConnectionString =
     'mongodb://cluster0-shard-00-00-smeth.gcp.mongodb.net:27017/'
     'test?authSource=admin,'
@@ -19,8 +21,6 @@ const sslQueryParmConnectionString =
     'test?authSource=admin&ssl=true';
 const tlsQueryParmConnectionString = 'mongodb://cluster0-shard-00-01-smeth'
     '.gcp.mongodb.net:27017/test?tls=true&authSource=admin';
-
-var throwsMongoDartError = throwsA((e) => e is MongoDartError);
 
 void main() {
   group('Dns lookup', () {
@@ -42,7 +42,6 @@ void main() {
       var result =
           await decodeDnsSeedlist(Uri.parse('mongodb+srv://user:password@'
               'rs.joedrumgoole.com/test?retryWrites=true&w=majority'));
-      print(result);
 
       expect(
           result.first,
@@ -64,7 +63,6 @@ void main() {
       decodeDnsSeedlist(Uri.parse('mongodb+srv://user:password@'
               'rs.joedrumgoole.com/test?retryWrites=true&w=majority'))
           .then((result) {
-        print(result);
         expect(
             result.first,
             'mongodb://user:password@rs1.joedrumgoole.com:27022/'
