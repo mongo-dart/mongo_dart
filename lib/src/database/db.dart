@@ -301,22 +301,20 @@ class Db {
 
   Future open(
       {WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED,
-      bool secure = false}) {
-    return Future.sync(() {
-      if (state == State.OPENING) {
-        throw MongoDartError('Attempt to open db in state $state');
-      }
+      bool secure = false}) async {
+    if (state == State.OPENING) {
+      throw MongoDartError('Attempt to open db in state $state');
+    }
 
-      state = State.OPENING;
-      _writeConcern = writeConcern;
-      _connectionManager = _ConnectionManager(this);
+    state = State.OPENING;
+    _writeConcern = writeConcern;
+    _connectionManager = _ConnectionManager(this);
 
-      _uriList.forEach((uri) {
-        _connectionManager.addConnection(_parseUri(uri, isSecure: secure));
-      });
+    for (var uri in _uriList) {
+      _connectionManager.addConnection(_parseUri(uri, isSecure: secure));
+    }
 
-      return _connectionManager.open(writeConcern);
-    }).catchError((error) => throw error);
+    return _connectionManager.open(writeConcern);
   }
 
   Future<Map<String, dynamic>> executeDbCommand(MongoMessage message,
