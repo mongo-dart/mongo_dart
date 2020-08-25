@@ -54,19 +54,17 @@ class _ConnectionManager {
     return true;
   }
 
-  Future open(WriteConcern writeConcern) {
-    return Future.forEach(_connectionPool.keys, (hostUrl) {
+  Future open(WriteConcern writeConcern) async {
+    for (var hostUrl in _connectionPool.keys) {
       var connection = _connectionPool[hostUrl];
-      return _connect(connection);
-    }).then((_) async {
-      db.state = State.OPEN;
-      db.masterConnection.serverStatus
-          .processServerStatus(await db.serverStatus());
-      return true;
-    }).catchError((error) => throw error);
+      await _connect(connection);
+    }
+    db.state = State.OPEN;
+    db.masterConnection.serverStatus
+        .processServerStatus(await db.serverStatus());
   }
 
-  Future close() {
+  Future close() async {
     while (sendQueue.isNotEmpty) {
       masterConnection._sendBuffer();
     }
@@ -74,13 +72,12 @@ class _ConnectionManager {
 
     _masterConnection == null;
 
-    return Future.forEach(_connectionPool.keys, (hostUrl) {
+    for (var hostUrl in _connectionPool.keys) {
       var connection = _connectionPool[hostUrl];
       _log.fine(() => '$db: ${connection.serverConfig.hostUrl} closed');
-      return connection.close();
-    }).then((_) {
-      replyCompleters.clear();
-    });
+      await connection.close();
+    }
+    replyCompleters.clear();
   }
 
   void addConnection(ServerConfig serverConfig) {

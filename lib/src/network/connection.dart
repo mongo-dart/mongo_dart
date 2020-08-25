@@ -89,10 +89,10 @@ class _Connection {
     _repliesSubscription = socket
         .transform<MongoResponseMessage>(MongoMessageHandler().transformer)
         .listen(_receiveReply,
-            onError: (e, st) {
+            onError: (e, st) async {
               _log.severe('Socket error ${e} ${st}');
               if (!_closed) {
-                _closeSocketOnError(socketError: e);
+                await _closeSocketOnError(socketError: e);
               }
             },
             cancelOnError: true,
@@ -102,9 +102,9 @@ class _Connection {
             // * Trying to connect to a tls encrypted Database
             //   without specifing tls=true in the query parms or setting
             //   the secure parameter to true in db.open()
-            onDone: () {
+            onDone: () async {
               if (!_closed) {
-                _closeSocketOnError(socketError: noSecureRequestError);
+                await _closeSocketOnError(socketError: noSecureRequestError);
               }
             });
     connected = true;
@@ -189,18 +189,18 @@ class _Connection {
     }
   }
 
-  void _closeSocketOnError({dynamic socketError}) {
+  Future<void> _closeSocketOnError({dynamic socketError}) async {
     _closed = true;
     connected = false;
     var ex = ConnectionException(
         'connection closed${socketError == null ? '.' : ': $socketError'}');
-    _pendingQueries.forEach((id) {
+    for (var id in _pendingQueries) {
       Completer completer = _replyCompleters.remove(id);
       completer.completeError(ex);
-    });
+    }
     _pendingQueries.clear();
     if (isMaster) {
-      _manager.close();
+      await _manager.close();
     }
   }
 }
