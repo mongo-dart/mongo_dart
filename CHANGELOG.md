@@ -2,9 +2,13 @@
 
 ## Recent change notes
 
+### 0.4.3
+
+* New `isConnected` `Db` getter. It returns `true` if the state of the database is open and at least the primary connection is on.
+
 ### 0.4.2
 
-* New Db constructor (Db.create()) that accepts also the url in DNS Seedlist Connection Format ("mongodb+srv://")
+* New `Db` constructor (`Db.create()`) that accepts also the url in DNS Seedlist Connection Format (`mongodb+srv://`)
 
 ### 0.4.1
 

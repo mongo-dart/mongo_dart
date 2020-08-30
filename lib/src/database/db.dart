@@ -318,6 +318,13 @@ class Db {
     return _connectionManager.open(writeConcern);
   }
 
+  /// Is connected returns true if the database is in state `OPEN`
+  /// and at least the primary connection is connected
+  ///
+  /// Connections can disconect because of network or database server problems.
+  bool get isConnected =>
+      state == State.OPEN && (_masterConnection?.connected ?? false);
+
   Future<Map<String, dynamic>> executeDbCommand(MongoMessage message,
       {_Connection connection}) async {
     connection ??= _masterConnectionVerified;
