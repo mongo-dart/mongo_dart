@@ -5,6 +5,7 @@
 ### 0.4.3
 
 * New `isConnected` `Db` getter. It returns `true` if the state of the database is open and at least the primary connection is on.
+* db._masterConnectionVerified() now throws an explicit error if the db state is not OPEN (it was throwing a `NoSuchMethodError`).
 
 ### 0.4.2
 

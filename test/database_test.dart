@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart' as crypto;
 import 'dart:async';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
+import 'utils/throw_utils.dart' show throwsMongoDartError;
 
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
@@ -19,6 +20,34 @@ String getRandomCollectionName() {
   var name = uuid.v4();
   usedCollectionNames.add(name);
   return name;
+}
+
+Future testDbCreate() async {
+  var dbCreate = Db(DefaultUri);
+  await dbCreate.open();
+  await dbCreate.close();
+
+  dbCreate = await Db.create(DefaultUri);
+  await dbCreate.open();
+  await dbCreate.close();
+}
+
+Future testOperationNotInOpenState() async {
+  var dbCreate = await Db.create(DefaultUri);
+  var coll = dbCreate.collection('test-error');
+  expect(
+      () async =>
+          await coll.findAndModify(query: {'value': 1}, update: {'value': 1}),
+      throwsMongoDartError);
+
+  dbCreate = Db(DefaultUri);
+  await dbCreate.open();
+  coll = dbCreate.collection('test-error');
+  await dbCreate.close();
+  expect(
+      () async =>
+          await coll.findAndModify(query: {'value': 1}, update: {'value': 1}),
+      throwsMongoDartError);
 }
 
 Future testDbConnectionString() async {
@@ -1349,6 +1378,8 @@ void main() async {
 
     group('Db creation tests:', () {
       test('test connection string', testDbConnectionString);
+      test('test db.create()', testDbCreate);
+      test('Error - operation not in Open state', testOperationNotInOpenState);
     });
     group('DbCollection tests:', () {
       test('testAuthComponents', testAuthComponents);

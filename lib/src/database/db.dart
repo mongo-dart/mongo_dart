@@ -131,8 +131,14 @@ class Db {
 
   _Connection get _masterConnection => _connectionManager.masterConnection;
 
-  _Connection get _masterConnectionVerified =>
-      _connectionManager.masterConnectionVerified;
+  _Connection get _masterConnectionVerified {
+    if (state != State.OPEN) {
+      throw MongoDartError(
+          'The required operation can be executed only when the db is open');
+    }
+    return _connectionManager.masterConnectionVerified;
+  }
+
   WriteConcern _writeConcern;
   AuthenticationScheme _authenticationScheme;
   ReadPreference readPreference = ReadPreference.primary;
