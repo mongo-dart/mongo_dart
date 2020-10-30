@@ -5,6 +5,13 @@
 ### 0.4.4
 
 * Test for text index.
+* Fix problem wit "OPENING" state in db. When a socket error happened during opening, the state was't resetted so that any new `db.open()` attempt failed.
+* Closing a db when the connection socket was null threw error.
+* Changed the way the socket error is thrown on `db.open()`: All errors detected are collected.
+  1) If after all the attempts the master connection is not on, an error is thrown relative to the the first server tested. This for compatibility reason with the previous way the message was thrown.
+  2) If the master connection is on, the errors are logged as warning.
+* The socket error message has been changed to comprehend also the address of the server, so it is easier to identify the problem.
+* If an authentication error occurs, the relative socket is closed.
 
 ### 0.4.3
 

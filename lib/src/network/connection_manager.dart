@@ -43,13 +43,18 @@ class _ConnectionManager {
     if (connection.serverConfig.userName == null) {
       _log.fine(() => '$db: ${connection.serverConfig.hostUrl} connected');
     } else {
-      await db
-          .authenticate(connection.serverConfig.userName,
-              connection.serverConfig.password,
-              connection: connection)
-          .then((v) {
+      try {
+        await db.authenticate(
+            connection.serverConfig.userName, connection.serverConfig.password,
+            connection: connection);
         _log.fine(() => '$db: ${connection.serverConfig.hostUrl} connected');
-      });
+      } catch (e) {
+        if (connection == _masterConnection) {
+          _masterConnection = null;
+        }
+        await connection.close();
+        rethrow;
+      }
     }
     return true;
   }
@@ -66,12 +71,12 @@ class _ConnectionManager {
     }
     if (connectionErrors.isNotEmpty) {
       if (_masterConnection == null) {
-        var errorString;
         for (var error in connectionErrors) {
           _log.severe('$error');
-          errorString = '$error\n';
         }
-        throw MongoDartError(errorString);
+        // Simply returns the first exception to be more compatible
+        // with previous error management.
+        throw connectionErrors.first;
       } else {
         for (var error in connectionErrors) {
           _log.warning('$error');
