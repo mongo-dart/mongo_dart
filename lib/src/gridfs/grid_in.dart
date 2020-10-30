@@ -6,7 +6,9 @@ class GridIn extends GridFSFile {
   int currentChunkNumber = 0;
   int currentBufferPosition = 0;
   int totalBytes = 0;
+  @override
   GridFS fs;
+  @override
   String filename;
 
   ///TODO Review that code. Currently it sums all file's content in one (potentially big) List, to get MD5 hash
@@ -38,7 +40,7 @@ class GridIn extends GridFSFile {
     var futures = <Future>[];
     var completer = Completer<Map<String, dynamic>>();
 
-    _onDone() {
+    void _onDone() {
       Future.wait(futures).then((list) {
         return finishData();
       }).then((map) {

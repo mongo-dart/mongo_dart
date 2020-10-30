@@ -29,7 +29,7 @@ class MockConsumer implements StreamConsumer<List<int>> {
     return completer.future;
   }
 
-  _onData(List<int> chunk) {
+  void _onData(List<int> chunk) {
     data.addAll(chunk);
   }
 

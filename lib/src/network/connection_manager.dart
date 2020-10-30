@@ -54,10 +54,29 @@ class _ConnectionManager {
     return true;
   }
 
-  Future open(WriteConcern writeConcern) async {
+  Future<void> open(WriteConcern writeConcern) async {
+    var connectionErrors = [];
     for (var hostUrl in _connectionPool.keys) {
       var connection = _connectionPool[hostUrl];
-      await _connect(connection);
+      try {
+        await _connect(connection);
+      } catch (e) {
+        connectionErrors.add(e);
+      }
+    }
+    if (connectionErrors.isNotEmpty) {
+      if (_masterConnection == null) {
+        var errorString;
+        for (var error in connectionErrors) {
+          _log.severe('$error');
+          errorString = '$error\n';
+        }
+        throw MongoDartError(errorString);
+      } else {
+        for (var error in connectionErrors) {
+          _log.warning('$error');
+        }
+      }
     }
     db.state = State.OPEN;
     db.masterConnection.serverStatus

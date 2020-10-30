@@ -73,12 +73,11 @@ class _Connection {
       } else {
         _socket = await Socket.connect(serverConfig.host, serverConfig.port);
       }
-    } catch (e, st) {
-      _log.severe(
-          'Socket error on connect to ${serverConfig.hostUrl}: ${e} ${st}');
+    } catch (e) {
       _closed = true;
       connected = false;
-      var ex = const ConnectionException('Could not connect to the Data Base.');
+      var ex =
+          ConnectionException('Could not connect to ${serverConfig.hostUrl}');
       throw ex;
     }
 
@@ -114,7 +113,7 @@ class _Connection {
   Future close() {
     _closed = true;
     connected = false;
-    return socket.close();
+    return socket?.close();
   }
 
   void _sendBuffer() {

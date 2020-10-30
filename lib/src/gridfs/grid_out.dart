@@ -18,7 +18,7 @@ class GridOut extends GridFSFile {
   Future<int> writeTo(IOSink out) {
     var length = 0;
     var completer = Completer<int>();
-    addToSink(Map<String, dynamic> chunk) {
+    void addToSink(Map<String, dynamic> chunk) {
       final data = chunk['data'] as BsonBinary;
       out.add(data.byteList);
       length += data.byteList.length;

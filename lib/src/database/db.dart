@@ -320,7 +320,13 @@ class Db {
       _connectionManager.addConnection(_parseUri(uri, isSecure: secure));
     }
 
-    return _connectionManager.open(writeConcern);
+    try {
+      await _connectionManager.open(writeConcern);
+    } catch (e) {
+      state = State.INIT;
+      await _connectionManager.close();
+      rethrow;
+    }
   }
 
   /// Is connected returns true if the database is in state `OPEN`
