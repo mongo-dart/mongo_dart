@@ -39,24 +39,104 @@ class DbCollection {
     });
   }
 
-  Future<Map<String, dynamic>> update(selector, document,
+  /// The update command modifies documents in a collection.
+  ///
+  /// [selector] is the query that matches documents to update.
+  /// Use the same query selectors as used in the find() method.
+  ///
+  /// [document] is the modifications to apply. Can be either a document
+  /// or pipeline.
+  ///
+  /// [ordered] is optional. If true, then when an update statement fails,
+  /// return without performing the remaining update statements.
+  /// If false, then when an update fails, continue with the remaining
+  /// update statements, if any.
+  ///
+  /// [writeConcern] is optional. A document expressing the write concern
+  /// of the update command. Omit to use the default write concern.
+  /// Do not explicitly set the write concern for the operation if run in a
+  /// transaction. To use write concern with transactions, see official docs.
+  ///
+  /// [bypassDocumentValidation] is optional. Enables update to bypass
+  /// document validation during the operation.
+  /// This lets you update documents that do not meet the
+  /// validation requirements. Version >= 3.2
+  ///
+  /// [comment] is optional. A user-provided comment to attach to this command.
+  ///
+  /// [upsert] is optional. If true, perform an insert if no documents match
+  /// the query. If both upsert and multi are true and no documents match
+  /// the query, the update operation inserts only a single document.
+  ///
+  /// [multi] is optional. If true, updates all documents that meet
+  /// the query criteria. If false, limit the update to one document that
+  /// meet the query criteria. Defaults to false.
+  ///
+  /// [collation] is optional. Specifies the collation to use for the
+  /// operation. Collation allows users to specify language-specific rules
+  /// for string comparison, such as rules for lettercase and accent marks.
+  ///
+  /// [arrayFilters] is optional. An array of filter documents that
+  /// determines which array elements to modify for an update operation
+  /// on an array field.
+  ///
+  /// [hint] is optional. A document or string that specifies the index
+  /// to use to support the query predicate. The option can take an index
+  /// specification document or the index name string.
+  /// If you specify an index that does not exist, the operation errors.
+  ///
+  /// Return example:
+  /// ```json
+  ///  {
+  ///    "ok" : 1,
+  ///    "nModified" : 0,
+  ///    "n" : 1,
+  ///    "upserted" : [
+  ///       {
+  ///          "index" : 0,
+  ///          "_id" : ObjectId("52ccb2118908ccd753d65882")
+  ///       }
+  ///    ]
+  ///  }
+  /// ```
+  ///
+  /// See more at the official docs:
+  /// https://docs.mongodb.com/manual/reference/command/update/
+  Future<Map<String, dynamic>> update(Map<String, Object> selector,
+      Object document,
       {bool upsert = false,
-      bool multiUpdate = false,
-      WriteConcern writeConcern}) {
-    return Future.sync(() {
-      var flags = 0;
-      if (upsert) {
-        flags |= 0x1;
-      }
-      if (multiUpdate) {
-        flags |= 0x2;
-      }
+        bool multiUpdate = false,
+        Map<String, Object> collation,
+        Iterable arrayFilters, dynamic hint,
+        WriteConcern writeConcern, bool ordered = true,
+        bool bypassDocumentValidation, dynamic comment}) {
+    var data = <String, Object>{
+      keyUpdate: collectionName,
+      keyDatabaseName: db.databaseName,
+      keyOrdered: ordered,
+      if (bypassDocumentValidation != null)
+        keyBypassDocumentValidation: bypassDocumentValidation,
+      if (comment != null)
+        keyComment: comment,
+      if (writeConcern != null)
+        keyWriteConcern: writeConcern.asMap(db.masterConnection.serverStatus),
+      keyUpdateArgument: [
+        {
+          keyUpdateQuery: selector,
+          keyUpdateDocument: document,
+          keyUpsert: upsert,
+          keyUpdateMulti: multiUpdate,
+          if (arrayFilters != null)
+            keyArrayFilters: arrayFilters,
+          if (collation != null)
+            keyCollation: collation,
+          if (hint != null)
+            keyHint: hint
+        }
+      ]
+    };
 
-      var message = MongoUpdateMessage(
-          fullName(), _selectorBuilder2Map(selector), document, flags);
-      db.executeMessage(message, writeConcern);
-      return db._getAcknowledgement(writeConcern: writeConcern);
-    });
+    return db.executeModernMessage(MongoModernMessage(data));
   }
 
   /// Creates a cursor for a query that can be used to iterate over results from MongoDB

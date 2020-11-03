@@ -25,6 +25,7 @@ import 'package:mongo_dart/src/database/operation/options/create_index_options.d
 import 'package:mongo_dart/src/database/operation/options/insert_one_options.dart';
 import 'package:mongo_dart/src/database/operation/server_status_operation.dart';
 import 'package:mongo_dart/src/database/utils/dns_lookup.dart';
+import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:mongo_dart/src/database/utils/split_hosts.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:pool/pool.dart';
