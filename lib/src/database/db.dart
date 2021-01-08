@@ -2,60 +2,106 @@ part of mongo_dart;
 
 /// [WriteConcern] control the acknowledgment of write operations with various paramaters.
 class WriteConcern {
-  /// Denotes the Write Concern level that takes the following values ([int] or [String]):
-  ///
-  /// * -1 Disables all acknowledgment of write operations, and suppresses all errors, including network and socket errors.
-  /// * 0: Disables basic acknowledgment of write operations, but returns information about socket exceptions and networking errors to the application.
-  /// * 1: Provides acknowledgment of write operations on a standalone mongod or the primary in a replica set.
-  /// * A number greater than 1: Guarantees that write operations have propagated successfully to the specified number of replica set members including the primary.
-  /// * "majority": Confirms that write operations have propagated to the majority of configured replica set
-  /// * A tag set: Fine-grained control over which replica set members must acknowledge a write operation
+  /// Denotes the Write Concern level that takes the following values
+  /// ([int] or [String]):
+  /// - -1 Disables all acknowledgment of write operations, and suppresses
+  /// all errors, including network and socket errors.
+  /// - 0: Disables basic acknowledgment of write operations, but returns
+  /// information about socket exceptions and networking errors to the
+  /// application.
+  /// - 1: Provides acknowledgment of write operations on a standalone mongod
+  /// or the primary in a replica set.
+  /// - A number greater than 1: Guarantees that write operations have
+  /// propagated successfully to the specified number of replica set members
+  /// including the primary.
+  /// - "majority": Confirms that write operations have propagated to the
+  /// majority of configured replica set
+  /// - A tag set: Fine-grained control over which replica set members must
+  /// acknowledge a write operation
   final w;
 
-  /// Specifies a timeout for this Write Concern in milliseconds, or infinite if equal to 0.
+  /// Specifies a timeout for this Write Concern in milliseconds,
+  /// or infinite if equal to 0.
   final int wtimeout;
 
-  /// Enables or disable fsync() operation before acknowledgement of the requested write operation.
+  /// Enables or disable fsync() operation before acknowledgement of
+  /// the requested write operation.
   /// If [true], wait for mongod instance to write data to disk before returning.
   final bool fsync;
 
-  /// Enables or disable journaling of the requested write operation before acknowledgement.
-  /// If [true], wait for mongod instance to write data to the on-disk journal before returning.
+  /// Enables or disable journaling of the requested write operation before
+  /// acknowledgement.
+  /// If [true], wait for mongod instance to write data to the on-disk journal
+  /// before returning.
   final bool j;
 
+  /// A string value indicating where the write concern originated
+  /// (known as write concern provenance). The following table shows the
+  /// possible values for this field and their significance:
+  ///
+  /// **Provenance** -  **Description**
+  /// - clientSupplied
+  ///   - The write concern was specified in the application.
+  /// - customDefault
+  ///   - The write concern originated from a custom defined default value. See setDefaultRWConcern.
+  /// - getLastErrorDefaults
+  ///   - The write concern originated from the replica set’s settings.getLastErrorDefaults field.
+  /// - implicitDefault
+  ///   - The write concern originated from the server in absence of all other write concern specifications.
+  ///
+  /// ** NOTE **
+  ///
+  /// This field is *only* set by the database when the Write concern is
+  /// returned in a writeConcernError. It is **NOT** to be sent to the server
+  final String provenance;
+
   /// Creates a WriteConcern object
-  const WriteConcern({this.w, this.wtimeout, this.fsync, this.j});
+  const WriteConcern(
+      {this.w, this.wtimeout, this.fsync, this.j, this.provenance});
+
+  WriteConcern.fromMap(Map<String, Object> writeConcernMap)
+      : w = writeConcernMap[keyW],
+        wtimeout = writeConcernMap[keyWtimeout],
+        fsync = writeConcernMap[keyFsync],
+        j = writeConcernMap[keyJ],
+        provenance = writeConcernMap[keyProvenance];
 
   /// No exceptions are raised, even for network issues.
   @deprecated
   static const ERRORS_IGNORED =
       WriteConcern(w: -1, wtimeout: 0, fsync: false, j: false);
 
-  /// Write operations that use this write concern will return as soon as the message is written to the socket.
+  /// Write operations that use this write concern will return as soon as the
+  /// message is written to the socket.
   /// Exceptions are raised for network issues, but not server errors.
   static const UNACKNOWLEDGED =
       WriteConcern(w: 0, wtimeout: 0, fsync: false, j: false);
 
-  /// Write operations that use this write concern will wait for acknowledgement from the primary server before returning.
+  /// Write operations that use this write concern will wait for
+  /// acknowledgement from the primary server before returning.
   /// Exceptions are raised for network issues, and server errors.
   static const ACKNOWLEDGED =
       WriteConcern(w: 1, wtimeout: 0, fsync: false, j: false);
 
-  /// Exceptions are raised for network issues, and server errors; waits for at least 2 servers for the write operation.
+  /// Exceptions are raised for network issues, and server errors;
+  /// waits for at least 2 servers for the write operation.
   static const REPLICA_ACKNOWLEDGED =
       WriteConcern(w: 2, wtimeout: 0, fsync: false, j: false);
 
-  /// Exceptions are raised for network issues, and server errors; the write operation waits for the server to flush
+  /// Exceptions are raised for network issues, and server errors;
+  /// the write operation waits for the server to flush
   /// the data to disk.
   @deprecated
   static const FSYNCED = WriteConcern(w: 1, wtimeout: 0, fsync: true, j: false);
 
-  /// Exceptions are raised for network issues, and server errors; the write operation waits for the server to
+  /// Exceptions are raised for network issues, and server errors; the write
+  /// operation waits for the server to
   /// group commit to the journal file on disk.
   static const JOURNALED =
       WriteConcern(w: 1, wtimeout: 0, fsync: false, j: true);
 
-  /// Exceptions are raised for network issues, and server errors; waits on a majority of servers for the write operation.
+  /// Exceptions are raised for network issues, and server errors; waits on a
+  /// majority of servers for the write operation.
   static const MAJORITY =
       WriteConcern(w: 'majority', wtimeout: 0, fsync: false, j: false);
 
@@ -89,20 +135,20 @@ class WriteConcern {
   Map<String, Object> asMap(ServerStatus serverStatus) {
     var ret = <String, Object>{};
     if (w != null) {
-      ret['w'] = w;
+      ret[keyW] = w;
     }
     if (wtimeout != null) {
-      ret['wtimeout'] = wtimeout;
+      ret[keyWtimeout] = wtimeout;
     }
     if (serverStatus.isPersistent) {
       if (j != null) {
-        ret['j'] = j;
+        ret[keyJ] = j;
       }
       if (fsync != null && j != true) {
         if (serverStatus.isJournaled) {
-          ret['j'] = fsync;
+          ret[keyJ] = fsync;
         } else {
-          ret['fsync'] = fsync;
+          ret[keyFsync] = fsync;
         }
       }
     }
@@ -128,12 +174,11 @@ class Db {
   Db authSourceDb;
   _ConnectionManager _connectionManager;
 
-  _Connection get _masterConnection => _connectionManager.masterConnection;
+  Connection get _masterConnection => _connectionManager.masterConnection;
 
-  _Connection get _masterConnectionVerified {
+  Connection get _masterConnectionVerified {
     if (state != State.OPEN) {
-      throw MongoDartError(
-          'The required operation can be executed only when the db is open');
+      throw MongoDartError('Db is in the wrong state: ${state}');
     }
     return _connectionManager.masterConnectionVerified;
   }
@@ -196,7 +241,7 @@ class Db {
 
   WriteConcern get writeConcern => _writeConcern;
 
-  _Connection get masterConnection => _connectionManager.masterConnection;
+  Connection get masterConnection => _connectionManager.masterConnection;
 
   List<String> get uriList => _uriList.toList();
 
@@ -265,7 +310,7 @@ class Db {
   }
 
   Future<MongoReplyMessage> queryMessage(MongoMessage queryMessage,
-      {_Connection connection}) {
+      {Connection connection}) {
     return Future.sync(() {
       if (state != State.OPEN) {
         throw MongoDartError('Db is in the wrong state: $state');
@@ -278,7 +323,7 @@ class Db {
   }
 
   void executeMessage(MongoMessage message, WriteConcern writeConcern,
-      {_Connection connection}) {
+      {Connection connection}) {
     if (state != State.OPEN) {
       throw MongoDartError('DB is not open. $state');
     }
@@ -291,9 +336,13 @@ class Db {
   }
 
   Future<Map<String, Object>> executeModernMessage(MongoModernMessage message,
-      {_Connection connection}) async {
+      {Connection connection}) async {
     if (state != State.OPEN) {
       throw MongoDartError('DB is not open. $state');
+    }
+    if (!_masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError('The "modern message" can only be executed '
+          'starting from release 3.6');
     }
 
     connection ??= _masterConnectionVerified;
@@ -319,7 +368,6 @@ class Db {
     for (var uri in _uriList) {
       _connectionManager.addConnection(_parseUri(uri, isSecure: secure));
     }
-
     try {
       await _connectionManager.open(writeConcern);
     } catch (e) {
@@ -337,7 +385,7 @@ class Db {
       state == State.OPEN && (_masterConnection?.connected ?? false);
 
   Future<Map<String, dynamic>> executeDbCommand(MongoMessage message,
-      {_Connection connection}) async {
+      {Connection connection}) async {
     connection ??= _masterConnectionVerified;
 
     var result = Completer<Map<String, dynamic>>();
@@ -394,23 +442,27 @@ class Db {
     });
   }
 
-  Future<Map<String, dynamic>> getLastError([WriteConcern writeConcern]) {
+  Future<Map<String, dynamic>> getLastError([WriteConcern writeConcern]) async {
     writeConcern ??= _writeConcern;
-    return executeDbCommand(
-        DbCommand.createGetLastErrorCommand(this, writeConcern));
+    if (_masterConnection.serverCapabilities.supportsOpMsg) {
+      return GetLastErrorCommand(this, writeConcern: writeConcern).execute();
+    } else {
+      return executeDbCommand(
+          DbCommand.createGetLastErrorCommand(this, writeConcern));
+    }
   }
 
-  Future<Map<String, dynamic>> getNonce({_Connection connection}) {
+  Future<Map<String, dynamic>> getNonce({Connection connection}) {
     return executeDbCommand(DbCommand.createGetNonceCommand(this),
         connection: connection);
   }
 
-  Future<Map<String, dynamic>> getBuildInfo({_Connection connection}) {
+  Future<Map<String, dynamic>> getBuildInfo({Connection connection}) {
     return executeDbCommand(DbCommand.createBuildInfoCommand(this),
         connection: connection);
   }
 
-  Future<Map<String, dynamic>> isMaster({_Connection connection}) {
+  Future<Map<String, dynamic>> isMaster({Connection connection}) {
     return executeDbCommand(DbCommand.createIsMasterCommand(this),
         connection: connection);
   }
@@ -506,7 +558,7 @@ class Db {
   }
 
   Future<bool> authenticate(String userName, String password,
-      {_Connection connection}) async {
+      {Connection connection}) async {
     var credential = UsernamePasswordCredential()
       ..username = userName
       ..password = password;
@@ -653,19 +705,6 @@ class Db {
     return createdIndex;
   }
 
-  /// This method return the status information on the
-  /// connection.
-  ///
-  /// Only works from version 3.6
-  Future<Map<String, Object>> serverStatus(
-      {Map<String, Object> options}) async {
-    if (!_masterConnection.serverCapabilities.supportsOpMsg) {
-      return <String, Object>{};
-    }
-    var operation = ServerStatusOperation(this, options: options);
-    return operation.execute();
-  }
-
   Future<Map<String, dynamic>> _getAcknowledgement(
       {WriteConcern writeConcern}) {
     writeConcern ??= _writeConcern;
@@ -675,5 +714,42 @@ class Db {
     } else {
       return getLastError(writeConcern);
     }
+  }
+
+  // **********************************************************+
+  // ************** OP_MSG_COMMANDS ****************************
+  // ***********************************************************
+
+  /// This method return the status information on the
+  /// connection.
+  ///
+  /// Only works from version 3.6
+  Future<Map<String, Object>> serverStatus(
+      {Map<String, Object> options}) async {
+    if (!_masterConnection.serverCapabilities.supportsOpMsg) {
+      return <String, Object>{};
+    }
+    var operation = ServerStatusCommand(this);
+    return operation.execute();
+  }
+
+  /// This method explicitly creates a collection
+  Future<Map<String, Object>> createCollection(String name,
+      {CreateCollectionOptions createCollectionOptions,
+      Map<String, Object> rawOptions}) async {
+    var command = CreateCollectionCommand(this, name,
+        createCollectionOptions: createCollectionOptions,
+        rawOptions: rawOptions);
+    return command.execute();
+  }
+
+  /// This method creates a view
+  Future<Map<String, Object>> createView(
+      String view, String source, List pipeline,
+      {CreateViewOptions createViewOptions,
+      Map<String, Object> rawOptions}) async {
+    var command = CreateViewCommand(this, view, source, pipeline,
+        createViewOptions: createViewOptions, rawOptions: rawOptions);
+    return command.execute();
   }
 }

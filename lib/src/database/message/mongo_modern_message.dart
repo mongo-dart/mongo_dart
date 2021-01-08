@@ -8,14 +8,55 @@ import 'mongo_response_message.dart';
 const int notFound = -1;
 
 class MongoModernMessage extends MongoResponseMessage {
+  /// The maximum permitted size of a BSON object in bytes for this mongod
+  /// process. If not provided, clients should assume a max size
+  /// of “16 * 1024 * 1024” (16MB).
+  /// It is set when connecting from the isMaster command
+  static int maxBsonObjectSize = 16777216;
+
+  /// The maximum permitted size of a BSON wire protocol message.
+  /// The default value is 48000000 bytes
+  /// It is set when connecting from the isMaster command
+  static int maxMessageSizeBytes = 48000000;
+
+  /// The maximum number of write operations permitted in a write batch.
+  /// If a batch exceeds this limit, the client driver divides the batch into
+  /// smaller groups each with counts less than or equal to the value of
+  /// this field.
+  ///
+  /// The value of this limit is 100,000 writes.
+  ///
+  /// It is set when connecting from the isMaster command
+  static int maxWriteBatchSize = 100000;
+
   static const int basePayloadType = 0;
   static const int documentsPayloadType = 1;
 
-  // Maybe that this is not necessary, but i create small sections if needed.
+  // Maybe that this is not necessary, but I created small sections if needed.
   // It is not clear in the documentation why we can have more than one section
   // of type 1. I assumed that is because of the size.
   // If this assumption is wrong, please remove this logic.
-  static const int maxDocumentsPerPayload1 = 50;
+  // Edit. It seems that the server only accept one section of type 1
+  // Tried creating two sections of type 1 on insert
+  // but got error message that "insert.documents document sequence is
+  // duplicated". And that is OK. Tried to suffix a counter ("documents_1,
+  // etc..."), but got the error "insert.documents_1 is an unknown field"
+  // Could not understand if multiple sections of type 1 is to mix commands
+  // of different types (insert, update, delete), but in the
+  // specifications is stated that the command must be the first
+  // element in section one (type 0) map... So, this is how I did it:
+  // One command per message, if it can be pulled out, documents are moved to
+  // section 1.
+  // If The number of documents is bigger than the "maxWriteBatchSize", error.
+  // This limit is actually 100,000 documents (4.4).
+  // Bulk functions (only) will split a bigger number of documents into
+  // the needed number of messages.
+  // The splitting logic is left, but it is not operative, as the limit set
+  // (1,000,000) is bigger than the "maxWriteBatchSixe". Maybe in the future
+  // the number of sections of type 1 will be increased.
+  // In this case it will be needed to change the logic with which we are
+  // generating the section identifier.
+  static int maxDocumentsPerPayload1 = 1000000;
 
   /// Checksum present
   static const int flagCheckSumPresent = 1;
@@ -77,14 +118,24 @@ class MongoModernMessage extends MongoResponseMessage {
     keyInsert,
     keyUpdate,
     keyDelete,
-    keyServerStatus
+    //keyServerStatus,
+    //keyFind,
+    //keyGetMore,
+    //keyKillCursors,
+    //keyGetLastError,
+    //keyCreate
   ];
   static List<String> commandArgument = <String>[
     keyCreateIndexesArgument,
     keyInsertArgument,
     keyUpdateArgument,
     keyDeleteArgument,
-    null
+    //null,
+    //null,
+    //null,
+    //null,
+    //null,
+    //null
   ];
   static List<String> globalArgument = <String>[
     keyDatabaseName,
@@ -139,6 +190,11 @@ class MongoModernMessage extends MongoResponseMessage {
     }
 
     sections = createSections(document);
+
+    if (messageLength > maxMessageSizeBytes) {
+      throw MongoDartError('The total message length (${messageLength} bytes) '
+          'is bigger than the max allowed limit ($maxMessageSizeBytes bytes)');
+    }
   }
 
   List<Section> createSections(Map<String, dynamic> doc) {
@@ -151,13 +207,6 @@ class MongoModernMessage extends MongoResponseMessage {
           'Invalid document received for Mongo Modern Message');
     }
 
-    /// The command name MUST continue to be the first key of the
-    /// command arguments in the Payload Type 0 section.
-    var indexOfCommandName = commandName.indexOf(keys.first);
-    if (indexOfCommandName == notFound) {
-      throw MongoDartError(
-          'The first entry ("${keys.first}") of the document is not a command name');
-    }
     if (pulledOutCommand.contains(keys.first)) {
       isPulledOutCommand = true;
     }
@@ -168,6 +217,13 @@ class MongoModernMessage extends MongoResponseMessage {
       return ret;
     }
 
+    /// The command name MUST continue to be the first key of the
+    /// command arguments in the Payload Type 0 section.
+    var indexOfCommandName = commandName.indexOf(keys.first);
+    if (indexOfCommandName == notFound) {
+      throw MongoDartError(
+          'The first entry ("${keys.first}") of the document is not a command name');
+    }
     var argumentName = commandArgument[indexOfCommandName];
     var data = doc[argumentName] as List<Map<String, Object>>;
     if (data == null) {
@@ -177,6 +233,10 @@ class MongoModernMessage extends MongoResponseMessage {
     doc.remove(argumentName);
     ret.add(Section(basePayloadType, doc));
     var totalElements = data.length;
+    if (data.length > maxWriteBatchSize) {
+      throw MongoDartError('The total number of documents (${data.length}) '
+          'is greater than the max allowed ($maxWriteBatchSize)');
+    }
 
     List<Map<String, Object>> sectionList;
     while (totalElements > 0) {
@@ -220,8 +280,8 @@ class MongoModernMessage extends MongoResponseMessage {
 
     if (buffer.byteArray.lengthInBytes != super.messageLength) {
       throw MongoDartError('The length of the buffer received '
-          '(${buffer.byteLength()}) is not what expected '
-          '(${super.messageLength})');
+          '(${buffer.byteLength()} bytes) is not what expected '
+          '(${super.messageLength} bytes)');
     }
     while (buffer.offset < super.messageLength) {
       sections.add(Section.fromBuffer(buffer));

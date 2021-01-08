@@ -1,9 +1,9 @@
-import 'package:mongo_dart/mongo_dart.dart' show Db, DbCollection;
-import 'package:mongo_dart/src/database/operation/operation_base.dart';
+import 'package:mongo_dart/mongo_dart.dart' show Connection, Db, DbCollection;
+import 'package:mongo_dart/src/database/operation/base/command_operation.dart';
+import 'package:mongo_dart/src/database/operation/base/operation_base.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
-import 'command_operation.dart';
-import 'options/create_index_options.dart';
+import 'create_index_options.dart';
 
 const Set keysToOmit = <String>{
   'name',
@@ -22,27 +22,35 @@ class CreateIndexOperation extends CommandOperation {
   Map<String, Object> indexes;
 
   CreateIndexOperation(Db db, DbCollection collection, this.fieldOrSpec,
-      CreateIndexOptions indexOptions)
-      : super(db, indexOptions.options,
-            collection: collection, aspect: Aspect.writeOperation) {
+      CreateIndexOptions indexOptions,
+      {Connection connection, Map<String, Object> rawOptions})
+      : super(db, indexOptions?.options ?? rawOptions,
+            collection: collection,
+            aspect: Aspect.writeOperation,
+            connection: connection) {
     var indexParameters = parseIndexOptions(fieldOrSpec);
-    final indexName = options != null &&
-            options[keyName] != null &&
-            options[keyName] is String
-        ? options[keyName] as String
-        : indexParameters[keyName] as String;
+    final indexName = /* options != null && */
+        options[keyName] != null && options[keyName] is String
+            ? options[keyName] as String
+            : indexParameters[keyName] as String;
     indexes = {keyName: indexName, keyKey: indexParameters[keyFieldHash]};
+    options.remove(keyName);
   }
 
   @override
   Map<String, Object> $buildCommand() {
     var indexes = this.indexes;
 
-    // merge all the options
+    // merge all options
+    var added = <String>[];
     for (var optionName in options.keys) {
       if (!keysToOmit.contains(optionName)) {
         indexes[optionName] = options[optionName];
+        added.add(optionName);
       }
+    }
+    for (var optionName in added) {
+      options.remove(optionName);
     }
 
     // Create command, apply write concern to command
@@ -50,25 +58,6 @@ class CreateIndexOperation extends CommandOperation {
       keyCreateIndexes: collection.collectionName,
       keyCreateIndexesArgument: [indexes]
     };
-  }
-
-  @override
-  Future<Map<String, Object>> execute() async {
-    // Get capabilities
-    // Todo manage capabilities
-    //const capabilities = db.s.topology.capabilities();
-
-    // Did the user pass in a collation, check if our write server supports it
-    // Todo review when we will manage Collation
-    /*   if (options.collation && capabilities && !capabilities.commandsTakeCollation) {
-      // Create a new error
-      final error = MongoDartError('server/primary/mongos does not support collation', errorCode: 67);
-      //error.code = 67;
-      // Return the error
-      return callback(error);
-    }*/
-
-    return super.execute();
   }
 }
 

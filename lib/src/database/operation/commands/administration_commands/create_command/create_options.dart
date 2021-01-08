@@ -149,7 +149,7 @@ class CreateOptions {
   /// If you specify a collation at the collection level:
   /// - Indexes on that collection will be created with that collation unless
   /// the index creation operation explicitly specify a different collation.
-  /// - Operations on that collection use the collectionâs default collation
+  /// - Operations on that collection use the collection’s default collation
   /// unless they explicitly specify a different collation.
   /// - You cannot specify multiple collations for an operation. For example,
   /// you cannot specify different collations per field, or if performing

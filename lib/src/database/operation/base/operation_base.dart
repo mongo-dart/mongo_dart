@@ -1,19 +1,21 @@
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
+import '../../../../mongo_dart.dart';
+
 enum Aspect {
   readOperation,
-  skipSession,
+  noInheritOptions,
   writeOperation,
   retryable,
-  executeWithSelection
 }
 
 class OperationBase {
   Map<String, Object> options;
   Set<Aspect> _aspects;
+  Connection connection;
 
-  OperationBase(Map<String, Object> options) {
-    this.options = Map.from(options ?? {});
+  OperationBase(Map<String, Object> options, {this.connection}) {
+    this.options = <String, Object>{if (options != null) ...options};
   }
 
   bool hasAspect(Aspect aspect) =>

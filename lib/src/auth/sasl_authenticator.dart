@@ -3,7 +3,7 @@ part of mongo_dart;
 abstract class SaslMechanism {
   String get name;
 
-  SaslStep initialize(_Connection connection);
+  SaslStep initialize(Connection connection);
 }
 
 abstract class SaslStep {
@@ -14,7 +14,7 @@ abstract class SaslStep {
 }
 
 class SaslConversation {
-  _Connection connection;
+  Connection connection;
 
   SaslConversation(this.connection);
 }
@@ -26,7 +26,7 @@ abstract class SaslAuthenticator extends Authenticator {
   SaslAuthenticator(this.mechanism, this.db);
 
   @override
-  Future authenticate(_Connection connection) async {
+  Future authenticate(Connection connection) async {
     var conversation = SaslConversation(connection);
 
     var currentStep = mechanism.initialize(connection);

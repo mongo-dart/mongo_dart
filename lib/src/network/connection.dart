@@ -38,7 +38,7 @@ class _ServerCapabilities {
   }
 }
 
-class _Connection {
+class Connection {
   final Logger _log = Logger('Connection');
   final _ConnectionManager _manager;
   ServerConfig serverConfig;
@@ -60,7 +60,7 @@ class _Connection {
   final _ServerCapabilities serverCapabilities = _ServerCapabilities();
   final ServerStatus serverStatus = ServerStatus();
 
-  _Connection(this._manager, [this.serverConfig]) {
+  Connection(this._manager, [this.serverConfig]) {
     serverConfig ??= ServerConfig();
   }
 

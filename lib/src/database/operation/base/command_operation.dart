@@ -1,10 +1,16 @@
-import 'package:mongo_dart/mongo_dart.dart' show Db, DbCollection;
+import 'package:mongo_dart/mongo_dart.dart'
+    show Connection, Db, DbCollection, MongoDartError, State;
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart'
     show MongoModernMessage;
 import 'package:mongo_dart/src/database/utils/map_keys.dart'
-    show keyAuthdb, keyDbName, keyReadPreference, keyWriteConcern;
+    show
+        keyAuthdb,
+        keyDatabaseName,
+        keyDbName,
+        keyReadPreference,
+        keyWriteConcern;
 
-import 'parameters/read_preference.dart'
+import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
 import 'operation_base.dart' show Aspect, OperationBase;
 
@@ -13,36 +19,58 @@ class CommandOperation extends OperationBase {
   DbCollection collection;
   Map<String, Object> command;
   String namespace;
+  ReadPreference readPreference;
 
   CommandOperation(this.db, Map<String, Object> options,
-      {this.collection, this.command, Aspect aspect})
-      : super(options) {
+      {this.collection, this.command, Aspect aspect, Connection connection})
+      : super(options, connection: connection) {
+    db ??= collection?.db;
+    aspect ??= Aspect.noInheritOptions;
     defineAspects(aspect);
-    if (!hasAspect(Aspect.writeOperation)) {
-      if (collection != null) {
-        var readPreference = resolveReadPreference(collection, options);
-        if (readPreference != null) {
-          this.options[keyReadPreference] = readPreference.toJSON();
-        }
-      } else {
-        var readPreference = resolveReadPreference(db, options);
-        if (readPreference != null) {
-          this.options[keyReadPreference] = readPreference.toJSON();
-        }
-      }
-    } else {
-      applyWriteConcern(this.options, this.options,
-          db: db, collection: collection);
-      this.options[keyReadPreference] = ReadPreference.primary.toJSON();
+    if (db == null) {
+      throw MongoDartError('Database reference required for this command');
     }
   }
 
   Map<String, Object> $buildCommand() => command;
 
+  void processOptions(Map<String, Object> command) {
+    // Get the db name we are executing against
+    final dbName = (options[keyDbName] as String) ??
+        ((options[keyAuthdb] as String) ?? db.databaseName);
+    options.removeWhere((key, value) => key == keyDbName || key == keyAuthdb);
+    if (dbName != null) {
+      command[keyDatabaseName] = dbName;
+    }
+    if (hasAspect(Aspect.writeOperation)) {
+      applyWriteConcern(options, options, db: db, collection: collection);
+      readPreference = ReadPreference.primary;
+    } else {
+      // Todo we have to manage Session
+      options.remove(keyWriteConcern);
+      // if Aspect is noInheritOptions, here a separated method is maintained
+      // even if not necessary, waiting for the future check of the session
+      // value.
+      if (collection != null) {
+        readPreference = resolveReadPreference(collection, options,
+            inheritReadPreference: !hasAspect(Aspect.noInheritOptions));
+      } else {
+        readPreference = resolveReadPreference(db, options,
+            inheritReadPreference: !hasAspect(Aspect.noInheritOptions));
+      }
+    }
+    options.remove(keyReadPreference);
+
+    options.removeWhere((key, value) => command.containsKey(key));
+  }
+
   @override
   Future<Map<String, Object>> execute() async {
     final db = this.db;
-    final options = Map.from(this.options);
+    if (db.state != State.OPEN) {
+      throw MongoDartError('Db is in the wrong state: ${db.state}');
+    }
+    //final options = Map.from(this.options);
 
     // Todo implement topology
     // Did the user destroy the topology
@@ -52,27 +80,20 @@ class CommandOperation extends OperationBase {
 
     var command = $buildCommand();
 
-    // Get the db name we are executing against
-    final dbName = (options[keyDbName] as String) ??
-        ((options[keyAuthdb] as String) ?? db.databaseName);
+    processOptions(command);
 
-    // Convert the readPreference if its not a write
-    if (hasAspect(Aspect.writeOperation)) {
-      if (options[keyWriteConcern] != null
-          // Todo we have to manage Session
-          /*&& (options[keySession] == null ||
-          !options[keySession].inTransaction())*/
-          ) {
-        command[keyWriteConcern] = options[keyWriteConcern];
-      }
+    command.addAll(options);
+
+    if (readPreference != null) {
+      // search for the right connection
     }
 
-    if (dbName != null) {
-      command[r'$db'] = dbName;
-    }
-
+    // Todo remove debug()
+    //print(command);
     var modernMessage = MongoModernMessage(command);
-    return db.executeModernMessage(modernMessage /*, writeConcern*/);
+
+    return db.executeModernMessage(modernMessage,
+        connection: connection /*, writeConcern*/);
   }
 }
 

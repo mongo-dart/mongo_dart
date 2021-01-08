@@ -108,9 +108,8 @@ class ReadPreference {
       return ReadPreference(
           readPreference, options[keyReadPreferenceTags] as List);
     } else if (readPreference is Map) {
-      var mode =
-          (readPreference[keyMode] as ReadPreferenceMode) ??
-              (readPreference[keyPreference] as ReadPreferenceMode);
+      var mode = (readPreference[keyMode] as ReadPreferenceMode) ??
+          (readPreference[keyPreference] as ReadPreferenceMode);
       if (mode != null) {
         return ReadPreference(mode, readPreference[keyTags] as List,
             {keyMaxStalenessSecond: readPreference[keyMaxStalenessSecond]});
@@ -162,19 +161,23 @@ class ReadPreference {
 /// preference, used for determining the inherited read preference.
 /// @param {Object} options The options passed into the method, potentially containing a read preference
 /// @returns {(ReadPreference|null)} The resolved read preference
-ReadPreference resolveReadPreference(parent, Map<String, Object> options) {
+ReadPreference resolveReadPreference(parent, Map<String, Object> options,
+    {bool inheritReadPreference}) {
   options ??= {};
+  inheritReadPreference ??= true;
 
   ReadPreference inheritedReadPreference;
 
-  if (parent is DbCollection) {
-    inheritedReadPreference = parent.readPreference;
-  } else if (parent is Db) {
-    inheritedReadPreference = parent.readPreference;
-  } //Todo MongoClient class not yet Implemented
-  /*else if (parent is MongoClient) {
+  if (inheritReadPreference) {
+    if (parent is DbCollection) {
+      inheritedReadPreference = parent.readPreference;
+    } else if (parent is Db) {
+      inheritedReadPreference = parent.readPreference;
+    } //Todo MongoClient class not yet Implemented
+    /*else if (parent is MongoClient) {
     inheritedReadPreference = parent.readPreference;
   }*/
+  }
 
   ReadPreference readPreference;
   if (options[keyReadPreference] != null) {
@@ -187,7 +190,9 @@ ReadPreference resolveReadPreference(parent, Map<String, Object> options) {
   else if (inheritedReadPreference != null) {
     readPreference = inheritedReadPreference;
   } else {
-    throw ArgumentError('No readPreference was provided or inherited.');
+    if (inheritReadPreference) {
+      throw ArgumentError('No readPreference was provided or inherited.');
+    }
   }
 
   return readPreference;

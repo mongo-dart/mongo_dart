@@ -59,15 +59,68 @@ class DbCollection {
     });
   }
 
-  /// Creates a cursor for a query that can be used to iterate over results from MongoDB
+  /// Creates a cursor for a query that can be used to iterate over results
+  /// from MongoDB
   /// ##[selector]
-  /// parameter represents query to locate objects. If omitted as in `find()` then query matches all documents in colleciton.
+  /// parameter represents query to locate objects. If omitted as in `find()`
+  /// then query matches all documents in colleciton.
   /// Here's a more selective example:
   ///     find({'last_name': 'Smith'})
-  /// Here our selector will match every document where the last_name attribute is 'Smith.'
-  ///
-  Stream<Map<String, dynamic>> find([selector]) =>
+  /// Here our selector will match every document where the last_name attribute
+  /// is 'Smith.'
+  Stream<Map<String, dynamic>> find([selector]) {
+    if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
+      if (selector is SelectorBuilder) {
+        return modernFind(selector: selector);
+      } else if (selector is Map<String, dynamic>) {
+        return modernFind(filter: selector);
+      } else if (selector == null) {
+        return modernFind();
+      }
+      throw MongoDartError('The selector parameter should be either a '
+          'SelectorBuilder or a Map<String, dynamic>');
+    }
+    return legacyFind(selector);
+  }
+
+  // Old version to be used on MongoDb versions prior to 3.6
+  Stream<Map<String, dynamic>> legacyFind([selector]) =>
       Cursor(db, this, selector).stream;
+
+  // Find operation with the new OP_MSG (starting from release 3.6)
+  Stream<Map<String, dynamic>> modernFind(
+      {SelectorBuilder selector,
+      Map<String, Object> filter,
+      Map<String, Object> sort,
+      Map<String, Object> projection,
+      String hint,
+      Map<String, Object> hintDocument,
+      int skip,
+      int limit,
+      FindOptions findOptions,
+      Map<String, Object> rawOptions}) {
+    if (!db._masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError(
+          'At least MongoDb version 3.6 is required to run the find operation');
+    }
+
+    var operation = FindOperation(this,
+        filter:
+            filter ?? (selector?.map == null ? null : selector.map[keyQuery]),
+        sort: sort ?? (selector?.map == null ? null : selector.map['orderby']),
+        projection: projection ?? selector?.paramFields,
+        hint: hint,
+        hintDocument: hintDocument,
+        limit: limit ?? selector?.paramLimit,
+        skip: skip ??
+            (selector != null && selector.paramSkip > 0
+                ? selector.paramSkip
+                : null),
+        findOptions: findOptions,
+        rawOptions: rawOptions);
+
+    return ModernCursor(operation).stream;
+  }
 
   Cursor createCursor([selector]) => Cursor(db, this, selector);
 
@@ -191,45 +244,24 @@ class DbCollection {
     if (!db._masterConnection.serverCapabilities.supportsOpMsg) {
       throw MongoDartError('Use createIndex() method on db (before 3.6)');
     }
-    return Future.sync(() async {
-      modernReply ??= true;
-      var indexOptions = CreateIndexOptions(this,
-          uniqueIndex: unique == true,
-          sparseIndex: sparse == true,
-          background: background == true,
-          dropDuplicatedEntries: dropDups == true,
-          partialFilterExpression: partialFilterExpression,
-          indexName: name);
 
-      var indexOperation =
-          CreateIndexOperation(db, this, _setKeys(key, keys), indexOptions);
+    modernReply ??= true;
+    var indexOptions = CreateIndexOptions(this,
+        uniqueIndex: unique == true,
+        sparseIndex: sparse == true,
+        background: background == true,
+        dropDuplicatedEntries: dropDups == true,
+        partialFilterExpression: partialFilterExpression,
+        indexName: name);
 
-      var res = await indexOperation.execute();
-      if (modernReply) {
-        return res;
-      }
-      return db.getLastError();
-    });
-  }
+    var indexOperation =
+        CreateIndexOperation(db, this, _setKeys(key, keys), indexOptions);
 
-  // This method has been made available since version 3.2
-  // As we will use this with the new wire message available
-  // since version 3.6, we will check this last version
-  // in order to allow the execution
-  Future<Map<String, dynamic>> insertOne(Map<String, dynamic> document,
-      {WriteConcern writeConcern}) async {
-    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
-      throw MongoDartError('This method is not available before release 3.6');
+    var res = await indexOperation.execute();
+    if (modernReply) {
+      return res;
     }
-    return Future.sync(() {
-      var insertOneOptions =
-          InsertOneOptions(this, writeConcern: writeConcern);
-
-      var insertOneOperation =
-          InsertOneOperation(this, document, insertOneOptions);
-
-      return insertOneOperation.execute();
-    });
+    return db.getLastError();
   }
 
   Map<String, dynamic> _setKeys(String key, Map<String, dynamic> keys) {
@@ -285,5 +317,54 @@ class DbCollection {
       update = update.map;
     }
     return update as Map<String, dynamic>;
+  }
+
+  // **********************************************************+
+  // ************** OP_MSG_COMMANDS ****************************
+  // ***********************************************************
+
+  // This method has been made available since version 3.2
+  // As we will use this with the new wire message available
+  // since version 3.6, we will check this last version
+  // in order to allow the execution
+  Future<WriteResult> insertOne(Map<String, dynamic> document,
+      {WriteConcern writeConcern, bool bypassDocumentValidation}) async {
+    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError('This method is not available before release 3.6');
+    }
+    return Future.sync(() {
+      var insertOneOptions = InsertOneOptions(
+          writeConcern: writeConcern,
+          bypassDocumentValidation: bypassDocumentValidation);
+
+      var insertOneOperation = InsertOneOperation(this, document,
+          insertOneOptions: insertOneOptions);
+
+      return insertOneOperation.executeDocument();
+    });
+  }
+
+  // This method has been made available since version 3.2
+  // As we will use this with the new wire message available
+  // since version 3.6, we will check this last version
+  // in order to allow the execution
+  Future<BulkWriteResult> insertMany(List<Map<String, dynamic>> documents,
+      {WriteConcern writeConcern,
+      bool ordered,
+      bool bypassDocumentValidation}) async {
+    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError('This method is not available before release 3.6');
+    }
+    return Future.sync(() {
+      var insertManyOptions = InsertManyOptions(
+          writeConcern: writeConcern,
+          ordered: ordered,
+          bypassDocumentValidation: bypassDocumentValidation);
+
+      var insertManyOperation = InsertManyOperation(this, documents,
+          insertManyOptions: insertManyOptions);
+
+      return insertManyOperation.executeDocument();
+    });
   }
 }

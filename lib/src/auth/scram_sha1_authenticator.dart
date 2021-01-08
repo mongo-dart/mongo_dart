@@ -153,7 +153,7 @@ class ScramSha1Mechanism extends SaslMechanism {
   ScramSha1Mechanism(this.credential, this.randomStringGenerator);
 
   @override
-  SaslStep initialize(_Connection connection) {
+  SaslStep initialize(Connection connection) {
     if (connection == null) throw ArgumentError("Connection can't be null");
 
     final gs2Header = 'n,,';
