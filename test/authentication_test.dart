@@ -1,8 +1,13 @@
 import 'package:test/test.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-final String mongoDbUri =
-    'mongodb://test:test@ds031477.mongolab.com:31477/dart';
+//final String mongoDbUri =
+//    'mongodb://test:test@ds031477.mongolab.com:31477/dart';
+
+const dbName = 'mongodb-auth';
+const dbAddress = '127.0.0.1';
+
+const mongoDbUri = 'mongodb://test:test@$dbAddress:27017/$dbName';
 
 void main() {
   test('Should be able to connect and authenticate', () async {
@@ -32,6 +37,12 @@ void main() {
       'code': 18,
       'codeName': 'AuthenticationFailed',
     };
+   var expectedError2 = {
+      'ok': 0.0,
+      'errmsg': 'Auth mechanism not specified',
+      'code': 2,
+      'codeName': 'BadValue',
+    };
 
     var err;
 
@@ -44,7 +55,11 @@ void main() {
     var result = ((err['ok'] == expectedError['ok']) &&
         (err['errmsg'] == expectedError['errmsg']) &&
         (err['code'] == expectedError['code']) &&
-        (err['codeName'] == expectedError['codeName']));
+        (err['codeName'] == expectedError['codeName'])) ||
+        ((err['ok'] == expectedError2['ok']) &&
+        (err['errmsg'] == expectedError2['errmsg']) &&
+        (err['code'] == expectedError2['code']) &&
+        (err['codeName'] == expectedError2['codeName']));
 
     expect(result, true);
   });

@@ -19,6 +19,7 @@ const sslQueryParmConnectionString =
     'cluster0-shard-00-01-smeth.gcp.mongodb.net:27017,'
     'cluster0-shard-00-02-smeth.gcp.mongodb.net:27017/'
     'test?authSource=admin&ssl=true';
+// Todo manage also the case in which the server is not the primary
 const tlsQueryParmConnectionString = 'mongodb://cluster0-shard-00-01-smeth'
     '.gcp.mongodb.net:27017/test?tls=true&authSource=admin';
 
@@ -119,11 +120,13 @@ void main() {
       var coll = db.collection('test-insert');
       var result =
           await coll.insertOne({'solved': true, 'autoinit': 'delayed'});
-      print(result['ops'].first);
+           // Todo update test
+      // print(result['ops'].first);
+      /* Todo update
       var findResult = await coll.find(where.id(result['insertedId'])).toList();
       print(findResult);
       expect(result['ops'].first['solved'], findResult.first['solved']);
-      expect(result['ops'].first['autoinit'], findResult.first['autoinit']);
+      expect(result['ops'].first['autoinit'], findResult.first['autoinit']); */
       await db.close();
     }, skip: 'Set the correct url before running this test');
   });
@@ -146,7 +149,7 @@ void main() {
     await db.close();
   });
 
-  test('Ssl wit no secure info => Error', () async {
+  test('Ssl with no secure info => Error', () async {
     var db = Db.pool(sslDbConnectionString.split(','));
     expect(() => db.open(), throwsA((ConnectionException e) => true));
   });

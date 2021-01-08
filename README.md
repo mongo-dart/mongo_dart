@@ -154,7 +154,7 @@ main() async {
 
 ### Secure connection
 
-You can connect using a secured tls/ssl connection in one of this two ways:
+You can connect using a secured tls/ssl connection in one of these two ways:
 
 * setting the secure connection parameter to true in db.open()
 
