@@ -17,16 +17,16 @@ enum ReadConcernLevel {
   local,
 
   /// @Since(3.6)
-  /// A query with read concern âavailableâ returns data from the
+  /// A query with read concern “available” returns data from the
   /// instance with no guarantee that the data has been written to a
   /// majority of the replica set members (i.e. may be rolled back).
-  /// Read concern âavailableâ is the default for reads against
+  /// Read concern “available” is the default for reads against
   /// secondaries if the reads are not associated with causally
   /// consistent sessions.
   /// For a sharded cluster, "available" read concern provides greater
   /// tolerance for partitions since it does not wait to ensure consistency
   /// guarantees. That is, read concern "available" does not contact the
-  /// shardâs primary nor the config servers for updated metadata.
+  /// shard’s primary nor the config servers for updated metadata.
   /// However, this means that a query with "available" read concern may
   /// return orphaned documents if the shard is undergoing chunk migrations.
   /// For unsharded collections (including collections in a standalone
@@ -45,7 +45,7 @@ enum ReadConcernLevel {
   /// The query returns the data that has been acknowledged by a majority
   /// of the replica set members. The documents returned by the read
   /// operation are durable, even in the event of failure.
-  /// To fulfill read concern âmajorityâ, the replica set member returns
+  /// To fulfill read concern “majority”, the replica set member returns
   /// data from its in-memory view of the data at the majority-commit
   /// point. As such, read concern "majority" is comparable in performance
   /// cost to other read concerns.
@@ -62,7 +62,7 @@ enum ReadConcernLevel {
   /// **Requirements**: To use read concern level of "majority",
   /// replica sets must use WiredTiger storage engine.
   /// ## Note
-  /// For operations in multi-document transactions, read concern "majority" provides its guarantees only if the transaction commits with write concern âmajorityâ. Otherwise, the "majority" read concern provides no guarantees about the data read in transactions.
+  /// For operations in multi-document transactions, read concern "majority" provides its guarantees only if the transaction commits with write concern “majority”. Otherwise, the "majority" read concern provides no guarantees about the data read in transactions.
   /// [See](https://docs.mongodb.com/manual/reference/read-concern-majority/)
   majority,
 
@@ -111,7 +111,7 @@ enum ReadConcernLevel {
   /// Read concern "snapshot" is only available for use with multi-document
   /// transactions.
   /// For transactions on a sharded cluster, if any operation in the
-  /// transaction involves a shard that has disabled read concern âmajorityâ,
+  /// transaction involves a shard that has disabled read concern “majority”,
   /// you cannot use read concern "snapshot" for the transaction.
   /// You can only use read concern "local" or "majority" for the transaction.
   /// [See](https://docs.mongodb.com/manual/reference/read-concern-snapshot/)

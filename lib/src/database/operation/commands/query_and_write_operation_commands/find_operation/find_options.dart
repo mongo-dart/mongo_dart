@@ -45,7 +45,7 @@ class FindOptions {
   /// against primary and read operations against secondaries when associated
   /// with causally consistent sessions.
   /// * "available". This is the default for reads against secondaries when
-  ///    when not associated with causally consistent sessions. The query returns the instanceâs most recent data.
+  ///    when not associated with causally consistent sessions. The query returns the instance’s most recent data.
   /// * "majority". Available for replica sets that use WiredTiger storage engine.
   /// * "linearizable". Available for read operations on the primary only.
   /// For more formation on the read concern levels, see [Read Concern Levels](https://docs.mongodb.com/manual/reference/read-concern/#read-concern-levels).
@@ -85,7 +85,7 @@ class FindOptions {
   final bool awaitData;
   @Deprecated('Deprecated since version 4.4')
 
-  /// An internal command for replaying a replica setâs oplog.
+  /// An internal command for replaying a replica set’s oplog.
   final bool oplogReplay;
 
   /// Prevents the server from timing out idle cursors after an inactivity
@@ -113,7 +113,7 @@ class FindOptions {
 
   /// Use allowDiskUse to allow MongoDB to use temporary files on disk to
   /// store data exceeding the 100 megabyte memory limit while processing a
-  /// non-indexed (âblockingâ) sort operation. If MongoDB requires using more
+  /// non-indexed (“blocking”) sort operation. If MongoDB requires using more
   /// than 100 megabytes of memory for a blocking sort operation,
   /// MongoDB returns an error unless the query specifies allowDiskUse.
   /// See Sort and Index Use for more information on blocking sort operations.
@@ -148,7 +148,7 @@ class FindOptions {
       throw MongoDartError('Batch size parameter must be a non negative value');
     }
     if (maxTimeMS != null && maxTimeMS < 1) {
-      throw MongoDartError('Batch size parameter must be a positivee value');
+      throw MongoDartError('MaxTimeMS parameter must be a positive value');
     }
   }
 

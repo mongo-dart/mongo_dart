@@ -120,7 +120,7 @@ void main() {
       var coll = db.collection('test-insert');
       var result =
           await coll.insertOne({'solved': true, 'autoinit': 'delayed'});
-           // Todo update test
+      // Todo update test
       // print(result['ops'].first);
       /* Todo update
       var findResult = await coll.find(where.id(result['insertedId'])).toList();
@@ -131,43 +131,45 @@ void main() {
     }, skip: 'Set the correct url before running this test');
   });
 
-  test('Connect and authenticate to a database over SSL', () async {
-    var db = Db.pool(sslDbConnectionString.split(','));
+  group('Real connection', () {
+    test('Connect and authenticate to a database over SSL', () async {
+      var db = Db.pool(sslDbConnectionString.split(','));
 
-    await db.open(secure: true);
-    await db.authenticate(sslDbUsername, sslDbPassword);
-    await db.collection('test').find().toList();
-    await db.close();
-  });
+      await db.open(secure: true);
+      await db.authenticate(sslDbUsername, sslDbPassword);
+      await db.collection('test').find().toList();
+      await db.close();
+    });
 
-  test('Ssl as query parm', () async {
-    var db = Db(sslQueryParmConnectionString);
+    test('Ssl as query parm', () async {
+      var db = Db(sslQueryParmConnectionString);
 
-    await db.open();
-    await db.authenticate(sslDbUsername, sslDbPassword);
-    await db.collection('test').find().toList();
-    await db.close();
-  });
+      await db.open();
+      await db.authenticate(sslDbUsername, sslDbPassword);
+      await db.collection('test').find().toList();
+      await db.close();
+    });
 
-  test('Ssl with no secure info => Error', () async {
-    var db = Db.pool(sslDbConnectionString.split(','));
-    expect(() => db.open(), throwsA((ConnectionException e) => true));
-  });
+    test('Ssl with no secure info => Error', () async {
+      var db = Db.pool(sslDbConnectionString.split(','));
+      expect(() => db.open(), throwsA((ConnectionException e) => true));
+    });
 
-  test('Tls as query parm', () async {
-    var db = Db(tlsQueryParmConnectionString);
+    test('Tls as query parm', () async {
+      var db = Db(tlsQueryParmConnectionString);
 
-    await db.open();
-    await db.authenticate(sslDbUsername, sslDbPassword);
-    await db.collection('test').find().toList();
-    await db.close();
-  });
-  test('Tls as query parm plus secure parameter', () async {
-    var db = Db(tlsQueryParmConnectionString);
+      await db.open();
+      await db.authenticate(sslDbUsername, sslDbPassword);
+      await db.collection('test').find().toList();
+      await db.close();
+    });
+    test('Tls as query parm plus secure parameter', () async {
+      var db = Db(tlsQueryParmConnectionString);
 
-    await db.open(secure: true);
-    await db.authenticate(sslDbUsername, sslDbPassword);
-    await db.collection('test').find().toList();
-    await db.close();
-  });
+      await db.open(secure: true);
+      await db.authenticate(sslDbUsername, sslDbPassword);
+      await db.collection('test').find().toList();
+      await db.close();
+    });
+  }, skip: 'Requires manual connection string adjustment before run');
 }

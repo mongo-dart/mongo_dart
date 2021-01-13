@@ -87,41 +87,6 @@ class DbCollection {
   Stream<Map<String, dynamic>> legacyFind([selector]) =>
       Cursor(db, this, selector).stream;
 
-  // Find operation with the new OP_MSG (starting from release 3.6)
-  Stream<Map<String, dynamic>> modernFind(
-      {SelectorBuilder selector,
-      Map<String, Object> filter,
-      Map<String, Object> sort,
-      Map<String, Object> projection,
-      String hint,
-      Map<String, Object> hintDocument,
-      int skip,
-      int limit,
-      FindOptions findOptions,
-      Map<String, Object> rawOptions}) {
-    if (!db._masterConnection.serverCapabilities.supportsOpMsg) {
-      throw MongoDartError(
-          'At least MongoDb version 3.6 is required to run the find operation');
-    }
-
-    var operation = FindOperation(this,
-        filter:
-            filter ?? (selector?.map == null ? null : selector.map[keyQuery]),
-        sort: sort ?? (selector?.map == null ? null : selector.map['orderby']),
-        projection: projection ?? selector?.paramFields,
-        hint: hint,
-        hintDocument: hintDocument,
-        limit: limit ?? selector?.paramLimit,
-        skip: skip ??
-            (selector != null && selector.paramSkip > 0
-                ? selector.paramSkip
-                : null),
-        findOptions: findOptions,
-        rawOptions: rawOptions);
-
-    return ModernCursor(operation).stream;
-  }
-
   Cursor createCursor([selector]) => Cursor(db, this, selector);
 
   Future<Map<String, dynamic>> findOne([selector]) {
@@ -181,7 +146,20 @@ class DbCollection {
     return db.executeDbCommand(cmd);
   }
 
-  Stream<Map<String, dynamic>> aggregateToStream(List pipeline,
+  Stream<Map<String, dynamic>> aggregateToStream(
+      List<Map<String, Object>> pipeline,
+      {Map<String, dynamic> cursorOptions = const <String, Object>{},
+      bool allowDiskUse = false}) {
+    if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
+      return modernAggregate(pipeline,
+          cursor: cursorOptions,
+          aggregateOptions: AggregateOptions(allowDiskUse: allowDiskUse));
+    }
+    return legacyAggregateToStream(pipeline,
+        cursorOptions: cursorOptions, allowDiskUse: allowDiskUse);
+  }
+
+  Stream<Map<String, dynamic>> legacyAggregateToStream(List pipeline,
       {Map<String, dynamic> cursorOptions = const {},
       bool allowDiskUse = false}) {
     return AggregateCursor(db, this, pipeline, cursorOptions, allowDiskUse)
@@ -258,6 +236,11 @@ class DbCollection {
         CreateIndexOperation(db, this, _setKeys(key, keys), indexOptions);
 
     var res = await indexOperation.execute();
+    if (res[keyOk] == 0.0) {
+      // It should be better to create a MongoDartError,
+      // but, for compatibility reasons, we throw the received map.
+      throw res;
+    }
     if (modernReply) {
       return res;
     }
@@ -366,5 +349,225 @@ class DbCollection {
 
       return insertManyOperation.executeDocument();
     });
+  }
+
+  // Find operation with the new OP_MSG (starting from release 3.6)
+  Stream<Map<String, dynamic>> modernFind(
+      {SelectorBuilder selector,
+      Map<String, Object> filter,
+      Map<String, Object> sort,
+      Map<String, Object> projection,
+      String hint,
+      Map<String, Object> hintDocument,
+      int skip,
+      int limit,
+      FindOptions findOptions,
+      Map<String, Object> rawOptions}) {
+    if (!db._masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError('At least MongoDb version 3.6 is required '
+          'to run the find operation');
+    }
+
+    var operation = FindOperation(this,
+        filter:
+            filter ?? (selector?.map == null ? null : selector.map[keyQuery]),
+        sort: sort ?? (selector?.map == null ? null : selector.map['orderby']),
+        projection: projection ?? selector?.paramFields,
+        hint: hint,
+        hintDocument: hintDocument,
+        limit: limit ?? selector?.paramLimit,
+        skip: skip ??
+            (selector != null && selector.paramSkip > 0
+                ? selector.paramSkip
+                : null),
+        findOptions: findOptions,
+        rawOptions: rawOptions);
+
+    return ModernCursor(operation).stream;
+  }
+
+  /// This method returns a stream that can be read or transformed into
+  /// a list with `.toList()`
+  ///
+  /// It corresponds to the legacy method `aggregateToStream()`.
+  ///
+  /// The pipeline can be either an `AggregationPipelineBuilder` or a
+  /// List of Maps (`List<Map<String, Object>>`)
+  Stream<Map<String, dynamic>> modernAggregate(dynamic pipeline,
+          {bool explain,
+          Map<String, Object> cursor,
+          String hint,
+          Map<String, Object> hintDocument,
+          AggregateOptions aggregateOptions,
+          Map<String, Object> rawOptions}) =>
+      modernAggregateCursor(pipeline,
+              explain: explain,
+              cursor: cursor,
+              hint: hint,
+              hintDocument: hintDocument,
+              aggregateOptions: aggregateOptions,
+              rawOptions: rawOptions)
+          .stream;
+
+  /// This method returns a curosr that can be read or transformed into
+  /// a stream with `stream` (for a stream you can directly call
+  /// `modernAggregate`)
+  ///
+  /// It corresponds to the legacy method `aggregate()`
+  ///
+  /// The pipeline can be either an `AggregationPipelineBuilder` or a
+  /// List of Maps (`List<Map<String, Object>>`)
+  ModernCursor modernAggregateCursor(dynamic pipeline,
+      {bool explain,
+      Map<String, Object> cursor,
+      String hint,
+      Map<String, Object> hintDocument,
+      AggregateOptions aggregateOptions,
+      Map<String, Object> rawOptions}) {
+    if (!db._masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError('At least MongoDb version 3.6 is required '
+          'to run the aggregate operation');
+    }
+    return ModernCursor(AggregateOperation(pipeline,
+        collection: this,
+        explain: explain,
+        cursor: cursor,
+        hint: hint,
+        hintDocument: hintDocument,
+        aggregateOptions: aggregateOptions,
+        rawOptions: rawOptions));
+  }
+
+  Stream watch(Object pipeline,
+          {int batchSize,
+          String hint,
+          Map<String, Object> hintDocument,
+          ChangeStreamOptions changeStreamOptions,
+          Map<String, Object> rawOptions}) =>
+      watchCursor(pipeline,
+              batchSize: batchSize,
+              hint: hint,
+              hintDocument: hintDocument,
+              changeStreamOptions: changeStreamOptions,
+              rawOptions: rawOptions)
+          .changeStream;
+
+  ModernCursor watchCursor(Object pipeline,
+          {int batchSize,
+          String hint,
+          Map<String, Object> hintDocument,
+          ChangeStreamOptions changeStreamOptions,
+          Map<String, Object> rawOptions}) =>
+      ModernCursor(ChangeStreamOperation(pipeline,
+          collection: this,
+          hint: hint,
+          hintDocument: hintDocument,
+          changeStreamOptions: changeStreamOptions,
+          rawOptions: rawOptions));
+
+  Future<BulkWriteResult> bulkWrite(List<Map<String, Object>> documents,
+      {bool ordered}) async {
+    ordered ??= true;
+
+    Bulk bulk;
+    if (ordered) {
+      bulk = OrderedBulk(this);
+    } else {
+      bulk = UnorderedBulk(this);
+    }
+    var index = -1;
+    for (var document in documents) {
+      index++;
+      if (document.isEmpty) {
+        continue;
+      }
+      var key = document.keys.first;
+      switch (key) {
+
+        /// { insertOne : { "document" : {
+        ///     "_id" : 4, "char" : "Dithras", "class" : "barbarian", "lvl" : 4
+        /// } } }
+        case bulkInsertOne:
+          var docMap = document[key];
+          if (docMap is Map<String, Object>) {
+            var contentMap = docMap[bulkDocument];
+            if (contentMap is Map<String, Object>) {
+              bulk.insertOne(contentMap);
+            } else {
+              throw MongoDartError('The "$bulkDocument" key of the '
+                  '"$bulkInsertOne" element at index $index must '
+                  'contain a Map');
+            }
+          } else {
+            throw MongoDartError('The "$bulkInsertOne" element at index '
+                '$index must contain a Map');
+          }
+          break;
+        case bulkInsertMany:
+          var docMap = document[key];
+          if (docMap is Map<String, Object>) {
+            var contentList = docMap[bulkDocuments];
+            if (contentList is List<Map<String, Object>>) {
+              bulk.insertMany(contentList);
+            } else {
+              throw MongoDartError('The "$bulkDocuments" key of the '
+                  '"$bulkInsertMany" element at index $index must '
+                  'contain a List of Maps');
+            }
+          } else {
+            throw MongoDartError('The "$bulkInsertMany" element at index '
+                '$index must contain a Map');
+          }
+          break;
+        case bulkUpdateOne:
+          throw StateError(
+              'The operation "$bulkUpdateOne" is Still to be developed');
+          break;
+        case bulkUpdateMany:
+          throw StateError(
+              'The operation "$bulkUpdateMany" is Still to be developed');
+          break;
+        case bulkReplaceOne:
+          throw StateError(
+              'The operation "$bulkReplaceOne" is Still to be developed');
+          break;
+        case bulkDeleteOne:
+          var docMap = document[key];
+          if (docMap is Map<String, Object>) {
+            var contentMap = docMap[bulkFilter];
+            if (contentMap is Map<String, Object>) {
+              bulk.deleteOne(DeleteOneRequest(contentMap));
+            } else {
+              throw MongoDartError('The "$bulkFilter" key of the '
+                  '"$bulkDeleteOne" element at index $index must '
+                  'contain a Map');
+            }
+          } else {
+            throw MongoDartError('The "$bulkDeleteOne" element at index '
+                '$index must contain a Map');
+          }
+          break;
+        case bulkDeleteMany:
+          var docMap = document[key];
+          if (docMap is Map<String, Object>) {
+            var contentMap = docMap[bulkFilter];
+            if (contentMap is Map<String, Object>) {
+              bulk.deleteMany(DeleteManyRequest(contentMap));
+            } else {
+              throw MongoDartError('The "$bulkFilter" key of the '
+                  '"$bulkDeleteMany" element at index $index must '
+                  'contain a Map');
+            }
+          } else {
+            throw MongoDartError('The "$bulkDeleteMany" element at index '
+                '$index must contain a Map');
+          }
+          break;
+        default:
+          throw StateError('The operation "$key" is not allowed in bulkWrite');
+      }
+    }
+
+    return bulk.executeDocument();
   }
 }

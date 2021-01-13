@@ -6,6 +6,9 @@ class ServerConfig {
   bool isSecure;
   String userName;
   String password;
+
+  bool isAuthenticated = false;
+  
   ServerConfig(
       [this.host = '127.0.0.1',
       this.port = Db.mongoDefaultPort,

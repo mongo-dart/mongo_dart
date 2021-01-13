@@ -196,10 +196,10 @@ Future testCreateModernMessageFromDocument() async {
   }
   data[keyInsertArgument] = documents;
 
-/// Check message splitting in sections of max 50 documents
+  /// Check message splitting in sections of max 50 documents
   var documentsPerPayload1 = MongoModernMessage.maxDocumentsPerPayload1;
   MongoModernMessage.maxDocumentsPerPayload1 = 50;
-    var message = MongoModernMessage(data);
+  var message = MongoModernMessage(data);
   MongoModernMessage.maxDocumentsPerPayload1 = documentsPerPayload1;
 
   expect(message.sections.length, 4);

@@ -36,11 +36,13 @@ class GetLastErrorCommand extends CommandOperation {
       {WriteConcern writeConcern,
       GetLastErrorOptions getLastErrorOptions,
       Map<String, Object> rawOptions})
-      : super(db, getLastErrorOptions?.options ?? rawOptions,
-            command: <String, Object>{
-              keyGetLastError: 1,
-              //keyDbName: db.databaseName,
-            }) {
+      : super(db, <String, Object>{
+          ...?getLastErrorOptions?.options,
+          ...?rawOptions
+        }, command: <String, Object>{
+          keyGetLastError: 1,
+          //keyDbName: db.databaseName,
+        }) {
     if (db == null) {
       throw MongoDartError('Database required in call to GetLastErrorCommand');
     }

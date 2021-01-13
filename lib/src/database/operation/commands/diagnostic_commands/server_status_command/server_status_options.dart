@@ -141,11 +141,10 @@ class ServerStatusOptions {
       shardingExcluded: true,
       shardedIndexConsistencyExcluded: true,
       shardingStatisticsExcluded: true,
-      storageEngineExcluded: true,
+      //storageEngineExcluded: true,
       transactionsExcluded: true,
       transportSecurityExcluded: true,
-      watchdogExcluded: true,
-      wiredTigerExcluded: true);
+      watchdogExcluded: true);
 
   static const ServerStatusOptions immutableValues = ServerStatusOptions(
       assertsExcluded: true,

@@ -16,6 +16,14 @@ class _ServerCapabilities {
   bool listIndexes = false;
   int maxNumberOfDocsInBatch = 1000;
   bool supportsOpMsg = false;
+  String replicaSetName;
+  List<String> replicaSetHosts;
+  bool get isReplicaSet => replicaSetName != null;
+  int get replicaSetHostsNum => replicaSetHosts?.length ?? 0;
+  bool get isSingleServerReplicaSet => isReplicaSet && replicaSetHostsNum == 1;
+  bool isShardedCluster = false;
+  bool isStandalone = false;
+  String fcv;
 
   void getParamsFromIstMaster(Map<String, dynamic> isMaster) {
     if (isMaster.containsKey('maxWireVersion')) {
@@ -34,6 +42,24 @@ class _ServerCapabilities {
     }
     if (maxWireVersion >= 6) {
       supportsOpMsg = true;
+    }
+    if (isMaster.containsKey(keyMsg)) {
+      isShardedCluster = true;
+    } else if (isMaster.containsKey(keySetName)) {
+      replicaSetName = isMaster[keySetName];
+      replicaSetHosts = <String>[...isMaster[keyHosts]];
+    } else {
+      isStandalone = true;
+    }
+    if (isMaster.containsKey(keyTopologyVersion)) {
+      fcv = '4.4';
+    } else if (isMaster.containsKey(keyConnectionId)) {
+      fcv = '4.2';
+    } else if (maxWireVersion > 6) {
+      // approximated
+      fcv = '4.0';
+    } else {
+      fcv = '3.6';
     }
   }
 }
@@ -63,6 +89,8 @@ class Connection {
   Connection(this._manager, [this.serverConfig]) {
     serverConfig ??= ServerConfig();
   }
+
+  bool get isAuthenticated => serverConfig?.isAuthenticated ?? false;
 
   Future<bool> connect() async {
     Socket _socket;

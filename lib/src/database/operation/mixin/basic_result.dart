@@ -23,7 +23,12 @@ mixin BasicResult {
 
   void extractBasic(Map<String, Object> document) {
     document ??= <String, Object>{};
-    ok = document[keyOk];
+    var documentOk = document[keyOk];
+    if (documentOk is int) {
+      ok = documentOk.toDouble();
+    } else {
+      ok = documentOk;
+    }
     errmsg = document[keyErrmsg];
     code = document[keyCode];
     codeName = document[keyCodeName];

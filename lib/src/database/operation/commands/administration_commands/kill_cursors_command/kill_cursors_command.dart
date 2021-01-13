@@ -1,5 +1,6 @@
 import 'package:bson/bson.dart';
-import 'package:mongo_dart/mongo_dart.dart' show DbCollection, MongoDartError;
+import 'package:mongo_dart/mongo_dart.dart'
+    show Db, DbCollection, MongoDartError;
 import 'package:mongo_dart/src/database/operation/base/command_operation.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
@@ -26,15 +27,20 @@ import 'kill_cursors_result.dart';
 ///   - a set of optional values for the command
 class KillCursorsCommand extends CommandOperation {
   KillCursorsCommand(DbCollection collection, List<BsonLong> cursorIds,
-      {KillCursorsOptions killCursorsOptions, Map<String, Object> rawOptions})
-      : super(null, killCursorsOptions?.options ?? rawOptions,
+      {Db db,
+      KillCursorsOptions killCursorsOptions,
+      Map<String, Object> rawOptions})
+      : super(db ?? collection?.db,
+            <String, Object>{...?killCursorsOptions?.options, ...?rawOptions},
             collection: collection,
             command: <String, Object>{
               keyKillCursors: collection?.collectionName,
               keyCursors: cursorIds,
             }) {
-    if (collection == null) {
-      throw MongoDartError('Collection required in call to KillCursorsCommand');
+    // In case of aggregate collection agnostic commands, collection is
+    // not needed
+    if (this.db == null) {
+      throw MongoDartError('Database required in call to KillCursorsCommand');
     }
     if (cursorIds == null || cursorIds.isEmpty) {
       throw MongoDartError('CursorIds required in call to KillCursorsCommand');

@@ -326,8 +326,8 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Create a view from multiple collections', () async {
-      var collection1Name = 'orders';
-      var collection2Name = 'inventory';
+      var collection1Name = 'orders.a';
+      var collection2Name = 'inventory.a';
       var collection1 = db.collection(collection1Name);
       var collection2 = db.collection(collection2Name);
 
@@ -378,7 +378,7 @@ void main() async {
           createOptions: CreateOptions(viewOn: collection1Name, pipeline: [
             {
               r'$lookup': {
-                'from': 'inventory',
+                'from': collection2Name,
                 'localField': 'item',
                 'foreignField': 'sku',
                 'as': 'inventory_docs'
@@ -443,6 +443,12 @@ void main() async {
         'price': Rational.parse('5.95'),
         'quantity': 10
       });
+      await collection1.insertOne({
+        '_id': 6,
+        'item': 'abc',
+        'price': Rational.parse('14.00'),
+        'quantity': 4
+      });
 
       await collection2.insertOne(
           {'_id': 1, 'sku': 'abc', 'description': 'product 1', 'instock': 120});
@@ -474,14 +480,14 @@ void main() async {
 
       var view = db.collection(viewName);
 
-      var result = await view.aggregateToStream([
+      var result = await view.modernAggregate([
         {r'$sortByCount': r'$item'}
       ]).toList();
 
       expect(result.length, 3);
 
       expect(result.first['_id'], 'abc');
-      expect(result.first['count'], 2);
+      expect(result.first['count'], 3);
       expect(result.last['_id'], 'jkl');
       expect(result.last['count'], 1);
     }, skip: cannotRunTests);

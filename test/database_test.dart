@@ -4,6 +4,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_operation/find_operation.dart';
+import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'dart:async';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
@@ -144,8 +145,9 @@ Future<void> testServerStatus() async {
     expect(dbStatus['version'], db.masterConnection.serverStatus.version);
     expect(dbStatus['process'], db.masterConnection.serverStatus.process);
     expect(dbStatus['host'], db.masterConnection.serverStatus.host);
-    if (dbStatus['storageEngine']['name'] == 'wiredTiger') {
-      expect(dbStatus['storageEngine']['persistent'],
+    Map storageEngineMap = dbStatus['storageEngine'];
+    if (storageEngineMap != null && storageEngineMap['name'] == 'wiredTiger') {
+      expect(storageEngineMap['persistent'],
           db.masterConnection.serverStatus.isPersistent);
       if (dbStatus['version'].compareTo('4.0') > 0) {
         expect(dbStatus['wiredTiger']['log']['maximum log file size'] > 0,
@@ -652,7 +654,7 @@ db.runCommand(
   expect(p1['\$group'], isNotNull);
   // set batchSize parameter to split response to 2 chunks
   var aggregate = await collection
-      .aggregateToStream(pipeline,
+      .legacyAggregateToStream(pipeline,
           cursorOptions: {'batchSize': 1}, allowDiskUse: true)
       .toList();
 
@@ -1099,8 +1101,11 @@ Future testIndexCreationErrorHandling() async {
   try {
     await db.ensureIndex(collectionName, key: 'a', unique: true);
     fail("Expecting an error, but wasn't thrown");
-  } catch (e) {
-    expect(e['err'],
+  } on TestFailure {
+    rethrow;
+  } catch (e, stack) {
+    print(stack);
+    expect(e[keyErrmsg] ?? e['err'],
         predicate((String msg) => msg.contains('duplicate key error')));
   }
 }

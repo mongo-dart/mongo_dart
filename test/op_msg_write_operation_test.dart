@@ -53,13 +53,16 @@ void main() async {
           !db.masterConnection.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
-      var serverFcv = db?.masterConnection?.serverStatus?.fcv ?? '0.0';
+      var serverFcv = db?.masterConnection?.serverCapabilities?.fcv ?? '0.0';
       if (serverFcv.compareTo('4.4') != -1) {
         running4_4orGreater = true;
       }
-      isReplicaSet = db?.masterConnection?.serverStatus?.isReplicaSet ?? false;
-      isStandalone = db?.masterConnection?.serverStatus?.isStandalone ?? false;
-      isSharded = db?.masterConnection?.serverStatus?.isShardedCluster ?? false;
+      isReplicaSet =
+          db?.masterConnection?.serverCapabilities?.isReplicaSet ?? false;
+      isStandalone =
+          db?.masterConnection?.serverCapabilities?.isStandalone ?? false;
+      isSharded =
+          db?.masterConnection?.serverCapabilities?.isShardedCluster ?? false;
     });
 
     tearDown(() async {

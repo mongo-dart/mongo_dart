@@ -4,6 +4,7 @@ import 'package:mongo_dart/src/database/operation/commands/query_and_write_opera
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/bulk/unordered_bulk.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_request.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_request.dart';
+import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
@@ -261,6 +262,67 @@ void main() async {
         var findResult = await collection.find().toList();
         expect(findResult.length, 3);
         expect(findResult.first['name'], 'John');
+        expect(findResult.last['name'], 'Mandy');
+      }, skip: cannotRunTests);
+
+      test(
+          'Ordered Bulk - Insert, delete one and delete many '
+          'with collection helper', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.bulkWrite([
+          {
+            bulkInsertOne: {
+              bulkDocument: {'_id': 2, 'name': 'Stephen', 'age': 54}
+            }
+          },
+          {
+            bulkDeleteOne: {
+              bulkFilter: {'_id': 2}
+            }
+          },
+          {
+            bulkInsertMany: {
+              bulkDocuments: [
+                {'_id': 3, 'name': 'John', 'age': 32},
+                {'_id': 4, 'name': 'Mira', 'age': 27},
+                {'_id': 7, 'name': 'Luis', 'age': 42}
+              ]
+            }
+          },
+          {
+            bulkDeleteMany: {
+              bulkFilter: {
+                'age': {r'$gt': 28}
+              }
+            }
+          },
+          {
+            bulkInsertOne: {
+              bulkDocument: {'_id': 5, 'name': 'Mandy', 'age': 21}
+            }
+          }
+        ]);
+
+        expect(ret.ok, 1.0);
+        expect(ret.operationSucceeded, isTrue);
+        expect(ret.hasWriteErrors, isFalse);
+        expect(ret.hasWriteConcernError, isFalse);
+        expect(ret.nInserted, 5);
+        expect(ret.operationSucceeded, isTrue);
+        expect(ret.writeCommandType, isNull);
+        expect(ret.nUpserted, 0);
+        expect(ret.nModified, 0);
+        expect(ret.nMatched, 0);
+        expect(ret.nRemoved, 3);
+        // Todo check ids and documents
+        //expect(ret.ids.first, 2);
+        //expect(ret.documents.first['name'], 'Stephen');
+
+        var findResult = await collection.find().toList();
+        expect(findResult.length, 2);
+        expect(findResult.first['name'], 'Mira');
         expect(findResult.last['name'], 'Mandy');
       }, skip: cannotRunTests);
 

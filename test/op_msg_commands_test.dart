@@ -271,7 +271,9 @@ void main() async {
           var ret = await command.execute();
           expect(ret[keyOk], 1.0);
           expect(ret[keyLogLevel], 0);
-          expect(ret[keyFeatureCompatibilityVersion], isMap);
+          if (!db.masterConnection.serverCapabilities.isShardedCluster) {
+            expect(ret[keyFeatureCompatibilityVersion], isMap);
+          }
         });
       });
       group('Get Parameter', () {
@@ -290,7 +292,7 @@ void main() async {
           var ret = await command.execute();
           expect(ret, isNotNull);
           expect(ret[keyHost], isNotEmpty);
-          expect(ret[keyMetrics], isNotEmpty);
+          expect(ret[keyVersion], isNotEmpty);
           expect(ret[keyLatchAnalysis], isNull);
         });
         test('No Host in RawOptions', () async {
@@ -335,7 +337,7 @@ void main() async {
           expect(ret, isNotNull);
           expect(ret.host, isNotEmpty);
           expect(ret.localTime.isAfter(DateTime(2020)), isTrue);
-          expect(ret.metrics, isNotNull);
+          expect(ret.version, isNotNull);
         });
 
         test('No Metric in ServerStatusOptions -> Result class', () async {

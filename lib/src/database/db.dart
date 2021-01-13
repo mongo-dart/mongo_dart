@@ -563,11 +563,15 @@ class Db {
       ..username = userName
       ..password = password;
 
+    (connection ?? _masterConnection).serverConfig.userName ??= userName;
+    (connection ?? _masterConnection).serverConfig.password ??= password;
+
     var authenticator =
         createAuthenticator(_authenticationScheme, this, credential);
 
     await authenticator.authenticate(connection ?? _masterConnection);
 
+    (connection ?? _masterConnection).serverConfig.isAuthenticated = true;
     return true;
   }
 
@@ -729,7 +733,8 @@ class Db {
     if (!_masterConnection.serverCapabilities.supportsOpMsg) {
       return <String, Object>{};
     }
-    var operation = ServerStatusCommand(this);
+    var operation = ServerStatusCommand(this,
+        serverStatusOptions: ServerStatusOptions.instance);
     return operation.execute();
   }
 
@@ -751,5 +756,30 @@ class Db {
     var command = CreateViewCommand(this, view, source, pipeline,
         createViewOptions: createViewOptions, rawOptions: rawOptions);
     return command.execute();
+  }
+
+  /// Runs a specified admin/diagnostic pipeline which does not require an
+  /// underlying collection. For aggregations on collection data,
+  /// see `dbcollection.modernAggregate()`.
+  Stream<Map<String, dynamic>> aggregate(List<Map<String, Object>> pipeline,
+      {bool explain,
+      Map<String, Object> cursor,
+      String hint,
+      Map<String, Object> hintDocument,
+      AggregateOptions aggregateOptions,
+      Map<String, Object> rawOptions}) {
+    if (!_masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError('At least MongoDb version 3.6 is required '
+          'to run the aggregate operation');
+    }
+    return ModernCursor(AggregateOperation(pipeline,
+            db: this,
+            explain: explain,
+            cursor: cursor,
+            hint: hint,
+            hintDocument: hintDocument,
+            aggregateOptions: aggregateOptions,
+            rawOptions: rawOptions))
+        .stream;
   }
 }

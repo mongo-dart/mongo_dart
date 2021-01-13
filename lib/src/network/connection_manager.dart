@@ -96,7 +96,7 @@ class _ConnectionManager {
 
     if (_masterConnection.serverCapabilities.supportsOpMsg) {
       await ServerStatusCommand(db,
-              serverStatusOptions: ServerStatusOptions.immutableValues)
+              serverStatusOptions: ServerStatusOptions.instance)
           .updateServerStatus(db.masterConnection);
     }
     /*    db.masterConnection.serverStatus

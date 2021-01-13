@@ -11,7 +11,7 @@ abstract class AbstractWriteResult with BasicResult {
     extractBasic(result);
 
     serverResponses = [result];
-    ok = result[keyOk];
+    //ok = result[keyOk];
     switch (writeCommandType) {
       case WriteCommandType.insert:
         nInserted = result[keyN] ?? 0;

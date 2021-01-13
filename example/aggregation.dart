@@ -14,6 +14,6 @@ void main() async {
       )).build();
   final result =
     await DbCollection(db, 'orders')
-      .aggregateToStream(pipeline).toList();
+      .legacyAggregateToStream(pipeline).toList();
   result.forEach(print);
 }

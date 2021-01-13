@@ -23,6 +23,10 @@ import 'package:mongo_dart/src/database/operation/commands/administration_comman
 import 'package:mongo_dart/src/database/operation/commands/administration_commands/wrapper/create_collection/create_collection_options.dart';
 import 'package:mongo_dart/src/database/operation/commands/administration_commands/wrapper/create_view/create_view_command.dart';
 import 'package:mongo_dart/src/database/operation/commands/administration_commands/wrapper/create_view/create_view_options.dart';
+import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/aggregate/aggregate_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/aggregate/aggregate_options.dart';
+import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/wrapper/change_stream/change_stream_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/wrapper/change_stream/change_stream_options.dart';
 import 'package:mongo_dart/src/database/operation/commands/diagnostic_commands/server_status_command/server_status_command.dart';
 import 'package:mongo_dart/src/database/operation/commands/diagnostic_commands/server_status_command/server_status_options.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/get_last_error_command/get_last_error_command.dart';
@@ -30,6 +34,11 @@ import 'package:mongo_dart/src/database/operation/commands/query_and_write_opera
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_operation/find_options.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/bulk_write_result.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/write_result.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/bulk/bulk.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/bulk/ordered_bulk.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/bulk/unordered_bulk.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_request.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_request.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/insert_many/insert_many_options.dart';
 import 'package:mongo_dart/src/database/operation/parameters/read_preference.dart';
 import 'package:mongo_dart/src/database/operation/commands/administration_commands/create_index_operation/create_index_operation.dart';

@@ -31,9 +31,9 @@ class CollationOptions {
 
   /// A field that determines sort order of case differences during tertiary level comparisons.
   /// Possible values are:
-  /// * âupperâ 	Uppercase sorts before lowercase.
-  /// * âlowerâ 	Lowercase sorts before uppercase.
-  /// * âoffâ 	Default value. Similar to "lower" with slight differences.
+  /// * “upper” 	Uppercase sorts before lowercase.
+  /// * “lower” 	Lowercase sorts before uppercase.
+  /// * “off” 	Default value. Similar to "lower" with slight differences.
   /// [See](http://userguide.icu-project.org/collation/customization)
   /// for details of differences.
   String caseFirst;
@@ -59,9 +59,9 @@ class CollationOptions {
   /// Field that determines up to which characters are considered ignorable
   /// when alternate: "shifted". Has no effect if alternate: "non-ignorable"
   /// Possible values are:
-  /// * "punct" 	Both whitespaces and punctuation are âignorableâ,
+  /// * "punct" 	Both whitespaces and punctuation are “ignorable”,
   ///    i.e. not considered base characters.
-  /// * "space" 	Whitespace are âignorableâ,
+  /// * "space" 	Whitespace are “ignorable”,
   ///    i.e. not considered base characters.
   String maxVariable;
 

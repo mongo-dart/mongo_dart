@@ -2,34 +2,39 @@
 
 ## Recent change notes
 
+### 0.5.0-dev.1
+
+- OP_MSG operations and commands. See the README file.
+- Decimal128 Type (inherited from BSON enhancements)
+
 ### 0.4.4
 
-* Test for text index.
-* Fix problem wit "OPENING" state in db. When a socket error happened during opening, the state was't resetted so that any new `db.open()` attempt failed.
-* Closing a db when the connection socket was null threw error.
-* Changed the way the socket error is thrown on `db.open()`: All errors detected are collected.
+- Test for text index.
+- Fix problem wit "OPENING" state in db. When a socket error happened during opening, the state was't resetted so that any new `db.open()` attempt failed.
+- Closing a db when the connection socket was null threw error.
+- Changed the way the socket error is thrown on `db.open()`: All errors detected are collected.
   1) If after all the attempts the master connection is not on, an error is thrown relative to the the first server tested. This for compatibility reason with the previous way the message was thrown.
   2) If the master connection is on, the errors are logged as warning.
-* The socket error message has been changed to comprehend also the address of the server, so it is easier to identify the problem.
-* If an authentication error occurs, the relative socket is closed.
+- The socket error message has been changed to comprehend also the address of the server, so it is easier to identify the problem.
+- If an authentication error occurs, the relative socket is closed.
 
 ### 0.4.3
 
-* New `isConnected` `Db` getter. It returns `true` if the state of the database is open and at least the primary connection is on.
-* db._masterConnectionVerified() now throws an explicit error if the db state is not OPEN (it was throwing a `NoSuchMethodError`).
+- New `isConnected` `Db` getter. It returns `true` if the state of the database is open and at least the primary connection is on.
+- db._masterConnectionVerified() now throws an explicit error if the db state is not OPEN (it was throwing a `NoSuchMethodError`).
 
 ### 0.4.2
 
-* New `Db` constructor (`Db.create()`) that accepts also the url in DNS Seedlist Connection Format (`mongodb+srv://`)
+- New `Db` constructor (`Db.create()`) that accepts also the url in DNS Seedlist Connection Format (`mongodb+srv://`)
 
 ### 0.4.1
 
-* Secure Connection
-* The connection string now accepts more than one server.
-  * Before: only mongodb://www.example.org/test.
-  * Now it can be: mongodb://www.example.org,www1.example.org,www2.example.org/test
-  * It is equivalent to: db.pool([mongodb://www.example.org/test, mongodb://www1.example.org/test, mongodb://www2.example.org/test]);  
-* Added an "uriList" getter in "Db" class.
+- Secure Connection
+- The connection string now accepts more than one server.
+  - Before: only mongodb://www.example.org/test.
+  - Now it can be: mongodb://www.example.org,www1.example.org,www2.example.org/test
+  - It is equivalent to: db.pool([mongodb://www.example.org/test, mongodb://www1.example.org/test, mongodb://www2.example.org/test]);  
+- Added an "uriList" getter in "Db" class.
 
 ### 0.4.1-dev.2.2
 

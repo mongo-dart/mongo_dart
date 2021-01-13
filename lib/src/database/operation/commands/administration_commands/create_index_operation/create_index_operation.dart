@@ -24,7 +24,7 @@ class CreateIndexOperation extends CommandOperation {
   CreateIndexOperation(Db db, DbCollection collection, this.fieldOrSpec,
       CreateIndexOptions indexOptions,
       {Connection connection, Map<String, Object> rawOptions})
-      : super(db, indexOptions?.options ?? rawOptions,
+      : super(db, <String, Object>{...?indexOptions?.options, ...?rawOptions},
             collection: collection,
             aspect: Aspect.writeOperation,
             connection: connection) {

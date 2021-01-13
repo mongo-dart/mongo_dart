@@ -1,4 +1,4 @@
-import 'package:mongo_dart/mongo_dart.dart' show DbCollection;
+                                                               import 'package:mongo_dart/mongo_dart.dart' show DbCollection;
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/insert_operation/insert_operation.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/bulk_write_result.dart';

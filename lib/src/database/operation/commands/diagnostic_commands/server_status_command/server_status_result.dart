@@ -52,11 +52,11 @@ class ServerStatusResult with BasicResult {
   }
 
   // ***** INSTANCE INFORMATION ******
-  /// The systemâs hostname. In Unix/Linux systems, this should be the same
+  /// The system’s hostname. In Unix/Linux systems, this should be the same
   /// as the output of the hostname command.
   String host;
 
-  /// An array of the systemâs fully qualified domain names (FQDNs).
+  /// An array of the system’s fully qualified domain names (FQDNs).
   List<String> advisoryHostFQDNs;
 
   /// The MongoDB version of the current MongoDB process.
@@ -75,7 +75,7 @@ class ServerStatusResult with BasicResult {
   /// been active.
   int uptimeMillis;
 
-  /// The uptime in seconds as calculated from MongoDBâs internal
+  /// The uptime in seconds as calculated from MongoDB’s internal
   /// course-grained time keeping system.
   int uptimeEstimate;
 
@@ -216,7 +216,7 @@ class ServerStatusResult with BasicResult {
   Map<String, dynamic> freeMonitoring;
 
   // **** Global Lock ****
-  /// A document that reports on the databaseâs lock state.
+  /// A document that reports on the database’s lock state.
   /// "globalLock" : {
   ///   "totalTime" : <num>,
   ///   "currentQueue" : {
@@ -344,7 +344,7 @@ class ServerStatusResult with BasicResult {
   Map<String, dynamic> mirroredReads;
 
   // **** Network ****
-  /// A document that reports data on MongoDBâs network use.
+  /// A document that reports data on MongoDB’s network use.
   ///
   /// "network" : {
   ///   "bytesIn" : <num>,
@@ -553,7 +553,7 @@ class ServerStatusResult with BasicResult {
   /// A document that reports on:
   /// The number of times a given authentication mechanism has been used to
   /// authenticate against the mongod / mongos instance. (New in MongoDB 4.4)
-  /// The mongod/mongos instanceâs TLS/SSL certificate.
+  /// The mongod/mongos instance’s TLS/SSL certificate.
   /// (Only appears for mongod / mongos instance with support for TLS)
   ///
   /// "security" : {
