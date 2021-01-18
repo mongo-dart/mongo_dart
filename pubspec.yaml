@@ -13,7 +13,7 @@ dependencies:
   path: '^1.7.0'
   pool: ^1.4.0
   uuid: ^2.2.0
-  basic_utils: ^2.6.2
+  basic_utils: ^2.6.3
 dev_dependencies:
   test: ^1.13.0
   pedantic: ^1.9.0
