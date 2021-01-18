@@ -302,9 +302,11 @@ class DbCollection {
     return update as Map<String, dynamic>;
   }
 
-  // **********************************************************+
-  // ************** OP_MSG_COMMANDS ****************************
-  // ***********************************************************
+  // ****************************************************************+
+  // ******************** OP_MSG_COMMANDS ****************************
+  // *****************************************************************
+  // All the following methods are available starting from release 3.6
+  // *****************************************************************
 
   // This method has been made available since version 3.2
   // As we will use this with the new wire message available
@@ -351,6 +353,32 @@ class DbCollection {
     });
   }
 
+  Future<WriteResult> deleteOne(selector,
+      {WriteConcern writeConcern,
+      CollationOptions collation,
+      String hint,
+      Map<String, Object> hintDocument}) async {
+    var deleteOperation = DeleteOneOperation(
+        this,
+        DeleteOneRequest(_selectorBuilder2Map(selector),
+            collation: collation, hint: hint, hintDocument: hintDocument),
+        deleteOneOptions: DeleteOneOptions(writeConcern: writeConcern));
+    return deleteOperation.executeDocument();
+  }
+
+  Future<WriteResult> deleteMany(selector,
+      {WriteConcern writeConcern,
+      CollationOptions collation,
+      String hint,
+      Map<String, Object> hintDocument}) async {
+    var deleteOperation = DeleteManyOperation(
+        this,
+        DeleteManyRequest(_selectorBuilder2Map(selector),
+            collation: collation, hint: hint, hintDocument: hintDocument),
+        deleteManyOptions: DeleteManyOptions(writeConcern: writeConcern));
+    return deleteOperation.executeDocument();
+  }
+
   // Find operation with the new OP_MSG (starting from release 3.6)
   Stream<Map<String, dynamic>> modernFind(
       {SelectorBuilder selector,
@@ -370,7 +398,7 @@ class DbCollection {
 
     var operation = FindOperation(this,
         filter:
-            filter ?? (selector?.map == null ? null : selector.map[keyQuery]),
+            filter ?? (selector?.map == null ? null : selector.map[key$Query]),
         sort: sort ?? (selector?.map == null ? null : selector.map['orderby']),
         projection: projection ?? selector?.paramFields,
         hint: hint,

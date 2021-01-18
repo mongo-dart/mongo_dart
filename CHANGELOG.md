@@ -2,7 +2,18 @@
 
 ## Recent change notes
 
+### 0.5.0-dev.2
+
+- Dbcolletion.deleteOne()
+- DbCollection.deleteMany()
+
 ### 0.5.0-dev.1
+
+#### Breaking Changes
+
+- The hidden class `_Connection` has been renamed `Connection`. If you have already your own Connection class may be that they conflict. In this case, you shoul hide the `Connection` class while importing MongoDart in your sources. Ex.```dart import 'package:mongo_dart/mongo_dart.dart' hide Connection;```
+
+#### Other Changes
 
 - OP_MSG operations and commands. See the README file.
 - Decimal128 Type (inherited from BSON enhancements)

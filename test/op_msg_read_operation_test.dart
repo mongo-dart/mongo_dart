@@ -358,7 +358,7 @@ void main() async {
 
       var result = await collection.modernAggregate(pipeline).toList();
       print(result);
-      expect(result.first[key_Id], 'games');
+      expect(result.first[key_id], 'games');
       expect(result.first['avg'], Rational.fromInt(15));
       expect(result.first['total'], Rational.fromInt(45));
     }, skip: cannotRunTests);
@@ -523,7 +523,7 @@ db.runCommand(
         var v = await aggregateOperation.execute();
         var cursor = v[keyCursor] as Map;
         var result = cursor[keyFirstBatch] as List;
-        expect(result.first[key_Id], 'Age of Steam');
+        expect(result.first[key_id], 'Age of Steam');
         expect(result.first['avgRating'], 3);
       });
 
@@ -632,7 +632,7 @@ db.runCommand(
         expect(cursor['id'], const TypeMatcher<int>());
         final firstBatch = cursor[keyFirstBatch] as List;
         expect(firstBatch.length, 3);
-        expect(firstBatch.first[key_Id], 'Age of Steam');
+        expect(firstBatch.first[key_id], 'Age of Steam');
         expect(firstBatch.first['avgRating'], 3);
       });
 
@@ -713,18 +713,18 @@ db.runCommand(
         var pipeline = <Map<String, Object>>[];
         var p1 = {
           r'$group': {
-            key_Id: {'game': r'$game', 'player': r'$player'},
+            key_id: {'game': r'$game', 'player': r'$player'},
             'rating': {r'$sum': r'$rating'}
           }
         };
         var p2 = {
           r'$group': {
-            key_Id: r'$_id.game',
+            key_id: r'$_id.game',
             'avgRating': {r'$avg': r'$rating'}
           }
         };
         var p3 = {
-          r'$sort': {key_Id: 1}
+          r'$sort': {key_id: 1}
         };
 
         pipeline.add(p1);
@@ -743,7 +743,7 @@ db.runCommand(
         var aggregate = await cursor.stream.toList();
 
         expect(aggregate.isNotEmpty, isTrue);
-        expect(aggregate.first[key_Id], 'Age of Steam');
+        expect(aggregate.first[key_id], 'Age of Steam');
         expect(aggregate.first['avgRating'], 3);
       });
     }, skip: cannotRunTests);

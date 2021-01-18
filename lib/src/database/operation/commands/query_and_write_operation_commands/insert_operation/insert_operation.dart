@@ -22,8 +22,8 @@ class InsertOperation extends CommandOperation {
 
     ids = List(documents.length);
     for (var idx = 0; idx < documents.length; idx++) {
-      documents[idx][key_Id] ??= ObjectId();
-      ids[idx] = documents[idx][key_Id];
+      documents[idx][key_id] ??= ObjectId();
+      ids[idx] = documents[idx][key_id];
     }
   }
   List<Map<String, Object>> documents;

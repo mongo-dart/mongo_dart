@@ -210,6 +210,8 @@ At present we have developed the following operations:
 | --- | --- | --- | --- |
 |   `insertOne`  |  Experimental   |  `insert`   | `insertOne` was already present in the previous release, but some changes in the call have been made    |
 | `insertMany` | Experimental | `insert` | Allows to insert many documents in one commnand. It is subject to the max number of documents per message limit (at present <4.4> 100,000)|
+|   [deleteOne][1] |  Experimental   |  -  | Allows to delete one document. [Example][3] [Example 2][4] |
+| [deleteMany][2] | Experimental | `remove` | Allows to delete many documents in one commnand. [Example][5] |
 | `modernFind` | Experimental | `legacyFind` | The old method `find` now is simply a wrapper. If you are running mongoDb 3.6 or later, `modernFind` is called, otherwise `legacyFind` |
 | `modernAggregate` | Experimental |  `legacyAggregateToStream` | The old method `aggregateToStream` now is simply a wrapper. If you are running mongoDb 3.6 or later, `modernAggregate` is called, otherwise `legacyAggregateToStream`|
 | `modernAggregateCursor` | Experimental | - | This method has no corresponding legacy one, as it returns a cursor and not a Map like the legacy `aggregate`|
@@ -229,6 +231,7 @@ Aside to these changes we have also to mention the new Decimal128 type managemen
 This is inherited from enhancements in the BSON package
 
 Last but not least, some commands:
+
 |Command| Status | Legacy alternative | Notes |
 |--- | --- | --- | --- |
 | `createIndex` | Production | `db.createIndex` | This was needed because the legacy method didn't work any more starting from release 4.0 |
@@ -250,3 +253,10 @@ Last but not least, some commands:
 * [Recent change notes](https://github.com/mongo-dart/mongo_dart/blob/master/CHANGELOG.md)
 
 * Additional [examples](https://github.com/mongo-dart/mongo_dart/tree/master/example) and [tests](https://github.com/mongo-dart/mongo_dart/tree/master/test)
+
+[1]: doc/manual/crud/delete.md#deleteOne
+[2]: doc/manual/crud/delete.md#deleteMany
+[3]: example/manual/crud/delete_one.dart
+[4]: example/manual/crud/delete_one_collation.dart "With collation"
+[5]: example/manual/crud/delete_many.dart
+

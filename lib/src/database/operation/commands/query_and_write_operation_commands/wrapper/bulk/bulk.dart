@@ -32,8 +32,8 @@ abstract class Bulk extends CommandOperation {
   List ids = [];
 
   void insertOne(Map<String, Object> document) {
-    document[key_Id] ??= ObjectId();
-    ids.add(document[key_Id]);
+    document[key_id] ??= ObjectId();
+    ids.add(document[key_id]);
     overallDocuments.add(document);
     var insertOneOperation = InsertOneOperation(collection, document);
     var command = insertOneOperation.$buildCommand();
@@ -42,8 +42,8 @@ abstract class Bulk extends CommandOperation {
 
   void insertMany(List<Map<String, Object>> documents) {
     for (var document in documents) {
-      document[key_Id] ??= ObjectId();
-      ids.add(document[key_Id]);
+      document[key_id] ??= ObjectId();
+      ids.add(document[key_id]);
       overallDocuments.add(document);
     }
     var insertManyOperation = InsertManyOperation(collection, documents);

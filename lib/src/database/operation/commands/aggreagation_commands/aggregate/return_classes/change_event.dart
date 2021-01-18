@@ -62,7 +62,7 @@ class ChangeEvent {
   bool get isInvalidate => operationType == 'invalidate';
 
   Map<String, Object> _extractEventData(Map<String, Object> streamData) {
-    id = streamData[key_Id];
+    id = streamData[key_id];
     operationType = streamData[keyOperationType];
     fullDocument = streamData[keyFullDocument];
     ns = MongoDBNamespace.fromMap(streamData[keyNs]);

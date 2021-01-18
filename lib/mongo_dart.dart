@@ -6,7 +6,7 @@ library mongo_dart;
 
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert' show base64, json, utf8;
+import 'dart:convert' show base64, utf8;
 import 'dart:io' show File, FileMode, IOSink, SecureSocket, Socket;
 import 'dart:math';
 import 'dart:typed_data';
@@ -19,42 +19,18 @@ import 'package:mongo_dart/src/database/info/server_status.dart';
 import 'package:mongo_dart/src/database/message/additional/section.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/database/message/mongo_response_message.dart';
-import 'package:mongo_dart/src/database/operation/commands/administration_commands/wrapper/create_collection/create_collection_command.dart';
-import 'package:mongo_dart/src/database/operation/commands/administration_commands/wrapper/create_collection/create_collection_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/administration_commands/wrapper/create_view/create_view_command.dart';
-import 'package:mongo_dart/src/database/operation/commands/administration_commands/wrapper/create_view/create_view_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/aggregate/aggregate_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/aggregate/aggregate_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/wrapper/change_stream/change_stream_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/wrapper/change_stream/change_stream_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/diagnostic_commands/server_status_command/server_status_command.dart';
-import 'package:mongo_dart/src/database/operation/commands/diagnostic_commands/server_status_command/server_status_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/get_last_error_command/get_last_error_command.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_operation/find_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_operation/find_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/bulk_write_result.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/write_result.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/bulk/bulk.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/bulk/ordered_bulk.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/bulk/unordered_bulk.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_request.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_request.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/insert_many/insert_many_options.dart';
-import 'package:mongo_dart/src/database/operation/parameters/read_preference.dart';
-import 'package:mongo_dart/src/database/operation/commands/administration_commands/create_index_operation/create_index_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/insert_one/insert_one_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/insert_many/insert_many_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/administration_commands/create_index_operation/create_index_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/insert_one/insert_one_options.dart';
+import 'package:mongo_dart/src/database/operation/operation.dart';
 import 'package:mongo_dart/src/database/utils/dns_lookup.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:mongo_dart/src/database/utils/split_hosts.dart';
-import 'package:mongo_dart_query/mongo_dart_query.dart' hide keyQuery;
+import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:pool/pool.dart';
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_aggregation.dart';
 export 'package:mongo_dart_query/mongo_dart_query.dart';
+export 'package:mongo_dart/src/database/operation/operation.dart';
+export 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 part 'src/connection_pool.dart';
 
@@ -113,4 +89,3 @@ part 'src/network/connection_manager.dart';
 part 'src/network/mongo_message_transformer.dart';
 
 part 'src/network/packet_converter.dart';
-

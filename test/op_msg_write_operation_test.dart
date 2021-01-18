@@ -1,6 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/delete_operation/delete_request.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_operation.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_options.dart';
@@ -260,7 +259,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteOneOperation(collection, DeleteOneRequest({key_Id: 7}));
+            DeleteOneOperation(collection, DeleteOneRequest({key_id: 7}));
         var res = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -287,6 +286,87 @@ void main() async {
         var deleteOperation =
             DeleteOneOperation(collection, DeleteOneRequest({'status': 'D'}));
         var res = await deleteOperation.executeDocument();
+        expect(res.hasWriteErrors, isFalse);
+        expect(res.hasWriteConcernError, isFalse);
+        expect(res.nInserted, 0);
+        expect(res.operationSucceeded, isTrue);
+        expect(res.writeCommandType, WriteCommandType.delete);
+        expect(res.nUpserted, 0);
+        expect(res.nModified, 0);
+        expect(res.nMatched, 0);
+        expect(res.nRemoved, 1);
+
+        var findResult = await collection.find({'status': 'D'}).toList();
+        expect(findResult.length, 12);
+        expect(findResult.first['item'], 'tst24');
+      }, skip: cannotRunTests);
+
+      test('DeleteOne - first - collection helper', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.insertMany([
+          {'_id': 3, 'name': 'John', 'age': 32},
+          {'_id': 4, 'name': 'Mira', 'age': 27},
+          {'_id': 7, 'name': 'Luis', 'age': 42},
+        ]);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var res = await collection.deleteOne(<String, Object>{});
+        expect(res.hasWriteErrors, isFalse);
+        expect(res.hasWriteConcernError, isFalse);
+        expect(res.nInserted, 0);
+        expect(res.operationSucceeded, isTrue);
+        expect(res.writeCommandType, WriteCommandType.delete);
+        expect(res.nUpserted, 0);
+        expect(res.nModified, 0);
+        expect(res.nMatched, 0);
+        expect(res.nRemoved, 1);
+
+        var findResult = await collection.find().toList();
+        expect(findResult.length, 2);
+        expect(findResult.first['name'], 'Mira');
+      }, skip: cannotRunTests);
+
+      test('DeleteOne - selected - collection helper', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.insertMany([
+          {'_id': 3, 'name': 'John', 'age': 32},
+          {'_id': 4, 'name': 'Mira', 'age': 27},
+          {'_id': 7, 'name': 'Luis', 'age': 42},
+        ]);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var res = await collection.deleteOne(<String, Object>{key_id: 7});
+
+        expect(res.hasWriteErrors, isFalse);
+        expect(res.hasWriteConcernError, isFalse);
+        expect(res.nInserted, 0);
+        expect(res.operationSucceeded, isTrue);
+        expect(res.writeCommandType, WriteCommandType.delete);
+        expect(res.nUpserted, 0);
+        expect(res.nModified, 0);
+        expect(res.nMatched, 0);
+        expect(res.nRemoved, 1);
+
+        var findResult = await collection.find().toList();
+        expect(findResult.length, 2);
+        expect(findResult.last['name'], 'Mira');
+      }, skip: cannotRunTests);
+
+      test('DeleteOne - orders - collection helper', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertOrders(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var res = await collection.deleteOne(<String, Object>{'status': 'D'});
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -346,7 +426,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteManyOperation(collection, DeleteManyRequest({key_Id: 7}));
+            DeleteManyOperation(collection, DeleteManyRequest({key_id: 7}));
         var res = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -444,6 +524,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteMany - hint', () async {
+        if (cannotRunTests || !running4_4orGreater) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -476,7 +559,173 @@ void main() async {
 
         var findResult = await collection.find().toList();
         expect(findResult.length, 3);
-      }, skip: cannotRunTests || !running4_4orGreater);
+      });
+
+      test('DeleteMany - all - collection helper', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.insertMany([
+          {'_id': 3, 'name': 'John', 'age': 32},
+          {'_id': 4, 'name': 'Mira', 'age': 27},
+          {'_id': 7, 'name': 'Luis', 'age': 42},
+        ]);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var res = await collection.deleteMany(<String, Object>{});
+        expect(res.hasWriteErrors, isFalse);
+        expect(res.hasWriteConcernError, isFalse);
+        expect(res.nInserted, 0);
+        expect(res.operationSucceeded, isTrue);
+        expect(res.writeCommandType, WriteCommandType.delete);
+        expect(res.nUpserted, 0);
+        expect(res.nModified, 0);
+        expect(res.nMatched, 0);
+        expect(res.nRemoved, 3);
+
+        var findResult = await collection.find().toList();
+        expect(findResult.length, 0);
+      }, skip: cannotRunTests);
+
+      test('DeleteMany - selected - collection helper', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.insertMany([
+          {'_id': 3, 'name': 'John', 'age': 32},
+          {'_id': 4, 'name': 'Mira', 'age': 27},
+          {'_id': 7, 'name': 'Luis', 'age': 42},
+        ]);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var res = await collection.deleteMany(<String, Object>{key_id: 7});
+
+        expect(res.hasWriteErrors, isFalse);
+        expect(res.hasWriteConcernError, isFalse);
+        expect(res.nInserted, 0);
+        expect(res.operationSucceeded, isTrue);
+        expect(res.writeCommandType, WriteCommandType.delete);
+        expect(res.nUpserted, 0);
+        expect(res.nModified, 0);
+        expect(res.nMatched, 0);
+        expect(res.nRemoved, 1);
+
+        var findResult = await collection.find().toList();
+        expect(findResult.length, 2);
+        expect(findResult.last['name'], 'Mira');
+      }, skip: cannotRunTests);
+
+      test('DeleteMany - orders - collection helper', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertOrders(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var res = await collection.deleteMany(<String, Object>{'status': 'D'});
+
+        expect(res.hasWriteErrors, isFalse);
+        expect(res.hasWriteConcernError, isFalse);
+        expect(res.nInserted, 0);
+        expect(res.operationSucceeded, isTrue);
+        expect(res.writeCommandType, WriteCommandType.delete);
+        expect(res.nUpserted, 0);
+        expect(res.nModified, 0);
+        expect(res.nMatched, 0);
+        expect(res.nRemoved, 13);
+
+        var findResult = await collection.find({'status': 'D'}).toList();
+        expect(findResult.length, 0);
+      }, skip: cannotRunTests);
+
+      test('DeleteMany - all orders - collection helper ', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertOrders(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var res = await collection.deleteMany(<String, Object>{},
+            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+
+        expect(res.hasWriteErrors, isFalse);
+        expect(res.hasWriteConcernError, isFalse);
+        expect(res.nInserted, 0);
+        expect(res.operationSucceeded, isTrue);
+        expect(res.writeCommandType, WriteCommandType.delete);
+        expect(res.nUpserted, 0);
+        expect(res.nModified, 0);
+        expect(res.nMatched, 0);
+        expect(res.nRemoved, 35);
+
+        var findResult = await collection.find(<String, Object>{}).toList();
+        expect(findResult.length, 0);
+      }, skip: cannotRunTests);
+
+      test('DeleteMany - collation - collection helper', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertFrenchCafe(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var res = await collection.deleteMany(
+            <String, Object>{'category': 'cafe', 'status': 'a'},
+            collation: CollationOptions('fr', strength: 1));
+
+        expect(res.hasWriteErrors, isFalse);
+        expect(res.hasWriteConcernError, isFalse);
+        expect(res.nInserted, 0);
+        expect(res.operationSucceeded, isTrue);
+        expect(res.writeCommandType, WriteCommandType.delete);
+        expect(res.nUpserted, 0);
+        expect(res.nModified, 0);
+        expect(res.nMatched, 0);
+        expect(res.nRemoved, 3);
+
+        var findResult = await collection.find().toList();
+        expect(findResult.length, 0);
+      }, skip: cannotRunTests);
+
+      test('DeleteMany - hint - collection helper', () async {
+        if (cannotRunTests || !running4_4orGreater) {
+          return;
+        }
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertMembers(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        await collection.createIndex(keys: {'status': 1});
+        await collection.createIndex(keys: {'points': 1});
+
+        var res = await collection.deleteMany(<String, Object>{
+          'points': {r'$lte': 20},
+          'status': 'P'
+        }, hintDocument: {
+          'status': 1
+        });
+
+        expect(res.hasWriteErrors, isFalse);
+        expect(res.hasWriteConcernError, isFalse);
+        expect(res.nInserted, 0);
+        expect(res.operationSucceeded, isTrue);
+        expect(res.writeCommandType, WriteCommandType.delete);
+        expect(res.nUpserted, 0);
+        expect(res.nModified, 0);
+        expect(res.nMatched, 0);
+        expect(res.nRemoved, 3);
+
+        var findResult = await collection.find().toList();
+        expect(findResult.length, 3);
+      });
     });
   });
   tearDownAll(() async {

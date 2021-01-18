@@ -48,9 +48,9 @@ Future testCreatePayload0FromBuffer() async {
 
 Future testCreatePayload1FromDocument() async {
   var data = <Map<String, Object>>[
-    {key_Id: 'Document#1', 'example': 1},
-    {key_Id: 'Document#2', 'example': 2},
-    {key_Id: 'Document#3', 'example': 3}
+    {key_id: 'Document#1', 'example': 1},
+    {key_id: 'Document#2', 'example': 2},
+    {key_id: 'Document#3', 'example': 3}
   ];
   var payload1 = Payload1('documents', data);
 
@@ -70,9 +70,9 @@ Future testCreatePayload1FromDocument() async {
 
 Future testCreatePayload1FromBuffer() async {
   var data = <Map<String, Object>>[
-    {key_Id: 'Document#1', 'example': 1},
-    {key_Id: 'Document#2', 'example': 2},
-    {key_Id: 'Document#3', 'example': 3}
+    {key_id: 'Document#1', 'example': 1},
+    {key_id: 'Document#2', 'example': 2},
+    {key_id: 'Document#3', 'example': 3}
   ];
   var check = Payload1('documents', data);
   var buffer = BsonBinary.fromHexString(
@@ -135,9 +135,9 @@ Future testCreateSectionType0FromBuffer() async {
 Future testCreateSectionType1FromDocument() async {
   var data = <String, Object>{
     'documents': [
-      {key_Id: 'Document#1', 'example': 1},
-      {key_Id: 'Document#2', 'example': 2},
-      {key_Id: 'Document#3', 'example': 3}
+      {key_id: 'Document#1', 'example': 1},
+      {key_id: 'Document#2', 'example': 2},
+      {key_id: 'Document#3', 'example': 3}
     ]
   };
   var section = Section(MongoModernMessage.documentsPayloadType, data);
@@ -159,9 +159,9 @@ Future testCreateSectionType1FromDocument() async {
 Future testCreateSectionType1FromBuffer() async {
   var data = <String, Object>{
     'documents': [
-      {key_Id: 'Document#1', 'example': 1},
-      {key_Id: 'Document#2', 'example': 2},
-      {key_Id: 'Document#3', 'example': 3}
+      {key_id: 'Document#1', 'example': 1},
+      {key_id: 'Document#2', 'example': 2},
+      {key_id: 'Document#3', 'example': 3}
     ]
   };
   var check = Section(MongoModernMessage.documentsPayloadType, data);
