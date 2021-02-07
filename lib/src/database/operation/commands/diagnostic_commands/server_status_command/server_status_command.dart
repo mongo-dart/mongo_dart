@@ -1,6 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/database/operation/base/command_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/administration_commands/get_parameter_command/get_parameter_command.dart';
+import 'package:mongo_dart/src/database/operation/commands/base/command_operation.dart';
 import 'server_status_options.dart';
 import 'server_status_result.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';

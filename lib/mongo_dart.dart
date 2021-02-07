@@ -19,6 +19,9 @@ import 'package:mongo_dart/src/database/info/server_status.dart';
 import 'package:mongo_dart/src/database/message/additional/section.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/database/message/mongo_response_message.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_options.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_result.dart';
 import 'package:mongo_dart/src/database/operation/operation.dart';
 import 'package:mongo_dart/src/database/utils/dns_lookup.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
@@ -28,7 +31,7 @@ import 'package:pool/pool.dart';
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_aggregation.dart';
-export 'package:mongo_dart_query/mongo_dart_query.dart';
+export 'package:mongo_dart_query/mongo_dart_query.dart' hide keyQuery;
 export 'package:mongo_dart/src/database/operation/operation.dart';
 export 'package:mongo_dart/src/database/utils/map_keys.dart';
 

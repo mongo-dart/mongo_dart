@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart' show Connection, Db, DbCollection;
-import 'package:mongo_dart/src/database/operation/base/command_operation.dart';
-import 'package:mongo_dart/src/database/operation/base/operation_base.dart';
+import 'package:mongo_dart/src/database/operation/commands/base/command_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 import 'create_index_options.dart';

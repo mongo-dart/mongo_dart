@@ -1,6 +1,6 @@
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
-import '../../../../mongo_dart.dart';
+import '../../../../../mongo_dart.dart';
 
 enum Aspect {
   readOperation,

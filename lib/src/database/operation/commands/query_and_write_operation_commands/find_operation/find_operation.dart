@@ -1,9 +1,9 @@
 import 'package:mongo_dart/mongo_dart.dart' show DbCollection, MongoDartError;
-import 'package:mongo_dart/src/database/operation/base/operation_base.dart';
+import 'package:mongo_dart/src/database/operation/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 import 'find_options.dart';
-import '../../../base/command_operation.dart';
+import '../../base/command_operation.dart';
 import 'find_result.dart';
 
 class FindOperation extends CommandOperation {

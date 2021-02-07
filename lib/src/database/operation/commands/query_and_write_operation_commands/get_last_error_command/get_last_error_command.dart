@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart'
     show Db, MongoDartError, WriteConcern;
-import 'package:mongo_dart/src/database/operation/base/command_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/base/command_operation.dart';
 import 'get_last_error_options.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 

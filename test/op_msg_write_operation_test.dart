@@ -1,5 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_options.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_operation.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_options.dart';
@@ -725,6 +727,831 @@ void main() async {
 
         var findResult = await collection.find().toList();
         expect(findResult.length, 3);
+      });
+    });
+
+    group('Find and Modify', () {
+      test('Update and Return', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var famOperation =
+            FindAndModifyOperation(collection, query: <String, dynamic>{
+          'name': 'Tom',
+          'state': 'active',
+          'rating': {r'$gt': 10}
+        }, sort: <String, dynamic>{
+          'rating': 1
+        }, update: <String, dynamic>{
+          r'$inc': {'score': 1}
+        });
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['name'], 'Tom');
+        expect(res.value['score'], 5);
+      });
+      test('Update and Return new', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'name': 'Tom',
+              'state': 'active',
+              'rating': {r'$gt': 10}
+            },
+            sort: <String, dynamic>{'rating': 1},
+            update: <String, dynamic>{
+              r'$inc': {'score': 1}
+            },
+            returnNew: true);
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['name'], 'Tom');
+        expect(res.value['score'], 6);
+      });
+      test('No update', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'name': 'Tim',
+              'state': 'active',
+              'rating': {r'$gt': 10}
+            },
+            sort: <String, dynamic>{'rating': 1},
+            update: <String, dynamic>{
+              r'$inc': {'score': 1}
+            },
+            returnNew: true);
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isFalse);
+        expect(res.lastErrorObject.n, 0);
+        expect(res.value, isNull);
+      });
+      test('Upsert true', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'name': 'Gus',
+              'state': 'active',
+              'rating': 100
+            },
+            sort: <String, dynamic>{'rating': 1},
+            update: <String, dynamic>{
+              r'$inc': {'score': 1}
+            },
+            upsert: true);
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isFalse);
+        expect(res.lastErrorObject.upserted, TypeMatcher<ObjectId>());
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNull);
+      });
+      test('Upsert true - returnNew true', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'name': 'Gus',
+              'state': 'active',
+              'rating': 100
+            },
+            sort: <String, dynamic>{'rating': 1},
+            update: <String, dynamic>{
+              r'$inc': {'score': 1}
+            },
+            upsert: true,
+            returnNew: true);
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isFalse);
+        expect(res.lastErrorObject.upserted, TypeMatcher<ObjectId>());
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['name'], 'Gus');
+        expect(res.value['score'], 1);
+        expect(res.value['_id'], res.lastErrorObject.upserted);
+      });
+
+      test('Upsert true ignored - returnNew true', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        await collection.insertOne(<String, dynamic>{
+          'name': 'Gus',
+          'state': 'active',
+          'rating': 100,
+          'score': 15
+        });
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'name': 'Gus',
+              'state': 'active',
+              'rating': 100
+            },
+            sort: <String, dynamic>{'rating': 1},
+            update: <String, dynamic>{
+              r'$inc': {'score': 1}
+            },
+            upsert: true,
+            returnNew: true);
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.upserted, isNull);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['name'], 'Gus');
+        expect(res.value['score'], 16);
+      });
+
+      test('Remove', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'state': 'active',
+            },
+            sort: <String, dynamic>{'rating': 1},
+            remove: true);
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isFalse);
+        expect(res.lastErrorObject.upserted, isNull);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['name'], 'George');
+        expect(res.value['score'], 8);
+        expect(res.value['_id'], 4);
+      });
+      test('Collation', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertFrenchCafe(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'category': 'cafe',
+              'status': 'a',
+            },
+            sort: <String, dynamic>{'category': 1},
+            update: <String, dynamic>{
+              r'$set': {'status': 'updated'}
+            },
+            findAndModifyOptions: FindAndModifyOptions(
+                collation: CollationOptions('fr', strength: 1)));
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['category'], 'café');
+        expect(res.value['status'], 'A');
+      });
+
+      test('Array Filters', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.insertMany([
+          {
+            '_id': 1,
+            'grades': [95, 92, 90]
+          },
+          {
+            '_id': 2,
+            'grades': [98, 100, 102]
+          },
+          {
+            '_id': 3,
+            'grades': [95, 110, 100]
+          }
+        ]);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'grades': {r'$gte': 100}
+            },
+            update: <String, dynamic>{
+              r'$set': {r'grades.$[element]': 100}
+            },
+            returnNew: true,
+            arrayFilters: [
+              {
+                'element': {r'$gte': 100}
+              }
+            ]);
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['grades'].last, 100);
+        expect(res.value['_id'], 2);
+      });
+
+      test('Array Filters on a specific element', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.insertMany([
+          {
+            '_id': 1,
+            'grades': [
+              {'grade': 80, 'mean': 75, 'std': 6},
+              {'grade': 85, 'mean': 90, 'std': 4},
+              {'grade': 85, 'mean': 85, 'std': 6}
+            ]
+          },
+          {
+            '_id': 2,
+            'grades': [
+              {'grade': 90, 'mean': 75, 'std': 6},
+              {'grade': 87, 'mean': 90, 'std': 3},
+              {'grade': 85, 'mean': 85, 'std': 4}
+            ]
+          }
+        ]);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{'_id': 1},
+            update: <String, dynamic>{
+              r'$set': {r'grades.$[element].mean': 100}
+            },
+            returnNew: true,
+            arrayFilters: [
+              {
+                'element.grade': {r'$gte': 85}
+              }
+            ]);
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['grades'].last['mean'], 100);
+        expect(res.value['_id'], 1);
+      });
+      test('Aggregation Pipeline', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.insertMany([
+          {
+            '_id': 1,
+            'grades': [
+              {'grade': 80, 'mean': 75, 'std': 6},
+              {'grade': 85, 'mean': 90, 'std': 4},
+              {'grade': 85, 'mean': 85, 'std': 6}
+            ]
+          },
+          {
+            '_id': 2,
+            'grades': [
+              {'grade': 90, 'mean': 75, 'std': 6},
+              {'grade': 87, 'mean': 90, 'std': 3},
+              {'grade': 85, 'mean': 85, 'std': 4}
+            ]
+          }
+        ]);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{'_id': 1},
+            update: [
+              <String, dynamic>{
+                r'$set': {
+                  r'total': {r'$sum': r'$grades.grade'}
+                }
+              }
+            ],
+            returnNew: true);
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.upserted, isNull);
+
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['total'], 250);
+        expect(res.value['_id'], 1);
+      });
+
+      test('Specify Hint', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertMembers(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        await collection.createIndex(keys: {'status': 1});
+        await collection.createIndex(key: 'points');
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'points': {r'$lte': 20},
+              'status': 'P'
+            },
+            remove: true,
+            hintDocument: {'status': 1});
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject.updatedExisting, isFalse);
+        expect(res.lastErrorObject.upserted, isNull);
+
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['member'], 'abc123');
+        expect(res.value['_id'], 1);
+      });
+    });
+    group('Find and Modify - Collection Helper', () {
+      test('Update and Return', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var res = await collection.modernFindAndModify(
+            query: where
+                .eq('name', 'Tom')
+                .eq('state', 'active')
+                .eq('rating', {r'$gt': 10}),
+            sort: <String, dynamic>{'rating': 1},
+            update: ModifierBuilder().inc('score', 1));
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['name'], 'Tom');
+        expect(res.value['score'], 5);
+      });
+      test('Update and Return new', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var res = await collection.modernFindAndModify(
+            query: where
+                .eq('name', 'Tom')
+                .eq('state', 'active')
+                .eq('rating', {r'$gt': 10}),
+            sort: <String, dynamic>{'rating': 1},
+            update: ModifierBuilder().inc('score', 1),
+            returnNew: true);
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['name'], 'Tom');
+        expect(res.value['score'], 6);
+      });
+      test('No update', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        var res = await collection.modernFindAndModify(
+            query: where
+                .eq('name', 'Tim')
+                .eq('state', 'active')
+                .eq('rating', {r'$gt': 10}),
+            sort: <String, dynamic>{'rating': 1},
+            update: ModifierBuilder().inc('score', 1),
+            returnNew: true);
+
+        expect(res.lastErrorObject.updatedExisting, isFalse);
+        expect(res.lastErrorObject.n, 0);
+        expect(res.value, isNull);
+      });
+
+      test('Upsert true', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        /*    var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'name': 'Gus',
+              'state': 'active',
+              'rating': 100
+            },
+            sort: <String, dynamic>{'rating': 1},
+            update: <String, dynamic>{
+              r'$inc': {'score': 1}
+            },
+            upsert: true);
+        var res = await famOperation.executeDocument(); */
+        var res = await collection.modernFindAndModify(
+            query:
+                where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
+            sort: <String, dynamic>{'rating': 1},
+            update: ModifierBuilder().inc('score', 1),
+            upsert: true);
+
+        expect(res.lastErrorObject.updatedExisting, isFalse);
+        expect(res.lastErrorObject.upserted, TypeMatcher<ObjectId>());
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNull);
+      });
+      test('Upsert true - returnNew true', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        /* var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'name': 'Gus',
+              'state': 'active',
+              'rating': 100
+            },
+            sort: <String, dynamic>{'rating': 1},
+            update: <String, dynamic>{
+              r'$inc': {'score': 1}
+            },
+            upsert: true,
+            returnNew: true);
+        var res = await famOperation.executeDocument(); */
+        var res = await collection.modernFindAndModify(
+            query:
+                where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
+            sort: <String, dynamic>{'rating': 1},
+            update: ModifierBuilder().inc('score', 1),
+            upsert: true,
+            returnNew: true);
+
+        expect(res.lastErrorObject.updatedExisting, isFalse);
+        expect(res.lastErrorObject.upserted, TypeMatcher<ObjectId>());
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['name'], 'Gus');
+        expect(res.value['score'], 1);
+        expect(res.value['_id'], res.lastErrorObject.upserted);
+      });
+
+      test('Upsert true ignored - returnNew true', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        await collection.insertOne(<String, dynamic>{
+          'name': 'Gus',
+          'state': 'active',
+          'rating': 100,
+          'score': 15
+        });
+
+        /*   var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'name': 'Gus',
+              'state': 'active',
+              'rating': 100
+            },
+            sort: <String, dynamic>{'rating': 1},
+            update: <String, dynamic>{
+              r'$inc': {'score': 1}
+            },
+            upsert: true,
+            returnNew: true);
+        var res = await famOperation.executeDocument(); */
+        var res = await collection.modernFindAndModify(
+            query:
+                where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
+            sort: <String, dynamic>{'rating': 1},
+            update: ModifierBuilder().inc('score', 1),
+            upsert: true,
+            returnNew: true);
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.upserted, isNull);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['name'], 'Gus');
+        expect(res.value['score'], 16);
+      });
+
+      test('Remove', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertPeople(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        /*  var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'state': 'active',
+            },
+            sort: <String, dynamic>{'rating': 1},
+            remove: true);
+        var res = await famOperation.executeDocument(); */
+        var res = await collection.modernFindAndModify(
+            query: where.eq('state', 'active'),
+            sort: <String, dynamic>{'rating': 1},
+            remove: true);
+
+        expect(res.lastErrorObject.updatedExisting, isFalse);
+        expect(res.lastErrorObject.upserted, isNull);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['name'], 'George');
+        expect(res.value['score'], 8);
+        expect(res.value['_id'], 4);
+      });
+      test('Collation', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertFrenchCafe(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+       /*  var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'category': 'cafe',
+              'status': 'a',
+            },
+            sort: <String, dynamic>{'category': 1},
+            update: <String, dynamic>{
+              r'$set': {'status': 'updated'}
+            },
+            findAndModifyOptions: FindAndModifyOptions(
+                collation: CollationOptions('fr', strength: 1)));
+        var res = await famOperation.executeDocument();
+ */
+        var res = await collection.modernFindAndModify(
+            query: where.eq('category', 'cafe').eq('status', 'a'),
+            sort: <String, dynamic>{'category': 1},
+            update: ModifierBuilder().set('status', 'updated'),
+            findAndModifyOptions: FindAndModifyOptions(
+                collation: CollationOptions('fr', strength: 1)));
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['category'], 'café');
+        expect(res.value['status'], 'A');
+      });
+
+      test('Array Filters', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.insertMany([
+          {
+            '_id': 1,
+            'grades': [95, 92, 90]
+          },
+          {
+            '_id': 2,
+            'grades': [98, 100, 102]
+          },
+          {
+            '_id': 3,
+            'grades': [95, 110, 100]
+          }
+        ]);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+       /*  var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'grades': {r'$gte': 100}
+            },
+            update: <String, dynamic>{
+              r'$set': {r'grades.$[element]': 100}
+            },
+            returnNew: true,
+            arrayFilters: [
+              {
+                'element': {r'$gte': 100}
+              }
+            ]);
+        var res = await famOperation.executeDocument(); */
+         var res = await collection.modernFindAndModify(
+            query: where.gte('grades',100),
+            update: ModifierBuilder().set(r'grades.$[element]', 100),
+            returnNew: true,
+            arrayFilters: [
+              {
+                'element': {r'$gte': 100}
+              }
+            ]);
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['grades'].last, 100);
+        expect(res.value['_id'], 2);
+      });
+
+      test('Array Filters on a specific element', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.insertMany([
+          {
+            '_id': 1,
+            'grades': [
+              {'grade': 80, 'mean': 75, 'std': 6},
+              {'grade': 85, 'mean': 90, 'std': 4},
+              {'grade': 85, 'mean': 85, 'std': 6}
+            ]
+          },
+          {
+            '_id': 2,
+            'grades': [
+              {'grade': 90, 'mean': 75, 'std': 6},
+              {'grade': 87, 'mean': 90, 'std': 3},
+              {'grade': 85, 'mean': 85, 'std': 4}
+            ]
+          }
+        ]);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        /* var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{'_id': 1},
+            update: <String, dynamic>{
+              r'$set': {r'grades.$[element].mean': 100}
+            },
+            returnNew: true,
+            arrayFilters: [
+              {
+                'element.grade': {r'$gte': 85}
+              }
+            ]);
+        var res = await famOperation.executeDocument(); */
+        var res = await collection.modernFindAndModify(
+            query: where.eq('_id',1),
+            update: ModifierBuilder().set(r'grades.$[element].mean', 100),
+            returnNew: true,
+            arrayFilters: [
+              {
+                'element.grade': {r'$gte': 85}
+              }
+            ]);
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['grades'].last['mean'], 100);
+        expect(res.value['_id'], 1);
+      });
+      test('Aggregation Pipeline', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.insertMany([
+          {
+            '_id': 1,
+            'grades': [
+              {'grade': 80, 'mean': 75, 'std': 6},
+              {'grade': 85, 'mean': 90, 'std': 4},
+              {'grade': 85, 'mean': 85, 'std': 6}
+            ]
+          },
+          {
+            '_id': 2,
+            'grades': [
+              {'grade': 90, 'mean': 75, 'std': 6},
+              {'grade': 87, 'mean': 90, 'std': 3},
+              {'grade': 85, 'mean': 85, 'std': 4}
+            ]
+          }
+        ]);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+      /*   var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{'_id': 1},
+            update: [
+              <String, dynamic>{
+                r'$set': {
+                  r'total': {r'$sum': r'$grades.grade'}
+                }
+              }
+            ],
+            returnNew: true);
+        var res = await famOperation.executeDocument(); */
+         var res = await collection.modernFindAndModify(
+            query: where.eq('_id',1),
+            update: AggregationPipelineBuilder().addStage(AddFields({
+                  r'total': {r'$sum': r'$grades.grade'}
+                })).build(),
+            returnNew: true,
+            );
+
+        expect(res.lastErrorObject.updatedExisting, isTrue);
+        expect(res.lastErrorObject.upserted, isNull);
+
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['total'], 250);
+        expect(res.value['_id'], 1);
+      });
+
+      test('Specify Hint', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await insertMembers(collection);
+        expect(ret.ok, 1.0);
+        expect(ret.isSuccess, isTrue);
+
+        await collection.createIndex(keys: {'status': 1});
+        await collection.createIndex(key: 'points');
+
+       /*  var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              'points': {r'$lte': 20},
+              'status': 'P'
+            },
+            remove: true,
+            hintDocument: {'status': 1});
+        var res = await famOperation.executeDocument(); */
+          var res = await collection.modernFindAndModify(
+            query: where.lte('points',20).eq('status', 'P'),
+            remove: true,
+            hintDocument: {'status': 1}
+            );
+
+        expect(res.lastErrorObject.updatedExisting, isFalse);
+        expect(res.lastErrorObject.upserted, isNull);
+
+        expect(res.lastErrorObject.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value['member'], 'abc123');
+        expect(res.value['_id'], 1);
       });
     });
   });

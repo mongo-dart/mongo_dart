@@ -1,7 +1,7 @@
 import 'package:bson/bson.dart';
 import 'package:mongo_dart/mongo_dart.dart'
     show Db, DbCollection, MongoDartError;
-import 'package:mongo_dart/src/database/operation/base/command_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/base/command_operation.dart';
 import 'get_more_options.dart';
 import 'get_more_result.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';

@@ -1,10 +1,10 @@
 import 'package:mongo_dart/mongo_dart.dart'
     show AggregationPipelineBuilder, Db, DbCollection, MongoDartError;
-import 'package:mongo_dart/src/database/operation/base/operation_base.dart';
+import 'package:mongo_dart/src/database/operation/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 import 'aggregate_options.dart';
-import '../../../base/command_operation.dart';
+import '../../base/command_operation.dart';
 import 'aggregate_result.dart';
 
 /// Collection is the collection on which the operation is performed

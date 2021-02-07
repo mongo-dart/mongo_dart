@@ -111,6 +111,20 @@ Future<BulkWriteResult> insertMembers(DbCollection collection) async {
   return collection.insertMany(toInsert);
 }
 
+Future<BulkWriteResult> insertPeople(DbCollection collection) async {
+  var toInsert = <Map<String, dynamic>>[
+    {'_id': 1, 'name': 'Tom', 'state': 'active', 'rating': 100, 'score': 5},
+    {'_id': 2, 'name': 'William', 'state': 'busy', 'rating': 80, 'score': 4},
+    {'_id': 3, 'name': 'Liz', 'state': 'on hold', 'rating': 70, 'score': 8},
+    {'_id': 4, 'name': 'George', 'state': 'active', 'rating': 95, 'score': 8},
+    {'_id': 5, 'name': 'Jim', 'state': 'idle', 'rating': 40, 'score': 3},
+    {'_id': 6, 'name': 'Laureen', 'state': 'busy', 'rating': 87, 'score': 8},
+    {'_id': 7, 'name': 'John', 'state': 'idle', 'rating': 72, 'score': 7}
+  ];
+
+  return collection.insertMany(toInsert);
+}
+
 Future<BulkWriteResult> insertManyDocuments(
     DbCollection collection, int numberOfRecords) async {
   var toInsert = <Map<String, dynamic>>[];

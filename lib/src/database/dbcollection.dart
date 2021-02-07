@@ -379,6 +379,39 @@ class DbCollection {
     return deleteOperation.executeDocument();
   }
 
+  Future<FindAndModifyResult> modernFindAndModify(
+      {query,
+      sort,
+      bool remove,
+      update,
+      bool returnNew,
+      fields,
+      bool upsert,
+      List arrayFilters,
+      String hint,
+      Map<String, Object> hintDocument,
+      FindAndModifyOptions findAndModifyOptions,
+      Map<String, Object> rawOptions}) async {
+    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError('This method is not available before release 3.6');
+    }
+
+    var famOperation = FindAndModifyOperation(this,
+        query: _queryBuilder2Map(query),
+        sort: _sortBuilder2Map(sort),
+        remove: remove,
+        update: update is List ? update : _updateBuilder2Map(update),
+        returnNew: returnNew,
+        fields: _fieldsBuilder2Map(fields),
+        upsert: upsert,
+        arrayFilters: arrayFilters,
+        hint: hint,
+        hintDocument: hintDocument,
+        findAndModifyOptions: findAndModifyOptions,
+        rawOptions: rawOptions);
+    return famOperation.executeDocument();
+  }
+
   // Find operation with the new OP_MSG (starting from release 3.6)
   Stream<Map<String, dynamic>> modernFind(
       {SelectorBuilder selector,

@@ -63,8 +63,7 @@ void main() async {
 
       test("Can't connect with mongodb-cr on a db without that scheme",
           () async {
-        var db =
-            Db('$mongoDbUri/?authMechanism=${MongoDbCRAuthenticator.name}');
+        var db = Db('$mongoDbUri?authMechanism=${MongoDbCRAuthenticator.name}');
 
         var expectedError = {
           'ok': 0.0,
@@ -82,6 +81,43 @@ void main() async {
         var err;
 
         try {
+          await db.open();
+        } catch (e) {
+          err = e;
+        }
+
+        var result = ((err['ok'] == expectedError['ok']) &&
+                (err['errmsg'] == expectedError['errmsg']) &&
+                (err['code'] == expectedError['code']) &&
+                (err['codeName'] == expectedError['codeName'])) ||
+            ((err['ok'] == expectedError2['ok']) &&
+                (err['errmsg'] == expectedError2['errmsg']) &&
+                (err['code'] == expectedError2['code']) &&
+                (err['codeName'] == expectedError2['codeName']));
+
+        expect(result, true);
+      });
+      
+      test('Setting mongodb-cr with selectAuthenticationMechanisn', () async {
+        var db = Db('$mongoDbUri');
+
+        var expectedError = {
+          'ok': 0.0,
+          'errmsg': 'auth failed',
+          'code': 18,
+          'codeName': 'AuthenticationFailed',
+        };
+        var expectedError2 = {
+          'ok': 0.0,
+          'errmsg': 'Auth mechanism not specified',
+          'code': 2,
+          'codeName': 'BadValue',
+        };
+
+        var err;
+
+        try {
+          db.selectAuthenticationMechanism('MONGODB-CR');
           await db.open();
         } catch (e) {
           err = e;

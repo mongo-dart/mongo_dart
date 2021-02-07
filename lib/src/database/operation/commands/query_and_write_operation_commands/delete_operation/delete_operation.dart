@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart' show DbCollection;
-import 'package:mongo_dart/src/database/operation/base/command_operation.dart';
-import 'package:mongo_dart/src/database/operation/base/operation_base.dart';
+import 'package:mongo_dart/src/database/operation/commands/base/command_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/delete_operation/delete_request.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 

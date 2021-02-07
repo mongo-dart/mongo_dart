@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'package:bson/bson.dart' show BsonLong;
 
-import 'package:mongo_dart/src/database/operation/base/command_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/database/operation/commands/administration_commands/kill_cursors_command/kill_cursors_command.dart';
 import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/aggregate/return_classes/change_event.dart';
 import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/wrapper/change_stream/change_stream_handler.dart';

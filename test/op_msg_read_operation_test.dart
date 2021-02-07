@@ -357,7 +357,6 @@ void main() async {
           fields: {'total': Sum(Field('cost')), 'avg': Avg(Field('cost'))}));
 
       var result = await collection.modernAggregate(pipeline).toList();
-      print(result);
       expect(result.first[key_id], 'games');
       expect(result.first['avg'], Rational.fromInt(15));
       expect(result.first['total'], Rational.fromInt(45));
