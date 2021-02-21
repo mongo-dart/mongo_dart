@@ -18,11 +18,25 @@ export 'commands/query_and_write_operation_commands/wrapper/bulk/ordered_bulk.da
 export 'commands/query_and_write_operation_commands/wrapper/bulk/unordered_bulk.dart';
 export 'commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_operation.dart';
 export 'commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_options.dart';
-export 'commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_request.dart';
+export 'commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_statement.dart';
 export 'commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_operation.dart';
 export 'commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_options.dart';
-export 'commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_request.dart';
+export 'commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_statement.dart';
+export 'commands/query_and_write_operation_commands/wrapper/update_many/update_many_operation.dart';
+export 'commands/query_and_write_operation_commands/wrapper/update_many/update_many_options.dart';
+export 'commands/query_and_write_operation_commands/wrapper/update_many/update_many_statement.dart';
+export 'commands/query_and_write_operation_commands/wrapper/update_one/update_one_operation.dart';
+export 'commands/query_and_write_operation_commands/wrapper/update_one/update_one_options.dart';
+export 'commands/query_and_write_operation_commands/wrapper/update_one/update_one_statement.dart';
+export 'commands/query_and_write_operation_commands/wrapper/replace_one/replace_one_operation.dart';
+export 'commands/query_and_write_operation_commands/wrapper/replace_one/replace_one_options.dart';
+export 'commands/query_and_write_operation_commands/wrapper/replace_one/replace_one_statement.dart';
 export 'commands/query_and_write_operation_commands/wrapper/insert_many/insert_many_options.dart';
+
+export 'commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_operation.dart';
+export 'commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_options.dart';
+export 'commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_result.dart';
+
 export 'parameters/collation_options.dart';
 export 'parameters/read_preference.dart';
 export 'commands/administration_commands/create_index_operation/create_index_operation.dart';

@@ -19,10 +19,12 @@ class UnorderedBulk extends Bulk {
 
   Map<String, Object> insertCommand = <String, Object>{};
   Map<String, Object> deleteCommand = <String, Object>{};
+  Map<String, Object> updateCommand = <String, Object>{};
 
   @override
   List<Map<String, Object>> getBulkCommands() => [
         if (insertCommand.isNotEmpty) ...splitCommands(insertCommand),
+        if (updateCommand.isNotEmpty) ...splitCommands(updateCommand),
         if (deleteCommand.isNotEmpty) ...splitCommands(deleteCommand)
       ];
 
@@ -36,14 +38,21 @@ class UnorderedBulk extends Bulk {
           insertCommand = command;
           return;
         }
-        lastCommandValues = insertCommand.values.last;
+        lastCommandValues = insertCommand.values.toList()[1];
         break;
       case keyDelete:
         if (deleteCommand.isEmpty) {
           deleteCommand = command;
           return;
         }
-        lastCommandValues = deleteCommand.values.last;
+        lastCommandValues = deleteCommand.values.toList()[1];
+        break;
+      case keyUpdate:
+        if (updateCommand.isEmpty) {
+          updateCommand = command;
+          return;
+        }
+        lastCommandValues = updateCommand.values.toList()[1];
         break;
     }
     var commandValue = command.values.last;

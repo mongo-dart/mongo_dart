@@ -20,7 +20,7 @@ class DbCollection {
       }
     }
     if (id != null) {
-      return update({'_id': id}, document,
+      return legacyUpdate({'_id': id}, document,
           upsert: true, writeConcern: writeConcern);
     } else {
       if (createId) {
@@ -40,6 +40,21 @@ class DbCollection {
   }
 
   Future<Map<String, dynamic>> update(selector, document,
+      {bool upsert = false,
+      bool multiUpdate = false,
+      WriteConcern writeConcern}) {
+    if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
+      return modernUpdate(selector, document,
+          upsert: upsert,
+          multi: multiUpdate,
+          writeConcern: writeConcern,
+          modernReply: false);
+    }
+    return legacyUpdate(selector, document,
+        upsert: upsert, multiUpdate: multiUpdate, writeConcern: writeConcern);
+  }
+
+  Future<Map<String, dynamic>> legacyUpdate(selector, document,
       {bool upsert = false,
       bool multiUpdate = false,
       WriteConcern writeConcern}) {
@@ -188,6 +203,68 @@ class DbCollection {
     }
   }
 
+  Map<String, dynamic> _setKeys(String key, Map<String, dynamic> keys) {
+    if (key != null && keys != null) {
+      throw ArgumentError('Only one parameter must be set: key or keys');
+    }
+
+    if (key != null) {
+      keys = {};
+      keys['$key'] = 1;
+    }
+
+    if (keys == null) {
+      throw ArgumentError('key or keys parameter must be set');
+    }
+
+    return keys;
+  }
+
+  Map<String, dynamic> _selectorBuilder2Map(selector) {
+    if (selector == null) {
+      return <String, dynamic>{};
+    }
+    if (selector is SelectorBuilder) {
+      return selector.map['\$query'] as Map<String, dynamic> ??
+          <String, dynamic>{};
+    }
+    return selector as Map<String, dynamic>;
+  }
+
+  Map<String, dynamic> _queryBuilder2Map(query) {
+    if (query is SelectorBuilder) {
+      query = query.map['\$query'];
+    }
+    return query as Map<String, dynamic>;
+  }
+
+  Map<String, dynamic> _sortBuilder2Map(query) {
+    if (query is SelectorBuilder) {
+      query = query.map['orderby'];
+    }
+    return query as Map<String, dynamic>;
+  }
+
+  Map<String, dynamic> _fieldsBuilder2Map(fields) {
+    if (fields is SelectorBuilder) {
+      return fields.paramFields;
+    }
+    return fields as Map<String, dynamic>;
+  }
+
+  Map<String, dynamic> _updateBuilder2Map(update) {
+    if (update is ModifierBuilder) {
+      update = update.map;
+    }
+    return update as Map<String, dynamic>;
+  }
+
+  // ****************************************************************+
+  // ******************** OP_MSG_COMMANDS ****************************
+  // *****************************************************************
+  // All the following methods are available starting from release 3.6
+  // *****************************************************************
+
   /// This function is provided for all servers starting from version 3.6
   /// For previous releases use the same method on Db class.
   ///
@@ -247,67 +324,6 @@ class DbCollection {
     return db.getLastError();
   }
 
-  Map<String, dynamic> _setKeys(String key, Map<String, dynamic> keys) {
-    if (key != null && keys != null) {
-      throw ArgumentError('Only one parameter must be set: key or keys');
-    }
-
-    if (key != null) {
-      keys = {};
-      keys['$key'] = 1;
-    }
-
-    if (keys == null) {
-      throw ArgumentError('key or keys parameter must be set');
-    }
-
-    return keys;
-  }
-
-  Map<String, dynamic> _selectorBuilder2Map(selector) {
-    if (selector == null) {
-      return <String, dynamic>{};
-    }
-    if (selector is SelectorBuilder) {
-      return selector.map['\$query'] as Map<String, dynamic>;
-    }
-    return selector as Map<String, dynamic>;
-  }
-
-  Map<String, dynamic> _queryBuilder2Map(query) {
-    if (query is SelectorBuilder) {
-      query = query.map['\$query'];
-    }
-    return query as Map<String, dynamic>;
-  }
-
-  Map<String, dynamic> _sortBuilder2Map(query) {
-    if (query is SelectorBuilder) {
-      query = query.map['orderby'];
-    }
-    return query as Map<String, dynamic>;
-  }
-
-  Map<String, dynamic> _fieldsBuilder2Map(fields) {
-    if (fields is SelectorBuilder) {
-      return fields.paramFields;
-    }
-    return fields as Map<String, dynamic>;
-  }
-
-  Map<String, dynamic> _updateBuilder2Map(update) {
-    if (update is ModifierBuilder) {
-      update = update.map;
-    }
-    return update as Map<String, dynamic>;
-  }
-
-  // ****************************************************************+
-  // ******************** OP_MSG_COMMANDS ****************************
-  // *****************************************************************
-  // All the following methods are available starting from release 3.6
-  // *****************************************************************
-
   // This method has been made available since version 3.2
   // As we will use this with the new wire message available
   // since version 3.6, we will check this last version
@@ -360,7 +376,7 @@ class DbCollection {
       Map<String, Object> hintDocument}) async {
     var deleteOperation = DeleteOneOperation(
         this,
-        DeleteOneRequest(_selectorBuilder2Map(selector),
+        DeleteOneStatement(_selectorBuilder2Map(selector),
             collation: collation, hint: hint, hintDocument: hintDocument),
         deleteOneOptions: DeleteOneOptions(writeConcern: writeConcern));
     return deleteOperation.executeDocument();
@@ -373,10 +389,98 @@ class DbCollection {
       Map<String, Object> hintDocument}) async {
     var deleteOperation = DeleteManyOperation(
         this,
-        DeleteManyRequest(_selectorBuilder2Map(selector),
+        DeleteManyStatement(_selectorBuilder2Map(selector),
             collation: collation, hint: hint, hintDocument: hintDocument),
         deleteManyOptions: DeleteManyOptions(writeConcern: writeConcern));
     return deleteOperation.executeDocument();
+  }
+
+  Future<Map<String, dynamic>> modernUpdate(selector, update,
+      {bool upsert,
+      bool multi,
+      WriteConcern writeConcern,
+      CollationOptions collation,
+      List<dynamic> arrayFilters,
+      String hint,
+      Map<String, Object> hintDocument,
+      bool modernReply}) async {
+    modernReply ??= true;
+    var updateOperation = UpdateOperation(
+        this,
+        [
+          UpdateStatement(_selectorBuilder2Map(selector),
+              update is List ? update : _updateBuilder2Map(update),
+              upsert: upsert,
+              multi: multi,
+              collation: collation,
+              arrayFilters: arrayFilters,
+              hint: hint,
+              hintDocument: hintDocument)
+        ],
+        updateOptions: UpdateOptions(writeConcern: writeConcern));
+    var res = await updateOperation.execute();
+    if (modernReply) {
+      return res;
+    }
+    return db._getAcknowledgement();
+  }
+
+  Future<WriteResult> replaceOne(selector, update,
+      {bool upsert,
+      WriteConcern writeConcern,
+      CollationOptions collation,
+      String hint,
+      Map<String, Object> hintDocument}) async {
+    var replaceOneOperation = ReplaceOneOperation(
+        this,
+        ReplaceOneStatement(_selectorBuilder2Map(selector),
+            update is List ? update : _updateBuilder2Map(update),
+            upsert: upsert,
+            collation: collation,
+            hint: hint,
+            hintDocument: hintDocument),
+        replaceOneOptions: ReplaceOneOptions(writeConcern: writeConcern));
+    return replaceOneOperation.executeDocument();
+  }
+
+  Future<WriteResult> updateOne(selector, update,
+      {bool upsert,
+      WriteConcern writeConcern,
+      CollationOptions collation,
+      List<dynamic> arrayFilters,
+      String hint,
+      Map<String, Object> hintDocument}) async {
+    var updateOneOperation = UpdateOneOperation(
+        this,
+        UpdateOneStatement(_selectorBuilder2Map(selector),
+            update is List ? update : _updateBuilder2Map(update),
+            upsert: upsert,
+            collation: collation,
+            arrayFilters: arrayFilters,
+            hint: hint,
+            hintDocument: hintDocument),
+        updateOneOptions: UpdateOneOptions(writeConcern: writeConcern));
+    return updateOneOperation.executeDocument();
+  }
+
+  Future<WriteResult> updateMany(selector, update,
+      {bool upsert,
+      WriteConcern writeConcern,
+      CollationOptions collation,
+      List<dynamic> arrayFilters,
+      String hint,
+      Map<String, Object> hintDocument}) async {
+    var updateManyOperation = UpdateManyOperation(
+        this,
+        UpdateManyStatement(_selectorBuilder2Map(selector),
+            update is List ? update : _updateBuilder2Map(update),
+            upsert: upsert,
+            collation: collation,
+            arrayFilters: arrayFilters,
+            hint: hint,
+            hintDocument: hintDocument),
+        updateManyOptions: UpdateManyOptions(writeConcern: writeConcern));
+    return updateManyOperation.executeDocument();
   }
 
   Future<FindAndModifyResult> modernFindAndModify(
@@ -597,7 +701,7 @@ class DbCollection {
           if (docMap is Map<String, Object>) {
             var contentMap = docMap[bulkFilter];
             if (contentMap is Map<String, Object>) {
-              bulk.deleteOne(DeleteOneRequest(contentMap));
+              bulk.deleteOne(DeleteOneStatement(contentMap));
             } else {
               throw MongoDartError('The "$bulkFilter" key of the '
                   '"$bulkDeleteOne" element at index $index must '
@@ -613,7 +717,7 @@ class DbCollection {
           if (docMap is Map<String, Object>) {
             var contentMap = docMap[bulkFilter];
             if (contentMap is Map<String, Object>) {
-              bulk.deleteMany(DeleteManyRequest(contentMap));
+              bulk.deleteMany(DeleteManyStatement(contentMap));
             } else {
               throw MongoDartError('The "$bulkFilter" key of the '
                   '"$bulkDeleteMany" element at index $index must '

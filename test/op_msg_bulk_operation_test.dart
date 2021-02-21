@@ -2,8 +2,8 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/bulk/ordered_bulk.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/bulk/unordered_bulk.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_request.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_request.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_statement.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_statement.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
@@ -202,9 +202,40 @@ void main() async {
         expect(retOrders.isSuccess, isTrue);
 
         var bulk = UnorderedBulk(collection, writeConcern: WriteConcern(w: 1));
-        bulk.deleteMany(DeleteManyRequest({'status': 'D'}));
+        bulk.deleteMany(DeleteManyStatement({'status': 'D'}));
 
-        bulk.deleteOne(DeleteOneRequest(
+        bulk.deleteOne(DeleteOneStatement(
+            {'cust_num': 99999, 'item': 'abc123', 'status': 'A'}));
+
+        var ret = await bulk.executeDocument();
+
+        expect(ret.ok, 1.0);
+        expect(ret.operationSucceeded, isTrue);
+        expect(ret.hasWriteErrors, isFalse);
+        expect(ret.hasWriteConcernError, isFalse);
+        expect(ret.nInserted, 0);
+        expect(ret.operationSucceeded, isTrue);
+        expect(ret.writeCommandType, WriteCommandType.delete);
+        expect(ret.nUpserted, 0);
+        expect(ret.nModified, 0);
+        expect(ret.nMatched, 0);
+        expect(ret.nRemoved, 14);
+        // Todo check ids and documents
+        //expect(ret.ids.first, 2);
+        //expect(ret.documents.first['name'], 'Stephen');
+      }, skip: cannotRunTests);
+      test('Ordered Bulk', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var retOrders = await insertOrders(collection);
+        expect(retOrders.ok, 1.0);
+        expect(retOrders.isSuccess, isTrue);
+
+        var bulk = OrderedBulk(collection, writeConcern: WriteConcern(w: 1));
+        bulk.deleteMany(DeleteManyStatement({'status': 'D'}));
+
+        bulk.deleteOne(DeleteOneStatement(
             {'cust_num': 99999, 'item': 'abc123', 'status': 'A'}));
 
         var ret = await bulk.executeDocument();
@@ -226,6 +257,77 @@ void main() async {
       }, skip: cannotRunTests);
     });
 
+    group('Bulk update', () {
+      test('Unordered Bulk', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var retOrders = await insertOrders(collection);
+        expect(retOrders.ok, 1.0);
+        expect(retOrders.isSuccess, isTrue);
+
+        var bulk = UnorderedBulk(collection, writeConcern: WriteConcern(w: 1));
+        bulk.updateMany(UpdateManyStatement(
+            where.eq('status', 'D').map[key$Query],
+            ModifierBuilder().set('status', 'd').map));
+
+        bulk.updateOne(UpdateOneStatement(
+            {'cust_num': 99999, 'item': 'abc123', 'status': 'A'},
+            ModifierBuilder().inc('ordered', 1).map));
+
+        var ret = await bulk.executeDocument();
+
+        expect(ret.ok, 1.0);
+        expect(ret.operationSucceeded, isTrue);
+        expect(ret.hasWriteErrors, isFalse);
+        expect(ret.hasWriteConcernError, isFalse);
+        expect(ret.nInserted, 0);
+        expect(ret.operationSucceeded, isTrue);
+        expect(ret.writeCommandType, WriteCommandType.update);
+        expect(ret.nUpserted, 0);
+        expect(ret.nModified, 14);
+        expect(ret.nMatched, 14);
+        expect(ret.nRemoved, 0);
+        // Todo check ids and documents
+        //expect(ret.ids.first, 2);
+        //expect(ret.documents.first['name'], 'Stephen');
+      }, skip: cannotRunTests);
+      test('Ordered Bulk', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var retOrders = await insertOrders(collection);
+        expect(retOrders.ok, 1.0);
+        expect(retOrders.isSuccess, isTrue);
+
+        var bulk = OrderedBulk(collection, writeConcern: WriteConcern(w: 1));
+        bulk.updateMany(UpdateManyStatement(
+            where.eq('status', 'D').map[key$Query],
+            ModifierBuilder().set('status', 'd').map));
+
+        bulk.updateOne(UpdateOneStatement(
+            {'cust_num': 99999, 'item': 'abc123', 'status': 'A'},
+            ModifierBuilder().inc('ordered', 1).map));
+
+        var ret = await bulk.executeDocument();
+
+        expect(ret.ok, 1.0);
+        expect(ret.operationSucceeded, isTrue);
+        expect(ret.hasWriteErrors, isFalse);
+        expect(ret.hasWriteConcernError, isFalse);
+        expect(ret.nInserted, 0);
+        expect(ret.operationSucceeded, isTrue);
+        expect(ret.writeCommandType, WriteCommandType.update);
+        expect(ret.nUpserted, 0);
+        expect(ret.nModified, 14);
+        expect(ret.nMatched, 14);
+        expect(ret.nRemoved, 0);
+        // Todo check ids and documents
+        //expect(ret.ids.first, 2);
+        //expect(ret.documents.first['name'], 'Stephen');
+      }, skip: cannotRunTests);
+    });
+
     group('Mixed functions', () {
       test('Ordered Bulk - Insert and delete one', () async {
         var collectionName = getRandomCollectionName();
@@ -233,13 +335,13 @@ void main() async {
 
         var bulk = OrderedBulk(collection);
         bulk.insertOne({'_id': 2, 'name': 'Stephen', 'age': 54});
-        bulk.deleteOne(DeleteOneRequest({'_id': 2}));
+        bulk.deleteOne(DeleteOneStatement({'_id': 2}));
         bulk.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42}
         ]);
-        bulk.deleteOne(DeleteOneRequest({'_id': 4}));
+        bulk.deleteOne(DeleteOneStatement({'_id': 4}));
         bulk.insertOne({'_id': 5, 'name': 'Mandy', 'age': 21});
 
         var ret = await bulk.executeDocument();
@@ -332,13 +434,13 @@ void main() async {
 
         var bulk = OrderedBulk(collection);
         bulk.insertOne({'_id': 2, 'name': 'Stephen', 'age': 54});
-        bulk.deleteOne(DeleteOneRequest({'_id': 2}));
+        bulk.deleteOne(DeleteOneStatement({'_id': 2}));
         bulk.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42}
         ]);
-        bulk.deleteMany(DeleteManyRequest({
+        bulk.deleteMany(DeleteManyStatement({
           'age': {r'$gt': 28}
         }));
         bulk.insertOne({'_id': 5, 'name': 'Mandy', 'age': 21});

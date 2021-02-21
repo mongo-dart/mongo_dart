@@ -7,11 +7,13 @@ import 'package:mongo_dart/src/database/operation/commands/base/operation_base.d
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/bulk_write_result.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_request.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_statement.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_request.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_statement.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/insert_many/insert_many_operation.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/insert_one/insert_one_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/replace_one/replace_one_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/replace_one/replace_one_statement.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 import 'bulk_options.dart';
@@ -35,9 +37,7 @@ abstract class Bulk extends CommandOperation {
     document[key_id] ??= ObjectId();
     ids.add(document[key_id]);
     overallDocuments.add(document);
-    var insertOneOperation = InsertOneOperation(collection, document);
-    var command = insertOneOperation.$buildCommand();
-    addCommand(command);
+    _setCommand(InsertOneOperation(collection, document));
   }
 
   void insertMany(List<Map<String, Object>> documents) {
@@ -46,22 +46,26 @@ abstract class Bulk extends CommandOperation {
       ids.add(document[key_id]);
       overallDocuments.add(document);
     }
-    var insertManyOperation = InsertManyOperation(collection, documents);
-    var command = insertManyOperation.$buildCommand();
-    addCommand(command);
+    _setCommand(InsertManyOperation(collection, documents));
   }
 
-  void deleteOne(DeleteOneRequest deleteRequest) {
-    var deleteOneOperation = DeleteOneOperation(collection, deleteRequest);
-    var command = deleteOneOperation.$buildCommand();
-    addCommand(command);
-  }
+  void deleteOne(DeleteOneStatement deleteRequest) =>
+      _setCommand(DeleteOneOperation(collection, deleteRequest));
 
-  void deleteMany(DeleteManyRequest deleteRequest) {
-    var deleteManyOperation = DeleteManyOperation(collection, deleteRequest);
-    var command = deleteManyOperation.$buildCommand();
-    addCommand(command);
-  }
+  void deleteMany(DeleteManyStatement deleteRequest) =>
+      _setCommand(DeleteManyOperation(collection, deleteRequest));
+
+  void replaceOne(ReplaceOneStatement replaceRequest) =>
+      _setCommand(ReplaceOneOperation(collection, replaceRequest));
+
+  void updateOne(UpdateOneStatement updateRequest) =>
+      _setCommand(UpdateOneOperation(collection, updateRequest));
+
+  void updateMany(UpdateManyStatement updateRequest) =>
+      _setCommand(UpdateManyOperation(collection, updateRequest));
+
+  void _setCommand(CommandOperation operation) =>
+      addCommand(operation.$buildCommand());
 
   void addCommand(Map<String, Object> command);
 
@@ -157,18 +161,19 @@ abstract class Bulk extends CommandOperation {
   /// Split the command if the number of documents exceed the maxWriteBatchSixe
   ///
   /// Here we assume that the command is made this way:
-  /// { <commandType>: <collectionName>, <commandArgument> : <documentsList>}
+  /// { <commandType>: <collectionName>, <commandArgument> : <documentsList>, 
+  /// ...maybe others}
   List<Map<String, Object>> splitCommands(Map<String, Object> command) {
     var ret = <Map<String, Object>>[];
     if (command.isEmpty) {
       return ret;
     }
     var maxWriteBatchSize = MongoModernMessage.maxWriteBatchSize;
-    var documentsNum = (command.values.last as List).length;
+    var documentsNum = (command.values.toList()[1] as List).length;
     if (documentsNum <= maxWriteBatchSize) {
       ret.add(command);
     } else {
-      var documents = command.values.last as List;
+      var documents = command.values.toList()[1] as List;
       var offset = 0;
       var endSubList = maxWriteBatchSize;
       var rest = documentsNum;

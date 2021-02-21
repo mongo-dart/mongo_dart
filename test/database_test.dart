@@ -1,3 +1,4 @@
+@Timeout(Duration(minutes: 10))
 library database_tests;
 
 import 'package:mongo_dart/mongo_dart.dart';
@@ -689,7 +690,7 @@ Future testUpdateWithUpsert() async {
   var objectUpdate = {
     r'$set': {'value': 20}
   };
-  result = await collection.update({'name': 'a'}, objectUpdate);
+  result = await collection.legacyUpdate({'name': 'a'}, objectUpdate);
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
 
@@ -714,7 +715,7 @@ Future testUpdateWithMultiUpdate() async {
   expect(results.first['key'], 'a');
   expect(results.first['value'], 'initial_value1');
 
-  result = await collection.update(where.eq('key', 'a'),
+  result = await collection.legacyUpdate(where.eq('key', 'a'),
       modify.set('value', 'value_modified_for_only_one_with_default'));
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
@@ -723,7 +724,7 @@ Future testUpdateWithMultiUpdate() async {
       .find({'value': 'value_modified_for_only_one_with_default'}).toList();
   expect(results.length, 1);
 
-  result = await collection.update(where.eq('key', 'a'),
+  result = await collection.legacyUpdate(where.eq('key', 'a'),
       modify.set('value', 'value_modified_for_only_one_with_multiupdate_false'),
       multiUpdate: false);
   expect(result['updatedExisting'], true);
@@ -733,7 +734,7 @@ Future testUpdateWithMultiUpdate() async {
       {'value': 'value_modified_for_only_one_with_multiupdate_false'}).toList();
   expect(results.length, 1);
 
-  result = await collection.update(
+  result = await collection.legacyUpdate(
       where.eq('key', 'a'), modify.set('value', 'new_value'),
       multiUpdate: true);
   expect(result['updatedExisting'], true);
@@ -796,7 +797,7 @@ Future<Cursor> testCursorCreation() async {
   var cursor =
       await ModernCursor(FindOperation(collection, filter: {'ping': 1}));
 
-  expect(cursor, isNotNull);  
+  expect(cursor, isNotNull);
 
   return Cursor(db, collection, null);
 }
@@ -1034,7 +1035,7 @@ Future testIndexCreationOnCollection() async {
     var resInsert = await collection
         .insertOne({'a': 200}, writeConcern: WriteConcern.UNACKNOWLEDGED);
 
-    // Todo correct 
+    // Todo correct
     //expect(resInsert['ok'], 1.0);
 
     var res = await collection.createIndex(key: 'a', unique: true);
@@ -1103,8 +1104,7 @@ Future testIndexCreationErrorHandling() async {
     fail("Expecting an error, but wasn't thrown");
   } on TestFailure {
     rethrow;
-  } catch (e, stack) {
-    print(stack);
+  } catch (e) {
     expect(e[keyErrmsg] ?? e['err'],
         predicate((String msg) => msg.contains('duplicate key error')));
   }
@@ -1146,6 +1146,42 @@ Future testTextIndex() async {
   }), isTrue);
 }
 
+Future testTtlIndex() async {
+  var collectionName = getRandomCollectionName();
+  var collection = db.collection(collectionName);
+
+  // Here the CreateIndexOptions is set to null, but you can pass other 
+  // parameters if needed
+  var indexOperation = CreateIndexOperation(db, collection, 'closingDate', null,
+      rawOptions: {'expireAfterSeconds': 1});
+  var res = await indexOperation.execute();
+  expect(res['ok'], 1.0);
+
+  await collection.insertAll([
+    {
+      '_id': 1,
+      'name': 'Java Hut',
+      'description': 'Coffee and cakes',
+      'closingDate': DateTime(2000)
+    },
+    {'_id': 2, 'name': 'Burger Buns', 'description': 'Gourmet hamburgers'},
+    {'_id': 3, 'name': 'Coffee Shop', 'description': 'Just coffee'},
+    {
+      '_id': 4,
+      'name': 'Clothes Clothes Clothes',
+      'description': 'Discount clothing'
+    },
+    {'_id': 5, 'name': 'Java Shopping', 'description': 'Indonesian goods'}
+  ]);
+
+  // The cleanup on the server runs every 60 seconds, plus the time to build
+  // the index, plus a little extra...
+  await Future.delayed(Duration(seconds: 90));
+
+  var elements = await collection.find().toList();
+  expect(elements.length, 4);
+}
+
 Future testSafeModeUpdate() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
@@ -1157,11 +1193,11 @@ Future testSafeModeUpdate() async {
     });
   }
 
-  var result = await collection.update({'a': 200}, {'a': 100});
+  var result = await collection.legacyUpdate({'a': 200}, {'a': 100});
   expect(result['updatedExisting'], false);
   expect(result['n'], 0);
 
-  result = await collection.update({'a': 3}, {'a': 100});
+  result = await collection.legacyUpdate({'a': 3}, {'a': 100});
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
 }
@@ -1311,7 +1347,7 @@ Future testFieldLevelUpdateSimple() async {
   expect(result, isNotNull);
 
   id = result['_id'] as ObjectId;
-  result = await collection.update(where.id(id), modify.set('name', 'BBB'));
+  result = await collection.legacyUpdate(where.id(id), modify.set('name', 'BBB'));
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
 
@@ -1515,6 +1551,7 @@ void main() async {
           'testEnsureIndexWithIndexCreation', testEnsureIndexWithIndexCreation);
       test('testIndexCreationErrorHandling', testIndexCreationErrorHandling);
       test('Text index', testTextIndex);
+      test('Ttl index', testTtlIndex);
     });
 
     group('Field level update tests:', () {

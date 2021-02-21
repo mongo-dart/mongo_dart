@@ -33,8 +33,8 @@ class OrderedBulk extends Bulk {
     var commandKey = command.keys.first;
     var lastCommandKey = commands.last.keys.first;
     if (commandKey == lastCommandKey) {
-      var commandValue = command.values.last;
-      List lastCommandValues = commands.last.values.last;
+      var commandValue = command.values.toList()[1];
+      List lastCommandValues = commands.last.values.toList()[1];
       lastCommandValues.addAll(commandValue);
     } else {
       commands.add(command);

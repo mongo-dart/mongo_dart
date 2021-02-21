@@ -1,6 +1,6 @@
 # Delete
 
-The new api provides to methods for removing documents from a collection
+The new api provides two methods for removing documents from a collection
 
 ## deleteOne
 

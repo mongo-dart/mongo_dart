@@ -3,13 +3,17 @@ import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_operation.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_options.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/update_operation/update_operation.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/update_operation/update_options.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/update_operation/update_statement.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_operation.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_request.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_statement.dart';
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_request.dart';
+import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_statement.dart';
 import 'package:mongo_dart/src/database/operation/parameters/collation_options.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
+import 'package:rational/rational.dart';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
@@ -45,6 +49,8 @@ void main() async {
   group('Write Operations', () {
     var cannotRunTests = false;
     var running4_4orGreater = false;
+    var running4_2orGreater = false;
+
     var isReplicaSet = false;
     var isStandalone = false;
     var isSharded = false;
@@ -57,6 +63,9 @@ void main() async {
       var serverFcv = db?.masterConnection?.serverCapabilities?.fcv ?? '0.0';
       if (serverFcv.compareTo('4.4') != -1) {
         running4_4orGreater = true;
+      }
+      if (serverFcv.compareTo('4.2') != -1) {
+        running4_2orGreater = true;
       }
       isReplicaSet =
           db?.masterConnection?.serverCapabilities?.isReplicaSet ?? false;
@@ -231,7 +240,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteOneOperation(collection, DeleteOneRequest({}));
+            DeleteOneOperation(collection, DeleteOneStatement({}));
         var res = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -261,7 +270,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteOneOperation(collection, DeleteOneRequest({key_id: 7}));
+            DeleteOneOperation(collection, DeleteOneStatement({key_id: 7}));
         var res = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -286,7 +295,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteOneOperation(collection, DeleteOneRequest({'status': 'D'}));
+            DeleteOneOperation(collection, DeleteOneStatement({'status': 'D'}));
         var res = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -399,7 +408,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteManyOperation(collection, DeleteManyRequest({}));
+            DeleteManyOperation(collection, DeleteManyStatement({}));
         var res = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -428,7 +437,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteManyOperation(collection, DeleteManyRequest({key_id: 7}));
+            DeleteManyOperation(collection, DeleteManyStatement({key_id: 7}));
         var res = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -453,8 +462,8 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var deleteOperation =
-            DeleteManyOperation(collection, DeleteManyRequest({'status': 'D'}));
+        var deleteOperation = DeleteManyOperation(
+            collection, DeleteManyStatement({'status': 'D'}));
         var res = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -479,7 +488,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation = DeleteManyOperation(
-            collection, DeleteManyRequest({}),
+            collection, DeleteManyStatement({}),
             deleteManyOptions: DeleteManyOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
         var res = await deleteOperation.executeDocument();
@@ -507,7 +516,7 @@ void main() async {
 
         var deleteOperation = DeleteManyOperation(
           collection,
-          DeleteManyRequest({'category': 'cafe', 'status': 'a'},
+          DeleteManyStatement({'category': 'cafe', 'status': 'a'},
               collation: CollationOptions('fr', strength: 1)),
         );
         var res = await deleteOperation.executeDocument();
@@ -541,7 +550,7 @@ void main() async {
 
         var deleteOperation = DeleteManyOperation(
           collection,
-          DeleteManyRequest({
+          DeleteManyStatement({
             'points': {r'$lte': 20},
             'status': 'P'
           }, hintDocument: {
@@ -1043,6 +1052,9 @@ void main() async {
         expect(res.value['_id'], 1);
       });
       test('Aggregation Pipeline', () async {
+        if (!running4_2orGreater) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1071,7 +1083,7 @@ void main() async {
             query: <String, dynamic>{'_id': 1},
             update: [
               <String, dynamic>{
-                r'$set': {
+                r'$addFields': {
                   r'total': {r'$sum': r'$grades.grade'}
                 }
               }
@@ -1089,6 +1101,9 @@ void main() async {
       });
 
       test('Specify Hint', () async {
+        if (!running4_4orGreater) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1193,18 +1208,6 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        /*    var famOperation = FindAndModifyOperation(collection,
-            query: <String, dynamic>{
-              'name': 'Gus',
-              'state': 'active',
-              'rating': 100
-            },
-            sort: <String, dynamic>{'rating': 1},
-            update: <String, dynamic>{
-              r'$inc': {'score': 1}
-            },
-            upsert: true);
-        var res = await famOperation.executeDocument(); */
         var res = await collection.modernFindAndModify(
             query:
                 where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
@@ -1225,19 +1228,6 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        /* var famOperation = FindAndModifyOperation(collection,
-            query: <String, dynamic>{
-              'name': 'Gus',
-              'state': 'active',
-              'rating': 100
-            },
-            sort: <String, dynamic>{'rating': 1},
-            update: <String, dynamic>{
-              r'$inc': {'score': 1}
-            },
-            upsert: true,
-            returnNew: true);
-        var res = await famOperation.executeDocument(); */
         var res = await collection.modernFindAndModify(
             query:
                 where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
@@ -1270,19 +1260,6 @@ void main() async {
           'score': 15
         });
 
-        /*   var famOperation = FindAndModifyOperation(collection,
-            query: <String, dynamic>{
-              'name': 'Gus',
-              'state': 'active',
-              'rating': 100
-            },
-            sort: <String, dynamic>{'rating': 1},
-            update: <String, dynamic>{
-              r'$inc': {'score': 1}
-            },
-            upsert: true,
-            returnNew: true);
-        var res = await famOperation.executeDocument(); */
         var res = await collection.modernFindAndModify(
             query:
                 where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
@@ -1307,13 +1284,6 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        /*  var famOperation = FindAndModifyOperation(collection,
-            query: <String, dynamic>{
-              'state': 'active',
-            },
-            sort: <String, dynamic>{'rating': 1},
-            remove: true);
-        var res = await famOperation.executeDocument(); */
         var res = await collection.modernFindAndModify(
             query: where.eq('state', 'active'),
             sort: <String, dynamic>{'rating': 1},
@@ -1335,19 +1305,6 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-       /*  var famOperation = FindAndModifyOperation(collection,
-            query: <String, dynamic>{
-              'category': 'cafe',
-              'status': 'a',
-            },
-            sort: <String, dynamic>{'category': 1},
-            update: <String, dynamic>{
-              r'$set': {'status': 'updated'}
-            },
-            findAndModifyOptions: FindAndModifyOptions(
-                collation: CollationOptions('fr', strength: 1)));
-        var res = await famOperation.executeDocument();
- */
         var res = await collection.modernFindAndModify(
             query: where.eq('category', 'cafe').eq('status', 'a'),
             sort: <String, dynamic>{'category': 1},
@@ -1383,22 +1340,8 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-       /*  var famOperation = FindAndModifyOperation(collection,
-            query: <String, dynamic>{
-              'grades': {r'$gte': 100}
-            },
-            update: <String, dynamic>{
-              r'$set': {r'grades.$[element]': 100}
-            },
-            returnNew: true,
-            arrayFilters: [
-              {
-                'element': {r'$gte': 100}
-              }
-            ]);
-        var res = await famOperation.executeDocument(); */
-         var res = await collection.modernFindAndModify(
-            query: where.gte('grades',100),
+        var res = await collection.modernFindAndModify(
+            query: where.gte('grades', 100),
             update: ModifierBuilder().set(r'grades.$[element]', 100),
             returnNew: true,
             arrayFilters: [
@@ -1439,20 +1382,8 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        /* var famOperation = FindAndModifyOperation(collection,
-            query: <String, dynamic>{'_id': 1},
-            update: <String, dynamic>{
-              r'$set': {r'grades.$[element].mean': 100}
-            },
-            returnNew: true,
-            arrayFilters: [
-              {
-                'element.grade': {r'$gte': 85}
-              }
-            ]);
-        var res = await famOperation.executeDocument(); */
         var res = await collection.modernFindAndModify(
-            query: where.eq('_id',1),
+            query: where.eq('_id', 1),
             update: ModifierBuilder().set(r'grades.$[element].mean', 100),
             returnNew: true,
             arrayFilters: [
@@ -1468,6 +1399,9 @@ void main() async {
         expect(res.value['_id'], 1);
       });
       test('Aggregation Pipeline', () async {
+        if (!running4_2orGreater) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1478,7 +1412,9 @@ void main() async {
               {'grade': 80, 'mean': 75, 'std': 6},
               {'grade': 85, 'mean': 90, 'std': 4},
               {'grade': 85, 'mean': 85, 'std': 6}
-            ]
+            ],
+            'addend1': Rational.fromInt(1) / Rational.fromInt(3),
+            'addend2': Rational.fromInt(2) / Rational.fromInt(3)
           },
           {
             '_id': 2,
@@ -1492,24 +1428,21 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-      /*   var famOperation = FindAndModifyOperation(collection,
-            query: <String, dynamic>{'_id': 1},
-            update: [
-              <String, dynamic>{
-                r'$set': {
-                  r'total': {r'$sum': r'$grades.grade'}
+        var res = await collection.modernFindAndModify(
+          query: where.eq('_id', 1),
+          update: AggregationPipelineBuilder()
+              .addStage(AddFields({
+                r'total': {r'$sum': r'$grades.grade'},
+                r'decimal': {
+                  r'$sum': [r'$addend1', r'$addend2']
+                },
+                r'decimal2': {
+                  r'$sum': [r'$addend1', r'$addend1', r'$addend1']
                 }
-              }
-            ],
-            returnNew: true);
-        var res = await famOperation.executeDocument(); */
-         var res = await collection.modernFindAndModify(
-            query: where.eq('_id',1),
-            update: AggregationPipelineBuilder().addStage(AddFields({
-                  r'total': {r'$sum': r'$grades.grade'}
-                })).build(),
-            returnNew: true,
-            );
+              }))
+              .build(),
+          returnNew: true,
+        );
 
         expect(res.lastErrorObject.updatedExisting, isTrue);
         expect(res.lastErrorObject.upserted, isNull);
@@ -1517,10 +1450,17 @@ void main() async {
         expect(res.lastErrorObject.n, 1);
         expect(res.value, isNotNull);
         expect(res.value['total'], 250);
+        expect(res.value['decimal'], Rational.fromInt(1));
+        expect(res.value['decimal2'],
+            Rational.parse('0.9999999999999999999999999999999999'));
+
         expect(res.value['_id'], 1);
       });
 
       test('Specify Hint', () async {
+        if (!running4_4orGreater) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1531,19 +1471,10 @@ void main() async {
         await collection.createIndex(keys: {'status': 1});
         await collection.createIndex(key: 'points');
 
-       /*  var famOperation = FindAndModifyOperation(collection,
-            query: <String, dynamic>{
-              'points': {r'$lte': 20},
-              'status': 'P'
-            },
+        var res = await collection.modernFindAndModify(
+            query: where.lte('points', 20).eq('status', 'P'),
             remove: true,
             hintDocument: {'status': 1});
-        var res = await famOperation.executeDocument(); */
-          var res = await collection.modernFindAndModify(
-            query: where.lte('points',20).eq('status', 'P'),
-            remove: true,
-            hintDocument: {'status': 1}
-            );
 
         expect(res.lastErrorObject.updatedExisting, isFalse);
         expect(res.lastErrorObject.upserted, isNull);

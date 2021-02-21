@@ -4,12 +4,12 @@ import 'package:mongo_dart/src/database/operation/commands/query_and_write_opera
 import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/write_result.dart';
 
 import 'delete_many_options.dart';
-import 'delete_many_request.dart';
+import 'delete_many_statement.dart';
 
 class DeleteManyOperation extends DeleteOperation {
-  DeleteManyRequest deleteRequest;
+  DeleteManyStatement deleteRequest;
 
-  DeleteManyOperation(DbCollection collection, DeleteManyRequest deleteRequest,
+  DeleteManyOperation(DbCollection collection, DeleteManyStatement deleteRequest,
       {DeleteManyOptions deleteManyOptions, Map<String, Object> rawOptions})
       : super(
           collection,

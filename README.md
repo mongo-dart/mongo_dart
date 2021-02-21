@@ -210,8 +210,11 @@ At present we have developed the following operations:
 | --- | --- | --- | --- |
 |   `insertOne`  |  Experimental   |  `insert`   | `insertOne` was already present in the previous release, but some changes in the call have been made    |
 | `insertMany` | Experimental | `insert` | Allows to insert many documents in one commnand. It is subject to the max number of documents per message limit (at present <4.4> 100,000)|
-|   [deleteOne][1] |  Experimental   |  -  | Allows to delete one document. [Example][3] [Example 2][4] |
+| [deleteOne][1] |  Experimental   |  -  | Allows to delete one document. [Example][3] [Example 2][4] |
 | [deleteMany][2] | Experimental | `remove` | Allows to delete many documents in one commnand. [Example][5] |
+| [updateOne][6] | Experimental | - | Allows to update one document [Example][7] |
+| [updateMany][8] | Experimental | - | Allows to update many documents in one command. [Example][9] |
+| [modernUpdate][10] | Experimental | `legacyUpdate` | The old method `update` now is only a wrapper. If you are running mongoDb 3.6 or later, `modernUpdate` is called, otherwise `legacyUpdate`
 | `modernFind` | Experimental | `legacyFind` | The old method `find` now is simply a wrapper. If you are running mongoDb 3.6 or later, `modernFind` is called, otherwise `legacyFind` |
 | `modernAggregate` | Experimental |  `legacyAggregateToStream` | The old method `aggregateToStream` now is simply a wrapper. If you are running mongoDb 3.6 or later, `modernAggregate` is called, otherwise `legacyAggregateToStream`|
 | `modernAggregateCursor` | Experimental | - | This method has no corresponding legacy one, as it returns a cursor and not a Map like the legacy `aggregate`|
@@ -259,4 +262,9 @@ Last but not least, some commands:
 [3]: example/manual/crud/delete_one.dart
 [4]: example/manual/crud/delete_one_collation.dart "With collation"
 [5]: example/manual/crud/delete_many.dart
+[6]: doc/manual/crud/update.md#updateOne
+[7]: example/manual/crud/update_one.dart
+[8]: doc/manual/crud/update.md#updateMany
+[9]: example/manual/crud/update_many.dart
+[10]: doc/manual/crud/update.md#modernUpdate
 

@@ -27,7 +27,7 @@ class FindAndModifyOperation extends CommandOperation {
               ...?rawOptions
             },
             collection: collection,
-            aspect: Aspect.readOperation) {
+            aspect: Aspect.writeOperation) {
     if (arrayFilters != null && arrayFilters is! List && arrayFilters is! Map) {
       throw MongoDartError(
           'The arrayFilters parameter must be either a List or a Map');
@@ -89,7 +89,7 @@ class FindAndModifyOperation extends CommandOperation {
   ///   * $replaceRoot and its alias $replaceWith.
   ///
   /// It can be a Map or a List
-  Object update = false;
+  Object update;
 
   /// When true, returns the modified document rather than the original.
   /// The findAndModify method ignores the 'new' option for remove operations.

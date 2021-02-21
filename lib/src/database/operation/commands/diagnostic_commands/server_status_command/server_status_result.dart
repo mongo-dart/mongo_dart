@@ -1,4 +1,4 @@
-import 'package:mongo_dart/src/database/operation/mixin/basic_result.dart';
+import 'package:mongo_dart/src/database/operation/commands/mixin/basic_result.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 /// Class representing the output of the ServerStatus command

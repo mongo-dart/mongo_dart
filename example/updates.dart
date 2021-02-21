@@ -32,7 +32,7 @@ void main() async {
   await coll.insertAll(toInsert);
   v1 = await coll.findOne({'name': 'c'});
   print('Record c: $v1');
-  await coll.update(where.eq('name', 'c'), modify.set('value', 31));
+  await coll.legacyUpdate(where.eq('name', 'c'), modify.set('value', 31));
   v2 = await coll.findOne({'name': 'c'});
   print('Record c after field level update: $v2');
 
@@ -49,7 +49,7 @@ void main() async {
   await coll.insertAll(toInsert);
   v1 = await coll.findOne({'name': 'c'});
   print('Record c: $v1');
-  await coll.update(where.eq('name', 'c'), modify.inc('value', 1));
+  await coll.legacyUpdate(where.eq('name', 'c'), modify.inc('value', 1));
   v2 = await coll.findOne({'name': 'c'});
   print('Record c after field level increment by one: $v2');
   await db.close();
