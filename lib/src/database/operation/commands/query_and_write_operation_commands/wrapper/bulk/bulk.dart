@@ -30,39 +30,328 @@ abstract class Bulk extends CommandOperation {
             collection: collection,
             aspect: Aspect.writeOperation);
 
-  List overallDocuments = <Map<String, Object>>[];
+  List overallInsertDocuments = <Map<String, Object>>[];
   List ids = [];
+  int operationInputIndex = 0;
 
+  /// Inserts a single document into the collection.
   void insertOne(Map<String, Object> document) {
     document[key_id] ??= ObjectId();
     ids.add(document[key_id]);
-    overallDocuments.add(document);
+    overallInsertDocuments.add(document);
     _setCommand(InsertOneOperation(collection, document));
   }
 
+  /// Inserts nultiple documents into the collection.
   void insertMany(List<Map<String, Object>> documents) {
     for (var document in documents) {
       document[key_id] ??= ObjectId();
       ids.add(document[key_id]);
-      overallDocuments.add(document);
+      overallInsertDocuments.add(document);
     }
     _setCommand(InsertManyOperation(collection, documents));
   }
 
+  /// deleteOne deletes a single document in the collection that match the
+  /// filter. If multiple documents match, deleteOne will delete the first
+  /// matching document only.
   void deleteOne(DeleteOneStatement deleteRequest) =>
       _setCommand(DeleteOneOperation(collection, deleteRequest));
 
+  /// Same as deleteOne but in Map format:
+  /// Schema:
+  /// { deleteOne : {
+  ///    "filter" : <Map>,
+  ///    "collation": <CollationOptions | Map>,
+  ///    "hint": <String>                 // Available starting in 4.2.1
+  ///    "hintDocument": <Map>            // Available starting in 4.2.1
+  ///   }
+  /// }
+  void deleteOneFromMap(Map<String, Object> docMap, int index) {
+    var contentMap = docMap[bulkFilter];
+    if (contentMap is! Map<String, Object>) {
+      throw MongoDartError('The "$bulkFilter" key of the '
+          '"$bulkDeleteOne" element at index $index must '
+          'contain a Map');
+    }
+    if (docMap[bulkCollation] != null &&
+        docMap[bulkCollation] is! CollationOptions &&
+        docMap[bulkCollation] is! Map<String, dynamic>) {
+      throw MongoDartError('The "$bulkCollation" key of the '
+          '"$bulkDeleteOne" element at index $index must '
+          'contain a CollationOptions element or a Map representation '
+          'of a collation');
+    }
+    if (docMap[bulkHint] != null && docMap[bulkHint] is! String) {
+      throw MongoDartError('The "$bulkHint" key of the '
+          '"$bulkDeleteOne" element at index $index must '
+          'contain a String');
+    }
+    if (docMap[bulkHintDocument] != null &&
+        docMap[bulkHintDocument] is! Map<String, Object>) {
+      throw MongoDartError('The "$bulkHintDocument" key of the '
+          '"$bulkDeleteOne" element at index $index must '
+          'contain a Map');
+    }
+    deleteOne(DeleteOneStatement(contentMap,
+        collation: docMap[bulkCollation] is Map<String, dynamic>
+            ? CollationOptions.fromMap(docMap[bulkCollation])
+            : docMap[bulkCollation],
+        hint: docMap[bulkHint],
+        hintDocument: docMap[bulkHintDocument]));
+  }
+
+  /// deleteMany deletes all documents in the collection that match the filter.
   void deleteMany(DeleteManyStatement deleteRequest) =>
       _setCommand(DeleteManyOperation(collection, deleteRequest));
 
+  /// Same as deleteMany but in Map format:
+  /// Schema:
+  /// { deleteMany : {
+  ///    "filter" : <Map>,
+  ///    "collation": <CollationOptions | Map>,
+  ///    "hint": <String>                 // Available starting in 4.2.1
+  ///    "hintDocument": <Map>            // Available starting in 4.2.1
+  ///   }
+  /// }
+  void deleteManyFromMap(Map<String, Object> docMap, int index) {
+    var contentMap = docMap[bulkFilter];
+    if (contentMap is! Map<String, Object>) {
+      throw MongoDartError('The "$bulkFilter" key of the '
+          '"$bulkDeleteMany" element at index $index must '
+          'contain a Map');
+    }
+    if (docMap[bulkCollation] != null &&
+        docMap[bulkCollation] is! CollationOptions &&
+        docMap[bulkCollation] is! Map<String, dynamic>) {
+      throw MongoDartError('The "$bulkCollation" key of the '
+          '"$bulkDeleteMany" element at index $index must '
+          'contain a CollationOptions element or a Map representation '
+          'of a collation');
+    }
+    if (docMap[bulkHint] != null && docMap[bulkHint] is! String) {
+      throw MongoDartError('The "$bulkHint" key of the '
+          '"$bulkDeleteMany" element at index $index must '
+          'contain a String');
+    }
+    if (docMap[bulkHintDocument] != null &&
+        docMap[bulkHintDocument] is! Map<String, Object>) {
+      throw MongoDartError('The "$bulkHintDocument" key of the '
+          '"$bulkDeleteMany" element at index $index must '
+          'contain a Map');
+    }
+    deleteMany(DeleteManyStatement(contentMap,
+        collation: docMap[bulkCollation] is Map<String, dynamic>
+            ? CollationOptions.fromMap(docMap[bulkCollation])
+            : docMap[bulkCollation],
+        hint: docMap[bulkHint],
+        hintDocument: docMap[bulkHintDocument]));
+  }
+
+  /// replaceOne replaces a single document in the collection that matches
+  /// the filter. If multiple documents match, replaceOne will replace the
+  /// first matching document only.
   void replaceOne(ReplaceOneStatement replaceRequest) =>
       _setCommand(ReplaceOneOperation(collection, replaceRequest));
 
+  /// Same as replaceOne but in Map format.
+  /// Schema:
+  /// { replaceOne :
+  ///    {
+  ///       "filter" : <Map>,
+  ///       "replacement" : <Map>,
+  ///       "upsert" : <bool>,
+  ///       "collation": <CollationOptions | Map>,
+  ///       "hint": <String>                 // Available starting in 4.2.1
+  ///       "hintDocument": <Map>            // Available starting in 4.2.1
+  ///    }
+  /// }
+  void replaceOneFromMap(Map<String, Object> docMap, int index) {
+    var filterMap = docMap[bulkFilter];
+    if (filterMap is! Map<String, Object>) {
+      throw MongoDartError('The "$bulkFilter" key of the '
+          '"$bulkReplaceOne" element at index $index must '
+          'contain a Map');
+    }
+    if (docMap[bulkReplacement] is! Map<String, Object>) {
+      throw MongoDartError('The "$bulkReplacement" key of the '
+          '"$bulkReplaceOne" element at index $index must '
+          'contain a Map');
+    }
+    if (docMap[bulkUpsert] != null && docMap[bulkUpsert] is! bool) {
+      throw MongoDartError('The "$bulkUpsert" key of the '
+          '"$bulkReplaceOne" element at index $index must '
+          'contain a bool');
+    }
+    if (docMap[bulkCollation] != null &&
+        docMap[bulkCollation] is! CollationOptions &&
+        docMap[bulkCollation] is! Map<String, dynamic>) {
+      throw MongoDartError('The "$bulkCollation" key of the '
+          '"$bulkReplaceOne" element at index $index must '
+          'contain a CollationOptions element or a Map representation '
+          'of a collation');
+    }
+    if (docMap[bulkHint] != null && docMap[bulkHint] is! String) {
+      throw MongoDartError('The "$bulkHint" key of the '
+          '"$bulkReplaceOne" element at index $index must '
+          'contain a String');
+    }
+    if (docMap[bulkHintDocument] != null &&
+        docMap[bulkHintDocument] is! Map<String, Object>) {
+      throw MongoDartError('The "$bulkHintDocument" key of the '
+          '"$bulkReplaceOne" element at index $index must '
+          'contain a Map');
+    }
+    replaceOne(ReplaceOneStatement(filterMap, docMap[bulkReplacement],
+        upsert: docMap[bulkUpsert],
+        collation: docMap[bulkCollation] is Map<String, dynamic>
+            ? CollationOptions.fromMap(docMap[bulkCollation])
+            : docMap[bulkCollation],
+        hint: docMap[bulkHint],
+        hintDocument: docMap[bulkHintDocument]));
+  }
+
+  /// updateOne updates a single document in the collection that matches
+  /// the filter. If multiple documents match, updateOne will update the
+  /// first matching document only.
   void updateOne(UpdateOneStatement updateRequest) =>
       _setCommand(UpdateOneOperation(collection, updateRequest));
 
+  /// Same as updateOne but in Map format.
+  /// Schema:
+  /// { updateOne :
+  ///    {
+  ///       "filter": <Map>,
+  ///       "update": <Map or pipeline>,     // Changed in 4.2
+  ///       "upsert": <bool>,
+  ///       "collation": <CollationOptions | Map>,
+  ///       "arrayFilters": [ <filterdocument1>, ... ],
+  ///       "hint": <String>                 // Available starting in 4.2.1
+  ///       "hintDocument": <Map>            // Available starting in 4.2.1
+  ///    }
+  /// }
+  void updateOneFromMap(Map<String, Object> docMap, int index) {
+    var filterMap = docMap[bulkFilter];
+    if (filterMap is! Map<String, Object>) {
+      throw MongoDartError('The "$bulkFilter" key of the '
+          '"$bulkUpdateOne" element at index $index must '
+          'contain a Map');
+    }
+    if (docMap[bulkUpdate] is! Map<String, Object> &&
+        docMap[bulkUpdate] is! List<Map<String, dynamic>>) {
+      throw MongoDartError('The "$bulkUpdate" key of the '
+          '"$bulkUpdateOne" element at index $index must '
+          'contain a Map or a pipeline (List<Map>)');
+    }
+    if (docMap[bulkUpsert] != null && docMap[bulkUpsert] is! bool) {
+      throw MongoDartError('The "$bulkUpsert" key of the '
+          '"$bulkUpdateOne" element at index $index must '
+          'contain a bool');
+    }
+    if (docMap[bulkCollation] != null &&
+        docMap[bulkCollation] is! CollationOptions &&
+        docMap[bulkCollation] is! Map<String, dynamic>) {
+      throw MongoDartError('The "$bulkCollation" key of the '
+          '"$bulkUpdateOne" element at index $index must '
+          'contain a CollationOptions element or a Map representation '
+          'of a collation');
+    }
+    if (docMap[bulkArrayFilters] != null &&
+        docMap[bulkArrayFilters] is! List<Map<String, dynamic>>) {
+      throw MongoDartError('The "$bulkArrayFilters" key of the '
+          '"$bulkUpdateOne" element at index $index must '
+          'contain a List<Map<String, dynamic>> Object');
+    }
+    if (docMap[bulkHint] != null && docMap[bulkHint] is! String) {
+      throw MongoDartError('The "$bulkHint" key of the '
+          '"$bulkUpdateOne" element at index $index must '
+          'contain a String');
+    }
+    if (docMap[bulkHintDocument] != null &&
+        docMap[bulkHintDocument] is! Map<String, Object>) {
+      throw MongoDartError('The "$bulkHintDocument" key of the '
+          '"$bulkUpdateOne" element at index $index must '
+          'contain a Map');
+    }
+    updateOne(UpdateOneStatement(filterMap, docMap[bulkUpdate],
+        upsert: docMap[bulkUpsert],
+        collation: docMap[bulkCollation] is Map<String, dynamic>
+            ? CollationOptions.fromMap(docMap[bulkCollation])
+            : docMap[bulkCollation],
+        arrayFilters: docMap[bulkArrayFilters],
+        hint: docMap[bulkHint],
+        hintDocument: docMap[bulkHintDocument]));
+  }
+
+  /// updateMany updates all documents in the collection that match the filter.
   void updateMany(UpdateManyStatement updateRequest) =>
       _setCommand(UpdateManyOperation(collection, updateRequest));
+
+  /// Same as updateMany but in Map format.
+  /// Schema:
+  /// { updateMany :
+  ///    {
+  ///       "filter" : <Map>,
+  ///       "update" : <Map or pipeline>,    // Changed in MongoDB 4.2
+  ///       "upsert" : <bool>,
+  ///       "collation": <CollationOptions | Map>,
+  ///       "arrayFilters": [ <filterdocument1>, ... ],
+  ///       "hint": <String>                 // Available starting in 4.2.1
+  ///       "hintDocument": <Map>            // Available starting in 4.2.1
+  ///    }
+  /// }
+  void updateManyFromMap(Map<String, Object> docMap, int index) {
+    var filterMap = docMap[bulkFilter];
+    if (filterMap is! Map<String, Object>) {
+      throw MongoDartError('The "$bulkFilter" key of the '
+          '"$bulkUpdateMany" element at index $index must '
+          'contain a Map');
+    }
+    if (docMap[bulkUpdate] is! Map<String, Object> &&
+        docMap[bulkUpdate] is! List<Map<String, dynamic>>) {
+      throw MongoDartError('The "$bulkUpdate" key of the '
+          '"$bulkUpdateMany" element at index $index must '
+          'contain a Map or a pipeline (List<Map>)');
+    }
+    if (docMap[bulkUpsert] != null && docMap[bulkUpsert] is! bool) {
+      throw MongoDartError('The "$bulkUpsert" key of the '
+          '"$bulkUpdateMany" element at index $index must '
+          'contain a bool');
+    }
+    if (docMap[bulkCollation] != null &&
+        docMap[bulkCollation] is! CollationOptions &&
+        docMap[bulkCollation] is! Map<String, dynamic>) {
+      throw MongoDartError('The "$bulkCollation" key of the '
+          '"$bulkUpdateMany" element at index $index must '
+          'contain a CollationOptions element or a Map representation '
+          'of a collation');
+    }
+    if (docMap[bulkArrayFilters] != null &&
+        docMap[bulkArrayFilters] is! List<Map<String, dynamic>>) {
+      throw MongoDartError('The "$bulkArrayFilters" key of the '
+          '"$bulkUpdateMany" element at index $index must '
+          'contain a List<Map<String, dynamic>> Object');
+    }
+    if (docMap[bulkHint] != null && docMap[bulkHint] is! String) {
+      throw MongoDartError('The "$bulkHint" key of the '
+          '"$bulkUpdateMany" element at index $index must '
+          'contain a String');
+    }
+    if (docMap[bulkHintDocument] != null &&
+        docMap[bulkHintDocument] is! Map<String, Object>) {
+      throw MongoDartError('The "$bulkHintDocument" key of the '
+          '"$bulkUpdateMany" element at index $index must '
+          'contain a Map');
+    }
+    updateMany(UpdateManyStatement(filterMap, docMap[bulkUpdate],
+        upsert: docMap[bulkUpsert],
+        collation: docMap[bulkCollation] is Map<String, dynamic>
+            ? CollationOptions.fromMap(docMap[bulkCollation])
+            : docMap[bulkCollation],
+        arrayFilters: docMap[bulkArrayFilters],
+        hint: docMap[bulkHint],
+        hintDocument: docMap[bulkHintDocument]));
+  }
 
   void _setCommand(CommandOperation operation) =>
       addCommand(operation.$buildCommand());
@@ -70,6 +359,8 @@ abstract class Bulk extends CommandOperation {
   void addCommand(Map<String, Object> command);
 
   List<Map<String, Object>> getBulkCommands();
+
+  List<Map<int, int>> getBulkInputOrigins();
 
   @override
   Future<Map<String, Object>> execute() =>
@@ -94,8 +385,10 @@ abstract class Bulk extends CommandOperation {
     }*/
 
     var commands = getBulkCommands();
+    var origins = getBulkInputOrigins();
     var saveOptions = Map<String, Object>.from(options);
 
+    var batchIndex = 0;
     for (var command in commands) {
       processOptions(command);
       command.addAll(options);
@@ -104,18 +397,34 @@ abstract class Bulk extends CommandOperation {
         // search for the right connection
       }
 
-      // Todo remove debug()
-      //print(command);
       var modernMessage = MongoModernMessage(command);
 
       var ret =
           await db.executeModernMessage(modernMessage, connection: connection);
-      ret['commandType'] = command.keys.first;
+
+      ret[keyCommandType] = command.keys.first;
+      if (ret.containsKey(keyWriteErrors)) {
+        List writeErrors = ret[keyWriteErrors];
+        for (Map error in writeErrors ?? []) {
+          var selectedKey = 0;
+          for (var key in origins[batchIndex].keys ?? []) {
+            if (key <= error[keyIndex] && key > selectedKey) {
+              selectedKey = key;
+            }
+          }
+          var opInputIndex = origins[batchIndex][selectedKey];
+          error[keyOperationInputIndex] = opInputIndex;
+        }
+      }
+      ret[keyBatchIndex] = batchIndex++;
+
       retList.add(ret);
       if (isOrdered) {
         if (ret[keyOk] == 0.0 ||
-            ret.containsKey(keyWriteErrors) ||
-            ret.containsKey(keyWriteConcernError)) {
+                ret.containsKey(
+                    keyWriteErrors) /* ||
+            ret.containsKey(keyWriteConcernError) */
+            ) {
           return retList;
         }
       }
@@ -137,11 +446,9 @@ abstract class Bulk extends CommandOperation {
           break;
         case keyUpdate:
           writeCommandType = WriteCommandType.update;
-
           break;
         case keyDelete:
           writeCommandType = WriteCommandType.delete;
-
           break;
         default:
           throw StateError('Unknown command type');
@@ -152,16 +459,50 @@ abstract class Bulk extends CommandOperation {
         ret.mergeFromMap(writeCommandType, executionMap);
       }
     }
+    ret.ids = ids.sublist(0, min<int>(ids.length, ret.nInserted));
     return ret;
-    /* return BulkWriteResult.fromMap(WriteCommandType.insert, ret)
-      ..ids = ids
-      ..documents = overallDocuments; */
+  }
+
+  List<Map<int, int>> splitInputOrigins(
+      Map<int, int> origins, int commandsLength) {
+    if (origins.isEmpty) {
+      return [origins];
+    }
+    var maxWriteBatchSize = MongoModernMessage.maxWriteBatchSize;
+    if (commandsLength <= maxWriteBatchSize) {
+      return [origins];
+    }
+    var ret = <Map<int, int>>[];
+    var offset = 0;
+    var elementLimit = maxWriteBatchSize - 1;
+    var rest = commandsLength;
+    Map<int, int> splittedElement;
+    var highestKey = 0;
+    var highestOperation = 0;
+    while (rest > 0) {
+      splittedElement = <int, int>{if (offset > 0) 0: highestOperation};
+      for (var key in origins.keys) {
+        if (key >= offset && key <= elementLimit) {
+          if (key > highestKey) {
+            highestKey = key;
+            highestOperation = origins[key];
+          }
+          splittedElement[key - offset] = origins[key];
+        }
+      }
+      offset = elementLimit + 1;
+      elementLimit = min(commandsLength, elementLimit + maxWriteBatchSize);
+      rest -= maxWriteBatchSize;
+      ret.add(splittedElement);
+    }
+
+    return ret;
   }
 
   /// Split the command if the number of documents exceed the maxWriteBatchSixe
   ///
   /// Here we assume that the command is made this way:
-  /// { <commandType>: <collectionName>, <commandArgument> : <documentsList>, 
+  /// { <commandType>: <collectionName>, <commandArgument> : <documentsList>,
   /// ...maybe others}
   List<Map<String, Object>> splitCommands(Map<String, Object> command) {
     var ret = <Map<String, Object>>[];

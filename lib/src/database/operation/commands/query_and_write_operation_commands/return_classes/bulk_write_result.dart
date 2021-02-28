@@ -38,16 +38,20 @@ class BulkWriteResult extends AbstractWriteResult {
     if (result[keyOk] == 0.0) {
       ok = result[keyOk];
     }
-    switch (writeCommandType) {
-      case WriteCommandType.insert:
-        nInserted += result[keyN];
-        break;
-      case WriteCommandType.update:
-        nMatched += result[keyN];
-        break;
-      case WriteCommandType.delete:
-        nRemoved += result[keyN];
-        break;
+    // When there is an error (such that 'ok' == 0.0), the 'n' element
+    // is not returned
+    if (result.containsKey(keyN)) {
+      switch (writeCommandType) {
+        case WriteCommandType.insert:
+          nInserted += result[keyN];
+          break;
+        case WriteCommandType.update:
+          nMatched += result[keyN];
+          break;
+        case WriteCommandType.delete:
+          nRemoved += result[keyN];
+          break;
+      }
     }
     if (result.containsKey(keyNModified)) {
       nModified += result[keyNModified];

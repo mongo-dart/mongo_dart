@@ -92,6 +92,10 @@ class CollationOptions {
       this.maxVariable,
       this.backwards,
       this.normalization}) {
+    if (locale == null) {
+      throw MongoDartError(
+          'Locale parameter required in Collation constructor');
+    }
     if (strength != null && (strength < 1 || strength > 5)) {
       throw MongoDartError(
           'The allowed values for the strngt parameter are 1 to 5');
@@ -108,6 +112,63 @@ class CollationOptions {
       throw MongoDartError(
           'invalid value "$maxVariable" for the maxVariable parameter');
     }
+  }
+
+  /// A constructor that accepts a Map with the following schema:
+  /// {
+  ///   locale: <String>,
+  ///   caseLevel: <bool>,
+  ///   caseFirst: <String>,
+  ///   strength: <int>,
+  ///   numericOrdering: <bool>,
+  ///   alternate: <String>,
+  ///   maxVariable: <String>,
+  ///   backwards: <bool>
+  /// }
+  factory CollationOptions.fromMap(Map<String, Object> collationMap) {
+    if (collationMap == null) {
+      throw MongoDartError('The collation constructor requires a Map');
+    }
+    if (collationMap[keyLocale] is! String) {
+      throw MongoDartError('$keyLocale must be of type String');
+    }
+    if (collationMap[keyCaseLevel] != null &&
+        collationMap[keyCaseLevel] is! bool) {
+      throw MongoDartError('$keyCaseLevel must be of type bool');
+    }
+    if (collationMap[keyCaseFirst] != null &&
+        collationMap[keyCaseFirst] is! String) {
+      throw MongoDartError('$keyCaseFirst must be of type String');
+    }
+    if (collationMap[keyStrength] != null &&
+        collationMap[keyStrength] is! int) {
+      throw MongoDartError('$keyStrength must be of type int');
+    }
+    if (collationMap[keyNumericOrdering] != null &&
+        collationMap[keyNumericOrdering] is! bool) {
+      throw MongoDartError('$keyNumericOrdering must be of type bool');
+    }
+    if (collationMap[keyAlternate] != null &&
+        collationMap[keyAlternate] is! String) {
+      throw MongoDartError('$keyAlternate must be of type String');
+    }
+    if (collationMap[keyMaxVariable] != null &&
+        collationMap[keyMaxVariable] is! String) {
+      throw MongoDartError('$keyMaxVariable must be of type String');
+    }
+    if (collationMap[keyBackwards] != null &&
+        collationMap[keyBackwards] is! bool) {
+      throw MongoDartError('$keyBackwards must be of type bool');
+    }
+
+    return CollationOptions(collationMap[keyLocale],
+        caseLevel: collationMap[keyCaseLevel],
+        caseFirst: collationMap[keyCaseFirst],
+        strength: collationMap[keyStrength],
+        numericOrdering: collationMap[keyNumericOrdering],
+        alternate: collationMap[keyAlternate],
+        maxVariable: collationMap[keyMaxVariable],
+        backwards: collationMap[keyBackwards]);
   }
 
   Map<String, Object> get options => <String, Object>{

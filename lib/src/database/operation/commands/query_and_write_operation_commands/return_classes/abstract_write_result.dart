@@ -136,23 +136,27 @@ abstract class AbstractWriteResult with BasicResult {
       case WriteCommandType.insert:
         return nInserted > 0;
       case WriteCommandType.update:
-        return nModified > 0 || nUpserted > 0;
+        return nModified + nUpserted > 0;
       case WriteCommandType.delete:
         return nRemoved > 0;
+      // mixed case, the writeCommandType is Null
+      default:
+        return nInserted + nModified + nUpserted + nRemoved > 0;
     }
-    return false;
   }
 
-  // Nothing has been procedd
+  // Nothing has been processed
   bool get isFailure {
     switch (writeCommandType) {
       case WriteCommandType.insert:
         return nInserted == 0;
       case WriteCommandType.update:
-        return nModified == 0 && nUpserted == 0;
+        return nModified + nUpserted == 0;
       case WriteCommandType.delete:
         return nRemoved == 0;
+      // mixed case, the writeCommandType is Null
+      default:
+        return nInserted + nModified + nUpserted + nRemoved == 0;
     }
-    return true;
   }
 }

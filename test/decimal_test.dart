@@ -71,7 +71,7 @@ void main() async {
           var value = values[idx];
           var update = (value['a'] as Rational) + ra;
           //print(update);
-          await collection.legacyUpdate(<String, dynamic>{
+          await collection.update(<String, dynamic>{
             '_id': value['_id']
           }, <String, dynamic>{
             r'$set': {'r': update}
@@ -86,7 +86,7 @@ void main() async {
         await collection
             .insert(<String, dynamic>{'value': Rational.fromInt(3), 'qty': 4});
 
-        await collection.legacyUpdate(<String, dynamic>{}, <String, dynamic>{
+        await collection.update(<String, dynamic>{}, <String, dynamic>{
           r'$mul': {'value': Rational.fromInt(5), 'qty': 5}
         });
 
@@ -109,7 +109,7 @@ void main() async {
           ..inc('value', Rational.fromInt(2))
           ..inc('qty', 3);
 
-        await collection.legacyUpdate(<String, dynamic>{}, mody.map);
+        await collection.update(<String, dynamic>{}, mody.map);
 
         var values = await collection.find(<String, dynamic>{}).toList();
 

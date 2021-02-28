@@ -630,7 +630,7 @@ db.runCommand(
 { "$sort": { "_id": 1 } }
 ]});
  */
-  var pipeline = [];
+  var pipeline = <Map<String, Object>>[];
   var p1 = {
     '\$group': {
       '_id': {'game': '\$game', 'player': '\$player'},
@@ -655,7 +655,7 @@ db.runCommand(
   expect(p1['\$group'], isNotNull);
   // set batchSize parameter to split response to 2 chunks
   var aggregate = await collection
-      .legacyAggregateToStream(pipeline,
+      .aggregateToStream(pipeline,
           cursorOptions: {'batchSize': 1}, allowDiskUse: true)
       .toList();
 
@@ -690,7 +690,7 @@ Future testUpdateWithUpsert() async {
   var objectUpdate = {
     r'$set': {'value': 20}
   };
-  result = await collection.legacyUpdate({'name': 'a'}, objectUpdate);
+  result = await collection.update({'name': 'a'}, objectUpdate);
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
 
@@ -715,7 +715,7 @@ Future testUpdateWithMultiUpdate() async {
   expect(results.first['key'], 'a');
   expect(results.first['value'], 'initial_value1');
 
-  result = await collection.legacyUpdate(where.eq('key', 'a'),
+  result = await collection.update(where.eq('key', 'a'),
       modify.set('value', 'value_modified_for_only_one_with_default'));
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
@@ -724,7 +724,7 @@ Future testUpdateWithMultiUpdate() async {
       .find({'value': 'value_modified_for_only_one_with_default'}).toList();
   expect(results.length, 1);
 
-  result = await collection.legacyUpdate(where.eq('key', 'a'),
+  result = await collection.update(where.eq('key', 'a'),
       modify.set('value', 'value_modified_for_only_one_with_multiupdate_false'),
       multiUpdate: false);
   expect(result['updatedExisting'], true);
@@ -734,7 +734,7 @@ Future testUpdateWithMultiUpdate() async {
       {'value': 'value_modified_for_only_one_with_multiupdate_false'}).toList();
   expect(results.length, 1);
 
-  result = await collection.legacyUpdate(
+  result = await collection.update(
       where.eq('key', 'a'), modify.set('value', 'new_value'),
       multiUpdate: true);
   expect(result['updatedExisting'], true);
@@ -1150,7 +1150,7 @@ Future testTtlIndex() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  // Here the CreateIndexOptions is set to null, but you can pass other 
+  // Here the CreateIndexOptions is set to null, but you can pass other
   // parameters if needed
   var indexOperation = CreateIndexOperation(db, collection, 'closingDate', null,
       rawOptions: {'expireAfterSeconds': 1});
@@ -1193,11 +1193,11 @@ Future testSafeModeUpdate() async {
     });
   }
 
-  var result = await collection.legacyUpdate({'a': 200}, {'a': 100});
+  var result = await collection.update({'a': 200}, {'a': 100});
   expect(result['updatedExisting'], false);
   expect(result['n'], 0);
 
-  result = await collection.legacyUpdate({'a': 3}, {'a': 100});
+  result = await collection.update({'a': 3}, {'a': 100});
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
 }
@@ -1347,7 +1347,7 @@ Future testFieldLevelUpdateSimple() async {
   expect(result, isNotNull);
 
   id = result['_id'] as ObjectId;
-  result = await collection.legacyUpdate(where.id(id), modify.set('name', 'BBB'));
+  result = await collection.update(where.id(id), modify.set('name', 'BBB'));
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
 
@@ -1372,10 +1372,12 @@ Future testUpdateOnClosedConnection() async {
   var collection = db.collection(collectionName);
 
   await db.close();
-  expect(
-      () async => collection.save({'test': 'test'}),
-      throwsA(
-          (MongoDartError e) => e.message == 'DB is not open. State.CLOSED'));
+  try {
+    await collection.insert({'test': 'test'});
+  } catch (e) {
+    expect(e is MongoDartError, isTrue);
+    expect(e.message.endsWith('State.CLOSED'), isTrue);
+  }
 }
 
 Future testReopeningDb() async {
@@ -1438,11 +1440,12 @@ void testInvalidIndexCreationErrorHandling1() {
       throwsA((e) => e is ArgumentError));
 }
 
-Future testFindOneWhileStateIsOpening() {
+Future testFindOneWhileStateIsOpening() async {
   var collectionName = getRandomCollectionName();
 
   var db = Db(DefaultUri);
-  return Future.sync(() {
+  return Future.sync(() async {
+    // ignore: unawaited_futures
     db.open().then((_) {
       return db.collection(collectionName).findOne();
     }).then((res) {
@@ -1450,12 +1453,12 @@ Future testFindOneWhileStateIsOpening() {
       db.close();
     });
 
-    db.collection(collectionName).findOne().then((res) {
-      expect(res, isNull);
-    }).catchError((e) {
+    try {
+      await db.collection(collectionName).findOne();
+    } catch (e) {
       expect(e is MongoDartError, isTrue);
       expect(db.state == State.OPENING, isTrue);
-    });
+    }
   });
 }
 

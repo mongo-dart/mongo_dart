@@ -67,6 +67,37 @@ void main() async {
       expect(result.length, 10000);
     }, skip: cannotRunTests);
 
+    test(r'Select with $where', () async {
+      var collectionName = getRandomCollectionName();
+      var collection = db.collection(collectionName);
+
+      var ret = await insertManyDocuments(collection, 10000);
+      expect(ret.isSuccess, isTrue);
+
+      var result = await collection.modernFind(filter: {
+        r'$where': 'function() { '
+            ' return (this.a < 100) }'
+      }).toList();
+      expect(result.length, 100);
+    }, skip: cannotRunTests);
+
+    test(r'Select with $where - possible injection', () async {
+      var collectionName = getRandomCollectionName();
+      var collection = db.collection(collectionName);
+
+      var ret = await insertManyDocuments(collection, 10000);
+      expect(ret.isSuccess, isTrue);
+
+      // instead of 100
+      var fromUser = '1 || "" == "" ';
+
+      var result = await collection.modernFind(filter: {
+        r'$where': 'function() { return (this.a < $fromUser) }'
+      }).toList();
+
+      expect(result.length, 10000);
+    }, skip: cannotRunTests);
+
     test('Simple read - using stream', () async {
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);

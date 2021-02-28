@@ -1046,7 +1046,7 @@ void main() async {
         expect(elements.first['status'], 'A');
         expect(elements.first['points'], 1);
       });
-      test('Update specific fields on one document - legacy return type',
+      test('Update specific fields on one document',
           () async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
@@ -1074,13 +1074,12 @@ void main() async {
 
         var res = await collection.modernUpdate(where.eq('member', 'abc123'),
             ModifierBuilder().set('status', 'A').inc('points', 1),
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000),
-            modernReply: false);
+            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
         expect(res[keyN], 1);
-        expect(res[keyUpdatedExisting], true);
+        expect(res[keyNModified], 1);
 
         var elements =
             await collection.find(where.eq('member', 'abc123')).toList();
