@@ -2,12 +2,17 @@
 
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
-import 'package:mongo_dart/src/database/operation/commands/administration_commands/wrapper/create_collection/create_collection_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/aggregate/aggregate_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/aggreagation_commands/wrapper/change_stream/change_stream_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_operation/find_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_operation/find_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
+import 'package:mongo_dart/src/database/commands/administration_commands/wrapper/create_collection/create_collection_options.dart';
+import 'package:mongo_dart/src/database/commands/aggreagation_commands/aggregate/aggregate_operation.dart';
+import 'package:mongo_dart/src/database/commands/aggreagation_commands/count/count_operation.dart';
+import 'package:mongo_dart/src/database/commands/aggreagation_commands/count/count_options.dart';
+import 'package:mongo_dart/src/database/commands/aggreagation_commands/distinct/distinct_operation.dart';
+import 'package:mongo_dart/src/database/commands/aggreagation_commands/distinct/distinct_options.dart';
+import 'package:mongo_dart/src/database/commands/aggreagation_commands/wrapper/change_stream/change_stream_operation.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_operation/find_operation.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_operation/find_options.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
+import 'package:mongo_dart/src/database/commands/parameters/read_concern.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:rational/rational.dart';
 import 'package:test/test.dart';
@@ -1014,6 +1019,611 @@ db.runCommand(
       await Future.forEach(usedCollectionNames,
           (String collectionName) => db.collection(collectionName).drop());
       await db.close();
+    });
+  });
+
+  group('Count', () {
+    var cannotRunTests = false;
+    setUp(() async {
+      await initializeDatabase();
+      if (db.masterConnection == null ||
+          !db.masterConnection.serverCapabilities.supportsOpMsg) {
+        cannotRunTests = true;
+      }
+    });
+
+    tearDown(() async {
+      await cleanupDatabase();
+    });
+
+    group('Command', () {
+      test('All documents - Map result', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {'game': 'At the Gates of Loyang', 'cost': Rational.parse('15.20')},
+          {'game': 'Age of Steam', 'cost': Rational.parse('16.80')},
+          {'game': 'Fresco', 'cost': Rational.parse('13')}
+        ]);
+
+        var operation = CountOperation(collection);
+
+        var result = await operation.execute();
+
+        expect(result[keyOk], 1.0);
+        expect(result[keyN], 3);
+      }, skip: cannotRunTests);
+      test('All documents - Class result', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {'game': 'At the Gates of Loyang', 'cost': Rational.parse('15.20')},
+          {'game': 'Age of Steam', 'cost': Rational.parse('16.80')},
+          {'game': 'Fresco', 'cost': Rational.parse('13')}
+        ]);
+
+        var operation = CountOperation(collection);
+
+        var result = await operation.executeDocument();
+
+        expect(result.ok, 1.0);
+        expect(result.count, 3);
+      }, skip: cannotRunTests);
+      test('Selected documents - Class result', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {'game': 'At the Gates of Loyang', 'cost': Rational.parse('15.20')},
+          {'game': 'Age of Steam', 'cost': Rational.parse('16.80')},
+          {'game': 'Fresco', 'cost': Rational.parse('13')}
+        ]);
+
+        var operation = CountOperation(collection,
+            query: where.gt('cost', Rational.fromInt(15)).map[key$Query]);
+
+        var result = await operation.executeDocument();
+
+        expect(result.ok, 1.0);
+        expect(result.count, 2);
+      }, skip: cannotRunTests);
+      test('Skip documents and majority read concern - Class result', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {'game': 'At the Gates of Loyang', 'cost': Rational.parse('15.20')},
+          {'game': 'Age of Steam', 'cost': Rational.parse('16.80')},
+          {'game': 'Fresco', 'cost': Rational.parse('13')}
+        ]);
+
+        var operation = CountOperation(collection,
+            // It seems that skip does not work with a selection
+            //query: where.gt('cost', Rational.fromInt(15)).map[key$Query],
+            skip: 1,
+            countOptions: CountOptions(
+                readConcern: ReadConcern(ReadConcernLevel.majority)));
+
+        var result = await operation.executeDocument();
+
+        expect(result.ok, 1.0);
+        expect(result.count, 2);
+      }, skip: cannotRunTests);
+
+      tearDownAll(() async {
+        await db.open();
+        await Future.forEach(usedCollectionNames,
+            (String collectionName) => db.collection(collectionName).drop());
+        await db.close();
+      });
+    });
+  });
+
+  group('Distinct', () {
+    var cannotRunTests = false;
+    var running3_6 = false;
+    var isReplicaSet = false;
+    var isSharded = false;
+    setUp(() async {
+      await initializeDatabase();
+      if (db.masterConnection == null ||
+          !db.masterConnection.serverCapabilities.supportsOpMsg) {
+        cannotRunTests = true;
+      }
+      var serverFcv = db?.masterConnection?.serverCapabilities?.fcv ?? '0.0';
+      if (serverFcv.compareTo('3.6') == 0) {
+        running3_6 = true;
+      }
+      isReplicaSet =
+          db?.masterConnection?.serverCapabilities?.isReplicaSet ?? false;
+      isSharded =
+          db?.masterConnection?.serverCapabilities?.isShardedCluster ?? false;
+    });
+
+    tearDown(() async {
+      await cleanupDatabase();
+    });
+
+    group('Command', () {
+      test('Return Distinct Values for a Field - Map result', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {
+            '_id': 1,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'red'},
+            'sizes': ['S', 'M']
+          },
+          {
+            '_id': 2,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'blue'},
+            'sizes': ['M', 'L']
+          },
+          {
+            '_id': 3,
+            'dept': 'B',
+            'item': {'sku': '222', 'color': 'blue'},
+            'sizes': 'S'
+          },
+          {
+            '_id': 4,
+            'dept': 'A',
+            'item': {'sku': '333', 'color': 'black'},
+            'sizes': ['S']
+          }
+        ]);
+
+        var operation = DistinctOperation(collection, 'dept');
+
+        var result = await operation.execute();
+
+        expect(result[keyOk], 1.0);
+        expect(result[keyValues], isNotNull);
+        expect((result[keyValues] as List).length, 2);
+        expect((result[keyValues] as List).first, 'A');
+        expect((result[keyValues] as List).last, 'B');
+      }, skip: cannotRunTests);
+
+      test('Return Distinct Values for a Field - Class result', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {
+            '_id': 1,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'red'},
+            'sizes': ['S', 'M']
+          },
+          {
+            '_id': 2,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'blue'},
+            'sizes': ['M', 'L']
+          },
+          {
+            '_id': 3,
+            'dept': 'B',
+            'item': {'sku': '222', 'color': 'blue'},
+            'sizes': 'S'
+          },
+          {
+            '_id': 4,
+            'dept': 'A',
+            'item': {'sku': '333', 'color': 'black'},
+            'sizes': ['S']
+          }
+        ]);
+
+        var operation = DistinctOperation(collection, 'dept');
+
+        var result = await operation.executeDocument();
+
+        expect(result.ok, 1.0);
+        expect(result.values, isNotNull);
+        expect(result.values.length, 2);
+        expect(result.values.first, 'A');
+        expect(result.values.last, 'B');
+      }, skip: cannotRunTests);
+
+      test('Return Distinct Values for an Embedded Field - Class result',
+          () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {
+            '_id': 1,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'red'},
+            'sizes': ['S', 'M']
+          },
+          {
+            '_id': 2,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'blue'},
+            'sizes': ['M', 'L']
+          },
+          {
+            '_id': 3,
+            'dept': 'B',
+            'item': {'sku': '222', 'color': 'blue'},
+            'sizes': 'S'
+          },
+          {
+            '_id': 4,
+            'dept': 'A',
+            'item': {'sku': '333', 'color': 'black'},
+            'sizes': ['S']
+          }
+        ]);
+
+        var operation = DistinctOperation(collection, 'item.sku');
+
+        var result = await operation.executeDocument();
+
+        expect(result.ok, 1.0);
+        expect(result.values, isNotNull);
+        expect(result.values.length, 3);
+        expect(result.values.first, '111');
+        expect(result.values.last, '333');
+      }, skip: cannotRunTests);
+
+      test('Return Distinct Values for an Array Field - Class result',
+          () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {
+            '_id': 1,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'red'},
+            'sizes': ['S', 'M']
+          },
+          {
+            '_id': 2,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'blue'},
+            'sizes': ['M', 'L']
+          },
+          {
+            '_id': 3,
+            'dept': 'B',
+            'item': {'sku': '222', 'color': 'blue'},
+            'sizes': 'S'
+          },
+          {
+            '_id': 4,
+            'dept': 'A',
+            'item': {'sku': '333', 'color': 'black'},
+            'sizes': ['S']
+          }
+        ]);
+
+        var operation = DistinctOperation(collection, 'sizes');
+
+        var result = await operation.executeDocument();
+
+        expect(result.ok, 1.0);
+        expect(result.values, isNotNull);
+        expect(result.values.length, 3);
+        if (running3_6 && !isSharded) {
+          expect(result.values.first, 'M');
+          expect(result.values.last, 'L');
+        } else {
+          expect(result.values.first, 'L');
+          expect(result.values.last, 'S');
+        }
+      }, skip: cannotRunTests);
+
+      test(
+          'Selection with Distinct Values for an Embedded Field - Class result',
+          () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {
+            '_id': 1,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'red'},
+            'sizes': ['S', 'M']
+          },
+          {
+            '_id': 2,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'blue'},
+            'sizes': ['M', 'L']
+          },
+          {
+            '_id': 3,
+            'dept': 'B',
+            'item': {'sku': '222', 'color': 'blue'},
+            'sizes': 'S'
+          },
+          {
+            '_id': 4,
+            'dept': 'A',
+            'item': {'sku': '333', 'color': 'black'},
+            'sizes': ['S']
+          }
+        ]);
+
+        var operation =
+            DistinctOperation(collection, 'item.sku', query: {'dept': 'A'});
+        var result = await operation.executeDocument();
+
+        expect(result.ok, 1.0);
+        expect(result.values, isNotNull);
+        expect(result.values.length, 2);
+        expect(result.values.first, '111');
+        expect(result.values.last, '333');
+      }, skip: cannotRunTests);
+      test('Specify a collation - Class result', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await insertFrenchCafe(collection);
+
+        var operation = DistinctOperation(collection, 'category',
+            distinctOptions: DistinctOptions(
+                collation: CollationOptions('fr', strength: 1)));
+        var result = await operation.executeDocument();
+
+        expect(result.ok, 1.0);
+        expect(result.values, isNotNull);
+        expect(result.values.length, 1);
+        expect(result.values.first, 'café');
+      }, skip: cannotRunTests);
+
+      tearDownAll(() async {
+        await db.open();
+        await Future.forEach(usedCollectionNames,
+            (String collectionName) => db.collection(collectionName).drop());
+        await db.close();
+      });
+    });
+
+    group('Collection helper', () {
+      test('Return Distinct Values for a Field - Map result', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {
+            '_id': 1,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'red'},
+            'sizes': ['S', 'M']
+          },
+          {
+            '_id': 2,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'blue'},
+            'sizes': ['M', 'L']
+          },
+          {
+            '_id': 3,
+            'dept': 'B',
+            'item': {'sku': '222', 'color': 'blue'},
+            'sizes': 'S'
+          },
+          {
+            '_id': 4,
+            'dept': 'A',
+            'item': {'sku': '333', 'color': 'black'},
+            'sizes': ['S']
+          }
+        ]);
+
+        var result = await collection.modernDistinctMap('dept');
+
+        expect(result[keyOk], 1.0);
+        expect(result[keyValues], isNotNull);
+        expect((result[keyValues] as List).length, 2);
+        expect((result[keyValues] as List).first, 'A');
+        expect((result[keyValues] as List).last, 'B');
+      }, skip: cannotRunTests);
+
+      test('Return Distinct Values for a Field - Class result', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {
+            '_id': 1,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'red'},
+            'sizes': ['S', 'M']
+          },
+          {
+            '_id': 2,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'blue'},
+            'sizes': ['M', 'L']
+          },
+          {
+            '_id': 3,
+            'dept': 'B',
+            'item': {'sku': '222', 'color': 'blue'},
+            'sizes': 'S'
+          },
+          {
+            '_id': 4,
+            'dept': 'A',
+            'item': {'sku': '333', 'color': 'black'},
+            'sizes': ['S']
+          }
+        ]);
+
+        var result = await collection.modernDistinct('dept');
+
+        expect(result.ok, 1.0);
+        expect(result.values, isNotNull);
+        expect(result.values.length, 2);
+        expect(result.values.first, 'A');
+        expect(result.values.last, 'B');
+      }, skip: cannotRunTests);
+
+      test('Return Distinct Values for an Embedded Field - Class result',
+          () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {
+            '_id': 1,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'red'},
+            'sizes': ['S', 'M']
+          },
+          {
+            '_id': 2,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'blue'},
+            'sizes': ['M', 'L']
+          },
+          {
+            '_id': 3,
+            'dept': 'B',
+            'item': {'sku': '222', 'color': 'blue'},
+            'sizes': 'S'
+          },
+          {
+            '_id': 4,
+            'dept': 'A',
+            'item': {'sku': '333', 'color': 'black'},
+            'sizes': ['S']
+          }
+        ]);
+
+        var result = await collection.modernDistinct('item.sku');
+
+        expect(result.ok, 1.0);
+        expect(result.values, isNotNull);
+        expect(result.values.length, 3);
+        expect(result.values.first, '111');
+        expect(result.values.last, '333');
+      }, skip: cannotRunTests);
+
+      test('Return Distinct Values for an Array Field - Class result',
+          () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {
+            '_id': 1,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'red'},
+            'sizes': ['S', 'M']
+          },
+          {
+            '_id': 2,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'blue'},
+            'sizes': ['M', 'L']
+          },
+          {
+            '_id': 3,
+            'dept': 'B',
+            'item': {'sku': '222', 'color': 'blue'},
+            'sizes': 'S'
+          },
+          {
+            '_id': 4,
+            'dept': 'A',
+            'item': {'sku': '333', 'color': 'black'},
+            'sizes': ['S']
+          }
+        ]);
+
+        var operation = DistinctOperation(collection, 'sizes');
+
+        var result = await operation.executeDocument();
+
+        expect(result.ok, 1.0);
+        expect(result.values, isNotNull);
+        expect(result.values.length, 3);
+        if (running3_6 && !isSharded) {
+          expect(result.values.first, 'M');
+          expect(result.values.last, 'L');
+        } else {
+          expect(result.values.first, 'L');
+          expect(result.values.last, 'S');
+        }
+      }, skip: cannotRunTests);
+
+      test(
+          'Selection with Distinct Values for an Embedded Field - Class result',
+          () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await collection.insertMany(<Map<String, dynamic>>[
+          {
+            '_id': 1,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'red'},
+            'sizes': ['S', 'M']
+          },
+          {
+            '_id': 2,
+            'dept': 'A',
+            'item': {'sku': '111', 'color': 'blue'},
+            'sizes': ['M', 'L']
+          },
+          {
+            '_id': 3,
+            'dept': 'B',
+            'item': {'sku': '222', 'color': 'blue'},
+            'sizes': 'S'
+          },
+          {
+            '_id': 4,
+            'dept': 'A',
+            'item': {'sku': '333', 'color': 'black'},
+            'sizes': ['S']
+          }
+        ]);
+
+        var result =
+            await collection.modernDistinct('item.sku', query: {'dept': 'A'});
+
+        expect(result.ok, 1.0);
+        expect(result.values, isNotNull);
+        expect(result.values.length, 2);
+        expect(result.values.first, '111');
+        expect(result.values.last, '333');
+      }, skip: cannotRunTests);
+      test('Specify a collation - Class result', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        await insertFrenchCafe(collection);
+
+        var result = await collection.modernDistinct('category',
+            distinctOptions: DistinctOptions(
+                collation: CollationOptions('fr', strength: 1)));
+
+        expect(result.ok, 1.0);
+        expect(result.values, isNotNull);
+        expect(result.values.length, 1);
+        expect(result.values.first, 'café');
+      }, skip: cannotRunTests);
+
+      tearDownAll(() async {
+        await db.open();
+        await Future.forEach(usedCollectionNames,
+            (String collectionName) => db.collection(collectionName).drop());
+        await db.close();
+      });
     });
   });
 }

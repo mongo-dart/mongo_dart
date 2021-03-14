@@ -1,5 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/bulk_write_result.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/return_classes/bulk_write_result.dart';
 
 /// For op_msg
 Future<BulkWriteResult> insertOrders(DbCollection collection) async {

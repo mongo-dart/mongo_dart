@@ -241,8 +241,15 @@ class DbCollection {
     });
   }
 
-  // Todo - missing modern version
-  Future<Map<String, dynamic>> distinct(String field, [selector]) =>
+  Future<Map<String, dynamic>> distinct(String field, [selector]) async {
+    if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
+      return modernDistinctMap(field, query: selector);
+    }
+    return legacyDistinct(field, selector);
+  }
+
+  /// Old version to be used on MongoDb versions prior to 3.6
+  Future<Map<String, dynamic>> legacyDistinct(String field, [selector]) async =>
       db.executeDbCommand(DbCommand.createDistinctCommand(
           db, collectionName, field, _selectorBuilder2Map(selector)));
 
@@ -436,7 +443,7 @@ class DbCollection {
   // in order to allow the execution
   Future<WriteResult> insertOne(Map<String, dynamic> document,
       {WriteConcern writeConcern, bool bypassDocumentValidation}) async {
-    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+    if (!db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       throw MongoDartError('This method is not available before release 3.6');
     }
     return Future.sync(() {
@@ -459,7 +466,7 @@ class DbCollection {
       {WriteConcern writeConcern,
       bool ordered,
       bool bypassDocumentValidation}) async {
-    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+    if (!db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       throw MongoDartError('This method is not available before release 3.6');
     }
     return Future.sync(() {
@@ -596,7 +603,7 @@ class DbCollection {
       Map<String, Object> hintDocument,
       FindAndModifyOptions findAndModifyOptions,
       Map<String, Object> rawOptions}) async {
-    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+    if (!db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       throw MongoDartError('This method is not available before release 3.6');
     }
 
@@ -695,6 +702,35 @@ class DbCollection {
 
     return ModernCursor(operation).nextObject();
   }
+
+  /// Utility method for preparing a DistinctOperation
+  DistinctOperation _prepareDistinct(String field,
+          {query,
+          DistinctOptions distinctOptions,
+          Map<String, Object> rawOptions}) =>
+      DistinctOperation(this, field,
+          query: extractfilterMap(query),
+          distinctOptions: distinctOptions,
+          rawOptions: rawOptions);
+
+  /// Executes a Distinct command on this collection.
+  /// Retuns a DistinctResult class.
+  Future<DistinctResult> modernDistinct(String field,
+          {query,
+          DistinctOptions distinctOptions,
+          Map<String, Object> rawOptions}) async =>
+      _prepareDistinct(field, query: query, distinctOptions: distinctOptions)
+          .executeDocument();
+
+  /// Executes a Distinct command on this collection.
+  /// Retuns a Map like received from the server.
+  /// Used for compatibility with the legacy method
+  Future<Map<String, Object>> modernDistinctMap(String field,
+          {query,
+          DistinctOptions distinctOptions,
+          Map<String, Object> rawOptions}) async =>
+      _prepareDistinct(field, query: query, distinctOptions: distinctOptions)
+          .execute();
 
   /// This method returns a stream that can be read or transformed into
   /// a list with `.toList()`
@@ -818,19 +854,19 @@ class DbCollection {
           bulk.insertMany(docMap[bulkDocuments]);
           break;
         case bulkUpdateOne:
-          bulk.updateOneFromMap(docMap, index);
+          bulk.updateOneFromMap(docMap, index: index);
           break;
         case bulkUpdateMany:
-          bulk.updateManyFromMap(docMap, index);
+          bulk.updateManyFromMap(docMap, index: index);
           break;
         case bulkReplaceOne:
-          bulk.replaceOneFromMap(docMap, index);
+          bulk.replaceOneFromMap(docMap, index: index);
           break;
         case bulkDeleteOne:
-          bulk.deleteOneFromMap(docMap, index);
+          bulk.deleteOneFromMap(docMap, index: index);
           break;
         case bulkDeleteMany:
-          bulk.deleteManyFromMap(docMap, index);
+          bulk.deleteManyFromMap(docMap, index: index);
           break;
         default:
           throw StateError('The operation "$key" is not allowed in bulkWrite');

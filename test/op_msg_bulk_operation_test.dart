@@ -1,10 +1,10 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/bulk/ordered_bulk.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/bulk/unordered_bulk.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_statement.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_statement.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/bulk/ordered_bulk.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/bulk/unordered_bulk.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_statement.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_statement.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
@@ -824,6 +824,142 @@ void main() async {
         expect(findResult[1]['char'], 'Eldon');
         expect(findResult.last['char'], 'Dithras');
       }, skip: cannotRunTests);
+
+      test('Ordered Bulk - "All" method types', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var ret = await collection.bulkWrite([
+          {
+            bulkInsertMany: {
+              bulkDocuments: [
+                {'_id': 1, 'char': 'Brisbane', 'class': 'monk', 'lvl': 4},
+                {'_id': 2, 'char': 'Eldon', 'class': 'alchemist', 'lvl': 3},
+                {'_id': 3, 'char': 'Meldane', 'class': 'ranger', 'lvl': 3}
+              ]
+            }
+          },
+          {
+            'insertOne': {
+              'document': {
+                '_id': 4,
+                'char': 'Dithras',
+                'class': 'barbarian',
+                'lvl': 4
+              }
+            }
+          },
+          {
+            'insertOne': {
+              'document': {
+                '_id': 5,
+                'char': 'Taeln',
+                'class': 'fighter',
+                'lvl': 3
+              }
+            }
+          },
+          {
+            'updateOne': {
+              'filter': {'char': 'Eldon'},
+              'update': {
+                r'$set': {'status': 'Critical Injury'}
+              }
+            }
+          },
+          {
+            'deleteOne': {
+              'filter': {'char': 'Brisbane'}
+            }
+          },
+          {
+            'replaceOne': {
+              'filter': {'char': 'Meldane'},
+              'replacement': {'char': 'Tanys', 'class': 'oracle', 'lvl': 4}
+            }
+          }
+        ]);
+
+        expect(ret.ok, 1.0);
+        expect(ret.operationSucceeded, isTrue);
+        expect(ret.hasWriteErrors, isFalse);
+        expect(ret.hasWriteConcernError, isFalse);
+        expect(ret.nInserted, 5);
+        expect(ret.isSuccess, isTrue);
+        expect(ret.isPartialSuccess, isFalse);
+        expect(ret.writeCommandType, isNull);
+        expect(ret.nUpserted, 0);
+        expect(ret.nModified, 2);
+        expect(ret.nMatched, 2);
+        expect(ret.nRemoved, 1);
+        expect(ret.ids, isNotNull);
+        expect(ret.ids.length, 5);
+        expect(ret.ids.first, 1);
+        expect(ret.upserted, isEmpty);
+
+        var findResult = await collection.find().toList();
+        expect(findResult.length, 4);
+        expect(findResult.first['char'], 'Eldon');
+        expect(findResult[1]['char'], 'Tanys');
+        expect(findResult.last['char'], 'Taeln');
+      }, skip: cannotRunTests);
+
+      test('Ordered Bulk - "All" method types fromMap', () async {
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var bulk = OrderedBulk(collection);
+
+        bulk.insertMany([
+          {'_id': 1, 'char': 'Brisbane', 'class': 'monk', 'lvl': 4},
+          {'_id': 2, 'char': 'Eldon', 'class': 'alchemist', 'lvl': 3},
+          {'_id': 3, 'char': 'Meldane', 'class': 'ranger', 'lvl': 3}
+        ]);
+
+        bulk.insertOne(
+            {'_id': 4, 'char': 'Dithras', 'class': 'barbarian', 'lvl': 4});
+        bulk.insertOne(
+            {'_id': 5, 'char': 'Taeln', 'class': 'fighter', 'lvl': 3});
+        bulk.updateOneFromMap({
+          'filter': {'char': 'Eldon'},
+          'update': {
+            r'$set': {'status': 'Critical Injury'}
+          }
+        });
+        bulk.deleteOneFromMap({
+          'filter': {'char': 'Brisbane'}
+        });
+        bulk.replaceOneFromMap({
+          'filter': {'char': 'Meldane'},
+          'replacement': {'char': 'Tanys', 'class': 'oracle', 'lvl': 4}
+        });
+
+        var ret = await bulk.executeDocument();
+
+        expect(ret.ok, 1.0);
+        expect(ret.operationSucceeded, isTrue);
+        expect(ret.hasWriteErrors, isFalse);
+        expect(ret.hasWriteConcernError, isFalse);
+        expect(ret.nInserted, 5);
+        expect(ret.isSuccess, isTrue);
+        expect(ret.isPartialSuccess, isFalse);
+        expect(ret.writeCommandType, isNull);
+        expect(ret.nUpserted, 0);
+        expect(ret.nModified, 2);
+        expect(ret.nMatched, 2);
+        expect(ret.nRemoved, 1);
+        expect(ret.ids, isNotNull);
+        expect(ret.ids.length, 5);
+        expect(ret.ids.first, 1);
+        expect(ret.upserted, isEmpty);
+
+        var findResult = await collection.find().toList();
+        expect(findResult.length, 4);
+        expect(findResult.first['char'], 'Eldon');
+        expect(findResult[1]['char'], 'Tanys');
+        expect(findResult.last['char'], 'Taeln');
+      }, skip: cannotRunTests);
+
       test('Ordered Bulk - "One" method types - with error - 2', () async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);

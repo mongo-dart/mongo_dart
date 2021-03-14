@@ -1,8 +1,8 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/database/operation/commands/administration_commands/create_command/create_command.dart';
-import 'package:mongo_dart/src/database/operation/commands/administration_commands/create_command/create_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/find_operation/find_options.dart';
-import 'package:mongo_dart/src/database/operation/parameters/collation_options.dart';
+import 'package:mongo_dart/src/database/commands/administration_commands/create_command/create_command.dart';
+import 'package:mongo_dart/src/database/commands/administration_commands/create_command/create_options.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_operation/find_options.dart';
+import 'package:mongo_dart/src/database/commands/parameters/collation_options.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:rational/rational.dart';
 import 'package:test/test.dart';

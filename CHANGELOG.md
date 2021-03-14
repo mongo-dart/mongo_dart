@@ -2,9 +2,20 @@
 
 ## Recent change notes
 
+### 0.5.0-dev.4
+
+- distinct()
+- reorganized folder with new commands
+- more examples and docs
+
 ### 0.5.0-dev.3
 
-- Renamed DeleteRequest class as DeleteStatement
+- Renamed DeleteRequest classes as DeleteStatement
+- updateOne(), replaceOne() and updateMany()
+- modermFindAndModify()
+- bulkWrite()
+- watch()
+- all crud methods have been modified to call the modern version if MongoDb has a version of 3.6 or greater.
 
 ### 0.5.0-dev.2
 

@@ -1,10 +1,10 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/update_operation/update_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/update_operation/update_options.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/update_operation/update_statement.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/replace_one/replace_one_operation.dart';
-import 'package:mongo_dart/src/database/operation/commands/query_and_write_operation_commands/wrapper/replace_one/replace_one_statement.dart';
-import 'package:mongo_dart/src/database/operation/parameters/collation_options.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/update_operation/update_operation.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/update_operation/update_options.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/update_operation/update_statement.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/replace_one/replace_one_operation.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/replace_one/replace_one_statement.dart';
+import 'package:mongo_dart/src/database/commands/parameters/collation_options.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:mongo_dart/src/database/utils/update_document_check.dart';
 import 'package:test/test.dart';
@@ -1046,8 +1046,7 @@ void main() async {
         expect(elements.first['status'], 'A');
         expect(elements.first['points'], 1);
       });
-      test('Update specific fields on one document',
-          () async {
+      test('Update specific fields on one document', () async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 

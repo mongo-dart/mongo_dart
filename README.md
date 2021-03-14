@@ -209,31 +209,32 @@ At present we have developed the following operations:
 | Command | Status | Legacy alternative | Notes |
 | :---: | --- | :---: | --- |
 | - | Not developed | `Save` | This method has been deprecated. |
-|   `insertOne`  |  Experimental   |  `legacyInsert`   | The old method `insert` is a wrapper that calls `insertOne` if you are running MongoDb 3.6 or later, otherwise `legacyInsert`. |
-| `insertMany` | Experimental | `legacyInsertAll` | Allows to insert many documents in one commnand. It is subject to the max number of documents per message limit (at present <4.4> 100,000).The old method `insertAll` is a wrapper that calls `insertMany` if you are running MongoDb 3.6 or later, otherwise `legacyInsertAll`. |
-| [deleteOne][1] |  Experimental   |  -  | Allows to delete one document. [Example][3] [Example 2][4] |
-| [deleteMany][2] | Experimental | `legacyRemove` | The old method `remove` is a wrapper that calls `deleteMany` if you are running MongoDb 3.6 or later, otherwise `legacyRemove`. Allows to delete many documents in one commnand. [Example][5] |
-| [updateOne][6] | Experimental | - | Allows to update one document [Example][7] |
-| [updateMany][8] | Experimental | - | Allows to update many documents in one command. [Example][9] |
-| [modernUpdate][10] | Experimental | `legacyUpdate` | The old method `update` now is only a wrapper. If you are running MongoDb 3.6 or later, `modernUpdate` is called, otherwise `legacyUpdate` |
+|   `insertOne`  |  Tested   |  `legacyInsert`   | The old method `insert` is a wrapper that calls `insertOne` if you are running MongoDb 3.6 or later, otherwise `legacyInsert`. |
+| `insertMany` | Tested | `legacyInsertAll` | Allows to insert many documents in one command. It is subject to the max number of documents per message limit (at present <4.4> 100,000).The old method `insertAll` is a wrapper that calls `insertMany` if you are running MongoDb 3.6 or later, otherwise `legacyInsertAll`. |
+| [deleteOne][1] |  Tested   |  -  | Allows to delete one document. [Example][3] [Example 2][4] |
+| [deleteMany][2] | Tested | `legacyRemove` | The old method `remove` is a wrapper that calls `deleteMany` if you are running MongoDb 3.6 or later, otherwise `legacyRemove`. Allows to delete many documents in one commnand. [Example][5] |
+| [updateOne][6] | Tested | - | Allows to update one document [Example][7] |
+| [updateMany][8] | Tested | - | Allows to update many documents in one command. [Example][9] |
+| [modernUpdate][10] | Tested | `legacyUpdate` | The old method `update` now is only a wrapper. If you are running MongoDb 3.6 or later, `modernUpdate` is called, otherwise `legacyUpdate` |
 | - | To be developed yet | `count` | |
-| - | To be developed yet | `distinct` | |
-| `modernFind` | Experimental | `legacyFind` | The old method `find` now is simply a wrapper. If you are running MongoDb 3.6 or later, `modernFind` is called, otherwise `legacyFind` |
-| `modernFindOne` | Experimental | `legacyFindOne` | The old method `findOne` now is simply a wrapper. If you are running MongoDb 3.6 or later, `modernFindOne` is called, otherwise `legacyFindOne` |
-| `modernFindAndModify`| Experimental | `legacyFindAndModify`| The old method `findandModify` now is simply a wrapper. If you are running MongoDb 3.6 or later, `modernFindAndModify` is called, otherwise `legacyFindAndModify` |
-| `modernAggregate` | Experimental |  `legacyAggregateToStream` | The old method `aggregateToStream` now is simply a wrapper. If you are running mongoDb 3.6 or later, `modernAggregate` is called, otherwise `legacyAggregateToStream`|
-| `modernAggregateCursor` | Experimental | - | This method has no corresponding legacy one, as it returns a cursor and not a Map like the legacy `aggregate`|
-| - | Production  | `aggregate` | The legacy method `aggregate` has no corresponding "moderm" method. It returns a Map. Is it used? |
-| `watch` | Experimental | - | This method has no corresponding legacy methods. Allows to monitor changes to a collection |
-| `watchCursor` | Experimental | - |This method has no corresponding legacy methods. Like `watch`, but resturns a cursor instead of a stream. Normally you will only need `watch` |
+| `modernDistinct` | Experimental | `legacyDistinct` | The old method `distinct` now is only a wrapper. If you are running MongoDb 3.6 or later, `modernDistinct` is called, otherwise `legacyDistinct` |
+| `modernFind` | Tested | `legacyFind` | The old method `find` now is simply a wrapper. If you are running MongoDb 3.6 or later, `modernFind` is called, otherwise `legacyFind` |
+| `modernFindOne` | Tested | `legacyFindOne` | The old method `findOne` now is simply a wrapper. If you are running MongoDb 3.6 or later, `modernFindOne` is called, otherwise `legacyFindOne` |
+| `modernFindAndModify`| Tested | `legacyFindAndModify`| The old method `findandModify` now is simply a wrapper. If you are running MongoDb 3.6 or later, `modernFindAndModify` is called, otherwise `legacyFindAndModify` |
+| `modernAggregate` | Tested |  `legacyAggregateToStream` | The old method `aggregateToStream` now is simply a wrapper. If you are running mongoDb 3.6 or later, `modernAggregate` is called, otherwise `legacyAggregateToStream`|
+| `modernAggregateCursor` | Tested | - | This method has no corresponding legacy one, as it returns a cursor and not a Map like the legacy `aggregate`|
+| - | Production  | `aggregate` | The legacy method `aggregate` has no corresponding "modern" method. It returns a Map. Is it used? |
+| [watch][11] | Tested | - | This method has no corresponding legacy methods. Allows to monitor changes in a collection. Examples: [watch selecting records][17] - [watch all insert operations][18] |
+| `watchCursor` | Experimental | - |This method has no corresponding legacy methods. Like `watch`, but returns a cursor instead of a stream. Normally you will only need `watch` |
 
-Something on the bulk write side has been done too:
-There is the new collection helper method bulkWrite. The syntax is quite similar to that of the shell:
+There is the new collection helper method [bulkWrite][12]. The syntax is quite similar to that of the shell:
 `collection.bulkWrite([{'insertOne': {'document': { "_id" : 1, "char" : "Brisbane", "class" : "monk", "lvl" : 4 }}}]);`
 Like the one in the shell you can define the `insertOne`, `deleteOne`, `deleteMany`, `updateOne`, `updateMany` and `replaceOne`.
-In addition to the shell operation, you can use also an `insertMany` operation, with the following sybtax:
+In addition to the shell operation, you can use also an `insertMany` operation, with the following syntax:
 `collection.bulkWrite([{'insertMany': {'documents': [{ "_id" : 1, "char" : "Brisbane", "class" : "monk", "lvl" : 4 }]}}]);`
 Unlike the insertMany helper, this bulk operation does not suffer of the max number of documents per message limitation.
+You can also use directly the Bulk Object, if you prefer. Some examples:
+[ordered Collection helper][13], [unordered collection helper][14], [ordered Bulk class][15] and [unordered Bulk Class][16]
 
 Aside to these changes we have also to mention the new Decimal128 type management (that is backed by the Rational class).
 This is inherited from enhancements in the BSON package
@@ -272,4 +273,11 @@ Last but not least, some commands:
 [8]: doc/manual/crud/update.md#updateMany
 [9]: example/manual/crud/update_many.dart
 [10]: doc/manual/crud/update.md#modernUpdate
-
+[11]: doc/manual/aggregate/watch.md
+[12]: doc/manual/bulk/bulk.md
+[13]: example/manual/bulk/ordered_collection_helper.dart
+[14]: example/manual/bulk/unordered_collection_helper.dart
+[15]: example/manual/bulk/ordered_bulk.dart
+[16]: example/manual/bulk/unordered_bulk.dart
+[17]: example/manual/watch/watch_on_collection.dart
+[18]: example/manual/watch/watch_on_collection_insert.dart
