@@ -21,7 +21,7 @@ void main() {
     });
     test('readIntoBuffer 1', () {
       var converter = PacketConverter();
-      var buffer = List<int>(7);
+      var buffer = List<int>.filled(7, 0);
       converter.packets.addAll([
         [1, 2, 3],
         [4, 5, 6, 7]
@@ -33,7 +33,7 @@ void main() {
     });
     test('readIntoBuffer 2', () {
       var converter = PacketConverter();
-      var buffer = List<int>(5);
+      var buffer = List<int>.filled(5, 0);
       converter.packets.addAll([
         [1, 2, 3],
         [4, 5, 6, 7]
@@ -46,7 +46,7 @@ void main() {
     });
     test('readIntoBuffer 3', () {
       var converter = PacketConverter();
-      var buffer = List<int>(3);
+      var buffer = List<int>.filled(3, 0);
       converter.packets.addAll([
         [1, 2, 3],
         [4, 5, 6, 7]
@@ -56,7 +56,7 @@ void main() {
       expect(buffer, [3, 4, 5]);
       expect(converter.readPos, 2);
       expect(converter.bytesAvailable(), 2);
-      buffer = List<int>(2);
+      buffer = List<int>.filled(2, 0);
       converter.readIntoBuffer(buffer, 0);
       expect(buffer, [6, 7]);
       expect(converter.packets, isEmpty);

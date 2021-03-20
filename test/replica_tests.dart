@@ -11,9 +11,9 @@ const DefaultUri3 = 'mongodb://127.0.0.1:27003';
 
 Future testCollectionInfoCursor() {
   var db = Db.pool([
-    '${DefaultUri1}/mongo_dart-test',
-    '${DefaultUri2}/mongo_dart-test',
-    '${DefaultUri3}/mongo_dart-test'
+    '$DefaultUri1/mongo_dart-test',
+    '$DefaultUri2/mongo_dart-test',
+    '$DefaultUri3/mongo_dart-test'
   ], 'testCollectionInfoCursor');
   DbCollection newColl;
   return db.open(writeConcern: WriteConcern.JOURNALED).then((c) {

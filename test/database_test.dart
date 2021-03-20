@@ -795,7 +795,7 @@ Future<Cursor> testCursorCreation() async {
   var collection = db.collection(collectionName);
 
   var cursor =
-      await ModernCursor(FindOperation(collection, filter: {'ping': 1}));
+      ModernCursor(FindOperation(collection, filter: {'ping': 1}));
 
   expect(cursor, isNotNull);
 
@@ -823,7 +823,7 @@ Future testCursorClosing() async {
   expect(newCursor, isNotNull);
   expect(result, isNotNull); // Added this -- and it passes!
 
-  var modernCursor = await ModernCursor(FindOperation(collection));
+  var modernCursor = ModernCursor(FindOperation(collection));
 
   expect(modernCursor.state, State.INIT);
 
@@ -955,8 +955,8 @@ void testAuthComponents() {
   var userName = 'dart';
   var password = 'test';
   var test_key = 'aea09fb38775830306c5ff6de964ff04';
-  var hashed_password = _md5('${userName}:mongo:${password}');
-  var key = _md5('${nonce}${userName}${hashed_password}');
+  var hashed_password = _md5('$userName:mongo:$password');
+  var key = _md5('$nonce$userName$hashed_password');
   expect(key, test_key);
 }
 
@@ -1032,7 +1032,7 @@ Future testIndexCreationOnCollection() async {
     }
     await collection.insertAll(toInsert);
 
-    var resInsert = await collection
+    /* var resInsert = */ await collection
         .insertOne({'a': 200}, writeConcern: WriteConcern.UNACKNOWLEDGED);
 
     // Todo correct

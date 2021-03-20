@@ -179,7 +179,7 @@ void main() async {
 
         await insertManyDocuments(collection, 120);
 
-        var cursor = await ModernCursor(FindOperation(collection));
+        var cursor = ModernCursor(FindOperation(collection));
 
         expect(cursor.state, State.INIT);
 

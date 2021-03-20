@@ -20,7 +20,7 @@ class MongoReplyMessage extends MongoResponseMessage {
     cursorId = buffer.readInt64();
     startingFrom = buffer.readInt32();
     numberReturned = buffer.readInt32();
-    documents = List(numberReturned);
+    documents = List<Map<String, dynamic>>.filled(numberReturned, null);
     for (var n = 0; n < numberReturned; n++) {
       var doc = BsonMap({});
       doc.unpackValue(buffer);

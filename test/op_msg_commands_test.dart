@@ -68,7 +68,7 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = await ModernCursor(FindOperation(collection));
+          var cursor = ModernCursor(FindOperation(collection));
 
           expect(cursor.state, State.INIT);
 
@@ -118,7 +118,7 @@ void main() async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
           await insertManyDocuments(collection, 10000);
-          var cursor = await ModernCursor(FindOperation(collection));
+          var cursor = ModernCursor(FindOperation(collection));
           expect(cursor.state, State.INIT);
           await cursor.nextObject();
           var command = KillCursorsCommand(collection, [BsonLong(1)]);
@@ -163,7 +163,7 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = await ModernCursor(FindOperation(collection));
+          var cursor = ModernCursor(FindOperation(collection));
 
           expect(cursor.state, State.INIT);
 
@@ -199,7 +199,7 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = await ModernCursor(FindOperation(collection));
+          var cursor = ModernCursor(FindOperation(collection));
 
           expect(cursor.state, State.INIT);
 
@@ -233,7 +233,7 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = await ModernCursor(FindOperation(collection,
+          var cursor = ModernCursor(FindOperation(collection,
               findOptions: FindOptions(batchSize: 1)));
           await cursor.nextObject();
           var options = GetMoreOptions(batchSize: 10001);
@@ -252,7 +252,7 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = await ModernCursor(FindOperation(collection));
+          var cursor = ModernCursor(FindOperation(collection));
           await cursor.nextObject();
 
           var command = GetMoreCommand(collection, cursor.cursorId);

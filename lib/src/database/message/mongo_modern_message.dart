@@ -192,7 +192,7 @@ class MongoModernMessage extends MongoResponseMessage {
     sections = createSections(document);
 
     if (messageLength > maxMessageSizeBytes) {
-      throw MongoDartError('The total message length (${messageLength} bytes) '
+      throw MongoDartError('The total message length ($messageLength bytes) '
           'is bigger than the max allowed limit ($maxMessageSizeBytes bytes)');
     }
   }

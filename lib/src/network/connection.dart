@@ -96,28 +96,37 @@ class Connection {
     Socket _socket;
     try {
       if (serverConfig.isSecure) {
-        _socket =
-            await SecureSocket.connect(serverConfig.host, serverConfig.port);
+        var securityContext = SecurityContext();
+        if (serverConfig.tlsCAFileContent != null) {
+          securityContext
+              .setTrustedCertificatesBytes(serverConfig.tlsCAFileContent);
+        }
+        _socket = await SecureSocket.connect(
+            serverConfig.host, serverConfig.port, context: securityContext,
+            onBadCertificate: (certificate) {
+          // couldn't find here if the cause is an hostname mismatch
+          return serverConfig.tlsAllowInvalidCertificates;
+        });
       } else {
         _socket = await Socket.connect(serverConfig.host, serverConfig.port);
       }
     } catch (e) {
       _closed = true;
       connected = false;
-      var ex =
-          ConnectionException('Could not connect to ${serverConfig.hostUrl}');
+      var ex = ConnectionException(
+          'Could not connect to ${serverConfig.hostUrl}\n- $e');
       throw ex;
     }
 
     // ignore: unawaited_futures
-    _socket.done.catchError((error) => _log.info('Socket error ${error}'));
+    _socket.done.catchError((error) => _log.info('Socket error $error'));
     socket = _socket;
 
     _repliesSubscription = socket
         .transform<MongoResponseMessage>(MongoMessageHandler().transformer)
         .listen(_receiveReply,
             onError: (e, st) async {
-              _log.severe('Socket error ${e} ${st}');
+              _log.severe('Socket error $e $st');
               if (!_closed) {
                 await _closeSocketOnError(socketError: e);
               }

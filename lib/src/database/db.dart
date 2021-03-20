@@ -161,6 +161,8 @@ class _UriParameters {
   static const authSource = 'authSource';
   static const tls = 'tls';
   static const ssl = 'ssl';
+  static const tlsAllowInvalidCertificates = 'tlsAllowInvalidCertificates';
+  static const tlsCAFile = 'tlsCAFile';
 }
 
 class Db {
@@ -178,7 +180,7 @@ class Db {
 
   Connection get _masterConnectionVerified {
     if (state != State.OPEN) {
-      throw MongoDartError('Db is in the wrong state: ${state}');
+      throw MongoDartError('Db is in the wrong state: $state');
     }
     return _connectionManager.masterConnectionVerified;
   }
@@ -245,8 +247,15 @@ class Db {
 
   List<String> get uriList => _uriList.toList();
 
-  ServerConfig _parseUri(String uriString, {bool isSecure}) {
+  Future<ServerConfig> _parseUri(String uriString,
+      {bool isSecure,
+      bool tlsAllowInvalidCertificates,
+      String tlsCAFile}) async {
     isSecure ??= false;
+    tlsAllowInvalidCertificates ??= false;
+    if (tlsAllowInvalidCertificates || tlsCAFile != null) {
+      isSecure = true;
+    }
     var uri = Uri.parse(uriString);
 
     if (uri.scheme != 'mongodb') {
@@ -267,10 +276,28 @@ class Db {
           value == 'true') {
         isSecure = true;
       }
+      if (queryParam == _UriParameters.tlsAllowInvalidCertificates &&
+          value == 'true') {
+        tlsAllowInvalidCertificates = true;
+        isSecure = true;
+      }
+      if (queryParam == _UriParameters.tlsCAFile && value.isNotEmpty) {
+        tlsCAFile = value;
+        isSecure = true;
+      }
     });
 
+    Uint8List tlsCAFileContent;
+    if (tlsCAFile != null) {
+      tlsCAFileContent = await File(tlsCAFile).readAsBytes();
+    }
+
     var serverConfig = ServerConfig(
-        uri.host ?? '127.0.0.1', uri.port ?? mongoDefaultPort, isSecure);
+        host: uri.host ?? '127.0.0.1',
+        port: uri.port ?? mongoDefaultPort,
+        isSecure: isSecure,
+        tlsAllowInvalidCertificates: tlsAllowInvalidCertificates,
+        tlsCAFileContent: tlsCAFileContent);
 
     if (serverConfig.port == 0) {
       serverConfig.port = mongoDefaultPort;
@@ -300,8 +327,8 @@ class Db {
     } else if (authenticationSchemeName == MongoDbCRAuthenticator.name) {
       _authenticationScheme = AuthenticationScheme.MONGODB_CR;
     } else {
-      throw MongoDartError(
-          'Provided authentication scheme is not supported : $authenticationSchemeName');
+      throw MongoDartError('Provided authentication scheme is '
+          'not supported : $authenticationSchemeName');
     }
   }
 
@@ -356,7 +383,9 @@ class Db {
 
   Future open(
       {WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED,
-      bool secure = false}) async {
+      bool secure = false,
+      bool tlsAllowInvalidCertificates = false,
+      String tlsCAFile}) async {
     if (state == State.OPENING) {
       throw MongoDartError('Attempt to open db in state $state');
     }
@@ -366,7 +395,10 @@ class Db {
     _connectionManager = _ConnectionManager(this);
 
     for (var uri in _uriList) {
-      _connectionManager.addConnection(_parseUri(uri, isSecure: secure));
+      _connectionManager.addConnection(await _parseUri(uri,
+          isSecure: secure,
+          tlsAllowInvalidCertificates: tlsAllowInvalidCertificates,
+          tlsCAFile: tlsCAFile));
     }
     try {
       await _connectionManager.open(writeConcern);
@@ -502,7 +534,7 @@ class Db {
       var selector = <String, dynamic>{};
       // If we are limiting the access to a specific collection name
       if (filter.containsKey('name')) {
-        selector['name'] = "${databaseName}.${filter['name']}";
+        selector['name'] = "$databaseName.${filter['name']}";
       }
       return Cursor(
               this,
@@ -524,7 +556,7 @@ class Db {
     var selector = <String, dynamic>{};
     // If we are limiting the access to a specific collection name
     if (collectionName != null) {
-      selector['name'] = '${databaseName}.$collectionName';
+      selector['name'] = '$databaseName.$collectionName';
     }
     // Return Cursor
     return Cursor(this,
@@ -654,7 +686,7 @@ class Db {
       selector['name'] = name;
       var insertMessage = MongoInsertMessage(
           '$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}', [selector]);
-      await executeMessage(insertMessage, _writeConcern);
+      executeMessage(insertMessage, _writeConcern);
       return getLastError();
     });
   }

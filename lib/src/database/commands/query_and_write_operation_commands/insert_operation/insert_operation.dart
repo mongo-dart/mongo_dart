@@ -20,7 +20,7 @@ class InsertOperation extends CommandOperation {
       throw ArgumentError('Documents required in insert operation');
     }
 
-    ids = List(documents.length);
+    ids = List.filled(documents.length, null);
     for (var idx = 0; idx < documents.length; idx++) {
       documents[idx][key_id] ??= ObjectId();
       ids[idx] = documents[idx][key_id];
