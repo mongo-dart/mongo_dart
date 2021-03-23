@@ -163,6 +163,8 @@ class _UriParameters {
   static const ssl = 'ssl';
   static const tlsAllowInvalidCertificates = 'tlsAllowInvalidCertificates';
   static const tlsCAFile = 'tlsCAFile';
+  static const tlsCertificateKeyFile = 'tlsCertificateKeyFile';
+  static const tlsCertificateKeyFilePassword = 'tlsCertificateKeyFilePassword';
 }
 
 class Db {
@@ -250,10 +252,14 @@ class Db {
   Future<ServerConfig> _parseUri(String uriString,
       {bool isSecure,
       bool tlsAllowInvalidCertificates,
-      String tlsCAFile}) async {
+      String tlsCAFile,
+      String tlsCertificateKeyFile,
+      String tlsCertificateKeyFilePassword}) async {
     isSecure ??= false;
     tlsAllowInvalidCertificates ??= false;
-    if (tlsAllowInvalidCertificates || tlsCAFile != null) {
+    if (tlsAllowInvalidCertificates ||
+        tlsCAFile != null ||
+        tlsCertificateKeyFile != null) {
       isSecure = true;
     }
     var uri = Uri.parse(uriString);
@@ -285,11 +291,29 @@ class Db {
         tlsCAFile = value;
         isSecure = true;
       }
+      if (queryParam == _UriParameters.tlsCertificateKeyFile &&
+          value.isNotEmpty) {
+        tlsCertificateKeyFile = value;
+        isSecure = true;
+      }
+      if (queryParam == _UriParameters.tlsCertificateKeyFilePassword &&
+          value.isNotEmpty) {
+        tlsCertificateKeyFilePassword = value;
+      }
     });
 
     Uint8List tlsCAFileContent;
     if (tlsCAFile != null) {
       tlsCAFileContent = await File(tlsCAFile).readAsBytes();
+    }
+    Uint8List tlsCertificateKeyFileContent;
+    if (tlsCertificateKeyFile != null) {
+      tlsCertificateKeyFileContent =
+          await File(tlsCertificateKeyFile).readAsBytes();
+    }
+    if (tlsCertificateKeyFilePassword != null &&
+        tlsCertificateKeyFile == null) {
+      throw MongoDartError('Missing tlsCertificateKeyFile parameter');
     }
 
     var serverConfig = ServerConfig(
@@ -297,7 +321,9 @@ class Db {
         port: uri.port ?? mongoDefaultPort,
         isSecure: isSecure,
         tlsAllowInvalidCertificates: tlsAllowInvalidCertificates,
-        tlsCAFileContent: tlsCAFileContent);
+        tlsCAFileContent: tlsCAFileContent,
+        tlsCertificateKeyFileContent: tlsCertificateKeyFileContent,
+        tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword);
 
     if (serverConfig.port == 0) {
       serverConfig.port = mongoDefaultPort;
@@ -385,7 +411,9 @@ class Db {
       {WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED,
       bool secure = false,
       bool tlsAllowInvalidCertificates = false,
-      String tlsCAFile}) async {
+      String tlsCAFile,
+      String tlsCertificateKeyFile,
+      String tlsCertificateKeyFilePassword}) async {
     if (state == State.OPENING) {
       throw MongoDartError('Attempt to open db in state $state');
     }
@@ -398,7 +426,9 @@ class Db {
       _connectionManager.addConnection(await _parseUri(uri,
           isSecure: secure,
           tlsAllowInvalidCertificates: tlsAllowInvalidCertificates,
-          tlsCAFile: tlsCAFile));
+          tlsCAFile: tlsCAFile,
+          tlsCertificateKeyFile: tlsCertificateKeyFile,
+          tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword));
     }
     try {
       await _connectionManager.open(writeConcern);

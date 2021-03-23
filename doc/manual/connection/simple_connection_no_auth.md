@@ -1,8 +1,12 @@
 
 # Connection
 
+Please note, these documents have been tested on a linux platform, ubuntu flavor.
+Most of the examples can be ported easily, but there are some parts that can be different on you platform.
+Unfortunately it takes a lot of time for testing on all platforms/versions, so I apologize, but I will only test this procedure on Ubuntu 20.04, mongodb 4.4, mongo_Dart 0.5.0.
+
 **Updated for Mongodb ver 4.4 and mongo_dart version 0.5.0**
-In order to connect to a mongodb with this driver you have to provide the correct connection string.
+In order to connect to a mongodb server with this driver you have to provide the correct connection string.
 We will talk about connection to a Replica set, but the same concepts should be applicable to Standalone, Sharded clusters and Cloud Clusters (Atlas).
 
 Let's assume that we have a three members replica set: replica0, replica1 and replica2
@@ -45,3 +49,5 @@ Let's analyze this operations in detail:
   There are some point to evidentiate
   - the host part (replica0 in the above example) must be (or contain) the name of the primary. So, in a replica set, it is better to define all hosts (in our example the connection string would be `mongodb://replica0, replica1, replica2:27017/myDb`). At present the driver connects only to the hosts defined in the connection string, and requires the primary to be one of them. This differs from other drivers where the connection string is used to connect to the cluster, but, after that, the connection to all members is done querying the internal topology.
   - if any connection problem occurs or a differnt primary is elected, the driver is no more able to work properly and you have to manually close and open again the database. This behavior also differs from other drivers where changes in the topology (server availabilty and typology) are monitored, so that the driver itself can reconnect and direct the operations to the correct hosts.
+
+  [Next doc.](simple_connection_auth.md)

@@ -1,6 +1,6 @@
 #!/bin/bash          
 
-# *** Insert here your defaults before running The script
+# *** Insert here your default before running The script
 # countryName_default - 2 chars
 countryNameDefault="insert-here-your-value"
 # stateOrProvinceName_default - max 64 chars
@@ -13,33 +13,28 @@ organizationNameDefault="insert-here-your-value"
 organizationalUnitNameDefault="insert-here-your-value"
 
 # $1 ca name prefix - same as in the CA generation script
-# $2 server ip address
-# $3 optional server name 
+# $2 client name
 
 if [ $# -lt 1 ]; then 
    echo "missing ca prefix name"
    exit 1
 fi
 if [ $# -lt 2 ]; then 
-   echo "missing server addres/name parameter"
+   echo "missing client name parameter"
    exit 1
 fi
 
-if [ $3 != "" ]; then 
-  FILENAME="$3_ssl.cnf"
-  GEN_FILE="$3"
-else   
-  FILENAME="serv.$2_ssl.cnf"
-  GEN_FILE="serv.$2"
-fi
+ 
+FILENAME="client.$2_ssl.cnf"
+GEN_FILE="client.$2"
 
 
-echo "Creating server configuration file"
-echo "# Server $2 configuration file" > $FILENAME
+echo "Creating client configuration file"
+echo "# Client $2 configuration file" > $FILENAME
 echo "" >> $FILENAME
 echo "[ req ]" >> $FILENAME
 echo "default_bits = 4096" >> $FILENAME
-echo "default_keyfile = myTestCertificateKey.pem    ## The default private key file name." >> $FILENAME
+echo "default_keyfile = myTestClientCertificateKey.pem    ## The default private key file name." >> $FILENAME
 echo "default_md = sha256                           ## Use SHA-256 for Signatures" >> $FILENAME
 echo "distinguished_name = req_dn" >> $FILENAME
 echo "req_extensions = v3_req" >> $FILENAME
@@ -51,14 +46,6 @@ echo "basicConstraints = CA:FALSE" >> $FILENAME
 echo "keyUsage = critical, digitalSignature, keyEncipherment" >> $FILENAME
 echo "nsComment = \"OpenSSL Generated Certificate.\"" >> $FILENAME
 echo "extendedKeyUsage  = serverAuth, clientAuth" >> $FILENAME
-echo "subjectAltName = @alt_names" >> $FILENAME
-echo "" >> $FILENAME
-
-echo "[ alt_names ]" >> $FILENAME
-if [ $3 != "" ]; then 
-  echo "DNS.1 = $3" >> $FILENAME
-fi
-echo "IP.1 = $2" >> $FILENAME
 echo "" >> $FILENAME
 
 echo "[ req_dn ]" >> $FILENAME
@@ -93,7 +80,7 @@ echo "commonName_max = 64" >> $FILENAME
 echo "" >> $FILENAME
 
 
-echo "Do you wish to password protect your private server key certificate?"
+echo "Do you wish to password protect your private client key certificate?"
 
 select installType in "No" "Yes standard method (aes256)"; do
     case $REPLY in
@@ -103,41 +90,36 @@ select installType in "No" "Yes standard method (aes256)"; do
     esac
 done
 
-echo "***"
-echo "   - Creating server private key certificate (.key)"
+echo "Create client private key (.key)"
 if [ $REPLY -eq 2 ]; then
   while true; do
-    read -sp "Insert private server key password: " serverpwd	
+    read -sp "Insert private client key password: " clientPwd	
     echo ""
-    read -sp "Confirm private server key password: " confserverpwd	
+    read -sp "Confirm private client key password: " confClientPwd	
     echo ""
-    if [[ "$serverpwd" == "$confserverpwd" ]]; then
+    if [[ "$clientPwd" == "$confClientPwd" ]]; then
       break
     fi
     echo "Password mismatch, please re-enter"
   done 
-  openssl genrsa -aes256 -passout pass:$serverpwd -out "$GEN_FILE.key" 4096
+ openssl genrsa -aes256  -passout pass:$clientPwd  -out "$GEN_FILE.key" 4096
 else
  openssl genrsa -out "$GEN_FILE.key" 4096
 fi
 
-echo "***"
-echo "   - Creating the server signing request certificate"
-openssl req -new -key "$GEN_FILE.key" -passin pass:$serverpwd  -out "$GEN_FILE.csr"  -config $FILENAME
+echo "Create the client signing request"
+openssl req -new -key "$GEN_FILE.key"  -passin pass:$clientPwd  -out "$GEN_FILE.csr"  -config $FILENAME
 
-echo "***"
-echo "   - Creating the server public certificate (.crt)"
+echo "Create the client public certificate (.crt)"
 openssl x509 -sha256 -req -days 365 -in "$GEN_FILE.csr" -CA $1-ia.crt -CAkey $1-ia.key -CAcreateserial -out "$GEN_FILE.crt"  -extfile $FILENAME -extensions v3_req
 
-echo "***"
-echo "   - creating PEM file (.crt + .key)"
+echo "create PEM file (.crt + .key)"
 cat "$GEN_FILE.crt" "$GEN_FILE.key" > "$GEN_FILE.pem"
 chmod 600 $GEN_FILE.pem
+
 
 # clean- up
 rm $GEN_FILE.csr
 rm $FILENAME
 rm $1-ia.srl
-
-
 

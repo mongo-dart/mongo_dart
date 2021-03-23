@@ -2,6 +2,11 @@
 
 ## Recent change notes
 
+### 0.5.0-beta
+
+- Added tls client and server certificate management
+- Created method .onlyFirst() in class ModernCursor
+
 ### 0.5.0-dev.4
 
 - distinct()

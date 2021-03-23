@@ -96,11 +96,19 @@ class Connection {
     Socket _socket;
     try {
       if (serverConfig.isSecure) {
-        var securityContext = SecurityContext();
+        var securityContext = SecurityContext.defaultContext;
         if (serverConfig.tlsCAFileContent != null) {
           securityContext
               .setTrustedCertificatesBytes(serverConfig.tlsCAFileContent);
         }
+        if (serverConfig.tlsCertificateKeyFileContent != null) {
+          securityContext
+            ..useCertificateChainBytes(
+                serverConfig.tlsCertificateKeyFileContent)
+            ..usePrivateKeyBytes(serverConfig.tlsCertificateKeyFileContent,
+                password: serverConfig.tlsCertificateKeyFilePassword);
+        }
+
         _socket = await SecureSocket.connect(
             serverConfig.host, serverConfig.port, context: securityContext,
             onBadCertificate: (certificate) {

@@ -176,7 +176,7 @@ You can connect using a secured tls/ssl connection in one of these two ways:
 
 When you use the `mongodb+srv` url schema, the "tls" (or "ssl") parameter is implicitly considered true.
 
-No certificates can be used.
+You can also use certificates for tls handshake [see this tutorial][19] for more info.
 
 ### Atlas (MongoDb cloud service) connection
 
@@ -281,3 +281,4 @@ Last but not least, some commands:
 [16]: example/manual/bulk/unordered_bulk.dart
 [17]: example/manual/watch/watch_on_collection.dart
 [18]: example/manual/watch/watch_on_collection_insert.dart
+[19]: doc/manual/connection/simple_connection_no_auth.md

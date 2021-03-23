@@ -1,14 +1,25 @@
-#!/bin/bash          
+#!/usr/bin/env bash
 
-# before running this script put a default value where there is "<update here>"
-# $1 is the prefix for the key files name
+# *** Insert here your default before running The script
+# countryName_default - 2 chars
+countryNameDefault="insert-here-your-value"
+# stateOrProvinceName_default - max 64 chars
+stateOrProvinceNameDefault="insert-here-your-value"
+# localityName_default - max 64 chars
+localityNameDefault="insert-here-your-value"
+# organizationName_default -max 64 chars
+organizationNameDefault="insert-here-your-value"
+# organizationalUnitName_default - max 64 chars
+organizationalUnitNameDefault="insert-here-your-value"
+
+
+# $1 is the prefix for the key files
+
 
 if [ $# -lt 1 ]; then 
    echo "missing prefix parameter"
    exit 1
 fi
-
-# Creates a subfolder called "cert"
 
 mkdir cert
 cd cert
@@ -43,28 +54,28 @@ echo "" >> $1_ssl.cnf
 
 echo "[ req_dn ]" >> $1_ssl.cnf
 echo "countryName = Country Name (2 letter code)" >> $1_ssl.cnf
-echo "countryName_default = <update here>" >> $1_ssl.cnf
+echo "countryName_default = $countryNameDefault" >> $1_ssl.cnf
 echo "countryName_min = 2" >> $1_ssl.cnf
 echo "countryName_max = 2" >> $1_ssl.cnf
 echo "" >> $1_ssl.cnf
 
 echo "stateOrProvinceName = State or Province Name (full name)" >> $1_ssl.cnf
-echo "stateOrProvinceName_default = <update here>" >> $1_ssl.cnf
+echo "stateOrProvinceName_default = $stateOrProvinceNameDefault" >> $1_ssl.cnf
 echo "stateOrProvinceName_max = 64" >> $1_ssl.cnf
 echo "" >> $1_ssl.cnf
 
 echo "localityName = Locality Name (eg, city)" >> $1_ssl.cnf
-echo "localityName_default = <update here>" >> $1_ssl.cnf
+echo "localityName_default = $localityNameDefault" >> $1_ssl.cnf
 echo "localityName_max = 64" >> $1_ssl.cnf
 echo "" >> $1_ssl.cnf
 
 echo "organizationName = Organization Name (eg, company)" >> $1_ssl.cnf
-echo "organizationName_default = <update here>" >> $1_ssl.cnf
+echo "organizationName_default = $organizationNameDefault" >> $1_ssl.cnf
 echo "organizationName_max = 64" >> $1_ssl.cnf
 echo "" >> $1_ssl.cnf
 
 echo "organizationalUnitName = Organizational Unit Name (eg, section)" >> $1_ssl.cnf
-echo "organizationalUnitName_default = root" >> $1_ssl.cnf
+echo "organizationalUnitName_default = $organizationalUnitNameDefault" >> $1_ssl.cnf
 echo "organizationalUnitName_max = 64" >> $1_ssl.cnf
 echo "" >> $1_ssl.cnf
 
@@ -79,33 +90,88 @@ echo "basicConstraints = critical,CA:true" >> $1_ssl.cnf
 echo "authorityKeyIdentifier=keyid:always,issuer:always" >> $1_ssl.cnf
 echo "" >> $1_ssl.cnf
 
-echo "Generating root key"
-openssl genrsa -out $1-ca.key 4096
 
-echo "Generate root.crt"
-openssl req -new -x509 -days 1826 -key $1-ca.key -out $1-ca.crt -config $1_ssl.cnf
+echo "Do you wish to password protect your private key certificates?"
 
-echo "Create intermediate key"
-openssl genrsa -out $1-ia.key 4096
+select installType in "No" "Yes standard method (aes256)" "Use gpg (must be installed)"; do
+    case $REPLY in
+        1 ) break;;
+        2 ) break;;
+        3 ) break;;
+        *) echo "invalid response";;
+    esac
+done
 
-echo "Create the certificate signing request for the intermediate certificate."
-openssl req -new -key $1-ia.key -out $1-ia.csr -config $1_ssl.cnf
+echo "***"
+echo "   - Generating root key"
+if [ $REPLY -eq 2 ]; then
+  while true; do
+    read -sp "Insert private root key password: " capwd	
+    echo ""
+    read -sp "Confirm private root key password: " confcapwd	
+    echo ""
+    if [[ "$capwd" == "$confcapwd" ]]; then
+      break
+    fi
+    echo "Password mismatch, please re-enter"
+  done 
+  openssl genrsa -aes256 -passout pass:$capwd -out $1-ca.key 4096
+else
+ openssl genrsa -out $1-ca.key 4096
+fi
 
-echo "Create the intermediate certificate .crt."
-openssl x509 -sha256 -req -days 730 -in $1-ia.csr -CA $1-ca.crt -CAkey $1-ca.key -set_serial 01 -out $1-ia.crt -extfile $1_ssl.cnf -extensions v3_ca
+echo "***"
+echo "   - Generate root.crt"
+openssl req -new -x509 -days 1826  -passin pass:$capwd -key $1-ca.key -out $1-ca.crt -config $1_ssl.cnf
 
-echo "create the CA.pem file"
-cat $1-ia.crt $1-ca.crt > $1-ca.pem
-chmod 600 $1-ca.pem
+echo "***"
+echo "   - Create intermediate key"
+if [ $REPLY -eq 2 ]; then
+  while true; do
+    read -sp "Insert private intermediate key password: " iapwd	
+    echo ""
+    read -sp "Confirm private intermediate key password: " confiapwd	
+    echo ""
+    if [[ "$iapwd" == "$confiapwd" ]]; then
+      break
+    fi
+    echo "Password mismatch, please re-enter"
+  done 
+ openssl genrsa -aes256 -passout pass:$iapwd -out $1-ia.key 4096
+else
+ openssl genrsa -out $1-ia.key 4096
+fi
 
-echo "crypt main key"
-gpg -c $1-ca.key
+echo "***"
+echo "   - Create the certificate signing request for the intermediate certificate."
+openssl req -new -passin pass:$iapwd -key $1-ia.key -out $1-ia.csr -config $1_ssl.cnf
 
-echo "crypt ia key"
-gpg -c $1-ia.key
+echo "***"
+echo "   - Create the intermediate certificate .crt."
+openssl x509 -sha256 -req -days 730 -in $1-ia.csr -CA $1-ca.crt  -passin pass:$capwd -CAkey $1-ca.key -set_serial 01 -out $1-ia.crt -extfile $1_ssl.cnf -extensions v3_ca
 
-rm $1-ca.key
-rm $1-ia.key
+echo "***"
+echo "   - create the CA-full-chain.crt file"
+cat $1-ia.crt $1-ca.crt > $1-ca-full-chain.crt
+chmod 600 $1-ca-full-chain.crt
+
+
+if [ $REPLY -eq 3 ]; then
+  echo "***"
+  echo "   - crypt main (ca) private key"
+  gpg -c $1-ca.key
+
+  echo "***"
+  echo "   - crypt intermediate (ia) private key"
+  gpg -c $1-ia.key
+
+  rm $1-ca.key
+  rm $1-ia.key
+fi
+
+# clean- up
+rm $1-ia.csr
+rm $1_ssl.cnf
 
 
 

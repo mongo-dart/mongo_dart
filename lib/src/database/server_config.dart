@@ -6,7 +6,9 @@ class ServerConfig {
   bool isSecure;
   bool tlsAllowInvalidCertificates;
   Uint8List tlsCAFileContent;
-  
+  Uint8List tlsCertificateKeyFileContent;
+  String tlsCertificateKeyFilePassword;
+
   String userName;
   String password;
 
@@ -17,6 +19,8 @@ class ServerConfig {
       this.port = Db.mongoDefaultPort,
       this.isSecure = false,
       this.tlsAllowInvalidCertificates,
-      this.tlsCAFileContent});
+      this.tlsCAFileContent,
+      this.tlsCertificateKeyFileContent,
+      this.tlsCertificateKeyFilePassword});
   String get hostUrl => '$host:${port.toString()}';
 }

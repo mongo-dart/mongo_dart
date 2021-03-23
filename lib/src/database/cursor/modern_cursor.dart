@@ -129,6 +129,19 @@ class ModernCursor {
     return null;
   }
 
+  /// Returns only the first document (if any) and then closes the cursor
+  ///
+  /// Convenience method for
+  /// ```dart
+  /// await nextObject();
+  ///  await close();
+  /// ```
+  Future<Map<String, Object>> onlyFirst() async {
+    var ret = await nextObject();
+    await close();
+    return ret;
+  }
+
   Future<Map<String, Object>> nextObject() async {
     if (items.isNotEmpty) {
       return _getNextItem();
