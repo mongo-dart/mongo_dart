@@ -8,17 +8,17 @@ class Cursor {
   int cursorId = 0;
   Db db;
   Queue<Map<String, dynamic>> items;
-  DbCollection collection;
-  Map<String, dynamic> selector;
-  Map<String, dynamic> fields;
+  DbCollection? collection;
+  late Map<String, dynamic> selector;
+  Map<String, dynamic>? fields;
   int skip = 0;
   int limit = 0;
   int _returnedCount = 0;
-  Map<String, dynamic> sort;
-  Map<String, dynamic> hint;
-  MonadicBlock eachCallback;
+  Map<String, dynamic>? sort;
+  Map<String, dynamic>? hint;
+  MonadicBlock? eachCallback;
   var eachComplete;
-  bool explain;
+  bool explain = false;
   int flags = 0;
 
   /// Tailable means cursor is not closed when the last data is retrieved
@@ -67,7 +67,7 @@ class Cursor {
   /// Default value is 100 ms
   int tailableRetryInterval = 100;
 
-  Cursor(this.db, this.collection, selectorBuilderOrMap) {
+  Cursor(this.db, this.collection, selectorBuilderOrMap) : items = Queue() {
     if (selectorBuilderOrMap == null) {
       selector = {};
     } else if (selectorBuilderOrMap is SelectorBuilder) {
@@ -81,20 +81,16 @@ class Cursor {
       throw ArgumentError(
           'Expected SelectorBuilder or Map, got $selectorBuilderOrMap');
     }
-
-//    if (!selector.isEmpty && !selector.containsKey(r"$query")){
-//        selector = {r"$query": selector};
-//    }
-    items = Queue();
   }
 
-  MongoQueryMessage generateQueryMessage() {
-    return MongoQueryMessage(
-        collection.fullName(), flags, skip, limit, selector, fields);
-  }
+  MongoQueryMessage generateQueryMessage() => MongoQueryMessage(
+      collection?.fullName(), flags, skip, limit, selector, fields);
 
   MongoGetMoreMessage generateGetMoreMessage() {
-    return MongoGetMoreMessage(collection.fullName(), cursorId);
+    if (collection == null) {
+      throw MongoDartError('Collection needed');
+    }
+    return MongoGetMoreMessage(collection!.fullName(), cursorId);
   }
 
   Map<String, dynamic> _getNextItem() {
@@ -103,11 +99,15 @@ class Cursor {
   }
 
   void getCursorData(MongoReplyMessage replyMessage) {
+    if (replyMessage.documents == null) {
+      throw MongoDartError(
+          'It seem that the message has not yet been deserialized.');
+    }
     cursorId = replyMessage.cursorId;
-    items.addAll(replyMessage.documents);
+    items.addAll(replyMessage.documents!);
   }
 
-  Future<Map<String, dynamic>> nextObject() {
+  Future<Map<String, dynamic>?> nextObject() {
     if (state == State.INIT) {
       var qm = generateQueryMessage();
       return db.queryMessage(qm).then((replyMessage) {
@@ -178,7 +178,7 @@ class Cursor {
 }
 
 class CommandCursor extends Cursor {
-  CommandCursor(Db db, DbCollection collection, selectorBuilderOrMap)
+  CommandCursor(Db db, DbCollection? collection, selectorBuilderOrMap)
       : super(db, collection, selectorBuilderOrMap);
   bool firstBatch = true;
   @override
@@ -190,7 +190,8 @@ class CommandCursor extends Cursor {
   void getCursorData(MongoReplyMessage replyMessage) {
     if (firstBatch) {
       firstBatch = false;
-      var cursorMap = replyMessage.documents.first['cursor'];
+      var cursorMap =
+          replyMessage.documents?.first['cursor'] as Map<String, dynamic>?;
       if (cursorMap != null) {
         cursorId = cursorMap['id'] as int;
         final firstBatch = cursorMap['firstBatch'] as List;
@@ -211,6 +212,9 @@ class AggregateCursor extends CommandCursor {
       : super(db, collection, <String, dynamic>{});
   @override
   MongoQueryMessage generateQueryMessage() {
+    if (collection == null) {
+      throw MongoDartError('Collection required');
+    }
     return DbCommand(
         db,
         DbCommand.SYSTEM_COMMAND_COLLECTION,
@@ -218,7 +222,7 @@ class AggregateCursor extends CommandCursor {
         0,
         -1,
         {
-          'aggregate': collection.collectionName,
+          'aggregate': collection!.collectionName,
           'pipeline': pipeline,
           'cursor': cursorOptions,
           'allowDiskUse': allowDiskUse
@@ -247,13 +251,16 @@ class ListIndexesCursor extends CommandCursor {
       : super(db, collection, <String, dynamic>{});
   @override
   MongoQueryMessage generateQueryMessage() {
+    if (collection == null) {
+      throw MongoDartError('Collection needed');
+    }
     return DbCommand(
         db,
         DbCommand.SYSTEM_COMMAND_COLLECTION,
         MongoQueryMessage.OPTS_NO_CURSOR_TIMEOUT,
         0,
         -1,
-        {'listIndexes': collection.collectionName},
+        {'listIndexes': collection!.collectionName},
         null);
   }
 }

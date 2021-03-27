@@ -3,9 +3,9 @@ import 'package:mongo_dart/src/database/commands/query_and_write_operation_comma
 
 class ReplaceOneOptions extends UpdateOptions {
   ReplaceOneOptions(
-      {WriteConcern writeConcern,
-      bool bypassDocumentValidation,
-      String comment})
+      {WriteConcern? writeConcern,
+      bool? bypassDocumentValidation,
+      String? comment})
       : super(
             writeConcern: writeConcern,
             bypassDocumentValidation: bypassDocumentValidation,

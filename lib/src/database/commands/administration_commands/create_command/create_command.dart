@@ -1,4 +1,4 @@
-import 'package:mongo_dart/mongo_dart.dart' show Db, MongoDartError;
+import 'package:mongo_dart/mongo_dart.dart' show Db;
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
@@ -28,15 +28,15 @@ import 'create_options.dart';
 ///   (must be manually set)
 class CreateCommand extends CommandOperation {
   CreateCommand(Db db, String name,
-      {CreateOptions createOptions, Map<String, Object> rawOptions})
+      {CreateOptions? createOptions, Map<String, Object>? rawOptions})
       : super(db, <String, Object>{
           ...?createOptions?.getOptions(db),
           ...?rawOptions
         }, command: <String, Object>{
           keyCreate: name,
         }) {
-    if (name == null) {
+    /*   if (name == null) {
       throw MongoDartError('Name required in call to createCommand');
-    }
+    } */
   }
 }

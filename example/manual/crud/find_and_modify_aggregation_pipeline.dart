@@ -6,25 +6,20 @@ const dbAddress = '127.0.0.1';
 const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void main() async {
-  Db db;
   var running4_2orGreater = false;
 
-  Future initializeDatabase() async {
-    db = Db(DefaultUri);
-    await db.open();
-    var serverFcv = db?.masterConnection?.serverCapabilities?.fcv ?? '0.0';
-    if (serverFcv.compareTo('4.2') != -1) {
-      running4_2orGreater = true;
-    }
+  var db = Db(DefaultUri);
+  await db.open();
+  var serverFcv = db.masterConnection.serverCapabilities.fcv ?? '0.0';
+  if (serverFcv.compareTo('4.2') != -1) {
+    running4_2orGreater = true;
   }
 
   Future cleanupDatabase() async {
     await db.close();
   }
 
-  await initializeDatabase();
-  if (db.masterConnection == null ||
-      !db.masterConnection.serverCapabilities.supportsOpMsg) {
+  if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
     return;
   }
   if (!running4_2orGreater) {
@@ -67,10 +62,10 @@ void main() async {
         .build(),
     returnNew: true,
   );
-  print('Updated document: ${res.lastErrorObject.updatedExisting}'); // true
+  print('Updated document: ${res.lastErrorObject?.updatedExisting}'); // true
 
   print('Modified element new total: '
-      '${res.value['total']}'); // 250;
+      '${res.value?['total']}'); // 250;
 
   await cleanupDatabase();
 }

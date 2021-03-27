@@ -9,7 +9,7 @@ import 'package:uuid/uuid.dart';
 
 const dbName = 'testauth';
 const DefaultUri = 'mongodb://localhost:27017/test-mongo-dart';
-Db db;
+late Db db;
 
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
@@ -118,7 +118,7 @@ Future<List<int>> getInitialState(GridFS gridFS) {
   futures.add(gridFS.files.count());
   futures.add(gridFS.chunks.count());
   Future.wait(futures).then((List<int> futureResults) {
-    var result = List<int>(2);
+    var result = List<int>.filled(2, 0);
     result[0] = futureResults[0].toInt();
     result[1] = futureResults[1].toInt();
     completer.complete(result);
@@ -127,25 +127,26 @@ Future<List<int>> getInitialState(GridFS gridFS) {
 }
 
 Future testInOut(List<int> data, GridFS gridFS,
-    [Map<String, dynamic> extraData]) async {
+    [Map<String, dynamic>? extraData]) async {
   var consumer = MockConsumer();
   var out = IOSink(consumer);
   await getInitialState(gridFS);
   var inputStream = Stream.fromIterable([data]);
   var input = gridFS.createFile(inputStream, 'test');
-  if (extraData != null) {
-    input.extraData = extraData;
-    await input.save();
-    var gridOut = await gridFS.findOne(where.eq('_id', input.id));
-    expect(gridOut, isNotNull, reason: 'Did not find file by Id');
-    expect(input.id, gridOut.id, reason: 'Ids not equal.');
-    expect(GridFS.DEFAULT_CHUNKSIZE, gridOut.chunkSize,
-        reason: 'Chunk size not the same.');
-    expect('test', gridOut.filename, reason: 'Filename not equal');
-    expect(input.extraData, gridOut.extraData);
-    await gridOut.writeTo(out);
-    expect(consumer.data, orderedEquals(data));
+  if (extraData == null) {
+    return;
   }
+  input.extraData = extraData;
+  await input.save();
+  var gridOut = await gridFS.findOne(where.eq('_id', input.id));
+  expect(gridOut, isNotNull, reason: 'Did not find file by Id');
+  expect(input.id, gridOut?.id, reason: 'Ids not equal.');
+  expect(GridFS.DEFAULT_CHUNKSIZE, gridOut?.chunkSize,
+      reason: 'Chunk size not the same.');
+  expect('test', gridOut?.filename, reason: 'Filename not equal');
+  expect(input.extraData, gridOut?.extraData);
+  await gridOut?.writeTo(out);
+  expect(consumer.data, orderedEquals(data));
 }
 
 Future testChunkTransformerOneChunk() {
@@ -189,7 +190,7 @@ Future testFileToGridFSToFile() async {
 
   gridFS = GridFS(db, collectionName);
   var gridOut = await gridFS.getFile('test');
-  await gridOut.writeToFilename('$dir/gridfs_testdata_out.txt');
+  await gridOut?.writeToFilename('$dir/gridfs_testdata_out.txt');
 
   List<int> dataIn = File('$dir/gridfs_testdata_in.txt').readAsBytesSync();
   List<int> dataOut = File('$dir/gridfs_testdata_out.txt').readAsBytesSync();

@@ -7,8 +7,9 @@ import 'insert_options.dart';
 
 class InsertOperation extends CommandOperation {
   InsertOperation(DbCollection collection, this.documents,
-      {InsertOptions insertOptions, Map<String, Object> rawOptions})
-      : super(
+      {InsertOptions? insertOptions, Map<String, Object>? rawOptions})
+      : ids = List.filled(documents.length, null),
+        super(
             collection.db,
             <String, Object>{
               ...?insertOptions?.getOptions(collection.db),
@@ -16,48 +17,21 @@ class InsertOperation extends CommandOperation {
             },
             collection: collection,
             aspect: Aspect.writeOperation) {
-    if (documents == null || documents.isEmpty) {
+    if (documents.isEmpty) {
       throw ArgumentError('Documents required in insert operation');
     }
 
-    ids = List.filled(documents.length, null);
     for (var idx = 0; idx < documents.length; idx++) {
       documents[idx][key_id] ??= ObjectId();
       ids[idx] = documents[idx][key_id];
     }
   }
-  List<Map<String, Object>> documents;
+  List<Map<String, Object?>> documents;
   List ids;
 
   @override
   Map<String, Object> $buildCommand() => <String, Object>{
-        keyInsert: collection.collectionName,
+        keyInsert: collection!.collectionName,
         keyDocuments: documents
       };
-
-  /* @override
-  Future<Map<String, Object>> execute() async {
-    // Get capabilities
-    // Todo manage capabilities
-    //const capabilities = db.s.topology.capabilities();
-
-    // Did the user pass in a collation, check if our write server supports it
-    // Todo review when we will manage Collation
-    /*   if (options.collation && capabilities && !capabilities.commandsTakeCollation) {
-      // Create a new error
-      final error = MongoDartError('server/primary/mongos does not support collation', errorCode: 67);
-      //error.code = 67;
-      // Return the error
-      throw error;
-    }*/
-
-    var ret = await super.execute();
-    if (ret[keyOk] == 1.0) {
-      ret[keyOps] = documents;
-      ret[keyInsertedCount] = 1;
-      ret[keyInsertedId] = documents.first[key_Id];
-    }
-    return ret;
-  } */
-
 }

@@ -11,11 +11,11 @@ class GetParameterOptions {
   /// We limit Comment to String only
   ///
   /// New in version 4.4.
-  final String comment;
+  final String? comment;
 
   const GetParameterOptions({this.comment});
 
   Map<String, Object> get options => <String, Object>{
-        if (comment != null) keyComment: comment,
+        if (comment != null) keyComment: comment!,
       };
 }

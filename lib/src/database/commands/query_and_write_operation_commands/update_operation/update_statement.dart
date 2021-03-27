@@ -4,30 +4,23 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 class UpdateStatement {
   UpdateStatement(this.q, this.u,
-      {this.upsert,
-      this.multi,
+      {bool? upsert,
+      bool? multi,
       this.collation,
       this.arrayFilters,
       this.hint,
-      this.hintDocument}) {
-    if (q == null) {
-      throw MongoDartError(
-          'A filter must be specified (empty Map if update all documents)');
-    }
-    if (u == null) {
-      throw MongoDartError('The update document must be specified');
-    }
+      this.hintDocument})
+      : upsert = upsert ?? false,
+        multi = multi ?? false {
     if (arrayFilters != null && arrayFilters is! List && arrayFilters is! Map) {
       throw MongoDartError(
           'The arrayFilters parameter must be either a List or a Map');
     }
-    upsert ??= false;
-    multi ??= false;
   }
 
   /// The query that matches documents to update.
   /// Use the same query selectors as used in the find() method.
-  Map<String, Object> q;
+  Map<String, Object?> q;
 
   /// The modifications to apply.
   ///
@@ -69,7 +62,7 @@ class UpdateStatement {
   /// for the sort.
   ///
   /// New in version 3.4.
-  CollationOptions collation;
+  CollationOptions? collation;
 
   /// An array of filter documents that determine which array elements to
   /// modify for an update operation on an array field.
@@ -120,7 +113,7 @@ class UpdateStatement {
   ///
   /// New in version 3.6.
   ///
-  List arrayFilters;
+  List? arrayFilters;
 
   /// A document or string that specifies the index to use to support the
   /// query predicate.
@@ -135,8 +128,8 @@ class UpdateStatement {
   /// We define two fields, if set, one exclude the other.
   ///
   /// New in 4.4
-  String hint;
-  Map<String, Object> hintDocument;
+  String? hint;
+  Map<String, Object>? hintDocument;
 
   Map<String, Object> toMap() {
     return <String, Object>{
@@ -144,12 +137,12 @@ class UpdateStatement {
       keyU: u,
       if (upsert) keyUpsert: upsert,
       if (multi) keyMulti: multi,
-      if (collation != null) keyCollation: collation.options,
-      if (arrayFilters != null) keyArrayFilters: arrayFilters,
+      if (collation != null) keyCollation: collation!.options,
+      if (arrayFilters != null) keyArrayFilters: arrayFilters!,
       if (hint != null)
-        keyHint: hint
+        keyHint: hint!
       else if (hintDocument != null)
-        keyHint: hintDocument,
+        keyHint: hintDocument!,
     };
   }
 }

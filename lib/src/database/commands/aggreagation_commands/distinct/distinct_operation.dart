@@ -12,24 +12,25 @@ import 'distinct_result.dart';
 class DistinctOperation extends CommandOperation {
   DistinctOperation(DbCollection collection, this.key,
       {this.query,
-      DistinctOptions distinctOptions,
-      Map<String, Object> rawOptions})
-      : super(collection?.db,
+      DistinctOptions? distinctOptions,
+      Map<String, Object>? rawOptions})
+      : super(collection.db,
             <String, Object>{...?distinctOptions?.options, ...?rawOptions},
             collection: collection, aspect: Aspect.readOperation);
 
   /// The field for which to return distinct values.
   String key;
 
-  /// A query that selects which documents to count in the collection or view.
-  Map<String, Object> query;
+  /// A query that specifies the documents from which to retrieve 
+  /// the distinct values.
+  Map<String, Object?>? query;
 
   @override
   Map<String, Object> $buildCommand() {
     return <String, Object>{
-      keyDistinct: collection?.collectionName,
+      keyDistinct: collection!.collectionName,
       keyKey: key,
-      if (query != null) keyQuery: query,
+      if (query != null) keyQuery: query!,
     };
   }
 

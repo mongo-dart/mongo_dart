@@ -11,7 +11,7 @@ class DbCollection {
 
   @Deprecated('Since version 4.2. Use insertOne() or replaceOne() instead.')
   Future<Map<String, dynamic>> save(Map<String, dynamic> document,
-      {WriteConcern writeConcern}) {
+      {WriteConcern? writeConcern}) {
     var id;
     var createId = false;
     if (document.containsKey('_id')) {
@@ -34,7 +34,7 @@ class DbCollection {
   /// Allows to insert many documents at a time.
   /// This is the legacy version of the insertMany() method
   Future<Map<String, dynamic>> insertAll(List<Map<String, dynamic>> documents,
-      {WriteConcern writeConcern}) async {
+      {WriteConcern? writeConcern}) async {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       await insertMany(documents, writeConcern: writeConcern);
       return db._getAcknowledgement(writeConcern: writeConcern);
@@ -46,7 +46,7 @@ class DbCollection {
   /// This is the legacy version of the insertMany() method
   Future<Map<String, dynamic>> legacyInsertAll(
       List<Map<String, dynamic>> documents,
-      {WriteConcern writeConcern}) {
+      {WriteConcern? writeConcern}) {
     return Future.sync(() {
       var insertMessage = MongoInsertMessage(fullName(), documents);
       db.executeMessage(insertMessage, writeConcern);
@@ -65,7 +65,7 @@ class DbCollection {
   Future<Map<String, dynamic>> update(selector, document,
       {bool upsert = false,
       bool multiUpdate = false,
-      WriteConcern writeConcern}) async {
+      WriteConcern? writeConcern}) async {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       await modernUpdate(selector, document,
           upsert: upsert, multi: multiUpdate, writeConcern: writeConcern);
@@ -79,7 +79,7 @@ class DbCollection {
   Future<Map<String, dynamic>> legacyUpdate(selector, document,
       {bool upsert = false,
       bool multiUpdate = false,
-      WriteConcern writeConcern}) {
+      WriteConcern? writeConcern}) {
     return Future.sync(() {
       var flags = 0;
       if (upsert) {
@@ -130,7 +130,7 @@ class DbCollection {
   /// Returns one document that satisfies the specified query criteria on the
   /// collection or view. If multiple documents satisfy the query,
   /// this method returns the first document.
-  Future<Map<String, dynamic>> findOne([selector]) {
+  Future<Map<String, dynamic>?> findOne([selector]) {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       if (selector is SelectorBuilder) {
         return modernFindOne(selector: selector);
@@ -146,7 +146,7 @@ class DbCollection {
   }
 
   // Old version to be used on MongoDb versions prior to 3.6
-  Future<Map<String, dynamic>> legacyFindOne([selector]) {
+  Future<Map<String, dynamic>?> legacyFindOne([selector]) {
     var cursor = Cursor(db, this, selector);
     var result = cursor.nextObject();
     cursor.close();
@@ -158,14 +158,14 @@ class DbCollection {
   /// made on the update.
   /// To return the document with the modifications made on the update,
   /// use the returnNew option.
-  Future<Map<String, dynamic>> findAndModify(
+  Future<Map<String, dynamic>?> findAndModify(
       {query,
       sort,
-      bool remove,
+      bool? remove,
       update,
-      bool returnNew,
+      bool? returnNew,
       fields,
-      bool upsert}) async {
+      bool? upsert}) async {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       var result = await modernFindAndModify(
           query: query,
@@ -190,7 +190,13 @@ class DbCollection {
 
   // Old version to be used on MongoDb versions prior to 3.6
   Future<Map<String, dynamic>> legacyFindAndModify(
-      {query, sort, bool remove, update, bool returnNew, fields, bool upsert}) {
+      {query,
+      sort,
+      bool? remove,
+      update,
+      bool? returnNew,
+      fields,
+      bool? upsert}) {
     query = _queryBuilder2Map(query);
     sort = _sortBuilder2Map(sort);
     update = _updateBuilder2Map(update);
@@ -214,7 +220,7 @@ class DbCollection {
 
   /// Removes documents from a collection.
   Future<Map<String, dynamic>> remove(selector,
-      {WriteConcern writeConcern}) async {
+      {WriteConcern? writeConcern}) async {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       var result = await deleteMany(
         selector,
@@ -227,7 +233,7 @@ class DbCollection {
 
   // Old version to be used on MongoDb versions prior to 3.6
   Future<Map<String, dynamic>> legacyRemove(selector,
-          {WriteConcern writeConcern}) =>
+          {WriteConcern? writeConcern}) =>
       db.removeFromCollection(
           collectionName, _selectorBuilder2Map(selector), writeConcern);
 
@@ -237,7 +243,7 @@ class DbCollection {
         .executeDbCommand(DbCommand.createCountCommand(
             db, collectionName, _selectorBuilder2Map(selector)))
         .then((reply) {
-      return Future.value((reply['n'] as num)?.toInt());
+      return Future.value((reply['n'] as num?)?.toInt());
     });
   }
 
@@ -255,7 +261,7 @@ class DbCollection {
 
   /// Old version to be used on MongoDb versions prior to 3.6
   Future<Map<String, dynamic>> aggregate(List pipeline,
-      {bool allowDiskUse = false, Map<String, dynamic> cursor}) {
+      {bool allowDiskUse = false, Map<String, Object>? cursor}) {
     var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline,
         allowDiskUse: allowDiskUse, cursor: cursor);
     return db.executeDbCommand(cmd);
@@ -264,7 +270,7 @@ class DbCollection {
   /// Executes an aggregation pipeline
   Stream<Map<String, dynamic>> aggregateToStream(
       List<Map<String, Object>> pipeline,
-      {Map<String, dynamic> cursorOptions = const <String, Object>{},
+      {Map<String, Object> cursorOptions = const <String, Object>{},
       bool allowDiskUse = false}) {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       return modernAggregate(pipeline,
@@ -285,7 +291,7 @@ class DbCollection {
 
   /// Inserts a document into a collection
   Future<Map<String, dynamic>> insert(Map<String, dynamic> document,
-      {WriteConcern writeConcern}) async {
+      {WriteConcern? writeConcern}) async {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       await insertOne(document, writeConcern: writeConcern);
       return db._getAcknowledgement(writeConcern: writeConcern);
@@ -295,7 +301,7 @@ class DbCollection {
 
   /// Old version to be used on MongoDb versions prior to 3.6
   Future<Map<String, dynamic>> legacyInsert(Map<String, dynamic> document,
-          {WriteConcern writeConcern}) =>
+          {WriteConcern? writeConcern}) =>
       insertAll([document], writeConcern: writeConcern);
 
   /// Analogue of mongodb shell method `db.collection.getIndexes()`
@@ -303,7 +309,7 @@ class DbCollection {
   /// the existing indexes on the collection. You must call `getIndexes()`
   ///  on a collection
   Future<List<Map<String, dynamic>>> getIndexes() {
-    if (db._masterConnection.serverCapabilities.listIndexes) {
+    if (db.masterConnection.serverCapabilities.listIndexes) {
       return ListIndexesCursor(db, this).stream.toList();
     } else {
       /// Pre MongoDB v3.0 API
@@ -316,7 +322,7 @@ class DbCollection {
     }
   }
 
-  Map<String, dynamic> _setKeys(String key, Map<String, dynamic> keys) {
+  Map<String, dynamic> _setKeys(String? key, Map<String, dynamic>? keys) {
     if (key != null && keys != null) {
       throw ArgumentError('Only one parameter must be set: key or keys');
     }
@@ -338,31 +344,31 @@ class DbCollection {
       return <String, dynamic>{};
     }
     if (selector is SelectorBuilder) {
-      return selector.map['\$query'] as Map<String, dynamic> ??
+      return selector.map[key$Query] as Map<String, dynamic>? ??
           <String, dynamic>{};
     }
     return selector as Map<String, dynamic>;
   }
 
-  Map<String, dynamic> _queryBuilder2Map(query) {
+  Map<String, dynamic> _queryBuilder2Map(Object query) {
     if (query is SelectorBuilder) {
       query = query.map['\$query'];
     }
     return query as Map<String, dynamic>;
   }
 
-  Map<String, dynamic> _sortBuilder2Map(query) {
+  Map<String, Object> _sortBuilder2Map(query) {
     if (query is SelectorBuilder) {
       query = query.map['orderby'];
     }
-    return query as Map<String, dynamic>;
+    return query as Map<String, Object>;
   }
 
-  Map<String, dynamic> _fieldsBuilder2Map(fields) {
+  Map<String, dynamic>? _fieldsBuilder2Map(fields) {
     if (fields is SelectorBuilder) {
       return fields.paramFields;
     }
-    return fields as Map<String, dynamic>;
+    return fields as Map<String, dynamic>?;
   }
 
   Map<String, dynamic> _updateBuilder2Map(update) {
@@ -400,16 +406,16 @@ class DbCollection {
   /// "err" -> null,
   /// "ok" -> 1.0}
   Future<Map<String, dynamic>> createIndex(
-      {String key,
-      Map<String, dynamic> keys,
-      bool unique,
-      bool sparse,
-      bool background,
-      bool dropDups,
-      Map<String, dynamic> partialFilterExpression,
-      String name,
-      bool modernReply}) async {
-    if (!db._masterConnection.serverCapabilities.supportsOpMsg) {
+      {String? key,
+      Map<String, dynamic>? keys,
+      bool? unique,
+      bool? sparse,
+      bool? background,
+      bool? dropDups,
+      Map<String, dynamic>? partialFilterExpression,
+      String? name,
+      bool? modernReply}) async {
+    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
       throw MongoDartError('Use createIndex() method on db (before 3.6)');
     }
 
@@ -442,7 +448,7 @@ class DbCollection {
   // since version 3.6, we will check this last version
   // in order to allow the execution
   Future<WriteResult> insertOne(Map<String, dynamic> document,
-      {WriteConcern writeConcern, bool bypassDocumentValidation}) async {
+      {WriteConcern? writeConcern, bool? bypassDocumentValidation}) async {
     if (!db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       throw MongoDartError('This method is not available before release 3.6');
     }
@@ -463,9 +469,9 @@ class DbCollection {
   // since version 3.6, we will check this last version
   // in order to allow the execution
   Future<BulkWriteResult> insertMany(List<Map<String, dynamic>> documents,
-      {WriteConcern writeConcern,
-      bool ordered,
-      bool bypassDocumentValidation}) async {
+      {WriteConcern? writeConcern,
+      bool? ordered,
+      bool? bypassDocumentValidation}) async {
     if (!db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       throw MongoDartError('This method is not available before release 3.6');
     }
@@ -483,10 +489,10 @@ class DbCollection {
   }
 
   Future<WriteResult> deleteOne(selector,
-      {WriteConcern writeConcern,
-      CollationOptions collation,
-      String hint,
-      Map<String, Object> hintDocument}) async {
+      {WriteConcern? writeConcern,
+      CollationOptions? collation,
+      String? hint,
+      Map<String, Object>? hintDocument}) async {
     var deleteOperation = DeleteOneOperation(
         this,
         DeleteOneStatement(_selectorBuilder2Map(selector),
@@ -496,10 +502,10 @@ class DbCollection {
   }
 
   Future<WriteResult> deleteMany(selector,
-      {WriteConcern writeConcern,
-      CollationOptions collation,
-      String hint,
-      Map<String, Object> hintDocument}) async {
+      {WriteConcern? writeConcern,
+      CollationOptions? collation,
+      String? hint,
+      Map<String, Object>? hintDocument}) async {
     var deleteOperation = DeleteManyOperation(
         this,
         DeleteManyStatement(_selectorBuilder2Map(selector),
@@ -509,13 +515,13 @@ class DbCollection {
   }
 
   Future<Map<String, dynamic>> modernUpdate(selector, update,
-      {bool upsert,
-      bool multi,
-      WriteConcern writeConcern,
-      CollationOptions collation,
-      List<dynamic> arrayFilters,
-      String hint,
-      Map<String, Object> hintDocument}) async {
+      {bool? upsert,
+      bool? multi,
+      WriteConcern? writeConcern,
+      CollationOptions? collation,
+      List<dynamic>? arrayFilters,
+      String? hint,
+      Map<String, Object>? hintDocument}) async {
     var updateOperation = UpdateOperation(
         this,
         [
@@ -532,16 +538,15 @@ class DbCollection {
     return updateOperation.execute();
   }
 
-  Future<WriteResult> replaceOne(selector, update,
-      {bool upsert,
-      WriteConcern writeConcern,
-      CollationOptions collation,
-      String hint,
-      Map<String, Object> hintDocument}) async {
+  Future<WriteResult> replaceOne(selector, Map<String, dynamic> update,
+      {bool? upsert,
+      WriteConcern? writeConcern,
+      CollationOptions? collation,
+      String? hint,
+      Map<String, Object>? hintDocument}) async {
     var replaceOneOperation = ReplaceOneOperation(
         this,
-        ReplaceOneStatement(_selectorBuilder2Map(selector),
-            update is List ? update : _updateBuilder2Map(update),
+        ReplaceOneStatement(_selectorBuilder2Map(selector), update,
             upsert: upsert,
             collation: collation,
             hint: hint,
@@ -551,12 +556,12 @@ class DbCollection {
   }
 
   Future<WriteResult> updateOne(selector, update,
-      {bool upsert,
-      WriteConcern writeConcern,
-      CollationOptions collation,
-      List<dynamic> arrayFilters,
-      String hint,
-      Map<String, Object> hintDocument}) async {
+      {bool? upsert,
+      WriteConcern? writeConcern,
+      CollationOptions? collation,
+      List<dynamic>? arrayFilters,
+      String? hint,
+      Map<String, Object>? hintDocument}) async {
     var updateOneOperation = UpdateOneOperation(
         this,
         UpdateOneStatement(_selectorBuilder2Map(selector),
@@ -571,12 +576,12 @@ class DbCollection {
   }
 
   Future<WriteResult> updateMany(selector, update,
-      {bool upsert,
-      WriteConcern writeConcern,
-      CollationOptions collation,
-      List<dynamic> arrayFilters,
-      String hint,
-      Map<String, Object> hintDocument}) async {
+      {bool? upsert,
+      WriteConcern? writeConcern,
+      CollationOptions? collation,
+      List<dynamic>? arrayFilters,
+      String? hint,
+      Map<String, Object>? hintDocument}) async {
     var updateManyOperation = UpdateManyOperation(
         this,
         UpdateManyStatement(_selectorBuilder2Map(selector),
@@ -593,25 +598,36 @@ class DbCollection {
   Future<FindAndModifyResult> modernFindAndModify(
       {query,
       sort,
-      bool remove,
+      bool? remove,
       update,
-      bool returnNew,
+      bool? returnNew,
       fields,
-      bool upsert,
-      List arrayFilters,
-      String hint,
-      Map<String, Object> hintDocument,
-      FindAndModifyOptions findAndModifyOptions,
-      Map<String, Object> rawOptions}) async {
+      bool? upsert,
+      List? arrayFilters,
+      String? hint,
+      Map<String, Object>? hintDocument,
+      FindAndModifyOptions? findAndModifyOptions,
+      Map<String, Object>? rawOptions}) async {
     if (!db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       throw MongoDartError('This method is not available before release 3.6');
     }
 
+    Map<String, Object>? sortMap;
+    if (sort is Map) {
+      sortMap = <String, Object>{...sort};
+    } else if (sortMap == null &&
+        sort is SelectorBuilder &&
+        sort.map[keyOrderby] != null) {
+      sortMap = <String, Object>{...sort.map[keyOrderby]};
+    }
+
     var famOperation = FindAndModifyOperation(this,
-        query: _queryBuilder2Map(query),
-        sort: _sortBuilder2Map(sort),
+        query: query == null ? null : _queryBuilder2Map(query),
+        sort: sortMap,
         remove: remove,
-        update: update is List ? update : _updateBuilder2Map(update),
+        update: update == null
+            ? null
+            : (update is List ? update : _updateBuilder2Map(update)),
         returnNew: returnNew,
         fields: _fieldsBuilder2Map(fields),
         upsert: upsert,
@@ -625,25 +641,29 @@ class DbCollection {
 
   // Find operation with the new OP_MSG (starting from release 3.6)
   Stream<Map<String, dynamic>> modernFind(
-      {SelectorBuilder selector,
-      Map<String, Object> filter,
-      Map<String, Object> sort,
-      Map<String, Object> projection,
-      String hint,
-      Map<String, Object> hintDocument,
-      int skip,
-      int limit,
-      FindOptions findOptions,
-      Map<String, Object> rawOptions}) {
-    if (!db._masterConnection.serverCapabilities.supportsOpMsg) {
+      {SelectorBuilder? selector,
+      Map<String, Object?>? filter,
+      Map<String, Object>? sort,
+      Map<String, Object>? projection,
+      String? hint,
+      Map<String, Object>? hintDocument,
+      int? skip,
+      int? limit,
+      FindOptions? findOptions,
+      Map<String, Object>? rawOptions}) {
+    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
       throw MongoDartError('At least MongoDb version 3.6 is required '
           'to run the find operation');
+    }
+    var sortMap = sort;
+    if (sortMap == null && selector?.map[keyOrderby] != null) {
+      sortMap = <String, Object>{...selector!.map[keyOrderby]};
     }
 
     var operation = FindOperation(this,
         filter:
-            filter ?? (selector?.map == null ? null : selector.map[key$Query]),
-        sort: sort ?? (selector?.map == null ? null : selector.map['orderby']),
+            filter ?? (selector?.map == null ? null : selector!.map[key$Query]),
+        sort: sortMap,
         projection: projection ?? selector?.paramFields,
         hint: hint,
         hintDocument: hintDocument,
@@ -670,25 +690,29 @@ class DbCollection {
   /// This version has more parameters, and it is essentially a wrapper
   /// araound the find method with a fixed limit set to 1 that returns
   /// a document instead of a stream.
-  Future<Map<String, dynamic>> modernFindOne(
-      {SelectorBuilder selector,
-      Map<String, Object> filter,
-      Map<String, Object> sort,
-      Map<String, Object> projection,
-      String hint,
-      Map<String, Object> hintDocument,
-      int skip,
-      FindOptions findOptions,
-      Map<String, Object> rawOptions}) async {
-    if (!db._masterConnection.serverCapabilities.supportsOpMsg) {
+  Future<Map<String, dynamic>?> modernFindOne(
+      {SelectorBuilder? selector,
+      Map<String, Object?>? filter,
+      Map<String, Object>? sort,
+      Map<String, Object>? projection,
+      String? hint,
+      Map<String, Object>? hintDocument,
+      int? skip,
+      FindOptions? findOptions,
+      Map<String, Object>? rawOptions}) async {
+    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
       throw MongoDartError('At least MongoDb version 3.6 is required '
           'to run the findOne operation');
     }
 
+    var sortMap = sort;
+    if (sortMap == null && selector?.map[keyOrderby] != null) {
+      sortMap = <String, Object>{...selector!.map[keyOrderby]};
+    }
     var operation = FindOperation(this,
         filter:
-            filter ?? (selector?.map == null ? null : selector.map[key$Query]),
-        sort: sort ?? (selector?.map == null ? null : selector.map['orderby']),
+            filter ?? (selector?.map == null ? null : selector!.map[key$Query]),
+        sort: sortMap,
         projection: projection ?? selector?.paramFields,
         hint: hint,
         hintDocument: hintDocument,
@@ -706,8 +730,8 @@ class DbCollection {
   /// Utility method for preparing a DistinctOperation
   DistinctOperation _prepareDistinct(String field,
           {query,
-          DistinctOptions distinctOptions,
-          Map<String, Object> rawOptions}) =>
+          DistinctOptions? distinctOptions,
+          Map<String, Object>? rawOptions}) =>
       DistinctOperation(this, field,
           query: extractfilterMap(query),
           distinctOptions: distinctOptions,
@@ -717,18 +741,18 @@ class DbCollection {
   /// Retuns a DistinctResult class.
   Future<DistinctResult> modernDistinct(String field,
           {query,
-          DistinctOptions distinctOptions,
-          Map<String, Object> rawOptions}) async =>
+          DistinctOptions? distinctOptions,
+          Map<String, Object>? rawOptions}) async =>
       _prepareDistinct(field, query: query, distinctOptions: distinctOptions)
           .executeDocument();
 
   /// Executes a Distinct command on this collection.
   /// Retuns a Map like received from the server.
   /// Used for compatibility with the legacy method
-  Future<Map<String, Object>> modernDistinctMap(String field,
+  Future<Map<String, Object?>> modernDistinctMap(String field,
           {query,
-          DistinctOptions distinctOptions,
-          Map<String, Object> rawOptions}) async =>
+          DistinctOptions? distinctOptions,
+          Map<String, Object>? rawOptions}) async =>
       _prepareDistinct(field, query: query, distinctOptions: distinctOptions)
           .execute();
 
@@ -740,12 +764,12 @@ class DbCollection {
   /// The pipeline can be either an `AggregationPipelineBuilder` or a
   /// List of Maps (`List<Map<String, Object>>`)
   Stream<Map<String, dynamic>> modernAggregate(dynamic pipeline,
-          {bool explain,
-          Map<String, Object> cursor,
-          String hint,
-          Map<String, Object> hintDocument,
-          AggregateOptions aggregateOptions,
-          Map<String, Object> rawOptions}) =>
+          {bool? explain,
+          Map<String, Object>? cursor,
+          String? hint,
+          Map<String, Object>? hintDocument,
+          AggregateOptions? aggregateOptions,
+          Map<String, Object>? rawOptions}) =>
       modernAggregateCursor(pipeline,
               explain: explain,
               cursor: cursor,
@@ -764,13 +788,13 @@ class DbCollection {
   /// The pipeline can be either an `AggregationPipelineBuilder` or a
   /// List of Maps (`List<Map<String, Object>>`)
   ModernCursor modernAggregateCursor(dynamic pipeline,
-      {bool explain,
-      Map<String, Object> cursor,
-      String hint,
-      Map<String, Object> hintDocument,
-      AggregateOptions aggregateOptions,
-      Map<String, Object> rawOptions}) {
-    if (!db._masterConnection.serverCapabilities.supportsOpMsg) {
+      {bool? explain,
+      Map<String, Object>? cursor,
+      String? hint,
+      Map<String, Object>? hintDocument,
+      AggregateOptions? aggregateOptions,
+      Map<String, Object>? rawOptions}) {
+    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
       throw MongoDartError('At least MongoDb version 3.6 is required '
           'to run the aggregate operation');
     }
@@ -785,11 +809,11 @@ class DbCollection {
   }
 
   Stream watch(Object pipeline,
-          {int batchSize,
-          String hint,
-          Map<String, Object> hintDocument,
-          ChangeStreamOptions changeStreamOptions,
-          Map<String, Object> rawOptions}) =>
+          {int? batchSize,
+          String? hint,
+          Map<String, Object>? hintDocument,
+          ChangeStreamOptions? changeStreamOptions,
+          Map<String, Object>? rawOptions}) =>
       watchCursor(pipeline,
               batchSize: batchSize,
               hint: hint,
@@ -799,11 +823,11 @@ class DbCollection {
           .changeStream;
 
   ModernCursor watchCursor(Object pipeline,
-          {int batchSize,
-          String hint,
-          Map<String, Object> hintDocument,
-          ChangeStreamOptions changeStreamOptions,
-          Map<String, Object> rawOptions}) =>
+          {int? batchSize,
+          String? hint,
+          Map<String, Object>? hintDocument,
+          ChangeStreamOptions? changeStreamOptions,
+          Map<String, Object>? rawOptions}) =>
       ModernCursor(ChangeStreamOperation(pipeline,
           collection: this,
           hint: hint,
@@ -812,9 +836,7 @@ class DbCollection {
           rawOptions: rawOptions));
 
   Future<BulkWriteResult> bulkWrite(List<Map<String, Object>> documents,
-      {bool ordered, WriteConcern writeConcern}) async {
-    ordered ??= true;
-
+      {bool ordered = true, WriteConcern? writeConcern}) async {
     Bulk bulk;
     if (ordered) {
       bulk = OrderedBulk(this, writeConcern: writeConcern);
@@ -829,11 +851,11 @@ class DbCollection {
       }
       var key = document.keys.first;
       var testMap = document[key];
-      if (testMap is! Map<String, dynamic>) {
+      if (testMap is! Map<String, Object>) {
         throw MongoDartError('The "$key" element at index '
             '$index must contain a Map');
       }
-      Map<String, dynamic> docMap = testMap;
+      var docMap = testMap;
 
       switch (key) {
         case bulkInsertOne:
@@ -842,7 +864,7 @@ class DbCollection {
                 '"$bulkInsertOne" element at index $index must '
                 'contain a Map');
           }
-          bulk.insertOne(docMap[bulkDocument]);
+          bulk.insertOne(docMap[bulkDocument] as Map<String, Object?>);
 
           break;
         case bulkInsertMany:
@@ -851,7 +873,7 @@ class DbCollection {
                 '"$bulkInsertMany" element at index $index must '
                 'contain a List of Maps');
           }
-          bulk.insertMany(docMap[bulkDocuments]);
+          bulk.insertMany(docMap[bulkDocuments] as List<Map<String, Object?>>);
           break;
         case bulkUpdateOne:
           bulk.updateOneFromMap(docMap, index: index);

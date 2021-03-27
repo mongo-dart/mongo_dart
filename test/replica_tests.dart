@@ -9,26 +9,26 @@ const DefaultUri1 = 'mongodb://127.0.0.1:27001';
 const DefaultUri2 = 'mongodb://127.0.0.1:27002';
 const DefaultUri3 = 'mongodb://127.0.0.1:27003';
 
-Future testCollectionInfoCursor() {
+Future testCollectionInfoCursor() async {
   var db = Db.pool([
     '$DefaultUri1/mongo_dart-test',
     '$DefaultUri2/mongo_dart-test',
     '$DefaultUri3/mongo_dart-test'
   ], 'testCollectionInfoCursor');
   DbCollection newColl;
-  return db.open(writeConcern: WriteConcern.JOURNALED).then((c) {
-    newColl = db.collection('new_collecion');
-    return newColl.remove({});
-  }).then((v) {
-    return newColl.insertAll([
-      {'a': 1}
-    ]);
-  }).then((v) {
-    return db.getCollectionInfos({'name': 'new_collecion'});
-  }).then((v) {
-    expect(v, hasLength(1));
-    return db.close();
-  });
+  await db.open(writeConcern: WriteConcern.JOURNALED);
+
+  newColl = db.collection('new_collecion');
+  await newColl.remove({});
+
+  await newColl.insertAll([
+    {'a': 1}
+  ]);
+
+  var v = await db.getCollectionInfos({'name': 'new_collecion'});
+
+  expect(v, hasLength(1));
+  await db.close();
 }
 
 void main() {

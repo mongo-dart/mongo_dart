@@ -28,15 +28,15 @@ void main() {
     test('Testing connection TXT', () async {
       var records =
           await DnsUtils.lookupRecord('rs.joedrumgoole.com', RRecordType.TXT);
-      expect(records.first.data, '"authSource=admin&replicaSet=srvdemo"');
+      expect(records?.first.data, '"authSource=admin&replicaSet=srvdemo"');
     });
     test('Testing connection SRV', () async {
       var records = await DnsUtils.lookupRecord(
           '_mongodb._tcp.' 'rs.joedrumgoole.com', RRecordType.SRV);
 
-      expect(records.first.data, '0 0 27022 rs1.joedrumgoole.com.');
-      expect(records[1].data, '0 0 27022 rs2.joedrumgoole.com.');
-      expect(records.last.data, '0 0 27022 rs3.joedrumgoole.com.');
+      expect(records?.first.data, '0 0 27022 rs1.joedrumgoole.com.');
+      expect(records?[1].data, '0 0 27022 rs2.joedrumgoole.com.');
+      expect(records?.last.data, '0 0 27022 rs3.joedrumgoole.com.');
     });
 
     test('Decode Dns Seedlist', () async {

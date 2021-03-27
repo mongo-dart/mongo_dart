@@ -21,7 +21,7 @@ const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
-Db db;
+late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
@@ -75,7 +75,7 @@ void main() async {
           var cursorResult = await cursor.nextObject();
           expect(cursor.state, State.OPEN);
           expect(cursor.cursorId.value, isPositive);
-          expect(cursorResult['a'], 0);
+          expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var command = KillCursorsCommand(collection, [cursor.cursorId]);
           var result = await command.execute();
@@ -138,7 +138,7 @@ void main() async {
           var result = await command.executeDocument();
           expect(result, isNotNull);
           expect(result.success, isTrue);
-          expect(result.cursorsNotFound.first, 1);
+          expect(result.cursorsNotFound?.first, 1);
           expect(result.cursorsAlive, isNull);
           expect(result.cursorsUnknown, isNull);
           expect(result.cursorsKilled, isNull);
@@ -150,7 +150,7 @@ void main() async {
           var result = await command.executeDocument();
           expect(result, isNotNull);
           expect(result.success, isTrue);
-          expect(result.cursorsNotFound.first, -1);
+          expect(result.cursorsNotFound?.first, -1);
           expect(result.cursorsAlive, isNull);
           expect(result.cursorsUnknown, isNull);
           expect(result.cursorsKilled, isNull);
@@ -170,14 +170,14 @@ void main() async {
           var cursorResult = await cursor.nextObject();
           expect(cursor.state, State.OPEN);
           expect(cursor.cursorId.value, isPositive);
-          expect(cursorResult['a'], 0);
+          expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var command = GetMoreCommand(collection, cursor.cursorId);
           var result = await command.execute();
           expect(result, isNotNull);
           expect(result[keyCursor], isNotNull);
 
-          Map cursorMap = result[keyCursor];
+          var cursorMap = result[keyCursor] as Map;
           expect(cursorMap[keyFirstBatch], isNull);
           expect(cursorMap[keyNextBatch], isNotEmpty);
           expect(cursorMap[keyNextBatch].length, 101);
@@ -206,7 +206,7 @@ void main() async {
           var cursorResult = await cursor.nextObject();
           expect(cursor.state, State.OPEN);
           expect(cursor.cursorId.value, isPositive);
-          expect(cursorResult['a'], 0);
+          expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var options = GetMoreOptions(batchSize: 10);
           var command = GetMoreCommand(collection, cursor.cursorId,
@@ -336,7 +336,7 @@ void main() async {
           var ret = await command.executeDocument();
           expect(ret, isNotNull);
           expect(ret.host, isNotEmpty);
-          expect(ret.localTime.isAfter(DateTime(2020)), isTrue);
+          expect(ret.localTime?.isAfter(DateTime(2020)), isTrue);
           expect(ret.version, isNotNull);
         });
 

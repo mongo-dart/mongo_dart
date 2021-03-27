@@ -4,12 +4,12 @@ import 'package:mongo_dart/src/database/commands/parameters/collation_options.da
 import 'package:mongo_dart/src/database/utils/update_document_check.dart';
 
 class UpdateOneStatement extends UpdateStatement {
-  UpdateOneStatement(Map<String, Object> q, Object u,
-      {bool upsert,
-      CollationOptions collation,
-      List<dynamic> arrayFilters,
-      String hint,
-      Map<String, Object> hintDocument})
+  UpdateOneStatement(Map<String, Object?> q, Object u,
+      {bool? upsert,
+      CollationOptions? collation,
+      List<dynamic>? arrayFilters,
+      String? hint,
+      Map<String, Object>? hintDocument})
       : super(q, u,
             upsert: upsert,
             multi: false,
@@ -17,7 +17,7 @@ class UpdateOneStatement extends UpdateStatement {
             arrayFilters: arrayFilters,
             hint: hint,
             hintDocument: hintDocument) {
-    if (!containsOnlyUpdateOperators(u)) {
+    if (u is Map<String, dynamic> && !containsOnlyUpdateOperators(u)) {
       throw MongoDartError('Invalid document in UpdateOneStatement. '
           'The document is either null or contains invalid update operators');
     }

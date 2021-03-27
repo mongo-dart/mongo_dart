@@ -136,5 +136,5 @@ class ReadConcern {
   ReadConcernLevel level;
 
   Map<String, Object> toMap() =>
-      <String, Object>{if (level != null) keyLevel: '$level'.split('.').last};
+      <String, Object>{keyLevel: '$level'.split('.').last};
 }

@@ -2,15 +2,15 @@ part of mongo_dart;
 
 class ChunkHandler {
   int chunkSize;
-  List<int> carry;
+  List<int> carry = <int>[];
 
   ChunkHandler([this.chunkSize = 1024 * 256]);
 
   void _handle(List<int> data, EventSink<List<int>> sink, bool isClosing) {
-    if (carry != null) {
+    if (carry.isNotEmpty) {
       carry.addAll(data);
-      data = carry;
-      carry = null;
+      data = carry.toList();
+      carry.clear();
     }
     var pos = 0;
     while (pos + chunkSize < data.length) {
@@ -18,7 +18,7 @@ class ChunkHandler {
       pos += chunkSize;
     }
     if (data.length > pos) {
-      carry = <int>[];
+      //carry = <int>[];
       carry.addAll(data.sublist(pos));
       if (isClosing) {
         sink.add(carry);
@@ -26,9 +26,8 @@ class ChunkHandler {
     }
   }
 
-  void handleData(List<int> data, EventSink<List<int>> sink) {
-    _handle(data, sink, false);
-  }
+  void handleData(List<int> data, EventSink<List<int>> sink) =>
+      _handle(data, sink, false);
 
   void handleError(
       Object error, StackTrace stackTrace, EventSink<List<int>> sink) {

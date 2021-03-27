@@ -16,20 +16,20 @@ class CountOperation extends CommandOperation {
       this.skip,
       this.hint,
       this.hintDocument,
-      CountOptions countOptions,
-      Map<String, Object> rawOptions})
-      : super(collection?.db,
+      CountOptions? countOptions,
+      Map<String, Object>? rawOptions})
+      : super(collection.db,
             <String, Object>{...?countOptions?.options, ...?rawOptions},
             collection: collection, aspect: Aspect.readOperation);
 
   /// A query that selects which documents to count in the collection or view.
-  Map<String, Object> query;
+  Map<String, Object?>? query;
 
   /// The maximum number of matching documents to return.
-  int limit;
+  int? limit;
 
   /// The number of matching documents to skip before returning results.
-  int skip;
+  int? skip;
 
   /// Optional. Index specification. Specify either the index name
   /// as a string (hint field) or the index key pattern (hintDocument field).
@@ -39,20 +39,20 @@ class CountOperation extends CommandOperation {
   /// hint is required if the command includes the min and/or max fields;
   /// hint is not required with min and/or max if the filter is an
   /// equality condition on the _id field { _id: <value> }.
-  String hint;
-  Map<String, Object> hintDocument;
+  String? hint;
+  Map<String, Object>? hintDocument;
 
   @override
   Map<String, Object> $buildCommand() {
     return <String, Object>{
-      keyCount: collection?.collectionName,
-      if (query != null) keyQuery: query,
-      if (limit != null && limit > 0) keyLimit: limit,
-      if (skip != null && skip > 0) keySkip: skip,
+      keyCount: collection!.collectionName,
+      if (query != null) keyQuery: query!,
+      if (limit != null && limit! > 0) keyLimit: limit!,
+      if (skip != null && skip! > 0) keySkip: skip!,
       if (hint != null)
-        keyHint: hint
+        keyHint: hint!
       else if (hintDocument != null)
-        keyHint: hintDocument,
+        keyHint: hintDocument!,
     };
   }
 

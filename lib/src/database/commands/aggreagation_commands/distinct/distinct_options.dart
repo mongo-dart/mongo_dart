@@ -15,7 +15,7 @@ class DistinctOptions {
   /// - "majority". Available for replica sets that use WiredTiger storage engine.
   /// - "linearizable". Available for read operations on the primary only.
   /// For more formation on the read concern levels, see [Read Concern Levels](https://docs.mongodb.com/manual/reference/read-concern/#read-concern-levels).
-  final ReadConcern readConcern;
+  final ReadConcern? readConcern;
 
   /// Specifies the [collation] to use for the operation.
   /// Collation allows users to specify language-specific rules for string
@@ -36,7 +36,7 @@ class DistinctOptions {
   /// for the sort.
   ///
   /// New in version 3.4.
-  final CollationOptions collation;
+  final CollationOptions? collation;
 
   /// A user-provided comment to attach to this command. Once set,
   /// this comment appears alongside records of this command in the
@@ -46,13 +46,13 @@ class DistinctOptions {
   /// * currentOp output, in the command.comment field.
   /// A comment can be only of type String unlike MongoDb that allows
   /// any valid BSON type since 4.4.
-  final String comment;
+  final String? comment;
 
   DistinctOptions({this.readConcern, this.collation, this.comment});
 
   Map<String, Object> get options => <String, Object>{
-        if (readConcern != null) keyReadConcern: readConcern.toMap(),
-        if (collation != null) keyCollation: collation.options,
-        if (comment != null) keyComment: comment,
+        if (readConcern != null) keyReadConcern: readConcern!.toMap(),
+        if (collation != null) keyCollation: collation!.options,
+        if (comment != null) keyComment: comment!,
       };
 }

@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/database/commands/query_and_write_operation_comma
 
 class InsertManyOptions extends InsertOptions {
   InsertManyOptions(
-      {WriteConcern writeConcern, bool ordered, bool bypassDocumentValidation})
+      {WriteConcern? writeConcern, bool? ordered, bool? bypassDocumentValidation})
       : super(
             writeConcern: writeConcern,
             ordered: ordered,

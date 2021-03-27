@@ -7,15 +7,15 @@ import 'insert_many_options.dart';
 
 class InsertManyOperation extends InsertOperation {
   InsertManyOperation(
-      DbCollection collection, List<Map<String, Object>> documents,
-      {InsertManyOptions insertManyOptions, Map<String, Object> rawOptions})
+      DbCollection collection, List<Map<String, Object?>> documents,
+      {InsertManyOptions? insertManyOptions, Map<String, Object>? rawOptions})
       : super(
           collection,
           documents,
           insertOptions: insertManyOptions,
           rawOptions: rawOptions,
         ) {
-    if (documents == null || documents.isEmpty) {
+    if (documents.isEmpty) {
       throw ArgumentError(
           'At least one document required in InsertManyOperation');
     }

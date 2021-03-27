@@ -7,24 +7,20 @@ import 'update_many_options.dart';
 import 'update_many_statement.dart';
 
 class UpdateManyOperation extends UpdateOperation {
-  UpdateManyStatement updateRequest;
+  //UpdateManyStatement updateRequest;
 
   UpdateManyOperation(
       DbCollection collection, UpdateManyStatement updateManyStatement,
-      {bool ordered,
-      UpdateManyOptions updateManyOptions,
-      Map<String, Object> rawOptions})
+      {bool? ordered,
+      UpdateManyOptions? updateManyOptions,
+      Map<String, Object>? rawOptions})
       : super(
           collection,
           [updateManyStatement],
           ordered: ordered,
           updateOptions: updateManyOptions,
           rawOptions: rawOptions,
-        ) {
-    if (updateManyStatement == null) {
-      throw ArgumentError('Update Statement needed in updateOne() method');
-    }
-  }
+        );
 
   Future<WriteResult> executeDocument() async {
     var ret = await super.execute();

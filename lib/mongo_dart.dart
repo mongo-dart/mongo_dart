@@ -82,7 +82,7 @@ part 'src/database/server_config.dart';
 
 part 'src/database/state.dart';
 
-part 'src/gridfs/grid_file.dart';
+part 'src/gridfs/grid_fs_file.dart';
 
 part 'src/gridfs/grid_in.dart';
 

@@ -32,23 +32,23 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 ///               originating find or aggregate command.
 class GetMoreOptions {
   final int batchSize;
-  final int maxTimeMS;
-  final String comment;
+  final int? maxTimeMS;
+  final String? comment;
 
-  GetMoreOptions({int batchSize, this.maxTimeMS, this.comment})
+  GetMoreOptions({int? batchSize, this.maxTimeMS, this.comment})
       : batchSize = batchSize ?? 101 {
     if (this.batchSize < 1) {
       throw MongoDartError('batchSize parameter must be a positive integer');
     }
-    if (maxTimeMS != null && maxTimeMS < 0) {
+    if (maxTimeMS != null && maxTimeMS! < 0) {
       throw MongoDartError(
           'maxTimeMS parameter must be a non-negative integer');
     }
   }
 
   Map<String, Object> get options => <String, Object>{
-        if (batchSize != null) keyBatchSize: batchSize,
-        if (maxTimeMS != null) keyMaxTimeMS: maxTimeMS,
-        if (comment != null) keyComment: comment,
+        keyBatchSize: batchSize,
+        if (maxTimeMS != null) keyMaxTimeMS: maxTimeMS!,
+        if (comment != null) keyComment: comment!,
       };
 }

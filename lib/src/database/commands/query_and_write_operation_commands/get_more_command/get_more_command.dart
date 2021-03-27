@@ -1,6 +1,6 @@
 import 'package:bson/bson.dart';
 import 'package:mongo_dart/mongo_dart.dart'
-    show Db, DbCollection, MongoDartError;
+    show Db, DbCollection;
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
 import 'get_more_options.dart';
 import 'get_more_result.dart';
@@ -20,26 +20,20 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 /// * getMoreOptions [GetMoreOptions] - Optional
 ///   - a set of optional values for the command
 class GetMoreCommand extends CommandOperation {
-  GetMoreCommand(DbCollection collection, BsonLong cursorId,
-      {Db db,
-      String collectionName,
-      GetMoreOptions getMoreOptions,
-      Map<String, Object> rawOptions})
+  GetMoreCommand(DbCollection? collection, BsonLong cursorId,
+      {Db? db,
+      String? collectionName,
+      GetMoreOptions? getMoreOptions,
+      Map<String, Object>? rawOptions})
       : super(db ?? collection?.db,
             <String, Object>{...?getMoreOptions?.options, ...?rawOptions},
             collection: collection,
             command: <String, Object>{
               keyGetMore: cursorId,
-              keyCollection: collection?.collectionName ?? collectionName,
+              keyCollection: collection?.collectionName ?? collectionName ?? '',
             }) {
     // In case of aggregate collection agnostic commands, collection is
     // not needed
-    if (this.db == null) {
-      throw MongoDartError('Database required in call to GetMoreCommand');
-    }
-    if (cursorId == null) {
-      throw MongoDartError('CursorId required in call to GetMoreCommand');
-    }
     if (collection == null) {
       options[keyDbName] = 'admin';
     }

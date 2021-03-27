@@ -15,7 +15,7 @@ const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
-Db db;
+late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
@@ -49,8 +49,7 @@ void main() async {
     var cannotRunTests = false;
     setUp(() async {
       await initializeDatabase();
-      if (db.masterConnection == null ||
-          !db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
     });
@@ -124,7 +123,7 @@ void main() async {
       expect(writeResult.isSuccess, isFalse);
       expect(writeResult.operationSucceeded, isTrue);
       expect(writeResult.hasWriteErrors, isTrue);
-      expect(writeResult.writeError.code, 121);
+      expect(writeResult.writeError?.code, 121);
     }, skip: cannotRunTests);
 
     test('Simple create collection with no collation', () async {
@@ -187,8 +186,7 @@ void main() async {
     var cannotRunTests = false;
     setUp(() async {
       await initializeDatabase();
-      if (db.masterConnection == null ||
-          !db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
     });

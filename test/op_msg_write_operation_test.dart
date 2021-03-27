@@ -23,7 +23,7 @@ const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
-Db db;
+late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
@@ -53,23 +53,19 @@ void main() async {
     var isSharded = false;
     setUp(() async {
       await initializeDatabase();
-      if (db.masterConnection == null ||
-          !db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
-      var serverFcv = db?.masterConnection?.serverCapabilities?.fcv ?? '0.0';
+      var serverFcv = db.masterConnection.serverCapabilities.fcv ?? '0.0';
       if (serverFcv.compareTo('4.4') != -1) {
         running4_4orGreater = true;
       }
       if (serverFcv.compareTo('4.2') != -1) {
         running4_2orGreater = true;
       }
-      isReplicaSet =
-          db?.masterConnection?.serverCapabilities?.isReplicaSet ?? false;
-      isStandalone =
-          db?.masterConnection?.serverCapabilities?.isStandalone ?? false;
-      isSharded =
-          db?.masterConnection?.serverCapabilities?.isShardedCluster ?? false;
+      isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
+      isStandalone = db.masterConnection.serverCapabilities.isStandalone;
+      isSharded = db.masterConnection.serverCapabilities.isShardedCluster;
     });
 
     tearDown(() async {
@@ -95,7 +91,7 @@ void main() async {
         expect(ret.nMatched, 0);
         expect(ret.nRemoved, 0);
         expect(ret.id, 3);
-        expect(ret.document['name'], 'John');
+        expect(ret.document?['name'], 'John');
       }, skip: cannotRunTests);
 
       test('InsertOne no Id', () async {
@@ -115,7 +111,7 @@ void main() async {
         expect(ret.nMatched, 0);
         expect(ret.nRemoved, 0);
         expect(ret.id.runtimeType, ObjectId);
-        expect(ret.document['item'], 'card');
+        expect(ret.document?['item'], 'card');
       }, skip: cannotRunTests);
 
       test('InsertOne duplicate id', () async {
@@ -141,7 +137,7 @@ void main() async {
         expect(ret.nMatched, 0);
         expect(ret.nRemoved, 0);
         expect(ret.id, 10);
-        expect(ret.document['item'], 'packing peanuts');
+        expect(ret.document?['item'], 'packing peanuts');
       }, skip: cannotRunTests);
 
       test('InsertOne increase Write Concern', () async {
@@ -177,7 +173,7 @@ void main() async {
         expect(ret.nMatched, 0);
         expect(ret.nRemoved, 0);
         expect(ret.id.runtimeType, ObjectId);
-        expect(ret.document['item'], 'envelopes');
+        expect(ret.document?['item'], 'envelopes');
         expect(ret.isSuccess, isFalse);
         expect(ret.isPartialSuccess, isFalse);
         expect(ret.isSuspendedPartial, isFalse);
@@ -206,10 +202,10 @@ void main() async {
         expect(ret.nModified, 0);
         expect(ret.nMatched, 0);
         expect(ret.nRemoved, 0);
-        expect(ret.ids.first, 3);
-        expect(ret.documents.first['name'], 'John');
-        expect(ret.ids.last, 7);
-        expect(ret.documents.last['name'], 'Luis');
+        expect(ret.ids?.first, 3);
+        expect(ret.documents?.first['name'], 'John');
+        expect(ret.ids?.last, 7);
+        expect(ret.documents?.last['name'], 'Luis');
       }, skip: cannotRunTests);
 
       test('Too much documents', () async {
@@ -750,18 +746,18 @@ void main() async {
           'name': 'Tom',
           'state': 'active',
           'rating': {r'$gt': 10}
-        }, sort: <String, dynamic>{
+        }, sort: <String, Object>{
           'rating': 1
         }, update: <String, dynamic>{
           r'$inc': {'score': 1}
         });
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['name'], 'Tom');
-        expect(res.value['score'], 5);
+        expect(res.value?['name'], 'Tom');
+        expect(res.value?['score'], 5);
       });
       test('Update and Return new', () async {
         var collectionName = getRandomCollectionName();
@@ -777,18 +773,18 @@ void main() async {
               'state': 'active',
               'rating': {r'$gt': 10}
             },
-            sort: <String, dynamic>{'rating': 1},
+            sort: <String, Object>{'rating': 1},
             update: <String, dynamic>{
               r'$inc': {'score': 1}
             },
             returnNew: true);
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['name'], 'Tom');
-        expect(res.value['score'], 6);
+        expect(res.value?['name'], 'Tom');
+        expect(res.value?['score'], 6);
       });
       test('No update', () async {
         var collectionName = getRandomCollectionName();
@@ -804,15 +800,15 @@ void main() async {
               'state': 'active',
               'rating': {r'$gt': 10}
             },
-            sort: <String, dynamic>{'rating': 1},
+            sort: <String, Object>{'rating': 1},
             update: <String, dynamic>{
               r'$inc': {'score': 1}
             },
             returnNew: true);
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isFalse);
-        expect(res.lastErrorObject.n, 0);
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.n, 0);
         expect(res.value, isNull);
       });
       test('Upsert true', () async {
@@ -829,16 +825,16 @@ void main() async {
               'state': 'active',
               'rating': 100
             },
-            sort: <String, dynamic>{'rating': 1},
+            sort: <String, Object>{'rating': 1},
             update: <String, dynamic>{
               r'$inc': {'score': 1}
             },
             upsert: true);
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isFalse);
-        expect(res.lastErrorObject.upserted, TypeMatcher<ObjectId>());
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, TypeMatcher<ObjectId>());
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNull);
       });
       test('Upsert true - returnNew true', () async {
@@ -855,7 +851,7 @@ void main() async {
               'state': 'active',
               'rating': 100
             },
-            sort: <String, dynamic>{'rating': 1},
+            sort: <String, Object>{'rating': 1},
             update: <String, dynamic>{
               r'$inc': {'score': 1}
             },
@@ -863,13 +859,13 @@ void main() async {
             returnNew: true);
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isFalse);
-        expect(res.lastErrorObject.upserted, TypeMatcher<ObjectId>());
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, TypeMatcher<ObjectId>());
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['name'], 'Gus');
-        expect(res.value['score'], 1);
-        expect(res.value['_id'], res.lastErrorObject.upserted);
+        expect(res.value?['name'], 'Gus');
+        expect(res.value?['score'], 1);
+        expect(res.value?['_id'], res.lastErrorObject?.upserted);
       });
 
       test('Upsert true ignored - returnNew true', () async {
@@ -893,7 +889,7 @@ void main() async {
               'state': 'active',
               'rating': 100
             },
-            sort: <String, dynamic>{'rating': 1},
+            sort: <String, Object>{'rating': 1},
             update: <String, dynamic>{
               r'$inc': {'score': 1}
             },
@@ -901,12 +897,12 @@ void main() async {
             returnNew: true);
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.upserted, isNull);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.upserted, isNull);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['name'], 'Gus');
-        expect(res.value['score'], 16);
+        expect(res.value?['name'], 'Gus');
+        expect(res.value?['score'], 16);
       });
 
       test('Remove', () async {
@@ -921,17 +917,17 @@ void main() async {
             query: <String, dynamic>{
               'state': 'active',
             },
-            sort: <String, dynamic>{'rating': 1},
+            sort: <String, Object>{'rating': 1},
             remove: true);
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isFalse);
-        expect(res.lastErrorObject.upserted, isNull);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, isNull);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['name'], 'George');
-        expect(res.value['score'], 8);
-        expect(res.value['_id'], 4);
+        expect(res.value?['name'], 'George');
+        expect(res.value?['score'], 8);
+        expect(res.value?['_id'], 4);
       });
       test('Collation', () async {
         var collectionName = getRandomCollectionName();
@@ -946,7 +942,7 @@ void main() async {
               'category': 'cafe',
               'status': 'a',
             },
-            sort: <String, dynamic>{'category': 1},
+            sort: <String, Object>{'category': 1},
             update: <String, dynamic>{
               r'$set': {'status': 'updated'}
             },
@@ -954,11 +950,11 @@ void main() async {
                 collation: CollationOptions('fr', strength: 1)));
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['category'], 'café');
-        expect(res.value['status'], 'A');
+        expect(res.value?['category'], 'café');
+        expect(res.value?['status'], 'A');
       });
 
       test('Array Filters', () async {
@@ -997,11 +993,11 @@ void main() async {
             ]);
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['grades'].last, 100);
-        expect(res.value['_id'], 2);
+        expect((res.value?['grades'] as List?)?.last, 100);
+        expect(res.value?['_id'], 2);
       });
 
       test('Array Filters on a specific element', () async {
@@ -1042,11 +1038,11 @@ void main() async {
             ]);
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['grades'].last['mean'], 100);
-        expect(res.value['_id'], 1);
+        expect((res.value?['grades'] as List?)?.last['mean'], 100);
+        expect(res.value?['_id'], 1);
       });
       test('Aggregation Pipeline', () async {
         if (!running4_2orGreater) {
@@ -1088,13 +1084,13 @@ void main() async {
             returnNew: true);
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.upserted, isNull);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.upserted, isNull);
 
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['total'], 250);
-        expect(res.value['_id'], 1);
+        expect(res.value?['total'], 250);
+        expect(res.value?['_id'], 1);
       });
 
       test('Specify Hint', () async {
@@ -1120,13 +1116,13 @@ void main() async {
             hintDocument: {'status': 1});
         var res = await famOperation.executeDocument();
 
-        expect(res.lastErrorObject.updatedExisting, isFalse);
-        expect(res.lastErrorObject.upserted, isNull);
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, isNull);
 
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['member'], 'abc123');
-        expect(res.value['_id'], 1);
+        expect(res.value?['member'], 'abc123');
+        expect(res.value?['_id'], 1);
       });
     });
     group('Find and Modify - Collection Helper', () {
@@ -1146,11 +1142,11 @@ void main() async {
             sort: <String, dynamic>{'rating': 1},
             update: ModifierBuilder().inc('score', 1));
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['name'], 'Tom');
-        expect(res.value['score'], 5);
+        expect(res.value?['name'], 'Tom');
+        expect(res.value?['score'], 5);
       });
       test('Update and Return new', () async {
         var collectionName = getRandomCollectionName();
@@ -1169,11 +1165,11 @@ void main() async {
             update: ModifierBuilder().inc('score', 1),
             returnNew: true);
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['name'], 'Tom');
-        expect(res.value['score'], 6);
+        expect(res.value?['name'], 'Tom');
+        expect(res.value?['score'], 6);
       });
       test('No update', () async {
         var collectionName = getRandomCollectionName();
@@ -1192,8 +1188,8 @@ void main() async {
             update: ModifierBuilder().inc('score', 1),
             returnNew: true);
 
-        expect(res.lastErrorObject.updatedExisting, isFalse);
-        expect(res.lastErrorObject.n, 0);
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.n, 0);
         expect(res.value, isNull);
       });
 
@@ -1212,9 +1208,9 @@ void main() async {
             update: ModifierBuilder().inc('score', 1),
             upsert: true);
 
-        expect(res.lastErrorObject.updatedExisting, isFalse);
-        expect(res.lastErrorObject.upserted, TypeMatcher<ObjectId>());
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, TypeMatcher<ObjectId>());
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNull);
       });
       test('Upsert true - returnNew true', () async {
@@ -1233,13 +1229,13 @@ void main() async {
             upsert: true,
             returnNew: true);
 
-        expect(res.lastErrorObject.updatedExisting, isFalse);
-        expect(res.lastErrorObject.upserted, TypeMatcher<ObjectId>());
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, TypeMatcher<ObjectId>());
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['name'], 'Gus');
-        expect(res.value['score'], 1);
-        expect(res.value['_id'], res.lastErrorObject.upserted);
+        expect(res.value?['name'], 'Gus');
+        expect(res.value?['score'], 1);
+        expect(res.value?['_id'], res.lastErrorObject?.upserted);
       });
 
       test('Upsert true ignored - returnNew true', () async {
@@ -1265,12 +1261,12 @@ void main() async {
             upsert: true,
             returnNew: true);
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.upserted, isNull);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.upserted, isNull);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['name'], 'Gus');
-        expect(res.value['score'], 16);
+        expect(res.value?['name'], 'Gus');
+        expect(res.value?['score'], 16);
       });
 
       test('Remove', () async {
@@ -1286,13 +1282,13 @@ void main() async {
             sort: <String, dynamic>{'rating': 1},
             remove: true);
 
-        expect(res.lastErrorObject.updatedExisting, isFalse);
-        expect(res.lastErrorObject.upserted, isNull);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, isNull);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['name'], 'George');
-        expect(res.value['score'], 8);
-        expect(res.value['_id'], 4);
+        expect(res.value?['name'], 'George');
+        expect(res.value?['score'], 8);
+        expect(res.value?['_id'], 4);
       });
       test('Collation', () async {
         var collectionName = getRandomCollectionName();
@@ -1309,11 +1305,11 @@ void main() async {
             findAndModifyOptions: FindAndModifyOptions(
                 collation: CollationOptions('fr', strength: 1)));
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['category'], 'café');
-        expect(res.value['status'], 'A');
+        expect(res.value?['category'], 'café');
+        expect(res.value?['status'], 'A');
       });
 
       test('Array Filters', () async {
@@ -1347,11 +1343,11 @@ void main() async {
               }
             ]);
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['grades'].last, 100);
-        expect(res.value['_id'], 2);
+        expect((res.value?['grades'] as List?)?.last, 100);
+        expect(res.value?['_id'], 2);
       });
 
       test('Array Filters on a specific element', () async {
@@ -1389,11 +1385,11 @@ void main() async {
               }
             ]);
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['grades'].last['mean'], 100);
-        expect(res.value['_id'], 1);
+        expect((res.value?['grades'] as List?)?.last['mean'], 100);
+        expect(res.value?['_id'], 1);
       });
       test('Aggregation Pipeline', () async {
         if (!running4_2orGreater) {
@@ -1441,17 +1437,17 @@ void main() async {
           returnNew: true,
         );
 
-        expect(res.lastErrorObject.updatedExisting, isTrue);
-        expect(res.lastErrorObject.upserted, isNull);
+        expect(res.lastErrorObject?.updatedExisting, isTrue);
+        expect(res.lastErrorObject?.upserted, isNull);
 
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['total'], 250);
-        expect(res.value['decimal'], Rational.fromInt(1));
-        expect(res.value['decimal2'],
+        expect(res.value?['total'], 250);
+        expect(res.value?['decimal'], Rational.fromInt(1));
+        expect(res.value?['decimal2'],
             Rational.parse('0.9999999999999999999999999999999999'));
 
-        expect(res.value['_id'], 1);
+        expect(res.value?['_id'], 1);
       });
 
       test('Specify Hint', () async {
@@ -1473,13 +1469,13 @@ void main() async {
             remove: true,
             hintDocument: {'status': 1});
 
-        expect(res.lastErrorObject.updatedExisting, isFalse);
-        expect(res.lastErrorObject.upserted, isNull);
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, isNull);
 
-        expect(res.lastErrorObject.n, 1);
+        expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
-        expect(res.value['member'], 'abc123');
-        expect(res.value['_id'], 1);
+        expect(res.value?['member'], 'abc123');
+        expect(res.value?['_id'], 1);
       });
     });
   });

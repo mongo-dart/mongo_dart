@@ -7,21 +7,17 @@ import 'delete_many_options.dart';
 import 'delete_many_statement.dart';
 
 class DeleteManyOperation extends DeleteOperation {
-  DeleteManyStatement deleteRequest;
+  //DeleteManyStatement deleteRequest;
 
   DeleteManyOperation(
       DbCollection collection, DeleteManyStatement deleteRequest,
-      {DeleteManyOptions deleteManyOptions, Map<String, Object> rawOptions})
+      {DeleteManyOptions? deleteManyOptions, Map<String, Object>? rawOptions})
       : super(
           collection,
           [deleteRequest],
           deleteOptions: deleteManyOptions,
           rawOptions: rawOptions,
-        ) {
-    if (deleteRequest == null) {
-      throw ArgumentError('Delete Request required in deleteMany() method');
-    }
-  }
+        );
 
   Future<WriteResult> executeDocument() async {
     var ret = await super.execute();

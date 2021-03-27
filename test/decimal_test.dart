@@ -10,9 +10,7 @@ const dbAddress = '127.0.0.1';
 
 const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
-var throwsMongoDartError = throwsA((e) => e is MongoDartError);
-
-Db db;
+late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
@@ -80,7 +78,6 @@ void main() async {
       });
       test('update Decimal', () async {
         var collectionName = getRandomCollectionName();
-        ;
         var collection = db.collection(collectionName);
 
         await collection
@@ -93,9 +90,16 @@ void main() async {
         var values = await collection.find().toList();
 
         expect(values.length, 1);
-
         expect(values.first['value'], Rational.fromInt(15));
         expect(values.first['qty'], 20);
+
+        await collection.update(where,
+            ModifierBuilder().mul('value', Rational.fromInt(5)).mul('qty', 2));
+            values = await collection.find().toList();
+
+        expect(values.length, 1);
+        expect(values.first['value'], Rational.fromInt(75));
+        expect(values.first['qty'], 40);
       });
       test('update Decimal with Modifier', () async {
         var collectionName = getRandomCollectionName();

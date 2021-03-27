@@ -53,7 +53,7 @@ import 'create_view_options.dart';
 ///   (must be manually set)
 class CreateViewCommand extends CreateCommand {
   CreateViewCommand(Db db, String view, String source, List pipeline,
-      {CreateViewOptions createViewOptions, Map<String, Object> rawOptions})
+      {CreateViewOptions? createViewOptions, Map<String, Object>? rawOptions})
       : super(db, view,
             createOptions:
                 _generateCreateOptions(db, source, pipeline, createViewOptions),
@@ -61,7 +61,7 @@ class CreateViewCommand extends CreateCommand {
 }
 
 CreateOptions _generateCreateOptions(
-    Db db, String source, List pipeline, CreateViewOptions createViewOptions) {
+    Db db, String source, List pipeline, CreateViewOptions? createViewOptions) {
   return CreateOptions(
       viewOn: source,
       pipeline: pipeline,

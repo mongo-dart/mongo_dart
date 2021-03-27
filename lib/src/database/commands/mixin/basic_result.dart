@@ -11,26 +11,26 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 mixin BasicResult {
   /// Command status (1.0 Ok, 0.0 error)
-  double ok;
+  double ok = 0.0;
 
   /// Optional error fields
-  String errmsg;
-  int code;
-  String codeName;
+  String? errmsg;
+  int? code;
+  String? codeName;
 
   bool get success => ok == 1.0;
   bool get failure => ok == 0.0;
 
-  void extractBasic(Map<String, Object> document) {
-    document ??= <String, Object>{};
+  void extractBasic(Map<String, Object?> document) {
+    //document ??= <String, Object>{};
     var documentOk = document[keyOk];
     if (documentOk is int) {
       ok = documentOk.toDouble();
     } else {
-      ok = documentOk;
+      ok = documentOk as double;
     }
-    errmsg = document[keyErrmsg];
-    code = document[keyCode];
-    codeName = document[keyCodeName];
+    errmsg = document[keyErrmsg] as String?;
+    code = document[keyCode] as int?;
+    codeName = document[keyCodeName] as String?;
   }
 }

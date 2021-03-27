@@ -2,10 +2,10 @@ import 'package:mongo_dart/src/database/commands/query_and_write_operation_comma
 import 'package:mongo_dart/src/database/commands/parameters/collation_options.dart';
 
 class DeleteOneStatement extends DeleteStatement {
-  DeleteOneStatement(Map<String, Object> filter,
-      {CollationOptions collation,
-      String hint,
-      Map<String, Object> hintDocument})
+  DeleteOneStatement(Map<String, Object?> filter,
+      {CollationOptions? collation,
+      String? hint,
+      Map<String, Object>? hintDocument})
       : super(filter,
             collation: collation,
             hint: hint,

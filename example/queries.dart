@@ -2,7 +2,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 void main() async {
   var db = Db('mongodb://127.0.0.1/mongo_dart-test');
-  ObjectId id;
+  ObjectId? id;
   DbCollection coll;
   await db.open();
   print('connection open');
@@ -18,7 +18,12 @@ void main() async {
       .forEach((v) => print(v));
   var val = await coll.findOne(where.eq('my_field', 17));
   print('Filtered by my_field=17 $val');
-  id = val['_id'] as ObjectId;
+  id = val?['_id'] as ObjectId?;
+  if (id == null) {
+    print('Id not detected');
+    await db.close();
+    return;
+  }
   val = await coll.findOne(where.eq('my_field', 17).fields(['str_field']));
   print("findOne with fields clause 'str_field' $val");
   val = await coll.findOne(where.id(id));

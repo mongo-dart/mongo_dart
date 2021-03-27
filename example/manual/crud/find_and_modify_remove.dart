@@ -6,20 +6,14 @@ const dbAddress = '127.0.0.1';
 const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void main() async {
-  Db db;
-
-  Future initializeDatabase() async {
-    db = Db(DefaultUri);
-    await db.open();
-  }
+  var db = Db(DefaultUri);
+  await db.open();
 
   Future cleanupDatabase() async {
     await db.close();
   }
 
-  await initializeDatabase();
-  if (db.masterConnection == null ||
-      !db.masterConnection.serverCapabilities.supportsOpMsg) {
+  if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
     return;
   }
 
@@ -46,9 +40,9 @@ void main() async {
       sort: <String, dynamic>{'rating': 1},
       remove: true);
 
-  print('Updated document: ${res.lastErrorObject.updatedExisting}'); // false
+  print('Updated document: ${res.lastErrorObject?.updatedExisting}'); // false
 
-  print('Removed element name: "${res.value['name']}"'); // 'George';
+  print('Removed element name: "${res.value?['name']}"'); // 'George';
 
   await cleanupDatabase();
 }

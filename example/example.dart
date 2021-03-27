@@ -63,22 +63,22 @@ void main() async {
     {
       'title': 'Caminando por Buenos Aires',
       'body': 'Las callecitas de Buenos Aires tienen ese no se que...',
-      'author_id': authors['Jorge Luis Borges']['_id']
+      'author_id': authors['Jorge Luis Borges']?['_id']
     },
     {
       'title': 'I must have seen thy face before',
       'body': 'Thine eyes call me in a new way',
-      'author_id': authors['William Shakespeare']['_id'],
+      'author_id': authors['William Shakespeare']?['_id'],
       'comments': [
-        {'user_id': users['jdoe']['_id'], 'body': 'great article!'}
+        {'user_id': users['jdoe']?['_id'], 'body': 'great article!'}
       ]
     }
   ]);
   print('====================================================================');
   print('>> Articles ordered by title ascending');
   await articlesCollection.find(where.sortBy('title')).forEach((article) {
-    print(
-        "[${article['title']}]:[${article['body']}]:[${article['author_id'].toHexString()}]");
+    print("[${article['title']}]:[${article['body']}]:"
+        "[${article['author_id'].toHexString()}]");
   });
   await db.close();
 }

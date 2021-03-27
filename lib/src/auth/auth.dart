@@ -3,7 +3,7 @@ part of mongo_dart;
 enum AuthenticationScheme { MONGODB_CR, SCRAM_SHA_1 }
 
 abstract class Authenticator {
-  static String name;
+  static String? name;
 
   Future authenticate(Connection connection);
 }
@@ -21,13 +21,13 @@ Authenticator createAuthenticator(AuthenticationScheme authenticationScheme,
 }
 
 class UsernamePasswordCredential {
-  String username;
-  String password; // TODO: Encrypt this to secureString
+  String? username;
+  String? password; // TODO: Encrypt this to secureString
 }
 
 abstract class RandomStringGenerator {
-  static const String allowedCharacters =
-      '!"#\'\$%&()*+-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
+  static const String allowedCharacters = '!"#\'\$%&()*+-./0123456789:;<=>?@'
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 
   String generate(int length);
 }

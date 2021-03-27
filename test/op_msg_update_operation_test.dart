@@ -19,7 +19,7 @@ const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
-Db db;
+late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
@@ -41,7 +41,7 @@ void main() async {
 
   group('Helper functions', () {
     test('Check update document', () {
-      Map testDocument = <String, dynamic>{
+      var testDocument = <String, dynamic>{
         r'$set': {'violations': 3},
         r'$unset': {'status': ''}
       };
@@ -50,7 +50,7 @@ void main() async {
       expect(isPureDocument(testDocument), isFalse);
     });
     test('Check replace document', () {
-      Map testDocument = <String, dynamic>{
+      var testDocument = <String, dynamic>{
         'violations': 3,
         'status': 'A',
         'name': 'Ethan'
@@ -59,12 +59,12 @@ void main() async {
       expect(containsOnlyUpdateOperators(testDocument), isFalse);
       expect(isPureDocument(testDocument), isTrue);
     });
-    test('Check null document', () {
+    /*   test('Check null document', () {
       expect(containsOnlyUpdateOperators(null), isFalse);
       expect(isPureDocument(null), isFalse);
-    });
+    }); */
     test('Check empty document', () {
-      Map testDocument = <String, dynamic>{};
+      var testDocument = <String, dynamic>{};
       expect(containsOnlyUpdateOperators(testDocument), isFalse);
       expect(isPureDocument(testDocument), isFalse);
     });
@@ -80,23 +80,19 @@ void main() async {
     var isSharded = false;
     setUp(() async {
       await initializeDatabase();
-      if (db.masterConnection == null ||
-          !db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
-      var serverFcv = db?.masterConnection?.serverCapabilities?.fcv ?? '0.0';
-      if (serverFcv.compareTo('4.4') != -1) {
+      var serverFcv = db.masterConnection.serverCapabilities.fcv;
+      if (serverFcv?.compareTo('4.4') != -1) {
         running4_4orGreater = true;
       }
-      if (serverFcv.compareTo('4.2') != -1) {
+      if (serverFcv?.compareTo('4.2') != -1) {
         running4_2orGreater = true;
       }
-      isReplicaSet =
-          db?.masterConnection?.serverCapabilities?.isReplicaSet ?? false;
-      isStandalone =
-          db?.masterConnection?.serverCapabilities?.isStandalone ?? false;
-      isSharded =
-          db?.masterConnection?.serverCapabilities?.isShardedCluster ?? false;
+      isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
+      isStandalone = db.masterConnection.serverCapabilities.isStandalone;
+      isSharded = db.masterConnection.serverCapabilities.isShardedCluster;
     });
 
     tearDown(() async {
@@ -1572,9 +1568,9 @@ void main() async {
         expect(res.isFailure, isTrue);
         expect(res.hasWriteErrors, isTrue);
         if (isSharded && running4_2orGreater) {
-          expect(res.writeError.code, 72);
+          expect(res.writeError?.code, 72);
         } else {
-          expect(res.writeError.code, 9);
+          expect(res.writeError?.code, 9);
         }
 
         var elements = await collection.find(where).toList();
@@ -1653,8 +1649,9 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         expect(
-            () => collection.replaceOne(where.eq('name', 'Central Perk Cafe'),
-                ModifierBuilder().set('name', 'Central Park Cafe')),
+            () => collection.replaceOne(where.eq('name', 'Central Perk Cafe'), {
+                  r'$set': {'name', 'Central Park Cafe'}
+                }),
             throwsMongoDartError);
       });
 
@@ -1940,9 +1937,9 @@ void main() async {
     });
   });
   tearDownAll(() async {
-    await db?.open();
+    await db.open();
     await Future.forEach(usedCollectionNames,
-        (String collectionName) => db?.collection(collectionName)?.drop());
-    await db?.close();
+        (String collectionName) => db.collection(collectionName).drop());
+    await db.close();
   });
 }

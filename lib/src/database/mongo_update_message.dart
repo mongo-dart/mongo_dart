@@ -1,17 +1,17 @@
 part of mongo_dart;
 
 class MongoUpdateMessage extends MongoMessage {
-  BsonCString _collectionFullName;
+  final BsonCString _collectionFullName;
   int flags;
-  int numberToSkip;
-  int numberToReturn;
-  BsonMap _selector;
-  BsonMap _document;
+  //int numberToSkip;
+  //int numberToReturn;
+  final BsonMap _selector;
+  late BsonMap _document;
 
   MongoUpdateMessage(String collectionFullName, Map<String, dynamic> selector,
-      document, this.flags) {
-    _collectionFullName = BsonCString(collectionFullName);
-    _selector = BsonMap(selector);
+      document, this.flags)
+      : _collectionFullName = BsonCString(collectionFullName),
+        _selector = BsonMap(selector) {
     if (document is ModifierBuilder) {
       document = document.map;
     }
@@ -43,7 +43,6 @@ class MongoUpdateMessage extends MongoMessage {
   }
 
   @override
-  String toString() {
-    return 'MongoUpdateMessage($requestId, ${_collectionFullName.value}, ${_selector.value}, ${_document.value})';
-  }
+  String toString() => 'MongoUpdateMessage($requestId, '
+      '${_collectionFullName.value}, ${_selector.value}, ${_document.value})';
 }

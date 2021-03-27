@@ -2,11 +2,11 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:mongo_dart/src/database/utils/mongo_db_namespace.dart';
 
 class ChangeEvent {
-  ChangeEvent.fromMap(Map<String, Object> streamData) {
+  ChangeEvent.fromMap(Map<String, Object?> streamData) {
     serverResponse = _extractEventData(streamData);
   }
 
-  Map<String, Object> serverResponse;
+  late Map<String, Object?> serverResponse;
 
   /// Metadata related to the operation. Acts as the resumeToken for the
   /// resumeAfter parameter when resuming a change stream.
@@ -17,7 +17,7 @@ class ChangeEvent {
   /// The _data type depends on the MongoDB versions and, in some cases,
   /// the feature compatibility version (fcv) at the time of the change stream’s
   /// opening/resumption. For details, see [Resume Tokens](https://docs.mongodb.com/manual/changeStreams/#change-stream-resume-token).
-  Map<String, Object> id;
+  Map<String, Object>? id;
 
   /// The type of operation that occurred. Can be any of the following values:
   /// - insert
@@ -28,7 +28,7 @@ class ChangeEvent {
   /// - rename
   /// - dropDatabase
   /// - invalidate
-  String operationType;
+  String? operationType;
 
   /// The document created or modified by the insert, replace, delete,
   /// update operations (i.e. CRUD operations).
@@ -46,10 +46,10 @@ class ChangeEvent {
   /// This document may differ from the changes described in updateDescription
   /// if other majority-committed operations modified the document between
   /// the original update operation and the full document lookup.
-  Map<String, Object> fullDocument;
+  Map<String, Object?>? fullDocument;
 
   /// The namespace (database and or collection) affected by the event.
-  MongoDBNamespace ns;
+  MongoDBNamespace? ns;
 
   bool get isInsert => operationType == 'insert';
   bool get isDelete => operationType == 'delete';
@@ -61,11 +61,16 @@ class ChangeEvent {
   bool get isDropDatabase => operationType == 'dropDatabase';
   bool get isInvalidate => operationType == 'invalidate';
 
-  Map<String, Object> _extractEventData(Map<String, Object> streamData) {
-    id = streamData[key_id];
-    operationType = streamData[keyOperationType];
-    fullDocument = streamData[keyFullDocument];
-    ns = MongoDBNamespace.fromMap(streamData[keyNs]);
+  Map<String, Object?> _extractEventData(Map<String, Object?> streamData) {
+    if (streamData[key_id] != null) {
+      id = <String, Object>{...streamData[key_id] as Map};
+    }
+    operationType = streamData[keyOperationType] as String?;
+    fullDocument = streamData[keyFullDocument] as Map<String, Object?>?;
+    if (streamData[keyNs] != null) {
+      ns = MongoDBNamespace.fromMap(
+          <String, Object>{...streamData[keyNs] as Map});
+    }
     return Map.from(streamData);
   }
 }

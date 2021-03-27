@@ -27,22 +27,22 @@ import 'kill_cursors_result.dart';
 ///   - a set of optional values for the command
 class KillCursorsCommand extends CommandOperation {
   KillCursorsCommand(DbCollection collection, List<BsonLong> cursorIds,
-      {Db db,
-      KillCursorsOptions killCursorsOptions,
-      Map<String, Object> rawOptions})
-      : super(db ?? collection?.db,
+      {Db? db,
+      KillCursorsOptions? killCursorsOptions,
+      Map<String, Object>? rawOptions})
+      : super(db ?? collection.db,
             <String, Object>{...?killCursorsOptions?.options, ...?rawOptions},
             collection: collection,
             command: <String, Object>{
-              keyKillCursors: collection?.collectionName,
+              keyKillCursors: collection.collectionName,
               keyCursors: cursorIds,
             }) {
     // In case of aggregate collection agnostic commands, collection is
     // not needed
-    if (this.db == null) {
+    /*  if (this.db == null) {
       throw MongoDartError('Database required in call to KillCursorsCommand');
-    }
-    if (cursorIds == null || cursorIds.isEmpty) {
+    } */
+    if (/* cursorIds == null || */ cursorIds.isEmpty) {
       throw MongoDartError('CursorIds required in call to KillCursorsCommand');
     }
   }

@@ -172,7 +172,7 @@ var testDoc = {
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
-Db db;
+late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
@@ -196,8 +196,7 @@ void main() async {
     var cannotRunTests = false;
     setUp(() async {
       await initializeDatabase();
-      if (db.masterConnection == null ||
-          !db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
     });
@@ -237,19 +236,18 @@ void main() async {
           '208a3f93-9fcb-4db7-ac44-bb11b86a2d31');
 
       var resultOne = await collection.modernFindOne(
-          selector: where
-            ..eq('pontosGastronomicos.id',
-                '208a3f93-9fcb-4db7-ac44-bb11b86a2d31')
-            ..paramFields = {
-              '_id': 0,
-              'pontosGastronomicos': {
-                r'$elemMatch': {'id': '208a3f93-9fcb-4db7-ac44-bb11b86a2d31'}
-              }
-            });
-      expect(resultOne['pontosGastronomicos'].first['id'],
+          selector: where.eq(
+              'pontosGastronomicos.id', '208a3f93-9fcb-4db7-ac44-bb11b86a2d31'),
+          projection: {
+            '_id': 0,
+            'pontosGastronomicos': {
+              r'$elemMatch': {'id': '208a3f93-9fcb-4db7-ac44-bb11b86a2d31'}
+            }
+          });
+      expect(resultOne?['pontosGastronomicos'].first['id'],
           '208a3f93-9fcb-4db7-ac44-bb11b86a2d31');
       expect(result.first['pontosGastronomicos'].first['id'],
-          resultOne['pontosGastronomicos'].first['id']);
+          resultOne?['pontosGastronomicos'].first['id']);
 
       resultOne = await collection.modernFindOne(filter: {
         'pontosGastronomicos': {
@@ -261,7 +259,7 @@ void main() async {
           r'$elemMatch': {'id': '208a3f93-9fcb-4db7-ac44-bb11b86a2d31'}
         }
       });
-      expect(resultOne['pontosGastronomicos'].first['id'],
+      expect(resultOne?['pontosGastronomicos'].first['id'],
           '208a3f93-9fcb-4db7-ac44-bb11b86a2d31');
 
       var cursor = collection.modernAggregateCursor([
@@ -289,8 +287,7 @@ void main() async {
         }
       ]);
       var doc = await cursor.onlyFirst();
-      expect(doc['id'], '208a3f93-9fcb-4db7-ac44-bb11b86a2d31');
-
+      expect(doc?['id'], '208a3f93-9fcb-4db7-ac44-bb11b86a2d31');
     }, skip: cannotRunTests);
 
     test(r'Select with $where', () async {
@@ -418,7 +415,7 @@ void main() async {
         expect(resultCommand, isNotNull);
         expect(resultCommand[keyCursor], isNotNull);
 
-        Map cursorMap = resultCommand[keyCursor];
+        var cursorMap = resultCommand[keyCursor] as Map;
         expect(cursorMap[keyFirstBatch], isNull);
         expect(cursorMap[keyNextBatch], isNotEmpty);
         expect(cursorMap[keyNextBatch].length, 19);
@@ -452,10 +449,10 @@ void main() async {
         var cursorResult = await cursor.nextObject();
         expect(cursor.state, State.OPEN);
         expect(cursor.cursorId.value, isPositive);
-        expect(cursorResult['a'], 101);
+        expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
 
-        var aResult = (cursorResult['a'] as int) + 1;
+        var aResult = (cursorResult?['a'] as int) + 1;
         var got110 = false;
         cursor.stream.listen((event) {
           expect(event['a'], aResult++);
@@ -503,10 +500,10 @@ void main() async {
         var cursorResult = await cursor.nextObject();
         expect(cursor.state, State.OPEN);
         expect(cursor.cursorId.value, isPositive);
-        expect(cursorResult['a'], 101);
+        expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
 
-        var aResult = (cursorResult['a'] as int) + 1;
+        var aResult = (cursorResult?['a'] as int) + 1;
         var got110 = false;
         var got111 = false;
 
@@ -637,7 +634,8 @@ void main() async {
         ]);
 
         var resultList = await stream.toList();
-        if (db.masterConnection.serverCapabilities.fcv.compareTo('4.2') == -1) {
+        if (db.masterConnection.serverCapabilities.fcv?.compareTo('4.2') ==
+            -1) {
           if (db.masterConnection.serverCapabilities.isShardedCluster) {
             // one command per shard
             expect(resultList, isNotEmpty);
@@ -1066,13 +1064,13 @@ db.runCommand(
 
       var aResult = 3;
       var controller = stream.listen((changeEvent) {
-        Map fullDocument = changeEvent.fullDocument;
-        expect(fullDocument['a'], aResult++);
+        var fullDocument = changeEvent.fullDocument;
+        expect(fullDocument?['a'], aResult++);
 
-        if (fullDocument['a'] == 3) {
+        if (fullDocument?['a'] == 3) {
           expect(changeEvent.isInsert, isTrue);
           gotFourth = true;
-        } else if (fullDocument['a'] == 4) {
+        } else if (fullDocument?['a'] == 4) {
           expect(changeEvent.isInsert, isTrue);
           gotFifth = true;
         }
@@ -1137,14 +1135,14 @@ db.runCommand(
 
       var aResult = 3;
       var controller = stream.listen((changeEvent) {
-        Map fullDocument = changeEvent.fullDocument;
+        var fullDocument = changeEvent.fullDocument;
 
-        expect(fullDocument['a'], aResult++);
+        expect(fullDocument?['a'], aResult++);
 
-        if (fullDocument['a'] == 3) {
+        if (fullDocument?['a'] == 3) {
           expect(changeEvent.isInsert, isTrue);
           gotFourth = true;
-        } else if (fullDocument['a'] == 4) {
+        } else if (fullDocument?['a'] == 4) {
           expect(changeEvent.isInsert, isTrue);
           gotFifth = true;
         }
@@ -1349,18 +1347,15 @@ db.runCommand(
     var isSharded = false;
     setUp(() async {
       await initializeDatabase();
-      if (db.masterConnection == null ||
-          !db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
-      var serverFcv = db?.masterConnection?.serverCapabilities?.fcv ?? '0.0';
+      var serverFcv = db.masterConnection.serverCapabilities.fcv ?? '0.0';
       if (serverFcv.compareTo('3.6') == 0) {
         running3_6 = true;
       }
-      isReplicaSet =
-          db?.masterConnection?.serverCapabilities?.isReplicaSet ?? false;
-      isSharded =
-          db?.masterConnection?.serverCapabilities?.isShardedCluster ?? false;
+      isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
+      isSharded = db.masterConnection.serverCapabilities.isShardedCluster;
     });
 
     tearDown(() async {

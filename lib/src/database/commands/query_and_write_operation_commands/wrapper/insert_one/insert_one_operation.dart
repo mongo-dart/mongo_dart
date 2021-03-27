@@ -6,20 +6,16 @@ import 'package:mongo_dart/src/database/commands/query_and_write_operation_comma
 import 'insert_one_options.dart';
 
 class InsertOneOperation extends InsertOperation {
-  Map<String, Object> document;
+  Map<String, Object?> document;
 
   InsertOneOperation(DbCollection collection, this.document,
-      {InsertOneOptions insertOneOptions, Map<String, Object> rawOptions})
+      {InsertOneOptions? insertOneOptions, Map<String, Object>? rawOptions})
       : super(
           collection,
           [document],
           insertOptions: insertOneOptions,
           rawOptions: rawOptions,
-        ) {
-    if (document == null) {
-      throw ArgumentError('Document required in insertOne() method');
-    }
-  }
+        );
 
   Future<WriteResult> executeDocument() async {
     var ret = await super.execute();

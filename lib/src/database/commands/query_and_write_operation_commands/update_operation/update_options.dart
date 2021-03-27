@@ -8,14 +8,14 @@ class UpdateOptions {
   /// Do not explicitly set the write concern for the operation if run
   /// in a transaction. To use write concern with transactions,
   /// see [Transactions and Write Concern.](https://docs.mongodb.com/manual/core/transactions/#transactions-write-concern)
-  WriteConcern writeConcern;
+  WriteConcern? writeConcern;
 
   /// Enables update to bypass document validation during the operation.
   /// This lets you update documents that do not meet the validation
   /// requirements.
   ///
   /// New in version 3.2.
-  bool bypassDocumentValidation = false;
+  bool bypassDocumentValidation;
 
   /// A user-provided comment to attach to this command. Once set,
   /// this comment appears alongside records of this command in the
@@ -28,19 +28,17 @@ class UpdateOptions {
   /// any valid BSON type
   ///
   /// New in version 4.4.
-  final String comment;
+  final String? comment;
 
   UpdateOptions(
-      {this.writeConcern, this.bypassDocumentValidation, this.comment}) {
-    bypassDocumentValidation ??= false;
-  }
-
+      {this.writeConcern, bool? bypassDocumentValidation, this.comment})
+      : bypassDocumentValidation = bypassDocumentValidation ?? false;
   Map<String, Object> getOptions(Db db) => <String, Object>{
         if (bypassDocumentValidation)
           keyBypassDocumentValidation: bypassDocumentValidation,
         if (writeConcern != null)
           keyWriteConcern:
-              writeConcern.asMap(db.masterConnection?.serverStatus),
-        if (comment != null) keyComment: comment,
+              writeConcern!.asMap(db.masterConnection.serverStatus),
+        if (comment != null) keyComment: comment!,
       };
 }

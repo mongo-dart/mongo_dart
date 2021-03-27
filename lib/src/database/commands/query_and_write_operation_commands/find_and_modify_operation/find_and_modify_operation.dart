@@ -10,17 +10,18 @@ class FindAndModifyOperation extends CommandOperation {
   FindAndModifyOperation(DbCollection collection,
       {this.query,
       this.sort,
-      this.remove,
+      bool? remove,
       this.update,
-      this.returnNew,
+      bool? returnNew,
       this.fields,
-      this.upsert,
+      bool? upsert,
       this.arrayFilters,
       this.hint,
       this.hintDocument,
-      FindAndModifyOptions findAndModifyOptions,
-      Map<String, Object> rawOptions})
-      : super(
+      FindAndModifyOptions? findAndModifyOptions,
+      Map<String, Object>? rawOptions})
+      : remove = remove ?? false, returnNew = returnNew ?? false, 
+      upsert = upsert ?? false, super(
             collection.db,
             <String, Object>{
               ...?findAndModifyOptions?.getOptions(collection.db),
@@ -32,9 +33,7 @@ class FindAndModifyOperation extends CommandOperation {
       throw MongoDartError(
           'The arrayFilters parameter must be either a List or a Map');
     }
-    remove ??= false;
-    returnNew ??= false;
-    upsert ??= false;
+    
   }
 
   /// The selection criteria for the modification. The query field employs
@@ -46,7 +45,7 @@ class FindAndModifyOperation extends CommandOperation {
   ///
   /// Starting in MongoDB 4.2 (and 4.0.12+, 3.6.14+, and 3.4.23+),
   /// the operation errors if the query argument is not a document.
-  Map<String, Object> query;
+  Map<String, Object?>? query;
 
   /// Determines which document the operation modifies if the query selects
   /// multiple documents. findAndModify modifies the first document
@@ -67,12 +66,12 @@ class FindAndModifyOperation extends CommandOperation {
   /// this is to include the _id field in your sort query.
   ///
   /// See [Sort Stability](https://docs.mongodb.com/manual/reference/method/cursor.sort/#sort-cursor-stable-sorting) for more information.
-  Map<String, Object> sort;
+  Map<String, Object>? sort;
 
   /// Must specify either the remove or the update field. Removes the document
   /// specified in the query field. Set this to true to remove the
   /// selected document . The default is false.
-  bool remove = false;
+  bool remove;
 
   /// Must specify either the remove or the update field.
   /// Performs an update of the selected document.
@@ -89,14 +88,14 @@ class FindAndModifyOperation extends CommandOperation {
   ///   * $replaceRoot and its alias $replaceWith.
   ///
   /// It can be a Map or a List
-  Object update;
+  Object? update;
 
   /// When true, returns the modified document rather than the original.
   /// The findAndModify method ignores the 'new' option for remove operations.
   /// The default is false.
   ///
   /// Original name `new` renamed in `returnNew` because of the reserved word
-  bool returnNew = false;
+  bool returnNew;
 
   /// A subset of fields to return. The fields document specifies an inclusion
   /// of a field with 1, as in: fields: { <field1>: 1, <field2>: 1, ... }.
@@ -104,7 +103,7 @@ class FindAndModifyOperation extends CommandOperation {
   ///
   /// Starting in MongoDB 4.2 (and 4.0.12+, 3.6.14+, and 3.4.23+),
   /// the operation errors if the fields argument is not a document.
-  Map<String, dynamic> fields;
+  Map<String, dynamic>? fields;
 
   /// Used in conjunction with the update field.
   ///
@@ -117,7 +116,7 @@ class FindAndModifyOperation extends CommandOperation {
   /// ensure that the query fields are uniquely indexed.
   ///
   /// Defaults to false.
-  bool upsert = false;
+  bool upsert;
 
   /// An array of filter documents that determine which array elements to
   /// modify for an update operation on an array field.
@@ -172,7 +171,7 @@ class FindAndModifyOperation extends CommandOperation {
   ///
   /// New in version 3.6.
   ///
-  List arrayFilters;
+  List? arrayFilters;
 
   /// Optional. Index specification. Specify either the index name
   /// as a string (hint field) or the index key pattern (hintDocument field).
@@ -182,25 +181,25 @@ class FindAndModifyOperation extends CommandOperation {
   /// hint is required if the command includes the min and/or max fields;
   /// hint is not required with min and/or max if the filter is an
   /// equality condition on the _id field { _id: <value> }.
-  String hint;
-  Map<String, Object> hintDocument;
+  String? hint;
+  Map<String, Object>? hintDocument;
 
   @override
   Map<String, Object> $buildCommand() {
     return <String, Object>{
-      keyFindAndModify: collection.collectionName,
-      if (query != null) keyQuery: query,
-      if (sort != null) keySort: sort,
+      keyFindAndModify: collection!.collectionName,
+      if (query != null) keyQuery: query!,
+      if (sort != null) keySort: sort!,
       if (remove) keyRemove: remove,
-      if (update != null) keyUpdate: update,
+      if (update != null) keyUpdate: update!,
       if (returnNew) keyNew: returnNew,
-      if (fields != null) keyFields: fields,
+      if (fields != null) keyFields: fields!,
       if (upsert) keyUpsert: upsert,
-      if (arrayFilters != null) keyArrayFilters: arrayFilters,
+      if (arrayFilters != null) keyArrayFilters: arrayFilters!,
       if (hint != null)
-        keyHint: hint
+        keyHint: hint!
       else if (hintDocument != null)
-        keyHint: hintDocument,
+        keyHint: hintDocument!,
     };
   }
 

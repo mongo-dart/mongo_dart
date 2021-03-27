@@ -22,6 +22,11 @@ void main() async {
       .forEach(displayZip);
   print('\n******************** Find ZIP for code 78829 (BATESVILLE)');
   var batesville = await zips.findOne(where.eq('id', '78829'));
+  if (batesville == null) {
+    print('"BATESVILLE" record not found');
+    await db.close();
+    return;
+  }
   displayZip(batesville);
   print('******************** Find 10 ZIP closest to BATESVILLE');
   await zips

@@ -8,19 +8,18 @@ import '../../base/command_operation.dart';
 
 class UpdateOperation extends CommandOperation {
   UpdateOperation(DbCollection collection, this.updates,
-      {this.ordered,
-      UpdateOptions updateOptions,
-      Map<String, Object> rawOptions})
-      : super(
+      {bool? ordered,
+      UpdateOptions? updateOptions,
+      Map<String, Object>? rawOptions})
+      : ordered = ordered ?? true,
+        super(
             collection.db,
             <String, Object>{
               ...?updateOptions?.getOptions(collection.db),
               ...?rawOptions
             },
             collection: collection,
-            aspect: Aspect.writeOperation) {
-    ordered ??= true;
-  }
+            aspect: Aspect.writeOperation);
 
   /// An array of one or more update statements to perform on the
   /// named collection.
@@ -30,11 +29,11 @@ class UpdateOperation extends CommandOperation {
   /// the remaining update statements. If false, then when an update fails,
   /// continue with the remaining update statements, if any.
   /// Defaults to true.
-  bool ordered = true;
+  bool ordered;
 
   @override
   Map<String, Object> $buildCommand() => <String, Object>{
-        keyUpdate: collection.collectionName,
+        keyUpdate: collection!.collectionName,
         keyUpdates: [for (var request in updates) request.toMap()],
         if (ordered) keyOrdered: ordered,
       };

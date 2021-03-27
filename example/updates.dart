@@ -14,6 +14,11 @@ void main() async {
   ];
   await coll.insertAll(toInsert);
   var v1 = await coll.findOne({'name': 'c'});
+  if (v1 == null) {
+    print('Record not found');
+    await db.close();
+    return;
+  }
   print('Record c: $v1');
   v1['value'] = 31;
   await coll.save(v1);

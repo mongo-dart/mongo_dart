@@ -8,7 +8,9 @@ abstract class SaslMechanism {
 
 abstract class SaslStep {
   Uint8List bytesToSendToServer;
-  bool isComplete;
+  bool isComplete = false;
+
+  SaslStep(this.bytesToSendToServer, {this.isComplete = false});
   SaslStep transition(
       SaslConversation conversation, List<int> bytesReceivedFromServer);
 }

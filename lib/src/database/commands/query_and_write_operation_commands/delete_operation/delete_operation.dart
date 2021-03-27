@@ -8,7 +8,7 @@ import 'delete_options.dart';
 
 class DeleteOperation extends CommandOperation {
   DeleteOperation(DbCollection collection, this.deleteRequests,
-      {DeleteOptions deleteOptions, Map<String, Object> rawOptions})
+      {DeleteOptions? deleteOptions, Map<String, Object>? rawOptions})
       : super(
             collection.db,
             <String, Object>{
@@ -17,7 +17,7 @@ class DeleteOperation extends CommandOperation {
             },
             collection: collection,
             aspect: Aspect.writeOperation) {
-    if (deleteRequests == null || deleteRequests.isEmpty) {
+    if (deleteRequests.isEmpty) {
       throw ArgumentError('Delete request required in delete operation');
     }
   }
@@ -25,7 +25,7 @@ class DeleteOperation extends CommandOperation {
 
   @override
   Map<String, Object> $buildCommand() => <String, Object>{
-        keyDelete: collection.collectionName,
+        keyDelete: collection!.collectionName,
         keyDeletes: [for (var request in deleteRequests) request.toMap()]
       };
 }

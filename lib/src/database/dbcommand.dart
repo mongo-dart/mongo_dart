@@ -16,40 +16,40 @@ class DbCommand extends MongoQueryMessage {
       int numberToSkip,
       int numberToReturn,
       Map<String, dynamic> query,
-      Map<String, dynamic> fields)
+      Map<String, dynamic>? fields)
       : super(collectionName, flags, numberToSkip, numberToReturn, query,
             fields) {
     _collectionFullName = BsonCString('${db.databaseName}.$collectionName');
   }
 
   static DbCommand createFindAndModifyCommand(Db db, String collectionName,
-      {Map<String, dynamic> query,
-      Map<String, dynamic> sort,
-      bool remove,
-      Map<String, dynamic> update,
-      bool returnNew,
-      Map<String, dynamic> fields,
-      bool upsert}) {
-    Map command = <String, dynamic>{'findandmodify': collectionName};
+      {Map<String, dynamic>? query,
+      Map<String, dynamic>? sort,
+      bool? remove = false,
+      Map<String, dynamic>? update,
+      bool? returnNew = false,
+      Map<String, dynamic>? fields,
+      bool? upsert = false}) {
+    var command = <String, dynamic>{'findandmodify': collectionName};
     if (query != null) {
       command['query'] = query;
     }
     if (sort != null) {
       command['sort'] = sort;
     }
-    if (remove != null) {
+    if (remove != null && remove) {
       command['remove'] = remove;
     }
     if (update != null) {
       command['update'] = update;
     }
-    if (returnNew != null) {
+    if (returnNew != null && returnNew) {
       command['new'] = returnNew;
     }
     if (fields != null) {
       command['fields'] = fields;
     }
-    if (upsert != null) {
+    if (upsert != null && upsert) {
       command['upsert'] = upsert;
     }
     return DbCommand(db, SYSTEM_COMMAND_COLLECTION,
@@ -112,8 +112,8 @@ class DbCommand extends MongoQueryMessage {
     return createQueryDbCommand(db, {'buildInfo': 1});
   }
 
-  static DbCommand createGetLastErrorCommand(Db db, WriteConcern concern) {
-    return createQueryDbCommand(db, concern.command);
+  static DbCommand createGetLastErrorCommand(Db db, WriteConcern? concern) {
+    return createQueryDbCommand(db, concern?.command ?? <String, dynamic>{});
   }
 
   static DbCommand createCountCommand(Db db, String collectionName,
@@ -164,12 +164,12 @@ class DbCommand extends MongoQueryMessage {
 
   static DbCommand createAggregateCommand(
       Db db, String collectionName, List pipeline,
-      {bool allowDiskUse = false, Map<String, dynamic> cursor}) {
+      {bool allowDiskUse = false, Map<String, dynamic>? cursor}) {
     var query = {'aggregate': collectionName, 'pipeline': pipeline};
 
     if (cursor != null) query['cursor'] = cursor;
 
-    if (db._masterConnection.serverCapabilities.aggregationCursor) {
+    if (db.masterConnection.serverCapabilities.aggregationCursor) {
       query['allowDiskUse'] = allowDiskUse;
     }
 

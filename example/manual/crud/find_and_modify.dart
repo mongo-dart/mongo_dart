@@ -6,19 +6,17 @@ const dbAddress = '127.0.0.1';
 const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void main() async {
-  Db db;
+  var
 
-  Future initializeDatabase() async {
     db = Db(DefaultUri);
     await db.open();
-  }
+  
 
   Future cleanupDatabase() async {
     await db.close();
   }
 
-  await initializeDatabase();
-  if (db.masterConnection == null ||
+  if (
       !db.masterConnection.serverCapabilities.supportsOpMsg) {
     return;
   }
@@ -49,10 +47,10 @@ void main() async {
       sort: <String, dynamic>{'rating': 1},
       update: ModifierBuilder().inc('score', 1));
 
-  print('Updated document: ${res.lastErrorObject.updatedExisting}'); // true
+  print('Updated document: ${res.lastErrorObject?.updatedExisting}'); // true
 
   print('Modified element original score: '
-      '${res.value['score']}'); // 5;
+      '${res.value?['score']}'); // 5;
 
   await cleanupDatabase();
 }

@@ -6,20 +6,14 @@ const dbAddress = '127.0.0.1';
 const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void main() async {
-  Db db;
-
-  Future initializeDatabase() async {
-    db = Db(DefaultUri);
-    await db.open();
-  }
+  var db = Db(DefaultUri);
+  await db.open();
 
   Future cleanupDatabase() async {
     await db.close();
   }
 
-  await initializeDatabase();
-  if (db.masterConnection == null ||
-      !db.masterConnection.serverCapabilities.supportsOpMsg) {
+  if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
     return;
   }
 
@@ -37,7 +31,7 @@ void main() async {
   }
 
   var res = await collection.deleteMany(where.lt('age', 40));
- 
+
   print('Removed documents: ${res.nRemoved}'); // 2
 
   var findResult = await collection.find().toList();

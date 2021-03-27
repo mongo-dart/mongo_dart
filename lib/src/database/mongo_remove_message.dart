@@ -1,14 +1,14 @@
 part of mongo_dart;
 
 class MongoRemoveMessage extends MongoMessage {
-  BsonCString _collectionFullName;
+  final BsonCString _collectionFullName;
   int flags;
-  BsonMap _selector;
+  final BsonMap _selector;
 
   MongoRemoveMessage(String collectionFullName,
-      [Map<String, dynamic> selector = const {}, this.flags = 0]) {
-    _collectionFullName = BsonCString(collectionFullName);
-    _selector = BsonMap(selector);
+      [Map<String, dynamic> selector = const {}, this.flags = 0])
+      : _collectionFullName = BsonCString(collectionFullName),
+        _selector = BsonMap(selector) {
     opcode = MongoMessage.Delete;
   }
 
@@ -34,7 +34,6 @@ class MongoRemoveMessage extends MongoMessage {
   }
 
   @override
-  String toString() {
-    return 'MongoRemoveMessage($requestId, ${_collectionFullName.value}, ${_selector.value})';
-  }
+  String toString() => 'MongoRemoveMessage($requestId, '
+      '${_collectionFullName.value}, ${_selector.value})';
 }

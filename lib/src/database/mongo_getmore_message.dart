@@ -1,13 +1,13 @@
 part of mongo_dart;
 
 class MongoGetMoreMessage extends MongoMessage {
-  BsonCString _collectionFullName;
+  final BsonCString _collectionFullName;
   int cursorId;
   int numberToReturn;
 
   MongoGetMoreMessage(String collectionFullName, this.cursorId,
-      [this.numberToReturn = 20]) {
-    _collectionFullName = BsonCString(collectionFullName);
+      [this.numberToReturn = 20])
+      : _collectionFullName = BsonCString(collectionFullName) {
     opcode = MongoMessage.GetMore;
   }
 
@@ -29,7 +29,6 @@ class MongoGetMoreMessage extends MongoMessage {
   }
 
   @override
-  String toString() {
-    return 'MongoGetMoreMessage($requestId, ${_collectionFullName.value}, $cursorId)';
-  }
+  String toString() => 'MongoGetMoreMessage($requestId, '
+      '${_collectionFullName.value}, $cursorId)';
 }

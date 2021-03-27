@@ -1,11 +1,11 @@
 part of mongo_dart;
 
 class _Statics {
-  static int _requestId;
+  static int? _requestId;
   static int get nextRequestId {
     _requestId ??= 1;
-
-    return ++_requestId;
+    _requestId = _requestId! + 1;
+    return _requestId!;
   }
 }
 
@@ -20,23 +20,21 @@ class MongoMessage {
   static final KillCursors = 2007;
   static final ModernMessage = 2013;
 
-  int _requestId;
-  int _messageLength;
+  int? _requestId;
+  int _messageLength = 0;
 
   int get messageLength => _messageLength;
 
   int get requestId {
     _requestId ??= _Statics.nextRequestId;
 
-    return _requestId;
+    return _requestId!;
   }
 
-  int responseTo;
+  int responseTo = 0;
   int opcode = MongoMessage.Reply;
 
-  BsonBinary serialize() {
-    throw MongoDartError('Must be implemented');
-  }
+  BsonBinary serialize() => throw MongoDartError('Must be implemented');
 
 /*  void deserialize(BsonBinary buffer) {
     throw MongoDartError('Must be implemented');

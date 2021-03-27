@@ -17,7 +17,7 @@ class CreateOptions {
   /// when creating collections in databases other than the local database.
   ///
   /// Deprecated since version 3.2.
-  final bool autoIndexId;
+  final bool? autoIndexId;
 
   /// To create a capped collection, specify true.
   /// If you specify true, you must also set a maximum size in the size field.
@@ -28,7 +28,7 @@ class CreateOptions {
   /// MongoDB removes the older documents to make space for the new documents.
   /// The size field is required for capped collections and ignored for other
   /// collections. (ex. for 60KB, 60 * 1024)
-  final int size;
+  final int? size;
 
   /// The maximum number of documents allowed in the capped collection.
   /// The size limit takes precedence over this limit. If a capped collection
@@ -37,7 +37,7 @@ class CreateOptions {
   /// If you prefer to use the max limit, ensure that the size limit,
   /// which is required for a capped collection, is sufficient to contain
   /// the maximum number of documents.
-  final int max;
+  final int? max;
 
   /// Available for the WiredTiger storage engine only.
   /// Allows users to specify configuration to the storage engine on a
@@ -49,7 +49,7 @@ class CreateOptions {
   /// Storage engine configuration specified when creating collections
   /// are validated and logged to the oplog during replication to support
   /// replica sets with members that use different storage engines.
-  final Map<String, dynamic> storageEngine;
+  final Map<String, dynamic>? storageEngine;
 
   /// Allows users to specify validation rules or expressions for the
   /// collection. For more information, see Schema Validation.
@@ -67,7 +67,7 @@ class CreateOptions {
   /// - You cannot specify a validator for collections in the admin, local,
   ///   and config databases.
   /// - You cannot specify a validator for system.* collections.
-  final Map validator;
+  final Map? validator;
 
   /// Determines how strictly MongoDB applies the validation rules to existing
   /// documents during an update.
@@ -79,7 +79,7 @@ class CreateOptions {
   /// |"off"|No validation for inserts or updates.|
   /// |"strict"|**Default.** Apply validation rules to all inserts and all updates.|
   /// |"moderate"|Apply validation rules to inserts and to updates on existing valid documents. Do not apply rules to updates on existing invalid documents.|
-  final String validationLevel;
+  final String? validationLevel;
 
   /// Determines whether to error on invalid documents or just warn about the
   /// violations but allow invalid documents to be inserted.
@@ -94,7 +94,7 @@ class CreateOptions {
   /// | --- | --- |
   /// |"error"|**Default.**  Documents must pass validation before the write occurs. Otherwise, the write operation fails. |
   /// |"warn"|Documents do not have to pass validation. If the document fails validation, the write operation logs the validation failure. |
-  final String validationAction;
+  final String? validationAction;
 
   /// Allows users to specify a default configuration for indexes when creating
   /// a collection.
@@ -107,7 +107,7 @@ class CreateOptions {
   /// replica sets with members that use different storage engines.
   ///
   /// New in version 3.2.
-  final Map<String, dynamic> indexOptionDefaults;
+  final Map<String, dynamic>? indexOptionDefaults;
 
   /// The name of the source collection or view from which to create the view.
   /// The name is not the full namespace of the collection or view;
@@ -118,7 +118,7 @@ class CreateOptions {
   /// See also [db.createView()](https://docs.mongodb.com/manual/reference/method/db.createView/#db.createView).
   ///
   /// New in version 3.4.
-  final String viewOn;
+  final String? viewOn;
 
   /// An array that consists of the [aggregation pipeline stage(s)](https://docs.mongodb.com/manual/core/aggregation-pipeline/#id1).
   /// create creates the view by applying the specified pipeline to the viewOn
@@ -138,7 +138,7 @@ class CreateOptions {
   /// See also [db.createView()](https://docs.mongodb.com/manual/reference/method/db.createView/#db.createView).
   ///
   /// New in version 3.4.
-  final List pipeline;
+  final List? pipeline;
 
   /// Specifies the default collation for the collection or the view.
   ///
@@ -167,14 +167,14 @@ class CreateOptions {
   /// of a collection, see [Specify Collation](https://docs.mongodb.com/manual/reference/command/create/#create-collation-example).
   ///
   /// New in version 3.4.
-  final CollationOptions collation;
+  final CollationOptions? collation;
 
   /// A document that expresses the write concern for the operation.
   /// Omit to use the default write concern.
   ///
   /// When issued on a sharded cluster, mongos converts the write concern of
   /// the create command and its helper db.createCollection() to "majority".
-  final WriteConcern writeConcern;
+  final WriteConcern? writeConcern;
 
   /// A user-provided comment to attach to this command. Once set,
   /// this comment appears alongside records of this command in the following
@@ -186,11 +186,10 @@ class CreateOptions {
   /// Mongo db allows any comment type, but we restrict it to String
   ///
   /// New in version 4.4.
-  final String comment;
+  final String? comment;
 
-  CreateOptions(
-      /*  this.db,  */ {
-    bool capped,
+  CreateOptions({
+    bool? capped,
     this.size,
     this.comment,
     this.pipeline,
@@ -208,35 +207,28 @@ class CreateOptions {
     if (this.capped && size == null) {
       throw ArgumentError('A capped collection requires a size');
     }
-    if (size != null && size < 1) {
+    if (size != null && size! < 1) {
       throw ArgumentError('Size must be a positive integer');
     }
   }
 
-  Map<String, Object> getOptions(Db db) {
-    if (writeConcern != null && db == null) {
-      throw MongoDartError('Db must be specified when a writeConcern is set');
-    }
-    if (db != null && db.masterConnection == null) {
-      throw MongoDartError('An active connection is required');
-    }
-    return <String, Object>{
-      if (capped != null && capped) keyCapped: capped,
-      if (autoIndexId != null && !autoIndexId) keyAutoIndexId: autoIndexId,
-      if (size != null) keySize: size,
-      if (max != null) keyMax: max,
-      if (storageEngine != null) keyStorageEngine: storageEngine,
-      if (validator != null) keyValidator: validator,
-      if (validationLevel != null) keyValidationLevel: validationLevel,
-      if (validationAction != null) keyValidationAction: validationAction,
-      if (indexOptionDefaults != null)
-        keyIndexOptionDefaults: indexOptionDefaults,
-      if (viewOn != null) keyViewOn: viewOn,
-      if (pipeline != null) keyPipeline: pipeline,
-      if (collation != null) keyCollation: collation.options,
-      if (writeConcern != null)
-        keyWriteConcern: writeConcern.asMap(db.masterConnection.serverStatus),
-      if (comment != null) keyComment: comment,
-    };
-  }
+  Map<String, Object> getOptions(Db db) => <String, Object>{
+        if (/* capped != null && */ capped) keyCapped: capped,
+        if (autoIndexId != null && !autoIndexId!) keyAutoIndexId: autoIndexId!,
+        if (size != null) keySize: size!,
+        if (max != null) keyMax: max!,
+        if (storageEngine != null) keyStorageEngine: storageEngine!,
+        if (validator != null) keyValidator: validator!,
+        if (validationLevel != null) keyValidationLevel: validationLevel!,
+        if (validationAction != null) keyValidationAction: validationAction!,
+        if (indexOptionDefaults != null)
+          keyIndexOptionDefaults: indexOptionDefaults!,
+        if (viewOn != null) keyViewOn: viewOn!,
+        if (pipeline != null) keyPipeline: pipeline!,
+        if (collation != null) keyCollation: collation!.options,
+        if (writeConcern != null)
+          keyWriteConcern:
+              writeConcern!.asMap(db.masterConnection.serverStatus),
+        if (comment != null) keyComment: comment!,
+      };
 }

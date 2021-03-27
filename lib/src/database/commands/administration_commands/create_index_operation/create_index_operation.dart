@@ -19,21 +19,22 @@ const Set keysToOmit = <String>{
 
 class CreateIndexOperation extends CommandOperation {
   Object fieldOrSpec;
-  Map<String, Object> indexes;
+  late Map<String, Object> indexes;
 
   CreateIndexOperation(Db db, DbCollection collection, this.fieldOrSpec,
-      CreateIndexOptions indexOptions,
-      {Connection connection, Map<String, Object> rawOptions})
+      CreateIndexOptions? indexOptions,
+      {Connection? connection, Map<String, Object>? rawOptions})
       : super(db, <String, Object>{...?indexOptions?.options, ...?rawOptions},
             collection: collection,
             aspect: Aspect.writeOperation,
             connection: connection) {
+    // parseIndexOptions alway returns a filled "keyName" and a "keyFieldHash"
+    // elements
     var indexParameters = parseIndexOptions(fieldOrSpec);
-    final indexName = /* options != null && */
-        options[keyName] != null && options[keyName] is String
-            ? options[keyName] as String
-            : indexParameters[keyName] as String;
-    indexes = {keyName: indexName, keyKey: indexParameters[keyFieldHash]};
+    final indexName = options[keyName] != null && options[keyName] is String
+        ? options[keyName] as String
+        : indexParameters[keyName] as String;
+    indexes = {keyName: indexName, keyKey: indexParameters[keyFieldHash]!};
     options.remove(keyName);
   }
 
@@ -44,8 +45,8 @@ class CreateIndexOperation extends CommandOperation {
     // merge all options
     var added = <String>[];
     for (var optionName in options.keys) {
-      if (!keysToOmit.contains(optionName)) {
-        indexes[optionName] = options[optionName];
+      if (!keysToOmit.contains(optionName) && options[optionName] != null) {
+        indexes[optionName] = options[optionName]!;
         added.add(optionName);
       }
     }
@@ -55,7 +56,7 @@ class CreateIndexOperation extends CommandOperation {
 
     // Create command, apply write concern to command
     return <String, Object>{
-      keyCreateIndexes: collection.collectionName,
+      keyCreateIndexes: collection!.collectionName,
       keyCreateIndexesArgument: [indexes]
     };
   }
@@ -63,7 +64,7 @@ class CreateIndexOperation extends CommandOperation {
 
 Map<String, Object> parseIndexOptions(Object fieldOrSpec) {
   var fieldHash = <String, Object>{};
-  var indexes = [];
+  var indexes = <String>[];
   var keys;
 
 // Get all the fields accordingly
@@ -103,7 +104,7 @@ Map<String, Object> parseIndexOptions(Object fieldOrSpec) {
     }
   }
 
-  return {keyName: indexes.join('_'), 'keys': keys, keyFieldHash: fieldHash};
+  return {keyName: indexes.join('_'), if (keys != null) keyKeys: keys, keyFieldHash: fieldHash};
 }
 
 String _fieldIndexName(String fieldName, String sort) => '${fieldName}_$sort';

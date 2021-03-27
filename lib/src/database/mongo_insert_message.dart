@@ -1,14 +1,14 @@
 part of mongo_dart;
 
 class MongoInsertMessage extends MongoMessage {
-  BsonCString _collectionFullName;
+  final BsonCString _collectionFullName;
   int flags;
-  List<BsonMap> _documents;
+  final List<BsonMap> _documents;
   MongoInsertMessage(
       String collectionFullName, List<Map<String, dynamic>> documents,
-      [this.flags = 0]) {
-    _collectionFullName = BsonCString(collectionFullName);
-    _documents = [];
+      [this.flags = 0])
+      : _collectionFullName = BsonCString(collectionFullName),
+        _documents = <BsonMap>[] {
     for (var document in documents) {
       _documents.add(BsonMap(document));
     }
@@ -41,8 +41,10 @@ class MongoInsertMessage extends MongoMessage {
   @override
   String toString() {
     if (_documents.length == 1) {
-      return 'MongoInserMessage($requestId, ${_collectionFullName.value}, ${_documents[0].value})';
+      return 'MongoInserMessage($requestId, '
+          '${_collectionFullName.value}, ${_documents[0].value})';
     }
-    return 'MongoInserMessage($requestId, ${_collectionFullName.value}, ${_documents.length} documents)';
+    return 'MongoInserMessage($requestId, '
+        '${_collectionFullName.value}, ${_documents.length} documents)';
   }
 }

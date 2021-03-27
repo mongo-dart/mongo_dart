@@ -2,14 +2,14 @@ import 'dart:async';
 
 class ChunkHandler {
   int chunkSize;
-  List<int> carry;
+  List<int>? carry;
 
   ChunkHandler([this.chunkSize = 1024 * 256]);
 
   void _handle(List<int> data, EventSink<List<int>> sink, bool isClosing) {
     if (carry != null) {
-      carry.addAll(data);
-      data = carry;
+      carry!.addAll(data);
+      data = carry!;
       carry = null;
     }
     var pos = 0;
@@ -19,16 +19,15 @@ class ChunkHandler {
     }
     if (data.length > pos) {
       carry = <int>[];
-      carry.addAll(data.sublist(pos));
+      carry!.addAll(data.sublist(pos));
       if (isClosing) {
-        sink.add(carry);
+        sink.add(carry!);
       }
     }
   }
 
-  void handleData(List<int> data, EventSink<List<int>> sink) {
-    _handle(data, sink, false);
-  }
+  void handleData(List<int> data, EventSink<List<int>> sink) =>
+      _handle(data, sink, false);
 
   void handleError(
       Object error, StackTrace stackTrace, EventSink<List<int>> sink) {

@@ -3,7 +3,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 void main() async {
   var db = Db('mongodb://127.0.0.7/mongo_dart-test');
   DbCollection coll;
-  ObjectId id;
+  ObjectId? id;
   await db.open();
   print('connection open');
   coll = db.collection('simple_data');
@@ -13,7 +13,12 @@ void main() async {
   }
   var val = await coll.findOne({'my_field': 17});
   print('Filtered by my_field=17 $val');
-  id = val['_id'] as ObjectId;
+  id = val?['_id'] as ObjectId?;
+   if (id == null) {
+    print('Id not detected');
+    await db.close();
+    return;
+  }
   val = await coll.findOne({'_id': id});
   print('Filtered by _id=$id: $val');
   print('Removing doc with _id=$id');

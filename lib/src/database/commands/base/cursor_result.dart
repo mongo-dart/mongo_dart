@@ -1,3 +1,4 @@
+import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:mongo_dart/src/database/utils/mongo_db_namespace.dart';
 
@@ -16,28 +17,32 @@ import 'package:mongo_dart/src/database/utils/mongo_db_namespace.dart';
 /// only the getMore commands run when a queried shard or shards are
 /// unavailable include the partialResultsReturned flag in the output.
 class CursorResult {
-  int id;
-  MongoDBNamespace ns;
+  late int id;
+  MongoDBNamespace? ns;
 
   /// alternative container for documents:
   /// * firstBatch in response to a find/aggreagate operation
   /// * nextBatch in response to a getMore command
-  List<Map<String, Object>> firstBatch, nextBatch;
-  bool partialResultsReturned;
+  late List<Map<String, Object?>> firstBatch, nextBatch;
+  late bool partialResultsReturned;
 
   CursorResult(Map<String, Object> document) {
     _extract(document);
   }
 
   void _extract(Map<String, Object> document) {
-    document ??= <String, Object>{};
-    id = document[keyId];
-    // on errors "ns is not returned"
-    if (document.containsKey(keyNs)) {
-      ns = MongoDBNamespace.fromString(document[keyNs]);
+    //document ??= <String, Object>{};
+    if (document[keyId] == null) {
+      throw MongoDartError('Missing cursor Id');
     }
-    firstBatch = [...(document[keyFirstBatch] as List ?? [])];
-    nextBatch = [...(document[keyNextBatch] as List ?? [])];
-    partialResultsReturned = document[keyPartialResultsReturned];
+    id = document[keyId] as int;
+    // on errors "ns is not returned"
+    if (document[keyNs] != null) {
+      ns = MongoDBNamespace.fromString(document[keyNs] as String);
+    }
+    firstBatch = [...(document[keyFirstBatch] as List? ?? [])];
+    nextBatch = [...(document[keyNextBatch] as List? ?? [])];
+    partialResultsReturned =
+        document[keyPartialResultsReturned] as bool? ?? false;
   }
 }

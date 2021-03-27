@@ -18,7 +18,7 @@ const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
-Db db;
+late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
@@ -48,23 +48,19 @@ void main() async {
 
     setUp(() async {
       await initializeDatabase();
-      if (db.masterConnection == null ||
-          !db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
-      var serverFcv = db?.masterConnection?.serverCapabilities?.fcv ?? '0.0';
+      var serverFcv = db.masterConnection.serverCapabilities.fcv ?? '0.0';
       if (serverFcv.compareTo('4.4') != -1) {
         running4_4orGreater = true;
       }
       if (serverFcv.compareTo('4.2') != -1) {
         running4_2orGreater = true;
       }
-      isReplicaSet =
-          db?.masterConnection?.serverCapabilities?.isReplicaSet ?? false;
-      isStandalone =
-          db?.masterConnection?.serverCapabilities?.isStandalone ?? false;
-      isSharded =
-          db?.masterConnection?.serverCapabilities?.isShardedCluster ?? false;
+      isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
+      isStandalone = db.masterConnection.serverCapabilities.isStandalone;
+      isSharded = db.masterConnection.serverCapabilities.isShardedCluster;
     });
 
     tearDown(() async {
@@ -737,8 +733,8 @@ void main() async {
         expect(ret.nMatched, 2);
         expect(ret.nRemoved, 1);
         expect(ret.ids, isNotNull);
-        expect(ret.ids.length, 2);
-        expect(ret.ids[0], 4);
+        expect(ret.ids?.length, 2);
+        expect(ret.ids?[0], 4);
         expect(ret.upserted, isEmpty);
 
         var findResult = await collection.find().toList();
@@ -812,8 +808,8 @@ void main() async {
         expect(ret.nMatched, 0);
         expect(ret.nRemoved, 0);
         expect(ret.ids, isNotNull);
-        expect(ret.ids.length, 1);
-        expect(ret.ids.first, 4);
+        expect(ret.ids?.length, 1);
+        expect(ret.ids?.first, 4);
         expect(ret.upserted, isEmpty);
         expect(ret.writeErrors.first.index, 1);
         expect(ret.writeErrors.first.operationInputIndex, 1);
@@ -893,8 +889,8 @@ void main() async {
         expect(ret.nMatched, 2);
         expect(ret.nRemoved, 1);
         expect(ret.ids, isNotNull);
-        expect(ret.ids.length, 5);
-        expect(ret.ids.first, 1);
+        expect(ret.ids?.length, 5);
+        expect(ret.ids?.first, 1);
         expect(ret.upserted, isEmpty);
 
         var findResult = await collection.find().toList();
@@ -949,8 +945,8 @@ void main() async {
         expect(ret.nMatched, 2);
         expect(ret.nRemoved, 1);
         expect(ret.ids, isNotNull);
-        expect(ret.ids.length, 5);
-        expect(ret.ids.first, 1);
+        expect(ret.ids?.length, 5);
+        expect(ret.ids?.first, 1);
         expect(ret.upserted, isEmpty);
 
         var findResult = await collection.find().toList();
@@ -1030,8 +1026,8 @@ void main() async {
         expect(ret.nMatched, 2);
         expect(ret.nRemoved, 1);
         expect(ret.ids, isNotNull);
-        expect(ret.ids.length, 2);
-        expect(ret.ids.first, 4);
+        expect(ret.ids?.length, 2);
+        expect(ret.ids?.first, 4);
         expect(ret.upserted, isEmpty);
         expect(ret.writeErrors.first.index, 0);
         expect(ret.writeErrors.first.operationInputIndex, 5);
@@ -1107,8 +1103,8 @@ void main() async {
         expect(ret.nMatched, 2);
         expect(ret.nRemoved, 1);
         expect(ret.ids, isNotNull);
-        expect(ret.ids.length, 1);
-        expect(ret.ids.first, 4);
+        expect(ret.ids?.length, 1);
+        expect(ret.ids?.first, 4);
         expect(ret.upserted, isEmpty);
         expect(ret.writeErrors.first.index, 1);
         expect(ret.writeErrors.first.operationInputIndex, 1);
@@ -1190,8 +1186,8 @@ void main() async {
         expect(ret.nMatched, 2);
         expect(ret.nRemoved, 1);
         expect(ret.ids, isNotNull);
-        expect(ret.ids.length, 2);
-        expect(ret.ids.first, 4);
+        expect(ret.ids?.length, 2);
+        expect(ret.ids?.first, 4);
         expect(ret.upserted, isEmpty);
         expect(ret.writeErrors.first.index, 2);
         expect(ret.writeErrors.first.operationInputIndex, 5);
@@ -1267,8 +1263,8 @@ void main() async {
         expect(ret.nMatched, 2);
         expect(ret.nRemoved, 1);
         expect(ret.ids, isNotNull);
-        expect(ret.ids.length, 1);
-        expect(ret.ids[0], 4);
+        expect(ret.ids?.length, 1);
+        expect(ret.ids?[0], 4);
         expect(ret.upserted, isEmpty);
 
         var findResult = await collection.find().toList();
@@ -1353,8 +1349,8 @@ void main() async {
           expect(ret.nMatched, 4);
           expect(ret.nRemoved, 1);
           expect(ret.ids, isNotNull);
-          expect(ret.ids.length, 1);
-          expect(ret.ids[0], 5);
+          expect(ret.ids?.length, 1);
+          expect(ret.ids?[0], 5);
           expect(ret.upserted, isEmpty);
           var findResult = await collection.find().toList();
           expect(findResult.length, 4);
@@ -1438,8 +1434,8 @@ void main() async {
           expect(ret.nMatched, 4);
           expect(ret.nRemoved, 1);
           expect(ret.ids, isNotNull);
-          expect(ret.ids.length, 1);
-          expect(ret.ids[0], 5);
+          expect(ret.ids?.length, 1);
+          expect(ret.ids?[0], 5);
           expect(ret.upserted, isEmpty);
           var findResult = await collection.find().toList();
           expect(findResult.length, 4);

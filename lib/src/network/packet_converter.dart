@@ -7,9 +7,9 @@ class PacketConverter {
   final MAX_DOC_SIZE = 32 * 1024 * 1024;
   bool headerMode = true;
   int bytesToRead = 4;
-  List<int> buffer;
+  List<int>? buffer;
   int readPos = 0;
-  List<int> messageBuffer;
+  List<int>? messageBuffer;
   int messagesConverted = 0;
   final lengthBuffer = BsonBinary(4);
 
@@ -29,7 +29,10 @@ class PacketConverter {
         }
       }
       if (!headerMode) {
-        if (bytesAvailable() >= messageBuffer.length - 4) {
+        if (messageBuffer == null) {
+          throw MongoDartError('Message buffer not yet initialized');
+        }
+        if (bytesAvailable() >= messageBuffer!.length - 4) {
           handleBody();
           if (bytesAvailable() >= 4) {
             hasMoreData = true;
@@ -47,15 +50,18 @@ class PacketConverter {
     if (len > MAX_DOC_SIZE) {
       throw MongoDartError('Message length $len over maximum document size');
     }
-    messageBuffer = List<int>(len);
+    messageBuffer = List<int>.filled(len, 0);
   }
 
   void handleBody() {
     headerMode = true;
-    messageBuffer.setRange(0, 4, lengthBuffer.byteList);
-    readIntoBuffer(messageBuffer, 4);
+    if (messageBuffer == null) {
+      throw MongoDartError('Message buffer not yet initialized');
+    }
+    messageBuffer!.setRange(0, 4, lengthBuffer.byteList);
+    readIntoBuffer(messageBuffer!, 4);
     messagesConverted++;
-    messages.addLast(messageBuffer);
+    messages.addLast(messageBuffer!);
   }
 
   /// Length of all packets with current read position on first packet subtracted

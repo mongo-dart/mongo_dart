@@ -12,15 +12,17 @@ import 'aggregate_result.dart';
 /// collection, the db parameter must be passed instead.
 class AggregateOperation extends CommandOperation {
   AggregateOperation(Object pipeline,
-      {DbCollection collection,
-      Db db,
-      this.explain,
-      this.cursor,
+      {DbCollection? collection,
+      Db? db,
+      bool? explain,
+      Map<String, Object>? cursor,
       this.hint,
       this.hintDocument,
-      AggregateOptions aggregateOptions,
-      Map<String, Object> rawOptions})
-      : super(
+      AggregateOptions? aggregateOptions,
+      Map<String, Object>? rawOptions})
+      : cursor = cursor ?? <String, Object>{},
+      explain = explain ?? false,
+        super(
             collection?.db ?? db,
             <String, Object>{
               ...?aggregateOptions?.getOptions(collection?.db ?? db),
@@ -28,12 +30,10 @@ class AggregateOperation extends CommandOperation {
             },
             collection: collection,
             aspect: Aspect.readOperation) {
-    explain ??= false;
-    cursor ??= <String, Object>{};
     if (pipeline is List<Map<String, Object>>) {
       this.pipeline = <Map<String, Object>>[...pipeline];
     } else if (pipeline is AggregationPipelineBuilder) {
-      this.pipeline = pipeline.build();
+      this.pipeline = pipeline.build() as List<Map<String, Object>>;
     } else {
       throw MongoDartError('Received pipeline is "${pipeline.runtimeType}", '
           'while the method only accept "AggregationPipelineBuilder" or '
@@ -43,7 +43,7 @@ class AggregateOperation extends CommandOperation {
 
   /// An array of aggregation pipeline stages that process and transform
   /// the document stream as part of the aggregation pipeline.
-  List<Map<String, Object>> pipeline;
+  late List<Map<String, Object>> pipeline;
 
   /// Specifies to return the information on the processing of the pipeline.
   ///
@@ -70,8 +70,8 @@ class AggregateOperation extends CommandOperation {
   /// hint is required if the command includes the min and/or max fields;
   /// hint is not required with min and/or max if the filter is an
   /// equality condition on the _id field { _id: <value> }.
-  String hint;
-  Map<String, Object> hintDocument;
+  String? hint;
+  Map<String, Object>? hintDocument;
 
   @override
   Map<String, Object> $buildCommand() {
@@ -86,9 +86,9 @@ class AggregateOperation extends CommandOperation {
       if (explain) keyExplain: explain,
       keyCursor: cursor,
       if (hint != null)
-        keyHint: hint
+        keyHint: hint!
       else if (hintDocument != null)
-        keyHint: hintDocument,
+        keyHint: hintDocument!,
     };
   }
 

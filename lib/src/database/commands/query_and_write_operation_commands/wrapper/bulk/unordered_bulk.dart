@@ -6,9 +6,9 @@ import 'bulk_options.dart';
 
 class UnorderedBulk extends Bulk {
   UnorderedBulk(DbCollection collection,
-      {WriteConcern writeConcern,
-      Map<String, Object> rawOptions,
-      bool bypassDocumentValidation})
+      {WriteConcern? writeConcern,
+      Map<String, Object>? rawOptions,
+      bool? bypassDocumentValidation})
       : super(collection,
             bulkOptions: BulkOptions(
                 writeConcern: writeConcern,
@@ -81,7 +81,7 @@ class UnorderedBulk extends Bulk {
   @override
   void addCommand(Map<String, Object> command) {
     var commandKey = command.keys.first;
-    List lastCommandValues;
+    var lastCommandValues = [];
     switch (commandKey) {
       case keyInsert:
         if (insertCommand.isEmpty) {
@@ -89,7 +89,7 @@ class UnorderedBulk extends Bulk {
           insertCommandsOrigin[0] = operationInputIndex++;
           return;
         }
-        lastCommandValues = insertCommand.values.toList()[1];
+        lastCommandValues = insertCommand.values.toList()[1] as List;
         insertCommandsOrigin[lastCommandValues.length] = operationInputIndex++;
         break;
       case keyDelete:
@@ -98,7 +98,7 @@ class UnorderedBulk extends Bulk {
           deleteCommandsOrigin[0] = operationInputIndex++;
           return;
         }
-        lastCommandValues = deleteCommand.values.toList()[1];
+        lastCommandValues = deleteCommand.values.toList()[1] as List;
         deleteCommandsOrigin[lastCommandValues.length] = operationInputIndex++;
         break;
       case keyUpdate:
@@ -107,18 +107,27 @@ class UnorderedBulk extends Bulk {
           updateCommandsOrigin[0] = operationInputIndex++;
           return;
         }
-        lastCommandValues = updateCommand.values.toList()[1];
+        lastCommandValues = updateCommand.values.toList()[1] as List;
         updateCommandsOrigin[lastCommandValues.length] = operationInputIndex++;
         break;
     }
-    var commandValue = command.values.toList()[1];
+    var commandValue = command.values.toList()[1] as List;
     lastCommandValues.addAll(commandValue);
   }
 
   @override
   List<Map<int, int>> getBulkInputOrigins() => <Map<int, int>>[
-        ...splitInputOrigins(insertCommandsOrigin, insertCommand.length),
-        ...splitInputOrigins(updateCommandsOrigin, updateCommand.length),
-        ...splitInputOrigins(deleteCommandsOrigin, deleteCommand.length),
+        if (insertCommand[keyInsertArgument] != null &&
+            (insertCommand[keyInsertArgument]! as List).isNotEmpty)
+          ...splitInputOrigins(insertCommandsOrigin,
+              (insertCommand[keyInsertArgument]! as List).length),
+        if (updateCommand[keyUpdateArgument] != null &&
+            (updateCommand[keyUpdateArgument]! as List).isNotEmpty)
+          ...splitInputOrigins(updateCommandsOrigin,
+              (updateCommand[keyUpdateArgument]! as List).length),
+        if (deleteCommand[keyDeleteArgument] != null &&
+            (deleteCommand[keyDeleteArgument]! as List).isNotEmpty)
+          ...splitInputOrigins(deleteCommandsOrigin,
+              (deleteCommand[keyDeleteArgument]! as List).length),
       ];
 }

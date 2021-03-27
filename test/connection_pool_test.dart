@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 import 'database_test.dart';
 
 void main() {
-  ConnectionPool pool;
+  late ConnectionPool pool;
 
   setUp(() {
     pool = ConnectionPool(3, () => Db(DefaultUri));

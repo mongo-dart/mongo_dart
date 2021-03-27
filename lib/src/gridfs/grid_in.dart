@@ -1,30 +1,30 @@
 part of mongo_dart;
 
 class GridIn extends GridFSFile {
-  Stream<List<int>> input;
+  late Stream<List<int>> input;
   bool savedChunks = false;
   int currentChunkNumber = 0;
   int currentBufferPosition = 0;
   int totalBytes = 0;
+  //@override
+  //GridFS fs;
   @override
-  GridFS fs;
-  @override
-  String filename;
+  String? filename;
 
-  ///TODO Review that code. Currently it sums all file's content in one (potentially big) List, to get MD5 hash
-  /// Probably we should use some Stream api here
+  // TODO Review that code. Currently it sums all file's content in one
+  // (potentially big) List, to get MD5 hash
+  // Probably we should use some Stream api here
   List<int> contentToDigest = <int>[];
-  GridIn(this.fs,
-      [String filename, Stream<List<int>> inputStream]) {
+  GridIn._(GridFS fs, String filename, Stream<List<int>> inputStream) : super(fs) {
     id = ObjectId();
-    chunkSize = GridFS.DEFAULT_CHUNKSIZE;
+    //chunkSize = GridFS.DEFAULT_CHUNKSIZE;
     input = ChunkHandler(chunkSize).transformer.bind(inputStream);
     uploadDate = DateTime.now();
     this.filename = filename;
   }
 
   @override
-  Future<Map<String, dynamic>> save([int chunkSize]) {
+  Future<Map<String, dynamic>> save([int? chunkSize]) {
     chunkSize ??= this.chunkSize;
 
     Future<Map<String, dynamic>> result;
@@ -36,7 +36,7 @@ class GridIn extends GridFSFile {
     return result;
   }
 
-  Future<Map<String, dynamic>> saveChunks([int chunkSize = 0]) {
+  Future<Map<String, dynamic>> saveChunks([int? chunkSize]) {
     var futures = <Future>[];
     var completer = Completer<Map<String, dynamic>>();
 

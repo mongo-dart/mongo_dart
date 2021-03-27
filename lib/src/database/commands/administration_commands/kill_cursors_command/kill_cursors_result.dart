@@ -2,40 +2,43 @@ import 'package:mongo_dart/src/database/commands/mixin/basic_result.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 class KillCursorsResult with BasicResult {
-  KillCursorsResult(Map<String, Object> document) {
+  KillCursorsResult(Map<String, Object?> document) {
     extractBasic(document);
-    List docs = document[keyCursorsKilled] ?? [];
-    if (docs.isNotEmpty) {
+    var docs = document[keyCursorsKilled] as List?;
+    if (docs != null && docs.isNotEmpty) {
       cursorsKilled = <int>[];
+      for (var cursorKilled in docs) {
+        cursorsKilled!.add(cursorKilled);
+      }
     }
-    for (var cursorKilled in docs) {
-      cursorsKilled.add(cursorKilled);
-    }
-    docs = document[keyCursorsNotFound] ?? [];
-    if (docs.isNotEmpty) {
+
+    docs = document[keyCursorsNotFound] as List?;
+    if (docs != null && docs.isNotEmpty) {
       cursorsNotFound = <int>[];
+      for (var cursorNotFound in docs) {
+        cursorsNotFound!.add(cursorNotFound);
+      }
     }
-    for (var cursorNotFound in docs) {
-      cursorsNotFound.add(cursorNotFound);
-    }
-    docs = document[keyCursorsAlive] ?? [];
-    if (docs.isNotEmpty) {
+
+    docs = document[keyCursorsAlive] as List?;
+    if (docs != null && docs.isNotEmpty) {
       cursorsAlive = <int>[];
+      for (var cursorAlive in docs) {
+        cursorsAlive!.add(cursorAlive);
+      }
     }
-    for (var cursorAlive in docs) {
-      cursorsAlive.add(cursorAlive);
-    }
-    docs = document[keyCursorsUnknown] ?? [];
-    if (docs.isNotEmpty) {
+
+    docs = document[keyCursorsUnknown] as List?;
+    if (docs != null && docs.isNotEmpty) {
       cursorsUnknown = <int>[];
-    }
-    for (var cursorUnknown in docs) {
-      cursorsUnknown.add(cursorUnknown);
+      for (var cursorUnknown in docs) {
+        cursorsUnknown!.add(cursorUnknown);
+      }
     }
   }
 
-  List<int> cursorsKilled;
-  List<int> cursorsNotFound;
-  List<int> cursorsAlive;
-  List<int> cursorsUnknown;
+  List<int>? cursorsKilled;
+  List<int>? cursorsNotFound;
+  List<int>? cursorsAlive;
+  List<int>? cursorsUnknown;
 }

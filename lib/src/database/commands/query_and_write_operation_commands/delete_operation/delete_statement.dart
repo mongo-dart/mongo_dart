@@ -4,18 +4,14 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 class DeleteStatement {
   DeleteStatement(this.filter,
-      {this.collation, this.hint, this.hintDocument, this.limit}) {
-    if (filter == null) {
-      throw MongoDartError(
-          'A filter must be specified (empty Map if remove all documents)');
-    }
-  }
+      {this.collation, this.hint, this.hintDocument, int? limit})
+      : limit = limit ?? 1;
 
   /// Optional. The query predicate. If unspecified, then all documents in the
   /// collection will match the predicate.
   ///
   /// internal document key is "q"
-  Map<String, Object> filter;
+  Map<String, Object?> filter;
 
   /// The number of matching documents to delete.
   /// Specify either a 0 to delete all matching documents or 1 to delete a
@@ -45,7 +41,7 @@ class DeleteStatement {
   /// for the sort.
   ///
   /// New in version 3.4.
-  CollationOptions collation;
+  CollationOptions? collation;
 
   /// A document or string that specifies the index to use to support the
   /// query predicate.
@@ -60,18 +56,18 @@ class DeleteStatement {
   /// We define two fields, if set, one exclude the other.
   ///
   /// New in 4.4
-  String hint;
-  Map<String, Object> hintDocument;
+  String? hint;
+  Map<String, Object>? hintDocument;
 
   Map<String, Object> toMap() {
     return <String, Object>{
       keyQ: filter,
       keyLimit: limit,
-      if (collation != null) keyCollation: collation.options,
+      if (collation != null) keyCollation: collation!.options,
       if (hint != null)
-        keyHint: hint
+        keyHint: hint!
       else if (hintDocument != null)
-        keyHint: hintDocument,
+        keyHint: hintDocument!,
     };
   }
 }

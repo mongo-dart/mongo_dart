@@ -5,7 +5,7 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 class GetParameterCommand extends DbAdminCommandOperation {
   GetParameterCommand(Db db, String parameterName,
-      {GetParameterOptions getParameterOptions, Map<String, Object> rawOptions})
+      {GetParameterOptions? getParameterOptions, Map<String, Object>? rawOptions})
       : super(db, <String, Object>{
           keyGetParameter: 1,
           parameterName: 1

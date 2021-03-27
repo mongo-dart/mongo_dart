@@ -2,6 +2,12 @@
 
 ## Recent change notes
 
+### version: 0.7.0-nullsafety.1
+
+- Null-safety port - first step
+- Uuid fields (UuidType class)
+- $mul operator in ModifierBuilder
+
 ### 0.5.0-beta
 
 - Added tls client and server certificate management

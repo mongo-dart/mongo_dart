@@ -7,39 +7,39 @@ enum WriteCommandType { insert, update, delete }
 
 abstract class AbstractWriteResult with BasicResult {
   AbstractWriteResult.fromMap(
-      this.writeCommandType, Map<String, Object> result) {
+      WriteCommandType writeCommandType, Map<String, Object?> result)
+      : writeCommandType = writeCommandType,
+        serverResponses = [result] {
     extractBasic(result);
 
-    serverResponses = [result];
-    //ok = result[keyOk];
     switch (writeCommandType) {
       case WriteCommandType.insert:
-        nInserted = result[keyN] ?? 0;
+        nInserted = result[keyN] as int? ?? 0;
         break;
       case WriteCommandType.update:
-        nMatched = result[keyN] ?? 0;
+        nMatched = result[keyN] as int? ?? 0;
         break;
       case WriteCommandType.delete:
-        nRemoved = result[keyN] ?? 0;
+        nRemoved = result[keyN] as int? ?? 0;
         break;
     }
     if (result.containsKey(keyNModified)) {
-      nModified = result[keyNModified];
+      nModified = result[keyNModified] as int? ?? 0;
     }
     if (result[keyUpserted] != null) {
       nUpserted = (result[keyUpserted] as List).length;
     }
     if (result.containsKey(keyWriteConcernError)) {
-      writeConcernError =
-          WriteConcernError.fromMap(result[keyWriteConcernError]);
+      writeConcernError = WriteConcernError.fromMap(
+          <String, Object>{...?(result[keyWriteConcernError] as Map?)});
     }
   }
 
   /// This is the original response from the server;
-  List<Map<String, Object>> serverResponses;
+  List<Map<String, Object?>> serverResponses;
 
   /// The command that generated this output;
-  WriteCommandType writeCommandType;
+  WriteCommandType? writeCommandType;
 
   /// The number of documents inserted, excluding upserted documents.
   /// See nUpserted for the number of documents inserted
@@ -63,7 +63,7 @@ abstract class AbstractWriteResult with BasicResult {
   /// The number of documents removed.
   int nRemoved = 0;
 
-  WriteConcernError writeConcernError;
+  WriteConcernError? writeConcernError;
 
   int get totalInserted => nInserted + nUpserted;
 

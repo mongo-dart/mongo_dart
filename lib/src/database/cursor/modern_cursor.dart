@@ -18,16 +18,20 @@ import '../../../mongo_dart.dart';
 typedef MonadicBlock = void Function(Map<String, dynamic> value);
 
 class ModernCursor {
-  ModernCursor(this.operation,
-      {this.checksumPresent, this.moreToCome, this.exhaustAllowed})
-      : collection = operation.collection,
-        db = operation.collection?.db ?? operation.db {
+  ModernCursor(CommandOperation operation,
+      {bool? checksumPresent, bool? moreToCome, bool? exhaustAllowed})
+      : operation = operation,
+        collection = operation.collection,
+        db = operation.collection?.db ?? operation.db,
+        checksumPresent = checksumPresent ?? false,
+        moreToCome = moreToCome ?? false,
+        exhaustAllowed = exhaustAllowed ?? false {
     if (operation is FindOperation && collection == null) {
       throw MongoDartError('Collection required in cursor initialization');
     }
     if (operation is FindOperation) {
-      tailable = (operation as FindOperation).isTailable;
-      awaitData = (operation as FindOperation).isAwaitData;
+      tailable = (operation).isTailable;
+      awaitData = (operation).isAwaitData;
     } else if (operation is ChangeStreamOperation) {
       isChangeStream = tailable = awaitData = true;
     }
@@ -46,35 +50,40 @@ class ModernCursor {
   /// or other read operation has been executed, without generating
   /// an explicit cursor. This way, for getting the extra documents,
   /// we may need a cursor.
-  ModernCursor.fromOpenId(this.collection, this.cursorId,
-      {this.tailable,
-      this.awaitData,
-      this.isChangeStream,
-      this.checksumPresent,
-      this.moreToCome,
-      this.exhaustAllowed}) {
+  ModernCursor.fromOpenId(DbCollection collection, this.cursorId,
+      {bool? tailable,
+      bool? awaitData,
+      bool? isChangeStream,
+      bool? checksumPresent,
+      bool? moreToCome,
+      bool? exhaustAllowed})
+      : collection = collection,
+        collectionName = collection.collectionName,
+        tailable = tailable ?? false,
+        awaitData = awaitData ?? false,
+        isChangeStream = isChangeStream ?? false,
+        checksumPresent = checksumPresent ?? false,
+        moreToCome = moreToCome ?? false,
+        exhaustAllowed = exhaustAllowed ?? false {
     state = State.OPEN;
-    db = collection?.db;
-    tailable ??= false;
-    awaitData ??= false;
-    isChangeStream ??= false;
-    if (isChangeStream) {
-      tailable = awaitData = true;
+    db = collection.db;
+    if (this.isChangeStream) {
+      this.tailable = this.awaitData = true;
     }
   }
 
   State state = State.INIT;
   BsonLong cursorId = BsonLong(0);
-  Db db;
-  Queue<Map<String, dynamic>> items = Queue<Map<String, Object>>();
-  DbCollection collection;
+  late Db db;
+  Queue<Map<String, Object?>> items = Queue<Map<String, Object?>>();
+  DbCollection? collection;
   bool tailable = false;
   bool awaitData = false;
   bool isChangeStream = false;
 
   // in case of collection agnostic commands (aggregate) is the name
   // of the collecton as returns from the first batch (taken from ns)
-  String collectionName;
+  String? collectionName;
 
   // at present you have to se these values on the operation options
   /* Map<String, dynamic> selector;
@@ -87,46 +96,57 @@ class ModernCursor {
   //var eachComplete;
 
   // These 4 fields are not used at present
-  bool explain;
+  bool explain = false;
   bool checksumPresent;
   bool moreToCome;
   bool exhaustAllowed;
 
   /// The operation to be executed.
   /// It must be an operation that returns a cursorId, like find, getMore, etc.
-  CommandOperation operation;
+  CommandOperation? operation;
 
   /// Specify the milliseconds between getMore on tailable cursor,
   /// only applicable when awaitData isn't set.
   /// Default value is 100 ms
   int tailableRetryInterval = 100;
 
-  Map<String, Object> _getNextItem() => items.removeFirst();
+  Map<String, Object?>? _getNextItem() => items.removeFirst();
 
-  void extractCursorData(Map<String, Object> operationReturnMap) {
-    Map<String, Object> cursorMap = operationReturnMap[keyCursor];
-    if (cursorMap == null) {
+  void extractCursorData(Map<String, Object?> operationReturnMap) {
+    if (operationReturnMap[keyCursor] == null) {
       throw MongoDartError('The operation type ${operation.runtimeType} '
           'does not return a cursor');
     }
-    if (collectionName == null) {
-      String ns = cursorMap[keyNs];
-      var nsParts = ns?.split('.');
-      nsParts.removeAt(0);
-      collectionName ??= nsParts.join('.');
+    var cursorMap = operationReturnMap[keyCursor] as Map<String, Object?>?;
+    if (cursorMap == null) {
+      throw MongoDartError('No cursor returned');
     }
-    var documents = (cursorMap[keyNextBatch] ?? cursorMap[keyFirstBatch] ?? []);
+    if (collectionName == null && cursorMap[keyNs] != null) {
+      var ns = cursorMap[keyNs] as String;
+      var nsParts = ns.split('.');
+      nsParts.removeAt(0);
+      collectionName = nsParts.join('.');
+    }
+    List<Map<String, Object?>> documents;
+    if (cursorMap[keyNextBatch] != null && cursorMap[keyNextBatch] is List) {
+      documents = <Map<String, Object?>>[...cursorMap[keyNextBatch] as List];
+    } else if (cursorMap[keyFirstBatch] != null &&
+        cursorMap[keyFirstBatch] is List) {
+      documents = <Map<String, Object?>>[...cursorMap[keyFirstBatch] as List];
+    } else {
+      documents = <Map<String, Object?>>[];
+    }
+
     for (var doc in documents) {
-      items.add(doc as Map<String, Object>);
+      items.add(doc);
     }
   }
 
-  Future<Map<String, Object>> _serverSideCursorClose() async {
+  Future<void> _serverSideCursorClose() async {
     if (tailable) {
       throw MongoDartError('Tailable Cursor closed by the server.');
     }
-    await close();
-    return null;
+    return close();
   }
 
   /// Returns only the first document (if any) and then closes the cursor
@@ -136,43 +156,52 @@ class ModernCursor {
   /// await nextObject();
   ///  await close();
   /// ```
-  Future<Map<String, Object>> onlyFirst() async {
+  Future<Map<String, Object?>?> onlyFirst() async {
     var ret = await nextObject();
     await close();
     return ret;
   }
 
-  Future<Map<String, Object>> nextObject() async {
+  Future<Map<String, Object?>?> nextObject() async {
     if (items.isNotEmpty) {
       return _getNextItem();
     }
 
-    Map<String, Object> result;
-    if (state == State.INIT) {
-      result = await operation.execute();
+    Map<String, Object?>? result;
+    if (state == State.INIT && operation != null) {
+      result = await operation!.execute();
       state = State.OPEN;
     } else if (state == State.OPEN) {
       if (cursorId.data == 0) {
-        return _serverSideCursorClose();
+        await _serverSideCursorClose();
+        return null;
       }
       var command = GetMoreCommand(collection, cursorId,
           db: db, collectionName: collectionName);
       result = await command.execute();
     }
+    if (result == null) {
+      throw MongoDartError('Could not execut a further search');
+    }
     if (result[keyOk] == 0.0) {
       await close();
-      throw MongoDartError(result[keyErrmsg],
-          mongoCode: result[keyCode], errorCodeName: result[keyCodeName]);
+      throw MongoDartError(
+          result[keyErrmsg] as String? ??
+              'Generic error in nextObject() method',
+          mongoCode: result[keyCode] as int?,
+          errorCodeName: result[keyCodeName] as String?);
     }
-    Map cursorMap = result[keyCursor];
-    cursorId = cursorMap == null ? 0 : BsonLong(cursorMap[keyId] ?? 0);
+    var cursorMap = result[keyCursor] as Map<String, dynamic>?;
+    cursorId =
+        cursorMap == null ? BsonLong(0) : BsonLong(cursorMap[keyId] ?? 0);
     // The result map returns last records while setting cursorId to zero.
     extractCursorData(result);
     if (items.isNotEmpty) {
       return _getNextItem();
     }
     if (cursorId.data == 0) {
-      return _serverSideCursorClose();
+      await _serverSideCursorClose();
+      return null;
     }
 
     if (tailable) {
@@ -190,18 +219,17 @@ class ModernCursor {
   Future<void> close() async {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
     state = State.CLOSED;
-    if (cursorId.value != 0) {
-      var command = KillCursorsCommand(collection, [cursorId], db: db);
+    if (cursorId.value != 0 && collection != null) {
+      var command = KillCursorsCommand(collection!, [cursorId], db: db);
       await command.execute();
       cursorId = BsonLong(0);
     }
     return;
   }
 
-  Stream<Map<String, dynamic>> get stream {
-    StreamController<Map<String, dynamic>> controller;
-
+  Stream<Map<String, Object?>> get stream {
     var paused = true;
+    var controller = StreamController<Map<String, Object?>>();
 
     Future<void> readNext() async {
       try {
@@ -231,11 +259,10 @@ class ModernCursor {
     void resumeReading() => startReading();
     void cancelReading() async => await close();
 
-    controller = StreamController<Map<String, dynamic>>(
-        onListen: startReading,
-        onPause: pauseReading,
-        onResume: resumeReading,
-        onCancel: cancelReading);
+    controller.onCancel = cancelReading;
+    controller.onResume = resumeReading;
+    controller.onPause = pauseReading;
+    controller.onListen = startReading;
 
     return controller.stream;
   }

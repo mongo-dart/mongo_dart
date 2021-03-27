@@ -5,7 +5,7 @@ abstract class Payload {
 
   int get byteLength;
 
-  Map<String, Object> get content;
+  Map<String, Object?> get content;
 }
 
 class Payload0 extends Payload {
@@ -15,7 +15,7 @@ class Payload0 extends Payload {
 
   Payload0.fromBuffer(BsonBinary buffer)
       : document = BsonMap(<String, Object>{})
-          ..unpackValue(buffer..makeByteList());
+          ..unpackValue(buffer/* ..makeByteList() */);
 
   @override
   void packValue(BsonBinary buffer) => document.packValue(buffer);
@@ -24,23 +24,23 @@ class Payload0 extends Payload {
   int get byteLength => document.byteLength();
 
   @override
-  Map<String, Object> get content => document.data;
+  Map<String, Object?> get content => document.data;
 }
 
 class Payload1 extends Payload {
-  int _length;
+  int? _length;
   final BsonCString identifier;
-  List<BsonMap> _documents;
+  late List<BsonMap> _documents;
 
-  Payload1(String identifier, List<Map<String, Object>> documents)
+  Payload1(String identifier, List<Map<String, Object?>> documents)
       : identifier = BsonCString(identifier),
         _documents = _createBsonMapList(documents);
 
   Payload1.fromBuffer(BsonBinary buffer)
-      : _length = (buffer..makeByteList()).readInt32(),
+      : _length = (buffer/* ..makeByteList() */).readInt32(),
         identifier = BsonCString(buffer.readCString()) {
     _documents =
-        _decodeBsonMapList(buffer, _length - 4 - identifier.byteLength());
+        _decodeBsonMapList(buffer, _length! - 4 - identifier.byteLength());
   }
 
   @override
@@ -69,7 +69,7 @@ class Payload1 extends Payload {
       {identifier.data: _extractBsonMapList(_documents)};
 }
 
-List<BsonMap> _createBsonMapList(List<Map<String, Object>> documents) {
+List<BsonMap> _createBsonMapList(List<Map<String, Object?>> documents) {
   var _documents = <BsonMap>[];
   for (var document in documents) {
     _documents.add(BsonMap(document));
@@ -80,7 +80,7 @@ List<BsonMap> _createBsonMapList(List<Map<String, Object>> documents) {
 List<Map<String, Object>> _extractBsonMapList(List<BsonMap> documents) {
   var _documents = <Map<String, Object>>[];
   for (var document in documents) {
-    _documents.add(document.data);
+    _documents.add(document.data as Map<String, Object>);
   }
   return _documents;
 }

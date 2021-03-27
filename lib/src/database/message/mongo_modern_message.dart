@@ -161,17 +161,18 @@ class MongoModernMessage extends MongoResponseMessage {
     keyDelete
   ];
 
-  int flags;
-  int responseFlags;
-  List<Section> sections;
+  late int flags;
+  int? responseFlags;
+  late List<Section> sections;
 
   MongoModernMessage.fromBuffer(BsonBinary buffer) {
     opcode = MongoMessage.ModernMessage;
+    flags = 0;
     deserialize(buffer);
   }
 
-  MongoModernMessage(Map<String, dynamic> document,
-      {bool checksumPresent, bool moreToCome, bool exhaustAllowed}) {
+  MongoModernMessage(Map<String, Object> document,
+      {bool? checksumPresent, bool? moreToCome, bool? exhaustAllowed}) {
     checksumPresent ??= false;
     moreToCome ??= false;
     exhaustAllowed ??= false;
@@ -180,13 +181,13 @@ class MongoModernMessage extends MongoResponseMessage {
 
     flags = 0;
     if (checksumPresent) {
-      flags |= flagCheckSumPresent;
+      flags = flags | flagCheckSumPresent;
     }
     if (moreToCome) {
-      flags |= flagMoreToCome;
+      flags = flags | flagMoreToCome;
     }
     if (exhaustAllowed) {
-      flags |= flagExhaustAllowed;
+      flags = flags | flagExhaustAllowed;
     }
 
     sections = createSections(document);
@@ -197,12 +198,12 @@ class MongoModernMessage extends MongoResponseMessage {
     }
   }
 
-  List<Section> createSections(Map<String, dynamic> doc) {
+  List<Section> createSections(Map<String, Object> doc) {
     var ret = <Section>[];
     var isPulledOutCommand = false;
-    var keys = doc?.keys?.toList();
+    var keys = doc.keys.toList();
 
-    if (keys == null || keys.isEmpty) {
+    if (keys.isEmpty) {
       throw MongoDartError(
           'Invalid document received for Mongo Modern Message');
     }
@@ -225,7 +226,7 @@ class MongoModernMessage extends MongoResponseMessage {
           'The first entry ("${keys.first}") of the document is not a command name');
     }
     var argumentName = commandArgument[indexOfCommandName];
-    var data = doc[argumentName] as List<Map<String, Object>>;
+    var data = doc[argumentName] as List<Map<String, Object?>>?;
     if (data == null) {
       throw MongoDartError('The command ${keys.first} requires an element with '
           'key $argumentName');
@@ -238,7 +239,7 @@ class MongoModernMessage extends MongoResponseMessage {
           'is greater than the max allowed ($maxWriteBatchSize)');
     }
 
-    List<Map<String, Object>> sectionList;
+    List<Map<String, Object?>> sectionList;
     while (totalElements > 0) {
       if (totalElements > maxDocumentsPerPayload1) {
         sectionList = data.sublist(0, maxDocumentsPerPayload1);

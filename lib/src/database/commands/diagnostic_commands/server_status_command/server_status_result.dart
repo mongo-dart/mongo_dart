@@ -13,75 +13,80 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 /// refer to the appropriate version of the MongoDB Manual.
 
 class ServerStatusResult with BasicResult {
-  ServerStatusResult(Map<String, Object> document) {
+  ServerStatusResult(Map<String, Object?> document)
+      : writeBacksQueued = document[keyWriteBacksQueued] as bool? ?? false {
     extractBasic(document);
     extractInstanceInfo(document);
-    asserts = document[keyAsserts];
-    connections = document[keyConnections];
-    defaultRWConcern = document[keyDefaultRWConcern];
-    electionMetrics = document[keyElectionMetrics];
-    extraInfo = document[keyExtraInfo];
-    flowControl = document[keyFlowControl];
-    freeMonitoring = document[keyFreeMonitoring];
-    globalLock = document[keyGlobalLock];
-    hedgingMetrics = document[keyHedgingMetrics];
-    latchAnalysis = document[keyLatchAnalysis];
-    logicalSessionRecordCache = document[keyLogicalSessionRecordCache];
-    locks = document[keyLocks];
-    mirroredReads = document[keyMirroredReads];
-    network = document[keyNetwork];
-    opLatencies = document[keyOpLatencies];
-    opReadConcernCounters = document[keyOpReadConcernCounters];
-    opWriteConcernCounters = document[keyOpWriteConcernCounters];
-    opcounters = document[keyOpcounters];
-    opcountersRepl = document[keyOpcountersRepl];
-    oplogTruncation = document[keyOplogTruncation];
-    repl = document[keyRepl];
-    security = document[keySecurity];
-    sharding = document[keySharding];
-    shardingStatistics = document[keyShardingStatistics];
-    shardedIndexConsistency = document[keyShardedIndexConsistency];
-    storageEngine = document[keyStorageEngine];
-    transactions = document[keyTransactions];
-    transportSecurity = document[keyTransportSecurity];
-    wiredTiger = document[keyWiredTiger];
-    writeBacksQueued = document[keyWriteBacksQueued];
-    mem = document[keyMem];
-    metrics = document[keyMetrics];
-    watchdog = document[keyWatchdog];
+    asserts = document[keyAsserts] as Map<String, dynamic>?;
+    connections = document[keyConnections] as Map<String, dynamic>?;
+    defaultRWConcern = document[keyDefaultRWConcern] as Map<String, dynamic>?;
+    electionMetrics = document[keyElectionMetrics] as Map<String, dynamic>?;
+    extraInfo = document[keyExtraInfo] as Map<String, dynamic>?;
+    flowControl = document[keyFlowControl] as Map<String, dynamic>?;
+    freeMonitoring = document[keyFreeMonitoring] as Map<String, dynamic>?;
+    globalLock = document[keyGlobalLock] as Map<String, dynamic>?;
+    hedgingMetrics = document[keyHedgingMetrics] as Map<String, dynamic>?;
+    latchAnalysis = document[keyLatchAnalysis] as Map<String, dynamic>?;
+    logicalSessionRecordCache =
+        document[keyLogicalSessionRecordCache] as Map<String, dynamic>?;
+    locks = document[keyLocks] as Map<String, dynamic>?;
+    mirroredReads = document[keyMirroredReads] as Map<String, dynamic>?;
+    network = document[keyNetwork] as Map<String, dynamic>?;
+    opLatencies = document[keyOpLatencies] as Map<String, dynamic>?;
+    opReadConcernCounters =
+        document[keyOpReadConcernCounters] as Map<String, dynamic>?;
+    opWriteConcernCounters =
+        document[keyOpWriteConcernCounters] as Map<String, dynamic>?;
+    opcounters = document[keyOpcounters] as Map<String, dynamic>?;
+    opcountersRepl = document[keyOpcountersRepl] as Map<String, dynamic>?;
+    oplogTruncation = document[keyOplogTruncation] as Map<String, dynamic>?;
+    repl = document[keyRepl] as Map<String, dynamic>?;
+    security = document[keySecurity] as Map<String, dynamic>?;
+    sharding = document[keySharding] as Map<String, dynamic>?;
+    shardingStatistics =
+        document[keyShardingStatistics] as Map<String, dynamic>?;
+    shardedIndexConsistency =
+        document[keyShardedIndexConsistency] as Map<String, dynamic>?;
+    storageEngine = document[keyStorageEngine] as Map<String, dynamic>?;
+    transactions = document[keyTransactions] as Map<String, dynamic>?;
+    transportSecurity = document[keyTransportSecurity] as Map<String, dynamic>?;
+    wiredTiger = document[keyWiredTiger] as Map<String, dynamic>?;
+    metrics = document[keyMem] as Map<String, dynamic>?;
+    metrics = document[keyMetrics] as Map<String, dynamic>?;
+    watchdog = document[keyWatchdog] as Map<String, dynamic>?;
   }
 
   // ***** INSTANCE INFORMATION ******
   /// The system’s hostname. In Unix/Linux systems, this should be the same
   /// as the output of the hostname command.
-  String host;
+  String? host;
 
   /// An array of the system’s fully qualified domain names (FQDNs).
-  List<String> advisoryHostFQDNs;
+  List<String>? advisoryHostFQDNs;
 
   /// The MongoDB version of the current MongoDB process.
-  String version;
+  String? version;
 
   /// The current MongoDB process. Possible values are: mongos or mongod.
-  String process;
+  String? process;
 
   /// The process id number.
-  int pid;
+  int? pid;
 
   /// The number of seconds that the current MongoDB process has been active.
-  int uptime;
+  int? uptime;
 
   /// The number of milliseconds that the current MongoDB process has
   /// been active.
-  int uptimeMillis;
+  int? uptimeMillis;
 
   /// The uptime in seconds as calculated from MongoDB’s internal
   /// course-grained time keeping system.
-  int uptimeEstimate;
+  int? uptimeEstimate;
 
   /// The ISODate representing the current time, according to the server,
   /// in UTC.
-  DateTime localTime;
+  DateTime? localTime;
 
   // **** ASSERTS ****
   /// A document that reports on the number of assertions raised since the
@@ -96,7 +101,7 @@ class ServerStatusResult with BasicResult {
   ///   "user" : <num>,
   ///   "rollovers" : <num>
   /// },
-  Map<String, dynamic> asserts;
+  Map<String, dynamic>? asserts;
 
   // **** Connections ****
   /// A document that reports on the status of the connections.
@@ -111,7 +116,7 @@ class ServerStatusResult with BasicResult {
   ///   "awaitingTopologyChanges" : <num>
   /// },
   /// @Since 4.4
-  Map<String, dynamic> connections;
+  Map<String, dynamic>? connections;
 
   // **** Default RWConcern ****
   /// The defaultRWConcern section provides information on the local copy
@@ -133,7 +138,7 @@ class ServerStatusResult with BasicResult {
   ///   "localUpdateWallClockTime" : Date
   /// }
   /// @Since 4.4
-  Map<String, dynamic> defaultRWConcern;
+  Map<String, dynamic>? defaultRWConcern;
 
   // **** Election Metrics ****
   /// The electionMetrics section provides information on elections
@@ -171,7 +176,7 @@ class ServerStatusResult with BasicResult {
   ///   "averageCatchUpOps" : <double>
   /// }
   /// @Since 4.2.1 (or 4.0.13)
-  Map<String, dynamic> electionMetrics;
+  Map<String, dynamic>? electionMetrics;
 
   // **** Extra Info ****
   /// A document that provides additional information regarding the
@@ -182,7 +187,7 @@ class ServerStatusResult with BasicResult {
   ///   "page_faults" : <num>
   /// },
   ///
-  Map<String, dynamic> extraInfo;
+  Map<String, dynamic>? extraInfo;
 
   // **** Flow Control ****
   /// A document that returns statistics on the Flow Control.
@@ -202,7 +207,7 @@ class ServerStatusResult with BasicResult {
   ///   "isLaggedTimeMicros" : <NumberLong>,
   /// },
   /// @Since 4.2
-  Map<String, dynamic> flowControl;
+  Map<String, dynamic>? flowControl;
 
   // **** Free Monitoring ****
   /// A document that reports on the free Cloud monitoring.
@@ -213,7 +218,7 @@ class ServerStatusResult with BasicResult {
   ///   "registerErrors" : <NumberLong>,
   ///   "metricsErrors" : <NumberLong>
   /// },
-  Map<String, dynamic> freeMonitoring;
+  Map<String, dynamic>? freeMonitoring;
 
   // **** Global Lock ****
   /// A document that reports on the database’s lock state.
@@ -230,7 +235,7 @@ class ServerStatusResult with BasicResult {
   ///      "writers" : <num>
   ///   }
   /// },
-  Map<String, dynamic> globalLock;
+  Map<String, dynamic>? globalLock;
 
   // **** Hedging Metrics ****
   /// Provides metrics on hedged reads for the mongos instance.
@@ -240,7 +245,7 @@ class ServerStatusResult with BasicResult {
   ///   "numAdvantageouslyHedgedOperations" : <num>
   /// },
   /// @Since 4.4
-  Map<String, dynamic> hedgingMetrics;
+  Map<String, dynamic>? hedgingMetrics;
 
   // **** Latch Analysis ****
   /// A document that reports on metrics related to internal locking primitives
@@ -262,7 +267,7 @@ class ServerStatusResult with BasicResult {
   ///  ...
   /// }
   /// @Since 4.4
-  Map<String, dynamic> latchAnalysis;
+  Map<String, dynamic>? latchAnalysis;
 
   // **** Logical Session Record Cache ****
   /// Provides metrics around the caching of server sessions.
@@ -281,7 +286,7 @@ class ServerStatusResult with BasicResult {
   ///   "sessionCatalogSize" : <num>   // Starting in MongoDB 4.2
   /// },
   /// @Since 3.6
-  Map<String, dynamic> logicalSessionRecordCache;
+  Map<String, dynamic>? logicalSessionRecordCache;
 
   // **** Locks ****
   /// A document that reports for each lock <type>, data on lock <modes>.
@@ -329,7 +334,7 @@ class ServerStatusResult with BasicResult {
   ///   },
   ///   ...
   /// }
-  Map<String, dynamic> locks;
+  Map<String, dynamic>? locks;
 
   // **** MirroredReads****
   /// A document that reports on mirrored reads. To return mirroredReads
@@ -341,7 +346,7 @@ class ServerStatusResult with BasicResult {
   ///      "sent" : <num>
   /// },
   /// @Since 4.4
-  Map<String, dynamic> mirroredReads;
+  Map<String, dynamic>? mirroredReads;
 
   // **** Network ****
   /// A document that reports data on MongoDB’s network use.
@@ -358,7 +363,7 @@ class ServerStatusResult with BasicResult {
   ///     "clientSupported" : <bool>,
   ///     "accepted" : "NumberLong(<num>)"
   /// },
-  Map<String, dynamic> network;
+  Map<String, dynamic>? network;
 
   // **** Op Latencies ****
   /// A document containing operation latencies for the instance as a whole.
@@ -370,7 +375,7 @@ class ServerStatusResult with BasicResult {
   ///   "writes" : <document>,
   ///   "commands" : <document>
   /// },
-  Map<String, dynamic> opLatencies;
+  Map<String, dynamic>? opLatencies;
 
   // **** Op Read Concern Counters ****
   /// A document that reports on the read concern level specified by query
@@ -400,7 +405,7 @@ class ServerStatusResult with BasicResult {
   ///   "none" :  NumberLong(<num>)
   // }
   /// @Since 4.0.6
-  Map<String, dynamic> opReadConcernCounters;
+  Map<String, dynamic>? opReadConcernCounters;
 
   // **** Op Write Concern Counters ****
   /// A document that reports on the write concerns specified by write
@@ -453,7 +458,7 @@ class ServerStatusResult with BasicResult {
   ///   }
   /// }
   /// @Since 4.0.6
-  Map<String, dynamic> opWriteConcernCounters;
+  Map<String, dynamic>? opWriteConcernCounters;
 
   // **** Opcounters ****
   /// A document that reports on database operations by type since the mongod
@@ -476,7 +481,7 @@ class ServerStatusResult with BasicResult {
   ///   "getmore" : NumberLong(<num>), // Starting in MongoDB 4.2, type is NumberLong
   ///   "command" : NumberLong(<num>), // Starting in MongoDB 4.2, type is NumberLong
   /// },
-  Map<String, dynamic> opcounters;
+  Map<String, dynamic>? opcounters;
 
   // **** Opcounters Repl ****
   /// A document that reports on database replication operations by type since
@@ -499,7 +504,7 @@ class ServerStatusResult with BasicResult {
   ///   "getmore" : NumberLong(<num>), // Starting in MongoDB 4.2, type is NumberLong
   ///   "command" : NumberLong(<num>), // Starting in MongoDB 4.2, type is NumberLong
   /// },
-  Map<String, dynamic> opcountersRepl;
+  Map<String, dynamic>? opcountersRepl;
 
   // **** Op Log Truncation ****
   /// A document that reports on oplog truncations.
@@ -516,7 +521,7 @@ class ServerStatusResult with BasicResult {
   ///   "totalTimeTruncatingMicros" : <NumberLong>,
   ///   "truncateCount" : <NumberLong>
   /// },
-  Map<String, dynamic> oplogTruncation;
+  Map<String, dynamic>? oplogTruncation;
 
   // **** Repl ****
   /// A document that reports on the replica set configuration. repl only
@@ -547,7 +552,7 @@ class ServerStatusResult with BasicResult {
   ///        ...
   ///   ]
   /// }
-  Map<String, dynamic> repl;
+  Map<String, dynamic>? repl;
 
   // **** Security ****
   /// A document that reports on:
@@ -595,7 +600,7 @@ class ServerStatusResult with BasicResult {
   ///     "SSLServerHasCertificateAuthority": <boolean>,
   ///     "SSLServerCertificateExpirationDate": <date>
   /// },
-  Map<String, dynamic> security;
+  Map<String, dynamic>? security;
 
   // **** Sharding ****
   /// A document with data regarding the sharded cluster.
@@ -616,7 +621,7 @@ class ServerStatusResult with BasicResult {
   ///   },
   ///   "maxChunkSizeInBytes" : NumberLong(67108864)
   /// }
-  Map<String, dynamic> sharding;
+  Map<String, dynamic>? sharding;
 
   // **** Sharding Statistics ****
   /// A document which contains metrics on metadata refresh on sharded clusters.
@@ -672,7 +677,7 @@ class ServerStatusResult with BasicResult {
   ///      }
   ///   }
   /// },
-  Map<String, dynamic> shardingStatistics;
+  Map<String, dynamic>? shardingStatistics;
 
   // **** Sharded Index Consistency ****
   /// Available only on config server instances.
@@ -688,7 +693,7 @@ class ServerStatusResult with BasicResult {
   /// "shardedIndexConsistency" : {
   ///   "numShardedCollectionsWithInconsistentIndexes" : <NumberLong>
   /// },
-  Map<String, dynamic> shardedIndexConsistency;
+  Map<String, dynamic>? shardedIndexConsistency;
 
   // **** Storage Engine ****
   /// A document with data about the current storage engine.
@@ -698,7 +703,7 @@ class ServerStatusResult with BasicResult {
   ///   "supportsCommittedReads" : <boolean>,
   ///   "persistent" : <boolean>
   /// },
-  Map<String, dynamic> storageEngine;
+  Map<String, dynamic>? storageEngine;
 
   // **** Transactions ****
   /// When run on a mongod, a document with data about the retryable
@@ -775,7 +780,7 @@ class ServerStatusResult with BasicResult {
   ///      }
   ///   }
   /// },
-  Map<String, dynamic> transactions;
+  Map<String, dynamic>? transactions;
 
   // **** Transport Security ****
   /// The cumulative number of TLS <version> connections that have been made
@@ -790,7 +795,7 @@ class ServerStatusResult with BasicResult {
   ///   "1.3" : <NumberLong>,
   ///   "unknown" :<NumberLong>
   /// },
-  Map<String, dynamic> transportSecurity;
+  Map<String, dynamic>? transportSecurity;
 
   // **** Wired Tiger ****
   /// wiredTiger information only appears if using the WiredTiger storage
@@ -1242,7 +1247,7 @@ class ServerStatusResult with BasicResult {
   ///      "oldest majority snapshot timestamp available" : <string>
   ///   }
   /// }
-  Map<String, dynamic> wiredTiger;
+  Map<String, dynamic>? wiredTiger;
 
   // **** Write Backs Queued ****
   /// A boolean that indicates whether there are operations from a mongos
@@ -1264,7 +1269,7 @@ class ServerStatusResult with BasicResult {
   ///   "mapped" : <int>,
   ///   "mappedWithJournal" : <int>
   /// },
-  Map<String, dynamic> mem;
+  Map<String, dynamic>? mem;
 
   // **** Metrics ****
   /// A document that returns various statistics that reflect the current
@@ -1397,7 +1402,7 @@ class ServerStatusResult with BasicResult {
   ///         "passes" : NumberLong(<num>)
   ///   }
   /// },
-  Map<String, dynamic> metrics;
+  Map<String, dynamic>? metrics;
 
   // **** Watchdog ****
   /// A document reporting the status of the
@@ -1408,21 +1413,21 @@ class ServerStatusResult with BasicResult {
   ///   "monitorGeneration" : NumberLong(<num>),
   ///   "monitorPeriod" : <num>
   /// }
-  Map<String, dynamic> watchdog;
+  Map<String, dynamic>? watchdog;
 
-  void extractInstanceInfo(Map<String, dynamic> document) {
-    host = document[keyHost];
-    advisoryHostFQDNs = document[keyAdvisoryHostFQDNs];
-    version = document[keyVersion];
-    process = document[keyProcess];
-    pid = document[keyPid];
+  void extractInstanceInfo(Map<String, Object?> document) {
+    host = document[keyHost] as String?;
+    advisoryHostFQDNs = document[keyAdvisoryHostFQDNs] as List<String>?;
+    version = document[keyVersion] as String?;
+    process = document[keyProcess] as String?;
+    pid = document[keyPid] as int?;
     if (document[keyUptime] is double) {
       uptime = (document[keyUptime] as double).toInt();
     } else {
-      uptime = document[keyUptime];
+      uptime = document[keyUptime] as int?;
     }
-    uptimeMillis = document[keyUptimeMillis];
-    uptimeEstimate = document[keyUptimeEstimate];
-    localTime = document[keyLocalTime];
+    uptimeMillis = document[keyUptimeMillis] as int?;
+    uptimeEstimate = document[keyUptimeEstimate] as int?;
+    localTime = document[keyLocalTime] as DateTime?;
   }
 }

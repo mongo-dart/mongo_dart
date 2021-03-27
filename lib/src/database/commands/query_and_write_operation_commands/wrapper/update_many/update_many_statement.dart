@@ -2,12 +2,12 @@ import 'package:mongo_dart/src/database/commands/query_and_write_operation_comma
 import 'package:mongo_dart/src/database/commands/parameters/collation_options.dart';
 
 class UpdateManyStatement extends UpdateStatement {
-  UpdateManyStatement(Map<String, Object> q, Object u,
-      {bool upsert,
-      CollationOptions collation,
-      List<dynamic> arrayFilters,
-      String hint,
-      Map<String, Object> hintDocument})
+  UpdateManyStatement(Map<String, Object?> q, Object u,
+      {bool? upsert,
+      CollationOptions? collation,
+      List<dynamic>? arrayFilters,
+      String? hint,
+      Map<String, Object>? hintDocument})
       : super(q, u,
             upsert: upsert,
             multi: true,

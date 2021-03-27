@@ -1,4 +1,4 @@
 class UpsertedInfo {
-  int index;
+  int? index;
   dynamic id;
 }

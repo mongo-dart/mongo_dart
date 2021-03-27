@@ -21,7 +21,7 @@ class AggregateOptions {
   /// MongoDB terminates operations that exceed their allotted time limit
   /// using the same mechanism as db.killOp(). MongoDB only terminates an
   /// operation at one of its designated interrupt points.
-  final int maxTimeMS;
+  final int? maxTimeMS;
 
   /// Applicable only if you specify the $out or $merge aggregation stages.
   /// Enables aggregate to bypass document validation during the operation.
@@ -51,7 +51,7 @@ class AggregateOptions {
   /// "linearizable". That is, if you specify "linearizable" read concern
   /// for db.collection.aggregate(), you cannot include the $merge stage
   /// in the pipeline.
-  final ReadConcern readConcern;
+  final ReadConcern? readConcern;
 
   /// Specifies the [collation] to use for the operation.
   /// Collation allows users to specify language-specific rules for string
@@ -72,7 +72,7 @@ class AggregateOptions {
   /// for the sort.
   ///
   /// New in version 3.4.
-  final CollationOptions collation;
+  final CollationOptions? collation;
 
   /// A user-provided comment to attach to this command. Once set,
   /// this comment appears alongside records of this command in the
@@ -85,37 +85,37 @@ class AggregateOptions {
   /// **Note**
   /// Any comment set on a find command is inherited by any subsequent
   /// getMore commands run on the find cursor.
-  final String comment;
+  final String? comment;
 
   /// A document that expresses the write concern to use with the $out or
   /// $merge stage.
   ///
   /// Omit to use the default write concern with the $out or $merge stage.
-  final WriteConcern writeConcern;
+  final WriteConcern? writeConcern;
 
   AggregateOptions(
-      {this.allowDiskUse,
+      {this.allowDiskUse = false,
       this.maxTimeMS,
-      this.bypassDocumentValidation,
+      this.bypassDocumentValidation = false,
       this.readConcern,
       this.collation,
       this.comment,
       this.writeConcern}) {
-    if (maxTimeMS != null && maxTimeMS < 1) {
+    if (maxTimeMS != null && maxTimeMS! < 1) {
       throw MongoDartError('MaxTimeMS parameter must be a positive value');
     }
   }
 
-  Map<String, Object> getOptions(Db db) => <String, Object>{
-        if (allowDiskUse != null && allowDiskUse) keyAllowDiskUse: allowDiskUse,
-        if (maxTimeMS != null) keyMaxTimeMS: maxTimeMS,
-        if (bypassDocumentValidation != null && bypassDocumentValidation)
+  Map<String, Object> getOptions(Db? db) => <String, Object>{
+        if (allowDiskUse) keyAllowDiskUse: allowDiskUse,
+        if (maxTimeMS != null) keyMaxTimeMS: maxTimeMS!,
+        if (bypassDocumentValidation)
           keyBypassDocumentValidation: bypassDocumentValidation,
-        if (readConcern != null) keyReadConcern: readConcern.toMap(),
-        if (collation != null) keyCollation: collation.options,
-        if (comment != null) keyComment: comment,
-        if (writeConcern != null)
+        if (readConcern != null) keyReadConcern: readConcern!.toMap(),
+        if (collation != null) keyCollation: collation!.options,
+        if (comment != null) keyComment: comment!,
+        if (writeConcern != null && db?.masterConnection.serverStatus != null)
           keyWriteConcern:
-              writeConcern.asMap(db.masterConnection?.serverStatus),
+              writeConcern!.asMap(db!.masterConnection.serverStatus),
       };
 }

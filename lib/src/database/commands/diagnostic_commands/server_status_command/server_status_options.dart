@@ -36,7 +36,7 @@ class ServerStatusOptions {
   final bool opcountersExcluded;
   final bool opcountersReplExcluded;
   final bool oplogTruncationExcluded;
-  final bool repl;
+  final bool? repl;
   final bool securityExcluded;
   final bool shardingExcluded;
   final bool shardingStatisticsExcluded;
@@ -48,72 +48,38 @@ class ServerStatusOptions {
   final bool wiredTigerExcluded;
 
   const ServerStatusOptions(
-      {bool assertsExcluded,
-      bool connectionsExcluded,
-      bool defaultRWConcernExcluded,
-      bool electionMetricsExcluded,
-      bool extra_infoExcluded,
-      bool flowControlExcluded,
-      bool freeMonitoringExcluded,
-      bool globalLockExcluded,
-      bool hedgingMetricsExcluded,
-      bool latchAnalysisIncluded,
-      bool logicalSessionRecordCacheExcluded,
-      bool locksExcluded,
-      bool memExcluded,
-      bool metricsExcluded,
-      bool mirroredReadsIncluded,
-      bool networkExcluded,
-      bool opLatenciesExcluded,
-      bool opReadConcernCountersExcluded,
-      bool opWriteConcernCountersExcluded,
-      bool opcountersExcluded,
-      bool opcountersReplExcluded,
-      bool oplogTruncationExcluded,
+      {this.assertsExcluded = false,
+      this.connectionsExcluded = false,
+      this.defaultRWConcernExcluded = false,
+      this.electionMetricsExcluded = false,
+      this.extra_infoExcluded = false,
+      this.flowControlExcluded = false,
+      this.freeMonitoringExcluded = false,
+      this.globalLockExcluded = false,
+      this.hedgingMetricsExcluded = false,
+      this.latchAnalysisIncluded = false,
+      this.logicalSessionRecordCacheExcluded = false,
+      this.locksExcluded = false,
+      this.memExcluded = false,
+      this.metricsExcluded = false,
+      this.mirroredReadsIncluded = false,
+      this.networkExcluded = false,
+      this.opLatenciesExcluded = false,
+      this.opReadConcernCountersExcluded = false,
+      this.opWriteConcernCountersExcluded = false,
+      this.opcountersExcluded = false,
+      this.opcountersReplExcluded = false,
+      this.oplogTruncationExcluded = false,
       this.repl,
-      bool securityExcluded,
-      bool shardingExcluded,
-      bool shardingStatisticsExcluded,
-      bool shardedIndexConsistencyExcluded,
-      bool storageEngineExcluded,
-      bool transactionsExcluded,
-      bool transportSecurityExcluded,
-      bool watchdogExcluded,
-      bool wiredTigerExcluded})
-      : assertsExcluded = assertsExcluded ?? false,
-        connectionsExcluded = connectionsExcluded ?? false,
-        defaultRWConcernExcluded = defaultRWConcernExcluded ?? false,
-        electionMetricsExcluded = electionMetricsExcluded ?? false,
-        extra_infoExcluded = extra_infoExcluded ?? false,
-        flowControlExcluded = flowControlExcluded ?? false,
-        freeMonitoringExcluded = freeMonitoringExcluded ?? false,
-        globalLockExcluded = globalLockExcluded ?? false,
-        hedgingMetricsExcluded = hedgingMetricsExcluded ?? false,
-        latchAnalysisIncluded = latchAnalysisIncluded ?? false,
-        logicalSessionRecordCacheExcluded =
-            logicalSessionRecordCacheExcluded ?? false,
-        locksExcluded = locksExcluded ?? false,
-        memExcluded = memExcluded ?? false,
-        metricsExcluded = metricsExcluded ?? false,
-        mirroredReadsIncluded = mirroredReadsIncluded ?? false,
-        networkExcluded = networkExcluded ?? false,
-        opLatenciesExcluded = opLatenciesExcluded ?? false,
-        opReadConcernCountersExcluded = opReadConcernCountersExcluded ?? false,
-        opWriteConcernCountersExcluded =
-            opWriteConcernCountersExcluded ?? false,
-        opcountersExcluded = opcountersExcluded ?? false,
-        opcountersReplExcluded = opcountersReplExcluded ?? false,
-        oplogTruncationExcluded = oplogTruncationExcluded ?? false,
-        securityExcluded = securityExcluded ?? false,
-        shardingExcluded = shardingExcluded ?? false,
-        shardingStatisticsExcluded = shardingStatisticsExcluded ?? false,
-        shardedIndexConsistencyExcluded =
-            shardedIndexConsistencyExcluded ?? false,
-        storageEngineExcluded = storageEngineExcluded ?? false,
-        transactionsExcluded = transactionsExcluded ?? false,
-        transportSecurityExcluded = transportSecurityExcluded ?? false,
-        watchdogExcluded = watchdogExcluded ?? false,
-        wiredTigerExcluded = wiredTigerExcluded ?? false;
+      this.securityExcluded = false,
+      this.shardingExcluded = false,
+      this.shardingStatisticsExcluded = false,
+      this.shardedIndexConsistencyExcluded = false,
+      this.storageEngineExcluded = false,
+      this.transactionsExcluded = false,
+      this.transportSecurityExcluded = false,
+      this.watchdogExcluded = false,
+      this.wiredTigerExcluded = false});
 
   static const ServerStatusOptions instance = ServerStatusOptions(
       assertsExcluded: true,
@@ -180,7 +146,7 @@ class ServerStatusOptions {
   Map<String, Object> get options => <String, Object>{
         // The default has partial values, "1" - all, "0" - nothing
         if (repl != null)
-          if (repl) keyRepl: 1 else keyRepl: 0,
+          if (repl!) keyRepl: 1 else keyRepl: 0,
         // Excluded by default
         if (mirroredReadsIncluded) keyMirroredReads: 1,
         if (latchAnalysisIncluded) keyLatchAnalysis: 1,

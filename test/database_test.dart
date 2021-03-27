@@ -18,7 +18,7 @@ const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 //var throwsMongoDartError = throwsA((e) => e is MongoDartError);
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
-Db db;
+late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
@@ -141,12 +141,12 @@ Future testIsMaster() async {
 
 Future<void> testServerStatus() async {
   Map<String, dynamic> dbStatus = await db.serverStatus();
-  if (dbStatus != null && dbStatus.isNotEmpty && dbStatus['ok'] == 1.0) {
+  if (dbStatus.isNotEmpty && dbStatus['ok'] == 1.0) {
     expect(dbStatus['ok'], 1.0);
     expect(dbStatus['version'], db.masterConnection.serverStatus.version);
     expect(dbStatus['process'], db.masterConnection.serverStatus.process);
     expect(dbStatus['host'], db.masterConnection.serverStatus.host);
-    Map storageEngineMap = dbStatus['storageEngine'];
+    var storageEngineMap = dbStatus['storageEngine'];
     if (storageEngineMap != null && storageEngineMap['name'] == 'wiredTiger') {
       expect(storageEngineMap['persistent'],
           db.masterConnection.serverStatus.isPersistent);
@@ -286,21 +286,43 @@ Future testSaveWithIntegerId() async {
 
   await collection.insertAll(toInsert);
   var result = await collection.findOne({'name': 'c'});
+  expect(result, isNotNull);
+  if (result == null) {
+    return;
+  }
   expect(result['value'], 30);
 
   result = await collection.findOne({'_id': 3});
+  expect(result, isNotNull);
+  if (result == null) {
+    return;
+  }
   result['value'] = 2;
+  // ignore: deprecated_member_use_from_same_package
   await collection.save(result);
 
   result = await collection.findOne({'_id': 3});
+  expect(result, isNotNull);
+  if (result == null) {
+    return;
+  }
   expect(result['value'], 2);
 
   result = await collection.findOne(where.eq('_id', 3));
+  expect(result, isNotNull);
+  if (result == null) {
+    return;
+  }
   expect(result['value'], 2);
 
   final notThere = {'_id': 5, 'name': 'd', 'value': 50};
+  // ignore: deprecated_member_use_from_same_package
   await collection.save(notThere);
   result = await collection.findOne(where.eq('_id', 5));
+  expect(result, isNotNull);
+  if (result == null) {
+    return;
+  }
   expect(result['value'], 50);
 }
 
@@ -317,15 +339,28 @@ Future testSaveWithObjectId() async {
 
   await collection.insertAll(toInsert);
   var result = await collection.findOne({'name': 'c'});
+  expect(result, isNotNull);
+  if (result == null) {
+    return;
+  }
   expect(result['value'], 30);
 
   var id = result['_id'];
   result = await collection.findOne({'_id': id});
+  expect(result, isNotNull);
+  if (result == null) {
+    return;
+  }
   expect(result['value'], 30);
 
   result['value'] = 1;
+  // ignore: deprecated_member_use_from_same_package
   await collection.save(result);
   result = await collection.findOne({'_id': id});
+  expect(result, isNotNull);
+  if (result == null) {
+    return;
+  }
   expect(result['value'], 1);
 }
 
@@ -343,7 +378,10 @@ Future testInsertWithObjectId() async {
   await collection.insert(objectToSave);
 
   var result = await collection.findOne(where.eq('name', 'a'));
-
+  expect(result, isNotNull);
+  if (result == null) {
+    return;
+  }
   expect(result['_id'], id);
   expect(result['value'], 10);
 }
@@ -671,6 +709,10 @@ Future testSkip() async {
   await insertManyDocuments(collection, 600);
 
   var result = await collection.findOne(where.sortBy('a').skip(300));
+  expect(result, isNotNull);
+  if (result == null) {
+    return;
+  }
 
   expect(result['a'], 300);
 }
@@ -794,8 +836,7 @@ Future<Cursor> testCursorCreation() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  var cursor =
-      ModernCursor(FindOperation(collection, filter: {'ping': 1}));
+  var cursor = ModernCursor(FindOperation(collection, filter: {'ping': 1}));
 
   expect(cursor, isNotNull);
 
@@ -830,6 +871,10 @@ Future testCursorClosing() async {
   var cursorResult = await modernCursor.nextObject();
   expect(modernCursor.state, State.OPEN);
   expect(modernCursor.cursorId.value, isPositive);
+  expect(cursorResult, isNotNull);
+  if (cursorResult == null) {
+    return;
+  }
   expect(cursorResult['a'], 0);
   expect(cursorResult, isNotNull);
 
@@ -848,7 +893,7 @@ Future testPingRaw() async {
 
   var result = await db.queryMessage(queryMessage);
 
-  expect(result.documents[0], containsPair('ok', 1));
+  expect(result.documents?[0], containsPair('ok', 1));
 }
 
 Future testNextObject() async {
@@ -919,7 +964,7 @@ void testDbCommandCreation() {
   var collectionName = getRandomCollectionName();
 
   var dbCommand = DbCommand(db, collectionName, 0, 0, 1, {}, {});
-  expect(dbCommand.collectionNameBson.value, '$dbName.$collectionName');
+  expect(dbCommand.collectionNameBson?.value, '$dbName.$collectionName');
 }
 
 Future testPingDbCommand() async {
@@ -927,7 +972,7 @@ Future testPingDbCommand() async {
 
   var result = await db.queryMessage(pingCommand);
 
-  expect(result.documents[0], containsPair('ok', 1));
+  expect(result.documents?[0], containsPair('ok', 1));
 }
 
 Future testDropDbCommand() async {
@@ -935,7 +980,7 @@ Future testDropDbCommand() async {
 
   var result = await db.queryMessage(command);
 
-  expect(result.documents[0]['ok'], 1);
+  expect(result.documents?[0]['ok'], 1);
 }
 
 Future testIsMasterDbCommand() async {
@@ -943,7 +988,7 @@ Future testIsMasterDbCommand() async {
 
   var result = await db.queryMessage(isMasterCommand);
 
-  expect(result.documents[0], containsPair('ok', 1));
+  expect(result.documents?[0], containsPair('ok', 1));
 }
 
 String _md5(String value) => crypto.md5.convert(value.codeUnits).toString();
@@ -969,6 +1014,10 @@ Future testAuthenticationWithUri() async {
   await collection.insert({'a': 3});
 
   var foundValue = await collection.findOne();
+  expect(foundValue, isNotNull);
+  if (foundValue == null) {
+    return;
+  }
 
   expect(foundValue['a'], isNotNull);
 }
@@ -1104,7 +1153,7 @@ Future testIndexCreationErrorHandling() async {
     fail("Expecting an error, but wasn't thrown");
   } on TestFailure {
     rethrow;
-  } catch (e) {
+  } on Map catch (e) {
     expect(e[keyErrmsg] ?? e['err'],
         predicate((String msg) => msg.contains('duplicate key error')));
   }
@@ -1214,7 +1263,10 @@ Future testFindWithFieldsClause() async {
 
   var result =
       await collection.findOne(where.eq('name', 'Vadim').fields(['score']));
-
+  expect(result, isNotNull);
+  if (result == null) {
+    return;
+  }
   expect(result['name'], isNull);
   expect(result['score'], 4);
 }
@@ -1299,12 +1351,15 @@ Future testSimpleQuery() async {
 
   var result1 = await collection.findOne(where.eq('my_field', 3));
   expect(result1, isNotNull);
+  if (result1 == null) {
+    return;
+  }
   expect(result1['my_field'], 3);
   id = result1['_id'] as ObjectId;
 
   var result2 = await collection.findOne(where.id(id));
   expect(result2, isNotNull);
-  expect(result2['my_field'], 3);
+  expect(result2?['my_field'], 3);
 
   await collection.remove(where.id(id));
   var result3 = await collection.findOne(where.eq('my_field', 3));
@@ -1332,7 +1387,7 @@ Future testCompoundQuery() async {
       .or(where.lt('my_field', 2))
       .and(where.eq('str_field', 'str_1')));
   expect(result1, isNotNull);
-  expect(result1['my_field'], 1);
+  expect(result1?['my_field'], 1);
 }
 
 Future testFieldLevelUpdateSimple() async {
@@ -1340,20 +1395,20 @@ Future testFieldLevelUpdateSimple() async {
   var collection = db.collection(collectionName);
 
   ObjectId id;
-  var result = await collection.insert({'name': 'a', 'value': 10});
-  expect(result['n'], 0);
+  var resultInsert = await collection.insert({'name': 'a', 'value': 10});
+  expect(resultInsert['n'], 0);
 
-  result = await collection.findOne({'name': 'a'});
+  var result = await collection.findOne({'name': 'a'});
   expect(result, isNotNull);
 
-  id = result['_id'] as ObjectId;
+  id = result?['_id'] as ObjectId;
   result = await collection.update(where.id(id), modify.set('name', 'BBB'));
   expect(result['updatedExisting'], true);
   expect(result['n'], 1);
 
   result = await collection.findOne(where.id(id));
   expect(result, isNotNull);
-  expect(result['name'], 'BBB');
+  expect(result?['name'], 'BBB');
 }
 
 Future testQueryOnClosedConnection() async {
@@ -1374,8 +1429,7 @@ Future testUpdateOnClosedConnection() async {
   await db.close();
   try {
     await collection.insert({'test': 'test'});
-  } catch (e) {
-    expect(e is MongoDartError, isTrue);
+  } on MongoDartError catch (e) {
     expect(e.message.endsWith('State.CLOSED'), isTrue);
   }
 }

@@ -16,14 +16,14 @@ class _ServerCapabilities {
   bool listIndexes = false;
   int maxNumberOfDocsInBatch = 1000;
   bool supportsOpMsg = false;
-  String replicaSetName;
-  List<String> replicaSetHosts;
+  String? replicaSetName;
+  List<String>? replicaSetHosts;
   bool get isReplicaSet => replicaSetName != null;
   int get replicaSetHostsNum => replicaSetHosts?.length ?? 0;
   bool get isSingleServerReplicaSet => isReplicaSet && replicaSetHostsNum == 1;
   bool isShardedCluster = false;
   bool isStandalone = false;
-  String fcv;
+  String? fcv;
 
   void getParamsFromIstMaster(Map<String, dynamic> isMaster) {
     if (isMaster.containsKey('maxWireVersion')) {
@@ -68,16 +68,16 @@ class Connection {
   final Logger _log = Logger('Connection');
   final _ConnectionManager _manager;
   ServerConfig serverConfig;
-  Socket socket;
+  Socket? socket;
   final Set _pendingQueries = <int>{};
 
   Map<int, Completer<MongoResponseMessage>> get _replyCompleters =>
       _manager.replyCompleters;
 
   Queue<MongoMessage> get _sendQueue => _manager.sendQueue;
-  StreamSubscription<MongoResponseMessage> _repliesSubscription;
+  StreamSubscription<MongoResponseMessage>? _repliesSubscription;
 
-  StreamSubscription<MongoResponseMessage> get repliesSubscription =>
+  StreamSubscription<MongoResponseMessage>? get repliesSubscription =>
       _repliesSubscription;
 
   bool connected = false;
@@ -86,11 +86,10 @@ class Connection {
   final _ServerCapabilities serverCapabilities = _ServerCapabilities();
   final ServerStatus serverStatus = ServerStatus();
 
-  Connection(this._manager, [this.serverConfig]) {
-    serverConfig ??= ServerConfig();
-  }
+  Connection(this._manager, [ServerConfig? serverConfig])
+      : serverConfig = serverConfig ?? ServerConfig();
 
-  bool get isAuthenticated => serverConfig?.isAuthenticated ?? false;
+  bool get isAuthenticated => serverConfig.isAuthenticated;
 
   Future<bool> connect() async {
     Socket _socket;
@@ -99,13 +98,13 @@ class Connection {
         var securityContext = SecurityContext.defaultContext;
         if (serverConfig.tlsCAFileContent != null) {
           securityContext
-              .setTrustedCertificatesBytes(serverConfig.tlsCAFileContent);
+              .setTrustedCertificatesBytes(serverConfig.tlsCAFileContent!);
         }
         if (serverConfig.tlsCertificateKeyFileContent != null) {
           securityContext
             ..useCertificateChainBytes(
-                serverConfig.tlsCertificateKeyFileContent)
-            ..usePrivateKeyBytes(serverConfig.tlsCertificateKeyFileContent,
+                serverConfig.tlsCertificateKeyFileContent!)
+            ..usePrivateKeyBytes(serverConfig.tlsCertificateKeyFileContent!,
                 password: serverConfig.tlsCertificateKeyFilePassword);
         }
 
@@ -127,10 +126,13 @@ class Connection {
     }
 
     // ignore: unawaited_futures
-    _socket.done.catchError((error) => _log.info('Socket error $error'));
+    _socket.done.catchError((error) {
+      _log.info('Socket error $error');
+      throw ConnectionException('Socket error: $e');
+    });
     socket = _socket;
 
-    _repliesSubscription = socket
+    _repliesSubscription = socket!
         .transform<MongoResponseMessage>(MongoMessageHandler().transformer)
         .listen(_receiveReply,
             onError: (e, st) async {
@@ -155,10 +157,11 @@ class Connection {
     return true;
   }
 
-  Future close() {
+  Future<void> close() async {
     _closed = true;
     connected = false;
-    return socket?.close();
+    await socket?.close();
+    return;
   }
 
   void _sendBuffer() {
@@ -168,7 +171,10 @@ class Connection {
       var mongoMessage = _sendQueue.removeFirst();
       message.addAll(mongoMessage.serialize().byteList);
     }
-    socket.add(message);
+    if (socket == null) {
+      throw ConnectionException('The socket has not been created yet');
+    }
+    socket!.add(message);
   }
 
   Future<MongoReplyMessage> query(MongoMessage queryMessage) {
@@ -205,7 +211,7 @@ class Connection {
 
   Future<MongoModernMessage> executeModernMessage(
       MongoModernMessage modernMessage) {
-    Completer completer = Completer<MongoModernMessage>();
+    var completer = Completer<MongoModernMessage>();
     if (!_closed) {
       _replyCompleters[modernMessage.requestId] = completer;
       _pendingQueries.add(modernMessage.requestId);
@@ -221,7 +227,7 @@ class Connection {
 
   void _receiveReply(MongoResponseMessage reply) {
     _log.fine(() => reply.toString());
-    Completer completer = _replyCompleters.remove(reply.responseTo);
+    var completer = _replyCompleters.remove(reply.responseTo);
     _pendingQueries.remove(reply.responseTo);
     if (completer != null) {
       _log.fine(() => 'Completing $reply');
@@ -239,8 +245,8 @@ class Connection {
     var ex = ConnectionException(
         'connection closed${socketError == null ? '.' : ': $socketError'}');
     for (var id in _pendingQueries) {
-      Completer completer = _replyCompleters.remove(id);
-      completer.completeError(ex);
+      var completer = _replyCompleters.remove(id);
+      completer?.completeError(ex);
     }
     _pendingQueries.clear();
     if (isMaster) {

@@ -34,13 +34,12 @@ Future<List<String>> decodeDnsSeedlist(Uri dnsSeedlistUri) async {
     throw MongoDartError('DNS data is not correct (missing SRV detail)');
   }
   var user = dnsSeedlistUri.userInfo;
-  var postPrefix = user == null || user.isEmpty ? '' : '$user@';
+  var postPrefix = user.isEmpty ? '' : '$user@';
   var prefix = 'mongodb://$postPrefix';
   var requestedParameters =
-      dnsSeedlistUri.queryParameters ?? <String, String>{};
+      dnsSeedlistUri.queryParameters;
   var dnsServerParameters =
-      Uri.parse('mongodb://db.example.com/?$additionalParms').queryParameters ??
-          <String, String>{};
+      Uri.parse('mongodb://db.example.com/?$additionalParms').queryParameters;
   var actualParameters = <String, String>{
     ...dnsServerParameters,
     ...requestedParameters

@@ -7,16 +7,13 @@ class LastErrorObject {
 
   /// Contains the ObjectId of the inserted document if an update
   /// operation with upsert: true resulted in a new document.
-  ObjectId upserted;
+  ObjectId? upserted;
 
-  int n;
+  int? n;
 
-  LastErrorObject.fromMap(Map document) {
-    if (document != null) {
-      updatedExisting = document[keyUpdatedExisting];
-      upserted = document[keyUpserted];
-      n = document[keyN];
-    }
-    updatedExisting ??= false;
+  LastErrorObject.fromMap(Map document)
+      : updatedExisting = document[keyUpdatedExisting] as bool? ?? false {
+    upserted = document[keyUpserted] as ObjectId?;
+    n = document[keyN] as int?;
   }
 }

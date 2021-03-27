@@ -12,7 +12,7 @@ typedef _DbFactory = FutureOr<Db> Function();
 class ConnectionPool {
   final List<Db> _connections = [];
   int _index = 0;
-  Pool _pool;
+  final Pool _pool;
 
   /// The maximum number of concurrent connections allowed.
   final int maxConnections;
@@ -24,9 +24,8 @@ class ConnectionPool {
   ///
   /// * `maxConnections`: The maximum amount of connections to keep open simultaneously.
   /// * `dbFactory*: a parameterless function that returns a [Db]. The function can be asynchronous if necessary.
-  ConnectionPool(this.maxConnections, this.dbFactory) {
-    _pool = Pool(maxConnections);
-  }
+  ConnectionPool(this.maxConnections, this.dbFactory)
+      : _pool = Pool(maxConnections);
 
   /// Connects to the database, using an existent connection, only creating a new one if
   /// the number of active connections is less than [maxConnections].
@@ -47,8 +46,6 @@ class ConnectionPool {
   }
 
   /// Closes all active database connections.
-  Future close() {
-    return Future.wait(_connections.map<Future>((c) => c.close()))
+  Future close() => Future.wait(_connections.map<Future>((c) => c.close()))
         .then((_) => _pool.close());
-  }
 }

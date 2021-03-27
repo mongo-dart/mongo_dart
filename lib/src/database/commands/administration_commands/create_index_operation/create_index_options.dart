@@ -17,18 +17,18 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 /// @param {ClientSession} [options.session] optional session to use for this operation
 class CreateIndexOptions {
   DbCollection collection;
-  WriteConcern writeConcern;
-  bool uniqueIndex = false;
-  bool sparseIndex = false;
-  bool background = false;
-  bool dropDuplicatedEntries = false;
-  double geoLowerBound;
-  double geoHighBound;
-  double formatVersion;
-  int expireAfterSeconds;
-  String indexName;
-  Map partialFilterExpression;
-  Map collation;
+  WriteConcern? writeConcern;
+  bool uniqueIndex;
+  bool sparseIndex;
+  bool background;
+  bool dropDuplicatedEntries;
+  double? geoLowerBound;
+  double? geoHighBound;
+  double? formatVersion;
+  int? expireAfterSeconds;
+  String? indexName;
+  Map? partialFilterExpression;
+  Map? collation;
 
   // Todo
   //ClientSession session;
@@ -36,10 +36,10 @@ class CreateIndexOptions {
   CreateIndexOptions(
     this.collection, {
     this.writeConcern,
-    this.uniqueIndex,
-    this.sparseIndex,
-    this.background,
-    this.dropDuplicatedEntries,
+    this.uniqueIndex = false,
+    this.sparseIndex = false,
+    this.background = false,
+    this.dropDuplicatedEntries = false,
     this.geoLowerBound,
     this.geoHighBound,
     this.indexName,
@@ -51,25 +51,20 @@ class CreateIndexOptions {
   Map<String, Object> get options => <String, Object>{
         if (writeConcern != null)
           keyWriteConcern:
-              writeConcern.asMap(collection.db.masterConnection.serverStatus),
+              writeConcern!.asMap(collection.db.masterConnection.serverStatus),
         keyUniqueIndex: uniqueIndex,
         keySparseIndex: sparseIndex,
         keyBackground: background,
         keyDropDuplicatedEntries: dropDuplicatedEntries,
-        if (geoLowerBound != null)
-          keyGeoLowerBound: geoLowerBound,
-        if (geoHighBound != null)
-          keyGeoHighBound: geoHighBound,
-        if (formatVersion != null)
-          keyFormatVersion: formatVersion,
+        if (geoLowerBound != null) keyGeoLowerBound: geoLowerBound!,
+        if (geoHighBound != null) keyGeoHighBound: geoHighBound!,
+        if (formatVersion != null) keyFormatVersion: formatVersion!,
         if (expireAfterSeconds != null)
-          keyExpireAfterSeconds: expireAfterSeconds,
-        if (indexName != null)
-          keyIndexName: indexName,
+          keyExpireAfterSeconds: expireAfterSeconds!,
+        if (indexName != null) keyIndexName: indexName!,
         if (partialFilterExpression != null)
-          keyPartialFilterExpression: partialFilterExpression,
-        if (collation != null)
-          keyCollation: collation,
+          keyPartialFilterExpression: partialFilterExpression!,
+        if (collation != null) keyCollation: collation!,
         //if (session 1= null) keySession: session
       };
 }

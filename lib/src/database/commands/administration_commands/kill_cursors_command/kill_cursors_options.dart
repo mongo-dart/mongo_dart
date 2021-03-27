@@ -15,10 +15,10 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 ///   limiting it to String only.
 ///
 class KillCursorsOptions {
-  final String comment;
+  final String? comment;
 
   KillCursorsOptions({this.comment});
   Map<String, Object> get options => <String, Object>{
-        if (comment != null) keyComment: comment,
+        if (comment != null) keyComment: comment!,
       };
 }

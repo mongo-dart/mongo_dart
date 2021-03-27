@@ -6,10 +6,8 @@ class ClientFirst extends SaslStep {
   String rPrefix;
 
   ClientFirst(Uint8List bytesToSendToServer, this.credential,
-      this.clientFirstMessageBare, this.rPrefix) {
-    this.bytesToSendToServer = bytesToSendToServer;
-    isComplete = false;
-  }
+      this.clientFirstMessageBare, this.rPrefix)
+      : super(bytesToSendToServer);
 
   @override
   SaslStep transition(
@@ -18,7 +16,7 @@ class ClientFirst extends SaslStep {
 
     Map<String, dynamic> decodedMessage = parsePayload(serverFirstMessage);
 
-    final r = decodedMessage['r'] as String;
+    final r = decodedMessage['r'] as String?;
     if (r == null || !r.startsWith(rPrefix)) {
       throw MongoDartError('Server sent an invalid nonce.');
     }
@@ -110,10 +108,8 @@ class ClientFirst extends SaslStep {
 class ClientLast extends SaslStep {
   Uint8List serverSignature64;
 
-  ClientLast(Uint8List bytesToSendToServer, this.serverSignature64) {
-    this.bytesToSendToServer = bytesToSendToServer;
-    isComplete = false;
-  }
+  ClientLast(Uint8List bytesToSendToServer, this.serverSignature64)
+      : super(bytesToSendToServer);
 
   @override
   SaslStep transition(
@@ -131,10 +127,7 @@ class ClientLast extends SaslStep {
 }
 
 class CompletedStep extends SaslStep {
-  CompletedStep() {
-    bytesToSendToServer = Uint8List(0);
-    isComplete = true;
-  }
+  CompletedStep() : super(Uint8List(0), isComplete: true);
 
   @override
   SaslStep transition(
@@ -154,10 +147,13 @@ class ScramSha1Mechanism extends SaslMechanism {
 
   @override
   SaslStep initialize(Connection connection) {
-    if (connection == null) throw ArgumentError("Connection can't be null");
+    //if (connection == null) throw ArgumentError("Connection can't be null");
+    if (credential.username == null) {
+      throw MongoDartError('');
+    }
 
     final gs2Header = 'n,,';
-    var username = 'n=${prepUsername(credential.username)}';
+    var username = 'n=${prepUsername(credential.username!)}';
     var r = randomStringGenerator.generate(20); // TODO Change this
 
     var nonce = 'r=$r';

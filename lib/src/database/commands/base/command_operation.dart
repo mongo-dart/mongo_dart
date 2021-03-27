@@ -15,35 +15,42 @@ import '../parameters/read_preference.dart'
 import 'operation_base.dart' show Aspect, OperationBase;
 
 class CommandOperation extends OperationBase {
-  Db db;
-  DbCollection collection;
-  Map<String, Object> command;
-  String namespace;
-  ReadPreference readPreference;
+  late Db db;
+  DbCollection? collection;
+  Map<String, Object>? command;
+  //String namespace;
+  ReadPreference? readPreference;
 
-  CommandOperation(this.db, Map<String, Object> options,
-      {this.collection, this.command, Aspect aspect, Connection connection})
-      : super(options, connection: connection) {
+  CommandOperation(Db? db, Map<String, Object> options,
+      {this.collection, this.command, Aspect? aspect, Connection? connection})
+      : super(options, connection: connection, aspects: aspect) {
     db ??= collection?.db;
-    aspect ??= Aspect.noInheritOptions;
-    defineAspects(aspect);
+    //aspect ??= Aspect.noInheritOptions;
+    //defineAspects(aspect);
     if (db == null) {
       throw MongoDartError('Database reference required for this command');
     }
+    this.db = db;
   }
 
-  Map<String, Object> $buildCommand() => command;
+  Map<String, Object> $buildCommand() => command == null
+      ? throw MongoDartError('Command not specified')
+      : command!;
 
-  void processOptions(Map<String, Object> command) {
+  void processOptions(Map<String, Object?> command) {
     // Get the db name we are executing against
-    final dbName = (options[keyDbName] as String) ??
-        ((options[keyAuthdb] as String) ?? db.databaseName);
-    options.removeWhere((key, value) => key == keyDbName || key == keyAuthdb);
-    if (dbName != null) {
-      command[keyDatabaseName] = dbName;
+    final dbName = (options[keyDbName] as String?) ??
+        ((options[keyAuthdb] as String?) ?? db.databaseName);
+    if (dbName == null) {
+      throw MongoDartError('Database name not specified');
     }
+    options.removeWhere((key, value) => key == keyDbName || key == keyAuthdb);
+    //if (dbName != null) {
+    command[keyDatabaseName] = dbName;
+    //}
     if (hasAspect(Aspect.writeOperation)) {
-      applyWriteConcern(options, options, db: db, collection: collection);
+      applyWriteConcern(options,
+          options: options, db: db, collection: collection);
       readPreference = ReadPreference.primary;
     } else {
       // Todo we have to manage Session
@@ -65,7 +72,7 @@ class CommandOperation extends OperationBase {
   }
 
   @override
-  Future<Map<String, Object>> execute() async {
+  Future<Map<String, Object?>> execute() async {
     final db = this.db;
     if (db.state != State.OPEN) {
       throw MongoDartError('Db is in the wrong state: ${db.state}');
@@ -92,8 +99,7 @@ class CommandOperation extends OperationBase {
     //print(command);
     var modernMessage = MongoModernMessage(command);
 
-    return db.executeModernMessage(modernMessage,
-        connection: connection /*, writeConcern*/);
+    return db.executeModernMessage(modernMessage, connection: connection);
   }
 }
 
@@ -104,9 +110,8 @@ class CommandOperation extends OperationBase {
 /// @param {Object} sources sources where we can inherit default write concerns from
 /// @param {Object} [options] optional settings passed into a command for write concern overrides
 /// @returns {Object} the (now) decorated target
-Map<String, Object> applyWriteConcern(
-    Map<String, Object> target, Map<String, Object> options,
-    {Db db, DbCollection collection}) {
+Map<String, Object> applyWriteConcern(Map<String, Object> target,
+    {Map<String, Object>? options, Db? db, DbCollection? collection}) {
   options ??= <String, Object>{};
 
   //Todo Session not yet implemented
@@ -128,7 +133,7 @@ Map<String, Object> applyWriteConcern(
 
   if (!identical(target, options) && options.containsKey(keyWriteConcern)) {
     if (options[keyWriteConcern] != null) {
-      target[keyWriteConcern] = options[keyWriteConcern];
+      target[keyWriteConcern] = options[keyWriteConcern]!;
       return target;
     }
   }
@@ -141,7 +146,7 @@ Map<String, Object> applyWriteConcern(
 
   if (db != null && db.writeConcern != null) {
     target[keyWriteConcern] =
-        db.writeConcern.asMap(db.masterConnection.serverStatus);
+        db.writeConcern!.asMap(db.masterConnection.serverStatus);
     return target;
   }
 

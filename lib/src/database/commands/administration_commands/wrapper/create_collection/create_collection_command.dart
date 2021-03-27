@@ -38,8 +38,8 @@ import 'create_collection_options.dart';
 ///   (must be manually set)
 class CreateCollectionCommand extends CreateCommand {
   CreateCollectionCommand(Db db, String name,
-      {CreateCollectionOptions createCollectionOptions,
-      Map<String, Object> rawOptions})
+      {CreateCollectionOptions? createCollectionOptions,
+      Map<String, Object>? rawOptions})
       : super(db, name,
             createOptions: createCollectionOptions, rawOptions: rawOptions);
 }

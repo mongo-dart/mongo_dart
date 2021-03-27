@@ -6,9 +6,9 @@ import 'bulk_options.dart';
 
 class OrderedBulk extends Bulk {
   OrderedBulk(DbCollection collection,
-      {WriteConcern writeConcern,
-      Map<String, Object> rawOptions,
-      bool bypassDocumentValidation})
+      {WriteConcern? writeConcern,
+      Map<String, Object>? rawOptions,
+      bool? bypassDocumentValidation})
       : super(collection,
             bulkOptions: BulkOptions(
                 writeConcern: writeConcern,
@@ -61,8 +61,10 @@ class OrderedBulk extends Bulk {
     var commandKey = command.keys.first;
     var lastCommandKey = commands.last.keys.first;
     if (commandKey == lastCommandKey) {
-      var commandValue = command.values.toList()[1];
-      List lastCommandValues = commands.last.values.toList()[1];
+      var commandValue =
+          command.values.toList()[1] as List<Map<String, Object?>>;
+      var lastCommandValues =
+          commands.last.values.toList()[1] as List<Map<String, Object?>>;
       commandsOrigin.last[lastCommandValues.length] = operationInputIndex++;
       lastCommandValues.addAll(commandValue);
     } else {

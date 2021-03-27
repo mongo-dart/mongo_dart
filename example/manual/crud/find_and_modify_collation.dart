@@ -6,20 +6,14 @@ const dbAddress = '127.0.0.1';
 const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void main() async {
-  Db db;
-
-  Future initializeDatabase() async {
-    db = Db(DefaultUri);
-    await db.open();
-  }
+  var db = Db(DefaultUri);
+  await db.open();
 
   Future cleanupDatabase() async {
     await db.close();
   }
 
-  await initializeDatabase();
-  if (db.masterConnection == null ||
-      !db.masterConnection.serverCapabilities.supportsOpMsg) {
+  if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
     return;
   }
 
@@ -36,17 +30,17 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-   var res = await collection.modernFindAndModify(
-            query: where.eq('category', 'cafe').eq('status', 'a'),
-            sort: <String, dynamic>{'category': 1},
-            update: ModifierBuilder().set('status', 'updated'),
-            findAndModifyOptions: FindAndModifyOptions(
-                collation: CollationOptions('fr', strength: 1)));
+  var res = await collection.modernFindAndModify(
+      query: where.eq('category', 'cafe').eq('status', 'a'),
+      sort: <String, dynamic>{'category': 1},
+      update: ModifierBuilder().set('status', 'updated'),
+      findAndModifyOptions:
+          FindAndModifyOptions(collation: CollationOptions('fr', strength: 1)));
 
-  print('Updated document: ${res.lastErrorObject.updatedExisting}'); // true
+  print('Updated document: ${res.lastErrorObject?.updatedExisting}'); // true
 
   print('Modified element original category: '
-      '${res.value['category']}'); // 'café';
+      '${res.value?['category']}'); // 'café';
 
   await cleanupDatabase();
 }

@@ -20,17 +20,17 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 /// `$clusterTime` => @Since 3.6 - a [$ClusterTime] object
 
 mixin TimingResult {
-  DateTime operationTime;
-  $ClusterTime $clusterTime;
+  DateTime? operationTime;
+  $ClusterTime? $clusterTime;
 
-  void extractTiming(Map<String, Object> document) {
-    document ??= <String, Object>{};
+  void extractTiming(Map<String, Object?> document) {
+    //document ??= <String, Object>{};
     var opTime = document[keyOperationTime];
     if (opTime is Timestamp) {
       operationTime =
           DateTime.fromMillisecondsSinceEpoch(opTime.seconds * 1000);
     } else if (opTime is DateTime) {
-      operationTime = document[keyOperationTime];
+      operationTime = opTime;
     }
 
     $clusterTime = $ClusterTime(document);
@@ -40,17 +40,17 @@ mixin TimingResult {
 /// A document that contains the hash of the cluster time
 /// and the id of the key used to sign the cluster time.
 class Signature {
-  BsonBinary hash;
-  int keyId;
+  BsonBinary? hash;
+  int? keyId;
 
-  Signature(Map<String, Object> document) {
+  Signature(Map<String, Object?> document) {
     _extract(document);
   }
 
-  void _extract(Map<String, Object> document) {
-    document ??= <String, Object>{};
-    keyId = document[keyKeyId];
-    hash = document[keyHash];
+  void _extract(Map<String, Object?> document) {
+    //document ??= <String, Object>{};
+    keyId = document[keyKeyId] as int?;
+    hash = document[keyHash] as BsonBinary?;
   }
 }
 
@@ -62,16 +62,16 @@ class Signature {
 /// `clusterTime` => timestamp of the highest known cluster time for the member.
 /// `signature`: => a [Signature] object
 class $ClusterTime {
-  DateTime clusterTime;
-  Signature signature;
+  DateTime? clusterTime;
+  Signature? signature;
 
-  $ClusterTime(Map<String, Object> document) {
+  $ClusterTime(Map<String, Object?> document) {
     _extract(document);
   }
 
-  void _extract(Map<String, Object> document) {
-    document ??= <String, Object>{};
-    clusterTime = document[keyClusterTime];
+  void _extract(Map<String, Object?> document) {
+    //document ??= <String, Object>{};
+    clusterTime = document[keyClusterTime] as DateTime?;
     signature = Signature(document);
   }
 }

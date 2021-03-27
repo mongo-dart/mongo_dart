@@ -1,5 +1,4 @@
-import 'package:mongo_dart/mongo_dart.dart'
-    show Db, MongoDartError, WriteConcern;
+import 'package:mongo_dart/mongo_dart.dart' show Db, WriteConcern;
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
 import 'get_last_error_options.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
@@ -33,9 +32,9 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 ///   - a set of optional values for the command
 class GetLastErrorCommand extends CommandOperation {
   GetLastErrorCommand(Db db,
-      {WriteConcern writeConcern,
-      GetLastErrorOptions getLastErrorOptions,
-      Map<String, Object> rawOptions})
+      {WriteConcern? writeConcern,
+      GetLastErrorOptions? getLastErrorOptions,
+      Map<String, Object>? rawOptions})
       : super(db, <String, Object>{
           ...?getLastErrorOptions?.options,
           ...?rawOptions
@@ -43,9 +42,6 @@ class GetLastErrorCommand extends CommandOperation {
           keyGetLastError: 1,
           //keyDbName: db.databaseName,
         }) {
-    if (db == null) {
-      throw MongoDartError('Database required in call to GetLastErrorCommand');
-    }
     if (writeConcern != null) {
       options = {
         ...writeConcern.asMap(db.masterConnection.serverStatus)
@@ -62,10 +58,10 @@ class GetLastErrorCommand extends CommandOperation {
   }
   // this is needed for compatibility with old command version
   @override
-  Future<Map<String, Object>> execute() async {
+  Future<Map<String, Object?>> execute() async {
     var result = await super.execute();
-    if (result != null && result.isNotEmpty) {
-      String res = result['err'];
+    if (result.isNotEmpty) {
+      var res = result['err'] as String?;
       if (res != null && res.isNotEmpty) {
         throw result;
       }
