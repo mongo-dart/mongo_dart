@@ -2,7 +2,13 @@
 
 ## Recent change notes
 
-### version: 0.7.0-nullsafety.1
+### 0.7.0-nullsafety.2
+
+- Example of cursor use.
+- Created cursor.batchSize variable
+- Fix on setting operation batchSize to zero
+
+### 0.7.0-nullsafety.1
 
 - Null-safety port - first step
 - Uuid fields (UuidType class)

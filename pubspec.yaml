@@ -1,5 +1,5 @@
 name: mongo_dart
-version: 0.7.0-nullsafety.1
+version: 0.7.0-nullsafety.2
 description: MongoDB driver, implemented in pure Dart. All CRUD operations, aggregation pipeline and more!
 homepage: https://github.com/mongo-dart/mongo_dart
 
@@ -14,7 +14,7 @@ dependencies:
   collection: ^1.15.0
   path: ^1.8.0
   pool: ^1.5.0
-  basic_utils: ^3.0.0-nullsafety.1
+  basic_utils: ^3.0.0-nullsafety.3
   rational: ^1.0.0
   uuid: ^3.0.0
   
