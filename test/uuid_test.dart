@@ -1,7 +1,6 @@
 @Timeout(Duration(seconds: 100))
 
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:rational/rational.dart';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart' hide UuidValue;
 
@@ -26,17 +25,6 @@ void main() async {
     await db.open();
   }
 
-  Future insertManyDocuments(
-      DbCollection collection, int numberOfRecords) async {
-    await collection.remove(<String, dynamic>{});
-    var toInsert = <Map<String, dynamic>>[];
-    for (var n = 0; n < numberOfRecords; n++) {
-      toInsert.add({'a': Rational.fromInt(n)});
-    }
-
-    await collection.insertAll(toInsert);
-  }
-
   Future cleanupDatabase() async {
     await db.close();
   }
@@ -55,7 +43,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var uuid = UuidValue.v4();
+        var uuid = Uuid().v4obj();
         await collection.insertOne({'uuid': uuid, 'null': null});
 
         var values = await collection.find(where.eq('uuid', uuid)).toList();
@@ -69,7 +57,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var uuid = UuidValue.v4();
+        var uuid = Uuid().v4obj();
         await collection.insertOne({'uuid': uuid, 'null': null});
 
         await collection.updateOne(
@@ -86,10 +74,10 @@ void main() async {
       test('replace Uuid', () async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
-        var uuid = UuidValue.v4();
+        var uuid = Uuid().v4obj();
         await collection.insertOne({'uuid': uuid, 'null': null});
 
-        var uuidNew = UuidValue.v4();
+        var uuidNew = Uuid().v4obj();
         await collection.replaceOne(
             where.eq('notNull', 0), {'uuid': uuidNew, 'notNull': 0},
             upsert: true);
@@ -105,7 +93,7 @@ void main() async {
       test('delete Uuid', () async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
-        var uuid = UuidValue.v4();
+        var uuid = Uuid().v4obj();
         await collection.insertOne({'uuid': uuid, 'null': null});
 
         await collection.deleteOne(where.eq('uuid', uuid));
