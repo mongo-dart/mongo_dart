@@ -117,8 +117,17 @@ class UnorderedBulk extends Bulk {
 
   @override
   List<Map<int, int>> getBulkInputOrigins() => <Map<int, int>>[
-        ...splitInputOrigins(insertCommandsOrigin, insertCommand.length),
-        ...splitInputOrigins(updateCommandsOrigin, updateCommand.length),
-        ...splitInputOrigins(deleteCommandsOrigin, deleteCommand.length),
+        if (insertCommand[keyInsertArgument] != null &&
+            (insertCommand[keyInsertArgument] as List).isNotEmpty)
+          ...splitInputOrigins(insertCommandsOrigin,
+              (insertCommand[keyInsertArgument] as List).length),
+        if (updateCommand[keyUpdateArgument] != null &&
+            (updateCommand[keyUpdateArgument] as List).isNotEmpty)
+          ...splitInputOrigins(updateCommandsOrigin,
+              (updateCommand[keyUpdateArgument] as List).length),
+        if (deleteCommand[keyDeleteArgument] != null &&
+            (deleteCommand[keyDeleteArgument] as List).isNotEmpty)
+          ...splitInputOrigins(deleteCommandsOrigin,
+              (deleteCommand[keyDeleteArgument] as List).length),
       ];
 }

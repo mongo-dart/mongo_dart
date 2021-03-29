@@ -2,6 +2,13 @@
 
 ## Recent change notes
 
+### 0.5.0
+
+- Added batchSize variable to ModernCursor class
+- Added cursor example
+- Fixed index count problem in unordered bulk write operations
+- Fixed setting batchSize to 0 in Cursor operaation.
+
 ### 0.5.0-beta
 
 - Added tls client and server certificate management

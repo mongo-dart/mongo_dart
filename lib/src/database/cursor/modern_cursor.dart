@@ -11,15 +11,21 @@ import 'package:mongo_dart/src/database/commands/aggreagation_commands/wrapper/c
 import 'package:mongo_dart/src/database/commands/aggreagation_commands/wrapper/change_stream/change_stream_operation.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_operation/find_operation.dart';
+import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_options.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 import '../../../mongo_dart.dart';
+
+const defaultBatchSize = 101;
 
 typedef MonadicBlock = void Function(Map<String, dynamic> value);
 
 class ModernCursor {
   ModernCursor(this.operation,
-      {this.checksumPresent, this.moreToCome, this.exhaustAllowed})
+      {this.checksumPresent,
+      this.moreToCome,
+      this.exhaustAllowed,
+      int batchSize})
       : collection = operation.collection,
         db = operation.collection?.db ?? operation.db {
     if (operation is FindOperation && collection == null) {
@@ -31,6 +37,15 @@ class ModernCursor {
     } else if (operation is ChangeStreamOperation) {
       isChangeStream = tailable = awaitData = true;
     }
+    var internalBatchSize = batchSize;
+    if (internalBatchSize == null) {
+      var operationBatchSize = operation.options[keyBatchSize] as int;
+      if (operationBatchSize != null && operationBatchSize != 0) {
+        internalBatchSize = operationBatchSize;
+      }
+    }
+
+    _batchSize = internalBatchSize ?? defaultBatchSize;
   }
 
   /// This method allows the creation of the cursor from the Id and the
@@ -61,6 +76,7 @@ class ModernCursor {
     if (isChangeStream) {
       tailable = awaitData = true;
     }
+    _batchSize = defaultBatchSize;
   }
 
   State state = State.INIT;
@@ -71,6 +87,16 @@ class ModernCursor {
   bool tailable = false;
   bool awaitData = false;
   bool isChangeStream = false;
+
+  // Batch size for the getMore command if different from the default
+  int _batchSize;
+  int get batchSize => _batchSize;
+  set batchSize(int _value) {
+    if (_value < 0) {
+      throw MongoDartError('Batch size must be a non negative value');
+    }
+    _batchSize = _value;
+  }
 
   // in case of collection agnostic commands (aggregate) is the name
   // of the collecton as returns from the first batch (taken from ns)
@@ -147,8 +173,13 @@ class ModernCursor {
       return _getNextItem();
     }
 
+    var justPrepareCursor = false;
     Map<String, Object> result;
     if (state == State.INIT) {
+      if (operation.options[keyBatchSize] != null &&
+          operation.options[keyBatchSize] == 0) {
+        justPrepareCursor = true;
+      }
       result = await operation.execute();
       state = State.OPEN;
     } else if (state == State.OPEN) {
@@ -156,7 +187,9 @@ class ModernCursor {
         return _serverSideCursorClose();
       }
       var command = GetMoreCommand(collection, cursorId,
-          db: db, collectionName: collectionName);
+          db: db,
+          collectionName: collectionName,
+          getMoreOptions: GetMoreOptions(batchSize: _batchSize));
       result = await command.execute();
     }
     if (result[keyOk] == 0.0) {
@@ -168,6 +201,11 @@ class ModernCursor {
     cursorId = cursorMap == null ? 0 : BsonLong(cursorMap[keyId] ?? 0);
     // The result map returns last records while setting cursorId to zero.
     extractCursorData(result);
+    // batch size for "first batch" was 0, no data returned.
+    // Just prepared the cursor for further fetching
+    if (justPrepareCursor) {
+      return nextObject();
+    }
     if (items.isNotEmpty) {
       return _getNextItem();
     }
