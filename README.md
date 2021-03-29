@@ -1,13 +1,6 @@
 # Mongo-dart - MongoDB driver for Dart programming language
 
-[![Pub](https://img.shields.io/pub/v/mongo_dart.svg)](https://pub.dartlang.org/packages/mongo_dart)
-[![Build Status](https://travis-ci.org/mongo-dart/mongo_dart.svg?branch=master)](https://travis-ci.org/mongo-dart/mongo_dart)
-
 Server-side driver library for MongoDb implemented in pure Dart.
-
-## Development release
-
-Please, note that this is a development release, published only to permit testing and suggestions from the users. Do not use in production.  See OP_MSG section
 
 ## Basic usage
 

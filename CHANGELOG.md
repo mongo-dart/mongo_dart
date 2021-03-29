@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+### 0.5.0+1
+
+- Updated Readme
+
 ### 0.5.0
 
 - Added batchSize variable to ModernCursor class
