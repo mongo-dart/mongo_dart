@@ -2,7 +2,7 @@
 
 ## Recent change notes
 
-### 0.5.0+2
+### 0.5.1-rc.1
 
 - Partially updated dependencies.
 
