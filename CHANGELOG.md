@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+### 0.5.0+2
+
+- Partially updated dependencies.
+
 ### 0.5.0+1
 
 - Updated Readme
