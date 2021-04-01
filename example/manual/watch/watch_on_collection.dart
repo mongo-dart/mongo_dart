@@ -11,7 +11,7 @@ void main() async {
 
   await db.open();
 
-  var collection = db.collection('watchCollection');
+  var collection = db.collection('watch-collection');
   // clean data if the example is run more than once.
   await collection.drop();
 
@@ -90,9 +90,9 @@ void main() async {
       return false;
     }
     print('Waiting for change to be detected...');
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(seconds: 2));
     waitingCount++;
-    if (waitingCount > 5) {
+    if (waitingCount > 7) {
       throw StateError('Something went wrong :-(');
     }
 

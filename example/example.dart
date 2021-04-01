@@ -21,7 +21,7 @@ void main() async {
   print('====================================================================');
   print('>> Adding Authors');
   var collection = db.collection('authors');
-  await collection.insertAll([
+  await collection.insertMany([
     {
       'name': 'William Shakespeare',
       'email': 'william@shakespeare.com',
@@ -42,7 +42,7 @@ void main() async {
   print('====================================================================');
   print('>> Adding Users');
   var usersCollection = db.collection('users');
-  await usersCollection.insertAll([
+  await usersCollection.insertMany([
     {'login': 'jdoe', 'name': 'John Doe', 'email': 'john@doe.com'},
     {'login': 'lsmith', 'name': 'Lucy Smith', 'email': 'lucy@smith.com'}
   ]);
@@ -59,7 +59,7 @@ void main() async {
   print('====================================================================');
   print('>> Adding articles');
   var articlesCollection = db.collection('articles');
-  await articlesCollection.insertAll([
+  await articlesCollection.insertMany([
     {
       'title': 'Caminando por Buenos Aires',
       'body': 'Las callecitas de Buenos Aires tienen ese no se que...',

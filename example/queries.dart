@@ -7,7 +7,7 @@ void main() async {
   await db.open();
   print('connection open');
   coll = db.collection('simple_data');
-  await coll.remove({});
+  await coll.deleteMany({});
   print('Packing data to insert into collection by Bson...');
   for (var n = 0; n < 1000; n++) {
     await coll.insert({'my_field': n, 'str_field': 'str_$n'});
@@ -29,7 +29,7 @@ void main() async {
   val = await coll.findOne(where.id(id));
   print('Filtered by _id=$id: $val');
   print('Removing doc with _id=$id');
-  await coll.remove(where.id(id));
+  await coll.deleteOne(where.id(id));
   val = await coll.findOne(where.id(id));
   print('Filtered by _id=$id: $val. There more no such a doc');
   await coll
@@ -69,7 +69,7 @@ void main() async {
   await coll
       .find(where.jsQuery('this.my_field % 100 == 35'))
       .forEach((v) => print(v));
-  var count = coll.count(where.gt('my_field', 995));
+  var count = await coll.count(where.gt('my_field', 995));
   print('Count of records with my_field > 995: $count');
   var databases = await db.listDatabases();
   print('List of databases: $databases');

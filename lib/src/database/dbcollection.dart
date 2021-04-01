@@ -347,7 +347,7 @@ class DbCollection {
       return selector.map[key$Query] as Map<String, dynamic>? ??
           <String, dynamic>{};
     }
-    return selector as Map<String, dynamic>;
+    return <String, dynamic>{...?(selector as Map?)};
   }
 
   Map<String, dynamic> _queryBuilder2Map(Object query) {

@@ -11,7 +11,7 @@ void main() async {
 
   await db.open();
 
-  var collection = db.collection('watchCollection');
+  var collection = db.collection('watch-collection-insert');
   // clean data if the example is run more than once.
   await collection.drop();
 
@@ -37,13 +37,13 @@ void main() async {
   /// *** Note ***
   /// In our case, if we do not specify 'updateLookup' the returned document
   /// will not contain the 'custId' field (for updates)
-  var stream = collection.watch(
-      <Map<String, Object>>[
-        {
-          '\$match': {'operationType': 'insert'}
-        }
-      ],
-      changeStreamOptions: ChangeStreamOptions(fullDocument: 'updateLookup'));
+  var stream = collection.watch(<Map<String, Object>>[
+    {
+      r'$match': {'operationType': 'insert'}
+    }
+  ] /* ,
+      changeStreamOptions: ChangeStreamOptions(fullDocument: 'updateLookup') */
+      );
 
   var pleaseClose = false;
 
@@ -72,17 +72,17 @@ void main() async {
   var waitingCount = 0;
   await Future.doWhile(() async {
     if (pleaseClose) {
-      print('Change detected, closing stream and db.');
+      print('Insert detected, closing stream and db.');
 
       /// This is the correct way to cancel the watch subscription
       await controller.cancel();
       await db.close();
       return false;
     }
-    print('Waiting for change to be detected...');
-    await Future.delayed(Duration(seconds: 1));
+    print('Waiting for insert to be detected...');
+    await Future.delayed(Duration(seconds: 2));
     waitingCount++;
-    if (waitingCount > 5) {
+    if (waitingCount > 7) {
       throw StateError('Something went wrong :-(');
     }
 

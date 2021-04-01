@@ -18,7 +18,7 @@ void main() async {
     return;
   }
 
-  var collectionName = 'delete-one';
+  var collectionName = 'delete-one-collation';
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
