@@ -53,10 +53,10 @@ Provided that all files are in PEM format (that one that has a '----- Begin ....
 
 - .key files -> Are files in PEM format containing the private key. They can be password protected or gpg encrypted (in this last case you have to decrypt them before using)
 - .csr files -> Are files in PEM format containing the certificate request. As they are of no use in or case, I delete them after that the public certificate have been created.
-- .crt files -> Are files in PEM format containing the public key. Those endind with -full-chain.crt contains a list of certificates in importatnce order (from less to more important). In our case the your-ca-name-full-chain.crt fille will contain two certificates: your-ca-name-ia.crt + your-ca-name-ca.crt strictly in this order. Inverting the order of the certificated causes strange and incomprehensible errors when trying to connect. The mongo db tutorial call these as .pem.
-- .pem files -> Are files in PEM format containing a public and a private key. Nornally they are concatenend in this order, and this works. I have never tried to change the order, but I cannot guarantee that it would work.
+- .crt files -> Are files in PEM format containing the public key. Those endind with -full-chain.crt contains a list of certificates in importatnce order (from less to more important). In our case the your-ca-name-full-chain.crt file will contain two certificates: your-ca-name-ia.crt + your-ca-name-ca.crt strictly in this order. Inverting the order of the certificates causes strange and incomprehensible errors when trying to connect. The mongo db tutorial call these as .pem.
+- .pem files -> Are files in PEM format containing a public and a private key. Normally they are concatenated in this order, and this works. I have never tried to change the order, but I cannot guarantee that it would work.
 
-I explicitly specify "PEM" format because there is also another kind of format, the "DER" one. I didn't use it, so I cannot give you more details on it, with the exception that I'm sure that you can convert the teo formats back and forth.
+I explicitly specify "PEM" format because there is also another kind of format, the "DER" one. I didn't use it, so I cannot give you more details on it, with the exception that I'm sure that you can convert the two formats back and forth.
 So, please note that the PEM format does not only refers to the .pem files.
 
 ## Server certificates
@@ -79,9 +79,9 @@ You can follow it or [run the script](script/server-certificate.sh) I have prepa
 You can run it in the cert folder generated before (the intermediate key file ".key" must be decrypted if you used gpg), in this way:
 move to the cert folder, run the command ./server-certificate.sh your-ca-name server-ip-address dns-server-name.
 The dns-server-name is optional. If you give it, you will need to use that name in the mongodb connection string.
-The script will require some parameters, set them as you like, be only careful to set the "Organization name" and the "Organizational Unit name" equal for all the servers that you will generate. Also the DC (Domain Component) parameters must be equal, but the script will not ask you for it.
+The script will require some parameters, set them as you like, only be careful to set the "Organization name" and the "Organizational Unit name" equal for all the servers that you will generate. Also the DC (Domain Component) parameters must be equal, but the script will not ask you for it.
 
-Create all servers certificates and send them to the servers in a safe way.
+Create all servers certificates and send them to the servers in a safe way (at least "your-server-name.pem" and "your-ca-name-full-chain.crt").
 
 ## Install certificates
 
@@ -93,12 +93,12 @@ Now that we have the certificates on the server we have to store them somewhere.
 - move certs to the new directory(```sudo mv path-to-cert-file/*.pem .```)
 - move certs to the new directory(```sudo mv path-to-cert-file/*.crt .```)
 - set the mongodb user ownership (or any user running mongodb), ```sudo chown mongodb:mongodb *```,
-- set restricted file permission, ```sudo chmod 600 *.pem```
+- set restricted file permission, ```sudo chmod 600 *```
 - go back to the /var/local folder (```cd ..```)
 - change the owner also for the mongodb folder (```sudo chown mongodb:mongodb /var/local/mongodb```)
 - change also the dir permission (```sudo chmod 770 /var/local/mongodb```)
 
-Ok, now we only to change the configuration file and restart the mongod daemon.
+Ok, now we only have to change the configuration file and restart the mongod daemon.
 Here I'm assuming that you are running mongod as a daemon, if not you can already run it on the command line
 (```mongod --tlsMode requireTLS --tlsCertificateKeyFile <pem>```)
 

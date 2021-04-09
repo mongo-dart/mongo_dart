@@ -81,7 +81,7 @@ So, if we use the suggested location:
 - move certs to the new directory(```sudo mv path-to-cert-file/*.pem .```)
 - move certs to the new directory(```sudo mv path-to-cert-file/*.crt .```)
 - set the user ownership, ```sudo chown your-user:your-user *```,
-- set restricted file permission, ```sudo chmod 600 *.pem```
+- set restricted file permission, ```sudo chmod 600 *```
 - go back to the home folder (```cd ..```)
 - change the owner also for the mongodb folder (```sudo chown your-user:your-user mongodb```)
 - change also the dir permission (```sudo chmod 770 mongodb```)
@@ -112,5 +112,4 @@ or
 
 If the key was password protected you must add also the `tlsCertificateKeyFilePassword` parameter, either in the connection string or as a `db.open()` parameter.
 
-[Prev doc.](tls_connection_no_auth_self_signed_certificate.md) 
-
+[Prev doc.](tls_connection_no_auth_self_signed_certificate.md)

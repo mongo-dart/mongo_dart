@@ -1356,6 +1356,7 @@ Future testSimpleQuery() async {
   }
   expect(result1['my_field'], 3);
   id = result1['_id'] as ObjectId;
+  expect(id.toHexString(), id.$oid);
 
   var result2 = await collection.findOne(where.id(id));
   expect(result2, isNotNull);
