@@ -1,5 +1,5 @@
 name: mongo_dart
-version: 0.5.1-rc.1
+version: 0.5.1
 description: MongoDB driver, implemented in pure Dart. All CRUD operations, aggregation pipeline and more!
 homepage: https://github.com/mongo-dart/mongo_dart
 environment:
@@ -12,7 +12,7 @@ dependencies:
   collection: ^1.15.0
   path: ^1.7.0
   pool: ^1.4.0
-  basic_utils: ^3.0.0-nullsafety.3
+  basic_utils: ^3.0.0
   rational: ^0.3.8
 dev_dependencies:
   test: ^1.16.4
