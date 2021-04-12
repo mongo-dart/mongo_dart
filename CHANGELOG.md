@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+### 0.5.0+2
+
+- Fixed problem with tlsCAFile parameter if passed more than once
+
 ### 0.5.0+1
 
 - Updated Readme
