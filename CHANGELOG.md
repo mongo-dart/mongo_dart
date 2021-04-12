@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+### 0.7.0
+
+- Fixed problem with tls CAFile parameter if passed more than once.
+
 ### 0.7.0-nullsafety.3
 
 - Documentation and examples
