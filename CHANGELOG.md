@@ -2,6 +2,14 @@
 
 ## Recent change notes
 
+### 0.5.1+1
+
+- Fixed problem with tlsCAFile parameter if passed more than once
+
+### 0.5.1
+
+- Final dependency update
+
 ### 0.5.1-rc.1
 
 - Partially updated dependencies.

@@ -5,6 +5,8 @@ const noSecureRequestError = 'The socket connection has been reset by peer.'
     '\n- Trying to connect to an ssl/tls encrypted database without specifiyng'
     '\n  either the query parm tls=true '
     'or the secure=true parameter in db.open()'
+    '\n- The server requires a key certificate from the client, '
+    'but no certificate has been sent'
     '\n- Others';
 
 class _ServerCapabilities {
@@ -65,6 +67,7 @@ class _ServerCapabilities {
 }
 
 class Connection {
+  static bool _caCertificateAlreadyInHash = false;
   final Logger _log = Logger('Connection');
   final _ConnectionManager _manager;
   ServerConfig serverConfig;
@@ -97,7 +100,8 @@ class Connection {
     try {
       if (serverConfig.isSecure) {
         var securityContext = SecurityContext.defaultContext;
-        if (serverConfig.tlsCAFileContent != null) {
+        if (serverConfig.tlsCAFileContent != null &&
+            !_caCertificateAlreadyInHash) {
           securityContext
               .setTrustedCertificatesBytes(serverConfig.tlsCAFileContent);
         }
@@ -118,6 +122,18 @@ class Connection {
       } else {
         _socket = await Socket.connect(serverConfig.host, serverConfig.port);
       }
+    } on TlsException catch (e) {
+      if (e.osError?.message
+              ?.contains('CERT_ALREADY_IN_HASH_TABLE(x509_lu.c:356)') ??
+          false) {
+        _caCertificateAlreadyInHash = true;
+        return connect();
+      }
+      _closed = true;
+      connected = false;
+      var ex = ConnectionException(
+          'Could not connect to ${serverConfig.hostUrl}\n- $e');
+      throw ex;
     } catch (e) {
       _closed = true;
       connected = false;
