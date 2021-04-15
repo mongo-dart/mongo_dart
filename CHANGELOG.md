@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+### 0.7.0+1
+
+- changed documentation references, now pointing directly on GitHub
+
 ### 0.7.0
 
 - Fixed problem with tls CAFile parameter if passed more than once.
