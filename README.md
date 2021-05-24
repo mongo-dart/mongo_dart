@@ -139,7 +139,7 @@ You can update the whole document with method `replaceOne` if you have mongoDb v
 ```dart
   var v1 = await coll.findOne({"name": "c"});
   v1["value"] = 31;
-  await coll.replaceOne(v1);
+  await coll.replaceOne({"name": "c"}, v1);
 ```
 
 ([Example....](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/replace_one.dart))

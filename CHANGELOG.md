@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+### 0.7.0+2
+
+- Fix in README. There was a wrong example on how to call the replaceOne method.
+
 ### 0.7.0+1
 
 - changed documentation references, now pointing directly on GitHub
