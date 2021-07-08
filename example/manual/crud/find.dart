@@ -40,7 +40,7 @@ void main() async {
     'rating': {r'$gt': 10}
   }).toList();
 
-  print('First document fetched: ${res.first['name']} - ${res.first['state']}'); 
+  print('First document fetched: ${res.first['name']} - ${res.first['state']}');
   // Tom - active
 
   await cleanupDatabase();

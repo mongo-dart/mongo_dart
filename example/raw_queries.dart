@@ -14,7 +14,7 @@ void main() async {
   var val = await coll.findOne({'my_field': 17});
   print('Filtered by my_field=17 $val');
   id = val?['_id'] as ObjectId?;
-   if (id == null) {
+  if (id == null) {
     print('Id not detected');
     await db.close();
     return;

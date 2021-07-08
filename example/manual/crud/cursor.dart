@@ -44,15 +44,15 @@ void main() async {
   /// You can set the size of the first batch setting the operation
   /// option (in this example "100"). The default is 101.
   /// For all subsequent fetches the cursor batch size will be used,
-  /// You can (if needed) set it as a parameter when creating the cursor 
-  /// (here 150) or changing it later, setting the cursor.batchSize 
+  /// You can (if needed) set it as a parameter when creating the cursor
+  /// (here 150) or changing it later, setting the cursor.batchSize
   /// variable (here 200).
-  /// 
+  ///
   /// By default the cursor batch size is set equal to the operation one.
   /// In our example, without setting 150 and then 200 it would heve been 100).
   /// Please note. This behavior differs from the mongodb shell,
   /// where the first bach has a size of 101 and the following
-  /// read (if not set otherwise) has a <no-limit> size, i.e. reads all other 
+  /// read (if not set otherwise) has a <no-limit> size, i.e. reads all other
   /// records in one batch.
   ///
   /// The batch size must be a positive integer.

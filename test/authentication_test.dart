@@ -97,7 +97,7 @@ void main() async {
 
         expect(result, true);
       });
-      
+
       test('Setting mongodb-cr with selectAuthenticationMechanisn', () async {
         var db = Db('$mongoDbUri');
 

@@ -20,8 +20,10 @@ class FindAndModifyOperation extends CommandOperation {
       this.hintDocument,
       FindAndModifyOptions? findAndModifyOptions,
       Map<String, Object>? rawOptions})
-      : remove = remove ?? false, returnNew = returnNew ?? false, 
-      upsert = upsert ?? false, super(
+      : remove = remove ?? false,
+        returnNew = returnNew ?? false,
+        upsert = upsert ?? false,
+        super(
             collection.db,
             <String, Object>{
               ...?findAndModifyOptions?.getOptions(collection.db),
@@ -33,7 +35,6 @@ class FindAndModifyOperation extends CommandOperation {
       throw MongoDartError(
           'The arrayFilters parameter must be either a List or a Map');
     }
-    
   }
 
   /// The selection criteria for the modification. The query field employs

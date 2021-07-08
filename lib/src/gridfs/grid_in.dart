@@ -15,7 +15,8 @@ class GridIn extends GridFSFile {
   // (potentially big) List, to get MD5 hash
   // Probably we should use some Stream api here
   List<int> contentToDigest = <int>[];
-  GridIn._(GridFS fs, String filename, Stream<List<int>> inputStream) : super(fs) {
+  GridIn._(GridFS fs, String filename, Stream<List<int>> inputStream)
+      : super(fs) {
     id = ObjectId();
     //chunkSize = GridFS.DEFAULT_CHUNKSIZE;
     input = ChunkHandler(chunkSize).transformer.bind(inputStream);

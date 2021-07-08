@@ -36,8 +36,7 @@ Future<List<String>> decodeDnsSeedlist(Uri dnsSeedlistUri) async {
   var user = dnsSeedlistUri.userInfo;
   var postPrefix = user.isEmpty ? '' : '$user@';
   var prefix = 'mongodb://$postPrefix';
-  var requestedParameters =
-      dnsSeedlistUri.queryParameters;
+  var requestedParameters = dnsSeedlistUri.queryParameters;
   var dnsServerParameters =
       Uri.parse('mongodb://db.example.com/?$additionalParms').queryParameters;
   var actualParameters = <String, String>{

@@ -26,8 +26,8 @@ class ServerStatus {
   void processServerStatus(Map<String, dynamic> serverStatus) {
     if (/* serverStatus == null || */
         serverStatus.isEmpty ||
-        !serverStatus.containsKey(keyOk) ||
-        serverStatus[keyOk] != 1.0) {
+            !serverStatus.containsKey(keyOk) ||
+            serverStatus[keyOk] != 1.0) {
       isInitialized = false;
       return;
     }

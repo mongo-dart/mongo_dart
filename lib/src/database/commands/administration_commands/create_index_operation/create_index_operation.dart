@@ -104,7 +104,11 @@ Map<String, Object> parseIndexOptions(Object fieldOrSpec) {
     }
   }
 
-  return {keyName: indexes.join('_'), if (keys != null) keyKeys: keys, keyFieldHash: fieldHash};
+  return {
+    keyName: indexes.join('_'),
+    if (keys != null) keyKeys: keys,
+    keyFieldHash: fieldHash
+  };
 }
 
 String _fieldIndexName(String fieldName, String sort) => '${fieldName}_$sort';

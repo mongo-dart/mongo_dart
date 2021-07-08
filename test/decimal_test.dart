@@ -95,7 +95,7 @@ void main() async {
 
         await collection.update(where,
             ModifierBuilder().mul('value', Rational.fromInt(5)).mul('qty', 2));
-            values = await collection.find().toList();
+        values = await collection.find().toList();
 
         expect(values.length, 1);
         expect(values.first['value'], Rational.fromInt(75));
