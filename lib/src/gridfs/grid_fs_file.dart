@@ -58,12 +58,12 @@ abstract class GridFSFile {
   Map<String, dynamic> get data {
     var result = <String, dynamic>{
       '_id': id,
-      'filename': filename,
-      'contentType': contentType,
       'length': length,
       'chunkSize': chunkSize,
       'uploadDate': uploadDate,
-      'md5': md5,
+      //'md5': md5,
+      'filename': filename,
+      'contentType': contentType,
     };
     extraData.forEach((String key, Object? value) {
       result[key] = value;

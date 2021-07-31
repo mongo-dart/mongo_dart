@@ -1,54 +1,35 @@
 part of mongo_dart;
 
 class GridIn extends GridFSFile {
-  late Stream<List<int>> input;
+  late Stream<Uint8List> input;
   bool savedChunks = false;
   int currentChunkNumber = 0;
-  int currentBufferPosition = 0;
   int totalBytes = 0;
-  //@override
-  //GridFS fs;
+ 
   @override
   String? filename;
 
-  // TODO Review that code. Currently it sums all file's content in one
-  // (potentially big) List, to get MD5 hash
-  // Probably we should use some Stream api here
-  List<int> contentToDigest = <int>[];
-  GridIn._(GridFS fs, String filename, Stream<List<int>> inputStream) : super(fs) {
+  /// Used for MD5 calculation, now deprecated
+  //Uint8List contentToDigest = Uint8List(0);
+  GridIn._(GridFS fs, String filename, Stream<List<int>> inputStream)
+      : super(fs) {
     id = ObjectId();
-    //chunkSize = GridFS.DEFAULT_CHUNKSIZE;
     input = ChunkHandler(chunkSize).transformer.bind(inputStream);
     uploadDate = DateTime.now();
     this.filename = filename;
   }
 
   @override
-  Future<Map<String, dynamic>> save([int? chunkSize]) {
-    chunkSize ??= this.chunkSize;
-
-    Future<Map<String, dynamic>> result;
+  Future<Map<String, dynamic>> save([int? chunkSize]) async {
     if (!savedChunks) {
-      result = saveChunks(chunkSize);
-    } else {
-      result = Future.value({'ok': 1.0});
+      return saveChunks(chunkSize);
     }
-    return result;
+    return {'ok': 1.0};
   }
 
-  Future<Map<String, dynamic>> saveChunks([int? chunkSize]) {
-    var futures = <Future>[];
-    var completer = Completer<Map<String, dynamic>>();
-
-    void _onDone() {
-      Future.wait(futures).then((list) {
-        return finishData();
-      }).then((map) {
-        completer.complete({});
-      });
-    }
-
+  Future<Map<String, dynamic>> saveChunks([int? chunkSize]) async {
     chunkSize ??= this.chunkSize;
+
     if (savedChunks) {
       throw MongoDartError('chunks already saved!');
     }
@@ -56,18 +37,18 @@ class GridIn extends GridFSFile {
       throw MongoDartError(
           'chunkSize must be greater than zero and less than or equal to GridFS.MAX_CHUNKSIZE');
     }
-    input.listen((data) {
-      futures.add(dumpBuffer(data));
-    }, onDone: _onDone);
-    return completer.future;
-  }
-  // TODO(tsander): OutputStream??
 
-  Future<Map<String, dynamic>> dumpBuffer(List<int> writeBuffer) {
-    contentToDigest.addAll(writeBuffer);
+    await for (var data in input) {
+      await dumpBuffer(data);
+    }
+
+    return finishData();
+  }
+
+  Future<Map<String, dynamic>> dumpBuffer(Uint8List writeBuffer) async {
     if (writeBuffer.isEmpty) {
       // Chunk is empty, may be last chunk
-      return Future.value({});
+      return <String, dynamic>{};
     }
 
     var chunk = <String, dynamic>{
@@ -76,16 +57,20 @@ class GridIn extends GridFSFile {
       'data': BsonBinary.from(writeBuffer)
     };
     currentChunkNumber++;
+
     totalBytes += writeBuffer.length;
-    contentToDigest.addAll(writeBuffer);
-    currentBufferPosition = 0;
+   /*  var actualLength = contentToDigest.length;
+    var contentTemp = Uint8List(totalBytes);
+    contentTemp.setAll(0, contentToDigest);
+    contentTemp.setAll(actualLength, writeBuffer);
+    contentToDigest = contentTemp; */
 
     return fs.chunks.insert(chunk);
   }
 
-  Future finishData() {
+  Future<Map<String, dynamic>> finishData() async {
     if (!savedChunks) {
-      md5 = crypto.md5.convert(contentToDigest).toString();
+      //md5 = crypto.md5.convert(contentToDigest).toString();
       length = totalBytes;
       savedChunks = true;
     }

@@ -28,7 +28,7 @@ void main() {
     test('Testing connection TXT', () async {
       var records =
           await DnsUtils.lookupRecord('rs.joedrumgoole.com', RRecordType.TXT);
-      expect(records?.first.data, '"authSource=admin&replicaSet=srvdemo"');
+      expect(records?.first.data, 'authSource=admin&replicaSet=srvdemo');
     });
     test('Testing connection SRV', () async {
       var records = await DnsUtils.lookupRecord(

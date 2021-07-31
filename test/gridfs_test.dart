@@ -174,6 +174,20 @@ Future testChunkTransformerSeveralChunks() {
   });
 }
 
+Future testChunkTransformerSeveralChunks2() {
+  return Stream.fromIterable([
+    [1, 2, 3, 4],
+    [5, 6],
+    [7],
+    [8, 9, 10, 11]
+  ]).transform(ChunkHandler(3).transformer).toList().then((chunkedList) {
+    expect(chunkedList[0], orderedEquals([1, 2, 3]));
+    expect(chunkedList[1], orderedEquals([4, 5, 6]));
+    expect(chunkedList[2], orderedEquals([7, 8, 9]));
+    expect(chunkedList[3], orderedEquals([10, 11]));
+  });
+}
+
 Future testFileToGridFSToFile() async {
   var collectionName = getRandomCollectionName();
   GridFS.DEFAULT_CHUNKSIZE = 30;
@@ -235,6 +249,8 @@ void main() {
     test('testChunkTransformer', testChunkTransformerOneChunk);
     test(
         'testChunkTransformerSeveralChunks', testChunkTransformerSeveralChunks);
+    test('testChunkTransformerSeveralChunks2',
+        testChunkTransformerSeveralChunks2);
   });
   group('GridFS tests:', () {
     setUp(() => GridFS.DEFAULT_CHUNKSIZE = 256 * 1024);

@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+### 0.7.1
+
+- Removed deprecated MD5 calculation in GridFs
+
 ### 0.7.0+2
 
 - Fix in README. There was a wrong example on how to call the replaceOne method.
