@@ -15,7 +15,7 @@ class Payload0 extends Payload {
 
   Payload0.fromBuffer(BsonBinary buffer)
       : document = BsonMap(<String, Object>{})
-          ..unpackValue(buffer/* ..makeByteList() */);
+          ..unpackValue(buffer /* ..makeByteList() */);
 
   @override
   void packValue(BsonBinary buffer) => document.packValue(buffer);
@@ -37,7 +37,7 @@ class Payload1 extends Payload {
         _documents = _createBsonMapList(documents);
 
   Payload1.fromBuffer(BsonBinary buffer)
-      : _length = (buffer/* ..makeByteList() */).readInt32(),
+      : _length = (buffer /* ..makeByteList() */).readInt32(),
         identifier = BsonCString(buffer.readCString()) {
     _documents =
         _decodeBsonMapList(buffer, _length! - 4 - identifier.byteLength());

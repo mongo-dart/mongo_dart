@@ -1,5 +1,4 @@
-import 'package:mongo_dart/mongo_dart.dart'
-    show Db, WriteConcern;
+import 'package:mongo_dart/mongo_dart.dart' show Db, WriteConcern;
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 class BulkOptions {

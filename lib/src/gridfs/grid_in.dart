@@ -5,7 +5,7 @@ class GridIn extends GridFSFile {
   bool savedChunks = false;
   int currentChunkNumber = 0;
   int totalBytes = 0;
- 
+
   @override
   String? filename;
 
@@ -59,7 +59,7 @@ class GridIn extends GridFSFile {
     currentChunkNumber++;
 
     totalBytes += writeBuffer.length;
-   /*  var actualLength = contentToDigest.length;
+    /*  var actualLength = contentToDigest.length;
     var contentTemp = Uint8List(totalBytes);
     contentTemp.setAll(0, contentToDigest);
     contentTemp.setAll(actualLength, writeBuffer);

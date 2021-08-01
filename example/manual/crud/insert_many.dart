@@ -37,7 +37,7 @@ void main() async {
 
   var res = await collection.find().toList();
 
-  print('Inserted ${res.length} elements'); 
+  print('Inserted ${res.length} elements');
   // 7
 
   await cleanupDatabase();

@@ -21,7 +21,7 @@ class DistinctOperation extends CommandOperation {
   /// The field for which to return distinct values.
   String key;
 
-  /// A query that specifies the documents from which to retrieve 
+  /// A query that specifies the documents from which to retrieve
   /// the distinct values.
   Map<String, Object?>? query;
 

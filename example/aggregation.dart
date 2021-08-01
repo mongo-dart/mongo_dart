@@ -17,8 +17,7 @@ void main() async {
       .addStage(
           Group(id: Field('cust_id'), fields: {'total': Sum(Field('amount'))}))
       .build();
-  final result = await DbCollection(db, 'orders')
-      .modernAggregate(pipeline)
-      .toList();
+  final result =
+      await DbCollection(db, 'orders').modernAggregate(pipeline).toList();
   result.forEach(print);
 }

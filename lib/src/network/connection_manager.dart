@@ -40,8 +40,7 @@ class _ConnectionManager {
       MongoModernMessage.maxWriteBatchSize =
           documents.first[keyMaxWriteBatchSize];
     }
-    connection.serverCapabilities
-        .getParamsFromIstMaster(documents.first);
+    connection.serverCapabilities.getParamsFromIstMaster(documents.first);
 
     if (db._authenticationScheme == null) {
       if (connection.serverCapabilities.maxWireVersion >= 3) {
@@ -54,8 +53,8 @@ class _ConnectionManager {
       _log.fine(() => '$db: ${connection.serverConfig.hostUrl} connected');
     } else {
       try {
-        await db.authenticate(
-            connection.serverConfig.userName!, connection.serverConfig.password ?? '',
+        await db.authenticate(connection.serverConfig.userName!,
+            connection.serverConfig.password ?? '',
             connection: connection);
         _log.fine(() => '$db: ${connection.serverConfig.hostUrl} connected');
       } catch (e) {

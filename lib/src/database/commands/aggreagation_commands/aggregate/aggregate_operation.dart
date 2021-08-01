@@ -21,7 +21,7 @@ class AggregateOperation extends CommandOperation {
       AggregateOptions? aggregateOptions,
       Map<String, Object>? rawOptions})
       : cursor = cursor ?? <String, Object>{},
-      explain = explain ?? false,
+        explain = explain ?? false,
         super(
             collection?.db ?? db,
             <String, Object>{

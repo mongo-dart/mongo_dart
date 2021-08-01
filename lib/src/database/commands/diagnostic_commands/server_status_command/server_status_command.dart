@@ -8,7 +8,8 @@ var _command = <String, Object>{keyServerStatus: 1};
 
 class ServerStatusCommand extends CommandOperation {
   ServerStatusCommand(Db db,
-      {ServerStatusOptions? serverStatusOptions, Map<String, Object>? rawOptions})
+      {ServerStatusOptions? serverStatusOptions,
+      Map<String, Object>? rawOptions})
       : super(db,
             <String, Object>{...?serverStatusOptions?.options, ...?rawOptions},
             command: _command);

@@ -9,12 +9,12 @@ import 'package:mongo_dart/mongo_dart.dart';
 //
 // Run server1 with these parameters:
 // mongod --port 27017  --dbpath <your-data-path> --oplogSize 128
-//  --tlsMode requireTLS --tlsCertificateKeyFile 
+//  --tlsMode requireTLS --tlsCertificateKeyFile
 //  <your-mongo-dart-folder>/test/certificates_for_testing/server1.pem
-// 
+//
 // Run server2 with these parameters:
 // mongod --port 27018  --dbpath <your-data-path-2> --oplogSize 128
-//  --tlsMode requireTLS --tlsCertificateKeyFile 
+//  --tlsMode requireTLS --tlsCertificateKeyFile
 //  <your-mongo-dart-folder>/test/certificates_for_testing/server2.pem
 const dbName = 'mongo-dart-server-cert';
 const dbServerName = 'server1';

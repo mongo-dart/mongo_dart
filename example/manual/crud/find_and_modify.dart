@@ -6,18 +6,14 @@ const dbAddress = '127.0.0.1';
 const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void main() async {
-  var
-
-    db = Db(DefaultUri);
-    await db.open();
-  
+  var db = Db(DefaultUri);
+  await db.open();
 
   Future cleanupDatabase() async {
     await db.close();
   }
 
-  if (
-      !db.masterConnection.serverCapabilities.supportsOpMsg) {
+  if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
     return;
   }
 
