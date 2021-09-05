@@ -1,12 +1,17 @@
-part of mongo_dart;
+//part of mongo_dart;
+import 'package:crypto/crypto.dart' as crypto;
+import 'package:mongo_dart/mongo_dart.dart'
+    show Connection, Db, DbCommand, MongoQueryMessage;
+import 'package:mongo_dart/src/auth/auth.dart';
+import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
 class MongoDbCRAuthenticator extends Authenticator {
+  MongoDbCRAuthenticator(this.db, this.credentials) : super();
+
   static final String name = 'MONGODB-CR';
 
   final Db db;
   final UsernamePasswordCredential credentials;
-
-  MongoDbCRAuthenticator(this.db, this.credentials);
 
   @override
   Future authenticate(Connection connection) {

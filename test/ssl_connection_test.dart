@@ -115,7 +115,9 @@ void main() {
           'retryWrites=true&w=majority&ssl=true');
     });
     test('Test Atlas connection', () async {
-      var db = await Db.create('mongodb+srv:<insert the correct url>');
+      var db = await Db.create(
+          'mongodb+srv://dbAtlas:pwd@cluster0.xopug.mongodb.net/'
+          'test?authMechanism=SCRAM-SHA-256&retryWrites=true&w=majority');
       await db.open();
       var coll = db.collection('test-insert');
       var result =

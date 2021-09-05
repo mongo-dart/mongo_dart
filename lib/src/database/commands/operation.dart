@@ -6,7 +6,14 @@ export 'aggreagation_commands/aggregate/aggregate_operation.dart';
 export 'aggreagation_commands/aggregate/aggregate_options.dart';
 export 'aggreagation_commands/wrapper/change_stream/change_stream_operation.dart';
 export 'aggreagation_commands/wrapper/change_stream/change_stream_options.dart';
+
+export 'authentication_commands/sasl_continue_command/sasl_continue_command.dart';
+export 'authentication_commands/sasl_continue_command/sasl_continue_command.dart';
+export 'authentication_commands/sasl_start_command/sasl_start_command.dart';
+export 'authentication_commands/sasl_start_command/sasl_start_options.dart';
+
 export 'diagnostic_commands/server_status_command/server_status_command.dart';
+
 export 'diagnostic_commands/server_status_command/server_status_options.dart';
 export 'query_and_write_operation_commands/get_last_error_command/get_last_error_command.dart';
 export 'query_and_write_operation_commands/find_operation/find_operation.dart';
@@ -36,6 +43,10 @@ export 'query_and_write_operation_commands/wrapper/insert_many/insert_many_optio
 export 'query_and_write_operation_commands/find_and_modify_operation/find_and_modify_operation.dart';
 export 'query_and_write_operation_commands/find_and_modify_operation/find_and_modify_options.dart';
 export 'query_and_write_operation_commands/find_and_modify_operation/find_and_modify_result.dart';
+
+export 'replication_commands/hello_command/hello_command.dart';
+export 'replication_commands/hello_command/hello_options.dart';
+export 'replication_commands/hello_command/hello_result.dart';
 
 export 'parameters/collation_options.dart';
 export 'parameters/read_preference.dart';

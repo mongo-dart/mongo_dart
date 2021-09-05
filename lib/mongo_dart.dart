@@ -6,7 +6,7 @@ library mongo_dart;
 
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert' show base64, utf8;
+import 'dart:convert' show base64;
 import 'dart:io'
     show
         File,
@@ -18,10 +18,9 @@ import 'dart:io'
         TlsException;
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:collection/collection.dart';
-import 'package:crypto/crypto.dart' as crypto;
 import 'package:bson/bson.dart';
 import 'package:logging/logging.dart';
+import 'package:mongo_dart/src/auth/scram_sha256_authenticator.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
 import 'package:mongo_dart/src/database/info/server_status.dart';
 import 'package:mongo_dart/src/database/message/additional/section.dart';
@@ -43,6 +42,16 @@ import 'package:mongo_dart/src/database/utils/parms_utils.dart';
 import 'package:mongo_dart/src/database/utils/split_hosts.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:pool/pool.dart';
+import 'package:mongo_dart/src/auth/auth.dart'
+    show Authenticator, AuthenticationScheme;
+import 'package:mongo_dart/src/auth/scram_sha1_authenticator.dart'
+    show ScramSha1Authenticator;
+import 'package:mongo_dart/src/auth/scram_sha256_authenticator.dart'
+    show ScramSha256Authenticator;
+import 'package:mongo_dart/src/auth/mongodb_cr_authenticator.dart'
+    show MongoDbCRAuthenticator;
+import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
+import 'package:vy_string_utils/vy_string_utils.dart';
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_aggregation.dart';
@@ -52,13 +61,10 @@ export 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 part 'src/connection_pool.dart';
 
-part 'src/auth/auth.dart';
-
-part 'src/auth/sasl_authenticator.dart';
-
-part 'src/auth/scram_sha1_authenticator.dart';
-
-part 'src/auth/mongodb_cr_authenticator.dart';
+//part 'src/auth/auth.dart';
+//part 'src/auth/sasl_authenticator.dart';
+//part 'src/auth/scram_sha1_authenticator.dart';
+//part 'src/auth/mongodb_cr_authenticator.dart';
 
 part 'src/database/cursor/cursor.dart';
 

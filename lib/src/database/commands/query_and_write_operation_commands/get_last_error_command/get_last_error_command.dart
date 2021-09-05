@@ -58,7 +58,7 @@ class GetLastErrorCommand extends CommandOperation {
   }
   // this is needed for compatibility with old command version
   @override
-  Future<Map<String, Object?>> execute() async {
+  Future<Map<String, Object?>> execute({bool skipStateCheck = false}) async {
     var result = await super.execute();
     if (result.isNotEmpty) {
       var res = result['err'] as String?;

@@ -188,6 +188,10 @@ class Db {
     if (state != State.OPEN) {
       throw MongoDartError('Db is in the wrong state: $state');
     }
+    return _masterConnectionVerifiedAnyState;
+  }
+
+  Connection get _masterConnectionVerifiedAnyState {
     if (_connectionManager == null) {
       throw MongoDartError('Invalid Connection manager state');
     }
@@ -253,6 +257,7 @@ class Db {
   WriteConcern? get writeConcern => _writeConcern;
 
   Connection get masterConnection => _masterConnectionVerified;
+  Connection get masterConnectionAnyState => _masterConnectionVerifiedAnyState;
 
   List<String> get uriList => _uriList.toList();
 
@@ -357,6 +362,8 @@ class Db {
   void selectAuthenticationMechanism(String authenticationSchemeName) {
     if (authenticationSchemeName == ScramSha1Authenticator.name) {
       _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
+    } else if (authenticationSchemeName == ScramSha256Authenticator.name) {
+      _authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
     } else if (authenticationSchemeName == MongoDbCRAuthenticator.name) {
       _authenticationScheme = AuthenticationScheme.MONGODB_CR;
     } else {
@@ -397,16 +404,23 @@ class Db {
   }
 
   Future<Map<String, Object?>> executeModernMessage(MongoModernMessage message,
-      {Connection? connection}) async {
-    if (state != State.OPEN) {
-      throw MongoDartError('DB is not open. $state');
-    }
-    if (!masterConnection.serverCapabilities.supportsOpMsg) {
-      throw MongoDartError('The "modern message" can only be executed '
-          'starting from release 3.6');
+      {Connection? connection, bool skipStateCheck = false}) async {
+    if (skipStateCheck) {
+      if (!_masterConnectionVerifiedAnyState.serverCapabilities.supportsOpMsg) {
+        throw MongoDartError('The "modern message" can only be executed '
+            'starting from release 3.6');
+      }
+    } else {
+      if (state != State.OPEN) {
+        throw MongoDartError('DB is not open. $state');
+      }
+      if (!masterConnection.serverCapabilities.supportsOpMsg) {
+        throw MongoDartError('The "modern message" can only be executed '
+            'starting from release 3.6');
+      }
     }
 
-    connection ??= _masterConnectionVerified;
+    connection ??= _masterConnectionVerifiedAnyState;
 
     var response = await connection.executeModernMessage(message);
 
@@ -650,7 +664,7 @@ class Db {
       throw MongoDartError('Authentication scheme not specified');
     }
     var authenticator =
-        createAuthenticator(_authenticationScheme!, this, credential);
+        Authenticator.create(_authenticationScheme!, this, credential);
 
     await authenticator.authenticate(connection ?? masterConnection);
 

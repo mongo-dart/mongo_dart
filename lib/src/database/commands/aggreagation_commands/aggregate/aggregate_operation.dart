@@ -33,7 +33,7 @@ class AggregateOperation extends CommandOperation {
     if (pipeline is List<Map<String, Object>>) {
       this.pipeline = <Map<String, Object>>[...pipeline];
     } else if (pipeline is AggregationPipelineBuilder) {
-      this.pipeline = pipeline.build() as List<Map<String, Object>>;
+      this.pipeline = pipeline.build();
     } else {
       throw MongoDartError('Received pipeline is "${pipeline.runtimeType}", '
           'while the method only accept "AggregationPipelineBuilder" or '

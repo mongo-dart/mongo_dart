@@ -2,6 +2,23 @@
 
 ## Recent change notes
 
+### 0.7.2
+
+- Added SCRAM-SHA-256 authentication mechanism
+  If no authentication mechanism is set, as a first try the driver analyze
+  the server response that returns the available scram mechanisms for the required user, otherwise, SCRAM-SHA-256 is set starting from release 4.0.
+
+  **BREAKING CHANGE**
+  Incidentally a potential *breaking change* has been introduced.
+  If there is any problem during authentication, in previous versions a
+  map containing the error message was thrown.
+  Now a MongoDartError object is thrown.
+
+  **Please NOTE**
+  By default the driver automatically sets SCRAM-SHA-256 if the server release is equal or greater to 4.0.
+  Unfortunately Atlas does not yet support SHA-256, and does not return informations about the supported authentication mechanisms for the user, so the driver, when detects the connection error, automatically downgrades to SHA-1
+  If you want to avoid the first attempt, you can set the autentication mechanism to SHA-1 in the connection string.
+
 ### 0.7.1
 
 - Removed deprecated MD5 calculation in GridFs

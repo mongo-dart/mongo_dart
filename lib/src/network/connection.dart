@@ -10,6 +10,7 @@ const noSecureRequestError = 'The socket connection has been reset by peer.'
     '\n- Others';
 
 class _ServerCapabilities {
+  int minWireVersion = 0;
   int maxWireVersion = 0;
   bool aggregationCursor = false;
   bool writeCommands = false;
@@ -53,12 +54,55 @@ class _ServerCapabilities {
     } else {
       isStandalone = true;
     }
-    if (isMaster.containsKey(keyTopologyVersion)) {
+    if (maxWireVersion >= 13) {
+      fcv = '5.0';
+    } else if (isMaster.containsKey(keyTopologyVersion)) {
       fcv = '4.4';
     } else if (isMaster.containsKey(keyConnectionId)) {
       fcv = '4.2';
     } else if (maxWireVersion > 6) {
       // approximated
+      fcv = '4.0';
+    } else {
+      fcv = '3.6';
+    }
+  }
+
+  void getParamsFromHello(HelloResult result) {
+    minWireVersion = result.minWireVersion;
+
+    maxWireVersion = result.maxWireVersion;
+
+    if (maxWireVersion >= 1) {
+      aggregationCursor = true;
+      authCommands = true;
+    }
+    if (maxWireVersion >= 2) {
+      writeCommands = true;
+    }
+    if (maxWireVersion >= 3) {
+      listCollections = true;
+      listIndexes = true;
+    }
+    if (maxWireVersion >= 6) {
+      supportsOpMsg = true;
+    }
+    if (filled(result.msg)) {
+      isShardedCluster = true;
+    } else if (filled(result.setName)) {
+      replicaSetName = result.setName;
+      replicaSetHosts = <String>[...?result.hosts];
+    } else {
+      isStandalone = true;
+    }
+
+    if (maxWireVersion >= 13) {
+      fcv = '5.0';
+    } else if (maxWireVersion >= 9) {
+      fcv = '4.4';
+    } else if (maxWireVersion >= 8) {
+      fcv = '4.2';
+    } else if (maxWireVersion >= 7) {
       fcv = '4.0';
     } else {
       fcv = '3.6';

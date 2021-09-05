@@ -401,7 +401,7 @@ abstract class Bulk extends CommandOperation {
   List<Map<int, int>> getBulkInputOrigins();
 
   @override
-  Future<Map<String, Object>> execute() =>
+  Future<Map<String, Object>> execute({bool skipStateCheck = false}) =>
       throw StateError('Call executeBulk() for bulk operations');
   @override
   Map<String, Object> $buildCommand() =>

@@ -1,7 +1,14 @@
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
-import 'package:test/test.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/database/utils/map_keys.dart';
+import 'package:sasl_scram/sasl_scram.dart' show CryptoStrengthStringGenerator;
+import 'package:test/test.dart';
 
+import 'package:mongo_dart/src/auth/scram_sha1_authenticator.dart'
+    show ScramSha1Authenticator;
+import 'package:mongo_dart/src/auth/scram_sha256_authenticator.dart'
+    show ScramSha256Authenticator;
+import 'package:mongo_dart/src/auth/mongodb_cr_authenticator.dart'
+    show MongoDbCRAuthenticator;
 //final String mongoDbUri =
 //    'mongodb://test:test@ds031477.mlab.com:31477/dart';
 
@@ -17,6 +24,11 @@ void main() async {
       await db.open();
       await db.close();
       return true;
+    } on MongoDartError catch (e) {
+      if (e.mongoCode == 18) {
+        return false;
+      }
+      rethrow;
     } on Map catch (e) {
       if (e.containsKey(keyCode)) {
         if (e[keyCode] == 18) {
@@ -29,11 +41,36 @@ void main() async {
     }
   }
 
+  Future<String?> getFcv() async {
+    var db = Db(mongoDbUri);
+    try {
+      await db.open();
+      var fcv = db.masterConnection.serverCapabilities.fcv;
+
+      await db.close();
+      return fcv;
+    } on Map catch (e) {
+      if (e.containsKey(keyCode)) {
+        if (e[keyCode] == 18) {
+          return null;
+        }
+      }
+      throw StateError('Unknown error $e');
+    } catch (e) {
+      throw StateError('Unknown error $e');
+    }
+  }
+
   group('Authentication', () {
     var serverRequiresAuth = false;
+    var isVer3_6 = false;
 
     setUpAll(() async {
       serverRequiresAuth = await testDatabase();
+      if (serverRequiresAuth) {
+        var fcv = await getFcv();
+        isVer3_6 = fcv == '3.6';
+      }
     });
 
     group('General Test', () {
@@ -47,12 +84,23 @@ void main() async {
         }
       });
 
-      test(
-          'Should be able to connect and authenticate with auth mechanism specified',
+      test('Should be able to connect and authenticate with scram sha1',
           () async {
         if (serverRequiresAuth) {
           var db =
               Db('$mongoDbUri?authMechanism=${ScramSha1Authenticator.name}');
+
+          await db.open();
+          expect(db.masterConnection.isAuthenticated, isTrue);
+          await db.collection('test').find().toList();
+          await db.close();
+        }
+      });
+      test('Should be able to connect and authenticate with scram sha256',
+          () async {
+        if (serverRequiresAuth && !isVer3_6) {
+          var db =
+              Db('$mongoDbUri?authMechanism=${ScramSha256Authenticator.name}');
 
           await db.open();
           expect(db.masterConnection.isAuthenticated, isTrue);
@@ -77,6 +125,12 @@ void main() async {
           'code': 2,
           'codeName': 'BadValue',
         };
+        var expectedError3 = {
+          'ok': 0.0,
+          'errmsg': "BSON field 'authenticate.nonce' is an unknown field.",
+          'code': 40415,
+          'codeName': 'Location40415'
+        };
 
         var err;
 
@@ -93,7 +147,11 @@ void main() async {
             ((err['ok'] == expectedError2['ok']) &&
                 (err['errmsg'] == expectedError2['errmsg']) &&
                 (err['code'] == expectedError2['code']) &&
-                (err['codeName'] == expectedError2['codeName']));
+                (err['codeName'] == expectedError2['codeName'])) ||
+            ((err['ok'] == expectedError3['ok']) &&
+                (err['errmsg'] == expectedError3['errmsg']) &&
+                (err['code'] == expectedError3['code']) &&
+                (err['codeName'] == expectedError3['codeName']));
 
         expect(result, true);
       });
@@ -113,6 +171,12 @@ void main() async {
           'code': 2,
           'codeName': 'BadValue',
         };
+        var expectedError3 = {
+          'ok': 0.0,
+          'errmsg': "BSON field 'authenticate.nonce' is an unknown field.",
+          'code': 40415,
+          'codeName': 'Location40415'
+        };
 
         var err;
 
@@ -130,7 +194,11 @@ void main() async {
             ((err['ok'] == expectedError2['ok']) &&
                 (err['errmsg'] == expectedError2['errmsg']) &&
                 (err['code'] == expectedError2['code']) &&
-                (err['codeName'] == expectedError2['codeName']));
+                (err['codeName'] == expectedError2['codeName'])) ||
+            ((err['ok'] == expectedError3['ok']) &&
+                (err['errmsg'] == expectedError3['errmsg']) &&
+                (err['code'] == expectedError3['code']) &&
+                (err['codeName'] == expectedError3['codeName']));
 
         expect(result, true);
       });

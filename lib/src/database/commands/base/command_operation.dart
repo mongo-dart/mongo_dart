@@ -72,9 +72,9 @@ class CommandOperation extends OperationBase {
   }
 
   @override
-  Future<Map<String, Object?>> execute() async {
+  Future<Map<String, Object?>> execute({bool skipStateCheck = false}) async {
     final db = this.db;
-    if (db.state != State.OPEN) {
+    if (!skipStateCheck && db.state != State.OPEN) {
       throw MongoDartError('Db is in the wrong state: ${db.state}');
     }
     //final options = Map.from(this.options);
@@ -99,7 +99,8 @@ class CommandOperation extends OperationBase {
     //print(command);
     var modernMessage = MongoModernMessage(command);
 
-    return db.executeModernMessage(modernMessage, connection: connection);
+    return db.executeModernMessage(modernMessage,
+        connection: connection, skipStateCheck: skipStateCheck);
   }
 }
 
