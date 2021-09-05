@@ -1,4 +1,3 @@
-
 /// SaslContinue command options;
 class SaslContinueOptions {
   /// Undocumented command
