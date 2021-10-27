@@ -5,7 +5,7 @@
 ### 0.7.3
 
 - Fixed a problem in `Timestamp` class so that seconds and increment were inverted in reading from db.
-- Decoupled the `Timestamp` class from the newly created `BsomTimestamp` one.
+- Decoupled the `Timestamp` class from the newly created `BsonTimestamp` one.
 
 ### 0.7.2
 
