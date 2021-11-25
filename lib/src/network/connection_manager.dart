@@ -58,6 +58,9 @@ class _ConnectionManager {
         throw MongoDartError('Empty reply message received');
       }
       var documents = replyMessage.documents!;
+      if (documents.first[keyOk] == 0.0) {
+        throw MongoDartError(documents.first[keyErrmsg]);
+      }
       _log.fine(() => documents.first.toString());
       var master = documents.first['ismaster'] == true;
       connection.isMaster = master;
@@ -151,6 +154,9 @@ class _ConnectionManager {
     }
     if (_masterConnection == null) {
       throw MongoDartError('No Primary found');
+    }
+    if (unfilled(db.databaseName)) {
+      throw MongoDartError('Database name not specified');
     }
     db.state = State.OPEN;
 

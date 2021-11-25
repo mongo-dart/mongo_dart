@@ -355,6 +355,9 @@ class Db {
     if (uri.path.isNotEmpty) {
       databaseName = uri.path.replaceAll('/', '');
     }
+    if (unfilled(databaseName)) {
+      databaseName = 'test';
+    }
 
     return serverConfig;
   }

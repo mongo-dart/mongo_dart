@@ -2,6 +2,11 @@
 
 ## Recent change notes
 
+## 0.7.4
+
+- Fixed misleading error message if the database name was not specified in the connection string
+- As the mongo shell assumes `test` if no database is specified, we will do the same. This could be a potential **breaking change** in some situations.
+
 ### 0.7.3
 
 - Fixed a problem in `Timestamp` class so that seconds and increment were inverted in reading from db.
