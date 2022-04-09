@@ -2,21 +2,14 @@
 
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
-import 'package:mongo_dart/src/database/commands/administration_commands/wrapper/create_collection/create_collection_options.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/aggregate/aggregate_operation.dart';
 import 'package:mongo_dart/src/database/commands/aggreagation_commands/count/count_operation.dart';
 import 'package:mongo_dart/src/database/commands/aggreagation_commands/count/count_options.dart';
 import 'package:mongo_dart/src/database/commands/aggreagation_commands/distinct/distinct_operation.dart';
 import 'package:mongo_dart/src/database/commands/aggreagation_commands/distinct/distinct_options.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/wrapper/change_stream/change_stream_operation.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_operation/find_operation.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_operation/find_options.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
 import 'package:mongo_dart/src/database/commands/parameters/read_concern.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:rational/rational.dart';
 import 'package:test/test.dart';
-import 'package:uuid/uuid.dart';
 
 import 'utils/insert_data.dart';
 
@@ -1014,12 +1007,10 @@ db.runCommand(
     var isStandalone = false;
     setUp(() async {
       await initializeDatabase();
-      if (db.masterConnection == null ||
-          !db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
-      if (db.masterConnection != null &&
-          db.masterConnection.serverCapabilities.isStandalone) {
+      if (db.masterConnection.serverCapabilities.isStandalone) {
         isStandalone = true;
       }
     });
@@ -1341,7 +1332,6 @@ db.runCommand(
   group('Distinct', () {
     var cannotRunTests = false;
     var running3_6 = false;
-    var isReplicaSet = false;
     var isSharded = false;
     setUp(() async {
       await initializeDatabase();
@@ -1352,7 +1342,6 @@ db.runCommand(
       if (serverFcv.compareTo('3.6') == 0) {
         running3_6 = true;
       }
-      isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
       isSharded = db.masterConnection.serverCapabilities.isShardedCluster;
     });
 

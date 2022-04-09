@@ -2,17 +2,12 @@
 
 import 'dart:async';
 import 'dart:collection';
-import 'package:bson/bson.dart' show BsonLong;
-
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/kill_cursors_command/kill_cursors_command.dart';
 import 'package:mongo_dart/src/database/commands/aggreagation_commands/aggregate/return_classes/change_event.dart';
 import 'package:mongo_dart/src/database/commands/aggreagation_commands/wrapper/change_stream/change_stream_handler.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/wrapper/change_stream/change_stream_operation.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_operation/find_operation.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_options.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 import '../../../mongo_dart.dart';
 

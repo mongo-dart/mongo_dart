@@ -3,7 +3,6 @@ part of mongo_dart;
 typedef MonadicBlock = void Function(Map<String, dynamic> value);
 
 class Cursor {
-  final _log = Logger('Cursor');
   State state = State.INIT;
   int cursorId = 0;
   Db db;
@@ -138,7 +137,7 @@ class Cursor {
         } else if (tailable && !isDead) {
           var completer = Completer<Map<String, dynamic>>();
           Timer(Duration(milliseconds: tailableRetryInterval),
-              () => completer.complete(null));
+              () => completer.complete({}));
           return completer.future;
         } else {
           state = State.CLOSED;

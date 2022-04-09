@@ -1,18 +1,8 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_operation.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_and_modify_operation/find_and_modify_options.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_operation.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_options.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_statement.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_operation.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_statement.dart';
-import 'package:mongo_dart/src/database/commands/parameters/collation_options.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:rational/rational.dart';
 import 'package:test/test.dart';
-import 'package:uuid/uuid.dart';
 
 import 'utils/insert_data.dart';
 
@@ -48,9 +38,7 @@ void main() async {
     var running4_4orGreater = false;
     var running4_2orGreater = false;
 
-    var isReplicaSet = false;
     var isStandalone = false;
-    var isSharded = false;
     setUp(() async {
       await initializeDatabase();
       if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
@@ -63,9 +51,7 @@ void main() async {
       if (serverFcv.compareTo('4.2') != -1) {
         running4_2orGreater = true;
       }
-      isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
       isStandalone = db.masterConnection.serverCapabilities.isStandalone;
-      isSharded = db.masterConnection.serverCapabilities.isShardedCluster;
     });
 
     tearDown(() async {

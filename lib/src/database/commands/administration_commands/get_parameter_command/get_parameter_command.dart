@@ -1,7 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/base/db_admin_command_operation.dart';
 import 'get_parameter_options.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 class GetParameterCommand extends DbAdminCommandOperation {
   GetParameterCommand(Db db, String parameterName,

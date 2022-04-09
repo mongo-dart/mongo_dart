@@ -1,13 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/bulk/ordered_bulk.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/bulk/unordered_bulk.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/delete_many/delete_many_statement.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/delete_one/delete_one_statement.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:test/test.dart';
-import 'package:uuid/uuid.dart';
 
 import 'utils/insert_data.dart';
 
@@ -40,27 +34,14 @@ void main() async {
 
   group('Bulk Operations', () {
     var cannotRunTests = false;
-    var isReplicaSet = false;
     var isStandalone = false;
-    var isSharded = false;
-    var running4_4orGreater = false;
-    var running4_2orGreater = false;
 
     setUp(() async {
       await initializeDatabase();
       if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
-      var serverFcv = db.masterConnection.serverCapabilities.fcv ?? '0.0';
-      if (serverFcv.compareTo('4.4') != -1) {
-        running4_4orGreater = true;
-      }
-      if (serverFcv.compareTo('4.2') != -1) {
-        running4_2orGreater = true;
-      }
-      isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
       isStandalone = db.masterConnection.serverCapabilities.isStandalone;
-      isSharded = db.masterConnection.serverCapabilities.isShardedCluster;
     });
 
     tearDown(() async {

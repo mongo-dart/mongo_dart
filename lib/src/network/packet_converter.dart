@@ -1,7 +1,6 @@
 part of mongo_dart;
 
 class PacketConverter {
-  final _log = Logger('PacketConverter');
   final packets = ListQueue<List<int>>();
   final messages = ListQueue<List<int>>();
   final MAX_DOC_SIZE = 32 * 1024 * 1024;

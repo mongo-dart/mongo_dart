@@ -119,9 +119,9 @@ void main() {
           'mongodb+srv://dbAtlas:pwd@cluster0.xopug.mongodb.net/'
           'test?authMechanism=SCRAM-SHA-256&retryWrites=true&w=majority');
       await db.open();
-      var coll = db.collection('test-insert');
-      var result =
-          await coll.insertOne({'solved': true, 'autoinit': 'delayed'});
+      // var coll = db.collection('test-insert');
+      // var result =
+      //     await coll.insertOne({'solved': true, 'autoinit': 'delayed'});
       // Todo update test
       // print(result['ops'].first);
       /* Todo update

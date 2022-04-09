@@ -1,5 +1,4 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 List<String> _caseFirstValidValues = <String>['upper', 'lower', 'off'];
 List<String> _alternateValidValues = <String>['non-ignorable', 'shifted'];
