@@ -1,7 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/database/commands/parameters/collation_options.dart';
 import 'package:mongo_dart/src/database/commands/parameters/read_concern.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 class CountOptions {
   /// Starting in MongoDB 3.6, the readConcern option has the following syntax:

@@ -6,14 +6,12 @@ import 'package:mongo_dart_query/mongo_dart_query.dart';
 
 void testSelectorBuilderCreation() {
   var selector = where;
-  expect(selector.map is Map, isTrue);
   expect(selector.map, isEmpty);
 }
 
 void testSelectorBuilderOnObjectId() {
   var id = ObjectId();
   var selector = where.id(id);
-  expect(selector.map is Map, isTrue);
   expect(selector.map.length, greaterThan(0));
   expect(
       selector.map,

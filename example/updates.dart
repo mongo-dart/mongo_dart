@@ -21,7 +21,7 @@ void main() async {
   }
   print('Record c: $v1');
   v1['value'] = 31;
-  await coll.save(v1);
+  await coll.insertOne(v1);
   var v2 = await coll.findOne({'name': 'c'});
   print('Record c after update: $v2');
 

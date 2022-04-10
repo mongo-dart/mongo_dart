@@ -5,7 +5,6 @@ import 'dart:io';
 import 'dart:async';
 import 'package:test/test.dart';
 import 'package:path/path.dart' as path;
-import 'package:uuid/uuid.dart';
 
 const dbName = 'testauth';
 const DefaultUri = 'mongodb://localhost:27017/test-mongo-dart';

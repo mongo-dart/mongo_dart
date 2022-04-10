@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/mongo-dart/mongo_dart.svg?branch=main)](https://travis-ci.org/mongo-dart/mongo_dart)
 -->
 
-Server-side driver library for MongoDb implemented in pure Dart. Server side means all packages using dart:io, dart:html is nota accepted.
+Server-side driver library for MongoDb implemented in pure Dart. Server side means all packages using dart:io, dart:html are not accepted.
 
 ## Apis
 

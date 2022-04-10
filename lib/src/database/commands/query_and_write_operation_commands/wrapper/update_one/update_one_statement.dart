@@ -1,6 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/update_operation/update_statement.dart';
-import 'package:mongo_dart/src/database/commands/parameters/collation_options.dart';
 import 'package:mongo_dart/src/database/utils/update_document_check.dart';
 
 class UpdateOneStatement extends UpdateStatement {

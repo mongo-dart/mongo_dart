@@ -2,13 +2,8 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/update_operation/update_operation.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/update_operation/update_options.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/update_operation/update_statement.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/replace_one/replace_one_operation.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/wrapper/replace_one/replace_one_statement.dart';
-import 'package:mongo_dart/src/database/commands/parameters/collation_options.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:mongo_dart/src/database/utils/update_document_check.dart';
 import 'package:test/test.dart';
-import 'package:uuid/uuid.dart';
 
 import 'utils/insert_data.dart';
 
@@ -71,27 +66,27 @@ void main() async {
   });
 
   group('Update Operations', () {
-    var cannotRunTests = false;
-    var running4_4orGreater = false;
+    //var cannotRunTests = false;
+    //var running4_4orGreater = false;
     var running4_2orGreater = false;
 
-    var isReplicaSet = false;
-    var isStandalone = false;
+    //var isReplicaSet = false;
+    //var isStandalone = false;
     var isSharded = false;
     setUp(() async {
       await initializeDatabase();
       if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
-        cannotRunTests = true;
+        //cannotRunTests = true;
       }
       var serverFcv = db.masterConnection.serverCapabilities.fcv;
       if (serverFcv?.compareTo('4.4') != -1) {
-        running4_4orGreater = true;
+        //running4_4orGreater = true;
       }
       if (serverFcv?.compareTo('4.2') != -1) {
         running4_2orGreater = true;
       }
-      isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
-      isStandalone = db.masterConnection.serverCapabilities.isStandalone;
+      //isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
+      //isStandalone = db.masterConnection.serverCapabilities.isStandalone;
       isSharded = db.masterConnection.serverCapabilities.isShardedCluster;
     });
 

@@ -1,6 +1,4 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/database/commands/parameters/collation_options.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 /// Create command options;
 ///

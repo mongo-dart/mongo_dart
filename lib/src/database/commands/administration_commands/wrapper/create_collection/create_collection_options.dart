@@ -1,6 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/create_command/create_options.dart';
-import 'package:mongo_dart/src/database/commands/parameters/collation_options.dart';
 
 class CreateCollectionOptions extends CreateOptions {
   CreateCollectionOptions({
@@ -19,6 +18,8 @@ class CreateCollectionOptions extends CreateOptions {
   }) : super(
             capped: capped,
             size: size,
+            // keeping here for backward compatabilit with 3.2
+            // ignore: deprecated_member_use_from_same_package
             autoIndexId: autoIndexId,
             max: max,
             storageEngine: storageEngine,
