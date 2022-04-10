@@ -1,7 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/database/commands/parameters/collation_options.dart';
 import 'package:mongo_dart/src/database/commands/parameters/read_concern.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 class FindOptions {
   /// The number of documents to return in the first batch. Defaults to **101**.

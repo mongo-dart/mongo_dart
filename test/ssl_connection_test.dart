@@ -120,8 +120,8 @@ void main() {
           'test?authMechanism=SCRAM-SHA-256&retryWrites=true&w=majority');
       await db.open();
       var coll = db.collection('test-insert');
-      var result =
-          await coll.insertOne({'solved': true, 'autoinit': 'delayed'});
+      /* var result = */
+      await coll.insertOne({'solved': true, 'autoinit': 'delayed'});
       // Todo update test
       // print(result['ops'].first);
       /* Todo update

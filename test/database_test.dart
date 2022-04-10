@@ -4,11 +4,8 @@ library database_tests;
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_operation/find_operation.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'dart:async';
 import 'package:test/test.dart';
-import 'package:uuid/uuid.dart';
 
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
@@ -221,7 +218,6 @@ Future testDateTime() async {
       .find(where.lt('posted_on', DateTime.utc(2013, 1, 5)))
       .toList();
 
-  expect(result is List, isTrue);
   expect(result.length, 4);
 }
 

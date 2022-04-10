@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+## 0.7.4+1
+
+Fixed Warnings and Lints for pub evaluation.
+
 ## 0.7.4
 
 - Fixed misleading error message if the database name was not specified in the connection string

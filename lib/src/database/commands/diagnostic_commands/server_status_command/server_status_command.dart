@@ -1,8 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
-import 'server_status_options.dart';
 import 'server_status_result.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 var _command = <String, Object>{keyServerStatus: 1};
 

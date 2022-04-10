@@ -1,5 +1,4 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 class UpdateOptions {
   /// A document expressing the [write concern](https://docs.mongodb.com/manual/reference/write-concern/).

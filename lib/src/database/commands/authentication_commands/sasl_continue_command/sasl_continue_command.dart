@@ -6,7 +6,6 @@ import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/database/message/additional/section.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
 import 'sasl_continue_options.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 class SaslContinueCommand extends CommandOperation {
   SaslContinueCommand(Db db, int conversationId, Uint8List payload,

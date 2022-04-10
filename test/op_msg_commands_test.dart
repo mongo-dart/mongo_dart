@@ -4,15 +4,9 @@ import 'package:mongo_dart/src/database/commands/administration_commands/get_par
 import 'package:mongo_dart/src/database/commands/administration_commands/kill_cursors_command/kill_cursors_command.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/get_all_parameters_command/get_all_parameters_command.dart';
 
-import 'package:mongo_dart/src/database/commands/diagnostic_commands/server_status_command/server_status_command.dart';
-import 'package:mongo_dart/src/database/commands/diagnostic_commands/server_status_command/server_status_options.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_options.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_operation/find_operation.dart';
-import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/find_operation/find_options.dart';
-import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:test/test.dart';
-import 'package:uuid/uuid.dart';
 
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
