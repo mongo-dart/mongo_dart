@@ -155,8 +155,8 @@ void main() {
       var db = await Db.create(doConnectionString);
       await db.open();
       var coll = db.collection('test-insert');
-      var result =
-          await coll.insertOne({'solved': true, 'autoinit': 'delayed'});
+      /*     var result = */
+      await coll.insertOne({'solved': true, 'autoinit': 'delayed'});
       // Todo update test
       // print(result['ops'].first);
       /* Todo update
