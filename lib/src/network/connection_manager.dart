@@ -158,7 +158,7 @@ class _ConnectionManager {
     if (unfilled(db.databaseName)) {
       throw MongoDartError('Database name not specified');
     }
-    db.state = State.OPEN;
+    db.state = State.open;
 
     if (_masterConnection!.serverCapabilities.supportsOpMsg) {
       await ServerStatusCommand(db,

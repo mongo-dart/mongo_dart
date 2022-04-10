@@ -107,6 +107,7 @@ const keyHidden = 'hidden';
 const keyHint = 'hint';
 const keyHost = 'host';
 const keyHosts = 'hosts';
+// ignore: constant_identifier_names
 const key_id = '_id';
 const keyId = 'id';
 const keyIndex = 'index';

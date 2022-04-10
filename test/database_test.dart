@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
 
-const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
+const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 //var throwsMongoDartError = throwsA((e) => e is MongoDartError);
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
@@ -26,24 +26,24 @@ String getRandomCollectionName() {
 }
 
 Future testDbCreate() async {
-  var dbCreate = Db(DefaultUri);
+  var dbCreate = Db(defaultUri);
   await dbCreate.open();
   await dbCreate.close();
 
-  dbCreate = await Db.create(DefaultUri);
+  dbCreate = await Db.create(defaultUri);
   await dbCreate.open();
   await dbCreate.close();
 }
 
 Future testOperationNotInOpenState() async {
-  var dbCreate = await Db.create(DefaultUri);
+  var dbCreate = await Db.create(defaultUri);
   var coll = dbCreate.collection('test-error');
   expect(
       () async =>
           await coll.findAndModify(query: {'value': 1}, update: {'value': 1}),
       throwsMongoDartError);
 
-  dbCreate = Db(DefaultUri);
+  dbCreate = Db(defaultUri);
   await dbCreate.open();
   coll = dbCreate.collection('test-error');
   await dbCreate.close();
@@ -364,7 +364,7 @@ Future testInsertWithObjectId() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  var id;
+  dynamic id;
   var objectToSave = <String, dynamic>{
     '_id': ObjectId(),
     'name': 'a',
@@ -799,7 +799,7 @@ Future testLimitWithSortByAndSkip() async {
 
   counter = await cursor.stream.length;
   expect(counter, 10);
-  expect(cursor.state, State.CLOSED);
+  expect(cursor.state, State.closed);
   expect(cursor.cursorId, 0);
 }
 
@@ -824,7 +824,7 @@ Future testLimit() async {
 
   await cursor.stream.forEach((e) => counter++);
   expect(counter, 10);
-  expect(cursor.state, State.CLOSED);
+  expect(cursor.state, State.closed);
   expect(cursor.cursorId, 0);
 }
 
@@ -846,14 +846,14 @@ Future testCursorClosing() async {
   await insertManyDocuments(collection, 10000);
 
   var cursor = collection.createCursor();
-  expect(cursor.state, State.INIT);
+  expect(cursor.state, State.init);
 
   var newCursor = await cursor.nextObject();
-  expect(cursor.state, State.OPEN);
+  expect(cursor.state, State.open);
   expect(cursor.cursorId, isPositive);
 
   await cursor.close();
-  expect(cursor.state, State.CLOSED);
+  expect(cursor.state, State.closed);
   expect(cursor.cursorId, 0);
 
   var result = await collection.findOne();
@@ -862,10 +862,10 @@ Future testCursorClosing() async {
 
   var modernCursor = ModernCursor(FindOperation(collection));
 
-  expect(modernCursor.state, State.INIT);
+  expect(modernCursor.state, State.init);
 
   var cursorResult = await modernCursor.nextObject();
-  expect(modernCursor.state, State.OPEN);
+  expect(modernCursor.state, State.open);
   expect(modernCursor.cursorId.value, isPositive);
   expect(cursorResult, isNotNull);
   if (cursorResult == null) {
@@ -875,7 +875,7 @@ Future testCursorClosing() async {
   expect(cursorResult, isNotNull);
 
   await modernCursor.close();
-  expect(modernCursor.state, State.CLOSED);
+  expect(modernCursor.state, State.closed);
   expect(modernCursor.cursorId.value, 0);
 
   result = await collection.findOne();
@@ -933,7 +933,7 @@ Future testCursorWithOpenServerCursor() async {
 
   await cursor.nextObject();
 
-  expect(cursor.state, State.OPEN);
+  expect(cursor.state, State.open);
   expect(cursor.cursorId, isPositive);
 }
 
@@ -953,7 +953,7 @@ Future testCursorGetMore() async {
 
   expect(count, 1000);
   expect(cursor.cursorId, 0);
-  expect(cursor.state, State.CLOSED);
+  expect(cursor.state, State.closed);
 }
 
 void testDbCommandCreation() {
@@ -995,10 +995,10 @@ void testAuthComponents() {
   var nonce = '94505e7196beb570';
   var userName = 'dart';
   var password = 'test';
-  var test_key = 'aea09fb38775830306c5ff6de964ff04';
-  var hashed_password = _md5('$userName:mongo:$password');
-  var key = _md5('$nonce$userName$hashed_password');
-  expect(key, test_key);
+  var testKey = 'aea09fb38775830306c5ff6de964ff04';
+  var hashedPassword = _md5('$userName:mongo:$password');
+  var key = _md5('$nonce$userName$hashedPassword');
+  expect(key, testKey);
 }
 
 Future testAuthenticationWithUri() async {
@@ -1078,7 +1078,7 @@ Future testIndexCreationOnCollection() async {
     await collection.insertAll(toInsert);
 
     /* var resInsert = */ await collection
-        .insertOne({'a': 200}, writeConcern: WriteConcern.UNACKNOWLEDGED);
+        .insertOne({'a': 200}, writeConcern: WriteConcern.unacknowledged);
 
     // Todo correct
     //expect(resInsert['ok'], 1.0);
@@ -1270,7 +1270,7 @@ Future testFindWithFieldsClause() async {
 Future testFindAndModify() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
-  var result;
+  dynamic result;
 
   await collection.insertAll([
     {'name': 'Bob', 'score': 2},
@@ -1458,7 +1458,7 @@ Future testDbNotOpen() async {
 Future testDbOpenWhileStateIsOpening() {
   var collectionName = getRandomCollectionName();
 
-  var db = Db(DefaultUri);
+  var db = Db(defaultUri);
   return Future.sync(() {
     db.open().then((_) {
       return db.collection(collectionName).findOne();
@@ -1472,7 +1472,7 @@ Future testDbOpenWhileStateIsOpening() {
       expect(res, isNull);
     }).catchError((e) {
       expect(e is MongoDartError, isTrue);
-      expect(db.state == State.OPENING, isTrue);
+      expect(db.state == State.opening, isTrue);
     });
   });
 }
@@ -1494,7 +1494,7 @@ void testInvalidIndexCreationErrorHandling1() {
 Future testFindOneWhileStateIsOpening() async {
   var collectionName = getRandomCollectionName();
 
-  var db = Db(DefaultUri);
+  var db = Db(defaultUri);
   return Future.sync(() async {
     // ignore: unawaited_futures
     db.open().then((_) {
@@ -1508,14 +1508,14 @@ Future testFindOneWhileStateIsOpening() async {
       await db.collection(collectionName).findOne();
     } catch (e) {
       expect(e is MongoDartError, isTrue);
-      expect(db.state == State.OPENING, isTrue);
+      expect(db.state == State.opening, isTrue);
     }
   });
 }
 
 void main() async {
   Future initializeDatabase() async {
-    db = Db(DefaultUri);
+    db = Db(defaultUri);
     await db.open();
   }
 

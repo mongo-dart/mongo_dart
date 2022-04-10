@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+## 0.7.4+2
+
+Now using Lints instead of Pedantic
+
 ## 0.7.4+1
 
 Fixed Warnings and Lints for pub evaluation.

@@ -4,7 +4,7 @@ typedef MonadicBlock = void Function(Map<String, dynamic> value);
 
 class Cursor {
   //final _log = Logger('Cursor');
-  State state = State.INIT;
+  State state = State.init;
   int cursorId = 0;
   Db db;
   Queue<Map<String, dynamic>> items;
@@ -17,7 +17,7 @@ class Cursor {
   Map<String, dynamic>? sort;
   Map<String, dynamic>? hint;
   MonadicBlock? eachCallback;
-  var eachComplete;
+  //var eachComplete;
   bool explain = false;
   int flags = 0;
 
@@ -108,10 +108,10 @@ class Cursor {
   }
 
   Future<Map<String, dynamic>?> nextObject() {
-    if (state == State.INIT) {
+    if (state == State.init) {
       var qm = generateQueryMessage();
       return db.queryMessage(qm).then((replyMessage) {
-        state = State.OPEN;
+        state = State.open;
         getCursorData(replyMessage);
         if (items.isNotEmpty) {
           return Future.value(_getNextItem());
@@ -119,17 +119,17 @@ class Cursor {
           return Future.value(null);
         }
       });
-    } else if (state == State.OPEN && limit > 0 && _returnedCount == limit) {
+    } else if (state == State.open && limit > 0 && _returnedCount == limit) {
       return close();
-    } else if (state == State.OPEN && items.isNotEmpty) {
+    } else if (state == State.open && items.isNotEmpty) {
       return Future.value(_getNextItem());
-    } else if (state == State.OPEN && cursorId > 0) {
+    } else if (state == State.open && cursorId > 0) {
       var qm = generateGetMoreMessage();
       return db.queryMessage(qm).then((replyMessage) {
-        state = State.OPEN;
+        state = State.open;
         getCursorData(replyMessage);
         var isDead = (replyMessage.responseFlags ==
-                MongoReplyMessage.FLAGS_CURSOR_NOT_FOUND) &&
+                MongoReplyMessage.flagsCursorNotFound) &&
             (cursorId == 0);
         if (items.isNotEmpty) {
           return Future.value(_getNextItem());
@@ -141,25 +141,25 @@ class Cursor {
               () => completer.complete(null));
           return completer.future;
         } else {
-          state = State.CLOSED;
+          state = State.closed;
           return Future.value(null);
         }
       });
     } else {
-      state = State.CLOSED;
+      state = State.closed;
       return Future.value(null);
     }
   }
 
-  Future<Null> close() {
+  Future<Map<String, dynamic>?> close() async {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
-    state = State.CLOSED;
+    state = State.closed;
     if (cursorId != 0) {
       var msg = MongoKillCursorsMessage(cursorId);
       cursorId = 0;
-      db.executeMessage(msg, WriteConcern.UNACKNOWLEDGED);
+      db.executeMessage(msg, WriteConcern.unacknowledged);
     }
-    return Future.value(null);
+    return null;
   }
 
 //  Stream<Map> get stream {

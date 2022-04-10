@@ -2,11 +2,11 @@ part of mongo_dart;
 
 abstract class GridFSFile {
   GridFS fs;
-  var id;
+  dynamic id;
   String? filename;
   String? contentType;
   int? length;
-  int chunkSize = GridFS.DEFAULT_CHUNKSIZE;
+  int chunkSize = GridFS.defaultChunkSize;
   DateTime? uploadDate;
   Map<String, Object?> extraData = <String, Object?>{};
   //StringBuffer fullContent;
@@ -80,7 +80,7 @@ abstract class GridFSFile {
     contentType = extraData.remove('contentType')?.toString();
     length = extraData.remove('length') as int?;
     chunkSize =
-        extraData.remove('chunkSize') as int? ?? GridFS.DEFAULT_CHUNKSIZE;
+        extraData.remove('chunkSize') as int? ?? GridFS.defaultChunkSize;
     uploadDate = extraData.remove('uploadDate') as DateTime?;
     md5 = extraData.remove('md5')?.toString();
   }

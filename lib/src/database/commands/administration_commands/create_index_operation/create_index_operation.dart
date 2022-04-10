@@ -65,7 +65,7 @@ class CreateIndexOperation extends CommandOperation {
 Map<String, Object> parseIndexOptions(Object fieldOrSpec) {
   var fieldHash = <String, Object>{};
   var indexes = <String>[];
-  var keys;
+  Iterable? keys;
 
 // Get all the fields accordingly
   if (fieldOrSpec is String) {

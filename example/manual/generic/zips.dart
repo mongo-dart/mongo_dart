@@ -5,7 +5,7 @@ import 'zip_list.dart';
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
 
-const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
+const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void displayZip(Map zip) {
   print('state: ${zip['state']}, city: ${zip['city']}, '
@@ -13,7 +13,7 @@ void displayZip(Map zip) {
 }
 
 void main() async {
-  var db = Db(DefaultUri);
+  var db = Db(defaultUri);
   await db.open();
 
   Future cleanupDatabase() async => await db.close();

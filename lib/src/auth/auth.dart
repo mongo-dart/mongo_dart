@@ -6,6 +6,7 @@ import 'mongodb_cr_authenticator.dart';
 import 'scram_sha1_authenticator.dart';
 import 'scram_sha256_authenticator.dart';
 
+// ignore: constant_identifier_names
 enum AuthenticationScheme { MONGODB_CR, SCRAM_SHA_1, SCRAM_SHA_256 }
 
 abstract class Authenticator {

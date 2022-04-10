@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 part of mongo_dart;
 
 class MongoQueryMessage extends MongoMessage {
@@ -32,7 +34,7 @@ class MongoQueryMessage extends MongoMessage {
     if (fields != null) {
       _fields = BsonMap(fields);
     }
-    opcode = MongoMessage.Query;
+    opcode = MongoMessage.query;
   }
 
   @override

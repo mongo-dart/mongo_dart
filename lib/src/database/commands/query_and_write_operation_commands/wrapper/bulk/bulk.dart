@@ -395,7 +395,7 @@ abstract class Bulk extends CommandOperation {
     var retList = <Map<String, Object?>>[];
     var isOrdered = options[keyOrdered] as bool? ?? true;
     final db = this.db;
-    if (db.state != State.OPEN) {
+    if (db.state != State.open) {
       throw MongoDartError('Db is in the wrong state: ${db.state}');
     }
     //final options = Map.from(this.options);

@@ -166,7 +166,7 @@ class MongoModernMessage extends MongoResponseMessage {
   late List<Section> sections;
 
   MongoModernMessage.fromBuffer(BsonBinary buffer) {
-    opcode = MongoMessage.ModernMessage;
+    opcode = MongoMessage.modernMessage;
     flags = 0;
     deserialize(buffer);
   }
@@ -177,7 +177,7 @@ class MongoModernMessage extends MongoResponseMessage {
     moreToCome ??= false;
     exhaustAllowed ??= false;
 
-    opcode = MongoMessage.ModernMessage;
+    opcode = MongoMessage.modernMessage;
 
     flags = 0;
     if (checksumPresent) {

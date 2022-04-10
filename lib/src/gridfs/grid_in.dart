@@ -6,8 +6,8 @@ class GridIn extends GridFSFile {
   int currentChunkNumber = 0;
   int totalBytes = 0;
 
-  @override
-  String? filename;
+  //@override
+  //String? filename;
 
   /// Used for MD5 calculation, now deprecated
   //Uint8List contentToDigest = Uint8List(0);
@@ -16,6 +16,7 @@ class GridIn extends GridFSFile {
     id = ObjectId();
     input = ChunkHandler(chunkSize).transformer.bind(inputStream);
     uploadDate = DateTime.now();
+    // ignore: prefer_initializing_formals
     this.filename = filename;
   }
 
@@ -33,7 +34,7 @@ class GridIn extends GridFSFile {
     if (savedChunks) {
       throw MongoDartError('chunks already saved!');
     }
-    if (chunkSize <= 0 || chunkSize > GridFS.MAX_CHUNKSIZE) {
+    if (chunkSize <= 0 || chunkSize > GridFS.maxChunkSize) {
       throw MongoDartError(
           'chunkSize must be greater than zero and less than or equal to GridFS.MAX_CHUNKSIZE');
     }

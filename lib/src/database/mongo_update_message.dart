@@ -16,7 +16,7 @@ class MongoUpdateMessage extends MongoMessage {
       document = document.map;
     }
     _document = BsonMap(document as Map<String, dynamic>);
-    opcode = MongoMessage.Update;
+    opcode = MongoMessage.update;
   }
 
   @override

@@ -16,7 +16,7 @@ class ServerStatusOptions {
   final bool connectionsExcluded;
   final bool defaultRWConcernExcluded;
   final bool electionMetricsExcluded;
-  final bool extra_infoExcluded;
+  final bool extraInfoExcluded;
   final bool flowControlExcluded;
   final bool freeMonitoringExcluded;
   final bool globalLockExcluded;
@@ -52,7 +52,7 @@ class ServerStatusOptions {
       this.connectionsExcluded = false,
       this.defaultRWConcernExcluded = false,
       this.electionMetricsExcluded = false,
-      this.extra_infoExcluded = false,
+      this.extraInfoExcluded = false,
       this.flowControlExcluded = false,
       this.freeMonitoringExcluded = false,
       this.globalLockExcluded = false,
@@ -86,7 +86,7 @@ class ServerStatusOptions {
       connectionsExcluded: true,
       defaultRWConcernExcluded: true,
       electionMetricsExcluded: true,
-      extra_infoExcluded: true,
+      extraInfoExcluded: true,
       flowControlExcluded: true,
       freeMonitoringExcluded: true,
       globalLockExcluded: true,
@@ -117,7 +117,7 @@ class ServerStatusOptions {
       connectionsExcluded: true,
       defaultRWConcernExcluded: true,
       electionMetricsExcluded: true,
-      extra_infoExcluded: true,
+      extraInfoExcluded: true,
       flowControlExcluded: true,
       freeMonitoringExcluded: true,
       globalLockExcluded: true,
@@ -155,7 +155,7 @@ class ServerStatusOptions {
         if (connectionsExcluded) keyConnections: 0,
         if (defaultRWConcernExcluded) keyDefaultRWConcern: 0,
         if (electionMetricsExcluded) keyElectionMetrics: 0,
-        if (extra_infoExcluded) keyExtraInfo: 0,
+        if (extraInfoExcluded) keyExtraInfo: 0,
         if (flowControlExcluded) keyFlowControl: 0,
         if (freeMonitoringExcluded) keyFreeMonitoring: 0,
         if (globalLockExcluded) keyGlobalLock: 0,

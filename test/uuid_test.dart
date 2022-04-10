@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 const dbName = 'test';
 const dbAddress = '127.0.0.1';
 
-const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
+const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 late Db db;
 Uuid uuid = Uuid();
@@ -20,7 +20,7 @@ String getRandomCollectionName() {
 
 void main() async {
   Future initializeDatabase() async {
-    db = Db(DefaultUri);
+    db = Db(defaultUri);
     await db.open();
   }
 

@@ -22,6 +22,7 @@ class ModernCursor {
       bool? moreToCome,
       bool? exhaustAllowed,
       int? batchSize})
+      // ignore: prefer_initializing_formals
       : operation = operation,
         collection = operation.collection,
         db = operation.collection?.db ?? operation.db,
@@ -68,6 +69,7 @@ class ModernCursor {
       bool? checksumPresent,
       bool? moreToCome,
       bool? exhaustAllowed})
+      // ignore: prefer_initializing_formals
       : collection = collection,
         collectionName = collection.collectionName,
         tailable = tailable ?? false,
@@ -76,7 +78,7 @@ class ModernCursor {
         checksumPresent = checksumPresent ?? false,
         moreToCome = moreToCome ?? false,
         exhaustAllowed = exhaustAllowed ?? false {
-    state = State.OPEN;
+    state = State.open;
     db = collection.db;
     if (this.isChangeStream) {
       this.tailable = this.awaitData = true;
@@ -84,7 +86,7 @@ class ModernCursor {
     _batchSize = defaultBatchSize;
   }
 
-  State state = State.INIT;
+  State state = State.init;
   BsonLong cursorId = BsonLong(0);
   late Db db;
   Queue<Map<String, Object?>> items = Queue<Map<String, Object?>>();
@@ -191,14 +193,14 @@ class ModernCursor {
 
     var justPrepareCursor = false;
     Map<String, Object?>? result;
-    if (state == State.INIT && operation != null) {
+    if (state == State.init && operation != null) {
       if (operation!.options[keyBatchSize] != null &&
           operation!.options[keyBatchSize] == 0) {
         justPrepareCursor = true;
       }
       result = await operation!.execute();
-      state = State.OPEN;
-    } else if (state == State.OPEN) {
+      state = State.open;
+    } else if (state == State.open) {
       if (cursorId.data == 0) {
         await _serverSideCursorClose();
         return null;
@@ -252,7 +254,7 @@ class ModernCursor {
 
   Future<void> close() async {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
-    state = State.CLOSED;
+    state = State.closed;
     if (cursorId.value != 0 && collection != null) {
       var command = KillCursorsCommand(collection!, [cursorId], db: db);
       await command.execute();
@@ -272,8 +274,8 @@ class ModernCursor {
           if (doc != null) {
             controller.add(doc);
           }
-        } while (state != State.CLOSED && !paused);
-        if (state == State.CLOSED) {
+        } while (state != State.closed && !paused);
+        if (state == State.closed) {
           await controller.close();
         }
       } catch (e, stack) {
@@ -282,7 +284,7 @@ class ModernCursor {
     }
 
     void startReading() {
-      if (state == State.CLOSED) {
+      if (state == State.closed) {
         return;
       }
       paused = false;

@@ -8,6 +8,7 @@ enum WriteCommandType { insert, update, delete }
 abstract class AbstractWriteResult with BasicResult {
   AbstractWriteResult.fromMap(
       WriteCommandType writeCommandType, Map<String, Object?> result)
+      // ignore: prefer_initializing_formals
       : writeCommandType = writeCommandType,
         serverResponses = [result] {
     extractBasic(result);

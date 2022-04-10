@@ -8,7 +8,7 @@ class MongoGetMoreMessage extends MongoMessage {
   MongoGetMoreMessage(String collectionFullName, this.cursorId,
       [this.numberToReturn = 20])
       : _collectionFullName = BsonCString(collectionFullName) {
-    opcode = MongoMessage.GetMore;
+    opcode = MongoMessage.getMore;
   }
 
   @override

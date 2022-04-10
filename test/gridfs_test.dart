@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 import 'package:path/path.dart' as path;
 
 const dbName = 'testauth';
-const DefaultUri = 'mongodb://localhost:27017/test-mongo-dart';
+const defaultUri = 'mongodb://localhost:27017/test-mongo-dart';
 late Db db;
 
 Uuid uuid = Uuid();
@@ -72,7 +72,7 @@ Future testBig() {
     0xff
   ];
 
-  var target = GridFS.DEFAULT_CHUNKSIZE * 3;
+  var target = GridFS.defaultChunkSize * 3;
   var data = <int>[];
   while (data.length < target) {
     data.addAll(smallData);
@@ -97,8 +97,8 @@ Future tesSomeChunks() async {
     0xff
   ];
 
-  GridFS.DEFAULT_CHUNKSIZE = 9;
-  var target = GridFS.DEFAULT_CHUNKSIZE * 3;
+  GridFS.defaultChunkSize = 9;
+  var target = GridFS.defaultChunkSize * 3;
 
   var data = <int>[];
   while (data.length < target) {
@@ -140,7 +140,7 @@ Future testInOut(List<int> data, GridFS gridFS,
   var gridOut = await gridFS.findOne(where.eq('_id', input.id));
   expect(gridOut, isNotNull, reason: 'Did not find file by Id');
   expect(input.id, gridOut?.id, reason: 'Ids not equal.');
-  expect(GridFS.DEFAULT_CHUNKSIZE, gridOut?.chunkSize,
+  expect(GridFS.defaultChunkSize, gridOut?.chunkSize,
       reason: 'Chunk size not the same.');
   expect('test', gridOut?.filename, reason: 'Filename not equal');
   expect(input.extraData, gridOut?.extraData);
@@ -189,7 +189,7 @@ Future testChunkTransformerSeveralChunks2() {
 
 Future testFileToGridFSToFile() async {
   var collectionName = getRandomCollectionName();
-  GridFS.DEFAULT_CHUNKSIZE = 30;
+  GridFS.defaultChunkSize = 30;
   GridIn input;
   var dir = path.join(path.current, 'test');
 
@@ -228,7 +228,7 @@ Future testExtraData() {
 
 void main() {
   Future initializeDatabase() async {
-    db = Db(DefaultUri);
+    db = Db(defaultUri);
     await db.open();
   }
 
@@ -252,7 +252,7 @@ void main() {
         testChunkTransformerSeveralChunks2);
   });
   group('GridFS tests:', () {
-    setUp(() => GridFS.DEFAULT_CHUNKSIZE = 256 * 1024);
+    setUp(() => GridFS.defaultChunkSize = 256 * 1024);
     test('testSmall', testSmall);
     test('tesSomeChunks', tesSomeChunks);
     test('testBig', testBig);

@@ -3,12 +3,12 @@ import 'package:mongo_dart/mongo_dart.dart';
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
 
-const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
+const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void main() async {
   var running4_2orGreater = false;
 
-  var db = Db(DefaultUri);
+  var db = Db(defaultUri);
   await db.open();
   var serverFcv = db.masterConnection.serverCapabilities.fcv ?? '0.0';
   if (serverFcv.compareTo('4.2') != -1) {

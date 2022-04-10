@@ -11,7 +11,7 @@ class MongoMessageHandler {
       var buffer = BsonBinary.from(converter.messages.removeFirst());
       var opcodeFromWire = MongoResponseMessage.extractOpcode(buffer);
       MongoResponseMessage reply;
-      if (opcodeFromWire == MongoMessage.Reply) {
+      if (opcodeFromWire == MongoMessage.reply) {
         reply = MongoReplyMessage()..deserialize(buffer);
       } else {
         reply = MongoModernMessage.fromBuffer(buffer);

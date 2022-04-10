@@ -131,7 +131,7 @@ void main() async {
           'codeName': 'Location40415'
         };
 
-        var err;
+        dynamic err;
 
         try {
           await db.open();
@@ -156,7 +156,7 @@ void main() async {
       });
 
       test('Setting mongodb-cr with selectAuthenticationMechanisn', () async {
-        var db = Db('$mongoDbUri');
+        var db = Db(mongoDbUri);
 
         var expectedError = {
           'ok': 0.0,
@@ -177,7 +177,7 @@ void main() async {
           'codeName': 'Location40415'
         };
 
-        var err;
+        dynamic err;
 
         try {
           db.selectAuthenticationMechanism('MONGODB-CR');
@@ -206,7 +206,7 @@ void main() async {
         final authMechanism = 'Anything';
         var db = Db('$mongoDbUri?authMechanism=$authMechanism');
 
-        var sut = () async => await db.open();
+        dynamic sut() async => await db.open();
 
         expect(
             sut(),

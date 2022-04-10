@@ -8,7 +8,7 @@ import 'utils/insert_data.dart';
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
 
-const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
+const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
@@ -24,7 +24,7 @@ String getRandomCollectionName() {
 
 void main() async {
   Future initializeDatabase() async {
-    db = Db(DefaultUri);
+    db = Db(defaultUri);
     await db.open();
   }
 

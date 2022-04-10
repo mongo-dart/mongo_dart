@@ -13,17 +13,17 @@ void main() async {
   await test.drop();
   print('Sequentially inserting 1000 records with aknowledgment');
   for (var elem in data) {
-    await test.insertOne(elem, writeConcern: WriteConcern.ACKNOWLEDGED);
+    await test.insertOne(elem, writeConcern: WriteConcern.acknowledged);
   }
 
   print(stopwatch.elapsed);
   print('Inserting array of 1000 records with aknowledgment');
 
-  await test.insertMany(data, writeConcern: WriteConcern.ACKNOWLEDGED);
+  await test.insertMany(data, writeConcern: WriteConcern.acknowledged);
   print(stopwatch.elapsed);
   print('Inserting array of 500 records with aknowledgment');
   await test.insertMany(data.sublist(500),
-      writeConcern: WriteConcern.ACKNOWLEDGED);
+      writeConcern: WriteConcern.acknowledged);
   print(stopwatch.elapsed);
 
   await db.close();

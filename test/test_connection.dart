@@ -4,7 +4,7 @@ import 'package:logging/logging.dart';
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
 
-const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
+const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 // This test must be run manually with mongoDb dowm,
 // Then, while it is running, start mongo db.
@@ -15,7 +15,7 @@ void main() async {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
 
-  var db = Db(DefaultUri);
+  var db = Db(defaultUri);
   var count = 0;
   while (count < 10) {
     try {

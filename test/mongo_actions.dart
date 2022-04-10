@@ -5,22 +5,22 @@ import 'dart:io';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart';
 
-const DATA_PATH = '/tmp/mongo_dart-unit_test';
-const DATA_CFG = '$DATA_PATH/configure.js';
-const PORT_STD = 27017;
-const PORT_BASE = 27000;
-const RS_LENGTH = 3;
-const RS_NAME = 'rs';
-const MONGOD = 'mongod';
-const MONGO = 'mongo';
+const dataPath = '/tmp/mongo_dart-unit_test';
+const dataCfg = '$dataPath/configure.js';
+const portStd = 27017;
+const portBase = 27000;
+const rsLength = 3;
+const rsName = 'rs';
+const mongod = 'mongod';
+const mongo = 'mongo';
 
 final _log = Logger('MongoActions');
 
-void _makeEnv([int rsLength = RS_LENGTH]) {
-  Directory('$DATA_PATH/$PORT_STD').createSync(recursive: true);
+void _makeEnv([int rsLength = rsLength]) {
+  Directory('$dataPath/$portStd').createSync(recursive: true);
   for (var i = 1; i <= rsLength; i++) {
-    var port = PORT_BASE + i;
-    Directory('$DATA_PATH/$port').createSync(recursive: true);
+    var port = portBase + i;
+    Directory('$dataPath/$port').createSync(recursive: true);
   }
 }
 
@@ -28,7 +28,7 @@ void _makeEnv([int rsLength = RS_LENGTH]) {
 //  new Directory(DATA_PATH).deleteSync(recursive: true);
 //}
 
-void _configureRs(StringBuffer buffer, [int rsLength = RS_LENGTH]) {
+void _configureRs(StringBuffer buffer, [int rsLength = rsLength]) {
   buffer.write('var x = rs.initiate({');
   buffer.write('"_id": "rs",');
   buffer.write('  "version": 1,');
@@ -36,7 +36,7 @@ void _configureRs(StringBuffer buffer, [int rsLength = RS_LENGTH]) {
   for (var i = 1; i <= rsLength; i++) {
     buffer.write('    {');
     buffer.write('      "_id": $i,');
-    buffer.write('      "host": "localhost:${PORT_BASE + i}"');
+    buffer.write('      "host": "localhost:${portBase + i}"');
     buffer.write('    },');
   }
   buffer.write('  ]');
@@ -63,7 +63,7 @@ void _waitDbIsmaster(StringBuffer buffer) {
 }
 
 void _initStatus() {
-  var script = File(DATA_CFG);
+  var script = File(dataCfg);
   var buffer = StringBuffer();
   _waitDbIsmaster(buffer);
   script.writeAsStringSync(buffer.toString());
@@ -78,11 +78,11 @@ ProcessResult _startMongod(int port, [String? rs]) {
     '--oplogSize',
     '50',
     '--logpath',
-    '$DATA_PATH/$port.log',
+    '$dataPath/$port.log',
     '--pidfilepath',
-    '$DATA_PATH/$port.pid',
+    '$dataPath/$port.pid',
     '--dbpath',
-    '$DATA_PATH/$port',
+    '$dataPath/$port',
     '--port',
     '$port',
     '-v'
@@ -90,11 +90,11 @@ ProcessResult _startMongod(int port, [String? rs]) {
   if (rs != null) {
     args.addAll(['--replSet', rs]);
   }
-  return Process.runSync(MONGOD, args);
+  return Process.runSync(mongod, args);
 }
 
 void _stopMongod(int port) {
-  var pid = _readPidFile('$DATA_PATH/$port.pid');
+  var pid = _readPidFile('$dataPath/$port.pid');
   if (_checkPid(pid)) {
     _log.info(() => '### Stop mongod $port instance');
     _killPid(pid);
@@ -102,10 +102,10 @@ void _stopMongod(int port) {
 }
 
 void _statusMongod(int port) {
-  var pid = _readPidFile('$DATA_PATH/$port.pid');
+  var pid = _readPidFile('$dataPath/$port.pid');
   if (_checkPid(pid)) {
-    var args = ['localhost:$port', DATA_CFG];
-    var result = Process.runSync(MONGO, args);
+    var args = ['localhost:$port', dataCfg];
+    var result = Process.runSync(mongo, args);
     _log.info(() => '### mongod $port instance is running (PID=$pid)');
     _log.info(() => result.stderr);
     _log.info(() => result.stdout);
@@ -116,66 +116,66 @@ void _statusMongod(int port) {
 
 void startStandalone() {
   _makeEnv();
-  _startMongod(PORT_STD);
+  _startMongod(portStd);
 }
 
 void stopStandalone() {
   _makeEnv();
-  _stopMongod(PORT_STD);
+  _stopMongod(portStd);
 }
 
 void statusStandalone() {
   _initStatus();
-  _statusMongod(PORT_STD);
+  _statusMongod(portStd);
 }
 
-void startRs([int rsLength = RS_LENGTH]) {
+void startRs([int rsLength = rsLength]) {
   _makeEnv(rsLength);
 
   //var futures = new List<Future<Process>>();
   for (var i = 1; i <= rsLength; i++) {
-    var port = PORT_BASE + i;
-    _startMongod(port, RS_NAME);
+    var port = portBase + i;
+    _startMongod(port, rsName);
   }
 
-  var script = File(DATA_CFG);
+  var script = File(dataCfg);
   var buffer = StringBuffer();
   _configureRs(buffer, rsLength);
   _waitRs(buffer);
   script.writeAsStringSync(buffer.toString());
   //script = null;
 
-  var port = PORT_BASE + 1;
-  var args = ['localhost:$port', DATA_CFG];
-  var result = Process.runSync(MONGO, args);
+  var port = portBase + 1;
+  var args = ['localhost:$port', dataCfg];
+  var result = Process.runSync(mongo, args);
   _log.info(() => result.stderr);
   _log.info(() => result.stdout);
 
-  script = File(DATA_CFG);
+  script = File(dataCfg);
   buffer = StringBuffer();
   _waitRs(buffer);
   script.writeAsStringSync(buffer.toString());
   //script = null;
 
   for (var i = 2; i <= rsLength; i++) {
-    var port = PORT_BASE + i;
-    var args = ['localhost:$port', DATA_CFG];
-    var result = Process.runSync(MONGO, args);
+    var port = portBase + i;
+    var args = ['localhost:$port', dataCfg];
+    var result = Process.runSync(mongo, args);
     _log.info(() => result.stderr);
     _log.info(() => result.stdout);
   }
 }
 
-void stopRs([int rsLength = RS_LENGTH]) {
+void stopRs([int rsLength = rsLength]) {
   for (var i = 1; i <= rsLength; i++) {
-    _stopMongod(PORT_BASE + i);
+    _stopMongod(portBase + i);
   }
 }
 
-void statusRs([int rsLength = RS_LENGTH]) {
+void statusRs([int rsLength = rsLength]) {
   _initStatus();
   for (var i = 1; i <= rsLength; i++) {
-    var port = PORT_BASE + i;
+    var port = portBase + i;
     _statusMongod(port);
   }
 }
@@ -204,10 +204,12 @@ void main(List<String> args) {
   hierarchicalLoggingEnabled = true;
   Logger.root.level = Level.OFF;
   Logger('MongoActions').level = Level.ALL;
-  var listener = (LogRecord r) {
+
+  void listener(LogRecord r) {
     var name = r.loggerName;
     print('${r.time}: $name: ${r.message}');
-  };
+  }
+
   Logger.root.onRecord.listen(listener);
 
   var cmd = (args.isEmpty) ? '' : args[0];

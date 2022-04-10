@@ -4,7 +4,7 @@ class PacketConverter {
   //final _log = Logger('PacketConverter');
   final packets = ListQueue<List<int>>();
   final messages = ListQueue<List<int>>();
-  final MAX_DOC_SIZE = 32 * 1024 * 1024;
+  final maxDocSize = 32 * 1024 * 1024;
   bool headerMode = true;
   int bytesToRead = 4;
   List<int>? buffer;
@@ -47,7 +47,7 @@ class PacketConverter {
     lengthBuffer.rewind();
     readIntoBuffer(lengthBuffer.byteList, 0);
     var len = lengthBuffer.readInt32();
-    if (len > MAX_DOC_SIZE) {
+    if (len > maxDocSize) {
       throw MongoDartError('Message length $len over maximum document size');
     }
     messageBuffer = List<int>.filled(len, 0);

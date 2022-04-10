@@ -11,7 +11,7 @@ import 'package:test/test.dart';
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
 
-const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
+const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
@@ -27,7 +27,7 @@ String getRandomCollectionName() {
 
 void main() async {
   Future initializeDatabase() async {
-    db = Db(DefaultUri);
+    db = Db(defaultUri);
     await db.open();
   }
 
@@ -64,10 +64,10 @@ void main() async {
 
           var cursor = ModernCursor(FindOperation(collection));
 
-          expect(cursor.state, State.INIT);
+          expect(cursor.state, State.init);
 
           var cursorResult = await cursor.nextObject();
-          expect(cursor.state, State.OPEN);
+          expect(cursor.state, State.open);
           expect(cursor.cursorId.value, isPositive);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
@@ -113,7 +113,7 @@ void main() async {
           var collection = db.collection(collectionName);
           await insertManyDocuments(collection, 10000);
           var cursor = ModernCursor(FindOperation(collection));
-          expect(cursor.state, State.INIT);
+          expect(cursor.state, State.init);
           await cursor.nextObject();
           var command = KillCursorsCommand(collection, [BsonLong(1)]);
           var result = await command.execute();
@@ -159,10 +159,10 @@ void main() async {
 
           var cursor = ModernCursor(FindOperation(collection));
 
-          expect(cursor.state, State.INIT);
+          expect(cursor.state, State.init);
 
           var cursorResult = await cursor.nextObject();
-          expect(cursor.state, State.OPEN);
+          expect(cursor.state, State.open);
           expect(cursor.cursorId.value, isPositive);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
@@ -195,10 +195,10 @@ void main() async {
 
           var cursor = ModernCursor(FindOperation(collection));
 
-          expect(cursor.state, State.INIT);
+          expect(cursor.state, State.init);
 
           var cursorResult = await cursor.nextObject();
-          expect(cursor.state, State.OPEN);
+          expect(cursor.state, State.open);
           expect(cursor.cursorId.value, isPositive);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);

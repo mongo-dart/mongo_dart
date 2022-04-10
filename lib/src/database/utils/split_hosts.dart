@@ -2,7 +2,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 List<String> splitHosts(String uriString) {
   String prefix, suffix;
-  var startHostsIndex, endServersIndex;
+  int startHostsIndex, endServersIndex;
   if (uriString.startsWith('mongodb://')) {
     startHostsIndex = 'mongodb://'.length;
   } else {

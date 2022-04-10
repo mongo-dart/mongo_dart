@@ -10,15 +10,15 @@ class _Statics {
 }
 
 class MongoMessage {
-  static final Reply = 1;
-  static final Message = 1000;
-  static final Update = 2001;
-  static final Insert = 2002;
-  static final Query = 2004;
-  static final GetMore = 2005;
-  static final Delete = 2006;
-  static final KillCursors = 2007;
-  static final ModernMessage = 2013;
+  static final reply = 1;
+  static final message = 1000;
+  static final update = 2001;
+  static final insert = 2002;
+  static final query = 2004;
+  static final getMore = 2005;
+  static final delete = 2006;
+  static final killCursors = 2007;
+  static final modernMessage = 2013;
 
   int? _requestId;
   int _messageLength = 0;
@@ -32,7 +32,7 @@ class MongoMessage {
   }
 
   int responseTo = 0;
-  int opcode = MongoMessage.Reply;
+  int opcode = MongoMessage.reply;
 
   BsonBinary serialize() => throw MongoDartError('Must be implemented');
 

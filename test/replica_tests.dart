@@ -5,18 +5,18 @@ import 'dart:async';
 //import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
-const DefaultUri1 = 'mongodb://127.0.0.1:27001';
-const DefaultUri2 = 'mongodb://127.0.0.1:27002';
-const DefaultUri3 = 'mongodb://127.0.0.1:27003';
+const defaultUri1 = 'mongodb://127.0.0.1:27001';
+const defaultUri2 = 'mongodb://127.0.0.1:27002';
+const defaultUri3 = 'mongodb://127.0.0.1:27003';
 
 Future testCollectionInfoCursor() async {
   var db = Db.pool([
-    '$DefaultUri1/mongo_dart-test',
-    '$DefaultUri2/mongo_dart-test',
-    '$DefaultUri3/mongo_dart-test'
+    '$defaultUri1/mongo_dart-test',
+    '$defaultUri2/mongo_dart-test',
+    '$defaultUri3/mongo_dart-test'
   ], 'testCollectionInfoCursor');
   DbCollection newColl;
-  await db.open(writeConcern: WriteConcern.JOURNALED);
+  await db.open(writeConcern: WriteConcern.journaled);
 
   newColl = db.collection('new_collecion');
   await newColl.remove({});

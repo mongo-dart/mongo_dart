@@ -5,10 +5,10 @@ import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
 
-const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
+const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void main() async {
-  var db = Db(DefaultUri);
+  var db = Db(defaultUri);
   await db.open();
 
   Future cleanupDatabase() async {

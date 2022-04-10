@@ -30,6 +30,7 @@ class CommandOperation extends OperationBase {
     if (db == null) {
       throw MongoDartError('Database reference required for this command');
     }
+    // ignore: prefer_initializing_formals
     this.db = db;
   }
 
@@ -74,7 +75,7 @@ class CommandOperation extends OperationBase {
   @override
   Future<Map<String, Object?>> execute({bool skipStateCheck = false}) async {
     final db = this.db;
-    if (!skipStateCheck && db.state != State.OPEN) {
+    if (!skipStateCheck && db.state != State.open) {
       throw MongoDartError('Db is in the wrong state: ${db.state}');
     }
     //final options = Map.from(this.options);

@@ -25,12 +25,12 @@ class MongoDbCRAuthenticator extends Authenticator {
 
   static DbCommand createMongoDbCrAuthenticationCommand(
       Db db, UsernamePasswordCredential credentials, String nonce) {
-    var hashed_password = crypto.md5
+    var hashedPassword = crypto.md5
         .convert(
             '${credentials.username}:mongo:${credentials.password}'.codeUnits)
         .toString();
     var key = crypto.md5
-        .convert('$nonce${credentials.username}$hashed_password'.codeUnits)
+        .convert('$nonce${credentials.username}$hashedPassword'.codeUnits)
         .toString();
     var selector = {
       'authenticate': 1,

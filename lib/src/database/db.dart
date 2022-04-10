@@ -18,7 +18,7 @@ class WriteConcern {
   /// majority of configured replica set
   /// - A tag set: Fine-grained control over which replica set members must
   /// acknowledge a write operation
-  final w;
+  final dynamic w;
 
   /// Specifies a timeout for this Write Concern in milliseconds,
   /// or infinite if equal to 0.
@@ -71,43 +71,65 @@ class WriteConcern {
         provenance = writeConcernMap[keyProvenance] as String?;
 
   /// No exceptions are raised, even for network issues.
-  @deprecated
+  @Deprecated('No more used')
+  // ignore: constant_identifier_names
   static const ERRORS_IGNORED =
       WriteConcern(w: -1, wtimeout: 0, fsync: false, j: false);
 
   /// Write operations that use this write concern will return as soon as the
   /// message is written to the socket.
   /// Exceptions are raised for network issues, but not server errors.
-  static const UNACKNOWLEDGED =
+  static const unacknowledged =
       WriteConcern(w: 0, wtimeout: 0, fsync: false, j: false);
+
+  @Deprecated('Use unacknowledged instead')
+  // ignore: constant_identifier_names
+  static const UNACKNOWLEDGED = unacknowledged;
 
   /// Write operations that use this write concern will wait for
   /// acknowledgement from the primary server before returning.
   /// Exceptions are raised for network issues, and server errors.
-  static const ACKNOWLEDGED =
+  static const acknowledged =
       WriteConcern(w: 1, wtimeout: 0, fsync: false, j: false);
+
+  @Deprecated('Use acknowledged instead')
+  // ignore: constant_identifier_names
+  static const ACKNOWLEDGED = acknowledged;
 
   /// Exceptions are raised for network issues, and server errors;
   /// waits for at least 2 servers for the write operation.
-  static const REPLICA_ACKNOWLEDGED =
+  static const replicaAcknowledged =
       WriteConcern(w: 2, wtimeout: 0, fsync: false, j: false);
+
+  @Deprecated('Use replicaAcknowledged instead')
+  // ignore: constant_identifier_names
+  static const REPLICA_ACKNOWLEDGED = replicaAcknowledged;
 
   /// Exceptions are raised for network issues, and server errors;
   /// the write operation waits for the server to flush
   /// the data to disk.
-  @deprecated
+  @Deprecated('No more used')
+  // ignore: constant_identifier_names
   static const FSYNCED = WriteConcern(w: 1, wtimeout: 0, fsync: true, j: false);
 
   /// Exceptions are raised for network issues, and server errors; the write
   /// operation waits for the server to
   /// group commit to the journal file on disk.
-  static const JOURNALED =
+  static const journaled =
       WriteConcern(w: 1, wtimeout: 0, fsync: false, j: true);
+
+  @Deprecated('Use journaled instead')
+  // ignore: constant_identifier_names
+  static const JOURNALED = journaled;
 
   /// Exceptions are raised for network issues, and server errors; waits on a
   /// majority of servers for the write operation.
-  static const MAJORITY =
+  static const majority =
       WriteConcern(w: 'majority', wtimeout: 0, fsync: false, j: false);
+
+  @Deprecated('Use majority instead')
+  // ignore: constant_identifier_names
+  static const MAJORITY = majority;
 
   /// Gets the getlasterror command for this write concern.
   Map<String, dynamic> get command {
@@ -176,7 +198,7 @@ class Db {
   final _log = Logger('Db');
   final List<String> _uriList = <String>[];
 
-  State state = State.INIT;
+  State state = State.init;
   String? databaseName;
   String? _debugInfo;
   Db? authSourceDb;
@@ -185,7 +207,7 @@ class Db {
   Connection? get _masterConnection => _connectionManager?._masterConnection;
 
   Connection get _masterConnectionVerified {
-    if (state != State.OPEN) {
+    if (state != State.open) {
       throw MongoDartError('Db is in the wrong state: $state');
     }
     return _masterConnectionVerifiedAnyState;
@@ -382,7 +404,7 @@ class Db {
   Future<MongoReplyMessage> queryMessage(MongoMessage queryMessage,
       {Connection? connection}) {
     return Future.sync(() {
-      if (state != State.OPEN) {
+      if (state != State.open) {
         throw MongoDartError('Db is in the wrong state: $state');
       }
 
@@ -394,7 +416,7 @@ class Db {
 
   void executeMessage(MongoMessage message, WriteConcern? writeConcern,
       {Connection? connection}) {
-    if (state != State.OPEN) {
+    if (state != State.open) {
       throw MongoDartError('DB is not open. $state');
     }
 
@@ -414,7 +436,7 @@ class Db {
             'starting from release 3.6');
       }
     } else {
-      if (state != State.OPEN) {
+      if (state != State.open) {
         throw MongoDartError('DB is not open. $state');
       }
       if (!masterConnection.serverCapabilities.supportsOpMsg) {
@@ -433,17 +455,17 @@ class Db {
   }
 
   Future open(
-      {WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED,
+      {WriteConcern writeConcern = WriteConcern.acknowledged,
       bool secure = false,
       bool tlsAllowInvalidCertificates = false,
       String? tlsCAFile,
       String? tlsCertificateKeyFile,
       String? tlsCertificateKeyFilePassword}) async {
-    if (state == State.OPENING) {
+    if (state == State.opening) {
       throw MongoDartError('Attempt to open db in state $state');
     }
 
-    state = State.OPENING;
+    state = State.opening;
     _writeConcern = writeConcern;
     _connectionManager = _ConnectionManager(this);
 
@@ -458,7 +480,7 @@ class Db {
     try {
       await _connectionManager!.open(writeConcern);
     } catch (e) {
-      state = State.INIT;
+      state = State.init;
       await _connectionManager!.close();
       rethrow;
     }
@@ -469,7 +491,7 @@ class Db {
   ///
   /// Connections can disconect because of network or database server problems.
   bool get isConnected =>
-      state == State.OPEN && (_masterConnection?.connected ?? false);
+      state == State.open && (_masterConnection?.connected ?? false);
 
   Future<Map<String, dynamic>> executeDbCommand(MongoMessage message,
       {Connection? connection}) async {
@@ -569,7 +591,7 @@ class Db {
 
   Future close() async {
     _log.fine(() => '$this closed');
-    state = State.CLOSED;
+    state = State.closed;
     var _cm = _connectionManager;
     _connectionManager = null;
     return _cm?.close();
@@ -611,10 +633,10 @@ class Db {
   /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
   /// with WiredTiger
   /// Use `getCollectionInfos` instead
-  @deprecated
-  Stream<Map<String, dynamic>> collectionsInfoCursor([String? collectionName]) {
-    return _collectionsInfoCursor(collectionName);
-  }
+  @Deprecated('Use `getCollectionInfos` instead')
+  Stream<Map<String, dynamic>> collectionsInfoCursor(
+          [String? collectionName]) =>
+      _collectionsInfoCursor(collectionName);
 
   Stream<Map<String, dynamic>> _collectionsInfoCursor(
       [String? collectionName]) {
@@ -633,7 +655,7 @@ class Db {
   /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
   /// with WiredTiger
   /// Use `getCollectionNames` instead
-  @deprecated
+  @Deprecated('Use `getCollectionNames` instead')
   Future<List<String?>> listCollections() {
     return _collectionsInfoCursor()
         .map((map) => map['name']?.toString().split('.'))
@@ -678,7 +700,7 @@ class Db {
   /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
   /// with WiredTiger
   /// Use `DbCollection.getIndexes()` instead
-  @deprecated
+  @Deprecated('Use `DbCollection.getIndexes()` instead')
   Future<List> indexInformation([String? collectionName]) {
     var selector = {};
 
@@ -766,7 +788,7 @@ class Db {
 
     if (key != null) {
       keys = {};
-      keys['$key'] = 1;
+      keys[key] = 1;
     }
 
     if (keys == null) {

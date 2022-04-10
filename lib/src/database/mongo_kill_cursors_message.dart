@@ -4,7 +4,7 @@ class MongoKillCursorsMessage extends MongoMessage {
   int cursorId;
 
   MongoKillCursorsMessage(this.cursorId) {
-    opcode = MongoMessage.KillCursors;
+    opcode = MongoMessage.killCursors;
   }
 
   @override

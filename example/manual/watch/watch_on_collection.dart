@@ -77,7 +77,7 @@ void main() async {
   /// to set the writeConcern to 'majority' or the events will not be emitted
   await collection.updateOne(
       where.eq('custId', 1), ModifierBuilder().set('name', 'Harry'),
-      writeConcern: WriteConcern.MAJORITY);
+      writeConcern: WriteConcern.majority);
 
   var waitingCount = 0;
   await Future.doWhile(() async {

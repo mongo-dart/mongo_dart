@@ -202,7 +202,7 @@ Future testCreateModernMessageFromDocument() async {
   MongoModernMessage.maxDocumentsPerPayload1 = documentsPerPayload1;
 
   expect(message.sections.length, 4);
-  expect(message.opcode, MongoMessage.ModernMessage);
+  expect(message.opcode, MongoMessage.modernMessage);
   var section0Number = 0;
   var section1Number = 0;
   var unknownSectionNumber = 0;

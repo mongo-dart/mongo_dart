@@ -12,7 +12,7 @@ class DbCollection {
   @Deprecated('Since version 4.2. Use insertOne() or replaceOne() instead.')
   Future<Map<String, dynamic>> save(Map<String, dynamic> document,
       {WriteConcern? writeConcern}) {
-    var id;
+    dynamic id;
     var createId = false;
     if (document.containsKey('_id')) {
       id = document['_id'];
@@ -329,7 +329,7 @@ class DbCollection {
 
     if (key != null) {
       keys = {};
-      keys['$key'] = 1;
+      keys[key] = 1;
     }
 
     if (keys == null) {

@@ -16,7 +16,7 @@ import 'utils/insert_data.dart';
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
 
-const DefaultUri = 'mongodb://$dbAddress:27017/$dbName';
+const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 var testDoc = {
   '_id': ObjectId.parse('6025b13eab1951094272d007'),
@@ -177,7 +177,7 @@ String getRandomCollectionName() {
 
 void main() async {
   Future initializeDatabase() async {
-    db = Db(DefaultUri);
+    db = Db(defaultUri);
     await db.open();
   }
 
@@ -392,7 +392,7 @@ void main() async {
 
         var cursor = ModernCursor(FindOperation(collection));
 
-        expect(cursor.state, State.INIT);
+        expect(cursor.state, State.init);
 
         await cursor.nextObject();
 
@@ -437,10 +437,10 @@ void main() async {
             collection, BsonLong((doc[keyCursor] as Map)[keyId] as int),
             tailable: true);
 
-        expect(cursor.state, State.OPEN);
+        expect(cursor.state, State.open);
 
         var cursorResult = await cursor.nextObject();
-        expect(cursor.state, State.OPEN);
+        expect(cursor.state, State.open);
         expect(cursor.cursorId.value, isPositive);
         expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
@@ -454,7 +454,7 @@ void main() async {
           }
         });
 
-        expect(cursor.state, State.OPEN);
+        expect(cursor.state, State.open);
 
         await Future.delayed(Duration(seconds: 3));
 
@@ -469,7 +469,7 @@ void main() async {
 
           return true;
         });
-        expect(cursor.state, State.CLOSED);
+        expect(cursor.state, State.closed);
       });
       test('Simple read from capped collection with awaitData', () async {
         var collectionName = getRandomCollectionName();
@@ -488,10 +488,10 @@ void main() async {
             collection, BsonLong((doc[keyCursor] as Map)[keyId] as int),
             tailable: true);
 
-        expect(cursor.state, State.OPEN);
+        expect(cursor.state, State.open);
 
         var cursorResult = await cursor.nextObject();
-        expect(cursor.state, State.OPEN);
+        expect(cursor.state, State.open);
         expect(cursor.cursorId.value, isPositive);
         expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
@@ -509,7 +509,7 @@ void main() async {
           }
         });
 
-        expect(cursor.state, State.OPEN);
+        expect(cursor.state, State.open);
 
         await Future.delayed(Duration(seconds: 2));
 
@@ -526,7 +526,7 @@ void main() async {
 
           return true;
         });
-        expect(cursor.state, State.CLOSED);
+        expect(cursor.state, State.closed);
       });
 
       // Reading with a tailable cursor on a capped collection
@@ -541,7 +541,7 @@ void main() async {
 
         var cursor = ModernCursor(FindOperation(collection,
             findOptions: FindOptions(tailable: true)));
-        expect(cursor.state, State.INIT);
+        expect(cursor.state, State.init);
 
         expect(() => cursor.nextObject(), throwsMongoDartError);
       });
@@ -563,11 +563,11 @@ void main() async {
         var cursor = ModernCursor(FindOperation(collection,
             filter: <String, Object>{'state': 'C'},
             findOptions: FindOptions(tailable: true)));
-        expect(cursor.state, State.INIT);
+        expect(cursor.state, State.init);
 
         var cursorResult = await cursor.nextObject();
         expect(cursorResult, isNull);
-        expect(cursor.state, State.OPEN);
+        expect(cursor.state, State.open);
         expect(cursor.cursorId.value, isNonZero);
 
         await cursor.close();
@@ -1066,7 +1066,7 @@ db.runCommand(
         }
       });
 
-      expect(cursor.state, State.INIT);
+      expect(cursor.state, State.init);
 
       await Future.delayed(Duration(seconds: 2));
 
@@ -1088,7 +1088,7 @@ db.runCommand(
 
         return true;
       });
-      expect(cursor.state, State.CLOSED);
+      expect(cursor.state, State.closed);
     }, skip: cannotRunTests);
 
     test('Change with match from collection with changeStream', () async {
@@ -1138,11 +1138,11 @@ db.runCommand(
         }
       });
 
-      expect(cursor.state, State.INIT);
+      expect(cursor.state, State.init);
 
       await Future.delayed(Duration(seconds: 2));
 
-      await collection.insertOne({'a': 3}, writeConcern: WriteConcern.MAJORITY);
+      await collection.insertOne({'a': 3}, writeConcern: WriteConcern.majority);
 
       await Future.doWhile(() async {
         if (gotFifth) {
@@ -1161,7 +1161,7 @@ db.runCommand(
         return true;
       });
 
-      expect(cursor.state, State.CLOSED);
+      expect(cursor.state, State.closed);
     }, skip: cannotRunTests);
 
     test('Change with match from collection.watch()', () async {
@@ -1203,7 +1203,7 @@ db.runCommand(
 
       await Future.delayed(Duration(seconds: 2));
 
-      await collection.insertOne({'a': 3}, writeConcern: WriteConcern.MAJORITY);
+      await collection.insertOne({'a': 3}, writeConcern: WriteConcern.majority);
 
       await Future.doWhile(() async {
         if (gotFifth) {

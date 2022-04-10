@@ -12,7 +12,7 @@ class MongoInsertMessage extends MongoMessage {
     for (var document in documents) {
       _documents.add(BsonMap(document));
     }
-    opcode = MongoMessage.Insert;
+    opcode = MongoMessage.insert;
   }
 
   @override

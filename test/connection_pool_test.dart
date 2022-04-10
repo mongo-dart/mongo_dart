@@ -6,7 +6,7 @@ void main() {
   late ConnectionPool pool;
 
   setUp(() {
-    pool = ConnectionPool(3, () => Db(DefaultUri));
+    pool = ConnectionPool(3, () => Db(defaultUri));
   });
 
   tearDown(() => pool.close());
