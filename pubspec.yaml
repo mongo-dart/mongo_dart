@@ -24,3 +24,6 @@ dev_dependencies:
   test: ^1.16.4
   pedantic: ^1.10.0
 
+false_secrets:
+ - /test/certificates_for_testing/*.key
+ - /test/certificates_for_testing/*.pem
