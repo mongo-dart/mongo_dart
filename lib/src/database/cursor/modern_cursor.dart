@@ -280,8 +280,8 @@ class ModernCursor {
         if (state == State.CLOSED) {
           await controller.close();
         }
-      } catch (e) {
-        controller.addError(e);
+      } catch (e, stack) {
+        controller.addError(e, stack);
       }
     }
 
