@@ -2,6 +2,10 @@
 
 ## Recent change notes
 
+## 0.7.5
+
+- Upgraded bson dependency from ^1.0.4 to ^2.0.0 and rational dependency from ^1.2.1 to ^2.2.0
+
 ## 0.7.4+2
 
 Now using Lints instead of Pedantic
