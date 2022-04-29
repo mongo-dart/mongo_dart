@@ -1,6 +1,13 @@
 # Changelog
 
-## Recent change notes
+## 0.8.0-1.0.beta
+
+- The `unionWith` stage has been added to the AggregationPipelineBuilder.
+- `unionWith` examples added in example/manual/aggregate
+
+### Breaking changes
+
+- Updating the dependencies, the `Decimal` class substitutes the `Rational` one. Inherited from BSON package. It seems that the `Rational` class has been designed more like a "core" class and the `Decimal` one (that is a subclass) is for everyday use. You can alway get a `Rational` instance from a `Decimal` calling the method `toRational()`.
 
 ## 0.7.4+2
 

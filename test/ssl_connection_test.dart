@@ -165,7 +165,9 @@ void main() {
       expect(result['ops'].first['solved'], findResult.first['solved']);
       expect(result['ops'].first['autoinit'], findResult.first['autoinit']); */
       await db.close();
-    });
+    },
+        skip: 'Set the correct Digita Ocean connection string '
+            'before running this test');
   });
 
   group('Real connection', () {

@@ -1,7 +1,7 @@
 @Timeout(Duration(seconds: 100))
 
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:rational/rational.dart';
+import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
 
 const dbName = 'test';
@@ -30,7 +30,7 @@ void main() async {
     await collection.remove(<String, dynamic>{});
     var toInsert = <Map<String, dynamic>>[];
     for (var n = 0; n < numberOfRecords; n++) {
-      toInsert.add({'a': Rational.fromInt(n)});
+      toInsert.add({'a': Decimal.fromInt(n)});
     }
 
     await collection.insertAll(toInsert);
@@ -61,12 +61,12 @@ void main() async {
 
         expect(values.length, 10000);
 
-        expect(values.last['a'], Rational.fromInt(9999));
+        expect(values.last['a'], Decimal.fromInt(9999));
 
-        var ra = Rational.parse('999999999999999999999999999999');
+        var ra = Decimal.parse('999999999999999999999999999999');
         for (var idx = 0; idx < 10; idx++) {
           var value = values[idx];
-          var update = (value['a'] as Rational) + ra;
+          var update = (value['a'] as Decimal) + ra;
           //print(update);
           await collection.update(<String, dynamic>{
             '_id': value['_id']
@@ -80,24 +80,24 @@ void main() async {
         var collection = db.collection(collectionName);
 
         await collection
-            .insert(<String, dynamic>{'value': Rational.fromInt(3), 'qty': 4});
+            .insert(<String, dynamic>{'value': Decimal.fromInt(3), 'qty': 4});
 
         await collection.update(<String, dynamic>{}, <String, dynamic>{
-          r'$mul': {'value': Rational.fromInt(5), 'qty': 5}
+          r'$mul': {'value': Decimal.fromInt(5), 'qty': 5}
         });
 
         var values = await collection.find().toList();
 
         expect(values.length, 1);
-        expect(values.first['value'], Rational.fromInt(15));
+        expect(values.first['value'], Decimal.fromInt(15));
         expect(values.first['qty'], 20);
 
         await collection.update(where,
-            ModifierBuilder().mul('value', Rational.fromInt(5)).mul('qty', 2));
+            ModifierBuilder().mul('value', Decimal.fromInt(5)).mul('qty', 2));
         values = await collection.find().toList();
 
         expect(values.length, 1);
-        expect(values.first['value'], Rational.fromInt(75));
+        expect(values.first['value'], Decimal.fromInt(75));
         expect(values.first['qty'], 40);
       });
       test('update Decimal with Modifier', () async {
@@ -106,10 +106,10 @@ void main() async {
         var collection = db.collection(collectionName);
 
         await collection.insertOne(
-            <String, dynamic>{'value': Rational.fromInt(3), 'qty': 4});
+            <String, dynamic>{'value': Decimal.fromInt(3), 'qty': 4});
 
         var mody = ModifierBuilder()
-          ..inc('value', Rational.fromInt(2))
+          ..inc('value', Decimal.fromInt(2))
           ..inc('qty', 3);
 
         await collection.update(<String, dynamic>{}, mody.map);
@@ -118,7 +118,7 @@ void main() async {
 
         expect(values.length, 1);
 
-        expect(values.last['value'], Rational.fromInt(5));
+        expect(values.last['value'], Decimal.fromInt(5));
         expect(values.last['qty'], 7);
       });
     });

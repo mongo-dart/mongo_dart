@@ -1,5 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:rational/rational.dart';
+import 'package:decimal/decimal.dart';
 
 void main() async {
   final db = Db('mongodb://127.0.0.1/testdb');
@@ -7,10 +7,10 @@ void main() async {
   var collection = db.collection('orders');
   await collection.drop();
   await collection.insertMany([
-    {'status': 'A', 'cust_id': 3, 'amount': Rational.fromInt(128)},
-    {'status': 'B', 'cust_id': 2, 'amount': Rational.fromInt(100)},
-    {'status': 'A', 'cust_id': 1, 'amount': Rational.fromInt(80)},
-    {'status': 'A', 'cust_id': 3, 'amount': Rational.fromInt(72)},
+    {'status': 'A', 'cust_id': 3, 'amount': Decimal.fromInt(128)},
+    {'status': 'B', 'cust_id': 2, 'amount': Decimal.fromInt(100)},
+    {'status': 'A', 'cust_id': 1, 'amount': Decimal.fromInt(80)},
+    {'status': 'A', 'cust_id': 3, 'amount': Decimal.fromInt(72)},
   ]);
   final pipeline = AggregationPipelineBuilder()
       .addStage(Match(where.eq('status', 'A').map['\$query']))

@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/create_command/create_command.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/create_command/create_options.dart';
-import 'package:rational/rational.dart';
+import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
 
 const dbName = 'test-mongo-dart';
@@ -328,31 +328,31 @@ void main() async {
       await collection1.insertOne({
         '_id': 1,
         'item': 'abc',
-        'price': Rational.parse('12.00'),
+        'price': Decimal.parse('12.00'),
         'quantity': 2
       });
       await collection1.insertOne({
         '_id': 2,
         'item': 'jkl',
-        'price': Rational.parse('20.00'),
+        'price': Decimal.parse('20.00'),
         'quantity': 1
       });
       await collection1.insertOne({
         '_id': 3,
         'item': 'abc',
-        'price': Rational.parse('10.95'),
+        'price': Decimal.parse('10.95'),
         'quantity': 5
       });
       await collection1.insertOne({
         '_id': 4,
         'item': 'xyz',
-        'price': Rational.parse('5.95'),
+        'price': Decimal.parse('5.95'),
         'quantity': 5
       });
       await collection1.insertOne({
         '_id': 5,
         'item': 'xyz',
-        'price': Rational.parse('5.95'),
+        'price': Decimal.parse('5.95'),
         'quantity': 10
       });
 
@@ -391,12 +391,12 @@ void main() async {
       expect(result.length, 5);
 
       expect(result.first['item'], 'abc');
-      expect(result.first['price'], Rational.fromInt(12));
+      expect(result.first['price'], Decimal.fromInt(12));
       expect(result.first['quantity'], 2);
       expect(result.first['inventory_docs'].first['instock'], 120);
 
       expect(result[1]['item'], 'jkl');
-      expect(result[1]['price'], Rational.parse('20.00'));
+      expect(result[1]['price'], Decimal.parse('20.00'));
       expect(result[1]['quantity'], 1);
       expect(result[1]['inventory_docs'].first['instock'], 70);
     }, skip: cannotRunTests);
@@ -410,37 +410,37 @@ void main() async {
       await collection1.insertOne({
         '_id': 1,
         'item': 'abc',
-        'price': Rational.parse('12.00'),
+        'price': Decimal.parse('12.00'),
         'quantity': 2
       });
       await collection1.insertOne({
         '_id': 2,
         'item': 'jkl',
-        'price': Rational.parse('20.00'),
+        'price': Decimal.parse('20.00'),
         'quantity': 1
       });
       await collection1.insertOne({
         '_id': 3,
         'item': 'abc',
-        'price': Rational.parse('10.95'),
+        'price': Decimal.parse('10.95'),
         'quantity': 5
       });
       await collection1.insertOne({
         '_id': 4,
         'item': 'xyz',
-        'price': Rational.parse('5.95'),
+        'price': Decimal.parse('5.95'),
         'quantity': 5
       });
       await collection1.insertOne({
         '_id': 5,
         'item': 'xyz',
-        'price': Rational.parse('5.95'),
+        'price': Decimal.parse('5.95'),
         'quantity': 10
       });
       await collection1.insertOne({
         '_id': 6,
         'item': 'abc',
-        'price': Rational.parse('14.00'),
+        'price': Decimal.parse('14.00'),
         'quantity': 4
       });
 

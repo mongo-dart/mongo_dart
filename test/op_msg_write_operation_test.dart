@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
-import 'package:rational/rational.dart';
+import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
 
 import 'utils/insert_data.dart';
@@ -38,7 +38,7 @@ void main() async {
     var running4_4orGreater = false;
     var running4_2orGreater = false;
 
-   // var isReplicaSet = false;
+    // var isReplicaSet = false;
     var isStandalone = false;
     //var isSharded = false;
     setUp(() async {
@@ -1396,8 +1396,8 @@ void main() async {
               {'grade': 85, 'mean': 90, 'std': 4},
               {'grade': 85, 'mean': 85, 'std': 6}
             ],
-            'addend1': Rational.fromInt(1) / Rational.fromInt(3),
-            'addend2': Rational.fromInt(2) / Rational.fromInt(3)
+            'addend1': Decimal.fromInt(1) / Decimal.fromInt(3),
+            'addend2': Decimal.fromInt(2) / Decimal.fromInt(3)
           },
           {
             '_id': 2,
@@ -1433,9 +1433,9 @@ void main() async {
         expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
         expect(res.value?['total'], 250);
-        expect(res.value?['decimal'], Rational.fromInt(1));
+        expect(res.value?['decimal'], Decimal.fromInt(1));
         expect(res.value?['decimal2'],
-            Rational.parse('0.9999999999999999999999999999999999'));
+            Decimal.parse('0.9999999999999999999999999999999999'));
 
         expect(res.value?['_id'], 1);
       });

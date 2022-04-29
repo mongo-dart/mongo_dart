@@ -8,7 +8,7 @@ import 'package:mongo_dart/src/database/commands/aggreagation_commands/distinct/
 import 'package:mongo_dart/src/database/commands/aggreagation_commands/distinct/distinct_options.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
 import 'package:mongo_dart/src/database/commands/parameters/read_concern.dart';
-import 'package:rational/rational.dart';
+import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
 
 import 'utils/insert_data.dart';
@@ -593,9 +593,9 @@ void main() async {
       var collection = db.collection(collectionName);
 
       await collection.insertMany(<Map<String, dynamic>>[
-        {'game': 'At the Gates of Loyang', 'cost': Rational.parse('15.20')},
-        {'game': 'Age of Steam', 'cost': Rational.parse('16.80')},
-        {'game': 'Fresco', 'cost': Rational.parse('13')}
+        {'game': 'At the Gates of Loyang', 'cost': Decimal.parse('15.20')},
+        {'game': 'Age of Steam', 'cost': Decimal.parse('16.80')},
+        {'game': 'Fresco', 'cost': Decimal.parse('13')}
       ]);
 
       var pipeline = AggregationPipelineBuilder().addStage(Group(
@@ -604,8 +604,8 @@ void main() async {
 
       var result = await collection.modernAggregate(pipeline).toList();
       expect(result.first[key_id], 'games');
-      expect(result.first['avg'], Rational.fromInt(15));
-      expect(result.first['total'], Rational.fromInt(45));
+      expect(result.first['avg'], Decimal.fromInt(15));
+      expect(result.first['total'], Decimal.fromInt(45));
     }, skip: cannotRunTests);
 
     group('admin/diagnostic pipeline', () {
@@ -1250,9 +1250,9 @@ db.runCommand(
         var collection = db.collection(collectionName);
 
         await collection.insertMany(<Map<String, dynamic>>[
-          {'game': 'At the Gates of Loyang', 'cost': Rational.parse('15.20')},
-          {'game': 'Age of Steam', 'cost': Rational.parse('16.80')},
-          {'game': 'Fresco', 'cost': Rational.parse('13')}
+          {'game': 'At the Gates of Loyang', 'cost': Decimal.parse('15.20')},
+          {'game': 'Age of Steam', 'cost': Decimal.parse('16.80')},
+          {'game': 'Fresco', 'cost': Decimal.parse('13')}
         ]);
 
         var operation = CountOperation(collection);
@@ -1267,9 +1267,9 @@ db.runCommand(
         var collection = db.collection(collectionName);
 
         await collection.insertMany(<Map<String, dynamic>>[
-          {'game': 'At the Gates of Loyang', 'cost': Rational.parse('15.20')},
-          {'game': 'Age of Steam', 'cost': Rational.parse('16.80')},
-          {'game': 'Fresco', 'cost': Rational.parse('13')}
+          {'game': 'At the Gates of Loyang', 'cost': Decimal.parse('15.20')},
+          {'game': 'Age of Steam', 'cost': Decimal.parse('16.80')},
+          {'game': 'Fresco', 'cost': Decimal.parse('13')}
         ]);
 
         var operation = CountOperation(collection);
@@ -1284,13 +1284,13 @@ db.runCommand(
         var collection = db.collection(collectionName);
 
         await collection.insertMany(<Map<String, dynamic>>[
-          {'game': 'At the Gates of Loyang', 'cost': Rational.parse('15.20')},
-          {'game': 'Age of Steam', 'cost': Rational.parse('16.80')},
-          {'game': 'Fresco', 'cost': Rational.parse('13')}
+          {'game': 'At the Gates of Loyang', 'cost': Decimal.parse('15.20')},
+          {'game': 'Age of Steam', 'cost': Decimal.parse('16.80')},
+          {'game': 'Fresco', 'cost': Decimal.parse('13')}
         ]);
 
         var operation = CountOperation(collection,
-            query: where.gt('cost', Rational.fromInt(15)).map[key$Query]);
+            query: where.gt('cost', Decimal.fromInt(15)).map[key$Query]);
 
         var result = await operation.executeDocument();
 
@@ -1302,14 +1302,14 @@ db.runCommand(
         var collection = db.collection(collectionName);
 
         await collection.insertMany(<Map<String, dynamic>>[
-          {'game': 'At the Gates of Loyang', 'cost': Rational.parse('15.20')},
-          {'game': 'Age of Steam', 'cost': Rational.parse('16.80')},
-          {'game': 'Fresco', 'cost': Rational.parse('13')}
+          {'game': 'At the Gates of Loyang', 'cost': Decimal.parse('15.20')},
+          {'game': 'Age of Steam', 'cost': Decimal.parse('16.80')},
+          {'game': 'Fresco', 'cost': Decimal.parse('13')}
         ]);
 
         var operation = CountOperation(collection,
             // It seems that skip does not work with a selection
-            //query: where.gt('cost', Rational.fromInt(15)).map[key$Query],
+            //query: where.gt('cost', Decimal.fromInt(15)).map[key$Query],
             skip: 1,
             countOptions: CountOptions(
                 readConcern: ReadConcern(ReadConcernLevel.majority)));
