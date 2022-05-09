@@ -188,7 +188,7 @@ class Connection {
     // ignore: unawaited_futures
     _socket.done.catchError((error) {
       _log.info('Socket error $error');
-      throw ConnectionException('Socket error: $e');
+      throw ConnectionException('Socket error: $error');
     });
     socket = _socket;
 
