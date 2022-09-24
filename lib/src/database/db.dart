@@ -202,7 +202,7 @@ class Db {
   String? databaseName;
   String? _debugInfo;
   Db? authSourceDb;
-  _ConnectionManager? _connectionManager;
+  ConnectionManager? _connectionManager;
 
   Connection? get _masterConnection => _connectionManager?._masterConnection;
 
@@ -264,12 +264,12 @@ class Db {
   /// This is an asynchronous constructor.
   /// In order to resolve the Seedlist, a call to a DNS server is needed
   /// If the DNS server is unreachable, the constructor throws an error.
-  static Future<Db> create(String uriString, [String? _debugInfo]) async {
+  static Future<Db> create(String uriString, [String? debugInfo]) async {
     if (uriString.startsWith('mongodb://')) {
-      return Db(uriString, _debugInfo);
+      return Db(uriString, debugInfo);
     } else if (uriString.startsWith('mongodb+srv://')) {
       var uriList = await decodeDnsSeedlist(Uri.parse(uriString));
-      return Db.pool(uriList, _debugInfo);
+      return Db.pool(uriList, debugInfo);
     } else {
       throw MongoDartError(
           'The only valid schemas for Db are: "mongodb" and "mongodb+srv".');
@@ -449,8 +449,8 @@ class Db {
 
     var response = await connection.executeModernMessage(message);
 
-    var section = response.sections.firstWhere((Section _section) =>
-        _section.payloadType == MongoModernMessage.basePayloadType);
+    var section = response.sections.firstWhere((Section section) =>
+        section.payloadType == MongoModernMessage.basePayloadType);
     return section.payload.content;
   }
 
@@ -467,7 +467,7 @@ class Db {
 
     state = State.opening;
     _writeConcern = writeConcern;
-    _connectionManager = _ConnectionManager(this);
+    _connectionManager = ConnectionManager(this);
 
     for (var uri in _uriList) {
       _connectionManager!.addConnection(await _parseUri(uri,
@@ -592,9 +592,9 @@ class Db {
   Future close() async {
     _log.fine(() => '$this closed');
     state = State.closed;
-    var _cm = _connectionManager;
+    var cm = _connectionManager;
     _connectionManager = null;
-    return _cm?.close();
+    return cm?.close();
   }
 
   /// Analogue to shell's `show dbs`. Helper for `listDatabases` mongodb command.

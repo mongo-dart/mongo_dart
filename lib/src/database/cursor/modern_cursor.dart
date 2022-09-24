@@ -98,11 +98,11 @@ class ModernCursor {
   // Batch size for the getMore command if different from the default
   late int _batchSize;
   int get batchSize => _batchSize;
-  set batchSize(int _value) {
-    if (_value < 0) {
+  set batchSize(int value) {
+    if (value < 0) {
       throw MongoDartError('Batch size must be a non negative value');
     }
-    _batchSize = _value;
+    _batchSize = value;
   }
 
   // in case of collection agnostic commands (aggregate) is the name

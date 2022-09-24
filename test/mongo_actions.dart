@@ -262,8 +262,7 @@ void main(List<String> args) {
       }
       break;
     default:
-      print('Usage: ' +
-          basename(Platform.script.path) +
+      print('Usage: ${basename(Platform.script.path)}'
           '{start|stop|status} [all|standalone|rs]');
   }
 }

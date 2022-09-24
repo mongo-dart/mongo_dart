@@ -1,6 +1,6 @@
 part of mongo_dart;
 
-class _ConnectionManager {
+class ConnectionManager {
   final _log = Logger('ConnectionManager');
   final Db db;
   final _connectionPool = <String, Connection>{};
@@ -8,7 +8,7 @@ class _ConnectionManager {
   final sendQueue = Queue<MongoMessage>();
   Connection? _masterConnection;
 
-  _ConnectionManager(this.db);
+  ConnectionManager(this.db);
 
   Connection? get masterConnection => _masterConnection;
 

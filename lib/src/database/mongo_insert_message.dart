@@ -18,8 +18,8 @@ class MongoInsertMessage extends MongoMessage {
   @override
   int get messageLength {
     var docsSize = 0;
-    for (var _doc in _documents) {
-      docsSize += _doc.byteLength();
+    for (var doc in _documents) {
+      docsSize += doc.byteLength();
     }
     var result = 16 + 4 + _collectionFullName.byteLength() + docsSize;
     return result;
@@ -31,8 +31,8 @@ class MongoInsertMessage extends MongoMessage {
     writeMessageHeaderTo(buffer);
     buffer.writeInt(flags);
     _collectionFullName.packValue(buffer);
-    for (var _doc in _documents) {
-      _doc.packValue(buffer);
+    for (var doc in _documents) {
+      doc.packValue(buffer);
     }
     buffer.offset = 0;
     return buffer;

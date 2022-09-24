@@ -1396,8 +1396,10 @@ void main() async {
               {'grade': 85, 'mean': 90, 'std': 4},
               {'grade': 85, 'mean': 85, 'std': 6}
             ],
-            'addend1': Decimal.fromInt(1) / Decimal.fromInt(3),
-            'addend2': Decimal.fromInt(2) / Decimal.fromInt(3)
+            'addend1': (Decimal.fromInt(1) / Decimal.fromInt(3))
+                .toDecimal(scaleOnInfinitePrecision: 15),
+            'addend2': (Decimal.fromInt(2) / Decimal.fromInt(3))
+                .toDecimal(scaleOnInfinitePrecision: 15)
           },
           {
             '_id': 2,

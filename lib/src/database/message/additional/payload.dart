@@ -70,29 +70,29 @@ class Payload1 extends Payload {
 }
 
 List<BsonMap> _createBsonMapList(List<Map<String, Object?>> documents) {
-  var _documents = <BsonMap>[];
+  var locDocuments = <BsonMap>[];
   for (var document in documents) {
-    _documents.add(BsonMap(document));
+    locDocuments.add(BsonMap(document));
   }
-  return _documents;
+  return locDocuments;
 }
 
 List<Map<String, Object>> _extractBsonMapList(List<BsonMap> documents) {
-  var _documents = <Map<String, Object>>[];
+  var locDocuments = <Map<String, Object>>[];
   for (var document in documents) {
-    _documents.add(document.data as Map<String, Object>);
+    locDocuments.add(document.data as Map<String, Object>);
   }
-  return _documents;
+  return locDocuments;
 }
 
 List<BsonMap> _decodeBsonMapList(BsonBinary buffer, int length) {
-  var _documents = <BsonMap>[];
+  var locDocuments = <BsonMap>[];
   while (length > 0) {
     var map = BsonMap(<String, Object>{});
     map.unpackValue(buffer);
-    _documents.add(map);
+    locDocuments.add(map);
     length -= map.byteLength();
   }
 
-  return _documents;
+  return locDocuments;
 }

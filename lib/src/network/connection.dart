@@ -9,7 +9,7 @@ const noSecureRequestError = 'The socket connection has been reset by peer.'
     'but no certificate has been sent'
     '\n- Others';
 
-class _ServerCapabilities {
+class ServerCapabilities {
   int minWireVersion = 0;
   int maxWireVersion = 0;
   bool aggregationCursor = false;
@@ -113,7 +113,7 @@ class _ServerCapabilities {
 class Connection {
   static bool _caCertificateAlreadyInHash = false;
   final Logger _log = Logger('Connection');
-  final _ConnectionManager _manager;
+  final ConnectionManager _manager;
   ServerConfig serverConfig;
   Socket? socket;
   final Set _pendingQueries = <int>{};
@@ -130,7 +130,7 @@ class Connection {
   bool connected = false;
   bool _closed = false;
   bool isMaster = false;
-  final _ServerCapabilities serverCapabilities = _ServerCapabilities();
+  final ServerCapabilities serverCapabilities = ServerCapabilities();
   final ServerStatus serverStatus = ServerStatus();
 
   Connection(this._manager, [ServerConfig? serverConfig])
@@ -139,7 +139,7 @@ class Connection {
   bool get isAuthenticated => serverConfig.isAuthenticated;
 
   Future<bool> connect() async {
-    Socket _socket;
+    Socket locSocket;
     try {
       if (serverConfig.isSecure) {
         var securityContext = SecurityContext.defaultContext;
@@ -156,14 +156,14 @@ class Connection {
                 password: serverConfig.tlsCertificateKeyFilePassword);
         }
 
-        _socket = await SecureSocket.connect(
+        locSocket = await SecureSocket.connect(
             serverConfig.host, serverConfig.port, context: securityContext,
             onBadCertificate: (certificate) {
           // couldn't find here if the cause is an hostname mismatch
           return serverConfig.tlsAllowInvalidCertificates;
         });
       } else {
-        _socket = await Socket.connect(serverConfig.host, serverConfig.port);
+        locSocket = await Socket.connect(serverConfig.host, serverConfig.port);
       }
     } on TlsException catch (e) {
       if (e.osError?.message
@@ -186,11 +186,11 @@ class Connection {
     }
 
     // ignore: unawaited_futures
-    _socket.done.catchError((error) {
+    locSocket.done.catchError((error) {
       _log.info('Socket error $error');
       throw ConnectionException('Socket error: $error');
     });
-    socket = _socket;
+    socket = locSocket;
 
     _repliesSubscription = socket!
         .transform<MongoResponseMessage>(MongoMessageHandler().transformer)

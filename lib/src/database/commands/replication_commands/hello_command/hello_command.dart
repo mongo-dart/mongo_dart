@@ -50,8 +50,8 @@ class HelloCommand extends CommandOperation {
 
     var response = await connection!.executeModernMessage(message);
 
-    var section = response.sections.firstWhere((Section _section) =>
-        _section.payloadType == MongoModernMessage.basePayloadType);
+    var section = response.sections.firstWhere((Section section) =>
+        section.payloadType == MongoModernMessage.basePayloadType);
     return section.payload.content;
   }
 }

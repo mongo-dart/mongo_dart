@@ -15,10 +15,11 @@ const dbName = 'mongodb-auth';
 const dbAddress = '127.0.0.1';
 
 const mongoDbUri = 'mongodb://test:test@$dbAddress:27017/$dbName';
+const mongoDbUri2 = 'mongodb://unicode:übelkübel@$dbAddress:27017/$dbName';
 
 void main() async {
-  Future<bool> testDatabase() async {
-    var db = Db(mongoDbUri);
+  Future<bool> testDatabase(String uri) async {
+    var db = Db(uri);
     try {
       await db.open();
       await db.close();
@@ -40,8 +41,8 @@ void main() async {
     }
   }
 
-  Future<String?> getFcv() async {
-    var db = Db(mongoDbUri);
+  Future<String?> getFcv(String uri) async {
+    var db = Db(uri);
     try {
       await db.open();
       var fcv = db.masterConnection.serverCapabilities.fcv;
@@ -65,9 +66,9 @@ void main() async {
     var isVer3_6 = false;
 
     setUpAll(() async {
-      serverRequiresAuth = await testDatabase();
+      serverRequiresAuth = await testDatabase(mongoDbUri);
       if (serverRequiresAuth) {
-        var fcv = await getFcv();
+        var fcv = await getFcv(mongoDbUri);
         isVer3_6 = fcv == '3.6';
       }
     });
@@ -100,6 +101,14 @@ void main() async {
         if (serverRequiresAuth && !isVer3_6) {
           var db =
               Db('$mongoDbUri?authMechanism=${ScramSha256Authenticator.name}');
+
+          await db.open();
+          expect(db.masterConnection.isAuthenticated, isTrue);
+          await db.collection('test').find().toList();
+          await db.close();
+
+          db =
+              Db('$mongoDbUri2?authMechanism=${ScramSha256Authenticator.name}');
 
           await db.open();
           expect(db.masterConnection.isAuthenticated, isTrue);
