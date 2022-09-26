@@ -2,10 +2,10 @@ export 'administration_commands/wrapper/create_collection/create_collection_comm
 export 'administration_commands/wrapper/create_collection/create_collection_options.dart';
 export 'administration_commands/wrapper/create_view/create_view_command.dart';
 export 'administration_commands/wrapper/create_view/create_view_options.dart';
-export 'aggreagation_commands/aggregate/aggregate_operation.dart';
-export 'aggreagation_commands/aggregate/aggregate_options.dart';
-export 'aggreagation_commands/wrapper/change_stream/change_stream_operation.dart';
-export 'aggreagation_commands/wrapper/change_stream/change_stream_options.dart';
+export 'aggregation_commands/aggregate/aggregate_operation.dart';
+export 'aggregation_commands/aggregate/aggregate_options.dart';
+export 'aggregation_commands/wrapper/change_stream/change_stream_operation.dart';
+export 'aggregation_commands/wrapper/change_stream/change_stream_options.dart';
 
 export 'authentication_commands/sasl_continue_command/sasl_continue_command.dart';
 export 'authentication_commands/sasl_continue_command/sasl_continue_command.dart';

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/aggregate/return_classes/change_event.dart';
+import 'package:mongo_dart/src/database/commands/aggregation_commands/aggregate/return_classes/change_event.dart';
 
 class ChangeStreamHandler {
   void handleData(

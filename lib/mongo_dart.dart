@@ -26,9 +26,9 @@ import 'package:mongo_dart/src/database/info/server_status.dart';
 import 'package:mongo_dart/src/database/message/additional/section.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/database/message/mongo_response_message.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/distinct/distinct_operation.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/distinct/distinct_options.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/distinct/distinct_result.dart';
+import 'package:mongo_dart/src/database/commands/aggregation_commands/distinct/distinct_operation.dart';
+import 'package:mongo_dart/src/database/commands/aggregation_commands/distinct/distinct_options.dart';
+import 'package:mongo_dart/src/database/commands/aggregation_commands/distinct/distinct_result.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/update_operation/update_operation.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/update_operation/update_options.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/update_operation/update_statement.dart';
@@ -49,6 +49,10 @@ import 'package:mongo_dart/src/auth/mongodb_cr_authenticator.dart'
     show MongoDbCRAuthenticator;
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 import 'package:vy_string_utils/vy_string_utils.dart';
+
+import 'src/database/commands/aggregation_commands/count/count_operation.dart';
+import 'src/database/commands/aggregation_commands/count/count_options.dart';
+import 'src/database/commands/aggregation_commands/count/count_result.dart';
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_aggregation.dart';

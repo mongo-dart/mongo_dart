@@ -8,6 +8,8 @@
 - connection: _ServerCapabilities renamed ServerCapabilities
 - connection_manager: _ConnectionManager renamed ConnectionManager
 - Lint fixes
+- The folder lib\src\database\commands\aggreagation_commands has bin renamed into lib\src\database\commands\aggregation_commands
+- created `modernCount` method
 
 ## 0.8.0-1.0.beta
 

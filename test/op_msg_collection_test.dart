@@ -498,10 +498,9 @@ void main() async {
       await collection.insertOne({'_id': 4, 'category': 'lait'});
       await collection.insertOne({'_id': 5, 'category': 'Bière'});
 
-      var viewName = 'alpha';
+      var viewName = getRandomCollectionName();
       usedCollectionNames.add(viewName);
 
-      //getRandomCollectionName();
       var resultMap = await CreateCommand(
         db,
         viewName,
@@ -539,10 +538,9 @@ void main() async {
       await collection.insertOne({'_id': 4, 'category': 'lait'});
       await collection.insertOne({'_id': 5, 'category': 'Bière'});
 
-      var viewName = 'alpha2';
+      var viewName = getRandomCollectionName();
       usedCollectionNames.add(viewName);
 
-      //getRandomCollectionName();
       var resultMap = await CreateCommand(db, viewName,
           createOptions: CreateOptions(
             viewOn: collectionName,
@@ -576,7 +574,7 @@ void main() async {
       await collection.insertOne({'_id': 4, 'category': 'lait'});
       await collection.insertOne({'_id': 5, 'category': 'Bière'});
 
-      var viewName = 'alpha3';
+      var viewName = getRandomCollectionName();
       usedCollectionNames.add(viewName);
 
       //getRandomCollectionName();

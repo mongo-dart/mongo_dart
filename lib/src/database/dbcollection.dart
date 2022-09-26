@@ -153,6 +153,10 @@ class DbCollection {
     return result;
   }
 
+  // **************************************************
+  //              Find and Modify
+  // **************************************************
+
   /// Modifies and returns a single document.
   /// By default, the returned document does not include the modifications
   /// made on the update.
@@ -216,7 +220,15 @@ class DbCollection {
     });
   }
 
+  // **************************************************
+  //              Drop Collection
+  // **************************************************
+
   Future<bool> drop() => db.dropCollection(collectionName);
+
+  // **************************************************
+  //            Delete Many (Remove)
+  // **************************************************
 
   /// Removes documents from a collection.
   Future<Map<String, dynamic>> remove(selector,
@@ -237,8 +249,22 @@ class DbCollection {
       db.removeFromCollection(
           collectionName, _selectorBuilder2Map(selector), writeConcern);
 
+  // **************************************************
+  //                   Count
+  // **************************************************
+
+  Future<int> count([selector]) async {
+    if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
+      var result = await modernCount(
+          selector: selector is SelectorBuilder ? selector : null,
+          filter: selector is Map<String, Object?> ? selector : null);
+      return result.count;
+    }
+    return legacyCount(selector);
+  }
+
   // Todo - missing modern version
-  Future<int> count([selector]) {
+  Future<int> legacyCount([selector]) {
     return db
         .executeDbCommand(DbCommand.createCountCommand(
             db, collectionName, _selectorBuilder2Map(selector)))
@@ -246,6 +272,10 @@ class DbCollection {
       return Future.value((reply['n'] as num?)?.toInt());
     });
   }
+
+  // **************************************************
+  //                   Distinct
+  // **************************************************
 
   Future<Map<String, dynamic>> distinct(String field, [selector]) async {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
@@ -896,5 +926,27 @@ class DbCollection {
     }
 
     return bulk.executeDocument();
+  }
+
+  Future<CountResult> modernCount(
+      {SelectorBuilder? selector,
+      Map<String, Object?>? filter,
+      int? limit,
+      int? skip,
+      CollationOptions? collation,
+      String? hint,
+      Map<String, Object>? hintDocument,
+      CountOptions? countOptions,
+      Map<String, Object>? rawOptions}) async {
+    var countOperation = CountOperation(this,
+        query:
+            filter ?? (selector?.map == null ? null : selector!.map[key$Query]),
+        skip: skip,
+        limit: limit,
+        hint: hint,
+        hintDocument: hintDocument,
+        countOptions: countOptions,
+        rawOptions: rawOptions);
+    return countOperation.executeDocument();
   }
 }

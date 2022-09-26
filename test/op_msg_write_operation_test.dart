@@ -1435,9 +1435,9 @@ void main() async {
         expect(res.lastErrorObject?.n, 1);
         expect(res.value, isNotNull);
         expect(res.value?['total'], 250);
-        expect(res.value?['decimal'], Decimal.fromInt(1));
-        expect(res.value?['decimal2'],
-            Decimal.parse('0.9999999999999999999999999999999999'));
+        expect(res.value?['decimal'],
+            /*  Decimal.fromInt(1) */ Decimal.parse('0.999999999999999'));
+        expect(res.value?['decimal2'], Decimal.parse('0.999999999999999'));
 
         expect(res.value?['_id'], 1);
       });

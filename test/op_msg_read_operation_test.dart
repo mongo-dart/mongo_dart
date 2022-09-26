@@ -2,10 +2,10 @@
 
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/count/count_operation.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/count/count_options.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/distinct/distinct_operation.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/distinct/distinct_options.dart';
+import 'package:mongo_dart/src/database/commands/aggregation_commands/count/count_operation.dart';
+import 'package:mongo_dart/src/database/commands/aggregation_commands/count/count_options.dart';
+import 'package:mongo_dart/src/database/commands/aggregation_commands/distinct/distinct_operation.dart';
+import 'package:mongo_dart/src/database/commands/aggregation_commands/distinct/distinct_options.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
 import 'package:mongo_dart/src/database/commands/parameters/read_concern.dart';
 import 'package:decimal/decimal.dart';

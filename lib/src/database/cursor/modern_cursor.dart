@@ -5,8 +5,8 @@ import 'dart:collection';
 
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/kill_cursors_command/kill_cursors_command.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/aggregate/return_classes/change_event.dart';
-import 'package:mongo_dart/src/database/commands/aggreagation_commands/wrapper/change_stream/change_stream_handler.dart';
+import 'package:mongo_dart/src/database/commands/aggregation_commands/aggregate/return_classes/change_event.dart';
+import 'package:mongo_dart/src/database/commands/aggregation_commands/wrapper/change_stream/change_stream_handler.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_options.dart';
 

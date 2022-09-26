@@ -388,8 +388,10 @@ Future testCount() async {
 
   await insertManyDocuments(collection, 167);
 
-  var result = await collection.count();
-  expect(result, 167);
+  //var result = await collection.legacyCount();
+  var result = await collection.modernCount();
+
+  expect(result.count, 167);
 }
 
 Future testDistinct() async {
