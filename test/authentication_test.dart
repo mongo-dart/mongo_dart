@@ -64,12 +64,16 @@ void main() async {
   group('Authentication', () {
     var serverRequiresAuth = false;
     var isVer3_6 = false;
+    var isNoMoreMongodbCR = false;
 
     setUpAll(() async {
       serverRequiresAuth = await testDatabase(mongoDbUri);
       if (serverRequiresAuth) {
         var fcv = await getFcv(mongoDbUri);
         isVer3_6 = fcv == '3.6';
+        if (fcv != null) {
+          isNoMoreMongodbCR = fcv.length != 3 || fcv.compareTo('5.9') == 1;
+        }
       }
     });
 
@@ -162,7 +166,7 @@ void main() async {
                 (err['codeName'] == expectedError3['codeName']));
 
         expect(result, true);
-      });
+      }, skip: isNoMoreMongodbCR);
 
       test('Setting mongodb-cr with selectAuthenticationMechanisn', () async {
         var db = Db(mongoDbUri);
@@ -209,7 +213,7 @@ void main() async {
                 (err['codeName'] == expectedError3['codeName']));
 
         expect(result, true);
-      });
+      }, skip: isNoMoreMongodbCR);
 
       test("Throw exception when auth mechanism isn't supported", () async {
         final authMechanism = 'Anything';
