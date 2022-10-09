@@ -143,6 +143,14 @@ void main() async {
           'code': 40415,
           'codeName': 'Location40415'
         };
+        var expectedError4 = {
+          'ok': 0.0,
+          'errmsg': "Unsupported OP_QUERY command: getnonce. "
+              "The client driver may require an upgrade. For more details "
+              "see https://dochub.mongodb.org/core/legacy-opcode-removal",
+          'code': 352,
+          'codeName': 'UnsupportedOpQueryCommand'
+        };
 
         dynamic err;
 
@@ -163,7 +171,11 @@ void main() async {
             ((err['ok'] == expectedError3['ok']) &&
                 (err['errmsg'] == expectedError3['errmsg']) &&
                 (err['code'] == expectedError3['code']) &&
-                (err['codeName'] == expectedError3['codeName']));
+                (err['codeName'] == expectedError3['codeName'])) ||
+            ((err['ok'] == expectedError4['ok']) &&
+                (err['errmsg'] == expectedError4['errmsg']) &&
+                (err['code'] == expectedError4['code']) &&
+                (err['codeName'] == expectedError4['codeName']));
 
         expect(result, true);
       }, skip: isNoMoreMongodbCR);
@@ -189,6 +201,14 @@ void main() async {
           'code': 40415,
           'codeName': 'Location40415'
         };
+        var expectedError4 = {
+          'ok': 0.0,
+          'errmsg': "Unsupported OP_QUERY command: getnonce. "
+              "The client driver may require an upgrade. For more details "
+              "see https://dochub.mongodb.org/core/legacy-opcode-removal",
+          'code': 352,
+          'codeName': 'UnsupportedOpQueryCommand'
+        };
 
         dynamic err;
 
@@ -210,10 +230,14 @@ void main() async {
             ((err['ok'] == expectedError3['ok']) &&
                 (err['errmsg'] == expectedError3['errmsg']) &&
                 (err['code'] == expectedError3['code']) &&
-                (err['codeName'] == expectedError3['codeName']));
+                (err['codeName'] == expectedError3['codeName'])) ||
+            ((err['ok'] == expectedError4['ok']) &&
+                (err['errmsg'] == expectedError4['errmsg']) &&
+                (err['code'] == expectedError4['code']) &&
+                (err['codeName'] == expectedError4['codeName']));
 
         expect(result, true);
-      }, skip: isNoMoreMongodbCR);
+      }, skip: !serverRequiresAuth && isNoMoreMongodbCR);
 
       test("Throw exception when auth mechanism isn't supported", () async {
         final authMechanism = 'Anything';

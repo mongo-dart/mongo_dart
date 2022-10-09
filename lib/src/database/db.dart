@@ -535,7 +535,23 @@ class Db {
   bool documentIsNotAnError(firstRepliedDocument) =>
       firstRepliedDocument['ok'] == 1.0 && firstRepliedDocument['err'] == null;
 
+  Future<bool> dropCollection2(String collectionName) async {
+    var collectionInfos = await getCollectionInfos({'name': collectionName});
+
+    if (collectionInfos.length == 1) {
+      return executeDbCommand(
+              DbCommand.createDropCollectionCommand(this, collectionName))
+          .then((_) => true);
+    }
+
+    return true;
+  }
+
   Future<bool> dropCollection(String collectionName) async {
+    if (masterConnection.serverCapabilities.supportsOpMsg) {
+      var result = await modernDrop(collectionName);
+      return result[keyOk] == 1.0;
+    }
     var collectionInfos = await getCollectionInfos({'name': collectionName});
 
     if (collectionInfos.length == 1) {
@@ -548,7 +564,11 @@ class Db {
   }
 
   ///   Drop current database
-  Future drop() {
+  Future drop() async {
+    if (masterConnection.serverCapabilities.supportsOpMsg) {
+      var result = await modernDropDatabase();
+      return result[keyOk] == 1.0;
+    }
     return executeDbCommand(DbCommand.createDropDatabaseCommand(this));
   }
 
@@ -656,7 +676,16 @@ class Db {
   /// with WiredTiger
   /// Use `getCollectionNames` instead
   @Deprecated('Use `getCollectionNames` instead')
-  Future<List<String?>> listCollections() {
+  Future<List<String?>> listCollections() async {
+    if (masterConnection.serverCapabilities.supportsOpMsg) {
+      var ret = await modernListCollections().toList();
+
+      return [
+        for (var element in ret)
+          for (var nameKey in element.keys)
+            if (nameKey == keyName) element[keyName]
+      ];
+    }
     return _collectionsInfoCursor()
         .map((map) => map['name']?.toString().split('.'))
         .where((arr) => arr != null && arr.length == 2)
@@ -665,12 +694,24 @@ class Db {
   }
 
   Future<List<Map<String, dynamic>>> getCollectionInfos(
-      [Map<String, dynamic> filter = const {}]) {
+      [Map<String, dynamic> filter = const {}]) async {
+    if (masterConnection.serverCapabilities.supportsOpMsg) {
+      return modernListCollections(filter: filter).toList();
+    }
     return _listCollectionsCursor(filter).toList();
   }
 
   Future<List<String?>> getCollectionNames(
-      [Map<String, dynamic> filter = const {}]) {
+      [Map<String, dynamic> filter = const {}]) async {
+    if (masterConnection.serverCapabilities.supportsOpMsg) {
+      var ret = await modernListCollections().toList();
+
+      return [
+        for (var element in ret)
+          for (var nameKey in element.keys)
+            if (nameKey == keyName) element[keyName]
+      ];
+    }
     return _listCollectionsCursor(filter)
         .map((map) => map['name']?.toString())
         .toList();
@@ -847,6 +888,15 @@ class Db {
   // ************** OP_MSG_COMMANDS ****************************
   // ***********************************************************
 
+  /// This method drops the current DB
+  Future<Map<String, Object?>> modernDropDatabase(
+      {DropDatabaseOptions? dropOptions,
+      Map<String, Object>? rawOptions}) async {
+    var command = DropDatabaseCommand(this,
+        dropDatabaseOptions: dropOptions, rawOptions: rawOptions);
+    return command.execute();
+  }
+
   /// This method return the status information on the
   /// connection.
   ///
@@ -871,6 +921,23 @@ class Db {
     return command.execute();
   }
 
+  /// This method retuns a cursor to get a list of the collections
+  /// for this DB.
+  ///
+  Stream<Map<String, dynamic>> modernListCollections(
+      {SelectorBuilder? selector,
+      Map<String, Object?>? filter,
+      ListCollectionsOptions? findOptions,
+      Map<String, Object>? rawOptions}) {
+    var command = ListCollectionsCommand(this,
+        filter:
+            filter ?? (selector?.map == null ? null : selector!.map[key$Query]),
+        listCollectionsOptions: findOptions,
+        rawOptions: rawOptions);
+
+    return ModernCursor(command).stream;
+  }
+
   /// This method creates a view
   Future<Map<String, Object?>> createView(
       String view, String source, List pipeline,
@@ -878,6 +945,14 @@ class Db {
       Map<String, Object>? rawOptions}) async {
     var command = CreateViewCommand(this, view, source, pipeline,
         createViewOptions: createViewOptions, rawOptions: rawOptions);
+    return command.execute();
+  }
+
+  /// This method drops a collection
+  Future<Map<String, Object?>> modernDrop(String collectionNAme,
+      {DropOptions? dropOptions, Map<String, Object>? rawOptions}) async {
+    var command = DropCommand(this, collectionNAme,
+        dropOptions: dropOptions, rawOptions: rawOptions);
     return command.execute();
   }
 

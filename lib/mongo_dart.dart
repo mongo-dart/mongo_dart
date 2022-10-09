@@ -50,6 +50,12 @@ import 'package:mongo_dart/src/auth/mongodb_cr_authenticator.dart'
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 import 'package:vy_string_utils/vy_string_utils.dart';
 
+import 'src/database/commands/administration_commands/drop_command/drop_command.dart';
+import 'src/database/commands/administration_commands/drop_command/drop_options.dart';
+import 'src/database/commands/administration_commands/drop_database_command/drop_database_command.dart';
+import 'src/database/commands/administration_commands/drop_database_command/drop_database_options.dart';
+import 'src/database/commands/administration_commands/list_collections_command/list_collections_command.dart';
+import 'src/database/commands/administration_commands/list_collections_command/list_collections_options.dart';
 import 'src/database/commands/aggregation_commands/count/count_operation.dart';
 import 'src/database/commands/aggregation_commands/count/count_options.dart';
 import 'src/database/commands/aggregation_commands/count/count_result.dart';

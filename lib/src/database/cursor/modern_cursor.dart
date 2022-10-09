@@ -11,6 +11,8 @@ import 'package:mongo_dart/src/database/commands/query_and_write_operation_comma
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/get_more_command/get_more_options.dart';
 
 import '../../../mongo_dart.dart';
+import '../commands/base/db_admin_command_operation.dart';
+import '../commands/base/operation_base.dart';
 
 typedef MonadicBlock = void Function(Map<String, dynamic> value);
 
@@ -41,6 +43,32 @@ class ModernCursor {
     var internalBatchSize = batchSize;
     if (internalBatchSize == null) {
       var operationBatchSize = operation.options[keyBatchSize] as int?;
+      if (operationBatchSize != null && operationBatchSize != 0) {
+        internalBatchSize = operationBatchSize;
+      }
+    }
+
+    _batchSize = internalBatchSize ?? defaultBatchSize;
+  }
+  ModernCursor.fromDbAdmincommand(DbAdminCommandOperation command,
+      {bool? checksumPresent,
+      bool? moreToCome,
+      bool? exhaustAllowed,
+      int? batchSize})
+      // ignore: prefer_initializing_formals
+      : operation = command,
+        //collection = command.collection,
+        db = command.db,
+        checksumPresent = checksumPresent ?? false,
+        moreToCome = moreToCome ?? false,
+        exhaustAllowed = exhaustAllowed ?? false {
+    if (command is FindOperation && collection == null) {
+      throw MongoDartError('Collection required in cursor initialization');
+    }
+
+    var internalBatchSize = batchSize;
+    if (internalBatchSize == null) {
+      var operationBatchSize = command.options[keyBatchSize] as int?;
       if (operationBatchSize != null && operationBatchSize != 0) {
         internalBatchSize = operationBatchSize;
       }
@@ -127,7 +155,7 @@ class ModernCursor {
 
   /// The operation to be executed.
   /// It must be an operation that returns a cursorId, like find, getMore, etc.
-  CommandOperation? operation;
+  OperationBase? operation;
 
   /// Specify the milliseconds between getMore on tailable cursor,
   /// only applicable when awaitData isn't set.
