@@ -96,7 +96,9 @@ class ServerCapabilities {
       isStandalone = true;
     }
 
-    if (maxWireVersion >= 13) {
+    if (maxWireVersion >= 17) {
+      fcv = '6.0';
+    } else if (maxWireVersion >= 13) {
       fcv = '5.0';
     } else if (maxWireVersion >= 9) {
       fcv = '4.4';

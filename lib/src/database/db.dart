@@ -535,18 +535,6 @@ class Db {
   bool documentIsNotAnError(firstRepliedDocument) =>
       firstRepliedDocument['ok'] == 1.0 && firstRepliedDocument['err'] == null;
 
-  Future<bool> dropCollection2(String collectionName) async {
-    var collectionInfos = await getCollectionInfos({'name': collectionName});
-
-    if (collectionInfos.length == 1) {
-      return executeDbCommand(
-              DbCommand.createDropCollectionCommand(this, collectionName))
-          .then((_) => true);
-    }
-
-    return true;
-  }
-
   Future<bool> dropCollection(String collectionName) async {
     if (masterConnection.serverCapabilities.supportsOpMsg) {
       var result = await modernDrop(collectionName);
@@ -573,7 +561,16 @@ class Db {
   }
 
   Future<Map<String, dynamic>> removeFromCollection(String collectionName,
-      [Map<String, dynamic> selector = const {}, WriteConcern? writeConcern]) {
+      [Map<String, dynamic> selector = const {},
+      WriteConcern? writeConcern]) async {
+    if (_masterConnectionVerified.serverCapabilities.supportsOpMsg) {
+      var collection = this.collection(collectionName);
+      var result = await collection.deleteMany(
+        selector,
+        writeConcern: writeConcern,
+      );
+      return result.serverResponses.first;
+    }
     return Future.sync(() {
       executeMessage(
           MongoRemoveMessage('$databaseName.$collectionName', selector),
@@ -593,7 +590,12 @@ class Db {
     }
   }
 
+  @Deprecated('Deprecated since version 4.0.')
   Future<Map<String, dynamic>> getNonce({Connection? connection}) {
+    if (masterConnection.serverCapabilities.fcv != null &&
+        masterConnection.serverCapabilities.fcv!.compareTo('6.0') >= 0) {
+      throw MongoDartError('getnonce command not managed in this version');
+    }
     return executeDbCommand(DbCommand.createGetNonceCommand(this),
         connection: connection);
   }

@@ -122,6 +122,10 @@ Future testDropDatabase() async {
 }
 
 Future testGetNonce() async {
+  if (db.masterConnection.serverCapabilities.fcv != null &&
+      db.masterConnection.serverCapabilities.fcv!.compareTo('6.0') >= 0) {
+    return;
+  }
   var result = await db.getNonce();
   expect(result['ok'], 1);
 }
@@ -821,6 +825,20 @@ Future testLimit() async {
   var counter = 0;
   Cursor cursor;
   await insertManyDocuments(collection, 30000);
+
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var operation = FindOperation(
+      collection,
+      limit: 10,
+    );
+
+    var modernCursor = ModernCursor(operation);
+    await modernCursor.stream.forEach((e) => counter++);
+    expect(counter, 10);
+    expect(modernCursor.state, State.closed);
+    expect(modernCursor.cursorId.value, 0);
+    return;
+  }
 
   cursor = collection.createCursor(where.limit(10));
 

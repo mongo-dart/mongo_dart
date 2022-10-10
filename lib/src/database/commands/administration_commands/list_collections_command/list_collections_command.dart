@@ -29,7 +29,7 @@ import 'list_collections_options.dart';
 
 class ListCollectionsCommand extends CommandOperation {
   ListCollectionsCommand(Db db,
-      {Map<String, Object?>? filter,
+      {this.filter,
       ListCollectionsOptions? listCollectionsOptions,
       Map<String, Object>? rawOptions})
       : super(db, <String, Object>{
