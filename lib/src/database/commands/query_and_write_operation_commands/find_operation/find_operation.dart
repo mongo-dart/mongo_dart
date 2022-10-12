@@ -76,6 +76,14 @@ class FindOperation extends CommandOperation {
 
   @override
   Map<String, Object> $buildCommand() {
+    if (collection!.collectionName == r'$cmd' &&
+        filter != null &&
+        limit != null &&
+        limit! == 1) {
+      return <String, Object>{
+        for (var key in filter!.keys) key: filter![key] ?? ''
+      };
+    }
     return <String, Object>{
       keyFind: collection!.collectionName,
       if (filter != null) keyFilter: filter!,
@@ -91,6 +99,10 @@ class FindOperation extends CommandOperation {
   }
 
   Future<FindResult> executeDocument() async {
+    if (collection!.collectionName == r'$cmd') {
+      throw MongoDartError('cannot return a FindResult object '
+          r'for a coomand request ($cmd collection)');
+    }
     var result = await super.execute();
     return FindResult(result);
   }

@@ -218,6 +218,9 @@ class ModernCursor {
     if (items.isNotEmpty) {
       return _getNextItem();
     }
+    if (collection != null && collection!.collectionName == r'$cmd') {
+      return operation!.execute();
+    }
 
     var justPrepareCursor = false;
     Map<String, Object?>? result;

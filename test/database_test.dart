@@ -292,37 +292,27 @@ Future testSaveWithIntegerId() async {
   }
   expect(result['value'], 30);
 
-  result = await collection.findOne({'_id': 3});
+  result = await collection.findOne({'_id': 3}) ?? <String, dynamic>{};
   expect(result, isNotNull);
-  if (result == null) {
-    return;
-  }
-  result['value'] = 2;
-  // ignore: deprecated_member_use_from_same_package
-  await collection.save(result);
 
-  result = await collection.findOne({'_id': 3});
+  result['value'] = 2;
+  await collection.replaceOne({'_id': 3}, result);
+
+  result = await collection.findOne({'_id': 3}) ?? <String, dynamic>{};
   expect(result, isNotNull);
-  if (result == null) {
-    return;
-  }
+
   expect(result['value'], 2);
 
-  result = await collection.findOne(where.eq('_id', 3));
+  result = await collection.findOne(where.eq('_id', 3)) ?? <String, dynamic>{};
   expect(result, isNotNull);
-  if (result == null) {
-    return;
-  }
+
   expect(result['value'], 2);
 
   final notThere = {'_id': 5, 'name': 'd', 'value': 50};
-  // ignore: deprecated_member_use_from_same_package
-  await collection.save(notThere);
-  result = await collection.findOne(where.eq('_id', 5));
+  await collection.insertOne(notThere);
+  result = await collection.findOne(where.eq('_id', 5)) ?? <String, dynamic>{};
   expect(result, isNotNull);
-  if (result == null) {
-    return;
-  }
+
   expect(result['value'], 50);
 }
 
@@ -354,8 +344,7 @@ Future testSaveWithObjectId() async {
   expect(result['value'], 30);
 
   result['value'] = 1;
-  // ignore: deprecated_member_use_from_same_package
-  await collection.save(result);
+  await collection.replaceOne({'_id': result['_id']}, result);
   result = await collection.findOne({'_id': id});
   expect(result, isNotNull);
   if (result == null) {
@@ -723,8 +712,8 @@ Future testUpdateWithUpsert() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  var result = await collection.insert({'name': 'a', 'value': 10});
-  expect(result['n'], 0);
+  var result = await collection.insertOne({'name': 'a', 'value': 10});
+  expect(result.isSuccess, true);
 
   var results = await collection.find({'name': 'a'}).toList();
   expect(results.length, 1);
@@ -734,9 +723,9 @@ Future testUpdateWithUpsert() async {
   var objectUpdate = {
     r'$set': {'value': 20}
   };
-  result = await collection.update({'name': 'a'}, objectUpdate);
-  expect(result['updatedExisting'], true);
-  expect(result['n'], 1);
+  var resultUpdate = await collection.updateOne({'name': 'a'}, objectUpdate);
+  expect(resultUpdate.isSuccess, true);
+  expect(resultUpdate.nModified, 1);
 
   results = await collection.find({'name': 'a'}).toList();
   expect(results.length, 1);
@@ -747,42 +736,42 @@ Future testUpdateWithMultiUpdate() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  var result = await collection.insertAll([
+  var result = await collection.insertMany([
     {'key': 'a', 'value': 'initial_value1'},
     {'key': 'a', 'value': 'initial_value2'},
     {'key': 'b', 'value': 'initial_value_b'}
   ]);
-  expect(result['n'], 0);
+  expect(result.isSuccess, true);
 
   var results = await collection.find({'key': 'a'}).toList();
   expect(results.length, 2);
   expect(results.first['key'], 'a');
   expect(results.first['value'], 'initial_value1');
 
-  result = await collection.update(where.eq('key', 'a'),
+  var resultUpd = await collection.updateOne(where.eq('key', 'a'),
       modify.set('value', 'value_modified_for_only_one_with_default'));
-  expect(result['updatedExisting'], true);
-  expect(result['n'], 1);
+  expect(resultUpd.isSuccess, true);
+  expect(resultUpd.nModified, 1);
 
   results = await collection
       .find({'value': 'value_modified_for_only_one_with_default'}).toList();
   expect(results.length, 1);
 
-  result = await collection.update(where.eq('key', 'a'),
-      modify.set('value', 'value_modified_for_only_one_with_multiupdate_false'),
-      multiUpdate: false);
-  expect(result['updatedExisting'], true);
-  expect(result['n'], 1);
+  resultUpd = await collection.updateOne(
+    where.eq('key', 'a'),
+    modify.set('value', 'value_modified_for_only_one_with_multiupdate_false'),
+  );
+  expect(resultUpd.isSuccess, true);
+  expect(resultUpd.nModified, 1);
 
   results = await collection.find(
       {'value': 'value_modified_for_only_one_with_multiupdate_false'}).toList();
   expect(results.length, 1);
 
-  result = await collection.update(
-      where.eq('key', 'a'), modify.set('value', 'new_value'),
-      multiUpdate: true);
-  expect(result['updatedExisting'], true);
-  expect(result['n'], 2);
+  resultUpd = await collection.updateMany(
+      where.eq('key', 'a'), modify.set('value', 'new_value'));
+  expect(resultUpd.isSuccess, true);
+  expect(resultUpd.nModified, 2);
 
   results = await collection.find({'value': 'new_value'}).toList();
   expect(results.length, 2);
@@ -797,11 +786,27 @@ Future testLimitWithSortByAndSkip() async {
   var collection = db.collection(collectionName);
 
   var counter = 0;
-  Cursor cursor;
 
   await insertManyDocuments(collection, 1000);
 
-  cursor = collection.createCursor(where.sortBy('a').skip(300).limit(10));
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var orderByMap = (where..sortBy('a')).map['orderby'];
+    var operation = FindOperation(
+      collection,
+      skip: 300,
+      sort: {...?orderByMap},
+      limit: 10,
+    );
+
+    var modernCursor = ModernCursor(operation);
+    counter = await modernCursor.stream.length;
+    expect(counter, 10);
+    expect(modernCursor.state, State.closed);
+    expect(modernCursor.cursorId.value, 0);
+    return;
+  }
+
+  var cursor = collection.createCursor(where.sortBy('a').skip(300).limit(10));
 
   counter = await cursor.stream.length;
   expect(counter, 10);
@@ -864,46 +869,55 @@ Future testCursorClosing() async {
   var collection = db.collection(collectionName);
 
   await insertManyDocuments(collection, 10000);
+  if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var cursor = collection.createCursor();
+    expect(cursor.state, State.init);
 
-  var cursor = collection.createCursor();
-  expect(cursor.state, State.init);
+    var newCursor = await cursor.nextObject();
+    expect(cursor.state, State.open);
+    expect(cursor.cursorId, isPositive);
 
-  var newCursor = await cursor.nextObject();
-  expect(cursor.state, State.open);
-  expect(cursor.cursorId, isPositive);
+    await cursor.close();
+    expect(cursor.state, State.closed);
+    expect(cursor.cursorId, 0);
 
-  await cursor.close();
-  expect(cursor.state, State.closed);
-  expect(cursor.cursorId, 0);
+    var result = await collection.findOne();
+    expect(newCursor, isNotNull);
+    expect(result, isNotNull); // Added this -- and it passes!
+  } else {
+    var modernCursor = ModernCursor(FindOperation(collection));
 
-  var result = await collection.findOne();
-  expect(newCursor, isNotNull);
-  expect(result, isNotNull); // Added this -- and it passes!
+    expect(modernCursor.state, State.init);
 
-  var modernCursor = ModernCursor(FindOperation(collection));
+    var cursorResult = await modernCursor.nextObject();
+    expect(modernCursor.state, State.open);
+    expect(modernCursor.cursorId.value, isPositive);
+    expect(cursorResult, isNotNull);
+    if (cursorResult == null) {
+      return;
+    }
+    expect(cursorResult['a'], 0);
+    expect(cursorResult, isNotNull);
 
-  expect(modernCursor.state, State.init);
+    await modernCursor.close();
+    expect(modernCursor.state, State.closed);
+    expect(modernCursor.cursorId.value, 0);
 
-  var cursorResult = await modernCursor.nextObject();
-  expect(modernCursor.state, State.open);
-  expect(modernCursor.cursorId.value, isPositive);
-  expect(cursorResult, isNotNull);
-  if (cursorResult == null) {
-    return;
+    var result = await collection.findOne();
+    expect(result, isNotNull);
   }
-  expect(cursorResult['a'], 0);
-  expect(cursorResult, isNotNull);
-
-  await modernCursor.close();
-  expect(modernCursor.state, State.closed);
-  expect(modernCursor.cursorId.value, 0);
-
-  result = await collection.findOne();
-  expect(result, isNotNull);
 }
 
 Future testPingRaw() async {
-  var collection = db.collection('\$cmd');
+  var collection = db.collection(r'$cmd');
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var modernCursor =
+        ModernCursor(FindOperation(collection, filter: {'ping': 1}, limit: 1));
+    var result = await modernCursor.nextObject();
+
+    expect(result, containsPair('ok', 1));
+    return;
+  }
   var cursor = Cursor(db, collection, where.eq('ping', 1).limit(1));
   var queryMessage = cursor.generateQueryMessage();
 
@@ -913,7 +927,16 @@ Future testPingRaw() async {
 }
 
 Future testNextObject() async {
-  var collection = db.collection('\$cmd');
+  var collection = db.collection(r'$cmd');
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var modernCursor =
+        ModernCursor(FindOperation(collection, filter: {'ping': 1}, limit: 1));
+
+    var result = await modernCursor.nextObject();
+
+    expect(result, containsPair('ok', 1));
+    return;
+  }
   var cursor = Cursor(db, collection, where.eq('ping', 1).limit(1));
 
   var newCursor = await cursor.nextObject();
@@ -924,11 +947,28 @@ Future testNextObject() async {
 Future testNextObjectToEnd() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
+  await collection.insertMany([
+    {'a': 1},
+    {'a': 2},
+    {'a': 3}
+  ]);
+
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var modernCursor = ModernCursor(FindOperation(collection, limit: 10));
+
+    var result = await modernCursor.nextObject();
+    expect(result, isNotNull);
+    result = await modernCursor.nextObject();
+    expect(result, isNotNull);
+    result = await modernCursor.nextObject();
+    expect(result, isNotNull);
+    result = await modernCursor.nextObject();
+    expect(result, isNull);
+
+    return;
+  }
 
   Cursor cursor;
-  await collection.insert({'a': 1});
-  await collection.insert({'a': 2});
-  await collection.insert({'a': 3});
 
   cursor = Cursor(db, collection, where.limit(10));
   var result = await cursor.nextObject();
@@ -949,6 +989,18 @@ Future testCursorWithOpenServerCursor() async {
   var collection = db.collection(collectionName);
 
   await insertManyDocuments(collection, 1000);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var modernCursor = ModernCursor(FindOperation(collection,
+        limit: 10, findOptions: FindOptions(batchSize: 5)));
+
+    await modernCursor.nextObject();
+    await modernCursor.nextObject();
+    expect(modernCursor.state, State.open);
+    expect(modernCursor.cursorId.value, isPositive);
+
+    return;
+  }
+
   var cursor = Cursor(db, collection, where.limit(10));
 
   await cursor.nextObject();
@@ -962,13 +1014,28 @@ Future testCursorGetMore() async {
   var collection = db.collection(collectionName);
 
   var count = 0;
-  var cursor = Cursor(db, collection, where.limit(10));
-  count = await cursor.stream.length;
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var modernCursor = ModernCursor(FindOperation(collection, limit: 10));
+
+    count = await modernCursor.stream.length;
+  } else {
+    var cursor = Cursor(db, collection, where.limit(10));
+    count = await cursor.stream.length;
+  }
   expect(count, 0);
 
   await insertManyDocuments(collection, 1000);
 
-  cursor = Cursor(db, collection, null);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var modernCursor = ModernCursor(FindOperation(collection));
+
+    count = await modernCursor.stream.length;
+    expect(count, 1000);
+    expect(modernCursor.cursorId.value, 0);
+    expect(modernCursor.state, State.closed);
+    return;
+  }
+  var cursor = Cursor(db, collection, null);
   count = await cursor.stream.length;
 
   expect(count, 1000);
