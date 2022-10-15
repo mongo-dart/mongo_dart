@@ -3,6 +3,7 @@ library database_tests;
 
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:crypto/crypto.dart' as crypto;
+import 'package:mongo_dart/src/database/commands/diagnostic_commands/ping_command/ping_command.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
 import 'dart:async';
 import 'package:test/test.dart';
@@ -1051,6 +1052,15 @@ void testDbCommandCreation() {
 }
 
 Future testPingDbCommand() async {
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var res = await PingCommand(db).execute();
+    expect(res, {'ok': 1});
+    res = await db.pingCommand();
+    expect(res, {'ok': 1});
+    res = await db.runCommand({'ping': 1});
+    expect(res, {'ok': 1});
+    return;
+  }
   var pingCommand = DbCommand.createPingCommand(db);
 
   var result = await db.queryMessage(pingCommand);
@@ -1059,6 +1069,12 @@ Future testPingDbCommand() async {
 }
 
 Future testDropDbCommand() async {
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var res = await db.modernDropDatabase();
+    expect(res, {'ok': 1});
+
+    return;
+  }
   var command = DbCommand.createDropDatabaseCommand(db);
 
   var result = await db.queryMessage(command);
@@ -1325,6 +1341,26 @@ Future testSafeModeUpdate() async {
     });
   }
 
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var result = await collection.updateOne({
+      'a': 200
+    }, {
+      r'$set': {'a': 100}
+    });
+    expect(result.isSuccess, true);
+    expect(result.nModified, 0);
+    expect(result.nMatched, 0);
+
+    result = await collection.updateOne({
+      'a': 3
+    }, {
+      r'$set': {'a': 100}
+    });
+    expect(result.isSuccess, true);
+    expect(result.nModified, 1);
+    expect(result.nMatched, 1);
+    return;
+  }
   var result = await collection.update({'a': 200}, {'a': 100});
   expect(result['updatedExisting'], false);
   expect(result['n'], 0);

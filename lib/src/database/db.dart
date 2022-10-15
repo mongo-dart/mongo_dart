@@ -982,4 +982,11 @@ class Db {
             rawOptions: rawOptions))
         .stream;
   }
+
+  /// Runs a command
+  Future<Map<String, Object?>> runCommand(Map<String, Object>? command) =>
+      CommandOperation(this, <String, Object>{}, command: command).execute();
+
+  /// Ping command
+  Future<Map<String, Object?>> pingCommand() => PingCommand(this).execute();
 }

@@ -218,7 +218,10 @@ class ModernCursor {
     if (items.isNotEmpty) {
       return _getNextItem();
     }
-    if (collection != null && collection!.collectionName == r'$cmd') {
+    if (collection != null &&
+        collection!.collectionName == r'$cmd' &&
+        operation is FindOperation &&
+        (operation! as FindOperation).limit == 1) {
       return operation!.execute();
     }
 

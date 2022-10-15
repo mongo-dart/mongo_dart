@@ -59,6 +59,8 @@ import 'src/database/commands/administration_commands/list_collections_command/l
 import 'src/database/commands/aggregation_commands/count/count_operation.dart';
 import 'src/database/commands/aggregation_commands/count/count_options.dart';
 import 'src/database/commands/aggregation_commands/count/count_result.dart';
+import 'src/database/commands/base/command_operation.dart';
+import 'src/database/commands/diagnostic_commands/ping_command/ping_command.dart';
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_aggregation.dart';
