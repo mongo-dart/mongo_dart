@@ -789,8 +789,7 @@ class Db {
           background: background,
           dropDups: dropDups,
           partialFilterExpression: partialFilterExpression,
-          name: name,
-          modernReply: false);
+          name: name);
     }
     return Future.sync(() async {
       var selector = <String, dynamic>{};

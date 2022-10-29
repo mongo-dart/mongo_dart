@@ -54,8 +54,12 @@ import 'src/database/commands/administration_commands/drop_command/drop_command.
 import 'src/database/commands/administration_commands/drop_command/drop_options.dart';
 import 'src/database/commands/administration_commands/drop_database_command/drop_database_command.dart';
 import 'src/database/commands/administration_commands/drop_database_command/drop_database_options.dart';
+import 'src/database/commands/administration_commands/drop_indexes_command/drop_indexes_command.dart';
+import 'src/database/commands/administration_commands/drop_indexes_command/drop_indexes_options.dart';
 import 'src/database/commands/administration_commands/list_collections_command/list_collections_command.dart';
 import 'src/database/commands/administration_commands/list_collections_command/list_collections_options.dart';
+import 'src/database/commands/administration_commands/listt_indexes_command/list_indexes_command.dart';
+import 'src/database/commands/administration_commands/listt_indexes_command/list_indexes_options.dart';
 import 'src/database/commands/aggregation_commands/count/count_operation.dart';
 import 'src/database/commands/aggregation_commands/count/count_options.dart';
 import 'src/database/commands/aggregation_commands/count/count_result.dart';

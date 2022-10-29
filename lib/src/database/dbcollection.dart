@@ -339,6 +339,9 @@ class DbCollection {
   /// the existing indexes on the collection. You must call `getIndexes()`
   ///  on a collection
   Future<List<Map<String, dynamic>>> getIndexes() {
+    if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+      return listIndexes().toList();
+    }
     if (db.masterConnection.serverCapabilities.listIndexes) {
       return ListIndexesCursor(db, this).stream.toList();
     } else {
@@ -471,6 +474,38 @@ class DbCollection {
       return res;
     }
     return db.getLastError();
+  }
+
+  Stream<Map<String, dynamic>> listIndexes(
+      {int? batchSize, String? comment, Map<String, Object>? rawOptions}) {
+    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError('listIndexes method cannot be used before 3.6');
+    }
+
+    var indexOptions =
+        ListIndexesOptions(batchSize: batchSize, comment: comment);
+
+    var command = ListIndexesCommand(db, this,
+        listIndexesOptions: indexOptions, rawOptions: rawOptions);
+
+    return ModernCursor(command).stream;
+  }
+
+  Future<Map<String, dynamic>> dropIndexes(Object index,
+      {WriteConcern? writeConcern,
+      String? comment,
+      Map<String, Object>? rawOptions}) {
+    if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      throw MongoDartError('dropIndexes method cannot be used before 3.6');
+    }
+
+    var indexOptions =
+        DropIndexesOptions(writeConcern: writeConcern, comment: comment);
+
+    var command = DropIndexesCommand(db, this, index,
+        dropIndexesOptions: indexOptions, rawOptions: rawOptions);
+
+    return command.execute();
   }
 
   // This method has been made available since version 3.2

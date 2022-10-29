@@ -156,6 +156,9 @@ void main() async {
 
         try {
           await db.open();
+        } on MongoDartError {
+          // 6.0 does not connect with MongoDbCr
+          return;
         } catch (e) {
           err = e;
         }
@@ -215,6 +218,9 @@ void main() async {
         try {
           db.selectAuthenticationMechanism('MONGODB-CR');
           await db.open();
+        } on MongoDartError {
+          // 6.0 does not connect with MongoDbCr
+          return;
         } catch (e) {
           err = e;
         }

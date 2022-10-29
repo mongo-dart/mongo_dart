@@ -12,6 +12,7 @@
 - created `modernCount` method
 - OP_MSG commands added: Drop, DropDatabase and ListCollections
 - Db.runCommand()
+- dropIndex()
 
 ## 0.8.0-1.0.beta
 
