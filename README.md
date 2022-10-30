@@ -6,6 +6,10 @@
 
 Server-side driver library for MongoDb implemented in pure Dart. Server side means all packages using dart:io, dart:html are not accepted.
 
+**NOTE**
+Starting from release 6.0 of MongDb the old messages structure has been removed (almost completely). This means that some commands cannot be annymore executed. As per compatibility reasons with (very) old releases we are returning in some wrappers (like `insert` method) the result of this commands (in detail `getLastError` command), to let your programs work you should use instead the OP_MSG version. In general this methods are prefixed with `modern`, but this is not the case for all.
+For example, instead of `insert`, you should use `insertOne`, and instead of `update` you should use `updateOne` or `updateMany`.
+
 ## Apis
 
 Apis normally are created to behave in the most similar way to the mongo shell.

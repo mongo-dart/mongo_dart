@@ -69,6 +69,7 @@ void main() async {
     //var cannotRunTests = false;
     //var running4_4orGreater = false;
     var running4_2orGreater = false;
+    var running4_2 = false;
 
     //var isReplicaSet = false;
     //var isStandalone = false;
@@ -84,6 +85,9 @@ void main() async {
       }
       if (serverFcv?.compareTo('4.2') != -1) {
         running4_2orGreater = true;
+      }
+      if (serverFcv?.compareTo('4.2') == 0) {
+        running4_2 = true;
       }
       //isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
       //isStandalone = db.masterConnection.serverCapabilities.isStandalone;
@@ -226,7 +230,7 @@ void main() async {
         expect(res[keyOk], 1.0);
         expect(res[keyN], 0);
         expect(res[keyNModified], 0);
-        if (isSharded && running4_2orGreater) {
+        if (isSharded && running4_2) {
           expect((res[keyWriteErrors] as List).first['code'], 72);
         } else {
           expect((res[keyWriteErrors] as List).first['code'], 9);
@@ -1562,7 +1566,7 @@ void main() async {
         expect(res.nModified, 0);
         expect(res.isFailure, isTrue);
         expect(res.hasWriteErrors, isTrue);
-        if (isSharded && running4_2orGreater) {
+        if (isSharded && running4_2) {
           expect(res.writeError?.code, 72);
         } else {
           expect(res.writeError?.code, 9);

@@ -618,7 +618,12 @@ void main() async {
             r'$match': {
               'active': true,
               if (db.masterConnection.serverCapabilities.isShardedCluster)
-                'op': 'getmore'
+                if (db.masterConnection.serverCapabilities.fcv
+                        ?.compareTo('4.2') ==
+                    1)
+                  'op': 'command'
+                else
+                  'op': 'getmore'
               else
                 'command.aggregate': 1
             }
@@ -641,7 +646,12 @@ void main() async {
             // one command per shard
             expect(resultList, isNotEmpty);
             expect(resultList.first['type'], 'op');
-            expect(resultList.first['op'], 'getmore');
+            if (db.masterConnection.serverCapabilities.fcv?.compareTo('4.2') ==
+                1) {
+              expect(resultList.first['op'], 'command');
+            } else {
+              expect(resultList.first['op'], 'getmore');
+            }
           } else {
             expect(resultList.length, 1);
             expect(resultList.first['type'], 'op');

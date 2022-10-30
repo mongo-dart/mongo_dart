@@ -36,7 +36,12 @@ void main() async {
     tearDown(() async {
       await cleanupDatabase();
     });
-
+    tearDownAll(() async {
+      await db.open();
+      await Future.forEach(usedCollectionNames,
+          (String collectionName) => db.collection(collectionName).drop());
+      await db.close();
+    });
     group('Uuid:', () {
       test('read Uuid', () async {
         var collectionName = getRandomCollectionName();
@@ -102,12 +107,5 @@ void main() async {
         expect(values.isEmpty, isTrue);
       });
     });
-  });
-
-  tearDownAll(() async {
-    await db.open();
-    await Future.forEach(usedCollectionNames,
-        (String collectionName) => db.collection(collectionName).drop());
-    await db.close();
   });
 }

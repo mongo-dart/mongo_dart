@@ -132,21 +132,21 @@ Future testRunCommand() async {
   if (db.masterConnection.serverCapabilities.fcv != null &&
       db.masterConnection.serverCapabilities.fcv!.compareTo('6.0') >= 0) {
     var ret = await db.runCommand({'ping': 1});
-    expect(ret, {'ok': 1.0});
+    expect(ret[keyOk], 1.0);
 
     var ret2 =
         await CommandOperation(db, <String, Object>{}, command: {'ping': 1})
             .execute();
-    expect(ret, ret2);
+    expect(ret2[keyOk], 1.0);
 
     ret2 = await PingCommand(db).execute();
-    expect(ret, ret2);
+    expect(ret[keyOk], 1.0);
 
     ret2 = await db.pingCommand();
-    expect(ret, ret2);
+    expect(ret[keyOk], 1.0);
 
     var result = await db.collection(r'$cmd').findOne({'ping': 1});
-    expect(ret, result);
+    expect(result?[keyOk], 1.0);
     return;
   }
 }
@@ -1088,11 +1088,11 @@ void testDbCommandCreation() {
 Future testPingDbCommand() async {
   if (db.masterConnection.serverCapabilities.supportsOpMsg) {
     var res = await PingCommand(db).execute();
-    expect(res, {'ok': 1});
+    expect(res[keyOk], 1.0);
     res = await db.pingCommand();
-    expect(res, {'ok': 1});
+    expect(res[keyOk], 1.0);
     res = await db.runCommand({'ping': 1});
-    expect(res, {'ok': 1});
+    expect(res[keyOk], 1.0);
     return;
   }
   var pingCommand = DbCommand.createPingCommand(db);
@@ -1105,7 +1105,7 @@ Future testPingDbCommand() async {
 Future testDropDbCommand() async {
   if (db.masterConnection.serverCapabilities.supportsOpMsg) {
     var res = await db.modernDropDatabase();
-    expect(res, {'ok': 1});
+    expect(res[keyOk], 1.0);
 
     return;
   }
