@@ -4,7 +4,7 @@ description: MongoDB driver, implemented in pure Dart. All CRUD operations, aggr
 homepage: https://github.com/mongo-dart/mongo_dart
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.18.0 <3.0.0"
 
 dependencies:
   bson: ^3.0.0
