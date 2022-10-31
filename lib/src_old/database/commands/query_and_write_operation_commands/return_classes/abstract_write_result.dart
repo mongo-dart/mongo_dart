@@ -1,7 +1,7 @@
 import 'package:mongo_dart/src_old/database/commands/mixin/basic_result.dart';
 
 import 'write_concern_error.dart';
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart';
+import 'package:mongo_dart/src/utils/map_keys.dart';
 
 enum WriteCommandType { insert, update, delete }
 

@@ -1,6 +1,8 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src_old/database/utils/mongo_db_namespace.dart';
 
+import '../../../../src/core/error/mongo_dart_error.dart';
+
 /// Contains the cursor information,
 /// including the cursor id and the firstBatch/nextBatch of documents.
 ///

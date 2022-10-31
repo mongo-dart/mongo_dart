@@ -1,9 +1,11 @@
 //part of mongo_dart;
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:mongo_dart/mongo_dart_old.dart'
-    show Connection, Db, DbCommand, MongoQueryMessage;
+    show Db, DbCommand, MongoQueryMessage;
 import 'package:mongo_dart/src_old/auth/auth.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
+
+import '../network/connection.dart';
 
 class MongoDbCRAuthenticator extends Authenticator {
   MongoDbCRAuthenticator(this.db, this.credentials) : super();

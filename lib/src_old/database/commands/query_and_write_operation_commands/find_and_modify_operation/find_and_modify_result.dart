@@ -1,7 +1,7 @@
 import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_commands/return_classes/last_error_object.dart';
 import 'package:mongo_dart/src_old/database/commands/mixin/basic_result.dart';
 import 'package:mongo_dart/src_old/database/commands/mixin/timing_result.dart';
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart';
+import 'package:mongo_dart/src/utils/map_keys.dart';
 
 class FindAndModifyResult with BasicResult, TimingResult {
   FindAndModifyResult(Map<String, Object?> document)

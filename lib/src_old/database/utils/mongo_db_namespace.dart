@@ -1,4 +1,6 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/mongo_dart_old.dart' show keyColl, keyDb;
+
+import '../../../src/core/error/mongo_dart_error.dart';
 
 class MongoDBNamespace {
   final String db;

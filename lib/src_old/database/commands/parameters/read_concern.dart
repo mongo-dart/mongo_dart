@@ -1,4 +1,4 @@
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart';
+import 'package:mongo_dart/src/utils/map_keys.dart';
 
 enum ReadConcernLevel {
   /// A query with read concern "local" returns data from the instance

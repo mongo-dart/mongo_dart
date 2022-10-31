@@ -7,6 +7,7 @@ import 'package:mongo_dart/src_old/database/commands/base/operation_base.dart';
 
 import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 
+import '../../../../../../src/core/error/mongo_dart_error.dart';
 import 'bulk_options.dart';
 
 abstract class Bulk extends CommandOperation {

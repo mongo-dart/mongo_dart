@@ -1,15 +1,11 @@
-part of mongo_dart;
+import 'package:bson/bson.dart';
 
-class _Statics {
-  static int? _requestId;
-  static int get nextRequestId {
-    _requestId ??= 1;
-    _requestId = _requestId! + 1;
-    return _requestId!;
-  }
-}
+import '../../error/mongo_dart_error.dart';
 
-class MongoMessage {
+int _requestId = 0;
+
+abstract class MongoMessage {
+  // Todo adjust the following constants
   static final reply = 1;
   static final message = 1000;
   static final update = 2001;
@@ -20,25 +16,15 @@ class MongoMessage {
   static final killCursors = 2007;
   static final modernMessage = 2013;
 
-  int? _requestId;
+  final int requestId = ++_requestId;
   int _messageLength = 0;
 
   int get messageLength => _messageLength;
-
-  int get requestId {
-    _requestId ??= _Statics.nextRequestId;
-
-    return _requestId!;
-  }
 
   int responseTo = 0;
   int opcode = MongoMessage.reply;
 
   BsonBinary serialize() => throw MongoDartError('Must be implemented');
-
-/*  void deserialize(BsonBinary buffer) {
-    throw MongoDartError('Must be implemented');
-  }*/
 
   void readMessageHeaderFrom(BsonBinary buffer) {
     _messageLength = buffer.readInt32();

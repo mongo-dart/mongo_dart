@@ -7,10 +7,8 @@ import 'package:sasl_scram/sasl_scram.dart'
     show SaslMechanism, UsernamePasswordCredential;
 import 'package:mongo_dart/mongo_dart_old.dart'
     show
-        Connection,
         Db,
         DbCommand,
-        MongoDartError,
         SaslContinueCommand,
         SaslStartCommand,
         SaslStartOptions,
@@ -19,6 +17,9 @@ import 'package:mongo_dart/mongo_dart_old.dart'
         keyErrmsg,
         keyOk;
 import 'package:mongo_dart/src_old/auth/auth.dart';
+
+import '../../src/core/error/mongo_dart_error.dart';
+import '../network/connection.dart';
 
 abstract class SaslAuthenticator extends Authenticator {
   SaslAuthenticator(this.mechanism, this.db) : super();

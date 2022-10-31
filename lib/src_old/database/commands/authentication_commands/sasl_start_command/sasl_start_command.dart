@@ -6,6 +6,8 @@ import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart
 import 'package:mongo_dart/src_old/database/message/additional/section.dart';
 import 'package:mongo_dart/src_old/database/message/mongo_modern_message.dart';
 
+import '../../../../network/connection.dart';
+
 class SaslStartCommand extends CommandOperation {
   SaslStartCommand(Db db, String mechanism, Uint8List payload,
       {SaslStartOptions? saslStartOptions,

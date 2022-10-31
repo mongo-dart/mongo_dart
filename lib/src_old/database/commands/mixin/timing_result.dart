@@ -1,5 +1,5 @@
 import 'package:bson/bson.dart';
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart';
+import 'package:mongo_dart/src/utils/map_keys.dart';
 
 /// Basic communication from a MongoDb server
 ///

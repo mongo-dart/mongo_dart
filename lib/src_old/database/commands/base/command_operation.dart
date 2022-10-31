@@ -1,8 +1,7 @@
-import 'package:mongo_dart/mongo_dart_old.dart'
-    show Connection, Db, DbCollection, MongoDartError, State;
+import 'package:mongo_dart/mongo_dart_old.dart' show Db, DbCollection, State;
 import 'package:mongo_dart/src_old/database/message/mongo_modern_message.dart'
     show MongoModernMessage;
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart'
+import 'package:mongo_dart/src/utils/map_keys.dart'
     show
         keyAuthdb,
         keyDatabaseName,
@@ -10,6 +9,8 @@ import 'package:mongo_dart/src_old/database/utils/map_keys.dart'
         keyReadPreference,
         keyWriteConcern;
 
+import '../../../../src/core/error/mongo_dart_error.dart';
+import '../../../network/connection.dart';
 import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
 import 'operation_base.dart' show Aspect, OperationBase;

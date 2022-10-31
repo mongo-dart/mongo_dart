@@ -1,6 +1,5 @@
-import 'package:mongo_dart/mongo_dart_old.dart'
-    show Db, DbCollection, MongoDartError;
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart'
+import 'package:mongo_dart/mongo_dart_old.dart' show Db, DbCollection;
+import 'package:mongo_dart/src/utils/map_keys.dart'
     show
         keyHedgeOptions,
         keyMaxStalenessSecond,
@@ -8,6 +7,8 @@ import 'package:mongo_dart/src_old/database/utils/map_keys.dart'
         keyReadPreference,
         keyReadPreferenceTags,
         keyTags;
+
+import '../../../../src/core/error/mongo_dart_error.dart';
 
 enum ReadPreferenceMode {
   primary,

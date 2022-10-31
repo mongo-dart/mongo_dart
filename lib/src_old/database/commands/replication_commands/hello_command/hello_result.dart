@@ -1,6 +1,6 @@
 import 'package:bson/bson.dart';
 import 'package:mongo_dart/src_old/database/commands/mixin/basic_result.dart';
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart';
+import 'package:mongo_dart/src/utils/map_keys.dart';
 
 /// Class representing the output of the Hello command
 /// Not all values are represented. If you need something that here is missing

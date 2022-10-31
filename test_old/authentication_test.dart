@@ -1,4 +1,5 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/mongo_dart_old.dart' show Db, keyCode;
+import 'package:mongo_dart/mongo_dart.dart';
 import 'package:sasl_scram/sasl_scram.dart' show CryptoStrengthStringGenerator;
 import 'package:test/test.dart';
 

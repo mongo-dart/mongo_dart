@@ -1,5 +1,7 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 
+import '../../../../../src/core/error/mongo_dart_error.dart';
+
 class UpdateStatement {
   UpdateStatement(this.q, this.u,
       {bool? upsert,

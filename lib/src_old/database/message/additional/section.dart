@@ -1,6 +1,7 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show BsonBinary, MongoDartError;
+import 'package:mongo_dart/mongo_dart_old.dart' show BsonBinary;
 import 'package:mongo_dart/src_old/database/message/mongo_modern_message.dart'
     show MongoModernMessage;
+import '../../../../src/core/error/mongo_dart_error.dart';
 import 'payload.dart' show Payload, Payload0, Payload1;
 
 abstract class Section {

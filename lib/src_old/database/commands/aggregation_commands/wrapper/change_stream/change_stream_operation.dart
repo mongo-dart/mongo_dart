@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart_old.dart' show Db, DbCollection;
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/aggregate/aggregate_operation.dart';
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart';
+import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import 'change_stream_options.dart';
 

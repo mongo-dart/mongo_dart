@@ -1,4 +1,19 @@
-part of mongo_dart;
+import 'dart:async';
+import 'dart:collection';
+import 'dart:io';
+
+import 'package:logging/logging.dart';
+import 'package:mongo_dart/mongo_dart_old.dart'
+    show MongoMessageHandler, MongoReplyMessage, ServerConfig;
+import 'package:vy_string_utils/vy_string_utils.dart';
+
+import '../database/commands/replication_commands/hello_command/hello_result.dart';
+import '../database/info/server_status.dart';
+import '../database/message/mongo_modern_message.dart';
+import '../database/message/mongo_response_message.dart';
+import '../../src/utils/map_keys.dart';
+import '../../src/core/message/abstract/mongo_message.dart';
+import 'connection_manager.dart';
 
 const noSecureRequestError = 'The socket connection has been reset by peer.'
     '\nPossible causes:'
@@ -131,6 +146,7 @@ class Connection {
 
   bool connected = false;
   bool _closed = false;
+  bool get isClosed => _closed;
   bool isMaster = false;
   final ServerCapabilities serverCapabilities = ServerCapabilities();
   final ServerStatus serverStatus = ServerStatus();
@@ -226,7 +242,7 @@ class Connection {
     return;
   }
 
-  void _sendBuffer() {
+  void sendBuffer() {
     _log.fine(() => '_sendBuffer ${_sendQueue.isNotEmpty}');
     var message = <int>[];
     while (_sendQueue.isNotEmpty) {
@@ -246,7 +262,7 @@ class Connection {
       _pendingQueries.add(queryMessage.requestId);
       _log.fine(() => 'Query $queryMessage');
       _sendQueue.addLast(queryMessage);
-      _sendBuffer();
+      sendBuffer();
     } else {
       completer.completeError(const ConnectionException(
           'Invalid state: Connection already closed.'));
@@ -267,7 +283,7 @@ class Connection {
     _log.fine(() => 'Execute $mongoMessage');
     _sendQueue.addLast(mongoMessage);
     if (runImmediately) {
-      _sendBuffer();
+      sendBuffer();
     }
   }
 
@@ -279,7 +295,7 @@ class Connection {
       _pendingQueries.add(modernMessage.requestId);
       _log.fine(() => 'Message $modernMessage');
       _sendQueue.addLast(modernMessage);
-      _sendBuffer();
+      sendBuffer();
     } else {
       completer.completeError(const ConnectionException(
           'Invalid state: Connection already closed.'));

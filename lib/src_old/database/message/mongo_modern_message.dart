@@ -1,8 +1,9 @@
-import 'package:mongo_dart/mongo_dart_old.dart'
-    show BsonBinary, MongoDartError, MongoMessage;
+import 'package:mongo_dart/mongo_dart_old.dart' show BsonBinary;
 import 'package:mongo_dart/src_old/database/message/additional/section.dart';
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart';
+import 'package:mongo_dart/src/utils/map_keys.dart';
 
+import '../../../src/core/error/mongo_dart_error.dart';
+import '../../../src/core/message/abstract/mongo_message.dart';
 import 'mongo_response_message.dart';
 
 const int notFound = -1;

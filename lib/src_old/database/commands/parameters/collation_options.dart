@@ -1,5 +1,7 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 
+import '../../../../src/core/error/mongo_dart_error.dart';
+
 List<String> _caseFirstValidValues = <String>['upper', 'lower', 'off'];
 List<String> _alternateValidValues = <String>['non-ignorable', 'shifted'];
 List<String> _maxVariableValidValues = <String>['punct', 'space'];

@@ -1,4 +1,24 @@
-part of mongo_dart;
+//part of mongo_dart;
+
+import 'dart:async';
+import 'dart:collection';
+
+import 'package:logging/logging.dart';
+import 'package:vy_string_utils/vy_string_utils.dart';
+
+import '../../mongo_dart_old.dart'
+    show Db, DbCommand, ServerConfig, State, WriteConcern;
+import '../../src/core/error/mongo_dart_error.dart';
+import '../auth/auth.dart';
+import '../database/commands/diagnostic_commands/server_status_command/server_status_command.dart';
+import '../database/commands/diagnostic_commands/server_status_command/server_status_options.dart';
+import '../database/commands/replication_commands/hello_command/hello_command.dart';
+import '../database/commands/replication_commands/hello_command/hello_result.dart';
+import '../database/message/mongo_modern_message.dart';
+import '../database/message/mongo_response_message.dart';
+import '../../src/utils/map_keys.dart';
+import '../../src/core/message/abstract/mongo_message.dart';
+import 'connection.dart';
 
 class ConnectionManager {
   final _log = Logger('ConnectionManager');
@@ -13,7 +33,7 @@ class ConnectionManager {
   Connection? get masterConnection => _masterConnection;
 
   Connection get masterConnectionVerified {
-    if (_masterConnection != null && !_masterConnection!._closed) {
+    if (_masterConnection != null && !_masterConnection!.isClosed) {
       return _masterConnection!;
     } else {
       throw MongoDartError('No master connection');
@@ -43,12 +63,12 @@ class ConnectionManager {
         MongoModernMessage.maxWriteBatchSize = resultDoc.maxWriteBatchSize;
       }
       connection.serverCapabilities.getParamsFromHello(resultDoc);
-      if (db._authenticationScheme == null &&
+      if (db.authenticationScheme == null &&
           resultDoc.saslSupportedMechs != null) {
         if (resultDoc.saslSupportedMechs!.contains('SCRAM-SHA-256')) {
-          db._authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
+          db.authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
         } else if (resultDoc.saslSupportedMechs!.contains('SCRAM-SHA-1')) {
-          db._authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
+          db.authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
         }
       }
     } else {
@@ -76,13 +96,13 @@ class ConnectionManager {
       connection.serverCapabilities.getParamsFromIstMaster(documents.first);
     }
 
-    if (db._authenticationScheme == null) {
+    if (db.authenticationScheme == null) {
       if ((connection.serverCapabilities.fcv?.compareTo('4.0') ?? -1) > -1) {
-        db._authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
+        db.authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
       } else if (connection.serverCapabilities.maxWireVersion >= 3) {
-        db._authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
+        db.authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
       } else {
-        db._authenticationScheme = AuthenticationScheme.MONGODB_CR;
+        db.authenticationScheme = AuthenticationScheme.MONGODB_CR;
       }
     }
     if (connection.serverConfig.userName == null) {
@@ -99,10 +119,10 @@ class ConnectionManager {
             e.mongoCode == 8000 &&
             e.errorCodeName == 'AtlasError' &&
             e.message.contains('SCRAM-SHA-256') &&
-            db._authenticationScheme == AuthenticationScheme.SCRAM_SHA_256) {
+            db.authenticationScheme == AuthenticationScheme.SCRAM_SHA_256) {
           _log.warning(() => 'Atlas connection: SCRAM_SHA_256 not available, '
               'downgrading to SCRAM_SHA_1');
-          db._authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
+          db.authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
           try {
             await db.authenticate(connection.serverConfig.userName!,
                 connection.serverConfig.password ?? '',
@@ -169,7 +189,7 @@ class ConnectionManager {
 
   Future close() async {
     while (sendQueue.isNotEmpty) {
-      masterConnection?._sendBuffer();
+      masterConnection?.sendBuffer();
     }
     sendQueue.clear();
 

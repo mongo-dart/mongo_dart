@@ -1,7 +1,8 @@
 import 'package:basic_utils/basic_utils.dart' show DnsUtils, RRecordType;
 import 'package:logging/logging.dart' show Logger;
-import 'package:mongo_dart/mongo_dart_old.dart' show MongoDartError;
 import 'package:mongo_dart/src_old/database/utils/check_same_domain.dart';
+
+import '../../../src/core/error/mongo_dart_error.dart';
 
 var _log = Logger('dns_llokup');
 

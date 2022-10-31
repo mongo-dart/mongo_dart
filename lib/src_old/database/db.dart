@@ -204,7 +204,7 @@ class Db {
   Db? authSourceDb;
   ConnectionManager? _connectionManager;
 
-  Connection? get _masterConnection => _connectionManager?._masterConnection;
+  Connection? get _masterConnection => _connectionManager?.masterConnection;
 
   Connection get _masterConnectionVerified {
     if (state != State.open) {
@@ -221,7 +221,7 @@ class Db {
   }
 
   WriteConcern? _writeConcern;
-  AuthenticationScheme? _authenticationScheme;
+  AuthenticationScheme? authenticationScheme;
   ReadPreference readPreference = ReadPreference.primary;
 
   @override
@@ -386,11 +386,11 @@ class Db {
 
   void selectAuthenticationMechanism(String authenticationSchemeName) {
     if (authenticationSchemeName == ScramSha1Authenticator.name) {
-      _authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
+      authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
     } else if (authenticationSchemeName == ScramSha256Authenticator.name) {
-      _authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
+      authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
     } else if (authenticationSchemeName == MongoDbCRAuthenticator.name) {
-      _authenticationScheme = AuthenticationScheme.MONGODB_CR;
+      authenticationScheme = AuthenticationScheme.MONGODB_CR;
     } else {
       throw MongoDartError('Provided authentication scheme is '
           'not supported : $authenticationSchemeName');
@@ -728,11 +728,11 @@ class Db {
     (connection ?? masterConnection).serverConfig.userName ??= userName;
     (connection ?? masterConnection).serverConfig.password ??= password;
 
-    if (_authenticationScheme == null) {
+    if (authenticationScheme == null) {
       throw MongoDartError('Authentication scheme not specified');
     }
     var authenticator =
-        Authenticator.create(_authenticationScheme!, this, credential);
+        Authenticator.create(authenticationScheme!, this, credential);
 
     await authenticator.authenticate(connection ?? masterConnection);
 

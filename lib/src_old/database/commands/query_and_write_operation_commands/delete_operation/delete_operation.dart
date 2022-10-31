@@ -2,7 +2,7 @@ import 'package:mongo_dart/mongo_dart_old.dart' show DbCollection;
 import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart';
 import 'package:mongo_dart/src_old/database/commands/base/operation_base.dart';
 import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_commands/delete_operation/delete_statement.dart';
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart';
+import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import 'delete_options.dart';
 

@@ -4,6 +4,8 @@ import 'package:mongo_dart/src_old/database/message/additional/section.dart';
 import 'package:mongo_dart/src_old/database/message/mongo_modern_message.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
+import '../../../../network/connection.dart';
+
 var _command = <String, Object>{keyHello: 1};
 
 /// The Hello command takes the following form:

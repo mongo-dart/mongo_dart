@@ -5,6 +5,7 @@ import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart';
 import 'package:mongo_dart/src_old/database/message/additional/section.dart';
 import 'package:mongo_dart/src_old/database/message/mongo_modern_message.dart';
+import '../../../../network/connection.dart';
 import 'sasl_continue_options.dart';
 
 class SaslContinueCommand extends CommandOperation {

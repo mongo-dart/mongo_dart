@@ -1,4 +1,4 @@
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart';
+import 'package:mongo_dart/src/utils/map_keys.dart';
 
 /// contains information regarding any error, excluding write concern errors,
 /// encountered during the write operation.

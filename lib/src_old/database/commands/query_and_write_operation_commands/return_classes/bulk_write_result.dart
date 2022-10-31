@@ -1,5 +1,5 @@
 import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_commands/return_classes/write_concern_error.dart';
-import 'package:mongo_dart/src_old/database/utils/map_keys.dart';
+import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import 'abstract_write_result.dart';
 import 'bulk_write_error.dart';

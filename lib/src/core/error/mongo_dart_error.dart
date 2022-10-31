@@ -1,4 +1,4 @@
-part of mongo_dart;
+//part of mongo_dart;
 
 class MongoDartError extends Error {
   final String message;
