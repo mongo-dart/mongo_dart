@@ -1,10 +1,10 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show BsonBinary;
-import 'package:mongo_dart/src_old/database/message/additional/section.dart';
-import 'package:mongo_dart/src/utils/map_keys.dart';
+import 'package:bson/bson.dart' show BsonBinary;
 
-import '../../../src/core/error/mongo_dart_error.dart';
-import '../../../src/core/message/abstract/mongo_message.dart';
-import 'mongo_response_message.dart';
+import '../../utils/map_keys.dart';
+import '../error/mongo_dart_error.dart';
+import 'abstract/mongo_message.dart';
+import 'abstract/mongo_response_message.dart';
+import 'abstract/section.dart';
 
 const int notFound = -1;
 
@@ -119,24 +119,12 @@ class MongoModernMessage extends MongoResponseMessage {
     keyInsert,
     keyUpdate,
     keyDelete,
-    //keyServerStatus,
-    //keyFind,
-    //keyGetMore,
-    //keyKillCursors,
-    //keyGetLastError,
-    //keyCreate
   ];
   static List<String> commandArgument = <String>[
     keyCreateIndexesArgument,
     keyInsertArgument,
     keyUpdateArgument,
     keyDeleteArgument,
-    //null,
-    //null,
-    //null,
-    //null,
-    //null,
-    //null
   ];
   static List<String> globalArgument = <String>[
     keyDatabaseName,

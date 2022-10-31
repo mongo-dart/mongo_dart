@@ -1,9 +1,9 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show BsonBinary;
+import 'package:bson/bson.dart' show BsonBinary;
 
-import '../../../src/core/error/mongo_dart_error.dart';
-import '../../../src/core/message/abstract/mongo_message.dart';
+import '../../error/mongo_dart_error.dart';
+import 'mongo_message.dart';
 
-class MongoResponseMessage extends MongoMessage {
+abstract class MongoResponseMessage extends MongoMessage {
   MongoMessage deserialize(BsonBinary buffer) {
     throw MongoDartError('Must be implemented');
   }

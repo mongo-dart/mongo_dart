@@ -10,6 +10,7 @@ class DbCommand extends MongoQueryMessage {
   static final SYSTEM_USER_COLLECTION = 'system.users';
   static final SYSTEM_COMMAND_COLLECTION = '\$cmd';
 
+
   Db db;
   DbCommand(
       this.db,
@@ -21,7 +22,7 @@ class DbCommand extends MongoQueryMessage {
       Map<String, dynamic>? fields)
       : super(collectionName, flags, numberToSkip, numberToReturn, query,
             fields) {
-    _collectionFullName = BsonCString('${db.databaseName}.$collectionName');
+    collFullName = BsonCString('${db.databaseName}.$collectionName');
   }
 
   static DbCommand createFindAndModifyCommand(Db db, String collectionName,

@@ -4,13 +4,14 @@ import 'dart:io';
 
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/mongo_dart_old.dart'
-    show MongoMessageHandler, MongoReplyMessage, ServerConfig;
+    show MongoMessageHandler, ServerConfig;
 import 'package:vy_string_utils/vy_string_utils.dart';
 
+import '../../src/core/message/deprecated/mongo_reply_message.dart';
 import '../database/commands/replication_commands/hello_command/hello_result.dart';
 import '../database/info/server_status.dart';
-import '../database/message/mongo_modern_message.dart';
-import '../database/message/mongo_response_message.dart';
+import '../../src/core/message/mongo_modern_message.dart';
+import '../../src/core/message/abstract/mongo_response_message.dart';
 import '../../src/utils/map_keys.dart';
 import '../../src/core/message/abstract/mongo_message.dart';
 import 'connection_manager.dart';

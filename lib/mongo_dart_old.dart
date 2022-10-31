@@ -15,9 +15,9 @@ import 'package:logging/logging.dart';
 import 'package:mongo_dart/src_old/auth/scram_sha256_authenticator.dart';
 import 'package:mongo_dart/src_old/database/cursor/modern_cursor.dart';
 import 'package:mongo_dart/src_old/database/info/server_status.dart';
-import 'package:mongo_dart/src_old/database/message/additional/section.dart';
-import 'package:mongo_dart/src_old/database/message/mongo_modern_message.dart';
-import 'package:mongo_dart/src_old/database/message/mongo_response_message.dart';
+import 'package:mongo_dart/src/core/message/abstract/section.dart';
+import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
+import 'package:mongo_dart/src/core/message/abstract/mongo_response_message.dart';
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/distinct/distinct_operation.dart';
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/distinct/distinct_options.dart';
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/distinct/distinct_result.dart';
@@ -43,6 +43,8 @@ import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 import 'package:vy_string_utils/vy_string_utils.dart';
 
 import 'src/core/error/mongo_dart_error.dart';
+import 'src/core/message/deprecated/mongo_query_message.dart';
+import 'src/core/message/deprecated/mongo_reply_message.dart';
 import 'src_old/database/commands/administration_commands/drop_command/drop_command.dart';
 import 'src_old/database/commands/administration_commands/drop_command/drop_options.dart';
 import 'src_old/database/commands/administration_commands/drop_database_command/drop_database_command.dart';
@@ -93,11 +95,11 @@ part 'src_old/database/mongo_kill_cursors_message.dart';
 
 //part 'src_old/database/mongo_message.dart';
 
-part 'src_old/database/mongo_query_message.dart';
+//part 'src/core/message/mongo_query_message.dart';
 
 part 'src_old/database/mongo_remove_message.dart';
 
-part 'src_old/database/mongo_reply_message.dart';
+//part 'src/core/message/mongo_reply_message.dart';
 
 part 'src_old/database/mongo_update_message.dart';
 

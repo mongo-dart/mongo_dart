@@ -14,8 +14,8 @@ import '../database/commands/diagnostic_commands/server_status_command/server_st
 import '../database/commands/diagnostic_commands/server_status_command/server_status_options.dart';
 import '../database/commands/replication_commands/hello_command/hello_command.dart';
 import '../database/commands/replication_commands/hello_command/hello_result.dart';
-import '../database/message/mongo_modern_message.dart';
-import '../database/message/mongo_response_message.dart';
+import '../../src/core/message/mongo_modern_message.dart';
+import '../../src/core/message/abstract/mongo_response_message.dart';
 import '../../src/utils/map_keys.dart';
 import '../../src/core/message/abstract/mongo_message.dart';
 import 'connection.dart';

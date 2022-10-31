@@ -1,31 +1,14 @@
-part of mongo_dart;
+import 'package:bson/bson.dart';
+
+import '../abstract/mongo_message.dart';
+import '../abstract/mongo_response_message.dart';
 
 class MongoReplyMessage extends MongoResponseMessage {
-  static final flagsCursorNone = 0;
-  static final flagsCursorNotFound = 1;
-  static final flagsQueryFailure = 2;
-  static final flagsShardConfigStale = 4;
-  static final flagsAwaitCapable = 8;
-
-  @Deprecated('Use flagsCursoNone instead')
-  // ignore: non_constant_identifier_names
-  static final FLAGS_CURSOR_NONE = flagsCursorNone;
-
-  @Deprecated('Use flagsCursorNotFound instead')
-  // ignore: non_constant_identifier_names
-  static final FLAGS_CURSOR_NOT_FOUND = flagsCursorNotFound;
-
-  @Deprecated('Use flagsQueryFailure instead')
-  // ignore: non_constant_identifier_names
-  static final FLAGS_QUERY_FAILURE = flagsQueryFailure;
-
-  @Deprecated('Use flagsShardConfigStale instead')
-  // ignore: non_constant_identifier_names
-  static final FLAGS_SHARD_CONFIGSTALE = flagsShardConfigStale;
-
-  @Deprecated('Use flagsAwaitCapable instead')
-  // ignore: non_constant_identifier_names
-  static final FLAGS_AWAIT_CAPABLE = flagsAwaitCapable;
+  static const flagsCursorNone = 0;
+  static const flagsCursorNotFound = 1;
+  static const flagsQueryFailure = 2;
+  static const flagsShardConfigStale = 4;
+  static const flagsAwaitCapable = 8;
 
   int? responseFlags;
   int cursorId = -1; // 64bit integer

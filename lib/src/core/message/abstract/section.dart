@@ -1,7 +1,7 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show BsonBinary;
-import 'package:mongo_dart/src_old/database/message/mongo_modern_message.dart'
+import 'package:bson/bson.dart' show BsonBinary;
+import 'package:mongo_dart/src/core/message/mongo_modern_message.dart'
     show MongoModernMessage;
-import '../../../../src/core/error/mongo_dart_error.dart';
+import '../../error/mongo_dart_error.dart';
 import 'payload.dart' show Payload, Payload0, Payload1;
 
 abstract class Section {
@@ -65,11 +65,3 @@ class SectionType1 extends Section {
   SectionType1(int payloadType, Payload1 payload)
       : super._(payloadType, payload);
 }
-
-/* void _arrangeBuffer(BsonBinary buffer) {
-  if (buffer.byteList == null) {
-    buffer.makeByteList();
-  } else {
-    buffer.makeHexString();
-  }
-} */

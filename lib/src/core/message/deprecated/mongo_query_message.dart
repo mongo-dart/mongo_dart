@@ -1,6 +1,9 @@
 // ignore_for_file: non_constant_identifier_names
 
-part of mongo_dart;
+import 'package:bson/bson.dart';
+import 'package:meta/meta.dart';
+
+import '../abstract/mongo_message.dart';
 
 class MongoQueryMessage extends MongoMessage {
   static final OPTS_NONE = 0;
@@ -12,13 +15,14 @@ class MongoQueryMessage extends MongoMessage {
   static final OPTS_EXHAUST = 64;
   static final OPTS_PARTIAL = 128;
 
-  BsonCString? _collectionFullName;
+  @protected
+  BsonCString? collFullName;
   int flags;
   int numberToSkip;
   int numberToReturn;
   late BsonMap _query;
   BsonMap? _fields;
-  BsonCString? get collectionNameBson => _collectionFullName;
+  BsonCString? get collectionNameBson => collFullName;
 
   MongoQueryMessage(
       String? collectionFullName,
@@ -28,7 +32,7 @@ class MongoQueryMessage extends MongoMessage {
       Map<String, dynamic> query,
       Map<String, dynamic>? fields) {
     if (collectionFullName != null) {
-      _collectionFullName = BsonCString(collectionFullName);
+      collFullName = BsonCString(collectionFullName);
     }
     _query = BsonMap(query);
     if (fields != null) {
@@ -41,7 +45,7 @@ class MongoQueryMessage extends MongoMessage {
   int get messageLength {
     var result = 16 +
         4 +
-        (_collectionFullName?.byteLength() ?? 0) +
+        (collFullName?.byteLength() ?? 0) +
         4 +
         4 +
         _query.byteLength();
@@ -56,7 +60,7 @@ class MongoQueryMessage extends MongoMessage {
     var buffer = BsonBinary(messageLength);
     writeMessageHeaderTo(buffer);
     buffer.writeInt(flags);
-    _collectionFullName?.packValue(buffer);
+    collFullName?.packValue(buffer);
     buffer.writeInt(numberToSkip);
     buffer.writeInt(numberToReturn);
     _query.packValue(buffer);
@@ -69,6 +73,6 @@ class MongoQueryMessage extends MongoMessage {
 
   @override
   String toString() => 'MongoQueryMessage($requestId, '
-      '${_collectionFullName?.value ?? ''},numberToReturn:$numberToReturn, '
+      '${collFullName?.value ?? ''},numberToReturn:$numberToReturn, '
       '${_query.value})';
 }
