@@ -8,7 +8,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert' show base64;
 import 'dart:io' show File, FileMode, IOSink;
-import 'dart:math';
 import 'dart:typed_data';
 import 'package:bson/bson.dart';
 import 'package:logging/logging.dart';
@@ -17,7 +16,6 @@ import 'package:mongo_dart/src_old/database/cursor/modern_cursor.dart';
 import 'package:mongo_dart/src_old/database/info/server_status.dart';
 import 'package:mongo_dart/src/core/message/abstract/section.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
-import 'package:mongo_dart/src/core/message/abstract/mongo_response_message.dart';
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/distinct/distinct_operation.dart';
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/distinct/distinct_options.dart';
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/distinct/distinct_result.dart';
@@ -61,8 +59,8 @@ import 'src_old/database/commands/aggregation_commands/count/count_result.dart';
 import 'src_old/database/commands/base/command_operation.dart';
 import 'src_old/database/commands/diagnostic_commands/ping_command/ping_command.dart';
 import 'src/core/message/abstract/mongo_message.dart';
-import 'src_old/network/connection.dart';
-import 'src_old/network/connection_manager.dart';
+import 'src/core/network/connection.dart';
+import 'src/core/network/connection_manager.dart';
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_aggregation.dart';
@@ -121,6 +119,6 @@ part 'src_old/gridfs/chunk_handler.dart';
 
 //part 'src_old/network/connection_manager.dart';
 
-part 'src_old/network/mongo_message_transformer.dart';
+//part 'src/core/message/handler/mongo_message_transformer.dart';
 
-part 'src_old/network/packet_converter.dart';
+//part 'src/core/message/handler/packet_converter.dart';

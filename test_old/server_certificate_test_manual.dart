@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:mongo_dart/src_old/network/connection.dart';
+import 'package:mongo_dart/src/core/error/connection_exception.dart';
 import 'package:test/test.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 

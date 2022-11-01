@@ -3,7 +3,7 @@ import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart
 import 'package:mongo_dart/src_old/database/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../../network/connection.dart';
+import '../../../../../src/core/network/connection.dart';
 import 'create_index_options.dart';
 
 const Set keysToOmit = <String>{

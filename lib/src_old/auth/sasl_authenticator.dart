@@ -19,7 +19,7 @@ import 'package:mongo_dart/mongo_dart_old.dart'
 import 'package:mongo_dart/src_old/auth/auth.dart';
 
 import '../../src/core/error/mongo_dart_error.dart';
-import '../network/connection.dart';
+import '../../src/core/network/connection.dart';
 
 abstract class SaslAuthenticator extends Authenticator {
   SaslAuthenticator(this.mechanism, this.db) : super();

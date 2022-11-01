@@ -10,7 +10,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart'
         keyWriteConcern;
 
 import '../../../../src/core/error/mongo_dart_error.dart';
-import '../../../network/connection.dart';
+import '../../../../src/core/network/connection.dart';
 import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
 import 'operation_base.dart' show Aspect, OperationBase;

@@ -1,11 +1,22 @@
-part of mongo_dart;
+// part of mongo_dart;
+
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:bson/bson.dart';
+import 'package:logging/logging.dart';
+
+import '../abstract/mongo_message.dart';
+import '../abstract/mongo_response_message.dart';
+import '../deprecated/mongo_reply_message.dart';
+import '../mongo_modern_message.dart';
+import 'packet_converter.dart';
 
 class MongoMessageHandler {
   final _log = Logger('MongoMessageTransformer');
   final converter = PacketConverter();
 
-  void handleData(
-      /* List<int> */ Uint8List data, EventSink<MongoResponseMessage> sink) {
+  void handleData(Uint8List data, EventSink<MongoResponseMessage> sink) {
     converter.addPacket(data);
     while (!converter.messages.isEmpty) {
       var buffer = BsonBinary.from(converter.messages.removeFirst());

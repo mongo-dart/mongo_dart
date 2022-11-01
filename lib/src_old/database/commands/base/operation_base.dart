@@ -1,5 +1,5 @@
 import '../../../../mongo_dart_old.dart';
-import '../../../network/connection.dart';
+import '../../../../src/core/network/connection.dart';
 
 enum Aspect {
   readOperation,

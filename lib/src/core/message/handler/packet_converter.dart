@@ -1,4 +1,11 @@
-part of mongo_dart;
+// part of mongo_dart;
+
+import 'dart:collection';
+import 'dart:math';
+
+import 'package:bson/bson.dart';
+
+import '../../error/mongo_dart_error.dart';
 
 class PacketConverter {
   //final _log = Logger('PacketConverter');

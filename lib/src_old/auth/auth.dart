@@ -3,7 +3,7 @@ import 'package:mongo_dart/mongo_dart_old.dart' show Db;
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
 import '../../src/core/error/mongo_dart_error.dart';
-import '../network/connection.dart';
+import '../../src/core/network/connection.dart';
 
 import 'mongodb_cr_authenticator.dart';
 import 'scram_sha1_authenticator.dart';

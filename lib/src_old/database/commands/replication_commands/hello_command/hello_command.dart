@@ -4,7 +4,7 @@ import 'package:mongo_dart/src/core/message/abstract/section.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
-import '../../../../network/connection.dart';
+import '../../../../../src/core/network/connection.dart';
 
 var _command = <String, Object>{keyHello: 1};
 

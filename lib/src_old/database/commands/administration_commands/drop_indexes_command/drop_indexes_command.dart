@@ -4,7 +4,7 @@ import 'package:mongo_dart/src_old/database/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../../../src/core/error/mongo_dart_error.dart';
-import '../../../../network/connection.dart';
+import '../../../../../src/core/network/connection.dart';
 import 'drop_indexes_options.dart';
 
 class DropIndexesCommand extends CommandOperation {

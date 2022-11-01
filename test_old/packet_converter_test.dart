@@ -1,7 +1,7 @@
 library packet_converter_test;
 
+import 'package:mongo_dart/src/core/message/handler/packet_converter.dart';
 import 'package:test/test.dart';
-import 'package:mongo_dart/mongo_dart_old.dart';
 
 void main() {
   group('Packet converter basics', () {

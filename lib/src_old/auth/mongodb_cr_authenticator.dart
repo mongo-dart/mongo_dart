@@ -6,7 +6,7 @@ import 'package:mongo_dart/src/core/message/deprecated/mongo_query_message.dart'
 import 'package:mongo_dart/src_old/auth/auth.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
-import '../network/connection.dart';
+import '../../src/core/network/connection.dart';
 
 class MongoDbCRAuthenticator extends Authenticator {
   MongoDbCRAuthenticator(this.db, this.credentials) : super();

@@ -6,18 +6,18 @@ import 'dart:collection';
 import 'package:logging/logging.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
-import '../../mongo_dart_old.dart'
+import '../../../mongo_dart_old.dart'
     show Db, DbCommand, ServerConfig, State, WriteConcern;
-import '../../src/core/error/mongo_dart_error.dart';
-import '../auth/auth.dart';
-import '../database/commands/diagnostic_commands/server_status_command/server_status_command.dart';
-import '../database/commands/diagnostic_commands/server_status_command/server_status_options.dart';
-import '../database/commands/replication_commands/hello_command/hello_command.dart';
-import '../database/commands/replication_commands/hello_command/hello_result.dart';
-import '../../src/core/message/mongo_modern_message.dart';
-import '../../src/core/message/abstract/mongo_response_message.dart';
-import '../../src/utils/map_keys.dart';
-import '../../src/core/message/abstract/mongo_message.dart';
+import '../error/mongo_dart_error.dart';
+import '../../../src_old/auth/auth.dart';
+import '../../../src_old/database/commands/diagnostic_commands/server_status_command/server_status_command.dart';
+import '../../../src_old/database/commands/diagnostic_commands/server_status_command/server_status_options.dart';
+import '../../../src_old/database/commands/replication_commands/hello_command/hello_command.dart';
+import '../../../src_old/database/commands/replication_commands/hello_command/hello_result.dart';
+import '../message/mongo_modern_message.dart';
+import '../message/abstract/mongo_response_message.dart';
+import '../../utils/map_keys.dart';
+import '../message/abstract/mongo_message.dart';
 import 'connection.dart';
 
 class ConnectionManager {
