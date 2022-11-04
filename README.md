@@ -7,7 +7,7 @@
 Server-side driver library for MongoDb implemented in pure Dart. Server side means all packages using dart:io, dart:html are not accepted.
 
 **NOTE**
-Starting from this version of mongo_dart, we will be on support releases starting from MongoDb 4.2.
+Starting from this version of mongo_dart, we will support releases starting from MongoDb 4.2.
 All APIs have been revisited to reflect the last versions of the commands.
 
 ## Apis
