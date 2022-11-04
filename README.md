@@ -7,8 +7,8 @@
 Server-side driver library for MongoDb implemented in pure Dart. Server side means all packages using dart:io, dart:html are not accepted.
 
 **NOTE**
-Starting from this version of mongo_dart, we will on support rleases starting from MongoDb 4.2.
-All APIs hav been revisited to reflect the last versions of the commands.
+Starting from this version of mongo_dart, we will be on support releases starting from MongoDb 4.2.
+All APIs have been revisited to reflect the last versions of the commands.
 
 ## Apis
 
@@ -27,7 +27,7 @@ At present most of crud operations and commands have a "modern" version, but the
 
 ## Contribution
 
-If you can contribute to the develpment of this package, your help is welcome!
+If you can contribute to the development of this package, your help is welcome!
 
 [**Donate** If you need a reliable driver like I do, please help me maintaining this software with a donation. This will allow me to dedicate more time on development, testing and documentation.](https://www.paypal.com/donate?hosted_button_id=YRUNF9YWKX2NW)
 
@@ -303,7 +303,7 @@ At present we have developed the following operations:
 |   `insertOne`  |  Tested   |  `legacyInsert`   | The old method `insert` is a wrapper that calls `insertOne` if you are running MongoDb 3.6 or later, otherwise `legacyInsert`. |
 | `insertMany` | Tested | `legacyInsertAll` | Allows to insert many documents in one command. It is subject to the max number of documents per message limit (at present <4.4> 100,000).The old method `insertAll` is a wrapper that calls `insertMany` if you are running MongoDb 3.6 or later, otherwise `legacyInsertAll`. |
 | [deleteOne][1] |  Tested   |  -  | Allows to delete one document. [Example][3] [Example 2][4] |
-| [deleteMany][2] | Tested | `legacyRemove` | The old method `remove` is a wrapper that calls `deleteMany` if you are running MongoDb 3.6 or later, otherwise `legacyRemove`. Allows to delete many documents in one commnand. [Example][5] |
+| [deleteMany][2] | Tested | `legacyRemove` | The old method `remove` is a wrapper that calls `deleteMany` if you are running MongoDb 3.6 or later, otherwise `legacyRemove`. Allows to delete many documents in one command. [Example][5] |
 | [updateOne][6] | Tested | - | Allows to update one document [Example][7] |
 | [updateMany][8] | Tested | - | Allows to update many documents in one command. [Example][9] |
 | [modernUpdate][10] | Tested | `legacyUpdate` | The old method `update` now is only a wrapper. If you are running MongoDb 3.6 or later, `modernUpdate` is called, otherwise `legacyUpdate` |
@@ -342,7 +342,7 @@ Last but not least, some commands:
 | `killCursorCommand` | Tested | `MongoKillCursorMessage` | Used internally to close an unexhausted cursor.|
 | `getMoreCommand` | Tested | `MongoGetMoreMessage` | Used internally to read a new batch of data from the server |
 | `getLastErrorCommand` | Tested | `DbCommand.createGetLastErrorCommand` | Used internally to return the status of the previous operation. It is no more needed with the modern operations, but, for compatibility reasons, it can be used still. |
-| `serverStatus` | Tested | `serverStatus` | The method was already present, but it has been improved giving the possiblity to return a class with all the values instead of a map |
+| `serverStatus` | Tested | `serverStatus` | The method was already present, but it has been improved giving the possibility to return a class with all the values instead of a map |
 
 ### See also
 
