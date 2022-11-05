@@ -4,7 +4,7 @@ import 'package:mongo_dart/src/core/message/abstract/section.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
-import '../../../../../src/core/network/connection.dart';
+import '../../../../../src/core/network/deprecated/connection_multi_request.dart';
 
 var _command = <String, Object>{keyHello: 1};
 
@@ -24,7 +24,7 @@ class HelloCommand extends CommandOperation {
       {String? username,
       HelloOptions? helloOptions,
       Map<String, Object>? rawOptions,
-      Connection? connection})
+      ConnectionMultiRequest? connection})
       : super(db, <String, Object>{...?helloOptions?.options, ...?rawOptions},
             command: {
               ..._command,

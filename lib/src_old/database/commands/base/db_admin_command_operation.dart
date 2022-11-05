@@ -2,7 +2,7 @@ import 'package:mongo_dart/mongo_dart_old.dart' show Db;
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../../src/core/network/connection.dart';
+import '../../../../src/core/network/deprecated/connection_multi_request.dart';
 import 'operation_base.dart';
 
 class DbAdminCommandOperation extends OperationBase {
@@ -10,7 +10,7 @@ class DbAdminCommandOperation extends OperationBase {
   Map<String, Object> command;
 
   DbAdminCommandOperation(this.db, this.command,
-      {Map<String, Object>? options, Connection? connection})
+      {Map<String, Object>? options, ConnectionMultiRequest? connection})
       : super(options, connection: connection);
 
   Map<String, Object> $buildCommand() => command;

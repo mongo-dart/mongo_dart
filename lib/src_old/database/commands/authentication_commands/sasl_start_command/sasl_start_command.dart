@@ -6,13 +6,13 @@ import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart
 import 'package:mongo_dart/src/core/message/abstract/section.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 
-import '../../../../../src/core/network/connection.dart';
+import '../../../../../src/core/network/deprecated/connection_multi_request.dart';
 
 class SaslStartCommand extends CommandOperation {
   SaslStartCommand(Db db, String mechanism, Uint8List payload,
       {SaslStartOptions? saslStartOptions,
       Map<String, Object>? rawOptions,
-      Connection? connection})
+      ConnectionMultiRequest? connection})
       : super(
             db, <String, Object>{...?saslStartOptions?.options, ...?rawOptions},
             command: <String, Object>{

@@ -204,16 +204,17 @@ class Db {
   Db? authSourceDb;
   ConnectionManager? _connectionManager;
 
-  Connection? get _masterConnection => _connectionManager?.masterConnection;
+  ConnectionMultiRequest? get _masterConnection =>
+      _connectionManager?.masterConnection;
 
-  Connection get _masterConnectionVerified {
+  ConnectionMultiRequest get _masterConnectionVerified {
     if (state != State.open) {
       throw MongoDartError('Db is in the wrong state: $state');
     }
     return _masterConnectionVerifiedAnyState;
   }
 
-  Connection get _masterConnectionVerifiedAnyState {
+  ConnectionMultiRequest get _masterConnectionVerifiedAnyState {
     if (_connectionManager == null) {
       throw MongoDartError('Invalid Connection manager state');
     }
@@ -278,8 +279,9 @@ class Db {
 
   WriteConcern? get writeConcern => _writeConcern;
 
-  Connection get masterConnection => _masterConnectionVerified;
-  Connection get masterConnectionAnyState => _masterConnectionVerifiedAnyState;
+  ConnectionMultiRequest get masterConnection => _masterConnectionVerified;
+  ConnectionMultiRequest get masterConnectionAnyState =>
+      _masterConnectionVerifiedAnyState;
 
   List<String> get uriList => _uriList.toList();
 
@@ -402,7 +404,7 @@ class Db {
   }
 
   Future<MongoReplyMessage> queryMessage(MongoMessage queryMessage,
-      {Connection? connection}) {
+      {ConnectionMultiRequest? connection}) {
     return Future.sync(() {
       if (state != State.open) {
         throw MongoDartError('Db is in the wrong state: $state');
@@ -415,7 +417,7 @@ class Db {
   }
 
   void executeMessage(MongoMessage message, WriteConcern? writeConcern,
-      {Connection? connection}) {
+      {ConnectionMultiRequest? connection}) {
     if (state != State.open) {
       throw MongoDartError('DB is not open. $state');
     }
@@ -429,7 +431,7 @@ class Db {
   }
 
   Future<Map<String, Object?>> executeModernMessage(MongoModernMessage message,
-      {Connection? connection, bool skipStateCheck = false}) async {
+      {ConnectionMultiRequest? connection, bool skipStateCheck = false}) async {
     if (skipStateCheck) {
       if (!_masterConnectionVerifiedAnyState.serverCapabilities.supportsOpMsg) {
         throw MongoDartError('The "modern message" can only be executed '
@@ -494,7 +496,7 @@ class Db {
       state == State.open && (_masterConnection?.connected ?? false);
 
   Future<Map<String, dynamic>> executeDbCommand(MongoMessage message,
-      {Connection? connection}) async {
+      {ConnectionMultiRequest? connection}) async {
     connection ??= _masterConnectionVerified;
 
     //var result = Completer<Map<String, dynamic>>();
@@ -591,7 +593,7 @@ class Db {
   }
 
   @Deprecated('Deprecated since version 4.0.')
-  Future<Map<String, dynamic>> getNonce({Connection? connection}) {
+  Future<Map<String, dynamic>> getNonce({ConnectionMultiRequest? connection}) {
     if (masterConnection.serverCapabilities.fcv != null &&
         masterConnection.serverCapabilities.fcv!.compareTo('6.0') >= 0) {
       throw MongoDartError('getnonce command not managed in this version');
@@ -600,12 +602,13 @@ class Db {
         connection: connection);
   }
 
-  Future<Map<String, dynamic>> getBuildInfo({Connection? connection}) {
+  Future<Map<String, dynamic>> getBuildInfo(
+      {ConnectionMultiRequest? connection}) {
     return executeDbCommand(DbCommand.createBuildInfoCommand(this),
         connection: connection);
   }
 
-  Future<Map<String, dynamic>> isMaster({Connection? connection}) =>
+  Future<Map<String, dynamic>> isMaster({ConnectionMultiRequest? connection}) =>
       executeDbCommand(DbCommand.createIsMasterCommand(this),
           connection: connection);
 
@@ -720,7 +723,7 @@ class Db {
   }
 
   Future<bool> authenticate(String userName, String password,
-      {Connection? connection}) async {
+      {ConnectionMultiRequest? connection}) async {
     var credential = UsernamePasswordCredential()
       ..username = userName
       ..password = password;

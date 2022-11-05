@@ -1,19 +1,20 @@
 import 'dart:async';
 import 'dart:collection';
+//import 'dart:io';
 
 import 'package:universal_io/io.dart';
 import 'package:logging/logging.dart';
-import 'package:mongo_dart/mongo_dart_old.dart'
-    show MongoMessageHandler, ServerConfig;
 
-import '../error/connection_exception.dart';
-import '../info/server_capabilities.dart';
-import '../message/deprecated/mongo_reply_message.dart';
-import '../../../src_old/database/info/server_status.dart';
-import '../message/mongo_modern_message.dart';
-import '../message/abstract/mongo_response_message.dart';
-import '../message/abstract/mongo_message.dart';
-import '../../../src_old/network/connection_manager.dart';
+import '../../error/connection_exception.dart';
+import '../../info/server_capabilities.dart';
+import '../../info/server_config.dart';
+import '../../message/deprecated/mongo_reply_message.dart';
+import '../../info/server_status.dart';
+import '../../message/handler/mongo_message_transformer.dart';
+import '../../message/mongo_modern_message.dart';
+import '../../message/abstract/mongo_response_message.dart';
+import '../../message/abstract/mongo_message.dart';
+import 'connection_manager.dart';
 
 const noSecureRequestError = 'The socket connection has been reset by peer.'
     '\nPossible causes:'
@@ -24,9 +25,7 @@ const noSecureRequestError = 'The socket connection has been reset by peer.'
     'but no certificate has been sent'
     '\n- Others';
 
-enum ConnectionStatus {closed, active, available} 
-
-class ClusterServer {
+class ConnectionMultiRequest {
   static bool _caCertificateAlreadyInHash = false;
   final Logger _log = Logger('Connection');
   final ConnectionManager _manager;
@@ -50,7 +49,7 @@ class ClusterServer {
   final ServerCapabilities serverCapabilities = ServerCapabilities();
   final ServerStatus serverStatus = ServerStatus();
 
-  ConnectionSmart(this._manager, [ServerConfig? serverConfig])
+  ConnectionMultiRequest(this._manager, [ServerConfig? serverConfig])
       : serverConfig = serverConfig ?? ServerConfig();
 
   bool get isAuthenticated => serverConfig.isAuthenticated;

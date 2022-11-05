@@ -1,5 +1,5 @@
 import '../../../../mongo_dart_old.dart';
-import '../../../../src/core/network/connection.dart';
+import '../../../../src/core/network/deprecated/connection_multi_request.dart';
 
 enum Aspect {
   readOperation,
@@ -11,7 +11,7 @@ enum Aspect {
 class OperationBase {
   Map<String, Object> options;
   final Set<Aspect> _aspects;
-  Connection? connection;
+  ConnectionMultiRequest? connection;
 
   OperationBase(Map<String, Object>? options,
       {this.connection, Object? aspects})

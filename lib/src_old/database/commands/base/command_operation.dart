@@ -10,7 +10,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart'
         keyWriteConcern;
 
 import '../../../../src/core/error/mongo_dart_error.dart';
-import '../../../../src/core/network/connection.dart';
+import '../../../../src/core/network/deprecated/connection_multi_request.dart';
 import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
 import 'operation_base.dart' show Aspect, OperationBase;
@@ -23,7 +23,10 @@ class CommandOperation extends OperationBase {
   ReadPreference? readPreference;
 
   CommandOperation(Db? db, Map<String, Object> options,
-      {this.collection, this.command, Aspect? aspect, Connection? connection})
+      {this.collection,
+      this.command,
+      Aspect? aspect,
+      ConnectionMultiRequest? connection})
       : super(options, connection: connection, aspects: aspect) {
     db ??= collection?.db;
     //aspect ??= Aspect.noInheritOptions;

@@ -19,7 +19,7 @@ import 'package:mongo_dart/mongo_dart_old.dart'
 import 'package:mongo_dart/src_old/auth/auth.dart';
 
 import '../../src/core/error/mongo_dart_error.dart';
-import '../../src/core/network/connection.dart';
+import '../../src/core/network/deprecated/connection_multi_request.dart';
 
 abstract class SaslAuthenticator extends Authenticator {
   SaslAuthenticator(this.mechanism, this.db) : super();
@@ -28,7 +28,7 @@ abstract class SaslAuthenticator extends Authenticator {
   Db db;
 
   @override
-  Future authenticate(Connection connection) async {
+  Future authenticate(ConnectionMultiRequest connection) async {
     if (connection.serverCapabilities.supportsOpMsg) {
       return modernAuthenticate(connection);
     } else {
@@ -36,7 +36,7 @@ abstract class SaslAuthenticator extends Authenticator {
     }
   }
 
-  Future legacyAuthenticate(Connection connection) async {
+  Future legacyAuthenticate(ConnectionMultiRequest connection) async {
     var currentStep = mechanism.initialize(specifyUsername: true);
 
     var command = DbCommand.createSaslStartCommand(
@@ -73,7 +73,7 @@ abstract class SaslAuthenticator extends Authenticator {
     }
   }
 
-  Future modernAuthenticate(Connection connection) async {
+  Future modernAuthenticate(ConnectionMultiRequest connection) async {
     var currentStep = mechanism.initialize(specifyUsername: true);
 
     CommandOperation command = SaslStartCommand(

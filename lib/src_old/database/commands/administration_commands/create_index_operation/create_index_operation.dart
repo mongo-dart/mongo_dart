@@ -3,7 +3,7 @@ import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart
 import 'package:mongo_dart/src_old/database/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../../../src/core/network/connection.dart';
+import '../../../../../src/core/network/deprecated/connection_multi_request.dart';
 import 'create_index_options.dart';
 
 const Set keysToOmit = <String>{
@@ -24,7 +24,7 @@ class CreateIndexOperation extends CommandOperation {
 
   CreateIndexOperation(Db db, DbCollection collection, this.fieldOrSpec,
       CreateIndexOptions? indexOptions,
-      {Connection? connection, Map<String, Object>? rawOptions})
+      {ConnectionMultiRequest? connection, Map<String, Object>? rawOptions})
       : super(db, <String, Object>{...?indexOptions?.options, ...?rawOptions},
             collection: collection,
             aspect: Aspect.writeOperation,

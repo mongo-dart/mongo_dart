@@ -1,4 +1,6 @@
-part of mongo_dart;
+//part of mongo_dart;
+
+import 'dart:typed_data';
 
 class ServerConfig {
   String host;
@@ -16,7 +18,7 @@ class ServerConfig {
 
   ServerConfig(
       {this.host = '127.0.0.1',
-      this.port = Db.mongoDefaultPort,
+      this.port = 27017,
       bool? isSecure,
       bool? tlsAllowInvalidCertificates,
       this.tlsCAFileContent,

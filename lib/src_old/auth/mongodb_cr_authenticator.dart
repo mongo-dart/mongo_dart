@@ -1,12 +1,11 @@
 //part of mongo_dart;
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:mongo_dart/mongo_dart_old.dart'
-    show Db, DbCommand;
+import 'package:mongo_dart/mongo_dart_old.dart' show Db, DbCommand;
 import 'package:mongo_dart/src/core/message/deprecated/mongo_query_message.dart';
 import 'package:mongo_dart/src_old/auth/auth.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
-import '../../src/core/network/connection.dart';
+import '../../src/core/network/deprecated/connection_multi_request.dart';
 
 class MongoDbCRAuthenticator extends Authenticator {
   MongoDbCRAuthenticator(this.db, this.credentials) : super();
@@ -17,7 +16,7 @@ class MongoDbCRAuthenticator extends Authenticator {
   final UsernamePasswordCredential credentials;
 
   @override
-  Future authenticate(Connection connection) {
+  Future authenticate(ConnectionMultiRequest connection) {
     return db.getNonce(connection: connection).then((msg) {
       var nonce = msg['nonce'];
       var command = createMongoDbCrAuthenticationCommand(

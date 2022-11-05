@@ -6,33 +6,34 @@ import 'dart:collection';
 import 'package:logging/logging.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
-import '../../../mongo_dart_old.dart'
-    show Db, DbCommand, ServerConfig, State, WriteConcern;
-import '../error/mongo_dart_error.dart';
-import '../../../src_old/auth/auth.dart';
-import '../../../src_old/database/commands/diagnostic_commands/server_status_command/server_status_command.dart';
-import '../../../src_old/database/commands/diagnostic_commands/server_status_command/server_status_options.dart';
-import '../../../src_old/database/commands/replication_commands/hello_command/hello_command.dart';
-import '../../../src_old/database/commands/replication_commands/hello_command/hello_result.dart';
-import '../message/mongo_modern_message.dart';
-import '../message/abstract/mongo_response_message.dart';
-import '../../utils/map_keys.dart';
-import '../message/abstract/mongo_message.dart';
-import 'connection.dart';
+import '../../../../mongo_dart_old.dart'
+    show Db, DbCommand, State, WriteConcern;
+import '../../error/mongo_dart_error.dart';
+import '../../../../src_old/auth/auth.dart';
+import '../../../../src_old/database/commands/diagnostic_commands/server_status_command/server_status_command.dart';
+import '../../../../src_old/database/commands/diagnostic_commands/server_status_command/server_status_options.dart';
+import '../../../../src_old/database/commands/replication_commands/hello_command/hello_command.dart';
+import '../../../../src_old/database/commands/replication_commands/hello_command/hello_result.dart';
+import '../../info/server_config.dart';
+import '../../message/mongo_modern_message.dart';
+import '../../message/abstract/mongo_response_message.dart';
+import '../../../utils/map_keys.dart';
+import '../../message/abstract/mongo_message.dart';
+import 'connection_multi_request.dart';
 
 class ConnectionManager {
   final _log = Logger('ConnectionManager');
   final Db db;
-  final _connectionPool = <String, Connection>{};
+  final _connectionPool = <String, ConnectionMultiRequest>{};
   final replyCompleters = <int, Completer<MongoResponseMessage>>{};
   final sendQueue = Queue<MongoMessage>();
-  Connection? _masterConnection;
+  ConnectionMultiRequest? _masterConnection;
 
   ConnectionManager(this.db);
 
-  Connection? get masterConnection => _masterConnection;
+  ConnectionMultiRequest? get masterConnection => _masterConnection;
 
-  Connection get masterConnectionVerified {
+  ConnectionMultiRequest get masterConnectionVerified {
     if (_masterConnection != null && !_masterConnection!.isClosed) {
       return _masterConnection!;
     } else {
@@ -40,7 +41,7 @@ class ConnectionManager {
     }
   }
 
-  Future _connect(Connection connection) async {
+  Future _connect(ConnectionMultiRequest connection) async {
     await connection.connect();
     var result = <String, Object?>{keyOk: 0.0};
     // As I couldn't set-up a pre 3.6 environment, I check not only for
@@ -204,11 +205,11 @@ class ConnectionManager {
   }
 
   void addConnection(ServerConfig serverConfig) {
-    var connection = Connection(this, serverConfig);
+    var connection = ConnectionMultiRequest(this, serverConfig);
     _connectionPool[serverConfig.hostUrl] = connection;
   }
 
-  Connection? removeConnection(Connection connection) {
+  ConnectionMultiRequest? removeConnection(ConnectionMultiRequest connection) {
     connection.close();
     if (connection.isMaster) {
       _masterConnection = null;

@@ -1,20 +1,16 @@
 import 'dart:async';
-import 'dart:collection';
+import 'package:meta/meta.dart';
+import 'package:mongo_dart/src/core/network/connection.dart';
 
+import 'package:mongo_dart/src/core/network/secure_connection.dart';
 import 'package:universal_io/io.dart';
 import 'package:logging/logging.dart';
-import 'package:mongo_dart/mongo_dart_old.dart' show ServerConfig;
 
 import '../../error/connection_exception.dart';
 import '../../error/mongo_dart_error.dart';
-import '../../info/server_capabilities.dart';
-import '../../message/deprecated/mongo_reply_message.dart';
-import '../../../../src_old/database/info/server_status.dart';
+import '../../info/server_config.dart';
 import '../../message/handler/message_handler.dart';
 import '../../message/mongo_modern_message.dart';
-import '../../message/abstract/mongo_response_message.dart';
-import '../../message/abstract/mongo_message.dart';
-import '../connection_manager.dart';
 
 const noSecureRequestError = 'The socket connection has been reset by peer.'
     '\nPossible causes:'
@@ -25,38 +21,31 @@ const noSecureRequestError = 'The socket connection has been reset by peer.'
     'but no certificate has been sent'
     '\n- Others';
 
-enum ConnectionStatus { closed, active, available }
+enum ConnectionState { closed, active, available }
 
 abstract class ConnectionBase {
+  @protected
+  ConnectionBase.protected(this.id, this.serverConfig);
+
+  factory ConnectionBase(int id, ServerConfig serverConfig) {
+    if (serverConfig.isSecure) {
+      return SecureConnection(id, serverConfig);
+    }
+    return Connection(id, serverConfig);
+  }
+
+  ServerConfig serverConfig;
+  int id;
   final Logger log = Logger('Connection');
   Socket? socket;
-  ConnectionStatus status = ConnectionStatus.closed;
+  ConnectionState _state = ConnectionState.closed;
 
-  static bool _caCertificateAlreadyInHash = false;
-  final ConnectionManager _manager;
-  ServerConfig serverConfig;
-  final Set _pendingQueries = <int>{};
-
-  Map<int, Completer<MongoResponseMessage>> get _replyCompleters =>
-      _manager.replyCompleters;
-
-  Queue<MongoMessage> get _sendQueue => _manager.sendQueue;
-  StreamSubscription<MongoResponseMessage>? _repliesSubscription;
-
-  StreamSubscription<MongoResponseMessage>? get repliesSubscription =>
-      _repliesSubscription;
-
-  bool connected = false;
-  bool _closed = false;
-  bool get isClosed => _closed;
-  final ServerCapabilities serverCapabilities = ServerCapabilities();
-  final ServerStatus serverStatus = ServerStatus();
-
-  ConnectionBase(this._manager, [ServerConfig? serverConfig])
-      : serverConfig = serverConfig ?? ServerConfig();
+  bool get isClosed => _state == ConnectionState.closed;
+  bool get isAvailable => _state == ConnectionState.available;
 
   bool get isAuthenticated => serverConfig.isAuthenticated;
-
+  Future<void> connect();
+/* 
   Future connect() async {
     Socket locSocket;
     try {
@@ -111,7 +100,7 @@ abstract class ConnectionBase {
     });
     socket = locSocket;
 
-    _repliesSubscription = socket!
+    /* socket!
         .transform<MongoResponseMessage>(MessageHandler().transformer)
         .listen(receiveReply,
             onError: (e, st) async {
@@ -131,17 +120,23 @@ abstract class ConnectionBase {
               if (!_closed) {
                 await _closeSocketOnError(socketError: noSecureRequestError);
               }
-            });
-    connected = true;
+            }); */
+    //connected = true;
+    _status = ConnectionStatus.available;
+  }
+
+ */
+  void setSocket(Socket newSocket) {
+    socket = newSocket;
+    _state = ConnectionState.available;
   }
 
   Future<void> close() async {
-    _closed = true;
-    connected = false;
+    _state = ConnectionState.closed;
     await socket?.close();
     return;
   }
-
+/* 
   void sendBuffer() {
     log.fine(() => '_sendBuffer ${_sendQueue.isNotEmpty}');
     var message = <int>[];
@@ -153,41 +148,9 @@ abstract class ConnectionBase {
       throw ConnectionException('The socket has not been created yet');
     }
     socket!.add(message);
-  }
+  } */
 
-  Future<MongoReplyMessage> query(MongoMessage queryMessage) {
-    var completer = Completer<MongoReplyMessage>();
-    if (!_closed) {
-      _replyCompleters[queryMessage.requestId] = completer;
-      _pendingQueries.add(queryMessage.requestId);
-      log.fine(() => 'Query $queryMessage');
-      _sendQueue.addLast(queryMessage);
-      sendBuffer();
-    } else {
-      completer.completeError(const ConnectionException(
-          'Invalid state: Connection already closed.'));
-    }
-    return completer.future;
-  }
-
-  ///   If runImmediately is set to false, the message is joined into one packet with
-  ///   other messages that follows. This is used for joining insert, update and remove commands with
-  ///   getLastError query (according to MongoDB docs, for some reason, these should
-  ///   be sent 'together')
-
-  void executeDeprecated(MongoMessage mongoMessage, bool runImmediately) {
-    if (_closed) {
-      throw const ConnectionException(
-          'Invalid state: Connection already closed.');
-    }
-    log.fine(() => 'Execute $mongoMessage');
-    _sendQueue.addLast(mongoMessage);
-    if (runImmediately) {
-      sendBuffer();
-    }
-  }
-
-  void receiveReply(MongoResponseMessage reply) {
+  /*  void receiveReply(MongoResponseMessage reply) {
     log.fine(() => reply.toString());
     var completer = _replyCompleters.remove(reply.responseTo);
     _pendingQueries.remove(reply.responseTo);
@@ -199,38 +162,34 @@ abstract class ConnectionBase {
         log.info(() => 'Unexpected respondTo: ${reply.responseTo} $reply');
       }
     }
-  }
+  } */
 
   Future<MongoModernMessage> execute(MongoModernMessage modernMessage) async {
-    if (status == ConnectionStatus.closed) {
+    if (_state == ConnectionState.closed) {
       throw const ConnectionException(
           'Invalid state: Connection already closed.');
-    } else if (status == ConnectionStatus.active) {
+    } else if (_state == ConnectionState.active) {
       throw const ConnectionException(
           'Invalid state: Connection already busy.');
     }
     log.fine(() => 'Message $modernMessage');
-    _sendQueue.addLast(modernMessage);
-    sendBuffer();
+    var message = <int>[];
+
+    message.addAll(modernMessage.serialize().byteList);
+    socket!.add(message);
 
     MongoModernMessage? ret;
     await for (var reply in socket!
         .transform<MongoModernMessage>(MessageHandler().transformer)) {
       ret = reply;
-      receiveReply(reply);
+      //receiveReply(reply);
     }
     return ret ?? (throw MongoDartError('No Reply Received'));
   }
 
   Future<void> _closeSocketOnError({dynamic socketError}) async {
-    _closed = true;
-    connected = false;
-    var ex = ConnectionException(
+    _state = ConnectionState.closed;
+    throw ConnectionException(
         'connection closed${socketError == null ? '.' : ': $socketError'}');
-    for (var id in _pendingQueries) {
-      var completer = _replyCompleters.remove(id);
-      completer?.completeError(ex);
-    }
-    _pendingQueries.clear();
   }
 }
