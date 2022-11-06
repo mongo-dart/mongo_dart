@@ -7,8 +7,7 @@ import '../error/connection_exception.dart';
 import '../info/server_config.dart';
 
 class Connection extends ConnectionBase {
-  Connection(int id, ServerConfig serverConfig)
-      : super.protected(id, serverConfig);
+  Connection(ServerConfig serverConfig) : super.protected(serverConfig);
   @override
   Future<void> connect() async {
     Socket locSocket;

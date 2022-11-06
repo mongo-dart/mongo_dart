@@ -9,8 +9,8 @@ import '../info/server_config.dart';
 class SecureConnection extends ConnectionBase {
   static bool _caCertificateAlreadyInHash = false;
 
-  SecureConnection(int id, ServerConfig serverConfig)
-      : super.protected(id, serverConfig);
+  SecureConnection(ServerConfig serverConfig)
+      : super.protected(serverConfig);
 
   @override
   Future<void> connect() async {

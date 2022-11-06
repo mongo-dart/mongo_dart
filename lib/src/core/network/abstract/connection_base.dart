@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:meta/meta.dart';
+import 'package:mongo_dart/src/core/network/abstract/connection_events.dart';
 import 'package:mongo_dart/src/core/network/connection.dart';
 
 import 'package:mongo_dart/src/core/network/secure_connection.dart';
 import 'package:universal_io/io.dart';
 import 'package:logging/logging.dart';
 
+import '../../../utils/error.dart';
+import '../../../utils/events.dart';
 import '../../error/connection_exception.dart';
 import '../../error/mongo_dart_error.dart';
 import '../../info/server_config.dart';
@@ -23,28 +26,40 @@ const noSecureRequestError = 'The socket connection has been reset by peer.'
 
 enum ConnectionState { closed, active, available }
 
-abstract class ConnectionBase {
-  @protected
-  ConnectionBase.protected(this.id, this.serverConfig);
+int _uniqueIdentifier = 0;
 
-  factory ConnectionBase(int id, ServerConfig serverConfig) {
+abstract class ConnectionBase with EventEmitter {
+  @protected
+  ConnectionBase.protected(this.serverConfig) : id = ++_uniqueIdentifier {
+    // Todo find a more efficient way
+    addLegalEvent<Connected>();
+    addLegalEvent<ConnectionError>();
+    addLegalEvent<ConnectionClosed>();
+    addLegalEvent<ConnectionActive>();
+    addLegalEvent<ConnectionAvailable>();
+  }
+
+  factory ConnectionBase(ServerConfig serverConfig) {
     if (serverConfig.isSecure) {
-      return SecureConnection(id, serverConfig);
+      return SecureConnection(serverConfig);
     }
-    return Connection(id, serverConfig);
+    return Connection(serverConfig);
   }
 
   ServerConfig serverConfig;
-  int id;
+
+  late int id;
   final Logger log = Logger('Connection');
   Socket? socket;
   ConnectionState _state = ConnectionState.closed;
 
   bool get isClosed => _state == ConnectionState.closed;
   bool get isAvailable => _state == ConnectionState.available;
+  bool get isActive => _state == ConnectionState.active;
 
   bool get isAuthenticated => serverConfig.isAuthenticated;
   Future<void> connect();
+
 /* 
   Future connect() async {
     Socket locSocket;
@@ -129,11 +144,13 @@ abstract class ConnectionBase {
   void setSocket(Socket newSocket) {
     socket = newSocket;
     _state = ConnectionState.available;
+    emit(Connected(id));
   }
 
   Future<void> close() async {
-    _state = ConnectionState.closed;
     await socket?.close();
+    _state = ConnectionState.closed;
+    emit(ConnectionClosed(id));
     return;
   }
 /* 
@@ -172,23 +189,36 @@ abstract class ConnectionBase {
       throw const ConnectionException(
           'Invalid state: Connection already busy.');
     }
-    log.fine(() => 'Message $modernMessage');
     var message = <int>[];
 
     message.addAll(modernMessage.serialize().byteList);
+    emit(ConnectionActive(id));
+
+    log.finest(() => 'Submitting message $modernMessage');
     socket!.add(message);
 
     MongoModernMessage? ret;
-    await for (var reply in socket!
-        .transform<MongoModernMessage>(MessageHandler().transformer)) {
-      ret = reply;
-      //receiveReply(reply);
+    try {
+      await for (var reply in socket!
+          .transform<MongoModernMessage>(MessageHandler().transformer)) {
+        ret = reply;
+        //receiveReply(reply);
+      }
+    } catch (e, stack) {
+      var error = MongoError('$e', stackTrace: stack);
+      emit(ConnectionError(id, error));
+      _closeSocketOnError();
     }
-    return ret ?? (throw MongoDartError('No Reply Received'));
+    emit(ConnectionAvailable(ret, id));
+    if (ret == null) {
+      throw MongoDartError('No Reply Received');
+    }
+    return ret;
   }
 
   Future<void> _closeSocketOnError({dynamic socketError}) async {
     _state = ConnectionState.closed;
+    emit(ConnectionClosed(id));
     throw ConnectionException(
         'connection closed${socketError == null ? '.' : ': $socketError'}');
   }

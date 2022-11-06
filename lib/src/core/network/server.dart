@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/src/core/error/connection_exception.dart';
-import 'abstract/connection_base.dart';
 
 import '../info/server_capabilities.dart';
 import '../info/server_config.dart';

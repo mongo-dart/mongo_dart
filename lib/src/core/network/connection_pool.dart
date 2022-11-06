@@ -9,7 +9,6 @@ class ConnectionPool {
   ConnectionPool(this.serverConfig);
 
   ServerConfig serverConfig;
-  int _idCounter = 0;
   PoolState state = PoolState.closed;
   final Set<ConnectionBase> _connections = <ConnectionBase>{};
   final Map<int, ConnectionBase> availableConnections = <int, ConnectionBase>{};
@@ -33,7 +32,7 @@ class ConnectionPool {
   }
 
   ConnectionBase addConnection() {
-    var connection = ConnectionBase(++_idCounter, serverConfig);
+    var connection = ConnectionBase(serverConfig);
     _connections.add(connection);
     return connection;
   }
