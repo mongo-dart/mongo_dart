@@ -6,7 +6,7 @@ import 'package:mongo_dart/src/core/error/connection_exception.dart';
 import '../info/server_capabilities.dart';
 import '../info/server_config.dart';
 import '../info/server_status.dart';
-import 'connection_pool.dart';
+import '../network/connection_pool.dart';
 
 enum ServerState { closed, connected }
 
@@ -38,9 +38,7 @@ class Server {
   }
 
   Future<void> close() async {
-    //_closed = true;
-    //connected = false;
-    //await socket?.close();
+    await connectionPool.closePool();
     return;
   }
 }

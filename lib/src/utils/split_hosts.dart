@@ -1,4 +1,4 @@
-import '../../../src/core/error/mongo_dart_error.dart';
+import '../core/error/mongo_dart_error.dart';
 
 List<String> splitHosts(String uriString) {
   String prefix, suffix;

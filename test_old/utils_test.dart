@@ -1,6 +1,6 @@
 import 'package:mongo_dart/src_old/database/utils/check_same_domain.dart'
     show checkSameDomain;
-import 'package:mongo_dart/src_old/database/utils/split_hosts.dart';
+import 'package:mongo_dart/src/utils/split_hosts.dart';
 import 'package:test/test.dart' show expect, group, isFalse, isTrue, test;
 
 import 'utils/throw_utils.dart' show throwsMongoDartError;

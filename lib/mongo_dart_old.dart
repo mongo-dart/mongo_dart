@@ -27,7 +27,7 @@ import 'package:mongo_dart/src_old/database/commands/operation.dart';
 import 'package:mongo_dart/src_old/database/utils/dns_lookup.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 import 'package:mongo_dart/src_old/database/utils/parms_utils.dart';
-import 'package:mongo_dart/src_old/database/utils/split_hosts.dart';
+import 'package:mongo_dart/src/utils/split_hosts.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:pool/pool.dart';
 import 'package:mongo_dart/src_old/auth/auth.dart'
