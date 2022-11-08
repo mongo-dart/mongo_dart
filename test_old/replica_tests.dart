@@ -1,6 +1,7 @@
 library replica_tests;
 
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/write_concern.dart';
 import 'dart:async';
 //import 'package:logging/logging.dart';
 import 'package:test/test.dart';

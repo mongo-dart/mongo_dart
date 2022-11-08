@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/write_concern.dart';
 
 /// Watch does not work on Standalone systems
 /// Only Replica Set and Sharded Cluster

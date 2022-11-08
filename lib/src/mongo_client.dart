@@ -1,5 +1,18 @@
-import 'compression.dart';
-import 'read_concern.dart';
+import 'dart:typed_data';
+
+import 'package:logging/logging.dart';
+import 'package:mongo_dart/src_old/auth/auth.dart';
+import 'package:universal_io/io.dart';
+
+import '../src_old/auth/scram_sha1_authenticator.dart';
+import '../src_old/auth/scram_sha256_authenticator.dart';
+import 'core/error/mongo_dart_error.dart';
+import 'core/info/server_config.dart';
+import 'core/topology/abstract/topology.dart';
+import 'default_settings.dart';
+import 'mongo_client_options.dart';
+import 'uri_parameters.dart';
+import 'write_concern.dart';
 
 typedef ServerApiVersion = Map<String, String>;
 const ServerApiVersion serverApiVersion = <String, String>{'v1': '1'};
@@ -26,216 +39,142 @@ abstract class Auth {
   String? password;
 }
 
-/// Describes all possible URI query options for the mongo client
-/// @public
-/// @see https://docs.mongodb.com/manual/reference/connection-string
-class MongoClientOptions /*extends BSONSerializeOptions,  SupportedNodeConnectionOptions*/ {
-  /// Specifies the name of the replica set, if the mongod is a member of a replica set.
-  String? replicaSet;
+class MongoClient {
+  MongoClient(this.url, {MongoClientOptions? mongoClientOptions}) {
+    this.mongoClientOptions = mongoClientOptions ?? MongoClientOptions();
+  }
 
-  /// Enables or disables TLS/SSL for the connection.
-  bool? tls;
+  final Logger log = Logger('Mongo Client');
 
-  /// A boolean to enable or disables TLS/SSL for the connection. (The ssl option is equivalent to the tls option.) */
-  set ssl(bool value) => tls ??= value;
+  String url;
+  late MongoClientOptions mongoClientOptions;
+  Topology? topology;
+  Set activeSessions = {}; // Todo, create the session object
+  String defaultDatabaseName = defMongoDbName;
+  String defaultAuthDbName = defMongoAuthDbName;
 
-  /// Specifies the location of a local TLS Certificate */
-  String? tlsCertificateFile;
+  // ReadConcern
+  // Read Preference
+  WriteConcern? writeConcern;
 
-  /// Specifies the location of a local .pem file that contains either the client's TLS/SSL certificate and key or only the client's TLS/SSL key when tlsCertificateFile is used to provide the certificate. */
-  String? tlsCertificateKeyFile;
+  Future connect() async {}
+  Future close() async {}
 
-  /// Specifies the password to de-crypt the tlsCertificateKeyFile. */
-  String? tlsCertificateKeyFilePassword;
+  /// If no name passed, the url specified db is used
+  Future db(String? dbName) async {}
 
-  /// Specifies the location of a local .pem file that contains the root certificate chain from the Certificate Authority. This file is used to validate the certificate presented by the mongod/mongos instance. */
-  String? tlsCAFile;
+  Future<ServerConfig> decodeUrlParameters() async {
+    mongoClientOptions.tls ??= false;
+    mongoClientOptions.tlsAllowInvalidCertificates ??= false;
+    if (mongoClientOptions.tlsAllowInvalidCertificates! ||
+        mongoClientOptions.tlsCAFile != null ||
+        mongoClientOptions.tlsCertificateKeyFile != null) {
+      mongoClientOptions.tls = true;
+    }
+    var uri = Uri.parse(url);
 
-  /// Bypasses validation of the certificates presented by the mongod/mongos instance */
-  bool? tlsAllowInvalidCertificates;
+    if (uri.scheme != 'mongodb') {
+      throw MongoDartError('Invalid scheme in uri: $url ${uri.scheme}');
+    }
 
-  /// Disables hostname validation of the certificate presented by the mongod/mongos instance. */
-  bool? tlsAllowInvalidHostnames;
+    String? localAuthDbName;
 
-  /// Disables various certificate validations. */
-  bool? tlsInsecure;
+    uri.queryParameters.forEach((String queryParam, String value) {
+      if (queryParam == UriParameters.authMechanism) {
+        selectAuthenticationMechanism(value);
+      }
 
-  /// The time in milliseconds to attempt a connection before timing out. */
-  int? connectTimeoutMS;
+      if (queryParam == UriParameters.authSource) {
+        localAuthDbName = value;
+      }
 
-  /// The time in milliseconds to attempt a send or receive on a socket before the attempt times out. */
-  int? socketTimeoutMS;
+      if ((queryParam == UriParameters.tls ||
+              queryParam == UriParameters.ssl) &&
+          value == 'true') {
+        mongoClientOptions.tls = true;
+      }
+      if (queryParam == UriParameters.tlsAllowInvalidCertificates &&
+          value == 'true') {
+        mongoClientOptions.tlsAllowInvalidCertificates = true;
+        mongoClientOptions.tls = true;
+      }
+      if (queryParam == UriParameters.tlsCAFile && value.isNotEmpty) {
+        mongoClientOptions.tlsCAFile = value;
+        mongoClientOptions.tls = true;
+      }
+      if (queryParam == UriParameters.tlsCertificateKeyFile &&
+          value.isNotEmpty) {
+        mongoClientOptions.tlsCertificateKeyFile = value;
+        mongoClientOptions.tls = true;
+      }
+      if (queryParam == UriParameters.tlsCertificateKeyFilePassword &&
+          value.isNotEmpty) {
+        mongoClientOptions.tlsCertificateKeyFilePassword = value;
+      }
+    });
 
-  /// An array or comma-delimited string of compressors to enable network compression for communication between this client and a mongod/mongos instance. */
-  List<CompressorName>? compressors;
-  set compressorsString(String value) => compressors ??= [
-        for (var _element in value.split(','))
-          CompressorName.values
-              .toList()
-              .firstWhere((element) => element.name == _element)
-      ];
+    Uint8List? tlsCAFileContent;
+    if (mongoClientOptions.tlsCAFile != null) {
+      tlsCAFileContent =
+          await File(mongoClientOptions.tlsCAFile!).readAsBytes();
+    }
+    Uint8List? tlsCertificateKeyFileContent;
+    if (mongoClientOptions.tlsCertificateKeyFile != null) {
+      tlsCertificateKeyFileContent =
+          await File(mongoClientOptions.tlsCertificateKeyFile!).readAsBytes();
+    }
+    if (mongoClientOptions.tlsCertificateKeyFilePassword != null &&
+        mongoClientOptions.tlsCertificateKeyFile == null) {
+      throw MongoDartError('Missing tlsCertificateKeyFile parameter');
+    }
 
-  /// An integer that specifies the compression level if using zlib for network compression.
-  /// From 0 to 9 or null
-  int? zlibCompressionLevel;
+    var serverConfig = ServerConfig(
+        host: uri.host,
+        port: uri.port,
+        isSecure: mongoClientOptions.tls,
+        tlsAllowInvalidCertificates:
+            mongoClientOptions.tlsAllowInvalidCertificates,
+        tlsCAFileContent: tlsCAFileContent,
+        tlsCertificateKeyFileContent: tlsCertificateKeyFileContent,
+        tlsCertificateKeyFilePassword:
+            mongoClientOptions.tlsCertificateKeyFilePassword);
 
-  /// The maximum number of hosts to connect to when using an srv connection string, a setting of `0` means unlimited hosts
-  int? srvMaxHosts;
+    if (serverConfig.port == 0) {
+      serverConfig.port = defMongoPort;
+    }
 
-  /// Modifies the srv URI to look like:
-  ///
-  /// `_{srvServiceName}._tcp.{hostname}.{domainname}`
-  ///
-  /// Querying this DNS URI is expected to respond with SRV records
-  String? srvServiceName;
+    if (uri.userInfo.isNotEmpty) {
+      var userInfo = uri.userInfo.split(':');
 
-  /// The maximum number of connections in the connection pool.
-  int? maxPoolSize;
+      if (userInfo.length != 2) {
+        throw MongoDartError('Invalid format of userInfo field: $uri.userInfo');
+      }
 
-  /// The minimum number of connections in the connection pool.
-  int? minPoolSize;
+      serverConfig.userName = Uri.decodeComponent(userInfo[0]);
+      serverConfig.password = Uri.decodeComponent(userInfo[1]);
+    }
 
-  /// The maximum number of milliseconds that a connection can remain idle in the pool before being removed and closed.
-  int? maxIdleTimeMS;
+    if (uri.path.isNotEmpty) {
+      defaultDatabaseName = uri.path.replaceAll('/', '');
+      localAuthDbName ??= defaultDatabaseName;
+    }
 
-  /// The maximum time in milliseconds that a thread can wait for a connection to become available.
-  int? waitQueueTimeoutMS;
+    defaultAuthDbName = localAuthDbName ?? defMongoAuthDbName;
 
-  /// Specify a read concern for the collection (only MongoDB 3.2 or higher supported)
-  // Todo ReadConcernLike? readConcern;
-  /// The level of isolation */
-  ReadConcernLevel? readConcernLevel;
+    return serverConfig;
+  }
 
-  /// Specifies the read preferences for this connection */
-  // Todo readPreference?: ReadPreferenceMode | ReadPreference;
-  /// Specifies, in seconds, how stale a secondary can be before the client stops using it for read operations.
-  int? maxStalenessSeconds;
-
-  /// Specifies the tags document as a comma-separated list of colon-separated key-value pairs.
-  // Todo List<TagSet>? readPreferenceTags;
-  /// The auth settings for when connection to server.
-  Auth? auth;
-
-  /// Specify the database name associated with the user’s credentials.
-  String? authSource;
-
-  /// Specify the authentication mechanism that MongoDB will use to authenticate the connection.
-  // Todo AuthMechanism? authMechanism;
-  /// Specify properties for the specified authMechanism as a comma-separated list of colon-separated key-value pairs.
-  // Todo AuthMechanismProperties? authMechanismProperties;
-  /// The size (in milliseconds) of the latency window for selecting among multiple suitable MongoDB instances.
-  int? localThresholdMS;
-
-  /// Specifies how long (in milliseconds) to block for server selection before throwing an exception.
-  int? serverSelectionTimeoutMS;
-
-  /// heartbeatFrequencyMS controls when the driver checks the state of the MongoDB deployment. Specify the interval (in milliseconds) between checks, counted from the end of the previous check until the beginning of the next one.
-  int? heartbeatFrequencyMS;
-
-  /// Sets the minimum heartbeat frequency. In the event that the driver has to frequently re-check a server's availability, it will wait at least this long since the previous check to avoid wasted effort.
-  int? minHeartbeatFrequencyMS;
-
-  /// The name of the application that created this MongoClient instance. MongoDB 3.4 and newer will print this value in the server log upon establishing each connection. It is also recorded in the slow query log and profile collections
-  String? appName;
-
-  /// Enables retryable reads.
-  bool? retryReads;
-
-  /// Enable retryable writes.
-  bool? retryWrites;
-
-  /// Allow a driver to force a Single topology type with a connection string containing one host
-  bool? directConnection;
-
-  /// Instruct the driver it is connecting to a load balancer fronting a mongos like service
-  bool? loadBalanced;
-
-  /// The write concern w value
-  // Todo W? w;
-  /// The write concern timeout
-  int? wtimeoutMS;
-
-  /// The journal write concern
-  bool? journal;
-
-  /// Validate mongod server certificate against Certificate Authority
-  bool? sslValidate;
-
-  /// SSL Certificate file path.
-  String? sslCA;
-
-  /// SSL Certificate file path.
-  String? sslCert;
-
-  /// SSL Key file file path.
-  String? sslKey;
-
-  /// SSL Certificate pass phrase
-  String? sslPass;
-
-  /// SSL Certificate revocation list file path.
-  String? sslCRL;
-
-  /// TCP Connection no delay
-  bool? noDelay;
-
-  /// TCP Connection keep alive enabled
-  bool? keepAlive;
-
-  /// The number of milliseconds to wait before initiating keepAlive on the TCP socket
-  int? keepAliveInitialDelay;
-
-  /// Force server to assign `_id` values instead of driver
-  bool? forceServerObjectId;
-
-  /// Return document results as raw BSON buffers
-  bool? raw;
-
-  /// A primary key factory function for generation of custom `_id` keys
-  // Todo PkFactory? pkFactory;
-  /// A Promise library class the application wishes to use such as Bluebird, must be ES6 compatible
-  dynamic promiseLibrary;
-
-  /// The logging level
-  // Todo LoggerLevel? loggerLevel;
-  /// Custom logger object
-  // Todo Logger? logger;
-  /// Enable command monitoring for this client
-  bool? monitorCommands;
-
-  /// Server API version
-  // Todo serverApi?: ServerApi | ServerApiVersion;
-  /// Optionally enable client side auto encryption
-  ///
-  /// @remarks
-  ///  Automatic encryption is an enterprise only feature that only applies to operations on a collection. Automatic encryption is not supported for operations on a database or view, and operations that are not bypassed will result in error
-  ///  (see [libmongocrypt: Auto Encryption Allow-List](https://github.com/mongodb/specifications/blob/master/source/client-side-encryption/client-side-encryption.rst#libmongocrypt-auto-encryption-allow-list)). To bypass automatic encryption for all operations, set bypassAutoEncryption=true in AutoEncryptionOpts.
-  ///
-  ///  Automatic encryption requires the authenticated user to have the [listCollections privilege action](https://docs.mongodb.com/manual/reference/command/listCollections/#dbcmd.listCollections).
-  ///
-  ///  If a MongoClient with a limited connection pool size (i.e a non-zero maxPoolSize) is configured with AutoEncryptionOptions, a separate internal MongoClient is created if any of the following are true:
-  ///  - AutoEncryptionOptions.keyVaultClient is not passed.
-  ///  - AutoEncryptionOptions.bypassAutomaticEncryption is false.
-  ///
-  /// If an internal MongoClient is created, it is configured with the same options as the parent MongoClient except minPoolSize is set to 0 and AutoEncryptionOptions is omitted.
-  // Todo AutoEncryptionOptions?  autoEncryption;
-  /// Allows a wrapping driver to amend the client metadata generated by the driver to include information about the wrapping driver */
-  DriverInfo? driverInfo;
-
-  /// Configures a Socks5 proxy host used for creating TCP connections.
-  String? proxyHost;
-
-  /// Configures a Socks5 proxy port used for creating TCP connections.
-  int? proxyPort;
-
-  /// Configures a Socks5 proxy username when the proxy in proxyHost requires username/password authentication.
-  String? proxyUsername;
-
-  /// Configures a Socks5 proxy password when the proxy in proxyHost requires username/password authentication.
-  String? proxyPassword;
-
-  /// @internal
-  // Todo SrvPoller? srvPoller;
-  /// @internal
-  // Todo Connection? connectionType;
+  AuthenticationScheme selectAuthenticationMechanism(
+      String authenticationSchemeName) {
+    if (authenticationSchemeName == ScramSha1Authenticator.name) {
+      return AuthenticationScheme.SCRAM_SHA_1;
+    } else if (authenticationSchemeName == ScramSha256Authenticator.name) {
+      authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
+    } else if (authenticationSchemeName == MongoDbCRAuthenticator.name) {
+      authenticationScheme = AuthenticationScheme.MONGODB_CR;
+    } else {
+      throw MongoDartError('Provided authentication scheme is '
+          'not supported : $authenticationSchemeName');
+    }
+  }
 }

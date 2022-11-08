@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/write_concern.dart';
 
 void main() async {
   final db = Db('mongodb://127.0.0.1/testdb');

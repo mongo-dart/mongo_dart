@@ -4,10 +4,10 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:logging/logging.dart';
+import 'package:mongo_dart/src/write_concern.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
-import '../../../../mongo_dart_old.dart'
-    show Db, DbCommand, State, WriteConcern;
+import '../../../../mongo_dart_old.dart' show Db, DbCommand, State;
 import '../../error/mongo_dart_error.dart';
 import '../../../../src_old/auth/auth.dart';
 import '../../../../src_old/database/commands/diagnostic_commands/server_status_command/server_status_command.dart';

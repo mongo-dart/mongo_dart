@@ -1,5 +1,6 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show Db, WriteConcern;
+import 'package:mongo_dart/mongo_dart_old.dart' show Db;
 import 'package:mongo_dart/src/utils/map_keys.dart';
+import 'package:mongo_dart/src/write_concern.dart';
 
 class DeleteOptions {
   /// The WriteConcern for this delete operation.

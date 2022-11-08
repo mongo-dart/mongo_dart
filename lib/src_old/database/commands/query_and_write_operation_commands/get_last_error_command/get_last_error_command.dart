@@ -1,4 +1,5 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show Db, WriteConcern;
+import 'package:mongo_dart/mongo_dart_old.dart' show Db;
+import 'package:mongo_dart/src/write_concern.dart';
 import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart';
 import 'get_last_error_options.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';

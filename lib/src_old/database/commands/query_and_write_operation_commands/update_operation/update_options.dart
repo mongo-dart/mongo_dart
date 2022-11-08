@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/write_concern.dart';
 
 class UpdateOptions {
   /// A document expressing the [write concern](https://docs.mongodb.com/manual/reference/write-concern/).
