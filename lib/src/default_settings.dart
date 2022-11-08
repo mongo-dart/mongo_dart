@@ -1,3 +1,3 @@
 int defMongoPort = 27017;
-String defaultDbName = 'test';
-String defaultAuthDbName = 'admin';
+String defMongoDbName = 'test';
+String defMongoAuthDbName = 'admin';

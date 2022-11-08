@@ -52,6 +52,7 @@ class MongoClient {
   Set activeSessions = {}; // Todo, create the session object
   String defaultDatabaseName = defMongoDbName;
   String defaultAuthDbName = defMongoAuthDbName;
+  AuthenticationScheme authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
 
   // ReadConcern
   // Read Preference
@@ -81,7 +82,7 @@ class MongoClient {
 
     uri.queryParameters.forEach((String queryParam, String value) {
       if (queryParam == UriParameters.authMechanism) {
-        selectAuthenticationMechanism(value);
+        authenticationScheme = selectAuthenticationMechanism(value);
       }
 
       if (queryParam == UriParameters.authSource) {
@@ -169,9 +170,7 @@ class MongoClient {
     if (authenticationSchemeName == ScramSha1Authenticator.name) {
       return AuthenticationScheme.SCRAM_SHA_1;
     } else if (authenticationSchemeName == ScramSha256Authenticator.name) {
-      authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
-    } else if (authenticationSchemeName == MongoDbCRAuthenticator.name) {
-      authenticationScheme = AuthenticationScheme.MONGODB_CR;
+      return AuthenticationScheme.SCRAM_SHA_256;
     } else {
       throw MongoDartError('Provided authentication scheme is '
           'not supported : $authenticationSchemeName');
