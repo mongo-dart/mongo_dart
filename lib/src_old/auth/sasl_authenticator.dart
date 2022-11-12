@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart' show md5;
 import 'package:mongo_dart/src_old/auth/scram_sha1_authenticator.dart';
-import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart';
+import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import 'package:sasl_scram/sasl_scram.dart'
     show SaslMechanism, UsernamePasswordCredential;
 import 'package:mongo_dart/mongo_dart_old.dart'

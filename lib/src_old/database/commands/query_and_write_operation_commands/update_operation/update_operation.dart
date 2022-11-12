@@ -1,10 +1,10 @@
 import 'package:mongo_dart/mongo_dart_old.dart' show DbCollection;
-import 'package:mongo_dart/src_old/database/commands/base/operation_base.dart';
+import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_commands/update_operation/update_statement.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import 'update_options.dart';
-import '../../base/command_operation.dart';
+import '../../../../../src/commands/base/command_operation.dart';
 
 class UpdateOperation extends CommandOperation {
   UpdateOperation(DbCollection collection, this.updates,

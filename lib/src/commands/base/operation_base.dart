@@ -1,5 +1,5 @@
-import '../../../../mongo_dart_old.dart';
-import '../../../../src/core/network/deprecated/connection_multi_request.dart';
+import '../../../mongo_dart_old.dart' show keySession;
+import '../../core/network/deprecated/connection_multi_request.dart';
 
 enum Aspect {
   readOperation,
@@ -8,7 +8,7 @@ enum Aspect {
   retryable,
 }
 
-class OperationBase {
+abstract class OperationBase {
   Map<String, Object> options;
   final Set<Aspect> _aspects;
   ConnectionMultiRequest? connection;

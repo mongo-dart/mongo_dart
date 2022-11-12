@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart';
+import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import 'package:mongo_dart/src_old/database/commands/administration_commands/kill_cursors_command/kill_cursors_command.dart';
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/aggregate/return_classes/change_event.dart';
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/wrapper/change_stream/change_stream_handler.dart';
@@ -13,7 +13,7 @@ import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_c
 import '../../../mongo_dart_old.dart';
 import '../../../src/core/error/mongo_dart_error.dart';
 import '../commands/base/db_admin_command_operation.dart';
-import '../commands/base/operation_base.dart';
+import '../../../src/commands/base/operation_base.dart';
 
 typedef MonadicBlock = void Function(Map<String, dynamic> value);
 

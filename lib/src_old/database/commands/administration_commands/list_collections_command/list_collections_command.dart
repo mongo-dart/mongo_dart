@@ -1,5 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import '../../base/command_operation.dart';
+import '../../../../../src/commands/base/command_operation.dart';
 import 'list_collections_options.dart';
 
 /// listCollections command.

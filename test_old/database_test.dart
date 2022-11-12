@@ -5,7 +5,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:mongo_dart/src/write_concern.dart';
-import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart';
+import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import 'package:mongo_dart/src_old/database/commands/diagnostic_commands/ping_command/ping_command.dart';
 import 'package:mongo_dart/src_old/database/cursor/modern_cursor.dart';
 import 'dart:async';

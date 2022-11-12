@@ -1,5 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart';
+import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import '../../../../../src/core/network/deprecated/connection_multi_request.dart';
 import 'server_status_result.dart';
 

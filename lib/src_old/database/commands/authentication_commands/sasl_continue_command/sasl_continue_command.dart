@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src_old/database/commands/base/command_operation.dart';
+import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/core/message/abstract/section.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import '../../../../../src/core/network/deprecated/connection_multi_request.dart';

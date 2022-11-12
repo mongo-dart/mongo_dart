@@ -1,9 +1,9 @@
 import 'package:mongo_dart/mongo_dart_old.dart' show DbCollection;
-import 'package:mongo_dart/src_old/database/commands/base/operation_base.dart';
+import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import 'distinct_options.dart';
-import '../../base/command_operation.dart';
+import '../../../../../src/commands/base/command_operation.dart';
 import 'distinct_result.dart';
 
 /// Collection is the collection on which the operation is performed

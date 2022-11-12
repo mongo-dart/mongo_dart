@@ -58,7 +58,7 @@ import 'src_old/database/commands/administration_commands/listt_indexes_command/
 import 'src_old/database/commands/aggregation_commands/count/count_operation.dart';
 import 'src_old/database/commands/aggregation_commands/count/count_options.dart';
 import 'src_old/database/commands/aggregation_commands/count/count_result.dart';
-import 'src_old/database/commands/base/command_operation.dart';
+import 'src/commands/base/command_operation.dart';
 import 'src_old/database/commands/diagnostic_commands/ping_command/ping_command.dart';
 import 'src/core/message/abstract/mongo_message.dart';
 import 'src/core/network/deprecated/connection_multi_request.dart';
