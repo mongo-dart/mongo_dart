@@ -1,5 +1,3 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
-
 final String mongoDbUri =
 //    'mongodb://test:test@ds031477.mongolab.com:31477/dart';
     'mongodb://user:pencil@localhost/auth1';

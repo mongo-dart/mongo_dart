@@ -1,9 +1,9 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show Db;
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../core/network/abstract/connection_base.dart';
-import '../../core/topology/server.dart';
+import '../../database/db.dart';
+import '../../topology/server.dart';
 import 'operation_base.dart';
 
 class DbAdminCommandOperation extends OperationBase {

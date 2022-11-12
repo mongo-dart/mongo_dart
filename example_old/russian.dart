@@ -1,8 +1,10 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 void main() async {
-  var db = Db('mongodb://127.0.0.1/mongo_dart-test');
-  await db.open();
+  var client = MongoClient('mongodb://127.0.0.1/mongo_dart-test');
+  await client.connect();
+  var db = client.db();
   var collection = db.collection('test-utf8');
   await collection.remove({});
   await collection.insert({
@@ -20,5 +22,5 @@ void main() async {
   v = await collection
       .findOne(where.match('Имя', '^..ДИМ\$', caseInsensitive: true));
   print('Filtered by query().match(): $v');
-  await db.close();
+  await client.close();
 }

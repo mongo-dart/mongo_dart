@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 import 'zip_list.dart';
 
@@ -13,14 +14,11 @@ void displayZip(Map zip) {
 }
 
 void main() async {
-  var db = Db(defaultUri);
-  await db.open();
+  var client = MongoClient(defaultUri);
+  await client.connect();
+  var db = client.db();
 
-  Future cleanupDatabase() async => await db.close();
-
-  if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
-    return;
-  }
+  Future cleanupDatabase() async => await client.close();
 
   var collectionName = 'zip';
   await db.dropCollection(collectionName);

@@ -1,8 +1,10 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 void main() async {
-  var db = Db('mongodb://127.0.0.1/mongo_dart-test');
-  await db.open();
+  var client = MongoClient('mongodb://127.0.0.1/mongo_dart-test');
+  await client.connect();
+  var db = client.db();
   ///// Simple update
   var coll = db.collection('collection-for-save');
   await coll.remove({});
@@ -16,7 +18,7 @@ void main() async {
   var v1 = await coll.findOne({'name': 'c'});
   if (v1 == null) {
     print('Record not found');
-    await db.close();
+    await client.close();
     return;
   }
   print('Record c: $v1');
@@ -37,7 +39,7 @@ void main() async {
   await coll.insertAll(toInsert);
   v1 = await coll.findOne({'name': 'c'});
   print('Record c: $v1');
-  await coll.legacyUpdate(where.eq('name', 'c'), modify.set('value', 31));
+  await coll.update(where.eq('name', 'c'), modify.set('value', 31));
   v2 = await coll.findOne({'name': 'c'});
   print('Record c after field level update: $v2');
 
@@ -54,8 +56,8 @@ void main() async {
   await coll.insertAll(toInsert);
   v1 = await coll.findOne({'name': 'c'});
   print('Record c: $v1');
-  await coll.legacyUpdate(where.eq('name', 'c'), modify.inc('value', 1));
+  await coll.update(where.eq('name', 'c'), modify.inc('value', 1));
   v2 = await coll.findOne({'name': 'c'});
   print('Record c after field level increment by one: $v2');
-  await db.close();
+  await client.close();
 }

@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+/* // ignore_for_file: non_constant_identifier_names
 
 part of mongo_dart;
 
@@ -183,3 +183,4 @@ class DbCommand extends MongoQueryMessage {
     return createQueryDbCommand(db, {'ismaster': 1});
   }
 }
+ */

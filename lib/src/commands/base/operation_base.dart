@@ -1,6 +1,6 @@
 import '../../../mongo_dart_old.dart' show keySession;
 import '../../core/network/abstract/connection_base.dart';
-import '../../core/topology/server.dart';
+import '../../topology/server.dart';
 
 enum Aspect {
   readOperation,

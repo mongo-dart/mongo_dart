@@ -1,6 +1,8 @@
 @Timeout(Duration(seconds: 400))
 import 'package:basic_utils/basic_utils.dart' show DnsUtils, RRecordType;
 import 'package:mongo_dart/src/core/error/connection_exception.dart';
+import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src_old/database/utils/dns_lookup.dart';
 import 'package:test/test.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
@@ -122,8 +124,9 @@ void main() {
           'retryWrites=true&w=majority&ssl=true');
     });
     test('Test Atlas connection', () async {
-      var db = await Db.create(atlasConnectionString);
-      await db.open();
+      var client = MongoClient(atlasConnectionString);
+      await client.connect();
+      final db = client.db();
       var coll = db.collection('test-insert');
       /* var result = */
       await coll.insertOne({'solved': true, 'autoinit': 'delayed'});
@@ -134,7 +137,7 @@ void main() {
       print(findResult);
       expect(result['ops'].first['solved'], findResult.first['solved']);
       expect(result['ops'].first['autoinit'], findResult.first['autoinit']); */
-      await db.close();
+      await client.close();
     },
         skip:
             'Set the correct atlas connection string before running this test');

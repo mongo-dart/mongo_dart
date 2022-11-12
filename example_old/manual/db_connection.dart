@@ -1,14 +1,11 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/database/db.dart';
 
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
 
 void main() async {
   var db = await connection.db;
-
-  if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
-    return;
-  }
 
   var collectionName = 'delete-many';
   await db.dropCollection(collectionName);

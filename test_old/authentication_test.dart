@@ -1,11 +1,13 @@
 import 'package:mongo_dart/mongo_dart_old.dart' show Db, keyCode;
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:sasl_scram/sasl_scram.dart' show CryptoStrengthStringGenerator;
 import 'package:test/test.dart';
 
-import 'package:mongo_dart/src_old/auth/scram_sha1_authenticator.dart'
+import 'package:mongo_dart/src/core/auth/scram_sha1_authenticator.dart'
     show ScramSha1Authenticator;
-import 'package:mongo_dart/src_old/auth/scram_sha256_authenticator.dart'
+import 'package:mongo_dart/src/core/auth/scram_sha256_authenticator.dart'
     show ScramSha256Authenticator;
 import 'package:mongo_dart/src_old/auth/mongodb_cr_authenticator.dart'
     show MongoDbCRAuthenticator;
@@ -20,10 +22,11 @@ const mongoDbUri2 = 'mongodb://unicode:übelkübel@$dbAddress:27017/$dbName';
 
 void main() async {
   Future<bool> testDatabase(String uri) async {
-    var db = Db(uri);
+    var client = MongoClient(uri);
     try {
-      await db.open();
-      await db.close();
+      await client.connect();
+      client.db();
+      await client.close();
       return true;
     } on MongoDartError catch (e) {
       if (e.mongoCode == 18) {
@@ -43,12 +46,14 @@ void main() async {
   }
 
   Future<String?> getFcv(String uri) async {
-    var db = Db(uri);
+    var client = MongoClient(uri);
     try {
-      await db.open();
-      var fcv = db.masterConnection.serverCapabilities.fcv;
+      await client.connect();
+      var db = client.db();
 
-      await db.close();
+      var fcv = db.server.serverCapabilities.fcv;
+
+      await client.close();
       return fcv;
     } on Map catch (e) {
       if (e.containsKey(keyCode)) {

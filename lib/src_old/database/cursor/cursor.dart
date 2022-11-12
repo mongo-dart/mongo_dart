@@ -2,6 +2,7 @@ part of mongo_dart;
 
 typedef MonadicBlock = void Function(Map<String, dynamic> value);
 
+@Deprecated('No More Used')
 class Cursor {
   //final _log = Logger('Cursor');
   State state = State.init;
@@ -202,7 +203,7 @@ class CommandCursor extends Cursor {
     }
   }
 }
-
+/* 
 class AggregateCursor extends CommandCursor {
   List pipeline;
   Map<String, dynamic> cursorOptions;
@@ -264,3 +265,4 @@ class ListIndexesCursor extends CommandCursor {
         null);
   }
 }
+ */

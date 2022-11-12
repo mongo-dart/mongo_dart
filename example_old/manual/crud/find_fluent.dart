@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
@@ -6,15 +7,12 @@ const dbAddress = '127.0.0.1';
 const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void main() async {
-  var db = Db(defaultUri);
-  await db.open();
+  var client = MongoClient(defaultUri);
+  await client.connect();
+  var db = client.db();
 
   Future cleanupDatabase() async {
-    await db.close();
-  }
-
-  if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
-    return;
+    await client.close();
   }
 
   var collectionName = 'find';

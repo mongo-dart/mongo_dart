@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src/write_concern.dart';
 
 /// Watch does not work on Standalone systems
@@ -8,9 +9,9 @@ import 'package:mongo_dart/src/write_concern.dart';
 /// not for database or collection ones (like drop)
 /// [Give a look to this also](https://docs.mongodb.com/manual/changeStreams/)
 void main() async {
-  final db = Db('mongodb://127.0.0.1/testdb');
-
-  await db.open();
+  var client = MongoClient('mongodb://127.0.0.1/testdb');
+  await client.connect();
+  var db = client.db();
 
   var collection = db.collection('watch-collection');
   // clean data if the example is run more than once.
@@ -87,7 +88,7 @@ void main() async {
 
       /// This is the correct way to cancel the watch subscription
       await controller.cancel();
-      await db.close();
+      await client.close();
       return false;
     }
     print('Waiting for change to be detected...');

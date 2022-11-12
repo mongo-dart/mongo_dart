@@ -1,6 +1,7 @@
 // Example Tested on release 0.7.0
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src_old/database/cursor/modern_cursor.dart';
+import 'package:mongo_dart/src/database/modern_cursor.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
@@ -8,15 +9,12 @@ const dbAddress = '127.0.0.1';
 const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void main() async {
-  var db = Db(defaultUri);
-  await db.open();
+  var client = MongoClient(defaultUri);
+  await client.connect();
+  var db = client.db();
 
   Future cleanupDatabase() async {
-    await db.close();
-  }
-
-  if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
-    return;
+    await client.close();
   }
 
   var collectionName = 'cursor';
@@ -68,6 +66,7 @@ void main() async {
             'key': {r'$gte': 0}
           },
           findOptions: FindOptions(batchSize: 100)),
+      db.server,
       batchSize: 150);
 
   var sum = 0;

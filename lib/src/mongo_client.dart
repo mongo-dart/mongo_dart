@@ -1,7 +1,7 @@
 import 'package:logging/logging.dart';
 
 import 'core/error/mongo_dart_error.dart';
-import 'core/topology/abstract/topology.dart';
+import 'topology/abstract/topology.dart';
 import 'default_settings.dart';
 import 'mongo_client_options.dart';
 import 'utils/decode_dns_seed_list.dart';
@@ -93,7 +93,6 @@ class MongoClient {
   Future close() async {}
 
   /// If no name passed, the url specified db is used
-  Future<Db> db(String? dbName) async {
-    return Db.modern(dbName ?? mongoClientOptions.defaultDbName);
-  }
+  Db db({String? dbName}) =>
+      Db.modern(this, dbName ?? mongoClientOptions.defaultDbName);
 }

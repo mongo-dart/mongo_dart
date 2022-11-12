@@ -11,9 +11,11 @@ import 'package:mongo_dart/src/utils/map_keys.dart'
 
 import '../../core/error/mongo_dart_error.dart';
 import '../../core/network/abstract/connection_base.dart';
-import '../../../src_old/database/commands/parameters/read_preference.dart'
+import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
-import '../../core/topology/server.dart';
+import '../../database/db.dart';
+import '../../database/dbcollection.dart';
+import '../../topology/server.dart';
 import 'operation_base.dart' show Aspect, OperationBase;
 
 class CommandOperation extends OperationBase {
@@ -152,8 +154,9 @@ Map<String, Object> applyWriteConcern(Map<String, Object> target,
   }*/
 
   if (db != null && db.writeConcern != null) {
-    target[keyWriteConcern] =
-        db.writeConcern!.asMap(db.masterConnection.serverStatus);
+    target[keyWriteConcern] = db.writeConcern!.asMap(db.mongoClient.topology!
+        .getServer(ReadPreference.primary)
+        .serverStatus);
     return target;
   }
 

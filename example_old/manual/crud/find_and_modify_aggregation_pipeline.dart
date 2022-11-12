@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
@@ -7,21 +8,18 @@ const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 void main() async {
   var running4_2orGreater = false;
-
-  var db = Db(defaultUri);
-  await db.open();
-  var serverFcv = db.masterConnection.serverCapabilities.fcv ?? '0.0';
+  var client = MongoClient(defaultUri);
+  await client.connect();
+  var db = client.db();
+  var serverFcv = db.server.serverCapabilities.fcv ?? '0.0';
   if (serverFcv.compareTo('4.2') != -1) {
     running4_2orGreater = true;
   }
 
   Future cleanupDatabase() async {
-    await db.close();
+    await client.close();
   }
 
-  if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
-    return;
-  }
   if (!running4_2orGreater) {
     print('Not supported in this release');
     return;

@@ -1,4 +1,4 @@
-import '../src_old/auth/auth.dart';
+import 'core/auth/auth.dart';
 import 'compression.dart';
 import 'mongo_client.dart';
 import 'read_concern.dart';

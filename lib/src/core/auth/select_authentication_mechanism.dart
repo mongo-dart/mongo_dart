@@ -1,6 +1,6 @@
-import '../../../src_old/auth/auth.dart';
-import '../../../src_old/auth/scram_sha1_authenticator.dart';
-import '../../../src_old/auth/scram_sha256_authenticator.dart';
+import 'auth.dart';
+import 'scram_sha1_authenticator.dart';
+import 'scram_sha256_authenticator.dart';
 import '../error/mongo_dart_error.dart';
 
 AuthenticationScheme selectAuthenticationMechanism(

@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/database/dbcollection.dart';
 
 void main() async {
   var db = Db('mongodb://127.0.0.1/mongo_dart-test');
@@ -69,7 +70,7 @@ void main() async {
   await coll
       .find(where.jsQuery('this.my_field % 100 == 35'))
       .forEach((v) => print(v));
-  var count = await coll.legacyCount(where.gt('my_field', 995));
+  var count = await coll.count(where.gt('my_field', 995));
   print('Count of records with my_field > 995: $count');
   var databases = await db.listDatabases();
   print('List of databases: $databases');

@@ -1,12 +1,14 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
 import 'dart:async';
+
+import 'package:mongo_dart/src/database/dbcollection.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 //////// I guess tailable cursor does not work in that example
 /// NJ: it works for me provide the collection is not empty...
 void main() async {
-  var db = Db('mongodb://127.0.0.1/test');
-
-  await db.open();
+  var client = MongoClient('mongodb://127.0.0.1/test');
+  await client.connect();
+  var db = client.db();
   var i = 0;
   await db.collection('log').insert({'index': i});
   Timer.periodic(Duration(seconds: 10), (Timer t) async {

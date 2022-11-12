@@ -1,8 +1,10 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 void main() async {
-  var db = Db('mongodb://127.0.0.1/mongo_dart-blog');
-  await db.open();
+  var client = MongoClient('mongodb://127.0.0.1/mongo_dart-blog');
+  await client.connect();
+  var db = client.db();
   var collection = db.collection('test-types');
   await collection.remove({});
   await collection.insert({
@@ -21,5 +23,5 @@ void main() async {
   });
   var v = await collection.findOne();
   print(v);
-  await db.close();
+  await client.close();
 }

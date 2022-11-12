@@ -5,10 +5,9 @@ import 'package:mongo_dart/src/utils/map_keys.dart'
 
 import '../../core/error/mongo_dart_error.dart';
 import '../../core/message/abstract/section.dart';
-import '../../../src_old/database/commands/parameters/read_preference.dart'
-    show ReadPreference;
+import '../parameters/read_preference.dart' show ReadPreference;
 import '../../core/network/abstract/connection_base.dart';
-import '../../core/topology/server.dart';
+import '../../topology/server.dart';
 import 'operation_base.dart' show Aspect, OperationBase;
 
 /// Run a simple command

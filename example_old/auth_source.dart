@@ -1,9 +1,11 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 void main() async {
-  var db = Db('mongodb://user:pencil@localhost/auth2?authSource=admin');
-  await db.open();
+  var client =
+      MongoClient('mongodb://user:pencil@localhost/auth2?authSource=admin');
+  await client.connect();
+  var db = client.db();
   var collection = db.collection('test');
   print(await collection.find().toList());
-  await db.close();
+  await client.close();
 }
