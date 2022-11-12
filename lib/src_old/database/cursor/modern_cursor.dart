@@ -12,8 +12,10 @@ import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_c
 
 import '../../../mongo_dart_old.dart';
 import '../../../src/core/error/mongo_dart_error.dart';
-import '../commands/base/db_admin_command_operation.dart';
+import '../../../src/commands/base/db_admin_command_operation.dart';
 import '../../../src/commands/base/operation_base.dart';
+import '../../../src/core/network/abstract/connection_base.dart';
+import '../../../src/core/topology/server.dart';
 
 typedef MonadicBlock = void Function(Map<String, dynamic> value);
 
@@ -195,11 +197,12 @@ class ModernCursor {
     }
   }
 
-  Future<void> _serverSideCursorClose() async {
+  Future<void> _serverSideCursorClose(Server server,
+      {ConnectionBase? connection}) async {
     if (tailable) {
       throw MongoDartError('Tailable Cursor closed by the server.');
     }
-    return close();
+    return close(server, connection: connection);
   }
 
   /// Returns only the first document (if any) and then closes the cursor
@@ -209,13 +212,15 @@ class ModernCursor {
   /// await nextObject();
   /// await close();
   /// ```
-  Future<Map<String, Object?>?> onlyFirst() async {
-    var ret = await nextObject();
-    await close();
+  Future<Map<String, Object?>?> onlyFirst(Server server,
+      {ConnectionBase? connection}) async {
+    var ret = await nextObject(server, connection: connection);
+    await close(server, connection: connection);
     return ret;
   }
 
-  Future<Map<String, Object?>?> nextObject() async {
+  Future<Map<String, Object?>?> nextObject(Server server,
+      {ConnectionBase? connection}) async {
     if (items.isNotEmpty) {
       return _getNextItem();
     }
@@ -223,7 +228,7 @@ class ModernCursor {
         collection!.collectionName == r'$cmd' &&
         operation is FindOperation &&
         (operation! as FindOperation).limit == 1) {
-      return operation!.execute();
+      return operation!.execute(server, connection: connection);
     }
 
     var justPrepareCursor = false;
@@ -233,24 +238,24 @@ class ModernCursor {
           operation!.options[keyBatchSize] == 0) {
         justPrepareCursor = true;
       }
-      result = await operation!.execute();
+      result = await operation!.execute(server, connection: connection);
       state = State.open;
     } else if (state == State.open) {
       if (cursorId.data == 0) {
-        await _serverSideCursorClose();
+        await _serverSideCursorClose(server, connection: connection);
         return null;
       }
       var command = GetMoreCommand(collection, cursorId,
           db: db,
           collectionName: collectionName,
           getMoreOptions: GetMoreOptions(batchSize: _batchSize));
-      result = await command.execute();
+      result = await command.execute(server, connection: connection);
     }
     if (result == null) {
       throw MongoDartError('Could not execut a further search');
     }
     if (result[keyOk] == 0.0) {
-      await close();
+      await close(server, connection: connection);
       throw MongoDartError(
           result[keyErrmsg] as String? ??
               'Generic error in nextObject() method',
@@ -265,13 +270,13 @@ class ModernCursor {
     // batch size for "first batch" was 0, no data returned.
     // Just prepared the cursor for further fetching
     if (justPrepareCursor) {
-      return nextObject();
+      return nextObject(server, connection: connection);
     }
     if (items.isNotEmpty) {
       return _getNextItem();
     }
     if (cursorId.data == 0) {
-      await _serverSideCursorClose();
+      await _serverSideCursorClose(server, connection: connection);
       return null;
     }
 
@@ -283,16 +288,16 @@ class ModernCursor {
           Duration(milliseconds: tailableRetryInterval), () => null);
     }
     // residual check, it should never pass here.
-    await close();
+    await close(server, connection: connection);
     return null;
   }
 
-  Future<void> close() async {
+  Future<void> close(Server server, {ConnectionBase? connection}) async {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
     state = State.closed;
     if (cursorId.value != 0 && collection != null) {
       var command = KillCursorsCommand(collection!, [cursorId], db: db);
-      await command.execute();
+      await command.execute(server, connection: connection);
       cursorId = BsonLong(0);
     }
     return;
@@ -305,7 +310,7 @@ class ModernCursor {
     Future<void> readNext() async {
       try {
         do {
-          var doc = await nextObject();
+          var doc = await nextObject(server, connection: connection);
           if (doc != null) {
             controller.add(doc);
           }
@@ -328,7 +333,7 @@ class ModernCursor {
 
     void pauseReading() => paused = true;
     void resumeReading() => startReading();
-    void cancelReading() async => await close();
+    void cancelReading() async => await close(server, connection: connection);
 
     controller.onCancel = cancelReading;
     controller.onResume = resumeReading;

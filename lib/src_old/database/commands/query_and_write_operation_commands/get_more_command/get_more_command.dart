@@ -1,6 +1,8 @@
 import 'package:bson/bson.dart';
 import 'package:mongo_dart/mongo_dart_old.dart' show Db, DbCollection;
 import 'package:mongo_dart/src/commands/base/command_operation.dart';
+import '../../../../../src/core/network/abstract/connection_base.dart';
+import '../../../../../src/core/topology/server.dart';
 import 'get_more_options.dart';
 import 'get_more_result.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
@@ -41,8 +43,9 @@ class GetMoreCommand extends CommandOperation {
     }
   }
 
-  Future<GetMoreResult> executeDocument() async {
-    var result = await super.execute();
+  Future<GetMoreResult> executeDocument(Server server,
+      {ConnectionBase? connection}) async {
+    var result = await super.execute(server, connection: connection);
     return GetMoreResult(result);
   }
 }

@@ -10,13 +10,8 @@ import 'dart:convert' show base64;
 import 'dart:io' show File, FileMode, IOSink;
 import 'dart:typed_data';
 import 'package:bson/bson.dart';
-import 'package:logging/logging.dart';
-import 'package:mongo_dart/src/core/info/server_config.dart';
-import 'package:mongo_dart/src/connection_string_options.dart';
-import 'package:mongo_dart/src_old/auth/scram_sha256_authenticator.dart';
+import 'package:mongo_dart/src/core/network/abstract/connection_base.dart';
 import 'package:mongo_dart/src_old/database/cursor/modern_cursor.dart';
-import 'package:mongo_dart/src/core/message/abstract/section.dart';
-import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/distinct/distinct_operation.dart';
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/distinct/distinct_options.dart';
 import 'package:mongo_dart/src_old/database/commands/aggregation_commands/distinct/distinct_result.dart';
@@ -24,45 +19,24 @@ import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_c
 import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_commands/update_operation/update_options.dart';
 import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_commands/update_operation/update_statement.dart';
 import 'package:mongo_dart/src_old/database/commands/operation.dart';
-import 'package:mongo_dart/src_old/database/utils/dns_lookup.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 import 'package:mongo_dart/src_old/database/utils/parms_utils.dart';
-import 'package:mongo_dart/src/utils/split_hosts.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:pool/pool.dart';
-import 'package:mongo_dart/src_old/auth/auth.dart'
-    show Authenticator, AuthenticationScheme;
-import 'package:mongo_dart/src_old/auth/scram_sha1_authenticator.dart'
-    show ScramSha1Authenticator;
-import 'package:mongo_dart/src_old/auth/scram_sha256_authenticator.dart'
-    show ScramSha256Authenticator;
-import 'package:mongo_dart/src_old/auth/mongodb_cr_authenticator.dart'
-    show MongoDbCRAuthenticator;
-import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
-import 'package:vy_string_utils/vy_string_utils.dart';
 
 import 'src/core/error/mongo_dart_error.dart';
 import 'src/core/message/deprecated/mongo_query_message.dart';
 import 'src/core/message/deprecated/mongo_reply_message.dart';
+import 'src/core/topology/server.dart';
 import 'src/write_concern.dart';
-import 'src_old/database/commands/administration_commands/drop_command/drop_command.dart';
-import 'src_old/database/commands/administration_commands/drop_command/drop_options.dart';
-import 'src_old/database/commands/administration_commands/drop_database_command/drop_database_command.dart';
-import 'src_old/database/commands/administration_commands/drop_database_command/drop_database_options.dart';
 import 'src_old/database/commands/administration_commands/drop_indexes_command/drop_indexes_command.dart';
 import 'src_old/database/commands/administration_commands/drop_indexes_command/drop_indexes_options.dart';
-import 'src_old/database/commands/administration_commands/list_collections_command/list_collections_command.dart';
-import 'src_old/database/commands/administration_commands/list_collections_command/list_collections_options.dart';
 import 'src_old/database/commands/administration_commands/listt_indexes_command/list_indexes_command.dart';
 import 'src_old/database/commands/administration_commands/listt_indexes_command/list_indexes_options.dart';
 import 'src_old/database/commands/aggregation_commands/count/count_operation.dart';
 import 'src_old/database/commands/aggregation_commands/count/count_options.dart';
 import 'src_old/database/commands/aggregation_commands/count/count_result.dart';
-import 'src/commands/base/command_operation.dart';
-import 'src_old/database/commands/diagnostic_commands/ping_command/ping_command.dart';
 import 'src/core/message/abstract/mongo_message.dart';
-import 'src/core/network/deprecated/connection_multi_request.dart';
-import 'src/core/network/deprecated/connection_manager.dart';
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_aggregation.dart';
@@ -72,20 +46,11 @@ export 'package:mongo_dart/src/utils/map_keys.dart';
 
 part 'src_old/connection_pool.dart';
 
-//part 'src/auth/auth.dart';
-//part 'src/auth/sasl_authenticator.dart';
-//part 'src/auth/scram_sha1_authenticator.dart';
-//part 'src/auth/mongodb_cr_authenticator.dart';
-
 part 'src_old/database/cursor/cursor.dart';
-
-part 'src_old/database/db.dart';
 
 part 'src_old/database/dbcollection.dart';
 
 part 'src_old/database/dbcommand.dart';
-
-//part 'src/core/error/error.dart';
 
 part 'src_old/database/mongo_getmore_message.dart';
 
@@ -93,17 +58,9 @@ part 'src_old/database/mongo_insert_message.dart';
 
 part 'src_old/database/mongo_kill_cursors_message.dart';
 
-//part 'src_old/database/mongo_message.dart';
-
-//part 'src/core/message/mongo_query_message.dart';
-
 part 'src_old/database/mongo_remove_message.dart';
 
-//part 'src/core/message/mongo_reply_message.dart';
-
 part 'src_old/database/mongo_update_message.dart';
-
-//part 'src/core/info/server_config.dart';
 
 part 'src_old/database/state.dart';
 
@@ -116,11 +73,3 @@ part 'src_old/gridfs/grid_out.dart';
 part 'src_old/gridfs/gridfs.dart';
 
 part 'src_old/gridfs/chunk_handler.dart';
-
-//part 'src_old/network/connection.dart';
-
-//part 'src_old/network/connection_manager.dart';
-
-//part 'src/core/message/handler/mongo_message_transformer.dart';
-
-//part 'src/core/message/handler/packet_converter.dart';

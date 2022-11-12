@@ -19,7 +19,9 @@ import 'package:mongo_dart/mongo_dart_old.dart'
 import 'package:mongo_dart/src_old/auth/auth.dart';
 
 import '../../src/core/error/mongo_dart_error.dart';
+import '../../src/core/network/abstract/connection_base.dart';
 import '../../src/core/network/deprecated/connection_multi_request.dart';
+import '../../src/core/topology/server.dart';
 
 abstract class SaslAuthenticator extends Authenticator {
   SaslAuthenticator(this.mechanism, this.db) : super();
@@ -28,12 +30,8 @@ abstract class SaslAuthenticator extends Authenticator {
   Db db;
 
   @override
-  Future authenticate(ConnectionMultiRequest connection) async {
-    if (connection.serverCapabilities.supportsOpMsg) {
-      return modernAuthenticate(connection);
-    } else {
-      return legacyAuthenticate(connection);
-    }
+  Future authenticate(Server server, {ConnectionBase? connection}) async {
+    return modernAuthenticate(server, connection: connection);
   }
 
   Future legacyAuthenticate(ConnectionMultiRequest connection) async {
@@ -73,7 +71,7 @@ abstract class SaslAuthenticator extends Authenticator {
     }
   }
 
-  Future modernAuthenticate(ConnectionMultiRequest connection) async {
+  Future modernAuthenticate(Server server, {ConnectionBase? connection}) async {
     var currentStep = mechanism.initialize(specifyUsername: true);
 
     CommandOperation command = SaslStartCommand(
@@ -83,7 +81,7 @@ abstract class SaslAuthenticator extends Authenticator {
     while (true) {
       Map<String, dynamic> result;
 
-      result = await command.execute();
+      result = await command.execute(server);
 
       if (result[keyOk] == 0.0) {
         throw MongoDartError(result[keyErrmsg],

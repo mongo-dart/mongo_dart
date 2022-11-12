@@ -19,21 +19,23 @@ import '../../message/mongo_modern_message.dart';
 import '../../message/abstract/mongo_response_message.dart';
 import '../../../utils/map_keys.dart';
 import '../../message/abstract/mongo_message.dart';
+import '../../topology/server.dart';
+import '../abstract/connection_base.dart';
 import 'connection_multi_request.dart';
 
 class ConnectionManager {
   final _log = Logger('ConnectionManager');
   final Db db;
-  final _connectionPool = <String, ConnectionMultiRequest>{};
+  final _connectionPool = <String, ConnectionBase>{};
   final replyCompleters = <int, Completer<MongoResponseMessage>>{};
   final sendQueue = Queue<MongoMessage>();
-  ConnectionMultiRequest? _masterConnection;
+  ConnectionBase? _masterConnection;
 
   ConnectionManager(this.db);
 
-  ConnectionMultiRequest? get masterConnection => _masterConnection;
+  ConnectionBase? get masterConnection => _masterConnection;
 
-  ConnectionMultiRequest get masterConnectionVerified {
+  ConnectionBase get masterConnectionVerified {
     if (_masterConnection != null && !_masterConnection!.isClosed) {
       return _masterConnection!;
     } else {
@@ -41,29 +43,29 @@ class ConnectionManager {
     }
   }
 
-  Future _connect(ConnectionMultiRequest connection) async {
-    await connection.connect();
+  Future _connect(Server server, {ConnectionBase? connection}) async {
+    await server.connect();
     var result = <String, Object?>{keyOk: 0.0};
     // As I couldn't set-up a pre 3.6 environment, I check not only for
     // a {ok: 0.0} but also for any other error
     try {
       var helloCommand = HelloCommand(db,
-          username: connection.serverConfig.userName, connection: connection);
-      result = await helloCommand.execute(skipStateCheck: true);
+          username: server.serverConfig.userName, connection: connection);
+      result = await helloCommand.execute(server, connection: connection);
     } catch (e) {
       //Do nothing
     }
     if (result[keyOk] == 1.0) {
       var resultDoc = HelloResult(result);
       var master = resultDoc.isWritablePrimary;
-      connection.isMaster = master;
+      /* connection.isMaster = master;
       if (master) {
         _masterConnection = connection;
         MongoModernMessage.maxBsonObjectSize = resultDoc.maxBsonObjectSize;
         MongoModernMessage.maxMessageSizeBytes = resultDoc.maxMessageSizeBytes;
         MongoModernMessage.maxWriteBatchSize = resultDoc.maxWriteBatchSize;
       }
-      connection.serverCapabilities.getParamsFromHello(resultDoc);
+      connection.serverCapabilities.getParamsFromHello(resultDoc); */
       if (db.authenticationScheme == null &&
           resultDoc.saslSupportedMechs != null) {
         if (resultDoc.saslSupportedMechs!.contains('SCRAM-SHA-256')) {
@@ -73,10 +75,12 @@ class ConnectionManager {
         }
       }
     } else {
-      var isMasterCommand = DbCommand.createIsMasterCommand(db);
+      throw MongoDartError(
+          'Hello command not supported, please move to a newr version');
+      /*  var isMasterCommand = DbCommand.createIsMasterCommand(db);
       var replyMessage = await connection.query(isMasterCommand);
       if (replyMessage.documents == null || replyMessage.documents!.isEmpty) {
-        throw MongoDartError('Empty reply message received');
+        throw MongoDartError('Empty reply message received'); 
       }
       var documents = replyMessage.documents!;
       if (documents.first[keyOk] == 0.0) {
@@ -84,7 +88,7 @@ class ConnectionManager {
       }
       _log.fine(() => documents.first.toString());
       var master = documents.first['ismaster'] == true;
-      connection.isMaster = master;
+      /*   connection.isMaster = master;
       if (master) {
         _masterConnection = connection;
         MongoModernMessage.maxBsonObjectSize =
@@ -93,27 +97,27 @@ class ConnectionManager {
             documents.first[keyMaxMessageSizeBytes];
         MongoModernMessage.maxWriteBatchSize =
             documents.first[keyMaxWriteBatchSize];
-      }
-      connection.serverCapabilities.getParamsFromIstMaster(documents.first);
+      } */
+      server.serverCapabilities.getParamsFromIstMaster(documents.first);*/
     }
 
     if (db.authenticationScheme == null) {
-      if ((connection.serverCapabilities.fcv?.compareTo('4.0') ?? -1) > -1) {
+      if ((server.serverCapabilities.fcv?.compareTo('4.0') ?? -1) > -1) {
         db.authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
-      } else if (connection.serverCapabilities.maxWireVersion >= 3) {
+      } else if (server.serverCapabilities.maxWireVersion >= 3) {
         db.authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
       } else {
         db.authenticationScheme = AuthenticationScheme.MONGODB_CR;
       }
     }
-    if (connection.serverConfig.userName == null) {
-      _log.fine(() => '$db: ${connection.serverConfig.hostUrl} connected');
+    if (server.serverConfig.userName == null) {
+      _log.fine(() => '$db: ${server.serverConfig.hostUrl} connected');
     } else {
       try {
-        await db.authenticate(connection.serverConfig.userName!,
-            connection.serverConfig.password ?? '',
+        await db.authenticate(server.serverConfig.userName!,
+            server.serverConfig.password ?? '', server,
             connection: connection);
-        _log.fine(() => '$db: ${connection.serverConfig.hostUrl} connected');
+        _log.fine(() => '$db: ${server.serverConfig.hostUrl} connected');
       } catch (e) {
         /// Atlas does not currently support SHA_256
         if (e is MongoDartError &&
@@ -125,26 +129,24 @@ class ConnectionManager {
               'downgrading to SCRAM_SHA_1');
           db.authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
           try {
-            await db.authenticate(connection.serverConfig.userName!,
-                connection.serverConfig.password ?? '',
+            await db.authenticate(server.serverConfig.userName!,
+                server.serverConfig.password ?? '', server,
                 connection: connection);
-            _log.fine(
-                () => '$db: ${connection.serverConfig.hostUrl} connected');
+            _log.fine(() => '$db: ${server.serverConfig.hostUrl} connected');
           } catch (e) {
             rethrow;
           }
         }
-        if (connection == _masterConnection) {
-          _masterConnection = null;
-        }
-        await connection.close();
+
+        await connection!.close();
         rethrow;
       }
     }
     return true;
   }
 
-  Future<void> open(WriteConcern writeConcern) async {
+  Future<void> open(WriteConcern writeConcern, Server server,
+      {ConnectionBase? connection}) async {
     var connectionErrors = [];
     for (var hostUrl in _connectionPool.keys) {
       var connection = _connectionPool[hostUrl];
@@ -154,7 +156,7 @@ class ConnectionManager {
         continue;
       }
       try {
-        await _connect(connection);
+        await _connect(server, connection: connection);
       } catch (e) {
         connectionErrors.add(e);
       }
@@ -181,16 +183,16 @@ class ConnectionManager {
     }
     db.state = State.open;
 
-    if (_masterConnection!.serverCapabilities.supportsOpMsg) {
+    if (server.serverCapabilities.supportsOpMsg) {
       await ServerStatusCommand(db,
               serverStatusOptions: ServerStatusOptions.instance)
-          .updateServerStatus(db.masterConnection);
+          .updateServerStatus(server, connection: connection);
     }
   }
 
-  Future close() async {
+  Future close(ConnectionMultiRequest connection) async {
     while (sendQueue.isNotEmpty) {
-      masterConnection?.sendBuffer();
+      connection.sendBuffer();
     }
     sendQueue.clear();
 
@@ -205,11 +207,11 @@ class ConnectionManager {
   }
 
   void addConnection(ServerConfig serverConfig) {
-    var connection = ConnectionMultiRequest(this, serverConfig);
+    var connection = ConnectionBase(serverConfig);
     _connectionPool[serverConfig.hostUrl] = connection;
   }
 
-  ConnectionMultiRequest? removeConnection(ConnectionMultiRequest connection) {
+  ConnectionBase? removeConnection(ConnectionMultiRequest connection) {
     connection.close();
     if (connection.isMaster) {
       _masterConnection = null;

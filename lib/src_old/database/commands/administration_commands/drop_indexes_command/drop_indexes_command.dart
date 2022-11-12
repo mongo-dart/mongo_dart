@@ -4,6 +4,7 @@ import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../../../src/core/error/mongo_dart_error.dart';
+import '../../../../../src/core/network/abstract/connection_base.dart';
 import '../../../../../src/core/network/deprecated/connection_multi_request.dart';
 import 'drop_indexes_options.dart';
 
@@ -13,7 +14,7 @@ class DropIndexesCommand extends CommandOperation {
 
   DropIndexesCommand(Db db, DbCollection collection, this.index,
       {DropIndexesOptions? dropIndexesOptions,
-      ConnectionMultiRequest? connection,
+      ConnectionBase? connection,
       Map<String, Object>? rawOptions})
       : super(
             db,

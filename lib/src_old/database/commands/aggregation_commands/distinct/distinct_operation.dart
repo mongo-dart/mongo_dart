@@ -2,6 +2,8 @@ import 'package:mongo_dart/mongo_dart_old.dart' show DbCollection;
 import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
+import '../../../../../src/core/network/abstract/connection_base.dart';
+import '../../../../../src/core/topology/server.dart';
 import 'distinct_options.dart';
 import '../../../../../src/commands/base/command_operation.dart';
 import 'distinct_result.dart';
@@ -34,8 +36,9 @@ class DistinctOperation extends CommandOperation {
     };
   }
 
-  Future<DistinctResult> executeDocument() async {
-    var result = await super.execute();
+  Future<DistinctResult> executeDocument(Server server,
+      {ConnectionBase? connection}) async {
+    var result = await super.execute(server, connection: connection);
     return DistinctResult(result);
   }
 }

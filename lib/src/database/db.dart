@@ -1,4 +1,61 @@
-part of mongo_dart;
+//part of mongo_dart;
+
+import 'dart:typed_data';
+
+import 'package:logging/logging.dart';
+import 'package:universal_io/io.dart';
+import 'package:vy_string_utils/vy_string_utils.dart';
+
+import '../../mongo_dart_old.dart'
+    show
+        AggregateOperation,
+        AggregateOptions,
+        CreateCollectionCommand,
+        CreateCollectionOptions,
+        CreateViewCommand,
+        CreateViewOptions,
+        Cursor,
+        DbCollection,
+        DbCommand,
+        GetLastErrorCommand,
+        ListCollectionsCursor,
+        MongoInsertMessage,
+        MongoRemoveMessage,
+        ReadPreference,
+        SelectorBuilder,
+        ServerStatusCommand,
+        ServerStatusOptions,
+        State,
+        key$Query,
+        keyErrmsg,
+        keyName,
+        keyOk;
+import '../../src_old/auth/auth.dart';
+import '../../src_old/auth/mongodb_cr_authenticator.dart';
+import '../../src_old/auth/scram_sha1_authenticator.dart';
+import '../../src_old/auth/scram_sha256_authenticator.dart';
+import '../../src_old/database/commands/administration_commands/drop_command/drop_command.dart';
+import '../../src_old/database/commands/administration_commands/drop_command/drop_options.dart';
+import '../../src_old/database/commands/administration_commands/drop_database_command/drop_database_command.dart';
+import '../../src_old/database/commands/administration_commands/drop_database_command/drop_database_options.dart';
+import '../../src_old/database/commands/administration_commands/list_collections_command/list_collections_command.dart';
+import '../../src_old/database/commands/administration_commands/list_collections_command/list_collections_options.dart';
+import '../../src_old/database/cursor/modern_cursor.dart';
+import '../../src_old/database/utils/dns_lookup.dart';
+import '../commands/base/command_operation.dart';
+import '../connection_string_options.dart';
+import '../core/error/mongo_dart_error.dart';
+import '../core/info/server_config.dart';
+import '../core/message/abstract/mongo_message.dart';
+import '../core/message/abstract/section.dart';
+import '../core/message/deprecated/mongo_reply_message.dart';
+import '../core/message/mongo_modern_message.dart';
+import '../core/network/abstract/connection_base.dart';
+import '../core/network/deprecated/connection_manager.dart';
+import '../core/network/deprecated/connection_multi_request.dart';
+import '../core/topology/server.dart';
+import '../utils/split_hosts.dart';
+import '../write_concern.dart';
 
 class Db {
   static const mongoDefaultPort = 27017;
@@ -11,17 +68,16 @@ class Db {
   Db? authSourceDb;
   ConnectionManager? _connectionManager;
 
-  ConnectionMultiRequest? get _masterConnection =>
-      _connectionManager?.masterConnection;
+  ConnectionBase? get _masterConnection => _connectionManager?.masterConnection;
 
-  ConnectionMultiRequest get _masterConnectionVerified {
+  ConnectionBase get _masterConnectionVerified {
     if (state != State.open) {
       throw MongoDartError('Db is in the wrong state: $state');
     }
     return _masterConnectionVerifiedAnyState;
   }
 
-  ConnectionMultiRequest get _masterConnectionVerifiedAnyState {
+  ConnectionBase get _masterConnectionVerifiedAnyState {
     if (_connectionManager == null) {
       throw MongoDartError('Invalid Connection manager state');
     }
@@ -58,6 +114,8 @@ class Db {
 
   Db._authDb(this.databaseName);
 
+  Db.modern(this.databaseName);
+
   /// This method allow to create a Db object both with the Standard
   /// Connection String Format (`mongodb://`) or with the DNS Seedlist
   /// Connection Format (`mongodb+srv://`).
@@ -86,8 +144,8 @@ class Db {
 
   WriteConcern? get writeConcern => _writeConcern;
 
-  ConnectionMultiRequest get masterConnection => _masterConnectionVerified;
-  ConnectionMultiRequest get masterConnectionAnyState =>
+  ConnectionBase get masterConnection => _masterConnectionVerified;
+  ConnectionBase get masterConnectionAnyState =>
       _masterConnectionVerifiedAnyState;
 
   List<String> get uriList => _uriList.toList();
@@ -212,29 +270,12 @@ class Db {
 
   Future<MongoReplyMessage> queryMessage(MongoMessage queryMessage,
       {ConnectionMultiRequest? connection}) {
-    return Future.sync(() {
-      if (state != State.open) {
-        throw MongoDartError('Db is in the wrong state: $state');
-      }
-
-      connection ??= masterConnection;
-
-      return connection!.query(queryMessage);
-    });
+    throw MongoDartError('No More used');
   }
 
   void executeMessage(MongoMessage message, WriteConcern? writeConcern,
       {ConnectionMultiRequest? connection}) {
-    if (state != State.open) {
-      throw MongoDartError('DB is not open. $state');
-    }
-
-    connection ??= _masterConnectionVerified;
-
-    writeConcern ??= _writeConcern;
-
-    // ignore: deprecated_member_use_from_same_package
-    connection.execute(message, writeConcern == WriteConcern.ERRORS_IGNORED);
+    throw MongoDartError('No More used');
   }
 
   Future<Map<String, Object?>> executeModernMessage(MongoModernMessage message,
@@ -263,8 +304,9 @@ class Db {
     return section.payload.content;
   }
 
-  Future open(
-      {WriteConcern writeConcern = WriteConcern.acknowledged,
+  Future open(Server server,
+      {ConnectionBase? connection,
+      WriteConcern writeConcern = WriteConcern.acknowledged,
       bool secure = false,
       bool tlsAllowInvalidCertificates = false,
       String? tlsCAFile,
@@ -287,7 +329,8 @@ class Db {
           tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword));
     }
     try {
-      await _connectionManager!.open(writeConcern);
+      await _connectionManager!
+          .open(writeConcern, server, connection: connection);
     } catch (e) {
       state = State.init;
       await _connectionManager!.close();
@@ -304,41 +347,7 @@ class Db {
 
   Future<Map<String, dynamic>> executeDbCommand(MongoMessage message,
       {ConnectionMultiRequest? connection}) async {
-    connection ??= _masterConnectionVerified;
-
-    //var result = Completer<Map<String, dynamic>>();
-
-    var replyMessage = await connection.query(message);
-    if (replyMessage.documents == null || replyMessage.documents!.isEmpty) {
-      throw {
-        keyOk: 0.0,
-        keyErrmsg:
-            'Error executing Db command, documents are empty $replyMessage'
-      };
-    }
-    var firstRepliedDocument = replyMessage.documents!.first;
-    /*var errorMessage = '';
-
-     if (replyMessage.documents.isEmpty) {
-      errorMessage =
-          'Error executing Db command, documents are empty $replyMessage';
-
-      print('Error: $errorMessage');
-
-      var m = <String, dynamic>{};
-      m['errmsg'] = errorMessage;
-
-      result.completeError(m);
-    } else  */
-    if (documentIsNotAnError(firstRepliedDocument)) {
-      //result.complete(firstRepliedDocument);
-      return firstRepliedDocument;
-    } //else {
-
-    //result.completeError(firstRepliedDocument);
-    throw firstRepliedDocument;
-    //}
-    //return result.future;
+    throw MongoDartError('No More used');
   }
 
   bool documentIsNotAnError(firstRepliedDocument) =>
@@ -388,11 +397,12 @@ class Db {
     });
   }
 
-  Future<Map<String, dynamic>> getLastError(
-      [WriteConcern? writeConcern]) async {
+  Future<Map<String, dynamic>> getLastError(Server server,
+      {ConnectionBase? connection, WriteConcern? writeConcern}) async {
     writeConcern ??= _writeConcern;
     if (masterConnection.serverCapabilities.supportsOpMsg) {
-      return GetLastErrorCommand(this, writeConcern: writeConcern).execute();
+      return GetLastErrorCommand(this, writeConcern: writeConcern)
+          .execute(server);
     } else {
       return executeDbCommand(
           DbCommand.createGetLastErrorCommand(this, writeConcern));
@@ -419,14 +429,15 @@ class Db {
       executeDbCommand(DbCommand.createIsMasterCommand(this),
           connection: connection);
 
-  Future<Map<String, dynamic>> wait() => getLastError();
+  Future<Map<String, dynamic>> wait() => throw MongoDartError('No More used');
 
   Future close() async {
     _log.fine(() => '$this closed');
     state = State.closed;
     var cm = _connectionManager;
     _connectionManager = null;
-    return cm?.close();
+    return;
+    //cm?.close();
   }
 
   /// Analogue to shell's `show dbs`. Helper for `listDatabases` mongodb command.
@@ -529,14 +540,14 @@ class Db {
         .toList();
   }
 
-  Future<bool> authenticate(String userName, String password,
-      {ConnectionMultiRequest? connection}) async {
+  Future<bool> authenticate(String userName, String password, Server server,
+      {ConnectionBase? connection}) async {
     var credential = UsernamePasswordCredential()
       ..username = userName
       ..password = password;
 
-    (connection ?? masterConnection).serverConfig.userName ??= userName;
-    (connection ?? masterConnection).serverConfig.password ??= password;
+    server.serverConfig.userName ??= userName;
+    server.serverConfig.password ??= password;
 
     if (authenticationScheme == null) {
       throw MongoDartError('Authentication scheme not specified');
@@ -544,9 +555,9 @@ class Db {
     var authenticator =
         Authenticator.create(authenticationScheme!, this, credential);
 
-    await authenticator.authenticate(connection ?? masterConnection);
+    await authenticator.authenticate(server, connection: connection);
 
-    (connection ?? masterConnection).serverConfig.isAuthenticated = true;
+    server.serverConfig.isAuthenticated = true;
     return true;
   }
 

@@ -1,6 +1,8 @@
 import 'package:mongo_dart/mongo_dart_old.dart' show Db;
 import 'package:mongo_dart/src/write_concern.dart';
 import 'package:mongo_dart/src/commands/base/command_operation.dart';
+import '../../../../../src/core/network/abstract/connection_base.dart';
+import '../../../../../src/core/topology/server.dart';
 import 'get_last_error_options.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
@@ -59,8 +61,9 @@ class GetLastErrorCommand extends CommandOperation {
   }
   // this is needed for compatibility with old command version
   @override
-  Future<Map<String, Object?>> execute({bool skipStateCheck = false}) async {
-    var result = await super.execute();
+  Future<Map<String, Object?>> execute(Server server,
+      {ConnectionBase? connection}) async {
+    var result = await super.execute(server, connection: connection);
     if (result.isNotEmpty) {
       var res = result['err'] as String?;
       if (res != null && res.isNotEmpty) {

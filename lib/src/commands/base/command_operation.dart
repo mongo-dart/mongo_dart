@@ -10,9 +10,10 @@ import 'package:mongo_dart/src/utils/map_keys.dart'
         keyWriteConcern;
 
 import '../../core/error/mongo_dart_error.dart';
-import '../../core/network/deprecated/connection_multi_request.dart';
+import '../../core/network/abstract/connection_base.dart';
 import '../../../src_old/database/commands/parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
+import '../../core/topology/server.dart';
 import 'operation_base.dart' show Aspect, OperationBase;
 
 class CommandOperation extends OperationBase {
@@ -26,7 +27,7 @@ class CommandOperation extends OperationBase {
       {this.collection,
       this.command,
       Aspect? aspect,
-      ConnectionMultiRequest? connection})
+      ConnectionBase? connection})
       : super(options, connection: connection, aspects: aspect) {
     db ??= collection?.db;
     //aspect ??= Aspect.noInheritOptions;
@@ -77,9 +78,10 @@ class CommandOperation extends OperationBase {
   }
 
   @override
-  Future<Map<String, Object?>> execute({bool skipStateCheck = false}) async {
+  Future<Map<String, Object?>> execute(Server server,
+      {ConnectionBase? connection}) async {
     final db = this.db;
-    if (!skipStateCheck && db.state != State.open) {
+    if (db.state != State.open) {
       throw MongoDartError('Db is in the wrong state: ${db.state}');
     }
     //final options = Map.from(this.options);
@@ -104,8 +106,7 @@ class CommandOperation extends OperationBase {
     //print(command);
     var modernMessage = MongoModernMessage(command);
 
-    return db.executeModernMessage(modernMessage,
-        connection: connection, skipStateCheck: skipStateCheck);
+    return server.executeModernMessage(modernMessage, connection: connection);
   }
 }
 

@@ -1,10 +1,10 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/commands/base/command_operation.dart';
-import 'package:mongo_dart/src/core/message/abstract/section.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
-import '../../../../../src/core/network/deprecated/connection_multi_request.dart';
+import '../../../../../src/core/network/abstract/connection_base.dart';
+import '../../../../../src/core/topology/server.dart';
 
 var _command = <String, Object>{keyHello: 1};
 
@@ -24,7 +24,7 @@ class HelloCommand extends CommandOperation {
       {String? username,
       HelloOptions? helloOptions,
       Map<String, Object>? rawOptions,
-      ConnectionMultiRequest? connection})
+      ConnectionBase? connection})
       : super(db, <String, Object>{...?helloOptions?.options, ...?rawOptions},
             command: {
               ..._command,
@@ -33,27 +33,21 @@ class HelloCommand extends CommandOperation {
             },
             connection: connection);
 
-  Future<HelloResult> executeDocument() async {
-    var result = await super.execute();
+  Future<HelloResult> executeDocument(Server server,
+      {ConnectionBase? connection}) async {
+    var result = await super.execute(server, connection: connection);
     return HelloResult(result);
   }
 
   @override
-  Future<Map<String, Object?>> execute({bool skipStateCheck = false}) async {
-    final db = this.db;
-
+  Future<Map<String, Object?>> execute(Server server,
+      {ConnectionBase? connection}) async {
     var command = $buildCommand();
     processOptions(command);
     command.addAll(options);
 
     var message = MongoModernMessage(command);
 
-    connection ??= db.masterConnectionAnyState;
-
-    var response = await connection!.executeModernMessage(message);
-
-    var section = response.sections.firstWhere((Section section) =>
-        section.payloadType == MongoModernMessage.basePayloadType);
-    return section.payload.content;
+    return server.executeModernMessage(message);
   }
 }

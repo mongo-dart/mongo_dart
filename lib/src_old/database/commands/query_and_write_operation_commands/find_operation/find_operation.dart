@@ -3,6 +3,8 @@ import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../../../src/core/error/mongo_dart_error.dart';
+import '../../../../../src/core/network/abstract/connection_base.dart';
+import '../../../../../src/core/topology/server.dart';
 import 'find_options.dart';
 import '../../../../../src/commands/base/command_operation.dart';
 import 'find_result.dart';
@@ -99,12 +101,13 @@ class FindOperation extends CommandOperation {
     };
   }
 
-  Future<FindResult> executeDocument() async {
+  Future<FindResult> executeDocument(Server server,
+      {ConnectionBase? connection}) async {
     if (collection!.collectionName == r'$cmd') {
       throw MongoDartError('cannot return a FindResult object '
           r'for a coomand request ($cmd collection)');
     }
-    var result = await super.execute();
+    var result = await super.execute(server, connection: connection);
     return FindResult(result);
   }
 }

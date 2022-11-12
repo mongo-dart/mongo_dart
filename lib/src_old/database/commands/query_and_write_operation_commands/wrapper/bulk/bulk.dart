@@ -8,6 +8,8 @@ import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 
 import '../../../../../../src/core/error/mongo_dart_error.dart';
+import '../../../../../../src/core/network/abstract/connection_base.dart';
+import '../../../../../../src/core/topology/server.dart';
 import 'bulk_options.dart';
 
 abstract class Bulk extends CommandOperation {
@@ -386,13 +388,15 @@ abstract class Bulk extends CommandOperation {
   List<Map<int, int>> getBulkInputOrigins();
 
   @override
-  Future<Map<String, Object>> execute({bool skipStateCheck = false}) =>
+  Future<Map<String, Object>> execute(Server server,
+          {ConnectionBase? connection}) =>
       throw StateError('Call executeBulk() for bulk operations');
   @override
   Map<String, Object> $buildCommand() =>
       throw StateError('Call getBulkCommands() for bulk operations');
 
-  Future<List<Map<String, Object?>>> executeBulk() async {
+  Future<List<Map<String, Object?>>> executeBulk(Server server,
+      {ConnectionBase? connection}) async {
     var retList = <Map<String, Object?>>[];
     var isOrdered = options[keyOrdered] as bool? ?? true;
     final db = this.db;
@@ -422,8 +426,8 @@ abstract class Bulk extends CommandOperation {
 
       var modernMessage = MongoModernMessage(command);
 
-      var ret =
-          await db.executeModernMessage(modernMessage, connection: connection);
+      var ret = await server.executeModernMessage(modernMessage,
+          connection: connection);
 
       ret[keyCommandType] = command.keys.first;
       if (ret.containsKey(keyWriteErrors)) {
@@ -458,8 +462,9 @@ abstract class Bulk extends CommandOperation {
     return retList;
   }
 
-  Future<BulkWriteResult> executeDocument() async {
-    var executionRetList = await executeBulk();
+  Future<BulkWriteResult> executeDocument(Server server,
+      {ConnectionBase? connection}) async {
+    var executionRetList = await executeBulk(server, connection: connection);
     BulkWriteResult? ret;
     WriteCommandType writeCommandType;
 

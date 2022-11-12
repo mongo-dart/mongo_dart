@@ -1,18 +1,14 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show Db, DbCollection, State;
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart'
     show MongoModernMessage;
 import 'package:mongo_dart/src/utils/map_keys.dart'
-    show
-        keyAuthdb,
-        keyDatabaseName,
-        keyDbName,
-        keyReadPreference,
-        keyWriteConcern;
+    show keyReadPreference, keyWriteConcern;
 
 import '../../core/error/mongo_dart_error.dart';
-import '../../core/network/deprecated/connection_multi_request.dart';
+import '../../core/message/abstract/section.dart';
 import '../../../src_old/database/commands/parameters/read_preference.dart'
-    show ReadPreference, resolveReadPreference;
+    show ReadPreference;
+import '../../core/network/abstract/connection_base.dart';
+import '../../core/topology/server.dart';
 import 'operation_base.dart' show Aspect, OperationBase;
 
 /// Run a simple command
@@ -23,7 +19,7 @@ class SimpleCommand extends OperationBase {
   ReadPreference? readPreference;
 
   SimpleCommand(Map<String, Object> options,
-      {this.command, Aspect? aspect, ConnectionMultiRequest? connection})
+      {this.command, Aspect? aspect, ConnectionBase? connection})
       : super(options, connection: connection, aspects: aspect);
 
   Map<String, Object> $buildCommand() => command == null
@@ -44,7 +40,8 @@ class SimpleCommand extends OperationBase {
   }
 
   @override
-  Future<Map<String, Object?>> execute({bool skipStateCheck = false}) async {
+  Future<Map<String, Object?>> execute(Server server,
+      {ConnectionBase? connection}) async {
     var command = $buildCommand();
 
     processOptions(command);
@@ -57,8 +54,7 @@ class SimpleCommand extends OperationBase {
 
     var modernMessage = MongoModernMessage(command);
 
-    return db.executeModernMessage(modernMessage,
-        connection: connection, skipStateCheck: skipStateCheck);
+    return server.executeModernMessage(modernMessage, connection: connection);
   }
 }
 
@@ -70,7 +66,7 @@ class SimpleCommand extends OperationBase {
 /// @param {Object} [options] optional settings passed into a command for write concern overrides
 /// @returns {Object} the (now) decorated target
 Map<String, Object> applyWriteConcern(Map<String, Object> target,
-    {Map<String, Object>? options, Db? db, DbCollection? collection}) {
+    {Map<String, Object>? options}) {
   options ??= <String, Object>{};
 
   //Todo Session not yet implemented
@@ -95,18 +91,6 @@ Map<String, Object> applyWriteConcern(Map<String, Object> target,
       target[keyWriteConcern] = options[keyWriteConcern]!;
       return target;
     }
-  }
-
-  // Todo WriteConcern class not yet assigned to DbCollection
-/*  if (collection != null && collection.writeConcern != null) {
-    target[keyWriteConcern] = collection.writeConcern;
-    return target;
-  }*/
-
-  if (db != null && db.writeConcern != null) {
-    target[keyWriteConcern] =
-        db.writeConcern!.asMap(db.masterConnection.serverStatus);
-    return target;
   }
 
   return target;

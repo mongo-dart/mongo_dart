@@ -226,7 +226,7 @@ class ConnectionMultiRequest {
     }
     _pendingQueries.clear();
     if (isMaster) {
-      await _manager.close();
+      await _manager.close(this);
     }
   }
 }

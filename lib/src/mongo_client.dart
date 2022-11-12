@@ -8,6 +8,7 @@ import 'utils/decode_dns_seed_list.dart';
 import 'utils/decode_url_parameters.dart';
 import 'utils/split_hosts.dart';
 import 'write_concern.dart';
+import 'database/db.dart';
 
 typedef ServerApiVersion = Map<String, String>;
 const ServerApiVersion serverApiVersion = <String, String>{'v1': '1'};
@@ -92,5 +93,7 @@ class MongoClient {
   Future close() async {}
 
   /// If no name passed, the url specified db is used
-  Future db(String? dbName) async {}
+  Future<Db> db(String? dbName) async {
+    return Db.modern(dbName ?? mongoClientOptions.defaultDbName);
+  }
 }

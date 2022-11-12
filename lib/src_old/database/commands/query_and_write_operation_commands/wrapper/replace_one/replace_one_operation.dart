@@ -3,6 +3,8 @@ import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_c
 import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_commands/return_classes/write_result.dart';
 import 'package:mongo_dart/src_old/database/commands/query_and_write_operation_commands/update_operation/update_operation.dart';
 
+import '../../../../../../src/core/network/abstract/connection_base.dart';
+import '../../../../../../src/core/topology/server.dart';
 import 'replace_one_options.dart';
 import 'replace_one_statement.dart';
 
@@ -20,8 +22,9 @@ class ReplaceOneOperation extends UpdateOperation {
           rawOptions: rawOptions,
         );
 
-  Future<WriteResult> executeDocument() async {
-    var ret = await super.execute();
+  Future<WriteResult> executeDocument(Server server,
+      {ConnectionBase? connection}) async {
+    var ret = await super.execute(server, connection: connection);
     return WriteResult.fromMap(WriteCommandType.update, ret);
   }
 }
