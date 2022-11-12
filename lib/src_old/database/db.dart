@@ -76,7 +76,7 @@ class Db {
     if (uriString.startsWith('mongodb://')) {
       return Db(uriString, debugInfo);
     } else if (uriString.startsWith('mongodb+srv://')) {
-      var uriList = await decodeDnsSeedlist(Uri.parse(uriString));
+      var uriList = await dnsLookup(Uri.parse(uriString));
       return Db.pool(uriList, debugInfo);
     } else {
       throw MongoDartError(
@@ -112,34 +112,34 @@ class Db {
     }
 
     uri.queryParameters.forEach((String queryParam, String value) {
-      if (queryParam == UriParameters.authMechanism) {
+      if (queryParam == ConnectionStringOptions.authMechanism) {
         selectAuthenticationMechanism(value);
       }
 
-      if (queryParam == UriParameters.authSource) {
+      if (queryParam == ConnectionStringOptions.authSource) {
         authSourceDb = Db._authDb(value);
       }
 
-      if ((queryParam == UriParameters.tls ||
-              queryParam == UriParameters.ssl) &&
+      if ((queryParam == ConnectionStringOptions.tls ||
+              queryParam == ConnectionStringOptions.ssl) &&
           value == 'true') {
         isSecure = true;
       }
-      if (queryParam == UriParameters.tlsAllowInvalidCertificates &&
+      if (queryParam == ConnectionStringOptions.tlsAllowInvalidCertificates &&
           value == 'true') {
         tlsAllowInvalidCertificates = true;
         isSecure = true;
       }
-      if (queryParam == UriParameters.tlsCAFile && value.isNotEmpty) {
+      if (queryParam == ConnectionStringOptions.tlsCAFile && value.isNotEmpty) {
         tlsCAFile = value;
         isSecure = true;
       }
-      if (queryParam == UriParameters.tlsCertificateKeyFile &&
+      if (queryParam == ConnectionStringOptions.tlsCertificateKeyFile &&
           value.isNotEmpty) {
         tlsCertificateKeyFile = value;
         isSecure = true;
       }
-      if (queryParam == UriParameters.tlsCertificateKeyFilePassword &&
+      if (queryParam == ConnectionStringOptions.tlsCertificateKeyFilePassword &&
           value.isNotEmpty) {
         tlsCertificateKeyFilePassword = value;
       }

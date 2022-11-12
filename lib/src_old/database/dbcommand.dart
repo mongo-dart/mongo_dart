@@ -10,7 +10,6 @@ class DbCommand extends MongoQueryMessage {
   static final SYSTEM_USER_COLLECTION = 'system.users';
   static final SYSTEM_COMMAND_COLLECTION = '\$cmd';
 
-
   Db db;
   DbCommand(
       this.db,

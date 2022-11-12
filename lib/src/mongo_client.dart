@@ -1,17 +1,12 @@
-import 'dart:typed_data';
-
 import 'package:logging/logging.dart';
-import 'package:mongo_dart/src_old/auth/auth.dart';
-import 'package:universal_io/io.dart';
 
-import '../src_old/auth/scram_sha1_authenticator.dart';
-import '../src_old/auth/scram_sha256_authenticator.dart';
 import 'core/error/mongo_dart_error.dart';
-import 'core/info/server_config.dart';
 import 'core/topology/abstract/topology.dart';
 import 'default_settings.dart';
 import 'mongo_client_options.dart';
-import 'uri_parameters.dart';
+import 'utils/decode_dns_seed_list.dart';
+import 'utils/decode_url_parameters.dart';
+import 'utils/split_hosts.dart';
 import 'write_concern.dart';
 
 typedef ServerApiVersion = Map<String, String>;
@@ -40,140 +35,62 @@ abstract class Auth {
 }
 
 class MongoClient {
+  // This url can be informed both with the Standard
+  /// Connection String Format (`mongodb://`) or with the DNS Seedlist
+  /// Connection Format (`mongodb+srv://`).
+  /// The former has the format:
+  /// mongodb://[username:password@]host1[:port1]
+  ///      [,...hostN[:portN]][/[defaultauthdb][?options]]
+  /// The latter is available from version 3.6. The format is:
+  /// mongodb+srv://[username:password@]host1[:port1]
+  ///      [/[databaseName][?options]]
+  /// More info are available [here](https://docs.mongodb.com/manual/reference/connection-string/)
   MongoClient(this.url, {MongoClientOptions? mongoClientOptions}) {
     this.mongoClientOptions = mongoClientOptions ?? MongoClientOptions();
+    var uri = Uri.parse(url);
+    if (uri.scheme != 'mongodb' && uri.scheme != 'mongodb+srv') {
+      throw MongoDartError(
+          'The only valid schemas for Db are: "mongodb" and "mongodb+srv".');
+    }
   }
 
   final Logger log = Logger('Mongo Client');
 
   String url;
   late MongoClientOptions mongoClientOptions;
+  final List<Uri> seedServers = <Uri>[];
   Topology? topology;
   Set activeSessions = {}; // Todo, create the session object
   String defaultDatabaseName = defMongoDbName;
   String defaultAuthDbName = defMongoAuthDbName;
-  AuthenticationScheme authenticationScheme = AuthenticationScheme.SCRAM_SHA_1;
 
   // ReadConcern
   // Read Preference
   WriteConcern? writeConcern;
 
-  Future connect() async {}
+  /// Connects to the required server / cluster.
+  ///
+  /// Steps:
+  /// 1) Decode mongodb+srv url if it is the case
+  /// 2) Decode the mongodb url
+  /// 3) try a connection with the seed list servers
+  /// 4) run hello command and determine the topology.
+  /// 5) creates the topology.
+  Future connect() async {
+    var connectionUri = Uri.parse(url);
+
+    var hostsSeedList = <String>[];
+    if (connectionUri.scheme == 'mongodb+srv') {
+      hostsSeedList.addAll(await decodeDnsSeedlist(connectionUri));
+    } else {
+      hostsSeedList.addAll(splitHosts(url));
+    }
+    seedServers.addAll([for (var element in hostsSeedList) Uri.parse(element)]);
+    await decodeUrlParameters(connectionUri, mongoClientOptions);
+  }
+
   Future close() async {}
 
   /// If no name passed, the url specified db is used
   Future db(String? dbName) async {}
-
-  Future<ServerConfig> decodeUrlParameters() async {
-    mongoClientOptions.tls ??= false;
-    mongoClientOptions.tlsAllowInvalidCertificates ??= false;
-    if (mongoClientOptions.tlsAllowInvalidCertificates! ||
-        mongoClientOptions.tlsCAFile != null ||
-        mongoClientOptions.tlsCertificateKeyFile != null) {
-      mongoClientOptions.tls = true;
-    }
-    var uri = Uri.parse(url);
-
-    if (uri.scheme != 'mongodb') {
-      throw MongoDartError('Invalid scheme in uri: $url ${uri.scheme}');
-    }
-
-    String? localAuthDbName;
-
-    uri.queryParameters.forEach((String queryParam, String value) {
-      if (queryParam == UriParameters.authMechanism) {
-        authenticationScheme = selectAuthenticationMechanism(value);
-      }
-
-      if (queryParam == UriParameters.authSource) {
-        localAuthDbName = value;
-      }
-
-      if ((queryParam == UriParameters.tls ||
-              queryParam == UriParameters.ssl) &&
-          value == 'true') {
-        mongoClientOptions.tls = true;
-      }
-      if (queryParam == UriParameters.tlsAllowInvalidCertificates &&
-          value == 'true') {
-        mongoClientOptions.tlsAllowInvalidCertificates = true;
-        mongoClientOptions.tls = true;
-      }
-      if (queryParam == UriParameters.tlsCAFile && value.isNotEmpty) {
-        mongoClientOptions.tlsCAFile = value;
-        mongoClientOptions.tls = true;
-      }
-      if (queryParam == UriParameters.tlsCertificateKeyFile &&
-          value.isNotEmpty) {
-        mongoClientOptions.tlsCertificateKeyFile = value;
-        mongoClientOptions.tls = true;
-      }
-      if (queryParam == UriParameters.tlsCertificateKeyFilePassword &&
-          value.isNotEmpty) {
-        mongoClientOptions.tlsCertificateKeyFilePassword = value;
-      }
-    });
-
-    Uint8List? tlsCAFileContent;
-    if (mongoClientOptions.tlsCAFile != null) {
-      tlsCAFileContent =
-          await File(mongoClientOptions.tlsCAFile!).readAsBytes();
-    }
-    Uint8List? tlsCertificateKeyFileContent;
-    if (mongoClientOptions.tlsCertificateKeyFile != null) {
-      tlsCertificateKeyFileContent =
-          await File(mongoClientOptions.tlsCertificateKeyFile!).readAsBytes();
-    }
-    if (mongoClientOptions.tlsCertificateKeyFilePassword != null &&
-        mongoClientOptions.tlsCertificateKeyFile == null) {
-      throw MongoDartError('Missing tlsCertificateKeyFile parameter');
-    }
-
-    var serverConfig = ServerConfig(
-        host: uri.host,
-        port: uri.port,
-        isSecure: mongoClientOptions.tls,
-        tlsAllowInvalidCertificates:
-            mongoClientOptions.tlsAllowInvalidCertificates,
-        tlsCAFileContent: tlsCAFileContent,
-        tlsCertificateKeyFileContent: tlsCertificateKeyFileContent,
-        tlsCertificateKeyFilePassword:
-            mongoClientOptions.tlsCertificateKeyFilePassword);
-
-    if (serverConfig.port == 0) {
-      serverConfig.port = defMongoPort;
-    }
-
-    if (uri.userInfo.isNotEmpty) {
-      var userInfo = uri.userInfo.split(':');
-
-      if (userInfo.length != 2) {
-        throw MongoDartError('Invalid format of userInfo field: $uri.userInfo');
-      }
-
-      serverConfig.userName = Uri.decodeComponent(userInfo[0]);
-      serverConfig.password = Uri.decodeComponent(userInfo[1]);
-    }
-
-    if (uri.path.isNotEmpty) {
-      defaultDatabaseName = uri.path.replaceAll('/', '');
-      localAuthDbName ??= defaultDatabaseName;
-    }
-
-    defaultAuthDbName = localAuthDbName ?? defMongoAuthDbName;
-
-    return serverConfig;
-  }
-
-  AuthenticationScheme selectAuthenticationMechanism(
-      String authenticationSchemeName) {
-    if (authenticationSchemeName == ScramSha1Authenticator.name) {
-      return AuthenticationScheme.SCRAM_SHA_1;
-    } else if (authenticationSchemeName == ScramSha256Authenticator.name) {
-      return AuthenticationScheme.SCRAM_SHA_256;
-    } else {
-      throw MongoDartError('Provided authentication scheme is '
-          'not supported : $authenticationSchemeName');
-    }
-  }
 }

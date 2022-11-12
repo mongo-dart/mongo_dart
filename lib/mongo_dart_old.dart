@@ -12,7 +12,7 @@ import 'dart:typed_data';
 import 'package:bson/bson.dart';
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/src/core/info/server_config.dart';
-import 'package:mongo_dart/src/uri_parameters.dart';
+import 'package:mongo_dart/src/connection_string_options.dart';
 import 'package:mongo_dart/src_old/auth/scram_sha256_authenticator.dart';
 import 'package:mongo_dart/src_old/database/cursor/modern_cursor.dart';
 import 'package:mongo_dart/src/core/message/abstract/section.dart';

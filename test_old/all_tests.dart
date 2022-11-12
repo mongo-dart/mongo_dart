@@ -2,11 +2,11 @@ library all_tests;
 
 import 'database_test.dart' as database;
 import 'gridfs_test.dart' as gridfs;
-import 'packet_converter_test.dart' as converter;
+import '../test/packet_converter_test.dart' as converter;
 import 'mongo_dart_query_test.dart' as mongo_dart_query;
 import 'authentication_test.dart' as auth_tests;
 //import 'ssl_connection_test.dart' as ssl_tests;
-import 'utils_test.dart' as utils_tests;
+import '../test/utils_test.dart' as utils_tests;
 import 'decimal_test.dart' as decimal;
 import '../test/message_test.dart' as message;
 import 'op_msg_bulk_operation_test.dart' as bulk;

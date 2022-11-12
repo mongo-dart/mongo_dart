@@ -4,11 +4,11 @@ import 'package:mongo_dart/src/utils/check_same_domain.dart';
 
 import '../../../src/core/error/mongo_dart_error.dart';
 
-var _log = Logger('dns_lookup');
+var _log = Logger('decode_dns_seed_list');
 
 /// This method receive an Uri with "mongodb+srv" schema and returns
 /// A List of urls in "mongodb" schema format
-Future<List<String>> dnsLookup(Uri dnsSeedlistUri) async {
+Future<List<String>> decodeDnsSeedlist(Uri dnsSeedlistUri) async {
   assert(dnsSeedlistUri.scheme == 'mongodb+srv',
       'The method "decodeDnsSeedlist" requires an Uri with mongodb+srv schema');
   if (dnsSeedlistUri.host.contains(',')) {

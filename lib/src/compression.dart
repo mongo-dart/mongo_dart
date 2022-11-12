@@ -1,2 +1,1 @@
-
-enum CompressorName {none, snappy, zlib}
+enum CompressorName { none, snappy, zlib }

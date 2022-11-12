@@ -48,9 +48,8 @@ void main() {
     });
 
     test('Decode Dns Seedlist', () async {
-      var result =
-          await decodeDnsSeedlist(Uri.parse('mongodb+srv://user:password@'
-              'rs.joedrumgoole.com/test?retryWrites=true&w=majority'));
+      var result = await dnsLookup(Uri.parse('mongodb+srv://user:password@'
+          'rs.joedrumgoole.com/test?retryWrites=true&w=majority'));
 
       expect(
           result.first,
@@ -69,7 +68,7 @@ void main() {
           'retryWrites=true&w=majority&ssl=true');
     });
     test('Decode Dns Seedlist - sync', () {
-      decodeDnsSeedlist(Uri.parse('mongodb+srv://user:password@'
+      dnsLookup(Uri.parse('mongodb+srv://user:password@'
               'rs.joedrumgoole.com/test?retryWrites=true&w=majority'))
           .then((result) {
         expect(
@@ -91,13 +90,13 @@ void main() {
     });
     test('Decode Dns Seedlist - Wrong host error', () async {
       expect(
-          () async => decodeDnsSeedlist(Uri.parse('mongodb+srv://user:password@'
+          () async => dnsLookup(Uri.parse('mongodb+srv://user:password@'
               'rsx.joedrumgoole.com/test?retryWrites=true&w=majority')),
           throwsMongoDartError);
     });
     test('Decode Dns Seedlist - More than one host error', () async {
       expect(
-          () async => decodeDnsSeedlist(Uri.parse('mongodb+srv://user:password@'
+          () async => dnsLookup(Uri.parse('mongodb+srv://user:password@'
               'rs.joedrumgoole.com, rs2.joedrumgoole.com/'
               'test?retryWrites=true&w=majority')),
           throwsMongoDartError);

@@ -1,3 +1,4 @@
+import '../src_old/auth/auth.dart';
 import 'compression.dart';
 import 'mongo_client.dart';
 import 'read_concern.dart';
@@ -11,11 +12,11 @@ class MongoClientOptions /*extends BSONSerializeOptions,  SupportedNodeConnectio
   String? replicaSet;
 
   /// Enables or disables TLS/SSL for the connection.
-  bool? tls;
+  bool tls = false;
 
   /// A boolean to enable or disables TLS/SSL for the connection.
   /// (The ssl option is equivalent to the tls option.) */
-  set ssl(bool value) => tls ??= value;
+  set ssl(bool value) => tls = value;
 
   /// Specifies the location of a local TLS Certificate */
   String? tlsCertificateFile;
@@ -35,7 +36,7 @@ class MongoClientOptions /*extends BSONSerializeOptions,  SupportedNodeConnectio
   String? tlsCAFile;
 
   /// Bypasses validation of the certificates presented by the mongod/mongos instance */
-  bool? tlsAllowInvalidCertificates;
+  bool tlsAllowInvalidCertificates = false;
 
   /// Disables hostname validation of the certificate presented by the
   /// mongod/mongos instance. */
@@ -104,6 +105,9 @@ class MongoClientOptions /*extends BSONSerializeOptions,  SupportedNodeConnectio
   /// stops using it for read operations.
   int? maxStalenessSeconds;
 
+  /// Specify the default database name for connection.
+  String? defaultDbName;
+
   /// Specifies the tags document as a comma-separated list of colon-separated
   /// key-value pairs.
   // Todo List<TagSet>? readPreferenceTags;
@@ -115,7 +119,9 @@ class MongoClientOptions /*extends BSONSerializeOptions,  SupportedNodeConnectio
 
   /// Specify the authentication mechanism that MongoDB will use to
   /// authenticate the connection.
-  // Todo AuthMechanism? authMechanism;
+  AuthenticationScheme? authenticationMechanism =
+      AuthenticationScheme.SCRAM_SHA_1;
+
   /// Specify properties for the specified authMechanism as a comma-separated
   /// list of colon-separated key-value pairs.
   // Todo AuthMechanismProperties? authMechanismProperties;

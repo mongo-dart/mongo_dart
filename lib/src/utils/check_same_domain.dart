@@ -1,4 +1,4 @@
-import '../../../src/core/error/mongo_dart_error.dart';
+import '../core/error/mongo_dart_error.dart';
 
 bool checkSameDomain(Uri uri, Uri checkUri) {
   var uriParts = uri.host.split('.');
