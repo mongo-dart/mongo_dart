@@ -3,6 +3,8 @@
 import 'dart:typed_data';
 
 import 'package:logging/logging.dart';
+import 'package:mongo_dart/src/default_settings.dart';
+import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 import 'package:universal_io/io.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
@@ -27,20 +29,20 @@ import '../../mongo_dart_old.dart'
         ServerStatusOptions,
         State,
         key$Query,
-        keyErrmsg,
         keyName,
         keyOk;
-import '../../src_old/auth/auth.dart';
+import '../core/auth/auth.dart';
 import '../../src_old/auth/mongodb_cr_authenticator.dart';
-import '../../src_old/auth/scram_sha1_authenticator.dart';
-import '../../src_old/auth/scram_sha256_authenticator.dart';
-import '../../src_old/database/commands/administration_commands/drop_command/drop_command.dart';
-import '../../src_old/database/commands/administration_commands/drop_command/drop_options.dart';
-import '../../src_old/database/commands/administration_commands/drop_database_command/drop_database_command.dart';
-import '../../src_old/database/commands/administration_commands/drop_database_command/drop_database_options.dart';
-import '../../src_old/database/commands/administration_commands/list_collections_command/list_collections_command.dart';
-import '../../src_old/database/commands/administration_commands/list_collections_command/list_collections_options.dart';
-import '../../src_old/database/cursor/modern_cursor.dart';
+import '../core/auth/scram_sha1_authenticator.dart';
+import '../core/auth/scram_sha256_authenticator.dart';
+import '../commands/administration_commands/drop_command/drop_command.dart';
+import '../commands/administration_commands/drop_command/drop_options.dart';
+import '../commands/administration_commands/drop_database_command/drop_database_command.dart';
+import '../commands/administration_commands/drop_database_command/drop_database_options.dart';
+import '../commands/administration_commands/list_collections_command/list_collections_command.dart';
+import '../commands/administration_commands/list_collections_command/list_collections_options.dart';
+import '../commands/diagnostic_commands/ping_command/ping_command.dart';
+import 'modern_cursor.dart';
 import '../../src_old/database/utils/dns_lookup.dart';
 import '../commands/base/command_operation.dart';
 import '../connection_string_options.dart';
@@ -51,42 +53,28 @@ import '../core/message/abstract/section.dart';
 import '../core/message/deprecated/mongo_reply_message.dart';
 import '../core/message/mongo_modern_message.dart';
 import '../core/network/abstract/connection_base.dart';
-import '../core/network/deprecated/connection_manager.dart';
-import '../core/network/deprecated/connection_multi_request.dart';
-import '../core/topology/server.dart';
+import '../topology/server.dart';
+import '../mongo_client.dart';
 import '../utils/split_hosts.dart';
 import '../write_concern.dart';
+import 'dbcollection.dart';
 
 class Db {
-  static const mongoDefaultPort = 27017;
   final _log = Logger('Db');
   final List<String> _uriList = <String>[];
+  late MongoClient mongoClient;
 
   State state = State.init;
   String? databaseName;
   String? _debugInfo;
   Db? authSourceDb;
-  ConnectionManager? _connectionManager;
-
-  ConnectionBase? get _masterConnection => _connectionManager?.masterConnection;
-
-  ConnectionBase get _masterConnectionVerified {
-    if (state != State.open) {
-      throw MongoDartError('Db is in the wrong state: $state');
-    }
-    return _masterConnectionVerifiedAnyState;
-  }
-
-  ConnectionBase get _masterConnectionVerifiedAnyState {
-    if (_connectionManager == null) {
-      throw MongoDartError('Invalid Connection manager state');
-    }
-    return _connectionManager!.masterConnectionVerified;
-  }
 
   WriteConcern? _writeConcern;
   AuthenticationScheme? authenticationScheme;
   ReadPreference readPreference = ReadPreference.primary;
+
+  //Todo temp solution
+  Server get server => mongoClient.topology!.getServer(ReadPreference.primary);
 
   @override
   String toString() => 'Db($databaseName,$_debugInfo)';
@@ -100,6 +88,7 @@ class Db {
   ///```dart
   ///     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
   ///```
+  @Deprecated('No more used')
   Db(String uriString, [this._debugInfo]) {
     if (uriString.contains(',')) {
       _uriList.addAll(splitHosts(uriString));
@@ -107,14 +96,14 @@ class Db {
       _uriList.add(uriString);
     }
   }
-
+  @Deprecated('No more used')
   Db.pool(List<String> uriList, [this._debugInfo]) {
     _uriList.addAll(uriList);
   }
-
+  @Deprecated('No more used')
   Db._authDb(this.databaseName);
 
-  Db.modern(this.databaseName);
+  Db.modern(this.mongoClient, this.databaseName);
 
   /// This method allow to create a Db object both with the Standard
   /// Connection String Format (`mongodb://`) or with the DNS Seedlist
@@ -130,6 +119,7 @@ class Db {
   /// This is an asynchronous constructor.
   /// In order to resolve the Seedlist, a call to a DNS server is needed
   /// If the DNS server is unreachable, the constructor throws an error.
+  @Deprecated('No more used')
   static Future<Db> create(String uriString, [String? debugInfo]) async {
     if (uriString.startsWith('mongodb://')) {
       return Db(uriString, debugInfo);
@@ -143,10 +133,6 @@ class Db {
   }
 
   WriteConcern? get writeConcern => _writeConcern;
-
-  ConnectionBase get masterConnection => _masterConnectionVerified;
-  ConnectionBase get masterConnectionAnyState =>
-      _masterConnectionVerifiedAnyState;
 
   List<String> get uriList => _uriList.toList();
 
@@ -227,7 +213,7 @@ class Db {
         tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword);
 
     if (serverConfig.port == 0) {
-      serverConfig.port = mongoDefaultPort;
+      serverConfig.port = defMongoPort;
     }
 
     if (uri.userInfo.isNotEmpty) {
@@ -269,41 +255,25 @@ class Db {
   }
 
   Future<MongoReplyMessage> queryMessage(MongoMessage queryMessage,
-      {ConnectionMultiRequest? connection}) {
+      {ConnectionBase? connection}) {
     throw MongoDartError('No More used');
   }
 
   void executeMessage(MongoMessage message, WriteConcern? writeConcern,
-      {ConnectionMultiRequest? connection}) {
+      {ConnectionBase? connection}) {
     throw MongoDartError('No More used');
   }
 
   Future<Map<String, Object?>> executeModernMessage(MongoModernMessage message,
-      {ConnectionMultiRequest? connection, bool skipStateCheck = false}) async {
-    if (skipStateCheck) {
-      if (!_masterConnectionVerifiedAnyState.serverCapabilities.supportsOpMsg) {
-        throw MongoDartError('The "modern message" can only be executed '
-            'starting from release 3.6');
-      }
-    } else {
-      if (state != State.open) {
-        throw MongoDartError('DB is not open. $state');
-      }
-      if (!masterConnection.serverCapabilities.supportsOpMsg) {
-        throw MongoDartError('The "modern message" can only be executed '
-            'starting from release 3.6');
-      }
+      {ConnectionBase? connection}) async {
+    if (state != State.open) {
+      throw MongoDartError('DB is not open. $state');
     }
 
-    connection ??= _masterConnectionVerifiedAnyState;
-
-    var response = await connection.executeModernMessage(message);
-
-    var section = response.sections.firstWhere((Section section) =>
-        section.payloadType == MongoModernMessage.basePayloadType);
-    return section.payload.content;
+    return server.executeModernMessage(message);
   }
 
+  @Deprecated('Do Not USe')
   Future open(Server server,
       {ConnectionBase? connection,
       WriteConcern writeConcern = WriteConcern.acknowledged,
@@ -312,41 +282,11 @@ class Db {
       String? tlsCAFile,
       String? tlsCertificateKeyFile,
       String? tlsCertificateKeyFilePassword}) async {
-    if (state == State.opening) {
-      throw MongoDartError('Attempt to open db in state $state');
-    }
-
-    state = State.opening;
-    _writeConcern = writeConcern;
-    _connectionManager = ConnectionManager(this);
-
-    for (var uri in _uriList) {
-      _connectionManager!.addConnection(await _parseUri(uri,
-          isSecure: secure,
-          tlsAllowInvalidCertificates: tlsAllowInvalidCertificates,
-          tlsCAFile: tlsCAFile,
-          tlsCertificateKeyFile: tlsCertificateKeyFile,
-          tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword));
-    }
-    try {
-      await _connectionManager!
-          .open(writeConcern, server, connection: connection);
-    } catch (e) {
-      state = State.init;
-      await _connectionManager!.close();
-      rethrow;
-    }
+    throw MongoDartError('No More Used');
   }
 
-  /// Is connected returns true if the database is in state `OPEN`
-  /// and at least the primary connection is connected
-  ///
-  /// Connections can disconect because of network or database server problems.
-  bool get isConnected =>
-      state == State.open && (_masterConnection?.connected ?? false);
-
   Future<Map<String, dynamic>> executeDbCommand(MongoMessage message,
-      {ConnectionMultiRequest? connection}) async {
+      {ConnectionBase? connection}) async {
     throw MongoDartError('No More used');
   }
 
@@ -354,123 +294,68 @@ class Db {
       firstRepliedDocument['ok'] == 1.0 && firstRepliedDocument['err'] == null;
 
   Future<bool> dropCollection(String collectionName) async {
-    if (masterConnection.serverCapabilities.supportsOpMsg) {
-      var result = await modernDrop(collectionName);
-      return result[keyOk] == 1.0;
-    }
-    var collectionInfos = await getCollectionInfos({'name': collectionName});
-
-    if (collectionInfos.length == 1) {
-      return executeDbCommand(
-              DbCommand.createDropCollectionCommand(this, collectionName))
-          .then((_) => true);
-    }
-
-    return true;
+    var result = await modernDrop(collectionName);
+    return result[keyOk] == 1.0;
   }
 
   ///   Drop current database
   Future drop() async {
-    if (masterConnection.serverCapabilities.supportsOpMsg) {
-      var result = await modernDropDatabase();
-      return result[keyOk] == 1.0;
-    }
-    return executeDbCommand(DbCommand.createDropDatabaseCommand(this));
+    var result = await modernDropDatabase();
+    return result[keyOk] == 1.0;
   }
 
   Future<Map<String, dynamic>> removeFromCollection(String collectionName,
       [Map<String, dynamic> selector = const {},
       WriteConcern? writeConcern]) async {
-    if (_masterConnectionVerified.serverCapabilities.supportsOpMsg) {
-      var collection = this.collection(collectionName);
-      var result = await collection.deleteMany(
-        selector,
-        writeConcern: writeConcern,
-      );
-      return result.serverResponses.first;
-    }
-    return Future.sync(() {
-      executeMessage(
-          MongoRemoveMessage('$databaseName.$collectionName', selector),
-          writeConcern);
-      return _getAcknowledgement(writeConcern: writeConcern);
-    });
+    var collection = this.collection(collectionName);
+    var result = await collection.deleteMany(
+      selector,
+      writeConcern: writeConcern,
+    );
+    return result.serverResponses.first;
   }
 
+  @Deprecated('No More Used')
   Future<Map<String, dynamic>> getLastError(Server server,
       {ConnectionBase? connection, WriteConcern? writeConcern}) async {
     writeConcern ??= _writeConcern;
-    if (masterConnection.serverCapabilities.supportsOpMsg) {
-      return GetLastErrorCommand(this, writeConcern: writeConcern)
-          .execute(server);
-    } else {
-      return executeDbCommand(
-          DbCommand.createGetLastErrorCommand(this, writeConcern));
-    }
+    return GetLastErrorCommand(this, writeConcern: writeConcern)
+        .execute(server);
   }
 
   @Deprecated('Deprecated since version 4.0.')
-  Future<Map<String, dynamic>> getNonce({ConnectionMultiRequest? connection}) {
-    if (masterConnection.serverCapabilities.fcv != null &&
-        masterConnection.serverCapabilities.fcv!.compareTo('6.0') >= 0) {
-      throw MongoDartError('getnonce command not managed in this version');
-    }
-    return executeDbCommand(DbCommand.createGetNonceCommand(this),
-        connection: connection);
+  Future<Map<String, dynamic>> getNonce({ConnectionBase? connection}) {
+    throw MongoDartError('getnonce command not managed in this version');
   }
 
-  Future<Map<String, dynamic>> getBuildInfo(
-      {ConnectionMultiRequest? connection}) {
-    return executeDbCommand(DbCommand.createBuildInfoCommand(this),
-        connection: connection);
+  // Todo new version needed?
+  @Deprecated('No More Used')
+  Future<Map<String, dynamic>> getBuildInfo({ConnectionBase? connection}) {
+    throw MongoDartError('No More used');
   }
 
-  Future<Map<String, dynamic>> isMaster({ConnectionMultiRequest? connection}) =>
-      executeDbCommand(DbCommand.createIsMasterCommand(this),
-          connection: connection);
+  @Deprecated('No More Used')
+  Future<Map<String, dynamic>> isMaster({ConnectionBase? connection}) =>
+      throw MongoDartError('No More used');
 
   Future<Map<String, dynamic>> wait() => throw MongoDartError('No More used');
 
+  @Deprecated('No More Used')
   Future close() async {
-    _log.fine(() => '$this closed');
-    state = State.closed;
-    var cm = _connectionManager;
-    _connectionManager = null;
-    return;
-    //cm?.close();
+    throw MongoDartError('No More used');
   }
 
+  // Todo new version ?
   /// Analogue to shell's `show dbs`. Helper for `listDatabases` mongodb command.
+  ///   @Deprecated('No More Used')
   Future<List> listDatabases() async {
-    var commandResult = await executeDbCommand(
-        DbCommand.createQueryAdminCommand({'listDatabases': 1}));
-
-    var result = [];
-
-    for (var each in commandResult['databases']) {
-      result.add(each['name']);
-    }
-
-    return result;
+    throw MongoDartError('No More used');
   }
 
+  @Deprecated('No More Used')
   Stream<Map<String, dynamic>> _listCollectionsCursor(
       [Map<String, dynamic> filter = const {}]) {
-    if (masterConnection.serverCapabilities.listCollections) {
-      return ListCollectionsCursor(this, filter).stream;
-    } else {
-      // Using system collections (pre v3.0 API)
-      var selector = <String, dynamic>{};
-      // If we are limiting the access to a specific collection name
-      if (filter.containsKey('name')) {
-        selector['name'] = "$databaseName.${filter['name']}";
-      }
-      return Cursor(
-              this,
-              DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION),
-              selector)
-          .stream;
-    }
+    throw MongoDartError('No More used');
   }
 
   /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
@@ -481,17 +366,10 @@ class Db {
           [String? collectionName]) =>
       _collectionsInfoCursor(collectionName);
 
+  @Deprecated('No More Used')
   Stream<Map<String, dynamic>> _collectionsInfoCursor(
       [String? collectionName]) {
-    var selector = <String, dynamic>{};
-    // If we are limiting the access to a specific collection name
-    if (collectionName != null) {
-      selector['name'] = '$databaseName.$collectionName';
-    }
-    // Return Cursor
-    return Cursor(this,
-            DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector)
-        .stream;
+    throw MongoDartError('No More used');
   }
 
   /// Analogue to shell's `show collections`
@@ -500,44 +378,29 @@ class Db {
   /// Use `getCollectionNames` instead
   @Deprecated('Use `getCollectionNames` instead')
   Future<List<String?>> listCollections() async {
-    if (masterConnection.serverCapabilities.supportsOpMsg) {
-      var ret = await modernListCollections().toList();
+    var ret = await modernListCollections().toList();
 
-      return [
-        for (var element in ret)
-          for (var nameKey in element.keys)
-            if (nameKey == keyName) element[keyName]
-      ];
-    }
-    return _collectionsInfoCursor()
-        .map((map) => map['name']?.toString().split('.'))
-        .where((arr) => arr != null && arr.length == 2)
-        .map((arr) => arr?.last)
-        .toList();
+    return [
+      for (var element in ret)
+        for (var nameKey in element.keys)
+          if (nameKey == keyName) element[keyName]
+    ];
   }
 
   Future<List<Map<String, dynamic>>> getCollectionInfos(
       [Map<String, dynamic> filter = const {}]) async {
-    if (masterConnection.serverCapabilities.supportsOpMsg) {
-      return modernListCollections(filter: filter).toList();
-    }
-    return _listCollectionsCursor(filter).toList();
+    return modernListCollections(filter: filter).toList();
   }
 
   Future<List<String?>> getCollectionNames(
       [Map<String, dynamic> filter = const {}]) async {
-    if (masterConnection.serverCapabilities.supportsOpMsg) {
-      var ret = await modernListCollections().toList();
+    var ret = await modernListCollections().toList();
 
-      return [
-        for (var element in ret)
-          for (var nameKey in element.keys)
-            if (nameKey == keyName) element[keyName]
-      ];
-    }
-    return _listCollectionsCursor(filter)
-        .map((map) => map['name']?.toString())
-        .toList();
+    return [
+      for (var element in ret)
+        for (var nameKey in element.keys)
+          if (nameKey == keyName) element[keyName]
+    ];
   }
 
   Future<bool> authenticate(String userName, String password, Server server,
@@ -566,16 +429,7 @@ class Db {
   /// Use `DbCollection.getIndexes()` instead
   @Deprecated('Use `DbCollection.getIndexes()` instead')
   Future<List> indexInformation([String? collectionName]) {
-    var selector = {};
-
-    if (collectionName != null) {
-      selector['ns'] = '$databaseName.$collectionName';
-    }
-
-    return Cursor(this, DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION),
-            selector)
-        .stream
-        .toList();
+    throw MongoDartError('No More used');
   }
 
   String _createIndexName(Map<String, dynamic> keys) {
@@ -601,47 +455,15 @@ class Db {
       bool? dropDups,
       Map<String, dynamic>? partialFilterExpression,
       String? name}) {
-    if (masterConnection.serverCapabilities.supportsOpMsg) {
-      return collection(collectionName).createIndex(
-          key: key,
-          keys: keys,
-          unique: unique,
-          sparse: sparse,
-          background: background,
-          dropDups: dropDups,
-          partialFilterExpression: partialFilterExpression,
-          name: name);
-    }
-    return Future.sync(() async {
-      var selector = <String, dynamic>{};
-      selector['ns'] = '$databaseName.$collectionName';
-      keys = _setKeys(key, keys);
-      selector['key'] = keys;
-
-      if (unique == true) {
-        selector['unique'] = true;
-      } else {
-        selector['unique'] = false;
-      }
-      if (sparse == true) {
-        selector['sparse'] = true;
-      }
-      if (background == true) {
-        selector['background'] = true;
-      }
-      if (dropDups == true) {
-        selector['dropDups'] = true;
-      }
-      if (partialFilterExpression != null) {
-        selector['partialFilterExpression'] = partialFilterExpression;
-      }
-      name ??= _createIndexName(keys!);
-      selector['name'] = name;
-      var insertMessage = MongoInsertMessage(
-          '$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}', [selector]);
-      executeMessage(insertMessage, _writeConcern);
-      return getLastError();
-    });
+    return collection(collectionName).createIndex(
+        key: key,
+        keys: keys,
+        unique: unique,
+        sparse: sparse,
+        background: background,
+        dropDups: dropDups,
+        partialFilterExpression: partialFilterExpression,
+        name: name);
   }
 
   Map<String, dynamic> _setKeys(String? key, Map<String, dynamic>? keys) {
@@ -694,16 +516,11 @@ class Db {
     return createdIndex;
   }
 
+  @Deprecated('No More Used')
   Future<Map<String, dynamic>> _getAcknowledgement(
       {WriteConcern? writeConcern}) {
     writeConcern ??= _writeConcern;
-
-    // ignore: deprecated_member_use_from_same_package
-    if (writeConcern == WriteConcern.ERRORS_IGNORED) {
-      return Future.value({'ok': 1.0});
-    } else {
-      return getLastError(writeConcern);
-    }
+    throw MongoDartError('No More Used');
   }
 
   // **********************************************************+
@@ -716,7 +533,7 @@ class Db {
       Map<String, Object>? rawOptions}) async {
     var command = DropDatabaseCommand(this,
         dropDatabaseOptions: dropOptions, rawOptions: rawOptions);
-    return command.execute();
+    return command.execute(server);
   }
 
   /// This method return the status information on the
@@ -725,12 +542,9 @@ class Db {
   /// Only works from version 3.6
   Future<Map<String, Object?>> serverStatus(
       {Map<String, Object>? options}) async {
-    if (!masterConnection.serverCapabilities.supportsOpMsg) {
-      return <String, Object>{};
-    }
     var operation = ServerStatusCommand(this,
         serverStatusOptions: ServerStatusOptions.instance);
-    return operation.execute();
+    return operation.execute(server);
   }
 
   /// This method explicitly creates a collection
@@ -740,7 +554,7 @@ class Db {
     var command = CreateCollectionCommand(this, name,
         createCollectionOptions: createCollectionOptions,
         rawOptions: rawOptions);
-    return command.execute();
+    return command.execute(server);
   }
 
   /// This method retuns a cursor to get a list of the collections
@@ -757,7 +571,7 @@ class Db {
         listCollectionsOptions: findOptions,
         rawOptions: rawOptions);
 
-    return ModernCursor(command).stream;
+    return ModernCursor(command, server).stream;
   }
 
   /// This method creates a view
@@ -767,7 +581,7 @@ class Db {
       Map<String, Object>? rawOptions}) async {
     var command = CreateViewCommand(this, view, source, pipeline,
         createViewOptions: createViewOptions, rawOptions: rawOptions);
-    return command.execute();
+    return command.execute(server);
   }
 
   /// This method drops a collection
@@ -775,7 +589,7 @@ class Db {
       {DropOptions? dropOptions, Map<String, Object>? rawOptions}) async {
     var command = DropCommand(this, collectionNAme,
         dropOptions: dropOptions, rawOptions: rawOptions);
-    return command.execute();
+    return command.execute(server);
   }
 
   /// Runs a specified admin/diagnostic pipeline which does not require an
@@ -788,25 +602,25 @@ class Db {
       Map<String, Object>? hintDocument,
       AggregateOptions? aggregateOptions,
       Map<String, Object>? rawOptions}) {
-    if (!masterConnection.serverCapabilities.supportsOpMsg) {
-      throw MongoDartError('At least MongoDb version 3.6 is required '
-          'to run the aggregate operation');
-    }
-    return ModernCursor(AggregateOperation(pipeline,
-            db: this,
-            explain: explain,
-            cursor: cursor,
-            hint: hint,
-            hintDocument: hintDocument,
-            aggregateOptions: aggregateOptions,
-            rawOptions: rawOptions))
+    return ModernCursor(
+            AggregateOperation(pipeline,
+                db: this,
+                explain: explain,
+                cursor: cursor,
+                hint: hint,
+                hintDocument: hintDocument,
+                aggregateOptions: aggregateOptions,
+                rawOptions: rawOptions),
+            server)
         .stream;
   }
 
   /// Runs a command
   Future<Map<String, Object?>> runCommand(Map<String, Object>? command) =>
-      CommandOperation(this, <String, Object>{}, command: command).execute();
+      CommandOperation(this, <String, Object>{}, command: command)
+          .execute(server);
 
   /// Ping command
-  Future<Map<String, Object?>> pingCommand() => PingCommand(this).execute();
+  Future<Map<String, Object?>> pingCommand() =>
+      PingCommand(this).execute(server);
 }

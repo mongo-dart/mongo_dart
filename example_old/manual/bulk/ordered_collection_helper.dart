@@ -1,9 +1,10 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 void main() async {
-  final db = Db('mongodb://127.0.0.1/testdb');
-
-  await db.open();
+  var client = MongoClient('mongodb://127.0.0.1/testdb');
+  await client.connect();
+  final db = client.db();
 
   var collection = db.collection('orderedBulkHelper');
   // clean data if the example is run more than once.
