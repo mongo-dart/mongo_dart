@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:mongo_dart/src/core/error/connection_exception.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
+import 'package:mongo_dart/src/mongo_client_options.dart';
 import 'package:test/test.dart';
-import 'package:mongo_dart/mongo_dart_old.dart';
 
 // Insert in your hosts file:
 // 127.0.0.1 server1
@@ -30,53 +31,57 @@ void main() {
         File('test/certificates_for_testing/mongo-test-ca-full-chain.crt');
 
     test('No certificate, no connection', () async {
-      var db = Db(defaultUri);
+      var client = MongoClient(defaultUri);
 
       try {
-        await db.open(secure: true);
+        await client.connect();
         expect(true, isFalse);
       } on ConnectionException {
         expect(true, isTrue);
       } catch (e) {
         expect(true, isFalse);
       } finally {
-        await db.close();
+        await client.close();
       }
     });
 
     test('Must be run all together', () async {
-      var db = Db(defaultUri);
-
-      await db.open(secure: true, tlsCAFile: caCertFile.path);
-      await db.close();
+      var options = MongoClientOptions();
+      options.tls = true;
+      options.tlsCAFile = caCertFile.path;
+      var client = MongoClient(defaultUri, mongoClientOptions: options);
+      await client.connect();
+      await client.close();
 
       // Check to avoid problems with the
       // "certificate already in hash table error"
       //test('Connect no problems with cert', () async {
-      db = Db(defaultUri);
-
-      await db.open(secure: true, tlsCAFile: caCertFile.path);
-      await db.close();
+      options = MongoClientOptions();
+      options.tls = true;
+      options.tlsCAFile = caCertFile.path;
+      client = MongoClient(defaultUri, mongoClientOptions: options);
+      await client.connect();
+      await client.close();
       //});
 
       // same isolate, once connected, the certificate stays in cache
       //test('Reopen connection', () async {
-      db = Db(defaultUri);
+      options = MongoClientOptions();
+      options.tls = true;
+      client = MongoClient(defaultUri, mongoClientOptions: options);
+      await client.connect();
+      await client.close();
 
-      await db.open(secure: true);
-      await db.close();
-
-      await db.open(secure: true, tlsCAFile: caCertFile.path);
-      await db.close();
       //});
 
       // The certificate stays in cache even for a different server
       // (with a certificate from the same authority)
       //test('Connects with no problems on a different server', () async {
-      db = Db(defaultUri2);
-
-      await db.open(secure: true);
-      await db.close();
+      options = MongoClientOptions();
+      options.tls = true;
+      client = MongoClient(defaultUri2, mongoClientOptions: options);
+      await client.connect();
+      await client.close();
     });
   });
 }

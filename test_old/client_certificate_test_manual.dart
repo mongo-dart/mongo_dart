@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:mongo_dart/src/core/error/connection_exception.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
+import 'package:mongo_dart/src/mongo_client_options.dart';
 import 'package:test/test.dart';
-import 'package:mongo_dart/mongo_dart_old.dart';
 
 // Insert in your hosts file:
 // 127.0.0.1 server1
@@ -29,32 +30,35 @@ void main() {
 
     test('Should not be able to connect missing key file and CA file',
         () async {
-      var db = Db(defaultUri);
+      var client = MongoClient(defaultUri,
+          mongoClientOptions: MongoClientOptions()..tls = true);
 
       try {
-        await db.open(secure: true);
+        await client.connect();
         expect(true, isFalse);
       } on ConnectionException {
         expect(true, isTrue);
       } catch (e) {
         expect(true, isFalse);
       } finally {
-        await db.close();
+        await client.close();
       }
     });
 
     test('Should not be able to connect missing key file', () async {
-      var db = Db(defaultUri);
-
+      var client = MongoClient(defaultUri,
+          mongoClientOptions: MongoClientOptions()
+            ..tls = true
+            ..tlsCAFile = caCertFile.path);
       try {
-        await db.open(secure: true, tlsCAFile: caCertFile.path);
+        await client.connect();
         expect(true, isFalse);
       } on ConnectionException {
         expect(true, isTrue);
       } catch (e) {
         expect(true, isFalse);
       } finally {
-        await db.close();
+        await client.close();
       }
     });
 
@@ -63,61 +67,61 @@ void main() {
     test(
         'Should not be able to connect missing key file, CA File given 2 times',
         () async {
-      var db = Db(defaultUri);
-
+      var client = MongoClient(defaultUri,
+          mongoClientOptions: MongoClientOptions()
+            ..tls = true
+            ..tlsCAFile = caCertFile.path);
       try {
-        await db.open(secure: true, tlsCAFile: caCertFile.path);
+        await client.connect();
         expect(true, isFalse);
       } on ConnectionException {
         expect(true, isTrue);
       } catch (e) {
         expect(true, isFalse);
       } finally {
-        await db.close();
+        await client.close();
       }
     });
 
     test('Wrong pem file', () async {
-      var db = Db(defaultUri);
+      var client = MongoClient(defaultUri,
+          mongoClientOptions: MongoClientOptions()
+            ..tls = true
+            ..tlsCAFile = caCertFile.path
+            ..tlsCertificateKeyFile = wrongPemFile.path);
       try {
-        await db.open(
-            secure: true,
-            tlsCAFile: caCertFile.path,
-            tlsCertificateKeyFile: wrongPemFile.path);
-        await db.close();
+        await client.connect();
+        await client.close();
         expect(true, isFalse);
       } on ConnectionException {
         expect(true, isTrue);
       } catch (e) {
         expect(true, isFalse);
       } finally {
-        await db.close();
+        await client.close();
       }
     });
     test('Connect no problems with cert', () async {
-      var db = Db(defaultUri);
-
-      await db.open(
-          secure: true,
-          tlsCAFile: caCertFile.path,
-          tlsCertificateKeyFile: pemFile.path);
-      await db.close();
+      var client = MongoClient(defaultUri,
+          mongoClientOptions: MongoClientOptions()
+            ..tls = true
+            ..tlsCAFile = caCertFile.path
+            ..tlsCertificateKeyFile = pemFile.path);
+      await client.connect();
+      await client.close();
     });
 
     test('Reopen connection', () async {
-      var db = Db(defaultUri);
+      var client = MongoClient(defaultUri,
+          mongoClientOptions: MongoClientOptions()
+            ..tls = true
+            ..tlsCAFile = caCertFile.path
+            ..tlsCertificateKeyFile = pemFile.path);
+      await client.connect();
+      await client.close();
 
-      await db.open(
-          secure: true,
-          tlsCAFile: caCertFile.path,
-          tlsCertificateKeyFile: pemFile.path);
-      await db.close();
-
-      await db.open(
-          secure: true,
-          tlsCAFile: caCertFile.path,
-          tlsCertificateKeyFile: pemFile.path);
-      await db.close();
+      await client.connect();
+      await client.close();
     });
   });
 }

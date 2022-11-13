@@ -1,4 +1,4 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show Db, DbCollection, State;
+import 'package:mongo_dart/mongo_dart_old.dart' show State;
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart'
     show MongoModernMessage;
 import 'package:mongo_dart/src/utils/map_keys.dart'

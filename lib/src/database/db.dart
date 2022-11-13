@@ -1,12 +1,7 @@
 //part of mongo_dart;
 
-import 'dart:typed_data';
-
 import 'package:logging/logging.dart';
-import 'package:mongo_dart/src/default_settings.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
-import 'package:universal_io/io.dart';
-import 'package:vy_string_utils/vy_string_utils.dart';
 
 import '../../mongo_dart_old.dart'
     show
@@ -16,13 +11,7 @@ import '../../mongo_dart_old.dart'
         CreateCollectionOptions,
         CreateViewCommand,
         CreateViewOptions,
-        Cursor,
-        DbCollection,
-        DbCommand,
         GetLastErrorCommand,
-        ListCollectionsCursor,
-        MongoInsertMessage,
-        MongoRemoveMessage,
         ReadPreference,
         SelectorBuilder,
         ServerStatusCommand,
@@ -45,11 +34,8 @@ import '../commands/diagnostic_commands/ping_command/ping_command.dart';
 import 'modern_cursor.dart';
 import '../../src_old/database/utils/dns_lookup.dart';
 import '../commands/base/command_operation.dart';
-import '../connection_string_options.dart';
 import '../core/error/mongo_dart_error.dart';
-import '../core/info/server_config.dart';
 import '../core/message/abstract/mongo_message.dart';
-import '../core/message/abstract/section.dart';
 import '../core/message/deprecated/mongo_reply_message.dart';
 import '../core/message/mongo_modern_message.dart';
 import '../core/network/abstract/connection_base.dart';
@@ -60,7 +46,7 @@ import '../write_concern.dart';
 import 'dbcollection.dart';
 
 class Db {
-  final _log = Logger('Db');
+  final log = Logger('Db');
   final List<String> _uriList = <String>[];
   late MongoClient mongoClient;
 
@@ -100,8 +86,8 @@ class Db {
   Db.pool(List<String> uriList, [this._debugInfo]) {
     _uriList.addAll(uriList);
   }
-  @Deprecated('No more used')
-  Db._authDb(this.databaseName);
+  //@Deprecated('No more used')
+  //Db._authDb(this.databaseName);
 
   Db.modern(this.mongoClient, this.databaseName);
 
@@ -135,7 +121,7 @@ class Db {
   WriteConcern? get writeConcern => _writeConcern;
 
   List<String> get uriList => _uriList.toList();
-
+/* 
   Future<ServerConfig> _parseUri(String uriString,
       {bool? isSecure,
       bool? tlsAllowInvalidCertificates,
@@ -235,7 +221,7 @@ class Db {
     }
 
     return serverConfig;
-  }
+  } */
 
   void selectAuthenticationMechanism(String authenticationSchemeName) {
     if (authenticationSchemeName == ScramSha1Authenticator.name) {
@@ -351,12 +337,12 @@ class Db {
   Future<List> listDatabases() async {
     throw MongoDartError('No More used');
   }
-
+/* 
   @Deprecated('No More Used')
   Stream<Map<String, dynamic>> _listCollectionsCursor(
       [Map<String, dynamic> filter = const {}]) {
     throw MongoDartError('No More used');
-  }
+  } */
 
   /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
   /// with WiredTiger
@@ -515,13 +501,13 @@ class Db {
 
     return createdIndex;
   }
-
+/* 
   @Deprecated('No More Used')
   Future<Map<String, dynamic>> _getAcknowledgement(
       {WriteConcern? writeConcern}) {
     writeConcern ??= _writeConcern;
     throw MongoDartError('No More Used');
-  }
+  } */
 
   // **********************************************************+
   // ************** OP_MSG_COMMANDS ****************************

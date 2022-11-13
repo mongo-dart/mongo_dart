@@ -1,5 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src/write_concern.dart';
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/update_operation/update_operation.dart';
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/update_operation/update_options.dart';
@@ -7,7 +9,7 @@ import 'package:mongo_dart/src/commands/query_and_write_operation_commands/updat
 import 'package:mongo_dart/src_old/database/utils/update_document_check.dart';
 import 'package:test/test.dart';
 
-import 'utils/insert_data.dart';
+import '../test/utils/insert_data.dart';
 
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
@@ -16,6 +18,7 @@ const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
+late MongoClient client;
 late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
@@ -28,12 +31,13 @@ String getRandomCollectionName() {
 
 void main() async {
   Future initializeDatabase() async {
-    db = Db(defaultUri);
-    await db.open();
+    var client = MongoClient(defaultUri);
+    await client.connect();
+    db = client.db();
   }
 
   Future cleanupDatabase() async {
-    await db.close();
+    await client.close();
   }
 
   group('Helper functions', () {
@@ -78,10 +82,10 @@ void main() async {
     var isSharded = false;
     setUp(() async {
       await initializeDatabase();
-      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.server.serverCapabilities.supportsOpMsg) {
         //cannotRunTests = true;
       }
-      var serverFcv = db.masterConnection.serverCapabilities.fcv;
+      var serverFcv = db.server.serverCapabilities.fcv;
       if (serverFcv?.compareTo('4.4') != -1) {
         //running4_4orGreater = true;
       }
@@ -91,9 +95,9 @@ void main() async {
       if (serverFcv?.compareTo('4.2') == 0) {
         running4_2 = true;
       }
-      //isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
-      //isStandalone = db.masterConnection.serverCapabilities.isStandalone;
-      isSharded = db.masterConnection.serverCapabilities.isShardedCluster;
+      //isReplicaSet = db.server.serverCapabilities.isReplicaSet;
+      //isStandalone = db.server.serverCapabilities.isStandalone;
+      isSharded = db.server.serverCapabilities.isShardedCluster;
     });
 
     tearDown(() async {
@@ -139,7 +143,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -182,7 +186,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -226,7 +230,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -274,7 +278,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -328,7 +332,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -409,7 +413,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -446,7 +450,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -477,7 +481,7 @@ void main() async {
             }, collation: CollationOptions('fr', strength: 1))
           ],
         );
-        var res = await updateOperation.execute();
+        var res = await updateOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -520,7 +524,7 @@ void main() async {
             ], multi: true)
           ],
         );
-        var res = await updateOperation.execute();
+        var res = await updateOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -565,7 +569,7 @@ void main() async {
             ], multi: true)
           ],
         );
-        var res = await updateOperation.execute();
+        var res = await updateOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -599,7 +603,7 @@ void main() async {
             }, multi: true)
           ],
         );
-        var res = await updateOperation.execute();
+        var res = await updateOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -643,7 +647,7 @@ void main() async {
             }),
             updateOneOptions: UpdateOneOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOneOperation.executeDocument();
+        var res = await updateOneOperation.executeDocument(db.server);
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -684,7 +688,7 @@ void main() async {
             }),
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateManyOperation.executeDocument();
+        var res = await updateManyOperation.executeDocument(db.server);
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -721,7 +725,7 @@ void main() async {
               'name': 'Central Park Cafe',
               'Borough': 'Manhattan'
             }));
-        var res = await replaceOneOperation.execute();
+        var res = await replaceOneOperation.execute(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -772,7 +776,7 @@ void main() async {
             ordered: false,
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateManyOperation.executeDocument();
+        var res = await updateManyOperation.executeDocument(db.server);
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -851,7 +855,7 @@ void main() async {
             ordered: false,
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateManyOperation.executeDocument();
+        var res = await updateManyOperation.executeDocument(db.server);
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -876,7 +880,7 @@ void main() async {
             r'$set': {'status': 'Updated'},
           }, collation: CollationOptions('fr', strength: 1)),
         );
-        var res = await updateOneOperation.executeDocument();
+        var res = await updateOneOperation.executeDocument(db.server);
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -917,7 +921,7 @@ void main() async {
             }
           ]),
         );
-        var res = await updateManyOperation.executeDocument();
+        var res = await updateManyOperation.executeDocument(db.server);
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -960,7 +964,7 @@ void main() async {
             }
           ]),
         );
-        var res = await updateManyOperation.executeDocument();
+        var res = await updateManyOperation.executeDocument(db.server);
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -992,7 +996,7 @@ void main() async {
             'status': 1
           }),
         );
-        var res = await updateManyOperation.executeDocument();
+        var res = await updateManyOperation.executeDocument(db.server);
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -1938,9 +1942,10 @@ void main() async {
     });
   });
   tearDownAll(() async {
-    await db.open();
+    await client.connect();
+    db = client.db();
     await Future.forEach(usedCollectionNames,
         (String collectionName) => db.collection(collectionName).drop());
-    await db.close();
+    await client.close();
   });
 }

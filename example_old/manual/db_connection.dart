@@ -1,4 +1,5 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
+// Todo check if still needed
+/* import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/db.dart';
 
 const dbName = 'mongo-dart-example';
@@ -79,3 +80,4 @@ class DbConnection {
     return _db!;
   }
 }
+ */

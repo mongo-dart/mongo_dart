@@ -1,5 +1,8 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/database/dbcollection.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src/write_concern.dart';
 import 'package:mongo_dart/src/commands/administration_commands/create_command/create_command.dart';
 import 'package:mongo_dart/src/commands/administration_commands/create_command/create_options.dart';
@@ -13,6 +16,7 @@ const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
+late MongoClient client;
 late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
@@ -25,8 +29,9 @@ String getRandomCollectionName() {
 
 void main() async {
   Future initializeDatabase() async {
-    db = Db(defaultUri);
-    await db.open();
+    var client = MongoClient(defaultUri);
+    await client.connect();
+    db = client.db();
   }
 
   Future insertManyDocuments(
@@ -40,14 +45,14 @@ void main() async {
   }
 
   Future cleanupDatabase() async {
-    await db.close();
+    await client.close();
   }
 
   group('Collections', () {
     var cannotRunTests = false;
     setUp(() async {
       await initializeDatabase();
-      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.server.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
     });
@@ -58,7 +63,8 @@ void main() async {
 
     test('Simple create collection', () async {
       var collectionName = getRandomCollectionName();
-      var resultMap = await CreateCommand(db, collectionName).execute();
+      var resultMap =
+          await CreateCommand(db, collectionName).execute(db.server);
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
@@ -72,7 +78,7 @@ void main() async {
       var resultMap = await CreateCommand(db, collectionName,
               createOptions:
                   CreateOptions(capped: true, size: 5242880, max: 5000))
-          .execute();
+          .execute(db.server);
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
@@ -106,7 +112,7 @@ void main() async {
                 }
               }
             }
-          })).execute();
+          })).execute(db.server);
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
@@ -126,7 +132,8 @@ void main() async {
 
     test('Simple create collection with no collation', () async {
       var collectionName = getRandomCollectionName();
-      var resultMap = await CreateCommand(db, collectionName).execute();
+      var resultMap =
+          await CreateCommand(db, collectionName).execute(db.server);
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
@@ -149,7 +156,7 @@ void main() async {
       var collectionName = getRandomCollectionName();
       var resultMap = await CreateCommand(db, collectionName,
               createOptions: CreateOptions(collation: CollationOptions('fr')))
-          .execute();
+          .execute(db.server);
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
@@ -175,7 +182,7 @@ void main() async {
             'wiredTiger': {
               'configString': 'log=(enabled),block_compressor=snappy'
             }
-          })).execute();
+          })).execute(db.server);
       expect(resultMap[keyOk], 1.0);
     }, skip: cannotRunTests);
   });
@@ -184,7 +191,7 @@ void main() async {
     var cannotRunTests = false;
     setUp(() async {
       await initializeDatabase();
-      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.server.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
     });
@@ -204,7 +211,7 @@ void main() async {
                 'department': 1
               }
             }
-          ])).execute();
+          ])).execute(db.server);
       expect(resultMap[keyOk], 1.0);
 
       var collection = db.collection(collectionName);
@@ -247,7 +254,7 @@ void main() async {
               }
             },
             {r'$sortByCount': r'$department'}
-          ])).execute();
+          ])).execute(db.server);
       expect(resultMap[keyOk], 1.0);
 
       var collection = db.collection(collectionName);
@@ -288,7 +295,7 @@ void main() async {
                 'department': 1
               }
             }
-          ])).execute();
+          ])).execute(db.server);
       expect(resultMap[keyOk], 1.0);
 
       var collection = db.collection(collectionName);
@@ -383,7 +390,7 @@ void main() async {
             {
               r'$project': {'inventory_docs._id': 0, 'inventory_docs.sku': 0}
             }
-          ])).execute();
+          ])).execute(db.server);
       expect(resultMap[keyOk], 1.0);
 
       var view = db.collection(viewName);
@@ -471,7 +478,7 @@ void main() async {
             {
               r'$project': {'inventory_docs._id': 0, 'inventory_docs.sku': 0}
             }
-          ])).execute();
+          ])).execute(db.server);
       expect(resultMap[keyOk], 1.0);
 
       var view = db.collection(viewName);
@@ -514,7 +521,7 @@ void main() async {
               }
             ],
             collation: CollationOptions('fr')),
-      ).execute();
+      ).execute(db.server);
       expect(resultMap[keyOk], 1.0);
 
       var view = db.collection(viewName);
@@ -555,7 +562,7 @@ void main() async {
           ),
           rawOptions: {
             'collation': {'locale': 'fr', 'strength': 1}
-          }).execute();
+          }).execute(db.server);
       expect(resultMap[keyOk], 1.0);
 
       var view = db.collection(viewName);
@@ -591,7 +598,7 @@ void main() async {
               }
             ],
             collation: CollationOptions('fr')),
-      ).execute();
+      ).execute(db.server);
       expect(resultMap[keyOk], 1.0);
 
       var view = db.collection(viewName);
@@ -613,9 +620,10 @@ void main() async {
   });
 
   tearDownAll(() async {
-    await db.open();
+    await client.connect();
+    db = client.db();
     await Future.forEach(usedCollectionNames,
         (String collectionName) => db.collection(collectionName).drop());
-    await db.close();
+    await client.close();
   });
 }

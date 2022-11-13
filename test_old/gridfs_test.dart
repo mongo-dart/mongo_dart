@@ -1,6 +1,8 @@
 library gridfs_tests;
 
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:test/test.dart';
@@ -9,7 +11,7 @@ import 'package:path/path.dart' as path;
 const dbName = 'testauth';
 const defaultUri = 'mongodb://localhost:27017/test-mongo-dart';
 late Db db;
-
+late MongoClient client;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
@@ -230,12 +232,13 @@ Future testExtraData() {
 
 void main() {
   Future initializeDatabase() async {
-    db = Db(defaultUri);
-    await db.open();
+    client = MongoClient(defaultUri);
+    await client.connect();
+    db = client.db();
   }
 
   Future cleanupDatabase() async {
-    await db.close();
+    await client.close();
   }
 
   setUp(() async {
@@ -263,9 +266,10 @@ void main() {
   });
 
   tearDownAll(() async {
-    await db.open();
+    await client.connect();
+    db = client.db();
     await Future.forEach(usedCollectionNames,
         (String collectionName) => db.collection(collectionName).drop());
-    await db.close();
+    await client.close();
   });
 }

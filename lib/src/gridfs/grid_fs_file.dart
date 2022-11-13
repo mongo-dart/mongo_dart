@@ -34,7 +34,8 @@ abstract class GridFSFile {
 
     var completer = Completer<bool>();
     // query for md5 at filemd5
-    var dbCommand = DbCommand(
+    // Todo toe checked
+    /* var dbCommand = DbCommand(
         fs.database, fs.bucketName, 0, 0, 1, {'filemd5': id}, {'md5': 1});
     fs.database.executeDbCommand(dbCommand).then((data) {
       if (data.containsKey('md5')) {
@@ -42,7 +43,7 @@ abstract class GridFSFile {
       } else {
         completer.complete(false);
       }
-    });
+    }); */
     return completer.future;
   }
 

@@ -1,5 +1,4 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:test/test.dart';
+/* import 'package:test/test.dart';
 import 'database_test.dart';
 
 void main() {
@@ -20,3 +19,4 @@ void main() {
     expect(await pool.connect(), db3);
   });
 }
+ */

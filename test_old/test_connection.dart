@@ -1,5 +1,5 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:logging/logging.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
@@ -14,14 +14,13 @@ void main() async {
   Logger.root.onRecord.listen((record) {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
-
-  var db = Db(defaultUri);
+  var client = MongoClient(defaultUri);
   var count = 0;
   while (count < 10) {
     try {
-      await db.open();
+      await client.connect();
       print('Is connected!');
-      await db.close();
+      await client.close();
       break;
     } catch (e) {
       count++;

@@ -115,5 +115,5 @@ void main() async {
   print(ret.nRemoved); // 0
   print(ret.isSuccess); // true
 
-  await db.close();
+  await client.close();
 }

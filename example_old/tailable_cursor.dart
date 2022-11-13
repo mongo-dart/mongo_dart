@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:mongo_dart/src/database/dbcollection.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 
 //////// I guess tailable cursor does not work in that example
@@ -20,7 +19,8 @@ void main() async {
       t.cancel();
     }
   });
-  var oplog = DbCollection(db, 'log');
+  // Todo to be checked
+  /* var oplog = DbCollection(db, 'log');
   var cursor = oplog.createCursor()
     ..tailable = true
     ..timeout = false
@@ -33,5 +33,5 @@ void main() async {
     } else {
       print('Fetched: $doc');
     }
-  }
+  } */
 }

@@ -11,7 +11,7 @@ void main() async {
   final db = client.db();
 
   Future cleanupDatabase() async {
-    await db.close();
+    await client.close();
   }
 
   var collectionName = 'union-with-suppliers';

@@ -1,7 +1,5 @@
 //part of mongo_dart;
-import 'package:crypto/crypto.dart' as crypto;
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/core/message/deprecated/mongo_query_message.dart';
 import 'package:mongo_dart/src/core/auth/auth.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 

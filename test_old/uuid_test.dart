@@ -1,6 +1,8 @@
 @Timeout(Duration(seconds: 100))
 
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:test/test.dart';
 
 const dbName = 'test';
@@ -8,6 +10,7 @@ const dbAddress = '127.0.0.1';
 
 const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
+late MongoClient client;
 late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
@@ -20,12 +23,13 @@ String getRandomCollectionName() {
 
 void main() async {
   Future initializeDatabase() async {
-    db = Db(defaultUri);
-    await db.open();
+    var client = MongoClient(defaultUri);
+    await client.connect();
+    db = client.db();
   }
 
   Future cleanupDatabase() async {
-    await db.close();
+    await client.close();
   }
 
   group('Commands', () {
@@ -37,10 +41,11 @@ void main() async {
       await cleanupDatabase();
     });
     tearDownAll(() async {
-      await db.open();
+      await client.connect();
+      db = client.db();
       await Future.forEach(usedCollectionNames,
           (String collectionName) => db.collection(collectionName).drop());
-      await db.close();
+      await client.close();
     });
     group('Uuid:', () {
       test('read Uuid', () async {

@@ -1,11 +1,13 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/dbcollection.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 
 void main() async {
-  var db = Db('mongodb://127.0.0.1/mongo_dart-test');
+  var client = MongoClient('mongodb://127.0.0.1/mongo_dart-test');
+  await client.connect();
+  final db = client.db();
   ObjectId? id;
   DbCollection coll;
-  await db.open();
   print('connection open');
   coll = db.collection('simple_data');
   await coll.deleteMany({});
@@ -22,7 +24,7 @@ void main() async {
   id = val?['_id'] as ObjectId?;
   if (id == null) {
     print('Id not detected');
-    await db.close();
+    await client.close();
     return;
   }
   val = await coll.findOne(where.eq('my_field', 17).fields(['str_field']));
@@ -78,5 +80,5 @@ void main() async {
   print('List of collections : $collections');
   var collectionInfos = await db.getCollectionInfos();
   print('List of collection\'s infos: $collectionInfos');
-  await db.close();
+  await client.close();
 }

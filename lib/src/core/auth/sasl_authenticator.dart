@@ -7,8 +7,6 @@ import 'package:sasl_scram/sasl_scram.dart'
     show SaslMechanism, UsernamePasswordCredential;
 import 'package:mongo_dart/mongo_dart_old.dart'
     show
-        Db,
-        DbCommand,
         SaslContinueCommand,
         SaslStartCommand,
         SaslStartOptions,

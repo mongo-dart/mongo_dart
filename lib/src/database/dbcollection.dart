@@ -125,7 +125,7 @@ class DbCollection {
 
   // Old version to be used on MongoDb versions prior to 3.6
   @Deprecated('No More Used')
-  Cursor createCursor([selector]) => throw MongoDartError('No More Used');
+  ModernCursor createCursor([selector]) => throw MongoDartError('No More Used');
 
   /// Returns one document that satisfies the specified query criteria on the
   /// collection or view. If multiple documents satisfy the query,
@@ -328,13 +328,14 @@ class DbCollection {
     return query as Map<String, dynamic>;
   }
 
+/* 
   Map<String, Object> _sortBuilder2Map(query) {
     if (query is SelectorBuilder) {
       query = query.map['orderby'];
     }
     return query as Map<String, Object>;
   }
-
+ */
   Map<String, dynamic>? _fieldsBuilder2Map(fields) {
     if (fields is SelectorBuilder) {
       return fields.paramFields;
@@ -384,9 +385,7 @@ class DbCollection {
       bool? background,
       bool? dropDups,
       Map<String, dynamic>? partialFilterExpression,
-      String? name,
-      bool? modernReply}) async {
-    modernReply ??= true;
+      String? name}) async {
     var indexOptions = CreateIndexOptions(this,
         uniqueIndex: unique == true,
         sparseIndex: sparse == true,
@@ -404,10 +403,8 @@ class DbCollection {
       // but, for compatibility reasons, we throw the received map.
       throw res;
     }
-    if (modernReply) {
-      return res;
-    }
-    return db.getLastError(db.server);
+
+    return res;
   }
 
   Stream<Map<String, dynamic>> listIndexes(

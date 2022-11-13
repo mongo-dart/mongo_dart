@@ -78,7 +78,7 @@ void main() async {
 
       /// This is the correct way to cancel the watch subscription
       await controller.cancel();
-      await db.close();
+      await client.close();
       return false;
     }
     print('Waiting for insert to be detected...');

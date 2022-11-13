@@ -1,12 +1,14 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
+import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src/write_concern.dart';
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
 
-import 'utils/insert_data.dart';
+import '../test/utils/insert_data.dart';
 
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
@@ -15,6 +17,7 @@ const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
+late MongoClient client;
 late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
@@ -27,12 +30,13 @@ String getRandomCollectionName() {
 
 void main() async {
   Future initializeDatabase() async {
-    db = Db(defaultUri);
-    await db.open();
+    var client = MongoClient(defaultUri);
+    await client.connect();
+    db = client.db();
   }
 
   Future cleanupDatabase() async {
-    await db.close();
+    await client.close();
   }
 
   group('Write Operations', () {
@@ -45,19 +49,19 @@ void main() async {
     //var isSharded = false;
     setUp(() async {
       await initializeDatabase();
-      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.server.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
-      var serverFcv = db.masterConnection.serverCapabilities.fcv ?? '0.0';
+      var serverFcv = db.server.serverCapabilities.fcv ?? '0.0';
       if (serverFcv.compareTo('4.4') != -1) {
         running4_4orGreater = true;
       }
       if (serverFcv.compareTo('4.2') != -1) {
         running4_2orGreater = true;
       }
-      //isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
-      isStandalone = db.masterConnection.serverCapabilities.isStandalone;
-      //isSharded = db.masterConnection.serverCapabilities.isShardedCluster;
+      //isReplicaSet = db.server.serverCapabilities.isReplicaSet;
+      isStandalone = db.server.serverCapabilities.isStandalone;
+      //isSharded = db.server.serverCapabilities.isShardedCluster;
     });
 
     tearDown(() async {
@@ -226,7 +230,7 @@ void main() async {
 
         var deleteOperation =
             DeleteOneOperation(collection, DeleteOneStatement({}));
-        var res = await deleteOperation.executeDocument();
+        var res = await deleteOperation.executeDocument(db.server);
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -256,7 +260,7 @@ void main() async {
 
         var deleteOperation =
             DeleteOneOperation(collection, DeleteOneStatement({key_id: 7}));
-        var res = await deleteOperation.executeDocument();
+        var res = await deleteOperation.executeDocument(db.server);
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -281,7 +285,7 @@ void main() async {
 
         var deleteOperation =
             DeleteOneOperation(collection, DeleteOneStatement({'status': 'D'}));
-        var res = await deleteOperation.executeDocument();
+        var res = await deleteOperation.executeDocument(db.server);
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -394,7 +398,7 @@ void main() async {
 
         var deleteOperation =
             DeleteManyOperation(collection, DeleteManyStatement({}));
-        var res = await deleteOperation.executeDocument();
+        var res = await deleteOperation.executeDocument(db.server);
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -423,7 +427,7 @@ void main() async {
 
         var deleteOperation =
             DeleteManyOperation(collection, DeleteManyStatement({key_id: 7}));
-        var res = await deleteOperation.executeDocument();
+        var res = await deleteOperation.executeDocument(db.server);
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -449,7 +453,7 @@ void main() async {
 
         var deleteOperation = DeleteManyOperation(
             collection, DeleteManyStatement({'status': 'D'}));
-        var res = await deleteOperation.executeDocument();
+        var res = await deleteOperation.executeDocument(db.server);
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -476,7 +480,7 @@ void main() async {
             collection, DeleteManyStatement({}),
             deleteManyOptions: DeleteManyOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await deleteOperation.executeDocument();
+        var res = await deleteOperation.executeDocument(db.server);
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -504,7 +508,7 @@ void main() async {
           DeleteManyStatement({'category': 'cafe', 'status': 'a'},
               collation: CollationOptions('fr', strength: 1)),
         );
-        var res = await deleteOperation.executeDocument();
+        var res = await deleteOperation.executeDocument(db.server);
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -542,7 +546,7 @@ void main() async {
             'status': 1
           }),
         );
-        var res = await deleteOperation.executeDocument();
+        var res = await deleteOperation.executeDocument(db.server);
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -743,7 +747,7 @@ void main() async {
         }, update: <String, dynamic>{
           r'$inc': {'score': 1}
         });
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -770,7 +774,7 @@ void main() async {
               r'$inc': {'score': 1}
             },
             returnNew: true);
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -797,7 +801,7 @@ void main() async {
               r'$inc': {'score': 1}
             },
             returnNew: true);
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.n, 0);
@@ -822,7 +826,7 @@ void main() async {
               r'$inc': {'score': 1}
             },
             upsert: true);
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, TypeMatcher<ObjectId>());
@@ -849,7 +853,7 @@ void main() async {
             },
             upsert: true,
             returnNew: true);
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, TypeMatcher<ObjectId>());
@@ -887,7 +891,7 @@ void main() async {
             },
             upsert: true,
             returnNew: true);
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.upserted, isNull);
@@ -911,7 +915,7 @@ void main() async {
             },
             sort: <String, Object>{'rating': 1},
             remove: true);
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, isNull);
@@ -940,7 +944,7 @@ void main() async {
             },
             findAndModifyOptions: FindAndModifyOptions(
                 collation: CollationOptions('fr', strength: 1)));
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -983,7 +987,7 @@ void main() async {
                 'element': {r'$gte': 100}
               }
             ]);
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -1028,7 +1032,7 @@ void main() async {
                 'element.grade': {r'$gte': 85}
               }
             ]);
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -1074,7 +1078,7 @@ void main() async {
               }
             ],
             returnNew: true);
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.upserted, isNull);
@@ -1106,7 +1110,7 @@ void main() async {
             },
             remove: true,
             hintDocument: {'status': 1});
-        var res = await famOperation.executeDocument();
+        var res = await famOperation.executeDocument(db.server);
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, isNull);
@@ -1474,9 +1478,10 @@ void main() async {
     });
   });
   tearDownAll(() async {
-    await db.open();
+    await client.connect();
+    db = client.db();
     await Future.forEach(usedCollectionNames,
         (String collectionName) => db.collection(collectionName).drop());
-    await db.close();
+    await client.close();
   });
 }

@@ -2,6 +2,8 @@
 
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src/write_concern.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:mongo_dart/src/commands/aggregation_commands/count/count_operation.dart';
@@ -13,7 +15,7 @@ import 'package:mongo_dart/src/commands/parameters/read_concern.dart';
 import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
 
-import 'utils/insert_data.dart';
+import '../test/utils/insert_data.dart';
 
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
@@ -167,6 +169,7 @@ var testDoc = {
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
+late MongoClient client;
 late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
@@ -179,19 +182,20 @@ String getRandomCollectionName() {
 
 void main() async {
   Future initializeDatabase() async {
-    db = Db(defaultUri);
-    await db.open();
+    var client = MongoClient(defaultUri);
+    await client.connect();
+    db = client.db();
   }
 
   Future cleanupDatabase() async {
-    await db.close();
+    await client.close();
   }
 
   group('Read Operations', () {
     var cannotRunTests = false;
     setUp(() async {
       await initializeDatabase();
-      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.server.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
     });
@@ -338,7 +342,7 @@ void main() async {
       expect(ret.isSuccess, isTrue);
 
       var result = [];
-      var cursor = ModernCursor(FindOperation(collection));
+      var cursor = ModernCursor(FindOperation(collection), db.server);
       await for (var element in cursor.stream) {
         result.add(element);
       }
@@ -353,7 +357,7 @@ void main() async {
       expect(ret.isSuccess, isTrue);
 
       var result = [];
-      var cursor = ModernCursor(FindOperation(collection));
+      var cursor = ModernCursor(FindOperation(collection), db.server);
       try {
         await for (var element in cursor.changeStream) {
           result.add(element);
@@ -392,7 +396,7 @@ void main() async {
 
         await insertManyDocuments(collection, 120);
 
-        var cursor = ModernCursor(FindOperation(collection));
+        var cursor = ModernCursor(FindOperation(collection), db.server);
 
         expect(cursor.state, State.init);
 
@@ -406,7 +410,7 @@ void main() async {
         // a default 101 documents, so, when we run the getMore command
         // only 19 can be retrieved.
         var command = GetMoreCommand(collection, cursor.cursorId);
-        var resultCommand = await command.execute();
+        var resultCommand = await command.execute(db.server);
         expect(resultCommand, isNotNull);
         expect(resultCommand[keyCursor], isNotNull);
 
@@ -433,10 +437,10 @@ void main() async {
         await insertManyDocuments(collection, 110);
         var doc = await FindOperation(collection,
                 findOptions: FindOptions(tailable: true))
-            .execute();
+            .execute(db.server);
 
-        var cursor = ModernCursor.fromOpenId(
-            collection, BsonLong((doc[keyCursor] as Map)[keyId] as int),
+        var cursor = ModernCursor.fromOpenId(collection,
+            BsonLong((doc[keyCursor] as Map)[keyId] as int), db.server,
             tailable: true);
 
         expect(cursor.state, State.open);
@@ -484,10 +488,10 @@ void main() async {
         await insertManyDocuments(collection, 110);
         var doc = await FindOperation(collection,
                 findOptions: FindOptions(tailable: true, awaitData: true))
-            .execute();
+            .execute(db.server);
 
-        var cursor = ModernCursor.fromOpenId(
-            collection, BsonLong((doc[keyCursor] as Map)[keyId] as int),
+        var cursor = ModernCursor.fromOpenId(collection,
+            BsonLong((doc[keyCursor] as Map)[keyId] as int), db.server,
             tailable: true);
 
         expect(cursor.state, State.open);
@@ -541,8 +545,9 @@ void main() async {
         expect(resultMap[keyOk], 1.0);
         var collection = db.collection(collectionName);
 
-        var cursor = ModernCursor(FindOperation(collection,
-            findOptions: FindOptions(tailable: true)));
+        var cursor = ModernCursor(
+            FindOperation(collection, findOptions: FindOptions(tailable: true)),
+            db.server);
         expect(cursor.state, State.init);
 
         expect(() => cursor.nextObject(), throwsMongoDartError);
@@ -562,9 +567,11 @@ void main() async {
           {'test': 3, 'state': 'A'},
           {'test': 4, 'state': 'A'}
         ]);
-        var cursor = ModernCursor(FindOperation(collection,
-            filter: <String, Object>{'state': 'C'},
-            findOptions: FindOptions(tailable: true)));
+        var cursor = ModernCursor(
+            FindOperation(collection,
+                filter: <String, Object>{'state': 'C'},
+                findOptions: FindOptions(tailable: true)),
+            db.server);
         expect(cursor.state, State.init);
 
         var cursorResult = await cursor.nextObject();
@@ -581,7 +588,7 @@ void main() async {
     var cannotRunTests = false;
     setUp(() async {
       await initializeDatabase();
-      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.server.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
     });
@@ -619,10 +626,8 @@ void main() async {
           {
             r'$match': {
               'active': true,
-              if (db.masterConnection.serverCapabilities.isShardedCluster)
-                if (db.masterConnection.serverCapabilities.fcv
-                        ?.compareTo('4.2') ==
-                    1)
+              if (db.server.serverCapabilities.isShardedCluster)
+                if (db.server.serverCapabilities.fcv?.compareTo('4.2') == 1)
                   'op': 'command'
                 else
                   'op': 'getmore'
@@ -633,9 +638,8 @@ void main() async {
         ]);
 
         var resultList = await stream.toList();
-        if (db.masterConnection.serverCapabilities.fcv?.compareTo('4.2') ==
-            -1) {
-          if (db.masterConnection.serverCapabilities.isShardedCluster) {
+        if (db.server.serverCapabilities.fcv?.compareTo('4.2') == -1) {
+          if (db.server.serverCapabilities.isShardedCluster) {
             // one command per shard
             expect(resultList, isNotEmpty);
             expect(resultList.first['op'], 'getmore');
@@ -644,12 +648,11 @@ void main() async {
             expect(resultList.first['op'], 'command');
           }
         } else {
-          if (db.masterConnection.serverCapabilities.isShardedCluster) {
+          if (db.server.serverCapabilities.isShardedCluster) {
             // one command per shard
             expect(resultList, isNotEmpty);
             expect(resultList.first['type'], 'op');
-            if (db.masterConnection.serverCapabilities.fcv?.compareTo('4.2') ==
-                1) {
+            if (db.server.serverCapabilities.fcv?.compareTo('4.2') == 1) {
               expect(resultList.first['op'], 'command');
             } else {
               expect(resultList.first['op'], 'getmore');
@@ -778,7 +781,7 @@ db.runCommand(
 
         var aggregateOperation =
             AggregateOperation(pipeline, collection: collection);
-        var v = await aggregateOperation.execute();
+        var v = await aggregateOperation.execute(db.server);
         var cursor = v[keyCursor] as Map;
         var result = cursor[keyFirstBatch] as List;
         expect(result.first[key_id], 'Age of Steam');
@@ -885,7 +888,7 @@ db.runCommand(
 
         var aggregateOperation = AggregateOperation(pipeline,
             collection: collection, cursor: {'batchSize': 3});
-        var v = await aggregateOperation.execute();
+        var v = await aggregateOperation.execute(db.server);
         final cursor = v[keyCursor] as Map;
         expect(cursor['id'], const TypeMatcher<int>());
         final firstBatch = cursor[keyFirstBatch] as List;
@@ -996,8 +999,10 @@ db.runCommand(
             .aggregateToStream(pipeline,
                 cursorOptions: {'batchSize': 1}, allowDiskUse: true)
             .toList(); */
-        var cursor = ModernCursor(AggregateOperation(pipeline,
-            collection: collection, cursor: {'batchSize': 1}));
+        var cursor = ModernCursor(
+            AggregateOperation(pipeline,
+                collection: collection, cursor: {'batchSize': 1}),
+            db.server);
         var aggregate = await cursor.stream.toList();
 
         expect(aggregate.isNotEmpty, isTrue);
@@ -1007,10 +1012,11 @@ db.runCommand(
     }, skip: cannotRunTests);
 
     tearDownAll(() async {
-      await db.open();
+      await client.connect();
+      db = client.db();
       await Future.forEach(usedCollectionNames,
           (String collectionName) => db.collection(collectionName).drop());
-      await db.close();
+      await client.close();
     });
   });
 
@@ -1019,10 +1025,10 @@ db.runCommand(
     var isStandalone = false;
     setUp(() async {
       await initializeDatabase();
-      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.server.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
-      if (db.masterConnection.serverCapabilities.isStandalone) {
+      if (db.server.serverCapabilities.isStandalone) {
         isStandalone = true;
       }
     });
@@ -1048,8 +1054,8 @@ db.runCommand(
 
       //List<Map<String, Object>> pipeMap = pipeline.build();
       //pipeMap.insert(0, {aggregateChangeStream: {}});
-      var cursor =
-          ModernCursor(ChangeStreamOperation(pipeline, collection: collection));
+      var cursor = ModernCursor(
+          ChangeStreamOperation(pipeline, collection: collection), db.server);
       var stream = cursor.changeStream;
 
       var gotFourth = false;
@@ -1119,8 +1125,8 @@ db.runCommand(
           AggregationPipelineBuilder()
               .addStage(Match(where.lt('fullDocument.a', 15).map['\$query']));
 
-      var cursor =
-          ModernCursor(ChangeStreamOperation(pipeline, collection: collection));
+      var cursor = ModernCursor(
+          ChangeStreamOperation(pipeline, collection: collection), db.server);
       var stream = cursor.changeStream;
 
       var gotFourth = false;
@@ -1236,10 +1242,11 @@ db.runCommand(
     }, skip: cannotRunTests);
 
     tearDownAll(() async {
-      await db.open();
+      await client.connect();
+      client.db();
       await Future.forEach(usedCollectionNames,
           (String collectionName) => db.collection(collectionName).drop());
-      await db.close();
+      await client.close();
     });
   });
 
@@ -1247,7 +1254,7 @@ db.runCommand(
     var cannotRunTests = false;
     setUp(() async {
       await initializeDatabase();
-      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.server.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
     });
@@ -1269,7 +1276,7 @@ db.runCommand(
 
         var operation = CountOperation(collection);
 
-        var result = await operation.execute();
+        var result = await operation.execute(db.server);
 
         expect(result[keyOk], 1.0);
         expect(result[keyN], 3);
@@ -1286,7 +1293,7 @@ db.runCommand(
 
         var operation = CountOperation(collection);
 
-        var result = await operation.executeDocument();
+        var result = await operation.executeDocument(db.server);
 
         expect(result.ok, 1.0);
         expect(result.count, 3);
@@ -1304,7 +1311,7 @@ db.runCommand(
         var operation = CountOperation(collection,
             query: where.gt('cost', Decimal.fromInt(15)).map[key$Query]);
 
-        var result = await operation.executeDocument();
+        var result = await operation.executeDocument(db.server);
 
         expect(result.ok, 1.0);
         expect(result.count, 2);
@@ -1326,17 +1333,18 @@ db.runCommand(
             countOptions: CountOptions(
                 readConcern: ReadConcern(ReadConcernLevel.majority)));
 
-        var result = await operation.executeDocument();
+        var result = await operation.executeDocument(db.server);
 
         expect(result.ok, 1.0);
         expect(result.count, 2);
       }, skip: cannotRunTests);
 
       tearDownAll(() async {
-        await db.open();
+        await client.connect();
+        db = client.db();
         await Future.forEach(usedCollectionNames,
             (String collectionName) => db.collection(collectionName).drop());
-        await db.close();
+        await client.close();
       });
     });
   });
@@ -1348,15 +1356,15 @@ db.runCommand(
     var isSharded = false;
     setUp(() async {
       await initializeDatabase();
-      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+      if (!db.server.serverCapabilities.supportsOpMsg) {
         cannotRunTests = true;
       }
-      var serverFcv = db.masterConnection.serverCapabilities.fcv ?? '0.0';
+      var serverFcv = db.server.serverCapabilities.fcv ?? '0.0';
       if (serverFcv.compareTo('3.6') == 0) {
         running3_6 = true;
       }
-      //isReplicaSet = db.masterConnection.serverCapabilities.isReplicaSet;
-      isSharded = db.masterConnection.serverCapabilities.isShardedCluster;
+      //isReplicaSet = db.server.serverCapabilities.isReplicaSet;
+      isSharded = db.server.serverCapabilities.isShardedCluster;
     });
 
     tearDown(() async {
@@ -1397,7 +1405,7 @@ db.runCommand(
 
         var operation = DistinctOperation(collection, 'dept');
 
-        var result = await operation.execute();
+        var result = await operation.execute(db.server);
 
         expect(result[keyOk], 1.0);
         expect(result[keyValues], isNotNull);
@@ -1439,7 +1447,7 @@ db.runCommand(
 
         var operation = DistinctOperation(collection, 'dept');
 
-        var result = await operation.executeDocument();
+        var result = await operation.executeDocument(db.server);
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);
@@ -1482,7 +1490,7 @@ db.runCommand(
 
         var operation = DistinctOperation(collection, 'item.sku');
 
-        var result = await operation.executeDocument();
+        var result = await operation.executeDocument(db.server);
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);
@@ -1525,7 +1533,7 @@ db.runCommand(
 
         var operation = DistinctOperation(collection, 'sizes');
 
-        var result = await operation.executeDocument();
+        var result = await operation.executeDocument(db.server);
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);
@@ -1574,7 +1582,7 @@ db.runCommand(
 
         var operation =
             DistinctOperation(collection, 'item.sku', query: {'dept': 'A'});
-        var result = await operation.executeDocument();
+        var result = await operation.executeDocument(db.server);
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);
@@ -1591,7 +1599,7 @@ db.runCommand(
         var operation = DistinctOperation(collection, 'category',
             distinctOptions: DistinctOptions(
                 collation: CollationOptions('fr', strength: 1)));
-        var result = await operation.executeDocument();
+        var result = await operation.executeDocument(db.server);
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);
@@ -1600,10 +1608,11 @@ db.runCommand(
       }, skip: cannotRunTests);
 
       tearDownAll(() async {
-        await db.open();
+        await client.connect();
+        db = client.db();
         await Future.forEach(usedCollectionNames,
             (String collectionName) => db.collection(collectionName).drop());
-        await db.close();
+        await client.close();
       });
     });
 
@@ -1763,7 +1772,7 @@ db.runCommand(
 
         var operation = DistinctOperation(collection, 'sizes');
 
-        var result = await operation.executeDocument();
+        var result = await operation.executeDocument(db.server);
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);
@@ -1836,10 +1845,11 @@ db.runCommand(
       }, skip: cannotRunTests);
 
       tearDownAll(() async {
-        await db.open();
+        await client.connect();
+        db = client.db();
         await Future.forEach(usedCollectionNames,
             (String collectionName) => db.collection(collectionName).drop());
-        await db.close();
+        await client.close();
       });
     });
   });

@@ -1,4 +1,4 @@
-part of mongo_dart;
+/* //part of mongo_dart;
 
 typedef MonadicBlock = void Function(Map<String, dynamic> value);
 
@@ -265,4 +265,5 @@ class ListIndexesCursor extends CommandCursor {
         null);
   }
 }
+ */
  */

@@ -1,5 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart'
-    show CollationOptions, Db, FindOptions, where;
+    show CollationOptions, FindOptions, where;
 import 'package:mongo_dart/src/mongo_client.dart';
 
 const dbName = 'mongo-dart-example';

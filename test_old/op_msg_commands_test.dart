@@ -1,5 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/database/dbcollection.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:mongo_dart/src/commands/administration_commands/get_parameter_command/get_parameter_command.dart';
 import 'package:mongo_dart/src/commands/administration_commands/kill_cursors_command/kill_cursors_command.dart';
@@ -7,6 +9,7 @@ import 'package:mongo_dart/src/commands/administration_commands/get_all_paramete
 
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/get_more_command/get_more_options.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:test/test.dart';
 
 const dbName = 'test-mongo-dart';
@@ -16,6 +19,7 @@ const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
+late MongoClient client;
 late Db db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
@@ -28,8 +32,9 @@ String getRandomCollectionName() {
 
 void main() async {
   Future initializeDatabase() async {
-    db = Db(defaultUri);
-    await db.open();
+    var client = MongoClient(defaultUri);
+    await client.connect();
+    db = client.db();
   }
 
   Future insertManyDocuments(
@@ -43,7 +48,7 @@ void main() async {
   }
 
   Future cleanupDatabase() async {
-    await db.close();
+    await client.close();
   }
 
   group('Commands', () {
@@ -63,7 +68,7 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = ModernCursor(FindOperation(collection));
+          var cursor = ModernCursor(FindOperation(collection), db.server);
 
           expect(cursor.state, State.init);
 
@@ -73,7 +78,7 @@ void main() async {
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var command = KillCursorsCommand(collection, [cursor.cursorId]);
-          var result = await command.execute();
+          var result = await command.execute(db.server);
           expect(result, isNotNull);
           expect(
               (result[keyCursorsKilled] as List).first, cursor.cursorId.value);
@@ -85,7 +90,7 @@ void main() async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
           var command = KillCursorsCommand(collection, [BsonLong(1)]);
-          var result = await command.execute();
+          var result = await command.execute(db.server);
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
           expect((result[keyCursorsNotFound] as List).first, 1);
@@ -98,7 +103,7 @@ void main() async {
           var collection = db.collection(collectionName);
           var command =
               KillCursorsCommand(collection, [BsonLong(111111111111)]);
-          var result = await command.execute();
+          var result = await command.execute(db.server);
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
           expect((result[keyCursorsNotFound] as List).first, 111111111111);
@@ -113,11 +118,11 @@ void main() async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
           await insertManyDocuments(collection, 10000);
-          var cursor = ModernCursor(FindOperation(collection));
+          var cursor = ModernCursor(FindOperation(collection), db.server);
           expect(cursor.state, State.init);
           await cursor.nextObject();
           var command = KillCursorsCommand(collection, [BsonLong(1)]);
-          var result = await command.execute();
+          var result = await command.execute(db.server);
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
           expect((result[keyCursorsNotFound] as List).first, 1);
@@ -130,7 +135,7 @@ void main() async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
           var command = KillCursorsCommand(collection, [BsonLong(1)]);
-          var result = await command.executeDocument();
+          var result = await command.executeDocument(db.server);
           expect(result, isNotNull);
           expect(result.success, isTrue);
           expect(result.cursorsNotFound?.first, 1);
@@ -142,7 +147,7 @@ void main() async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
           var command = KillCursorsCommand(collection, [BsonLong(-1)]);
-          var result = await command.executeDocument();
+          var result = await command.executeDocument(db.server);
           expect(result, isNotNull);
           expect(result.success, isTrue);
           expect(result.cursorsNotFound?.first, -1);
@@ -158,7 +163,7 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = ModernCursor(FindOperation(collection));
+          var cursor = ModernCursor(FindOperation(collection), db.server);
 
           expect(cursor.state, State.init);
 
@@ -168,7 +173,7 @@ void main() async {
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var command = GetMoreCommand(collection, cursor.cursorId);
-          var result = await command.execute();
+          var result = await command.execute(db.server);
           expect(result, isNotNull);
           expect(result[keyCursor], isNotNull);
 
@@ -182,7 +187,7 @@ void main() async {
           var collection = db.collection(collectionName);
 
           var command = GetMoreCommand(collection, BsonLong(1));
-          var result = await command.execute();
+          var result = await command.execute(db.server);
           expect(result, isNotNull);
           expect(result[keyOk], 0.0);
           expect(result[keyCursor], isNull);
@@ -194,7 +199,7 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = ModernCursor(FindOperation(collection));
+          var cursor = ModernCursor(FindOperation(collection), db.server);
 
           expect(cursor.state, State.init);
 
@@ -206,7 +211,7 @@ void main() async {
           var options = GetMoreOptions(batchSize: 10);
           var command = GetMoreCommand(collection, cursor.cursorId,
               getMoreOptions: options);
-          var result = await command.executeDocument();
+          var result = await command.executeDocument(db.server);
           expect(result, isNotNull);
           var cursorRes = result.cursor;
           expect(cursorRes, isNotNull);
@@ -216,7 +221,7 @@ void main() async {
           options = GetMoreOptions(batchSize: 200);
           command = GetMoreCommand(collection, cursor.cursorId,
               getMoreOptions: options);
-          result = await command.executeDocument();
+          result = await command.executeDocument(db.server);
           expect(result, isNotNull);
           cursorRes = result.cursor;
           expect(cursorRes, isNotNull);
@@ -228,13 +233,14 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = ModernCursor(FindOperation(collection,
-              findOptions: FindOptions(batchSize: 1)));
+          var cursor = ModernCursor(
+              FindOperation(collection, findOptions: FindOptions(batchSize: 1)),
+              db.server);
           await cursor.nextObject();
           var options = GetMoreOptions(batchSize: 10001);
           var command = GetMoreCommand(collection, cursor.cursorId,
               getMoreOptions: options);
-          var result = await command.executeDocument();
+          var result = await command.executeDocument(db.server);
           expect(result, isNotNull);
           var cursorRes = result.cursor;
           expect(cursorRes, isNotNull);
@@ -247,11 +253,11 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = ModernCursor(FindOperation(collection));
+          var cursor = ModernCursor(FindOperation(collection), db.server);
           await cursor.nextObject();
 
           var command = GetMoreCommand(collection, cursor.cursorId);
-          var result = await command.executeDocument();
+          var result = await command.executeDocument(db.server);
           expect(result, isNotNull);
           var cursorRes = result.cursor;
           expect(cursorRes.nextBatch, isNotEmpty);
@@ -263,10 +269,10 @@ void main() async {
       group('Get All Parameters', () {
         test('Run command', () async {
           var command = GetAllParametersCommand(db);
-          var ret = await command.execute();
+          var ret = await command.execute(db.server);
           expect(ret[keyOk], 1.0);
           expect(ret[keyLogLevel], 0);
-          if (!db.masterConnection.serverCapabilities.isShardedCluster) {
+          if (!db.server.serverCapabilities.isShardedCluster) {
             expect(ret[keyFeatureCompatibilityVersion], isMap);
           }
         });
@@ -274,7 +280,7 @@ void main() async {
       group('Get Parameter', () {
         test('Run command', () async {
           var command = GetParameterCommand(db, keyLogLevel);
-          var ret = await command.execute();
+          var ret = await command.execute(db.server);
           expect(ret[keyOk], 1.0);
           expect(ret[keyLogLevel], 0);
         });
@@ -284,7 +290,7 @@ void main() async {
       group('Server Status', () {
         test('Map return', () async {
           var command = ServerStatusCommand(db);
-          var ret = await command.execute();
+          var ret = await command.execute(db.server);
           expect(ret, isNotNull);
           expect(ret[keyHost], isNotEmpty);
           expect(ret[keyVersion], isNotEmpty);
@@ -296,7 +302,7 @@ void main() async {
             keyPid: 0,
             keyAsserts: 0,
           });
-          var ret = await command.execute();
+          var ret = await command.execute(db.server);
           expect(ret, isNotNull);
           expect(ret[keyHost], isNotNull);
           expect(ret[keyPid], isNotNull);
@@ -306,14 +312,14 @@ void main() async {
         test('No Metric in ServerStatusOptions', () async {
           var command = ServerStatusCommand(db,
               serverStatusOptions: ServerStatusOptions(metricsExcluded: true));
-          var ret = await command.execute();
+          var ret = await command.execute(db.server);
           expect(ret, isNotNull);
           expect(ret[keyMetrics], isNull);
         });
 
         test('No Metric in RawOptions', () async {
           var command = ServerStatusCommand(db, rawOptions: {keyMetrics: 0});
-          var ret = await command.execute();
+          var ret = await command.execute(db.server);
           expect(ret, isNotNull);
           expect(ret[keyMetrics], isNull);
         });
@@ -321,14 +327,14 @@ void main() async {
         test('Only instance values', () async {
           var command = ServerStatusCommand(db,
               serverStatusOptions: ServerStatusOptions.instance);
-          var ret = await command.execute();
+          var ret = await command.execute(db.server);
           expect(ret, isNotNull);
           expect(ret[keyMetrics], isNull);
         });
 
         test('Document return', () async {
           var command = ServerStatusCommand(db);
-          var ret = await command.executeDocument();
+          var ret = await command.executeDocument(db.server);
           expect(ret, isNotNull);
           expect(ret.host, isNotEmpty);
           expect(ret.localTime?.isAfter(DateTime(2020)), isTrue);
@@ -338,14 +344,14 @@ void main() async {
         test('No Metric in ServerStatusOptions -> Result class', () async {
           var command = ServerStatusCommand(db,
               serverStatusOptions: ServerStatusOptions(metricsExcluded: true));
-          var ret = await command.executeDocument();
+          var ret = await command.executeDocument(db.server);
           expect(ret, isNotNull);
           expect(ret.metrics, isNull);
         });
 
         test('No Metric in RawOptions -> Result class', () async {
           var command = ServerStatusCommand(db, rawOptions: {keyMetrics: 0});
-          var ret = await command.executeDocument();
+          var ret = await command.executeDocument(db.server);
           expect(ret, isNotNull);
           expect(ret.metrics, isNull);
         });
@@ -354,9 +360,10 @@ void main() async {
   });
 
   tearDownAll(() async {
-    await db.open();
+    await client.connect();
+    db = client.db();
     await Future.forEach(usedCollectionNames,
         (String collectionName) => db.collection(collectionName).drop());
-    await db.close();
+    await client.close();
   });
 }

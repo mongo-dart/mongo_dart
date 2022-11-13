@@ -1,4 +1,4 @@
-part of mongo_dart;
+/* //part of mongo_dart;
 
 /// A function that produces an instance of [Db], whether synchronously or asynchronously.
 ///
@@ -49,3 +49,4 @@ class ConnectionPool {
   Future close() => Future.wait(_connections.map<Future>((c) => c.close()))
       .then((_) => _pool.close());
 }
+ */

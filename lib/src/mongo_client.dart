@@ -27,7 +27,7 @@ abstract class DriverInfo {
   String? platform;
 }
 
-abstract class Auth {
+class Auth {
   /// The username for auth
   String? username;
 

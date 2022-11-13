@@ -14,7 +14,6 @@ import '../../mongo_dart_old.dart';
 import '../core/error/mongo_dart_error.dart';
 import '../commands/base/db_admin_command_operation.dart';
 import '../commands/base/operation_base.dart';
-import '../core/network/abstract/connection_base.dart';
 import '../topology/server.dart';
 import 'db.dart';
 import 'dbcollection.dart';

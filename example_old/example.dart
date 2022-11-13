@@ -1,11 +1,15 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'dart:io' show Platform;
 
+import 'package:mongo_dart/src/mongo_client.dart';
+
 String host = Platform.environment['MONGO_DART_DRIVER_HOST'] ?? '127.0.0.1';
 String port = Platform.environment['MONGO_DART_DRIVER_PORT'] ?? '27017';
 
 void main() async {
-  var db = Db('mongodb://$host:$port/mongo_dart-blog');
+  var client = MongoClient('mongodb://$host:$port/mongo_dart-blog');
+  await client.connect();
+  final db = client.db();
   // Example url for Atlas connection
   /* var db = Db('mongodb://<atlas-user>:<atlas-password>@'
       'cluster0-shard-00-02.xtest.mongodb.net:27017,'
@@ -16,7 +20,6 @@ void main() async {
       '&ssl=true'); */
   var authors = <String, Map>{};
   var users = <String, Map>{};
-  await db.open();
   await db.drop();
   print('====================================================================');
   print('>> Adding Authors');
@@ -80,5 +83,5 @@ void main() async {
     print("[${article['title']}]:[${article['body']}]:"
         "[${article['author_id'].toHexString()}]");
   });
-  await db.close();
+  await client.close();
 }

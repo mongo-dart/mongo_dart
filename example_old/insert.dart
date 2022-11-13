@@ -1,11 +1,13 @@
 import 'package:mongo_dart/src/database/dbcollection.dart';
+import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src/write_concern.dart';
 
 void main() async {
-  var db = Db('mongodb://127.0.0.1/test_insert'); //
+  var client = MongoClient('mongodb://127.0.0.1/test_insert');
+  await client.connect();
+  final db = client.db();
   var stopwatch = Stopwatch()..start();
   DbCollection test;
-  await db.open();
   test = db.collection('test');
   var data = <Map<String, dynamic>>[];
   for (num i = 0; i < 1000; i++) {
@@ -27,5 +29,5 @@ void main() async {
       writeConcern: WriteConcern.acknowledged);
   print(stopwatch.elapsed);
 
-  await db.close();
+  await client.close();
 }
