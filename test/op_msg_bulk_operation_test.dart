@@ -113,6 +113,9 @@ void main() async {
     });
     group('Bulk insert', () {
       test('Ordered Bulk', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -141,9 +144,12 @@ void main() async {
         // Todo check ids and documents
         //expect(ret.ids.first, 2);
         //expect(ret.documents.first['name'], 'Stephen');
-      }, skip: cannotRunTests);
+      });
 
       test('Ordered Bulk - extra limit', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -182,6 +188,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('Unordered Bulk', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -220,6 +229,9 @@ void main() async {
         //expect(ret.documents.first['name'], 'Stephen');
       }, skip: cannotRunTests);
       test('Unordered Bulk - extra limit', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -252,11 +264,14 @@ void main() async {
         // Todo check ids and documents
         //expect(ret.ids.first, 2);
         //expect(ret.documents.first['name'], 'Stephen');
-      }, skip: cannotRunTests);
+      });
     });
 
     group('Bulk delete', () {
       test('Unordered Bulk', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -288,6 +303,9 @@ void main() async {
         //expect(ret.documents.first['name'], 'Stephen');
       }, skip: cannotRunTests);
       test('Unordered Bulk - collection helper', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -332,6 +350,9 @@ void main() async {
         //expect(ret.documents.first['name'], 'Stephen');
       }, skip: cannotRunTests);
       test('Ordered Bulk', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -366,6 +387,9 @@ void main() async {
 
     group('Bulk update', () {
       test('Unordered Bulk', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -409,7 +433,9 @@ void main() async {
         //expect(ret.documents.first['name'], 'Stephen');
       }, skip: cannotRunTests);
       test('Ordered Bulk', () async {
-        var collectionName = getRandomCollectionName();
+       if (cannotRunTests) {
+          return;
+        }   var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
         var retOrders = await insertOrders(collection);
@@ -451,6 +477,9 @@ void main() async {
         //expect(ret.documents.first['name'], 'Stephen');
       }, skip: cannotRunTests);
       test('Ordered Bulk - collection helper', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -526,6 +555,9 @@ void main() async {
 
     group('Mixed functions', () {
       test('Ordered Bulk - Insert and delete one', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -566,6 +598,9 @@ void main() async {
       test(
           'Ordered Bulk - Insert, delete one and delete many '
           'with collection helper', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -625,6 +660,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('Ordered Bulk - Insert, delete one and delete many', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -664,6 +702,9 @@ void main() async {
         expect(findResult.last['name'], 'Mandy');
       }, skip: cannotRunTests);
       test('Ordered Bulk - "One" method types', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -738,6 +779,9 @@ void main() async {
         expect(findResult.last['char'], 'Taeln');
       }, skip: cannotRunTests);
       test('Ordered Bulk - "One" method types - with error', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -816,6 +860,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('Ordered Bulk - "All" method types', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -895,6 +942,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('Ordered Bulk - "All" method types fromMap', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -951,6 +1001,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('Ordered Bulk - "One" method types - with error - 2', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1033,6 +1086,9 @@ void main() async {
         expect(findResult.last['char'], 'Taeln');
       }, skip: cannotRunTests);
       test('Unordered Bulk - "One" method types - with error', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1111,6 +1167,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('Unordered Bulk - "One" method types - with error - 2', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1193,6 +1252,9 @@ void main() async {
         expect(findResult.last['char'], 'Taeln');
       }, skip: cannotRunTests);
       test('Unordered Bulk - "One" method types', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1269,6 +1331,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('Ordered Bulk Write with Write Concern', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1354,6 +1419,9 @@ void main() async {
         }
       }, skip: cannotRunTests);
       test('Unordered Bulk Write with Write Concern', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 

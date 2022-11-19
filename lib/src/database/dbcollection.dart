@@ -193,7 +193,7 @@ class DbCollection {
   }
 
   // Old version to be used on MongoDb versions prior to 3.6
-  Future<Map<String, dynamic>> legacyFindAndModify(
+  Future<Map<String, dynamic>?> legacyFindAndModify(
       {query,
       sort,
       bool? remove,
@@ -201,22 +201,22 @@ class DbCollection {
       bool? returnNew,
       fields,
       bool? upsert}) {
-    query = _queryBuilder2Map(query);
-    sort = _sortBuilder2Map(sort);
-    update = _updateBuilder2Map(update);
-    fields = _fieldsBuilder2Map(fields);
+    query = _queryBuilder2Map(query ?? <String, Object>{});
+    sort = _sortBuilder2Map(sort ?? <String, Object>{});
+    update = _updateBuilder2Map(update ?? <String, Object>{});
+    fields = _fieldsBuilder2Map(fields ?? <String, Object>{});
     return db
         .executeDbCommand(DbCommand.createFindAndModifyCommand(
             db, collectionName,
             query: query as Map<String, dynamic>,
             sort: sort as Map<String, dynamic>,
             remove: remove,
-            update: update as Map<String, dynamic>,
+            update: update.isEmpty ? null : update as Map<String, dynamic>,
             returnNew: returnNew,
             fields: fields as Map<String, dynamic>,
             upsert: upsert))
         .then((reply) {
-      return Future.value(reply['value'] as Map<String, dynamic>);
+      return Future.value(reply['value'] as Map<String, dynamic>?);
     });
   }
 
@@ -392,7 +392,7 @@ class DbCollection {
 
   Map<String, Object> _sortBuilder2Map(query) {
     if (query is SelectorBuilder) {
-      query = query.map['orderby'];
+      query = <String, Object>{...?query.map['orderby']};
     }
     return query as Map<String, Object>;
   }

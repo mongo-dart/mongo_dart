@@ -29,7 +29,7 @@ class ConnectionManager {
       var helloCommand = HelloCommand(db,
           username: connection.serverConfig.userName, connection: connection);
       result = await helloCommand.execute(skipStateCheck: true);
-    } catch (e) {
+    } catch (error) {
       //Do nothing
     }
     if (result[keyOk] == 1.0) {
@@ -52,6 +52,11 @@ class ConnectionManager {
         }
       }
     } else {
+      if (connection._closed) {
+        connection._closed = false;
+        await connection.connect();
+        result = <String, Object?>{keyOk: 0.0};
+      }
       var isMasterCommand = DbCommand.createIsMasterCommand(db);
       var replyMessage = await connection.query(isMasterCommand);
       if (replyMessage.documents == null || replyMessage.documents!.isEmpty) {

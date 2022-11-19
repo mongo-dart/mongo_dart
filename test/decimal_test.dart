@@ -41,8 +41,13 @@ void main() async {
   }
 
   group('Commands', () {
+    var cannotRunTests = false;
+
     setUp(() async {
       await initializeDatabase();
+      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+        cannotRunTests = true;
+      }
     });
 
     tearDown(() async {
@@ -51,6 +56,9 @@ void main() async {
 
     group('Decimal:', () {
       test('read Decimal', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
 
         var collection = db.collection(collectionName);
@@ -76,6 +84,9 @@ void main() async {
         }
       });
       test('update Decimal', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -101,6 +112,9 @@ void main() async {
         expect(values.first['qty'], 40);
       });
       test('update Decimal with Modifier', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
 
         var collection = db.collection(collectionName);
