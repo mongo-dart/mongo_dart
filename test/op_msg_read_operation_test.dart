@@ -1342,9 +1342,10 @@ db.runCommand(
         expect(result[keyN], 3);
       }, skip: cannotRunTests);
       test('All documents - Class result', () async {
-   if (cannotRunTests) {
-            return;
-          }     var collectionName = getRandomCollectionName();
+        if (cannotRunTests) {
+          return;
+        }
+        var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
         await collection.insertMany(<Map<String, dynamic>>[

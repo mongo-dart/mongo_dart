@@ -433,9 +433,10 @@ void main() async {
         //expect(ret.documents.first['name'], 'Stephen');
       }, skip: cannotRunTests);
       test('Ordered Bulk', () async {
-       if (cannotRunTests) {
+        if (cannotRunTests) {
           return;
-        }   var collectionName = getRandomCollectionName();
+        }
+        var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
         var retOrders = await insertOrders(collection);

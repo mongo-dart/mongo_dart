@@ -86,8 +86,7 @@ void main() async {
 
   var res = await collection.count();
 
-  
-    print('Document counted: $res ');
+  print('Document counted: $res ');
   // Tom - active - 025456da-9e39-4e7c-b1f7-0f5a5e1cb212
 
   await cleanupDatabase();
