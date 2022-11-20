@@ -16,7 +16,7 @@ import 'package:mongo_dart/mongo_dart_old.dart'
         keyOk;
 import 'package:mongo_dart/src/core/auth/auth.dart';
 
-import '../../database/db.dart';
+import '../../database/mongo_database.dart';
 import '../error/mongo_dart_error.dart';
 import '../network/abstract/connection_base.dart';
 import '../../topology/server.dart';
@@ -25,7 +25,7 @@ abstract class SaslAuthenticator extends Authenticator {
   SaslAuthenticator(this.mechanism, this.db) : super();
 
   SaslMechanism mechanism;
-  Db db;
+  MongoDatabase db;
 
   @override
   Future authenticate(Server server, {ConnectionBase? connection}) async {

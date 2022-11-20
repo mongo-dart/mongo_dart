@@ -4,7 +4,7 @@ import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/db.dart';
+import '../../../database/mongo_database.dart';
 import '../../../topology/server.dart';
 
 var _command = <String, Object>{keyHello: 1};
@@ -21,7 +21,7 @@ var _command = <String, Object>{keyHello: 1};
 /// `db.runCommand( { hello: 1, saslSupportedMechs: "<db.username>",
 /// comment: <String> } )`
 class HelloCommand extends CommandOperation {
-  HelloCommand(Db db,
+  HelloCommand(MongoDatabase db,
       {String? username,
       HelloOptions? helloOptions,
       Map<String, Object>? rawOptions,

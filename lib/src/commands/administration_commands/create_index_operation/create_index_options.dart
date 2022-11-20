@@ -12,9 +12,9 @@ import 'package:mongo_dart/mongo_dart_old.dart'
         keySparseIndex,
         keyUniqueIndex,
         keyWriteConcern;
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 
-import '../../../database/dbcollection.dart';
+import '../../../database/mongo_collection.dart';
 
 /// @param {object} [options] Optional settings.
 /// @param {(number|string)} [options.writeConcern] The write concern.
@@ -31,7 +31,7 @@ import '../../../database/dbcollection.dart';
 /// @param {object} [options.collation] Specify collation (MongoDB 3.4 or higher) settings for update operation (see 3.4 documentation for available fields).
 /// @param {ClientSession} [options.session] optional session to use for this operation
 class CreateIndexOptions {
-  DbCollection collection;
+  MongoCollection collection;
   WriteConcern? writeConcern;
   bool uniqueIndex;
   bool sparseIndex;

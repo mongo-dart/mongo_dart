@@ -1,11 +1,11 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 
-import '../../../../database/dbcollection.dart';
+import '../../../../database/mongo_collection.dart';
 import 'bulk_options.dart';
 
 class UnorderedBulk extends Bulk {
-  UnorderedBulk(DbCollection collection,
+  UnorderedBulk(MongoCollection collection,
       {WriteConcern? writeConcern,
       Map<String, Object>? rawOptions,
       bool? bypassDocumentValidation})

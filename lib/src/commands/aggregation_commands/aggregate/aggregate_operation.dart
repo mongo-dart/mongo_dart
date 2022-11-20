@@ -4,8 +4,8 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/db.dart';
-import '../../../database/dbcollection.dart';
+import '../../../database/mongo_database.dart';
+import '../../../database/mongo_collection.dart';
 import '../../../topology/server.dart';
 import 'aggregate_options.dart';
 import '../../base/command_operation.dart';
@@ -16,8 +16,8 @@ import 'aggregate_result.dart';
 /// collection, the db parameter must be passed instead.
 class AggregateOperation extends CommandOperation {
   AggregateOperation(Object pipeline,
-      {DbCollection? collection,
-      Db? db,
+      {MongoCollection? collection,
+      MongoDatabase? db,
       bool? explain,
       Map<String, Object>? cursor,
       this.hint,

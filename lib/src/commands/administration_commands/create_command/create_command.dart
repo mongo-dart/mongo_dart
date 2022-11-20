@@ -1,7 +1,7 @@
 import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../database/db.dart';
+import '../../../database/mongo_database.dart';
 import 'create_options.dart';
 
 /// create command.
@@ -17,7 +17,7 @@ import 'create_options.dart';
 /// flags for create.
 ///
 /// The command accepts the following fields:
-/// - db [Db]
+/// - db [MongoDatabase]
 ///   The database on which create the collection or view
 /// - name 	[String]
 ///   The collection or view name to be created.
@@ -27,7 +27,7 @@ import 'create_options.dart';
 ///   An alternative way to creteOptions to specify command options
 ///   (must be manually set)
 class CreateCommand extends CommandOperation {
-  CreateCommand(Db db, String name,
+  CreateCommand(MongoDatabase db, String name,
       {CreateOptions? createOptions, Map<String, Object>? rawOptions})
       : super(db, <String, Object>{
           ...?createOptions?.getOptions(db),

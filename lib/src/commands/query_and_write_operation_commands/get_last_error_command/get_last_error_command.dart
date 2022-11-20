@@ -1,7 +1,7 @@
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/db.dart';
+import '../../../database/mongo_database.dart';
 import '../../../topology/server.dart';
 import 'get_last_error_options.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
@@ -19,7 +19,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 ///   current connection.
 ///
 /// The command accepts the following fields:
-/// * db 	[Db]
+/// * db 	[MongoDatabase]
 ///   - The database on which the previous write operation ha been executed.
 /// * writeConcern WriteConcern
 ///   - When running with replication, this is the number of servers to
@@ -34,7 +34,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 /// * getLastErrorOptions [GetLastErrorOptions] - Optional
 ///   - a set of optional values for the command
 class GetLastErrorCommand extends CommandOperation {
-  GetLastErrorCommand(Db db,
+  GetLastErrorCommand(MongoDatabase db,
       {WriteConcern? writeConcern,
       GetLastErrorOptions? getLastErrorOptions,
       Map<String, Object>? rawOptions})

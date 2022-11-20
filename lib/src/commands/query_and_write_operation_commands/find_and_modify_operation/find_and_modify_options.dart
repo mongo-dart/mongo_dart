@@ -1,8 +1,8 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
-import '../../../database/db.dart';
+import '../../../database/mongo_database.dart';
 
 class FindAndModifyOptions {
   /// Enables findAndModify to bypass document validation during the operation.
@@ -75,7 +75,7 @@ class FindAndModifyOptions {
     }
   }
 
-  Map<String, Object> getOptions(Db db) => <String, Object>{
+  Map<String, Object> getOptions(MongoDatabase db) => <String, Object>{
         if (bypassDocumentValidation)
           keyBypassDocumentValidation: bypassDocumentValidation,
         if (writeConcern != null)

@@ -3,8 +3,8 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
 import '../../mongo_dart_old.dart';
-import 'db.dart';
-import '../write_concern.dart';
+import 'mongo_database.dart';
+import '../parameters/write_concern.dart';
 import '../commands/administration_commands/drop_indexes_command/drop_indexes_command.dart';
 import '../commands/administration_commands/drop_indexes_command/drop_indexes_options.dart';
 import '../commands/administration_commands/listt_indexes_command/list_indexes_command.dart';
@@ -21,12 +21,12 @@ import '../commands/query_and_write_operation_commands/update_operation/update_s
 import 'modern_cursor.dart';
 import '../../src_old/database/utils/parms_utils.dart';
 
-class DbCollection {
-  Db db;
+class MongoCollection {
+  MongoDatabase db;
   String collectionName;
   ReadPreference readPreference = ReadPreference.primary;
 
-  DbCollection(this.db, this.collectionName);
+  MongoCollection(this.db, this.collectionName);
 
   String fullName() => '${db.databaseName}.$collectionName';
 

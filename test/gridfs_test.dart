@@ -1,7 +1,7 @@
 library gridfs_tests;
 
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/database/mongo_database.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 import 'dart:io';
 import 'dart:async';
@@ -10,7 +10,7 @@ import 'package:path/path.dart' as path;
 
 const dbName = 'testauth';
 const defaultUri = 'mongodb://localhost:27017/test-mongo-dart';
-late Db db;
+late MongoDatabase db;
 late MongoClient client;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];

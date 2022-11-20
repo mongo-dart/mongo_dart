@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';

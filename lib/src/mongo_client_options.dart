@@ -1,7 +1,7 @@
 import 'core/auth/auth.dart';
-import 'compression.dart';
+import 'core/compression.dart';
 import 'mongo_client.dart';
-import 'read_concern.dart';
+import 'parameters/read_concern.dart';
 
 /// Describes all possible URI query options for the mongo client
 /// @public

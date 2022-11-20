@@ -3,14 +3,14 @@ import 'package:mongo_dart/src/commands/query_and_write_operation_commands/retur
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/return_classes/write_result.dart';
 
 import '../../../../core/network/abstract/connection_base.dart';
-import '../../../../database/dbcollection.dart';
+import '../../../../database/mongo_collection.dart';
 import '../../../../topology/server.dart';
 import 'insert_one_options.dart';
 
 class InsertOneOperation extends InsertOperation {
   Map<String, Object?> document;
 
-  InsertOneOperation(DbCollection collection, this.document,
+  InsertOneOperation(MongoCollection collection, this.document,
       {InsertOneOptions? insertOneOptions, Map<String, Object>? rawOptions})
       : super(
           collection,

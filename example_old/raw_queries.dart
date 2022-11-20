@@ -1,12 +1,12 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/dbcollection.dart';
+import 'package:mongo_dart/src/database/mongo_collection.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 
 void main() async {
   var client = MongoClient('mongodb://127.0.0.1/mongo_dart-test');
   await client.connect();
   final db = client.db();
-  DbCollection coll;
+  MongoCollection coll;
   ObjectId? id;
   print('connection open');
   coll = db.collection('simple_data');

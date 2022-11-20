@@ -3,14 +3,14 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/dbcollection.dart';
+import '../../../database/mongo_collection.dart';
 import '../../../topology/server.dart';
 import 'find_and_modify_options.dart';
 import '../../base/command_operation.dart';
 import 'find_and_modify_result.dart';
 
 class FindAndModifyOperation extends CommandOperation {
-  FindAndModifyOperation(DbCollection collection,
+  FindAndModifyOperation(MongoCollection collection,
       {this.query,
       this.sort,
       bool? remove,

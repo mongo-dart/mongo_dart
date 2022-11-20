@@ -15,18 +15,15 @@ import '../core/network/connection_pool.dart';
 enum ServerState { closed, connected }
 
 class Server {
-  Server({ServerConfig? serverConfig})
-      : serverConfig = serverConfig ?? ServerConfig() {
-    connectionPool = ConnectionPool(this.serverConfig);
-  }
+  Server(this.serverConfig) : connectionPool = ConnectionPool(serverConfig);
 
   final Logger log = Logger('Server');
-  ServerConfig serverConfig;
-  late ConnectionPool connectionPool;
-  ServerState state = ServerState.closed;
-
+  final ServerConfig serverConfig;
+  final ConnectionPool connectionPool;
   final ServerCapabilities serverCapabilities = ServerCapabilities();
   final ServerStatus serverStatus = ServerStatus();
+
+  ServerState state = ServerState.closed;
 
   bool get isAuthenticated => serverConfig.isAuthenticated;
 

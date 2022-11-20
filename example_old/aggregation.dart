@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:decimal/decimal.dart';
-import 'package:mongo_dart/src/database/dbcollection.dart';
+import 'package:mongo_dart/src/database/mongo_collection.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 
 void main() async {
@@ -21,6 +21,6 @@ void main() async {
           Group(id: Field('cust_id'), fields: {'total': Sum(Field('amount'))}))
       .build();
   final result =
-      await DbCollection(db, 'orders').modernAggregate(pipeline).toList();
+      await MongoCollection(db, 'orders').modernAggregate(pipeline).toList();
   result.forEach(print);
 }

@@ -9,12 +9,12 @@ import 'package:mongo_dart/src/commands/query_and_write_operation_commands/retur
 
 import '../../../../core/error/mongo_dart_error.dart';
 import '../../../../core/network/abstract/connection_base.dart';
-import '../../../../database/dbcollection.dart';
+import '../../../../database/mongo_collection.dart';
 import '../../../../topology/server.dart';
 import 'bulk_options.dart';
 
 abstract class Bulk extends CommandOperation {
-  Bulk(DbCollection collection,
+  Bulk(MongoCollection collection,
       {BulkOptions? bulkOptions, Map<String, Object>? rawOptions})
       : super(
             collection.db,

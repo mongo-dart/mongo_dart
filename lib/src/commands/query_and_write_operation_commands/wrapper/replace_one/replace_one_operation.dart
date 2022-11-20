@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/commands/query_and_write_operation_commands/retur
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/update_operation/update_operation.dart';
 
 import '../../../../core/network/abstract/connection_base.dart';
-import '../../../../database/dbcollection.dart';
+import '../../../../database/mongo_collection.dart';
 import '../../../../topology/server.dart';
 import 'replace_one_options.dart';
 import 'replace_one_statement.dart';
@@ -12,7 +12,7 @@ class ReplaceOneOperation extends UpdateOperation {
   //ReplaceOneStatement replaceOneStatement;
 
   ReplaceOneOperation(
-      DbCollection collection, ReplaceOneStatement replaceOneStatement,
+      MongoCollection collection, ReplaceOneStatement replaceOneStatement,
       {ReplaceOneOptions? replaceOneOptions, Map<String, Object>? rawOptions})
       : super(
           collection,

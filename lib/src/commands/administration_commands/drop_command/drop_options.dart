@@ -1,8 +1,8 @@
 import 'package:mongo_dart/mongo_dart_old.dart'
     show keyComment, keyWriteConcern;
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 
-import '../../../database/db.dart';
+import '../../../database/mongo_database.dart';
 
 /// Drop command options;
 ///
@@ -32,7 +32,7 @@ class DropOptions {
     this.writeConcern,
   });
 
-  Map<String, Object> getOptions(Db db) => <String, Object>{
+  Map<String, Object> getOptions(MongoDatabase db) => <String, Object>{
         if (writeConcern != null)
           keyWriteConcern: writeConcern!.asMap(db.server.serverStatus),
         if (comment != null) keyComment: comment!,

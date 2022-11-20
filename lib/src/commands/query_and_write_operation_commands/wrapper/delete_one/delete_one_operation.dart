@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/commands/query_and_write_operation_commands/retur
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/return_classes/write_result.dart';
 
 import '../../../../core/network/abstract/connection_base.dart';
-import '../../../../database/dbcollection.dart';
+import '../../../../database/mongo_collection.dart';
 import '../../../../topology/server.dart';
 import 'delete_one_options.dart';
 import 'delete_one_statement.dart';
@@ -11,7 +11,8 @@ import 'delete_one_statement.dart';
 class DeleteOneOperation extends DeleteOperation {
   //DeleteOneStatement deleteRequest;
 
-  DeleteOneOperation(DbCollection collection, DeleteOneStatement deleteRequest,
+  DeleteOneOperation(
+      MongoCollection collection, DeleteOneStatement deleteRequest,
       {DeleteOneOptions? deleteOneOptions, Map<String, Object>? rawOptions})
       : super(
           collection,

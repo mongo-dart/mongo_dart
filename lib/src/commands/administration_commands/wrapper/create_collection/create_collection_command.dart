@@ -1,6 +1,6 @@
 import 'package:mongo_dart/src/commands/administration_commands/create_command/create_command.dart';
 
-import '../../../../database/db.dart';
+import '../../../../database/mongo_database.dart';
 import 'create_collection_options.dart';
 
 /// createCollection command.
@@ -27,7 +27,7 @@ import 'create_collection_options.dart';
 ///
 ///
 /// The command accepts the following fields:
-/// - db [Db]
+/// - db [MongoDatabase]
 ///   The database on which create the collection
 /// - name 	[String]
 ///   The collection name to be created.
@@ -37,7 +37,7 @@ import 'create_collection_options.dart';
 ///   An alternative way to creteCollectionOptions to specify command options
 ///   (must be manually set)
 class CreateCollectionCommand extends CreateCommand {
-  CreateCollectionCommand(Db db, String name,
+  CreateCollectionCommand(MongoDatabase db, String name,
       {CreateCollectionOptions? createCollectionOptions,
       Map<String, Object>? rawOptions})
       : super(db, name,

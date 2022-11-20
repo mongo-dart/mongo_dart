@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import '../../../database/db.dart';
-import '../../../database/dbcollection.dart';
+import '../../../database/mongo_database.dart';
+import '../../../database/mongo_collection.dart';
 import '../../base/command_operation.dart';
 import 'list_indexes_options.dart';
 
@@ -12,9 +12,9 @@ import 'list_indexes_options.dart';
 ///  batch size for the first batch of results.
 ///
 /// The command accepts the following fields:
-/// - db [Db]
+/// - db [MongoDatabase]
 ///   The database on which to query the indexes info
-/// - collection [DbCollection]
+/// - collection [MongoCollection]
 ///   The collection of which to list the indexes
 /// - listIndexesOptions [ListIndexesOptions] - Optional
 ///   a set of optional values for the command
@@ -23,7 +23,7 @@ import 'list_indexes_options.dart';
 ///   (must be manually set)
 
 class ListIndexesCommand extends CommandOperation {
-  ListIndexesCommand(Db db, DbCollection collection,
+  ListIndexesCommand(MongoDatabase db, MongoCollection collection,
       {ListIndexesOptions? listIndexesOptions, Map<String, Object>? rawOptions})
       : super(db,
             <String, Object>{...?listIndexesOptions?.options, ...?rawOptions},

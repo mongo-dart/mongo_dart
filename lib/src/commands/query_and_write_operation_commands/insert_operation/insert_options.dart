@@ -1,7 +1,7 @@
 import 'package:mongo_dart/src/utils/map_keys.dart';
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 
-import '../../../database/db.dart';
+import '../../../database/mongo_database.dart';
 
 class InsertOptions {
   /// The WriteConcern for this insert operation
@@ -33,7 +33,7 @@ class InsertOptions {
 
   // The db parameter is used to transform the writeConcern into a Map
   /// When a writeConcern is given a Db object must be specified
-  Map<String, Object> getOptions(Db db) {
+  Map<String, Object> getOptions(MongoDatabase db) {
     return <String, Object>{
       if (writeConcern != null)
         keyWriteConcern: writeConcern!.asMap(db.server.serverStatus),

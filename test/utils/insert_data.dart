@@ -1,8 +1,8 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/dbcollection.dart';
+import 'package:mongo_dart/src/database/mongo_collection.dart';
 
 /// For op_msg
-Future<BulkWriteResult> insertOrders(DbCollection collection) async {
+Future<BulkWriteResult> insertOrders(MongoCollection collection) async {
   var toInsert = <Map<String, dynamic>>[
     {'cust_num': 99999, 'item': 'abc123', 'status': 'A'},
     {'cust_num': 12345, 'item': 'tst24', 'status': 'D'},
@@ -45,7 +45,7 @@ Future<BulkWriteResult> insertOrders(DbCollection collection) async {
 }
 
 /// For op_msg
-Future<BulkWriteResult> insertFrenchCafe(DbCollection collection) async {
+Future<BulkWriteResult> insertFrenchCafe(MongoCollection collection) async {
   var toInsert = <Map<String, dynamic>>[
     {'_id': 1, 'category': 'café', 'status': 'A'},
     {'_id': 2, 'category': 'cafe', 'status': 'a'},
@@ -56,7 +56,7 @@ Future<BulkWriteResult> insertFrenchCafe(DbCollection collection) async {
 }
 
 /// For op_msg
-Future<BulkWriteResult> insertMembers(DbCollection collection) async {
+Future<BulkWriteResult> insertMembers(MongoCollection collection) async {
   var toInsert = <Map<String, dynamic>>[
     {
       '_id': 1,
@@ -111,7 +111,7 @@ Future<BulkWriteResult> insertMembers(DbCollection collection) async {
   return collection.insertMany(toInsert);
 }
 
-Future<BulkWriteResult> insertPeople(DbCollection collection) async {
+Future<BulkWriteResult> insertPeople(MongoCollection collection) async {
   var toInsert = <Map<String, dynamic>>[
     {'_id': 1, 'name': 'Tom', 'state': 'active', 'rating': 100, 'score': 5},
     {'_id': 2, 'name': 'William', 'state': 'busy', 'rating': 80, 'score': 4},
@@ -126,7 +126,7 @@ Future<BulkWriteResult> insertPeople(DbCollection collection) async {
 }
 
 Future<BulkWriteResult> insertManyDocuments(
-    DbCollection collection, int numberOfRecords) async {
+    MongoCollection collection, int numberOfRecords) async {
   var toInsert = <Map<String, dynamic>>[];
   for (var n = 0; n < numberOfRecords; n++) {
     toInsert.add({'a': n});

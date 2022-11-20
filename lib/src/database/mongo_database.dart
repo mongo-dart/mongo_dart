@@ -42,10 +42,10 @@ import '../core/network/abstract/connection_base.dart';
 import '../topology/server.dart';
 import '../mongo_client.dart';
 import '../utils/split_hosts.dart';
-import '../write_concern.dart';
-import 'dbcollection.dart';
+import '../parameters/write_concern.dart';
+import 'mongo_collection.dart';
 
-class Db {
+class MongoDatabase {
   final log = Logger('Db');
   final List<String> _uriList = <String>[];
   late MongoClient mongoClient;
@@ -53,7 +53,7 @@ class Db {
   State state = State.init;
   String? databaseName;
   String? _debugInfo;
-  Db? authSourceDb;
+  MongoDatabase? authSourceDb;
 
   WriteConcern? _writeConcern;
   AuthenticationScheme? authenticationScheme;
@@ -75,7 +75,7 @@ class Db {
   ///     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
   ///```
   @Deprecated('No more used')
-  Db(String uriString, [this._debugInfo]) {
+  MongoDatabase(String uriString, [this._debugInfo]) {
     if (uriString.contains(',')) {
       _uriList.addAll(splitHosts(uriString));
     } else {
@@ -83,13 +83,13 @@ class Db {
     }
   }
   @Deprecated('No more used')
-  Db.pool(List<String> uriList, [this._debugInfo]) {
+  MongoDatabase.pool(List<String> uriList, [this._debugInfo]) {
     _uriList.addAll(uriList);
   }
   //@Deprecated('No more used')
   //Db._authDb(this.databaseName);
 
-  Db.modern(this.mongoClient, this.databaseName);
+  MongoDatabase.modern(this.mongoClient, this.databaseName);
 
   /// This method allow to create a Db object both with the Standard
   /// Connection String Format (`mongodb://`) or with the DNS Seedlist
@@ -106,12 +106,13 @@ class Db {
   /// In order to resolve the Seedlist, a call to a DNS server is needed
   /// If the DNS server is unreachable, the constructor throws an error.
   @Deprecated('No more used')
-  static Future<Db> create(String uriString, [String? debugInfo]) async {
+  static Future<MongoDatabase> create(String uriString,
+      [String? debugInfo]) async {
     if (uriString.startsWith('mongodb://')) {
-      return Db(uriString, debugInfo);
+      return MongoDatabase(uriString, debugInfo);
     } else if (uriString.startsWith('mongodb+srv://')) {
       var uriList = await dnsLookup(Uri.parse(uriString));
-      return Db.pool(uriList, debugInfo);
+      return MongoDatabase.pool(uriList, debugInfo);
     } else {
       throw MongoDartError(
           'The only valid schemas for Db are: "mongodb" and "mongodb+srv".');
@@ -236,8 +237,8 @@ class Db {
     }
   }
 
-  DbCollection collection(String collectionName) {
-    return DbCollection(this, collectionName);
+  MongoCollection collection(String collectionName) {
+    return MongoCollection(this, collectionName);
   }
 
   Future<MongoReplyMessage> queryMessage(MongoMessage queryMessage,

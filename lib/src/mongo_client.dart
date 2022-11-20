@@ -1,14 +1,17 @@
 import 'package:logging/logging.dart';
+import 'package:mongo_dart/src/session/session_options.dart';
+import 'package:mongo_dart/src/topology/discover.dart';
 
+import 'session/client_session.dart';
 import 'core/error/mongo_dart_error.dart';
 import 'topology/abstract/topology.dart';
-import 'default_settings.dart';
+import 'configuration/default_settings.dart';
 import 'mongo_client_options.dart';
 import 'utils/decode_dns_seed_list.dart';
 import 'utils/decode_url_parameters.dart';
 import 'utils/split_hosts.dart';
-import 'write_concern.dart';
-import 'database/db.dart';
+import 'parameters/write_concern.dart';
+import 'database/mongo_database.dart';
 
 typedef ServerApiVersion = Map<String, String>;
 const ServerApiVersion serverApiVersion = <String, String>{'v1': '1'};
@@ -65,6 +68,8 @@ class MongoClient {
   String defaultDatabaseName = defMongoDbName;
   String defaultAuthDbName = defMongoAuthDbName;
 
+  DateTime? clientClusterTime;
+
   // ReadConcern
   // Read Preference
   WriteConcern? writeConcern;
@@ -88,11 +93,21 @@ class MongoClient {
     }
     seedServers.addAll([for (var element in hostsSeedList) Uri.parse(element)]);
     await decodeUrlParameters(connectionUri, mongoClientOptions);
+
+    var discoverTopology = Discover(seedServers, mongoClientOptions);
+
+    await discoverTopology.connect();
   }
 
   Future close() async {}
 
   /// If no name passed, the url specified db is used
-  Db db({String? dbName}) =>
-      Db.modern(this, dbName ?? mongoClientOptions.defaultDbName);
+  MongoDatabase db({String? dbName}) =>
+      MongoDatabase.modern(this, dbName ?? mongoClientOptions.defaultDbName);
+
+  // Todo
+  ClientSession startSession() {
+    // here also the server session must be assigned
+    return ClientSession(this, SessionOptions());
+  }
 }

@@ -2,12 +2,12 @@ import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/update_operation/update_statement.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../database/dbcollection.dart';
+import '../../../database/mongo_collection.dart';
 import 'update_options.dart';
 import '../../base/command_operation.dart';
 
 class UpdateOperation extends CommandOperation {
-  UpdateOperation(DbCollection collection, this.updates,
+  UpdateOperation(MongoCollection collection, this.updates,
       {bool? ordered,
       UpdateOptions? updateOptions,
       Map<String, Object>? rawOptions})

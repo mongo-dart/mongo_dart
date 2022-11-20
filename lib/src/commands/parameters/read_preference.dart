@@ -8,8 +8,8 @@ import 'package:mongo_dart/src/utils/map_keys.dart'
         keyTags;
 
 import '../../core/error/mongo_dart_error.dart';
-import '../../database/db.dart';
-import '../../database/dbcollection.dart';
+import '../../database/mongo_database.dart';
+import '../../database/mongo_collection.dart';
 
 enum ReadPreferenceMode {
   primary,
@@ -173,9 +173,9 @@ ReadPreference? resolveReadPreference(parent, Map<String, Object> options,
   ReadPreference? inheritedReadPreference;
 
   if (inheritReadPreference) {
-    if (parent is DbCollection) {
+    if (parent is MongoCollection) {
       inheritedReadPreference = parent.readPreference;
-    } else if (parent is Db) {
+    } else if (parent is MongoDatabase) {
       inheritedReadPreference = parent.readPreference;
     } //Todo MongoClient class not yet Implemented
     /*else if (parent is MongoClient) {

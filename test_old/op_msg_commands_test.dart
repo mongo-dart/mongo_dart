@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/db.dart';
-import 'package:mongo_dart/src/database/dbcollection.dart';
+import 'package:mongo_dart/src/database/mongo_database.dart';
+import 'package:mongo_dart/src/database/mongo_collection.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:mongo_dart/src/commands/administration_commands/get_parameter_command/get_parameter_command.dart';
 import 'package:mongo_dart/src/commands/administration_commands/kill_cursors_command/kill_cursors_command.dart';
@@ -20,7 +20,7 @@ const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
 late MongoClient client;
-late Db db;
+late MongoDatabase db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
@@ -38,7 +38,7 @@ void main() async {
   }
 
   Future insertManyDocuments(
-      DbCollection collection, int numberOfRecords) async {
+      MongoCollection collection, int numberOfRecords) async {
     var toInsert = <Map<String, dynamic>>[];
     for (var n = 0; n < numberOfRecords; n++) {
       toInsert.add({'a': n});

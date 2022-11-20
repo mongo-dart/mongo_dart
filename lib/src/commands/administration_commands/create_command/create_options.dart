@@ -15,9 +15,9 @@ import 'package:mongo_dart/mongo_dart_old.dart'
         keyValidator,
         keyViewOn,
         keyWriteConcern;
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 
-import '../../../database/db.dart';
+import '../../../database/mongo_database.dart';
 
 /// Create command options;
 ///
@@ -229,7 +229,7 @@ class CreateOptions {
     }
   }
 
-  Map<String, Object> getOptions(Db db) => <String, Object>{
+  Map<String, Object> getOptions(MongoDatabase db) => <String, Object>{
         if (/* capped != null && */ capped) keyCapped: capped,
         if (autoIndexId != null && !autoIndexId!) keyAutoIndexId: autoIndexId!,
         if (size != null) keySize: size!,

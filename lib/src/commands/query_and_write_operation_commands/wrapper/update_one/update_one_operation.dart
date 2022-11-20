@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/commands/query_and_write_operation_commands/retur
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/update_operation/update_operation.dart';
 
 import '../../../../core/network/abstract/connection_base.dart';
-import '../../../../database/dbcollection.dart';
+import '../../../../database/mongo_collection.dart';
 import '../../../../topology/server.dart';
 import 'update_one_options.dart';
 import 'update_one_statement.dart';
@@ -12,7 +12,7 @@ class UpdateOneOperation extends UpdateOperation {
   //UpdateOneStatement updateRequest;
 
   UpdateOneOperation(
-      DbCollection collection, UpdateOneStatement updateOneStatement,
+      MongoCollection collection, UpdateOneStatement updateOneStatement,
       {UpdateOneOptions? updateOneOptions, Map<String, Object>? rawOptions})
       : super(
           collection,

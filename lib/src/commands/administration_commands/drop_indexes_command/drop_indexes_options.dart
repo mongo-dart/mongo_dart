@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 
-import '../../../database/dbcollection.dart';
+import '../../../database/mongo_collection.dart';
 
 class DropIndexesOptions {
   /// The WriteConcern for this insert operation
@@ -20,7 +20,8 @@ class DropIndexesOptions {
 
   DropIndexesOptions({this.writeConcern, this.comment});
 
-  Map<String, Object> getOptions(DbCollection collection) => <String, Object>{
+  Map<String, Object> getOptions(MongoCollection collection) =>
+      <String, Object>{
         if (writeConcern != null)
           keyWriteConcern:
               writeConcern!.asMap(collection.db.server.serverStatus),

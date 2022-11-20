@@ -15,8 +15,8 @@ import '../core/error/mongo_dart_error.dart';
 import '../commands/base/db_admin_command_operation.dart';
 import '../commands/base/operation_base.dart';
 import '../topology/server.dart';
-import 'db.dart';
-import 'dbcollection.dart';
+import 'mongo_database.dart';
+import 'mongo_collection.dart';
 
 typedef MonadicBlock = void Function(Map<String, dynamic> value);
 
@@ -94,7 +94,8 @@ class ModernCursor {
   /// or other read operation has been executed, without generating
   /// an explicit cursor. This way, for getting the extra documents,
   /// we may need a cursor.
-  ModernCursor.fromOpenId(DbCollection collection, this.cursorId, this.server,
+  ModernCursor.fromOpenId(
+      MongoCollection collection, this.cursorId, this.server,
       {bool? tailable,
       bool? awaitData,
       bool? isChangeStream,
@@ -121,9 +122,9 @@ class ModernCursor {
   State state = State.init;
   BsonLong cursorId = BsonLong(0);
   Server server;
-  late Db db;
+  late MongoDatabase db;
   Queue<Map<String, Object?>> items = Queue<Map<String, Object?>>();
-  DbCollection? collection;
+  MongoCollection? collection;
   bool tailable = false;
   bool awaitData = false;
   bool isChangeStream = false;

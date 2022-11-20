@@ -1,7 +1,7 @@
 @Timeout(Duration(seconds: 100))
 
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/database/mongo_database.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:test/test.dart';
 
@@ -11,7 +11,7 @@ const dbAddress = '127.0.0.1';
 const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 late MongoClient client;
-late Db db;
+late MongoDatabase db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 

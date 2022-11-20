@@ -3,11 +3,11 @@ import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../database/dbcollection.dart';
+import '../../../database/mongo_collection.dart';
 import 'insert_options.dart';
 
 class InsertOperation extends CommandOperation {
-  InsertOperation(DbCollection collection, this.documents,
+  InsertOperation(MongoCollection collection, this.documents,
       {InsertOptions? insertOptions, Map<String, Object>? rawOptions})
       : ids = List.filled(documents.length, null),
         super(

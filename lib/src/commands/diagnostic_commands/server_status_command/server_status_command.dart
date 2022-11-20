@@ -1,14 +1,14 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/db.dart';
+import '../../../database/mongo_database.dart';
 import '../../../topology/server.dart';
 import 'server_status_result.dart';
 
 var _command = <String, Object>{keyServerStatus: 1};
 
 class ServerStatusCommand extends CommandOperation {
-  ServerStatusCommand(Db db,
+  ServerStatusCommand(MongoDatabase db,
       {ServerStatusOptions? serverStatusOptions,
       Map<String, Object>? rawOptions})
       : super(db,

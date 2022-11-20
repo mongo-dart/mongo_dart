@@ -3,13 +3,13 @@ import 'package:mongo_dart/src/commands/query_and_write_operation_commands/retur
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/return_classes/bulk_write_result.dart';
 
 import '../../../../core/network/abstract/connection_base.dart';
-import '../../../../database/dbcollection.dart';
+import '../../../../database/mongo_collection.dart';
 import '../../../../topology/server.dart';
 import 'insert_many_options.dart';
 
 class InsertManyOperation extends InsertOperation {
   InsertManyOperation(
-      DbCollection collection, List<Map<String, Object?>> documents,
+      MongoCollection collection, List<Map<String, Object?>> documents,
       {InsertManyOptions? insertManyOptions, Map<String, Object>? rawOptions})
       : super(
           collection,

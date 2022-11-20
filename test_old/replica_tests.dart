@@ -1,7 +1,7 @@
 library replica_tests;
 
 import 'package:mongo_dart/src/core/auth/scram_sha256_authenticator.dart';
-import 'package:mongo_dart/src/database/dbcollection.dart';
+import 'package:mongo_dart/src/database/mongo_collection.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 import 'dart:async';
 import 'package:test/test.dart';
@@ -11,7 +11,7 @@ const defaultUri2 = 'mongodb://127.0.0.1:27002';
 const defaultUri3 = 'mongodb://127.0.0.1:27003';
 
 Future testCollectionInfoCursor() async {
-  DbCollection newColl;
+  MongoCollection newColl;
 
   var client = MongoClient(
       'mongodb://$defaultUri1,$defaultUri2,$defaultUri3/mongo_dart-test'

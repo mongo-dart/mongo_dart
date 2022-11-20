@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 
-import '../../../database/db.dart';
+import '../../../database/mongo_database.dart';
 
 class UpdateOptions {
   /// A document expressing the [write concern](https://docs.mongodb.com/manual/reference/write-concern/).
@@ -35,7 +35,7 @@ class UpdateOptions {
   UpdateOptions(
       {this.writeConcern, bool? bypassDocumentValidation, this.comment})
       : bypassDocumentValidation = bypassDocumentValidation ?? false;
-  Map<String, Object> getOptions(Db db) => <String, Object>{
+  Map<String, Object> getOptions(MongoDatabase db) => <String, Object>{
         if (bypassDocumentValidation)
           keyBypassDocumentValidation: bypassDocumentValidation,
         if (writeConcern != null)

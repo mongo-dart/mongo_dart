@@ -38,6 +38,25 @@ class SimpleCommand extends OperationBase {
   }
 
   @override
+
+  /// A session ID MUST NOT be used simultaneously by more than one operation.
+  ///  Since drivers don't wait for a response for an unacknowledged write a
+  /// driver would not know when the session ID could be reused.
+  /// In theory a driver could use a new session ID for each unacknowledged
+  /// write, but that would result in many orphaned sessions building
+  /// up at the server.
+  /// Therefore drivers MUST NOT send a session ID with unacknowledged
+  /// writes under any circumstances:
+  ///  For unacknowledged writes with an explicit session, drivers SHOULD
+  /// raise an error. If a driver allows users to provide an explicit session
+  /// with an unacknowledged write (e.g. for backwards compatibility),
+  /// the driver MUST NOT send the session ID.
+  /// For unacknowledged writes without an explicit session,
+  /// drivers SHOULD NOT use an implicit session.
+  /// If a driver creates an implicit session for unacknowledged writes
+  /// without an explicit session, the driver MUST NOT send the session ID.
+  ///Drivers MUST document the behavior of unacknowledged writes for both
+  ///explicit and implicit sessions.
   Future<Map<String, Object?>> execute(Server server,
       {ConnectionBase? connection}) async {
     var command = $buildCommand();

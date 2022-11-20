@@ -1,9 +1,9 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 import 'package:mongo_dart/src/commands/parameters/read_concern.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
-import '../../../database/db.dart';
+import '../../../database/mongo_database.dart';
 
 class AggregateOptions {
   /// Enables writing to temporary files. When set to true, a
@@ -108,7 +108,7 @@ class AggregateOptions {
     }
   }
 
-  Map<String, Object> getOptions(Db? db) => <String, Object>{
+  Map<String, Object> getOptions(MongoDatabase? db) => <String, Object>{
         if (allowDiskUse) keyAllowDiskUse: allowDiskUse,
         if (maxTimeMS != null) keyMaxTimeMS: maxTimeMS!,
         if (bypassDocumentValidation)

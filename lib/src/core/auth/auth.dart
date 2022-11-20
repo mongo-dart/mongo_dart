@@ -2,7 +2,7 @@ import 'package:mongo_dart/src/core/network/abstract/connection_base.dart';
 import 'package:mongo_dart/src/topology/server.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
-import '../../database/db.dart';
+import '../../database/mongo_database.dart';
 import '../error/mongo_dart_error.dart';
 
 import '../../../src_old/auth/mongodb_cr_authenticator.dart';
@@ -15,8 +15,8 @@ enum AuthenticationScheme { MONGODB_CR, SCRAM_SHA_1, SCRAM_SHA_256 }
 abstract class Authenticator {
   Authenticator();
 
-  factory Authenticator.create(AuthenticationScheme authenticationScheme, Db db,
-      UsernamePasswordCredential credentials) {
+  factory Authenticator.create(AuthenticationScheme authenticationScheme,
+      MongoDatabase db, UsernamePasswordCredential credentials) {
     switch (authenticationScheme) {
       case AuthenticationScheme.MONGODB_CR:
         return MongoDbCRAuthenticator(db, credentials);

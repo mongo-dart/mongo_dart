@@ -1,7 +1,7 @@
 import 'package:mongo_dart/src/commands/administration_commands/create_command/create_command.dart';
 import 'package:mongo_dart/src/commands/administration_commands/create_command/create_options.dart';
 
-import '../../../../database/db.dart';
+import '../../../../database/mongo_database.dart';
 import 'create_view_options.dart';
 
 /// createView command.
@@ -20,7 +20,7 @@ import 'create_view_options.dart';
 /// nested pipelines as well.
 ///
 /// The command accepts the following fields:
-/// - db [Db]
+/// - db [MongoDatabase]
 ///   The database on which create the collection
 /// - view 	[String]
 ///   The view name to be created.
@@ -52,7 +52,7 @@ import 'create_view_options.dart';
 ///   An alternative way to creteViewOptions to specify command options
 ///   (must be manually set)
 class CreateViewCommand extends CreateCommand {
-  CreateViewCommand(Db db, String view, String source, List pipeline,
+  CreateViewCommand(MongoDatabase db, String view, String source, List pipeline,
       {CreateViewOptions? createViewOptions, Map<String, Object>? rawOptions})
       : super(db, view,
             createOptions:
@@ -60,8 +60,8 @@ class CreateViewCommand extends CreateCommand {
             rawOptions: rawOptions);
 }
 
-CreateOptions _generateCreateOptions(
-    Db db, String source, List pipeline, CreateViewOptions? createViewOptions) {
+CreateOptions _generateCreateOptions(MongoDatabase db, String source,
+    List pipeline, CreateViewOptions? createViewOptions) {
   return CreateOptions(
       viewOn: source,
       pipeline: pipeline,

@@ -4,10 +4,10 @@ library database_tests;
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:mongo_dart/src/database/db.dart';
-import 'package:mongo_dart/src/database/dbcollection.dart';
+import 'package:mongo_dart/src/database/mongo_database.dart';
+import 'package:mongo_dart/src/database/mongo_collection.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/commands/diagnostic_commands/ping_command/ping_command.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
@@ -22,7 +22,7 @@ const dbAddress = '127.0.0.1';
 const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 
 late MongoClient client;
-late Db db;
+late MongoDatabase db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 
@@ -199,7 +199,7 @@ Future<void> testServerStatus() async {
   }
 }
 
-DbCollection testCollectionCreation() {
+MongoCollection testCollectionCreation() {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
   return collection;
@@ -853,7 +853,8 @@ Future testLimitWithSortByAndSkip() async {
   return;
 }
 
-Future insertManyDocuments(DbCollection collection, int numberOfRecords) async {
+Future insertManyDocuments(
+    MongoCollection collection, int numberOfRecords) async {
   var toInsert = <Map<String, dynamic>>[];
   for (var n = 0; n < numberOfRecords; n++) {
     toInsert.add({'a': n});

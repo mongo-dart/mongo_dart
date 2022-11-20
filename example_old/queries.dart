@@ -1,5 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/dbcollection.dart';
+import 'package:mongo_dart/src/database/mongo_collection.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 
 void main() async {
@@ -7,7 +7,7 @@ void main() async {
   await client.connect();
   final db = client.db();
   ObjectId? id;
-  DbCollection coll;
+  MongoCollection coll;
   print('connection open');
   coll = db.collection('simple_data');
   await coll.deleteMany({});

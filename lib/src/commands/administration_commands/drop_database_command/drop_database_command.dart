@@ -1,7 +1,7 @@
 import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../database/db.dart';
+import '../../../database/mongo_database.dart';
 import 'drop_database_options.dart';
 
 /// dropDatabase command.
@@ -10,7 +10,7 @@ import 'drop_database_options.dart';
 /// deleting the associated data files.
 ///
 /// The command accepts the following fields:
-/// - db [Db]
+/// - db [MongoDatabase]
 ///   The database to be dropped
 /// - dropDatabaseOptions [DropDatabaseOptions] - Optional
 ///   a set of optional values for the command
@@ -18,7 +18,7 @@ import 'drop_database_options.dart';
 ///   An alternative way to dropDatabaseOptions to specify command options
 ///   (must be manually set)
 class DropDatabaseCommand extends CommandOperation {
-  DropDatabaseCommand(Db db,
+  DropDatabaseCommand(MongoDatabase db,
       {DropDatabaseOptions? dropDatabaseOptions,
       Map<String, Object>? rawOptions})
       : super(db, <String, Object>{

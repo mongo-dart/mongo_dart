@@ -2,12 +2,12 @@ import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../core/network/abstract/connection_base.dart';
-import '../../database/db.dart';
+import '../../database/mongo_database.dart';
 import '../../topology/server.dart';
 import 'operation_base.dart';
 
 class DbAdminCommandOperation extends OperationBase {
-  Db db;
+  MongoDatabase db;
   Map<String, Object> command;
 
   DbAdminCommandOperation(this.db, this.command,

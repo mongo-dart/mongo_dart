@@ -4,15 +4,15 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/db.dart';
-import '../../../database/dbcollection.dart';
+import '../../../database/mongo_database.dart';
+import '../../../database/mongo_collection.dart';
 import 'drop_indexes_options.dart';
 
 class DropIndexesCommand extends CommandOperation {
   Object index;
   late Map<String, Object> indexes;
 
-  DropIndexesCommand(Db db, DbCollection collection, this.index,
+  DropIndexesCommand(MongoDatabase db, MongoCollection collection, this.index,
       {DropIndexesOptions? dropIndexesOptions,
       ConnectionBase? connection,
       Map<String, Object>? rawOptions})

@@ -2,7 +2,7 @@ import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/dbcollection.dart';
+import '../../../database/mongo_collection.dart';
 import '../../../topology/server.dart';
 import 'count_options.dart';
 import '../../base/command_operation.dart';
@@ -12,7 +12,7 @@ import 'count_result.dart';
 /// In case of admin/diagnostic pipeline which does not require an underlying
 /// collection, the db parameter must be passed instead.
 class CountOperation extends CommandOperation {
-  CountOperation(DbCollection collection,
+  CountOperation(MongoCollection collection,
       {this.query,
       this.limit,
       this.skip,

@@ -2,9 +2,9 @@
 
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/db.dart';
+import 'package:mongo_dart/src/database/mongo_database.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/write_concern.dart';
+import 'package:mongo_dart/src/parameters/write_concern.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:mongo_dart/src/commands/aggregation_commands/count/count_operation.dart';
 import 'package:mongo_dart/src/commands/aggregation_commands/count/count_options.dart';
@@ -170,7 +170,7 @@ var testDoc = {
 final Matcher throwsMongoDartError = throwsA(TypeMatcher<MongoDartError>());
 
 late MongoClient client;
-late Db db;
+late MongoDatabase db;
 Uuid uuid = Uuid();
 List<String> usedCollectionNames = [];
 

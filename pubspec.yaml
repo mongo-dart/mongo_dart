@@ -21,6 +21,7 @@ dependencies:
   vy_string_utils: ^0.4.0
   universal_io: ^2.0.4
   meta: ^1.8.0
+  fixnum: ^1.0.1
     
 dev_dependencies:
   test: ^1.16.4

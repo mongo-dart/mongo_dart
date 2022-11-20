@@ -13,19 +13,19 @@ import '../../core/error/mongo_dart_error.dart';
 import '../../core/network/abstract/connection_base.dart';
 import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
-import '../../database/db.dart';
-import '../../database/dbcollection.dart';
+import '../../database/mongo_database.dart';
+import '../../database/mongo_collection.dart';
 import '../../topology/server.dart';
 import 'operation_base.dart' show Aspect, OperationBase;
 
 class CommandOperation extends OperationBase {
-  late Db db;
-  DbCollection? collection;
+  late MongoDatabase db;
+  MongoCollection? collection;
   Map<String, Object>? command;
   //String namespace;
   ReadPreference? readPreference;
 
-  CommandOperation(Db? db, Map<String, Object> options,
+  CommandOperation(MongoDatabase? db, Map<String, Object> options,
       {this.collection,
       this.command,
       Aspect? aspect,
@@ -120,7 +120,9 @@ class CommandOperation extends OperationBase {
 /// @param {Object} [options] optional settings passed into a command for write concern overrides
 /// @returns {Object} the (now) decorated target
 Map<String, Object> applyWriteConcern(Map<String, Object> target,
-    {Map<String, Object>? options, Db? db, DbCollection? collection}) {
+    {Map<String, Object>? options,
+    MongoDatabase? db,
+    MongoCollection? collection}) {
   options ??= <String, Object>{};
 
   //Todo Session not yet implemented

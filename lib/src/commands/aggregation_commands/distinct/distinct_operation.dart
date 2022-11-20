@@ -2,7 +2,7 @@ import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/dbcollection.dart';
+import '../../../database/mongo_collection.dart';
 import '../../../topology/server.dart';
 import 'distinct_options.dart';
 import '../../base/command_operation.dart';
@@ -12,7 +12,7 @@ import 'distinct_result.dart';
 /// In case of admin/diagnostic pipeline which does not require an underlying
 /// collection, the db parameter must be passed instead.
 class DistinctOperation extends CommandOperation {
-  DistinctOperation(DbCollection collection, this.key,
+  DistinctOperation(MongoCollection collection, this.key,
       {this.query,
       DistinctOptions? distinctOptions,
       Map<String, Object>? rawOptions})

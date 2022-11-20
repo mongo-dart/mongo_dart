@@ -1,5 +1,5 @@
-import 'core/info/server_status.dart';
-import 'utils/map_keys.dart';
+import '../core/info/server_status.dart';
+import '../utils/map_keys.dart';
 
 /// [WriteConcern] control the acknowledgment of write operations with various paramaters.
 class WriteConcern {
