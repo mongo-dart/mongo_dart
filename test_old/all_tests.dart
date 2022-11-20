@@ -1,7 +1,7 @@
 library all_tests;
 
 import 'database_test.dart' as database;
-import 'gridfs_test.dart' as gridfs;
+import '../test/gridfs_test.dart' as gridfs;
 import '../test/packet_converter_test.dart' as converter;
 import 'mongo_dart_query_test.dart' as mongo_dart_query;
 import '../test/authentication_test.dart' as auth_tests;
