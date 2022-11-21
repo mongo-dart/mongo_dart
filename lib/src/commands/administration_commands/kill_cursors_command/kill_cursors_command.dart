@@ -42,13 +42,15 @@ class KillCursorsCommand extends CommandOperation {
       {MongoDatabase? db,
       KillCursorsOptions? killCursorsOptions,
       Map<String, Object>? rawOptions})
-      : super(db ?? collection.db,
-            <String, Object>{...?killCursorsOptions?.options, ...?rawOptions},
-            collection: collection,
-            command: <String, Object>{
-              keyKillCursors: collection.collectionName,
-              keyCursors: cursorIds,
-            }) {
+      : super(
+          db ?? collection.db,
+          <String, Object>{
+            keyKillCursors: collection.collectionName,
+            keyCursors: cursorIds,
+          },
+          <String, Object>{...?killCursorsOptions?.options, ...?rawOptions},
+          collection: collection,
+        ) {
     // In case of aggregate collection agnostic commands, collection is
     // not needed
     /*  if (this.db == null) {
@@ -63,7 +65,7 @@ class KillCursorsCommand extends CommandOperation {
 
   Future<KillCursorsResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var result = await super.execute(server, connection: connection);
+    var result = await super.executeOnServer(server);
     return KillCursorsResult(result);
   }
 }

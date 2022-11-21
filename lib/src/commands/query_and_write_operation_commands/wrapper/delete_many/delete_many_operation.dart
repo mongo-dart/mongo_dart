@@ -23,7 +23,7 @@ class DeleteManyOperation extends DeleteOperation {
 
   Future<WriteResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var ret = await super.execute(server, connection: connection);
+    var ret = await super.executeOnServer(server);
     return WriteResult.fromMap(WriteCommandType.delete, ret);
   }
 }

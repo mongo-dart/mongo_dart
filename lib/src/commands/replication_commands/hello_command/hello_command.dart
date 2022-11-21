@@ -1,10 +1,11 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/commands/base/command_operation.dart';
+import 'package:mongo_dart/src/commands/base/simple_command.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
 import '../../../core/network/abstract/connection_base.dart';
 import '../../../database/mongo_database.dart';
+import '../../../topology/abstract/topology.dart';
 import '../../../topology/server.dart';
 
 var _command = <String, Object>{keyHello: 1};
@@ -20,28 +21,30 @@ var _command = <String, Object>{keyHello: 1};
 ///
 /// `db.runCommand( { hello: 1, saslSupportedMechs: "<db.username>",
 /// comment: <String> } )`
-class HelloCommand extends CommandOperation {
-  HelloCommand(MongoDatabase db,
-      {String? username,
+class HelloCommand extends SimpleCommand {
+  HelloCommand(Topology topology,
+      {MongoDatabase? db,
+      String? username,
       HelloOptions? helloOptions,
-      Map<String, Object>? rawOptions,
-      ConnectionBase? connection})
-      : super(db, <String, Object>{...?helloOptions?.options, ...?rawOptions},
-            command: {
-              ..._command,
-              if (filled(username))
-                keySaslSupportedMechs: '${db.databaseName}.$username'
-            },
-            connection: connection);
+      Map<String, Object>? rawOptions})
+      : super(
+          topology,
+          {
+            ..._command,
+            if (filled(username))
+              keySaslSupportedMechs: '${db?.databaseName ?? 'admin'}.$username'
+          },
+          <String, Object>{...?helloOptions?.options, ...?rawOptions},
+        );
 
   Future<HelloResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var result = await super.execute(server, connection: connection);
+    var result = await super.executeOnServer(server);
     return HelloResult(result);
   }
 
   @override
-  Future<Map<String, Object?>> execute(Server server,
+  Future<Map<String, Object?>> executeOnServer(Server server,
       {ConnectionBase? connection}) async {
     var command = $buildCommand();
     processOptions(command);
@@ -49,6 +52,6 @@ class HelloCommand extends CommandOperation {
 
     var message = MongoModernMessage(command);
 
-    return server.executeModernMessage(message);
+    return server.executeMessage(message);
   }
 }

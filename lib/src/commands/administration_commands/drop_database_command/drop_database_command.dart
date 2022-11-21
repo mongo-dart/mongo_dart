@@ -22,9 +22,9 @@ class DropDatabaseCommand extends CommandOperation {
       {DropDatabaseOptions? dropDatabaseOptions,
       Map<String, Object>? rawOptions})
       : super(db, <String, Object>{
+          keyDropDatabase: 1,
+        }, <String, Object>{
           ...?dropDatabaseOptions?.getOptions(db),
           ...?rawOptions
-        }, command: <String, Object>{
-          keyDropDatabase: 1,
         });
 }

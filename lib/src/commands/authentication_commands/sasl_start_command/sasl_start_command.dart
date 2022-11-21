@@ -15,12 +15,13 @@ class SaslStartCommand extends CommandOperation {
       Map<String, Object>? rawOptions,
       ConnectionBase? connection})
       : super(
-            db, <String, Object>{...?saslStartOptions?.options, ...?rawOptions},
-            command: <String, Object>{
+            db,
+            <String, Object>{
               keySaslStart: 1,
               keyMechanism: mechanism,
               keyPayload: base64.encode(payload)
             },
+            <String, Object>{...?saslStartOptions?.options, ...?rawOptions},
             connection: connection);
 
   /*  @override
@@ -28,7 +29,7 @@ class SaslStartCommand extends CommandOperation {
       super.execute(skipStateCheck: true); */
 
   @override
-  Future<Map<String, Object?>> execute(Server server,
+  Future<Map<String, Object?>> executeOnServer(Server server,
       {ConnectionBase? connection, bool skipStateCheck = false}) async {
     var command = $buildCommand();
     processOptions(command);
@@ -36,6 +37,6 @@ class SaslStartCommand extends CommandOperation {
 
     var message = MongoModernMessage(command);
 
-    return server.executeModernMessage(message);
+    return server.executeMessage(message);
   }
 }

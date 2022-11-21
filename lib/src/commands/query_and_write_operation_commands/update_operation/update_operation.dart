@@ -14,6 +14,7 @@ class UpdateOperation extends CommandOperation {
       : ordered = ordered ?? true,
         super(
             collection.db,
+            {},
             <String, Object>{
               ...?updateOptions?.getOptions(collection.db),
               ...?rawOptions

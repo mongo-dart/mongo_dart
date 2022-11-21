@@ -228,7 +228,7 @@ class ModernCursor {
         collection!.collectionName == r'$cmd' &&
         operation is FindOperation &&
         (operation! as FindOperation).limit == 1) {
-      return operation!.execute(server);
+      return operation!.executeOnServer(server);
     }
 
     var justPrepareCursor = false;
@@ -238,7 +238,7 @@ class ModernCursor {
           operation!.options[keyBatchSize] == 0) {
         justPrepareCursor = true;
       }
-      result = await operation!.execute(server);
+      result = await operation!.executeOnServer(server);
       state = State.open;
     } else if (state == State.open) {
       if (cursorId.data == 0) {
@@ -249,7 +249,7 @@ class ModernCursor {
           db: db,
           collectionName: collectionName,
           getMoreOptions: GetMoreOptions(batchSize: _batchSize));
-      result = await command.execute(server);
+      result = await command.executeOnServer(server);
     }
     if (result == null) {
       throw MongoDartError('Could not execut a further search');
@@ -298,7 +298,7 @@ class ModernCursor {
     if (cursorId.value != 0 && collection != null) {
       var command = KillCursorsCommand(collection!, [cursorId], db: db);
       if (server.state == ServerState.connected) {
-        await command.execute(server);
+        await command.executeOnServer(server);
       }
       cursorId = BsonLong(0);
     }

@@ -142,12 +142,12 @@ Future testRunCommand() async {
     var ret = await db.runCommand({'ping': 1});
     expect(ret[keyOk], 1.0);
 
-    var ret2 =
-        await CommandOperation(db, <String, Object>{}, command: {'ping': 1})
-            .execute(db.server);
+    var ret2 = await CommandOperation(db, {'ping': 1}, <String, Object>{})
+        .executeOnServer(db.server);
     expect(ret2[keyOk], 1.0);
 
-    ret2 = await PingCommand(db).execute(db.server);
+    ret2 =
+        await PingCommand(db.mongoClient.topology!).executeOnServer(db.server);
     expect(ret[keyOk], 1.0);
 
     ret2 = await db.pingCommand();
@@ -1009,7 +1009,8 @@ void testDbCommandCreation() {
 }
  */
 Future testPingDbCommand() async {
-  var res = await PingCommand(db).execute(db.server);
+  var res =
+      await PingCommand(db.mongoClient.topology!).executeOnServer(db.server);
   expect(res[keyOk], 1.0);
   res = await db.pingCommand();
   expect(res[keyOk], 1.0);
@@ -1292,7 +1293,7 @@ Future testTtlIndex() async {
   // parameters if needed
   var indexOperation = CreateIndexOperation(db, collection, 'closingDate', null,
       rawOptions: {'expireAfterSeconds': 1});
-  var res = await indexOperation.execute(db.server);
+  var res = await indexOperation.executeOnServer(db.server);
   expect(res['ok'], 1.0);
 
   await collection.insertAll([

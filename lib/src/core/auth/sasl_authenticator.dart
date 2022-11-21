@@ -80,7 +80,7 @@ abstract class SaslAuthenticator extends Authenticator {
     while (true) {
       Map<String, dynamic> result;
 
-      result = await command.execute(server);
+      result = await command.executeOnServer(server);
 
       if (result[keyOk] == 0.0) {
         throw MongoDartError(result[keyErrmsg],

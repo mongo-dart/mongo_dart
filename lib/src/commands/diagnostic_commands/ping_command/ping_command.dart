@@ -1,8 +1,9 @@
-import 'package:mongo_dart/src/commands/base/command_operation.dart';
+import 'package:mongo_dart/src/commands/base/simple_command.dart';
 
-import '../../../database/mongo_database.dart';
+import '../../../topology/abstract/topology.dart';
 
-class PingCommand extends CommandOperation {
-  PingCommand(MongoDatabase db)
-      : super(db, <String, Object>{}, command: {'ping': 1});
+class PingCommand extends SimpleCommand {
+  PingCommand(
+    Topology topology,
+  ) : super(topology, {'ping': 1}, <String, Object>{});
 }

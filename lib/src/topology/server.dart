@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/src/core/error/connection_exception.dart';
-import 'package:mongo_dart/src/core/network/abstract/connection_base.dart';
 
 import '../core/error/mongo_dart_error.dart';
 import '../core/info/server_capabilities.dart';
@@ -43,13 +42,13 @@ class Server {
     return;
   }
 
-  Future<Map<String, Object?>> executeModernMessage(MongoModernMessage message,
-      {ConnectionBase? connection}) async {
+  Future<Map<String, Object?>> executeMessage(
+      MongoModernMessage message) async {
     if (state != ServerState.connected) {
       throw MongoDartError('Server is not is not connected. $state');
     }
 
-    connection ??= await connectionPool.getAvailableConnection();
+    var connection = await connectionPool.getAvailableConnection();
 
     var response = await connection.execute(message);
 

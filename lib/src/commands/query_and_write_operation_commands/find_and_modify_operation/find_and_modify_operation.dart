@@ -28,6 +28,7 @@ class FindAndModifyOperation extends CommandOperation {
         upsert = upsert ?? false,
         super(
             collection.db,
+            {},
             <String, Object>{
               ...?findAndModifyOptions?.getOptions(collection.db),
               ...?rawOptions
@@ -209,7 +210,7 @@ class FindAndModifyOperation extends CommandOperation {
 
   Future<FindAndModifyResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var result = await super.execute(server, connection: connection);
+    var result = await super.executeOnServer(server);
     return FindAndModifyResult(result);
   }
 }

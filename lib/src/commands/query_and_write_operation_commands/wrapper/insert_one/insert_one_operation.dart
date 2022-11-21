@@ -21,7 +21,7 @@ class InsertOneOperation extends InsertOperation {
 
   Future<WriteResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var ret = await super.execute(server, connection: connection);
+    var ret = await super.executeOnServer(server);
     return WriteResult.fromMap(WriteCommandType.insert, ret)
       ..id = ids.first
       ..document = documents.first;

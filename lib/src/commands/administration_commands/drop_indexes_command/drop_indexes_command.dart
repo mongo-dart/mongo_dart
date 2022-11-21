@@ -18,6 +18,7 @@ class DropIndexesCommand extends CommandOperation {
       Map<String, Object>? rawOptions})
       : super(
             db,
+            {},
             <String, Object>{
               ...?dropIndexesOptions?.getOptions(collection),
               ...?rawOptions

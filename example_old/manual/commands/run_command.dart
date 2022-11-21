@@ -20,11 +20,11 @@ void main() async {
   var ret = await db.runCommand({'ping': 1});
   print(ret); // {ok: 1.0};
 
-  ret = await CommandOperation(db, <String, Object>{}, command: {'ping': 1})
-      .execute(db.server);
+  ret = await CommandOperation(db, {'ping': 1}, <String, Object>{})
+      .executeOnServer(db.server);
   print(ret); // {ok: 1.0};
 
-  ret = await PingCommand(db).execute(db.server);
+  ret = await PingCommand(db.mongoClient.topology!).executeOnServer(db.server);
   print(ret); // {ok: 1.0};
 
   ret = await db.pingCommand();

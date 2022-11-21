@@ -16,7 +16,7 @@ class DistinctOperation extends CommandOperation {
       {this.query,
       DistinctOptions? distinctOptions,
       Map<String, Object>? rawOptions})
-      : super(collection.db,
+      : super(collection.db, {},
             <String, Object>{...?distinctOptions?.options, ...?rawOptions},
             collection: collection, aspect: Aspect.readOperation);
 
@@ -38,7 +38,7 @@ class DistinctOperation extends CommandOperation {
 
   Future<DistinctResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var result = await super.execute(server, connection: connection);
+    var result = await super.executeOnServer(server);
     return DistinctResult(result);
   }
 }

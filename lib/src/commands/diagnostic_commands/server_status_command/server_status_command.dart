@@ -11,20 +11,22 @@ class ServerStatusCommand extends CommandOperation {
   ServerStatusCommand(MongoDatabase db,
       {ServerStatusOptions? serverStatusOptions,
       Map<String, Object>? rawOptions})
-      : super(db,
-            <String, Object>{...?serverStatusOptions?.options, ...?rawOptions},
-            command: _command);
+      : super(
+          db,
+          _command,
+          <String, Object>{...?serverStatusOptions?.options, ...?rawOptions},
+        );
 
   Future<ServerStatusResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var result = await super.execute(server, connection: connection);
+    var result = await super.executeOnServer(server);
     return ServerStatusResult(result);
   }
 
   /// Update basic server info + FeatureCompatibilityVersion
   Future<void> updateServerStatus(Server server,
       {ConnectionBase? connection}) async {
-    var result = await super.execute(server, connection: connection);
+    var result = await super.executeOnServer(server);
     // On error the ServerStatus class is not initialized
     // check the `isInitialized` flag.
     //

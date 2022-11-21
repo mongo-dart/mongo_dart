@@ -30,10 +30,10 @@ class CreateCommand extends CommandOperation {
   CreateCommand(MongoDatabase db, String name,
       {CreateOptions? createOptions, Map<String, Object>? rawOptions})
       : super(db, <String, Object>{
+          keyCreate: name,
+        }, <String, Object>{
           ...?createOptions?.getOptions(db),
           ...?rawOptions
-        }, command: <String, Object>{
-          keyCreate: name,
         }) {
     /*   if (name == null) {
       throw MongoDartError('Name required in call to createCommand');

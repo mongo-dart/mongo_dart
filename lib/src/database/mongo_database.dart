@@ -257,7 +257,7 @@ class MongoDatabase {
       throw MongoDartError('DB is not open. $state');
     }
 
-    return server.executeModernMessage(message);
+    return server.executeMessage(message);
   }
 
   @Deprecated('Do Not USe')
@@ -307,7 +307,7 @@ class MongoDatabase {
       {ConnectionBase? connection, WriteConcern? writeConcern}) async {
     writeConcern ??= _writeConcern;
     return GetLastErrorCommand(this, writeConcern: writeConcern)
-        .execute(server);
+        .executeOnServer(server);
   }
 
   @Deprecated('Deprecated since version 4.0.')
@@ -520,7 +520,7 @@ class MongoDatabase {
       Map<String, Object>? rawOptions}) async {
     var command = DropDatabaseCommand(this,
         dropDatabaseOptions: dropOptions, rawOptions: rawOptions);
-    return command.execute(server);
+    return command.executeOnServer(server);
   }
 
   /// This method return the status information on the
@@ -531,7 +531,7 @@ class MongoDatabase {
       {Map<String, Object>? options}) async {
     var operation = ServerStatusCommand(this,
         serverStatusOptions: ServerStatusOptions.instance);
-    return operation.execute(server);
+    return operation.executeOnServer(server);
   }
 
   /// This method explicitly creates a collection
@@ -541,7 +541,7 @@ class MongoDatabase {
     var command = CreateCollectionCommand(this, name,
         createCollectionOptions: createCollectionOptions,
         rawOptions: rawOptions);
-    return command.execute(server);
+    return command.executeOnServer(server);
   }
 
   /// This method retuns a cursor to get a list of the collections
@@ -568,7 +568,7 @@ class MongoDatabase {
       Map<String, Object>? rawOptions}) async {
     var command = CreateViewCommand(this, view, source, pipeline,
         createViewOptions: createViewOptions, rawOptions: rawOptions);
-    return command.execute(server);
+    return command.executeOnServer(server);
   }
 
   /// This method drops a collection
@@ -576,7 +576,7 @@ class MongoDatabase {
       {DropOptions? dropOptions, Map<String, Object>? rawOptions}) async {
     var command = DropCommand(this, collectionNAme,
         dropOptions: dropOptions, rawOptions: rawOptions);
-    return command.execute(server);
+    return command.executeOnServer(server);
   }
 
   /// Runs a specified admin/diagnostic pipeline which does not require an
@@ -603,11 +603,16 @@ class MongoDatabase {
   }
 
   /// Runs a command
-  Future<Map<String, Object?>> runCommand(Map<String, Object>? command) =>
-      CommandOperation(this, <String, Object>{}, command: command)
-          .execute(server);
+  Future<Map<String, Object?>> runCommand(Map<String, Object> command) =>
+      CommandOperation(
+        this,
+        command,
+        <String, Object>{},
+      ).executeOnServer(server);
 
   /// Ping command
   Future<Map<String, Object?>> pingCommand() =>
-      PingCommand(this).execute(server);
+      PingCommand(mongoClient.topology ??
+              (throw MongoDartError('Topology not defined')))
+          .executeOnServer(server);
 }

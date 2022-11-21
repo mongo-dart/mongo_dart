@@ -12,6 +12,7 @@ class InsertOperation extends CommandOperation {
       : ids = List.filled(documents.length, null),
         super(
             collection.db,
+            {},
             <String, Object>{
               ...?insertOptions?.getOptions(collection.db),
               ...?rawOptions

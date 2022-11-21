@@ -25,7 +25,7 @@ class InsertManyOperation extends InsertOperation {
 
   Future<BulkWriteResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var ret = await super.execute(server, connection: connection);
+    var ret = await super.executeOnServer(server);
     return BulkWriteResult.fromMap(WriteCommandType.insert, ret)
       ..ids = ids
       ..documents = documents;

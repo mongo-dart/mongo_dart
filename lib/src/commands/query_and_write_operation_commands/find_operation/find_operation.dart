@@ -20,7 +20,7 @@ class FindOperation extends CommandOperation {
       this.limit,
       FindOptions? findOptions,
       Map<String, Object>? rawOptions})
-      : super(collection.db,
+      : super(collection.db, {},
             <String, Object>{...?findOptions?.options, ...?rawOptions},
             collection: collection, aspect: Aspect.readOperation) {
     if (skip != null && skip! < 1) {
@@ -107,7 +107,7 @@ class FindOperation extends CommandOperation {
       throw MongoDartError('cannot return a FindResult object '
           r'for a coomand request ($cmd collection)');
     }
-    var result = await super.execute(server, connection: connection);
+    var result = await super.executeOnServer(server);
     return FindResult(result);
   }
 }

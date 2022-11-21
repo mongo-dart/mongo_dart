@@ -39,11 +39,11 @@ class GetLastErrorCommand extends CommandOperation {
       GetLastErrorOptions? getLastErrorOptions,
       Map<String, Object>? rawOptions})
       : super(db, <String, Object>{
-          ...?getLastErrorOptions?.options,
-          ...?rawOptions
-        }, command: <String, Object>{
           keyGetLastError: 1,
           //keyDbName: db.databaseName,
+        }, <String, Object>{
+          ...?getLastErrorOptions?.options,
+          ...?rawOptions
         }) {
     if (writeConcern != null) {
       options = {
@@ -60,9 +60,9 @@ class GetLastErrorCommand extends CommandOperation {
   }
   // this is needed for compatibility with old command version
   @override
-  Future<Map<String, Object?>> execute(Server server,
+  Future<Map<String, Object?>> executeOnServer(Server server,
       {ConnectionBase? connection}) async {
-    var result = await super.execute(server, connection: connection);
+    var result = await super.executeOnServer(server);
     if (result.isNotEmpty) {
       var res = result['err'] as String?;
       if (res != null && res.isNotEmpty) {

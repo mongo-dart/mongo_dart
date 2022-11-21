@@ -14,17 +14,18 @@ class SaslContinueCommand extends CommandOperation {
       {SaslContinueOptions? saslContinueOptions,
       Map<String, Object>? rawOptions,
       ConnectionBase? connection})
-      : super(db,
-            <String, Object>{...?saslContinueOptions?.options, ...?rawOptions},
-            command: <String, Object>{
+      : super(
+            db,
+            <String, Object>{
               keySaslContinue: 1,
               keyConversationId: conversationId,
               keyPayload: base64.encode(payload)
             },
+            <String, Object>{...?saslContinueOptions?.options, ...?rawOptions},
             connection: connection);
 
   @override
-  Future<Map<String, Object?>> execute(Server server,
+  Future<Map<String, Object?>> executeOnServer(Server server,
       {ConnectionBase? connection}) async {
     var command = $buildCommand();
     processOptions(command);
@@ -32,6 +33,6 @@ class SaslContinueCommand extends CommandOperation {
 
     var message = MongoModernMessage(command);
 
-    return server.executeModernMessage(message, connection: connection);
+    return server.executeMessage(message);
   }
 }

@@ -26,7 +26,7 @@ class UpdateManyOperation extends UpdateOperation {
 
   Future<WriteResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var ret = await super.execute(server, connection: connection);
+    var ret = await super.executeOnServer(server);
     return WriteResult.fromMap(WriteCommandType.update, ret);
   }
 }

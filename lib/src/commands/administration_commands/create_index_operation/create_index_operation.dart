@@ -26,7 +26,8 @@ class CreateIndexOperation extends CommandOperation {
   CreateIndexOperation(MongoDatabase db, MongoCollection collection,
       this.fieldOrSpec, CreateIndexOptions? indexOptions,
       {ConnectionBase? connection, Map<String, Object>? rawOptions})
-      : super(db, <String, Object>{...?indexOptions?.options, ...?rawOptions},
+      : super(
+            db, {}, <String, Object>{...?indexOptions?.options, ...?rawOptions},
             collection: collection,
             aspect: Aspect.writeOperation,
             connection: connection) {

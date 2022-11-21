@@ -1,5 +1,4 @@
 import '../../../mongo_dart_old.dart' show keySession;
-import '../../core/network/abstract/connection_base.dart';
 import '../../topology/server.dart';
 
 enum Aspect {
@@ -12,10 +11,8 @@ enum Aspect {
 abstract class OperationBase {
   Map<String, Object> options;
   final Set<Aspect> _aspects;
-  ConnectionBase? connection;
 
-  OperationBase(Map<String, Object>? options,
-      {this.connection, Object? aspects})
+  OperationBase(Map<String, Object>? options, {Object? aspects})
       : options = <String, Object>{...?options},
         _aspects = defineAspects(aspects);
 
@@ -33,8 +30,7 @@ abstract class OperationBase {
 
   bool get canRetryRead => true;
 
-  Future<Map<String, Object?>> execute(Server server,
-          {ConnectionBase? connection}) async =>
+  Future<Map<String, Object?>> executeOnServer(Server server) async =>
       throw UnsupportedError(
           '"execute" must be implemented for OperationBase subclasses');
 

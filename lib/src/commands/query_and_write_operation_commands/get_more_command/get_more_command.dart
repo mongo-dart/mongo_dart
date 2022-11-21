@@ -27,13 +27,14 @@ class GetMoreCommand extends CommandOperation {
       String? collectionName,
       GetMoreOptions? getMoreOptions,
       Map<String, Object>? rawOptions})
-      : super(db ?? collection?.db,
-            <String, Object>{...?getMoreOptions?.options, ...?rawOptions},
-            collection: collection,
-            command: <String, Object>{
+      : super(
+            db ?? collection?.db,
+            <String, Object>{
               keyGetMore: cursorId,
               keyCollection: collection?.collectionName ?? collectionName ?? '',
-            }) {
+            },
+            <String, Object>{...?getMoreOptions?.options, ...?rawOptions},
+            collection: collection) {
     // In case of aggregate collection agnostic commands, collection is
     // not needed
     if (collection == null) {
@@ -46,7 +47,7 @@ class GetMoreCommand extends CommandOperation {
 
   Future<GetMoreResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var result = await super.execute(server, connection: connection);
+    var result = await super.executeOnServer(server);
     return GetMoreResult(result);
   }
 }

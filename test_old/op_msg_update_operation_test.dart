@@ -143,7 +143,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute(db.server);
+        var res = await updateOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -186,7 +186,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute(db.server);
+        var res = await updateOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -230,7 +230,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute(db.server);
+        var res = await updateOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -278,7 +278,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute(db.server);
+        var res = await updateOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -332,7 +332,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute(db.server);
+        var res = await updateOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -413,7 +413,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute(db.server);
+        var res = await updateOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -450,7 +450,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
-        var res = await updateOperation.execute(db.server);
+        var res = await updateOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -481,7 +481,7 @@ void main() async {
             }, collation: CollationOptions('fr', strength: 1))
           ],
         );
-        var res = await updateOperation.execute(db.server);
+        var res = await updateOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -524,7 +524,7 @@ void main() async {
             ], multi: true)
           ],
         );
-        var res = await updateOperation.execute(db.server);
+        var res = await updateOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -569,7 +569,7 @@ void main() async {
             ], multi: true)
           ],
         );
-        var res = await updateOperation.execute(db.server);
+        var res = await updateOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -603,7 +603,7 @@ void main() async {
             }, multi: true)
           ],
         );
-        var res = await updateOperation.execute(db.server);
+        var res = await updateOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -725,7 +725,7 @@ void main() async {
               'name': 'Central Park Cafe',
               'Borough': 'Manhattan'
             }));
-        var res = await replaceOneOperation.execute(db.server);
+        var res = await replaceOneOperation.executeOnServer(db.server);
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);

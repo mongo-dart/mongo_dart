@@ -25,7 +25,7 @@ import 'list_indexes_options.dart';
 class ListIndexesCommand extends CommandOperation {
   ListIndexesCommand(MongoDatabase db, MongoCollection collection,
       {ListIndexesOptions? listIndexesOptions, Map<String, Object>? rawOptions})
-      : super(db,
+      : super(db, {},
             <String, Object>{...?listIndexesOptions?.options, ...?rawOptions},
             collection: collection);
 

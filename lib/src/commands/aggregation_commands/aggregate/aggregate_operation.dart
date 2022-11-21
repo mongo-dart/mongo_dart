@@ -28,6 +28,7 @@ class AggregateOperation extends CommandOperation {
         explain = explain ?? false,
         super(
             collection?.db ?? db,
+            {},
             <String, Object>{
               ...?aggregateOptions?.getOptions(collection?.db ?? db),
               ...?rawOptions
@@ -98,7 +99,7 @@ class AggregateOperation extends CommandOperation {
 
   Future<AggregateResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var result = await super.execute(server, connection: connection);
+    var result = await super.executeOnServer(server);
     return AggregateResult(result);
   }
 }

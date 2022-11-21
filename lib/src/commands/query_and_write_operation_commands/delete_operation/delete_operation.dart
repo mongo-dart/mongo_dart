@@ -11,6 +11,7 @@ class DeleteOperation extends CommandOperation {
       {DeleteOptions? deleteOptions, Map<String, Object>? rawOptions})
       : super(
             collection.db,
+            {},
             <String, Object>{
               ...?deleteOptions?.getOptions(collection.db),
               ...?rawOptions

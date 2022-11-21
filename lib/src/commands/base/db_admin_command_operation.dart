@@ -12,13 +12,12 @@ class DbAdminCommandOperation extends OperationBase {
 
   DbAdminCommandOperation(this.db, this.command,
       {Map<String, Object>? options, ConnectionBase? connection})
-      : super(options, connection: connection);
+      : super(options);
 
   Map<String, Object> $buildCommand() => command;
 
   @override
-  Future<Map<String, Object?>> execute(Server server,
-      {ConnectionBase? connection}) async {
+  Future<Map<String, Object?>> executeOnServer(Server server) async {
     var command = <String, Object>{
       ...$buildCommand(),
       keyDatabaseName: 'admin'
@@ -28,6 +27,6 @@ class DbAdminCommandOperation extends OperationBase {
     command.addAll(options);
 
     var modernMessage = MongoModernMessage(command);
-    return server.executeModernMessage(modernMessage, connection: connection);
+    return server.executeMessage(modernMessage);
   }
 }

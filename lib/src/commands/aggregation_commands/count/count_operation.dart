@@ -20,7 +20,7 @@ class CountOperation extends CommandOperation {
       this.hintDocument,
       CountOptions? countOptions,
       Map<String, Object>? rawOptions})
-      : super(collection.db,
+      : super(collection.db, {},
             <String, Object>{...?countOptions?.options, ...?rawOptions},
             collection: collection, aspect: Aspect.readOperation);
 
@@ -60,7 +60,7 @@ class CountOperation extends CommandOperation {
 
   Future<CountResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var result = await super.execute(server, connection: connection);
+    var result = await super.executeOnServer(server);
     return CountResult(result);
   }
 }

@@ -22,9 +22,9 @@ class DropCommand extends CommandOperation {
   DropCommand(MongoDatabase db, String collectionName,
       {DropOptions? dropOptions, Map<String, Object>? rawOptions})
       : super(db, <String, Object>{
+          keyDrop: collectionName,
+        }, <String, Object>{
           ...?dropOptions?.getOptions(db),
           ...?rawOptions
-        }, command: <String, Object>{
-          keyDrop: collectionName,
         });
 }

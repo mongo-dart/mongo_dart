@@ -397,7 +397,7 @@ class MongoCollection {
     var indexOperation =
         CreateIndexOperation(db, this, _setKeys(key, keys), indexOptions);
 
-    var res = await indexOperation.execute(db.server);
+    var res = await indexOperation.executeOnServer(db.server);
     if (res[keyOk] == 0.0) {
       // It should be better to create a MongoDartError,
       // but, for compatibility reasons, we throw the received map.
@@ -428,7 +428,7 @@ class MongoCollection {
     var command = DropIndexesCommand(db, this, index,
         dropIndexesOptions: indexOptions, rawOptions: rawOptions);
 
-    return command.execute(db.server);
+    return command.executeOnServer(db.server);
   }
 
   // This method has been made available since version 3.2
@@ -517,7 +517,7 @@ class MongoCollection {
               hintDocument: hintDocument)
         ],
         updateOptions: UpdateOptions(writeConcern: writeConcern));
-    return updateOperation.execute(db.server);
+    return updateOperation.executeOnServer(db.server);
   }
 
   Future<WriteResult> replaceOne(selector, Map<String, dynamic> update,
@@ -723,7 +723,7 @@ class MongoCollection {
           DistinctOptions? distinctOptions,
           Map<String, Object>? rawOptions}) async =>
       _prepareDistinct(field, query: query, distinctOptions: distinctOptions)
-          .execute(db.server);
+          .executeOnServer(db.server);
 
   /// This method returns a stream that can be read or transformed into
   /// a list with `.toList()`

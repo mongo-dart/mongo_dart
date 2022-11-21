@@ -34,10 +34,10 @@ class ListCollectionsCommand extends CommandOperation {
       ListCollectionsOptions? listCollectionsOptions,
       Map<String, Object>? rawOptions})
       : super(db, <String, Object>{
+          keyListCollections: 1,
+        }, <String, Object>{
           ...?listCollectionsOptions?.options,
           ...?rawOptions
-        }, command: <String, Object>{
-          keyListCollections: 1,
         });
 
   /// Optional. A query expression to filter the list of collections.

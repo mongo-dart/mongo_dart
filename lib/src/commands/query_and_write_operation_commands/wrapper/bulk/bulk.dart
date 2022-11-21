@@ -18,6 +18,7 @@ abstract class Bulk extends CommandOperation {
       {BulkOptions? bulkOptions, Map<String, Object>? rawOptions})
       : super(
             collection.db,
+            {},
             <String, Object>{
               ...?bulkOptions?.getOptions(collection.db),
               ...?rawOptions
@@ -389,7 +390,7 @@ abstract class Bulk extends CommandOperation {
   List<Map<int, int>> getBulkInputOrigins();
 
   @override
-  Future<Map<String, Object>> execute(Server server,
+  Future<Map<String, Object>> executeOnServer(Server server,
           {ConnectionBase? connection}) =>
       throw StateError('Call executeBulk() for bulk operations');
   @override
@@ -427,8 +428,7 @@ abstract class Bulk extends CommandOperation {
 
       var modernMessage = MongoModernMessage(command);
 
-      var ret = await server.executeModernMessage(modernMessage,
-          connection: connection);
+      var ret = await server.executeMessage(modernMessage);
 
       ret[keyCommandType] = command.keys.first;
       if (ret.containsKey(keyWriteErrors)) {

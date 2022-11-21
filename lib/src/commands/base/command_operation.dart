@@ -1,6 +1,4 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show State;
-import 'package:mongo_dart/src/core/message/mongo_modern_message.dart'
-    show MongoModernMessage;
+import 'package:mongo_dart/src/commands/base/simple_command.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart'
     show
         keyAuthdb,
@@ -15,36 +13,31 @@ import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
 import '../../database/mongo_database.dart';
 import '../../database/mongo_collection.dart';
-import '../../topology/server.dart';
-import 'operation_base.dart' show Aspect, OperationBase;
+import 'operation_base.dart' show Aspect;
 
-class CommandOperation extends OperationBase {
-  late MongoDatabase db;
-  MongoCollection? collection;
-  Map<String, Object>? command;
-  //String namespace;
-  ReadPreference? readPreference;
-
-  CommandOperation(MongoDatabase? db, Map<String, Object> options,
+class CommandOperation extends SimpleCommand {
+  CommandOperation(
+      this.db, Map<String, Object> command, Map<String, Object> options,
       {this.collection,
-      this.command,
+      ReadPreference? readPreference,
       Aspect? aspect,
       ConnectionBase? connection})
-      : super(options, connection: connection, aspects: aspect) {
-    db ??= collection?.db;
+      : super(
+            db.mongoClient.topology ??
+                (throw MongoDartError(
+                    'Topology is required executing a command')),
+            command,
+            options,
+            aspect: aspect,
+            readPreference: readPreference) {
     //aspect ??= Aspect.noInheritOptions;
     //defineAspects(aspect);
-    if (db == null) {
-      throw MongoDartError('Database reference required for this command');
-    }
-    // ignore: prefer_initializing_formals
-    this.db = db;
   }
 
-  Map<String, Object> $buildCommand() => command == null
-      ? throw MongoDartError('Command not specified')
-      : command!;
+  MongoDatabase db;
+  MongoCollection? collection;
 
+  @override
   void processOptions(Map<String, Object?> command) {
     // Get the db name we are executing against
     final dbName = (options[keyDbName] as String?) ??
@@ -68,47 +61,17 @@ class CommandOperation extends OperationBase {
       // value.
       if (collection != null) {
         readPreference = resolveReadPreference(collection, options,
-            inheritReadPreference: !hasAspect(Aspect.noInheritOptions));
+                inheritReadPreference: !hasAspect(Aspect.noInheritOptions)) ??
+            ReadPreference.primary;
       } else {
         readPreference = resolveReadPreference(db, options,
-            inheritReadPreference: !hasAspect(Aspect.noInheritOptions));
+                inheritReadPreference: !hasAspect(Aspect.noInheritOptions)) ??
+            ReadPreference.primary;
       }
     }
     options.remove(keyReadPreference);
 
     options.removeWhere((key, value) => command.containsKey(key));
-  }
-
-  @override
-  Future<Map<String, Object?>> execute(Server server,
-      {ConnectionBase? connection}) async {
-    final db = this.db;
-    if (db.state != State.open) {
-      throw MongoDartError('Db is in the wrong state: ${db.state}');
-    }
-    //final options = Map.from(this.options);
-
-    // Todo implement topology
-    // Did the user destroy the topology
-    /*if (db?.serverConfig?.isDestroyed() ?? false) {
-      return callback(MongoDartError('topology was destroyed'));
-    }*/
-
-    var command = $buildCommand();
-
-    processOptions(command);
-
-    command.addAll(options);
-
-    if (readPreference != null) {
-      // search for the right connection
-    }
-
-    // Todo remove debug()
-    //print(command);
-    var modernMessage = MongoModernMessage(command);
-
-    return server.executeModernMessage(modernMessage, connection: connection);
   }
 }
 
