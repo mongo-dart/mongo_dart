@@ -8,7 +8,6 @@ import 'package:mongo_dart/src/utils/map_keys.dart'
         keyWriteConcern;
 
 import '../../core/error/mongo_dart_error.dart';
-import '../../core/network/abstract/connection_base.dart';
 import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
 import '../../database/mongo_database.dart';
@@ -18,10 +17,7 @@ import 'operation_base.dart' show Aspect;
 class CommandOperation extends SimpleCommand {
   CommandOperation(
       this.db, Map<String, Object> command, Map<String, Object> options,
-      {this.collection,
-      ReadPreference? readPreference,
-      Aspect? aspect,
-      ConnectionBase? connection})
+      {this.collection, ReadPreference? readPreference, Aspect? aspect})
       : super(
             db.mongoClient.topology ??
                 (throw MongoDartError(

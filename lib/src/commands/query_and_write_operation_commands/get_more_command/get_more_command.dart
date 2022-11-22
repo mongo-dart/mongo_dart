@@ -1,5 +1,6 @@
 import 'package:bson/bson.dart';
 import 'package:mongo_dart/src/commands/base/command_operation.dart';
+import '../../../core/error/mongo_dart_error.dart';
 import '../../../core/network/abstract/connection_base.dart';
 import '../../../database/mongo_database.dart';
 import '../../../database/mongo_collection.dart';
@@ -28,7 +29,9 @@ class GetMoreCommand extends CommandOperation {
       GetMoreOptions? getMoreOptions,
       Map<String, Object>? rawOptions})
       : super(
-            db ?? collection?.db,
+            db ??
+                collection?.db ??
+                (throw MongoDartError('At least a Db must be specified')),
             <String, Object>{
               keyGetMore: cursorId,
               keyCollection: collection?.collectionName ?? collectionName ?? '',

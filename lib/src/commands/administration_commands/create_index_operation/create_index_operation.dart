@@ -28,9 +28,7 @@ class CreateIndexOperation extends CommandOperation {
       {ConnectionBase? connection, Map<String, Object>? rawOptions})
       : super(
             db, {}, <String, Object>{...?indexOptions?.options, ...?rawOptions},
-            collection: collection,
-            aspect: Aspect.writeOperation,
-            connection: connection) {
+            collection: collection, aspect: Aspect.writeOperation) {
     // parseIndexOptions alway returns a filled "keyName" and a "keyFieldHash"
     // elements
     var indexParameters = parseIndexOptions(fieldOrSpec);

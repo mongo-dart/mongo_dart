@@ -74,6 +74,8 @@ class MongoClient {
   // Read Preference
   WriteConcern? writeConcern;
 
+  Set<MongoDatabase> databases = <MongoDatabase>{};
+
   /// Connects to the required server / cluster.
   ///
   /// Steps:
@@ -102,8 +104,17 @@ class MongoClient {
   Future close() async {}
 
   /// If no name passed, the url specified db is used
-  MongoDatabase db({String? dbName}) =>
-      MongoDatabase.modern(this, dbName ?? mongoClientOptions.defaultDbName);
+  MongoDatabase db({String? dbName}) {
+    dbName ??= mongoClientOptions.defaultDbName;
+    try {
+      return databases.firstWhere((element) => element.databaseName == dbName);
+    } catch (_) {}
+    var db = _createDb(dbName!);
+    databases.add(db);
+    return db;
+  }
+
+  MongoDatabase _createDb(String dbName) => MongoDatabase.modern(this, dbName);
 
   // Todo
   ClientSession startSession() {

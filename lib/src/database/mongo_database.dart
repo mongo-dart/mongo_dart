@@ -31,6 +31,7 @@ import '../commands/administration_commands/drop_database_command/drop_database_
 import '../commands/administration_commands/list_collections_command/list_collections_command.dart';
 import '../commands/administration_commands/list_collections_command/list_collections_options.dart';
 import '../commands/diagnostic_commands/ping_command/ping_command.dart';
+import '../topology/abstract/topology.dart';
 import 'modern_cursor.dart';
 import '../../src_old/database/utils/dns_lookup.dart';
 import '../commands/base/command_operation.dart';
@@ -46,6 +47,8 @@ import '../parameters/write_concern.dart';
 import 'mongo_collection.dart';
 
 class MongoDatabase {
+  MongoDatabase.modern(this.mongoClient, this.databaseName);
+
   final log = Logger('Db');
   final List<String> _uriList = <String>[];
   late MongoClient mongoClient;
@@ -60,7 +63,10 @@ class MongoDatabase {
   ReadPreference readPreference = ReadPreference.primary;
 
   //Todo temp solution
-  Server get server => mongoClient.topology!.getServer(ReadPreference.primary);
+  Server get server => topology.getServer(ReadPreference.primary);
+  Topology get topology =>
+      mongoClient.topology ??
+      (throw MongoDartError('Topology not yet assigned'));
 
   @override
   String toString() => 'Db($databaseName,$_debugInfo)';
@@ -88,9 +94,6 @@ class MongoDatabase {
   }
   //@Deprecated('No more used')
   //Db._authDb(this.databaseName);
-
-  MongoDatabase.modern(this.mongoClient, this.databaseName);
-
   /// This method allow to create a Db object both with the Standard
   /// Connection String Format (`mongodb://`) or with the DNS Seedlist
   /// Connection Format (`mongodb+srv://`).
@@ -120,6 +123,8 @@ class MongoDatabase {
   }
 
   WriteConcern? get writeConcern => _writeConcern;
+
+  MongoDatabase getSibling(String dbName) => mongoClient.db(dbName: dbName);
 
   List<String> get uriList => _uriList.toList();
 /* 

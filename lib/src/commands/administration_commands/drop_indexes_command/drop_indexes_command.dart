@@ -24,8 +24,7 @@ class DropIndexesCommand extends CommandOperation {
               ...?rawOptions
             },
             collection: collection,
-            aspect: Aspect.writeOperation,
-            connection: connection) {
+            aspect: Aspect.writeOperation) {
     if (index is! String && index is! List<String> && index is! Map) {
       throw MongoDartError(
           'The index parameter is not String or List of string or an array');

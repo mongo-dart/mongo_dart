@@ -14,15 +14,14 @@ class SaslStartCommand extends CommandOperation {
       {SaslStartOptions? saslStartOptions,
       Map<String, Object>? rawOptions,
       ConnectionBase? connection})
-      : super(
-            db,
-            <String, Object>{
-              keySaslStart: 1,
-              keyMechanism: mechanism,
-              keyPayload: base64.encode(payload)
-            },
-            <String, Object>{...?saslStartOptions?.options, ...?rawOptions},
-            connection: connection);
+      : super(db, <String, Object>{
+          keySaslStart: 1,
+          keyMechanism: mechanism,
+          keyPayload: base64.encode(payload)
+        }, <String, Object>{
+          ...?saslStartOptions?.options,
+          ...?rawOptions
+        });
 
   /*  @override
   Future<Map<String, Object?>> execute({bool skipStateCheck = false}) async =>

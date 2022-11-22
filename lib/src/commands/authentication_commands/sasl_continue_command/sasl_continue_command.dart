@@ -14,15 +14,14 @@ class SaslContinueCommand extends CommandOperation {
       {SaslContinueOptions? saslContinueOptions,
       Map<String, Object>? rawOptions,
       ConnectionBase? connection})
-      : super(
-            db,
-            <String, Object>{
-              keySaslContinue: 1,
-              keyConversationId: conversationId,
-              keyPayload: base64.encode(payload)
-            },
-            <String, Object>{...?saslContinueOptions?.options, ...?rawOptions},
-            connection: connection);
+      : super(db, <String, Object>{
+          keySaslContinue: 1,
+          keyConversationId: conversationId,
+          keyPayload: base64.encode(payload)
+        }, <String, Object>{
+          ...?saslContinueOptions?.options,
+          ...?rawOptions
+        });
 
   @override
   Future<Map<String, Object?>> executeOnServer(Server server,

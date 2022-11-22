@@ -27,7 +27,9 @@ class AggregateOperation extends CommandOperation {
       : cursor = cursor ?? <String, Object>{},
         explain = explain ?? false,
         super(
-            collection?.db ?? db,
+            collection?.db ??
+                db ??
+                (throw MongoDartError('At least a Db must be specified')),
             {},
             <String, Object>{
               ...?aggregateOptions?.getOptions(collection?.db ?? db),
