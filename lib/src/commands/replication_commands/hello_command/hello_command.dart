@@ -1,12 +1,9 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/commands/base/simple_command.dart';
-import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
-import '../../../core/network/abstract/connection_base.dart';
 import '../../../database/mongo_database.dart';
 import '../../../topology/abstract/topology.dart';
-import '../../../topology/server.dart';
 
 var _command = <String, Object>{keyHello: 1};
 
@@ -31,21 +28,20 @@ class HelloCommand extends SimpleCommand {
           topology,
           {
             ..._command,
+            keyDatabaseName: db?.databaseName ?? 'admin',
             if (filled(username))
               keySaslSupportedMechs: '${db?.databaseName ?? 'admin'}.$username'
           },
           <String, Object>{...?helloOptions?.options, ...?rawOptions},
         );
 
-  Future<HelloResult> executeDocument(Server server,
-      {ConnectionBase? connection}) async {
-    var result = await super.executeOnServer(server);
+  Future<HelloResult> executeDocument() async {
+    var result = await super.execute();
     return HelloResult(result);
   }
-
+/* 
   @override
-  Future<Map<String, Object?>> executeOnServer(Server server,
-      {ConnectionBase? connection}) async {
+  Future<Map<String, Object?>> executeOnServer(Server server) async {
     var command = $buildCommand();
     processOptions(command);
     command.addAll(options);
@@ -53,5 +49,5 @@ class HelloCommand extends SimpleCommand {
     var message = MongoModernMessage(command);
 
     return server.executeMessage(message);
-  }
+  } */
 }

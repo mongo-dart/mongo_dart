@@ -20,9 +20,9 @@ class ConnectionPool {
   bool get isConnected => state == PoolState.connected;
 
   Future<void> connectPool() async {
-    if (state == PoolState.connected) {
+    /*   if (state == PoolState.connected) {
       throw ConnectionException('Pool Closing, please wait a while and retry');
-    }
+    } */
     if (state == PoolState.connected) {
       return;
     }
@@ -47,10 +47,6 @@ class ConnectionPool {
 
   Future<void> connectConnection(ConnectionBase connection) async {
     await connection.connect();
-    if (connection.isAvailable) {
-      availableConnections[connection.id] = connection;
-      state = PoolState.connected;
-    }
   }
 
   ConnectionBase removeConnection(int id) {
@@ -81,10 +77,20 @@ class ConnectionPool {
 
   void addListeners(ConnectionBase connection) {
     connection.on<ConnectionError>(connectionErrorListener);
+    connection.on<Connected>(connectedListener);
+    connection.on<ConnectionClosed>(connectionClosedListener);
+    connection.on<ConnectionActive>(connectionActive);
+    connection.on<ConnectionAvailable>(connectionAvailable);
+    connection.on<ConnectionMessageReceived>(connectionMessageReceived);
   }
 
   void removeListeners(ConnectionBase connection) {
     connection.off<ConnectionError>(connectionErrorListener);
+    connection.off<Connected>(connectedListener);
+    connection.off<ConnectionClosed>(connectionClosedListener);
+    connection.off<ConnectionActive>(connectionActive);
+    connection.off<ConnectionAvailable>(connectionAvailable);
+    connection.off<ConnectionMessageReceived>(connectionMessageReceived);
   }
 
   Future<void> closePool() async {
@@ -92,6 +98,7 @@ class ConnectionPool {
     for (var connection in _connections) {
       await connection.close();
     }
+    state = PoolState.closed;
     doNotAcceptAnyRequest = false;
   }
 
@@ -104,8 +111,7 @@ class ConnectionPool {
   }
 
   FutureOr<void> connectedListener(Connected event) {
-    availableConnections[event.id] =
-        _connections.firstWhere((element) => element.id == event.id);
+    state = PoolState.connected;
   }
 
   FutureOr<void> connectionClosedListener(ConnectionClosed event) {
@@ -119,7 +125,12 @@ class ConnectionPool {
     availableConnections.remove(event.id);
   }
 
-  FutureOr<void> connectionAvailable(ConnectionActive event) {
+  FutureOr<void> connectionAvailable(ConnectionAvailable event) {
+    availableConnections[event.id] =
+        _connections.firstWhere((element) => element.id == event.id);
+  }
+
+  FutureOr<void> connectionMessageReceived(ConnectionMessageReceived event) {
     availableConnections[event.id] =
         _connections.firstWhere((element) => element.id == event.id);
   }

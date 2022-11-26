@@ -25,6 +25,7 @@ class Server {
   ServerState state = ServerState.closed;
 
   bool get isAuthenticated => serverConfig.isAuthenticated;
+  bool get isConnected => state == ServerState.connected;
 
   Future<void> connect() async {
     if (state == ServerState.connected) {

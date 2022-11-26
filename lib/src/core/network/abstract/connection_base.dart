@@ -37,6 +37,7 @@ abstract class ConnectionBase with EventEmitter {
     addLegalEvent<ConnectionClosed>();
     addLegalEvent<ConnectionActive>();
     addLegalEvent<ConnectionAvailable>();
+    addLegalEvent<ConnectionMessageReceived>();
   }
 
   factory ConnectionBase(ServerConfig serverConfig) {
@@ -141,10 +142,53 @@ abstract class ConnectionBase with EventEmitter {
   }
 
  */
+
+  Completer<MongoModernMessage>? completer;
+
   void setSocket(Socket newSocket) {
     socket = newSocket;
     _state = ConnectionState.available;
     emit(Connected(id));
+    emit(ConnectionAvailable(id));
+
+    socket!
+        .transform<MongoModernMessage>(MessageHandler().transformer)
+        .listen(receiveReply,
+            onError: (e, st) async {
+              log.severe('Socket error $e $st');
+              if (!isClosed) {
+                await _closeSocketOnError(socketError: e);
+              }
+            },
+            cancelOnError: true,
+            // onDone is not called in any case after onData or OnError,
+            // it is called when the socket closes, i.e. it is an error.
+            // Possible causes:
+            // * Trying to connect to a tls encrypted Database
+            //   without specifing tls=true in the query parms or setting
+            //   the secure parameter to true in db.open()
+            onDone: () async {
+              if (!isClosed) {
+                await _closeSocketOnError(socketError: noSecureRequestError);
+              }
+            });
+  }
+
+  void receiveReply(MongoModernMessage reply) {
+    log.fine(() => reply.toString());
+
+    if (completer != null) {
+      log.fine(() => 'Completing $reply');
+      emit(ConnectionMessageReceived(id, reply));
+      emit(ConnectionAvailable(id));
+      completer!.complete(reply);
+    } else {
+      if (!isClosed) {
+        log.info(() => 'Unexpected respondTo: ${reply.responseTo} $reply');
+        emit(ConnectionError(id,
+            MongoError('Unexpected respondTo: ${reply.responseTo} $reply')));
+      }
+    }
   }
 
   Future<void> close() async {
@@ -181,7 +225,8 @@ abstract class ConnectionBase with EventEmitter {
     }
   } */
 
-  Future<MongoModernMessage> execute(MongoModernMessage modernMessage) async {
+  Future<MongoModernMessage> execute_async(
+      MongoModernMessage modernMessage) async {
     if (_state == ConnectionState.closed) {
       throw const ConnectionException(
           'Invalid state: Connection already closed.');
@@ -202,18 +247,45 @@ abstract class ConnectionBase with EventEmitter {
       await for (var reply in socket!
           .transform<MongoModernMessage>(MessageHandler().transformer)) {
         ret = reply;
-        //receiveReply(reply);
+        emit(ConnectionMessageReceived(id, ret));
+        break; //receiveReply(reply);
       }
     } catch (e, stack) {
       var error = MongoError('$e', stackTrace: stack);
       emit(ConnectionError(id, error));
-      _closeSocketOnError();
+      await _closeSocketOnError();
     }
-    emit(ConnectionAvailable(ret, id));
+    emit(ConnectionAvailable(id));
+
     if (ret == null) {
       throw MongoDartError('No Reply Received');
     }
     return ret;
+  }
+
+  Future<MongoModernMessage> execute(MongoModernMessage modernMessage) async {
+    if (_state == ConnectionState.closed) {
+      throw const ConnectionException(
+          'Invalid state: Connection already closed.');
+    } else if (_state == ConnectionState.active) {
+      throw const ConnectionException(
+          'Invalid state: Connection already busy.');
+    }
+    emit(ConnectionActive(id));
+
+    var message = <int>[];
+    message.addAll(modernMessage.serialize().byteList);
+    emit(ConnectionActive(id));
+
+    log.finest(() => 'Submitting message $modernMessage');
+    completer = Completer<MongoModernMessage>();
+    if (!isClosed) {
+      socket!.add(message);
+    } else {
+      completer!.completeError(const ConnectionException(
+          'Invalid state: Connection already closed.'));
+    }
+    return completer!.future;
   }
 
   Future<void> _closeSocketOnError({dynamic socketError}) async {

@@ -14,6 +14,7 @@ class Connection extends ConnectionBase {
     try {
       locSocket = await Socket.connect(serverConfig.host, serverConfig.port);
     } catch (e) {
+      // Socket connection - Connection refused from remote computer.
       var ex = ConnectionException(
           'Could not connect to ${serverConfig.hostUrl}\n- $e');
       throw ex;

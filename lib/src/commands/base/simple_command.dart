@@ -9,13 +9,14 @@ import '../parameters/read_preference.dart' show ReadPreference;
 ///
 /// Designed for system commands where Db/Collection are not needed
 class SimpleCommand extends ServerCommand {
-  ReadPreference readPreference;
-  Topology topology;
-
   SimpleCommand(this.topology, super.command, super.options,
       {super.aspect, ReadPreference? readPreference})
       : readPreference = readPreference ?? ReadPreference.primary,
         super();
+
+  ReadPreference readPreference;
+  Topology topology;
+
   Future<Map<String, Object?>> execute() async {
     var server = topology.getServer(readPreference);
     return super.executeOnServer(server);

@@ -48,7 +48,16 @@ abstract class Topology {
     for (var element in hostsSeedList) {
       var serverConfig = await _parseUri(element, mongoClientOptions);
       var server = Server(serverConfig);
+      servers.add(server);
       await server.connect();
+      if (server.isConnected) {
+        var command = HelloCommand(this);
+        var result = await command.execute();
+        print(result);
+        var resultDoc = await command.executeDocument();
+        print('The connection is: ${resultDoc.connectionId}');
+        print(resultDoc.success);
+      }
     }
   }
 

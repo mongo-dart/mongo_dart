@@ -40,6 +40,12 @@ class ConnectionActive extends ConnectionEvent {
 /// This Message is sent when the connection is available againa after
 /// beeign used
 class ConnectionAvailable extends ConnectionEvent {
-  ConnectionAvailable(this.reply, super.id);
+  ConnectionAvailable(super.id);
+  MongoModernMessage? reply;
+}
+
+/// This Message is sent when the connection receive a response
+class ConnectionMessageReceived extends ConnectionEvent {
+  ConnectionMessageReceived(super.id, this.reply);
   MongoModernMessage? reply;
 }

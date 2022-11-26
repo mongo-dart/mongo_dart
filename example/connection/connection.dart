@@ -11,11 +11,8 @@ void main() async {
   //var db = client.db();
 
   Future cleanupDatabase() async {
-    //await db.drop();
     await client.close();
   }
-
-  print('Added collection has been correctly removed');
 
   await cleanupDatabase();
 }
