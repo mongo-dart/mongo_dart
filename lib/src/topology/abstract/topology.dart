@@ -50,13 +50,12 @@ abstract class Topology {
       var server = Server(serverConfig);
       servers.add(server);
       await server.connect();
+      // Todo remove if
       if (server.isConnected) {
-        var command = HelloCommand(this);
-        var result = await command.execute();
-        print(result);
-        var resultDoc = await command.executeDocument();
-        print('The connection is: ${resultDoc.connectionId}');
-        print(resultDoc.success);
+        print(server.hello);
+        await server.refreshStatus();
+        print('The connection is: ${server.hello?.connectionId}');
+        print(server.hello?.success);
       }
     }
   }

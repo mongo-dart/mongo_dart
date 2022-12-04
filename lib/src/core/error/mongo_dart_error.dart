@@ -1,13 +1,16 @@
-class MongoDartError extends Error {
-  final String message;
+import '../../utils/generic_error.dart';
+
+class MongoDartError extends GenericError {
   final int? mongoCode;
-  final String? errorCode;
   final String? errorCodeName;
 
-  MongoDartError(this.message,
-      {this.mongoCode, String? errorCode, this.errorCodeName})
-      : errorCode = errorCode ?? (mongoCode != null ? '$mongoCode' : null);
+  MongoDartError(String message,
+      {this.mongoCode, String? errorCode, this.errorCodeName, super.stackTrace})
+      : super(message,
+            errorCode: errorCode ?? (mongoCode != null ? '$mongoCode' : null));
 
   @override
-  String toString() => 'MongoDart Error: $message';
+  String toString() => 'MongoDart Error: $originalErrorMessage';
+
+  String get message => originalErrorMessage;
 }

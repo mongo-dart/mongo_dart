@@ -99,6 +99,8 @@ class MongoClient {
     var discoverTopology = Discover(seedServers, mongoClientOptions);
 
     await discoverTopology.connect();
+
+    topology = discoverTopology.getEffectiveTopology();
   }
 
   Future close() async {}

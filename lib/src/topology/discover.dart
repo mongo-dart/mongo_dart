@@ -1,4 +1,7 @@
+import 'package:mongo_dart/mongo_dart.dart';
+
 import 'abstract/topology.dart';
+import 'standalone.dart';
 
 /// This is a class used uniquely to discover which is the
 /// topology of our connection.
@@ -9,4 +12,22 @@ import 'abstract/topology.dart';
 /// The correct topology object will have to complete all the connections.
 class Discover extends Topology {
   Discover(super.hostsSeedList, super.mongoClientOptions) : super.protected();
+
+  Topology getEffectiveTopology() {
+    Topology topology;
+    if (servers.first.isStandalone) {
+      topology = Standalone(hostsSeedList, mongoClientOptions);
+    } else if (servers.first.isReplicaSet) {
+      // Todo
+      topology = Standalone(hostsSeedList, mongoClientOptions);
+    } else if (servers.first.isReplicaSet) {
+      // Todo
+      topology = Standalone(hostsSeedList, mongoClientOptions);
+    } else {
+      throw MongoDartError('Unknown topology type');
+    }
+    topology.servers.add(servers.first);
+
+    return topology;
+  }
 }

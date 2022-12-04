@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'error.dart';
+import 'mongo_db_error.dart';
 
 String extractType<T>([T? object]) => object is Type ? '$object' : '$T';
 
@@ -52,7 +52,7 @@ mixin EventEmitter {
   // to be called
   final Map<String, Set<ListenerWrapper>> _listeners =
       <String, Set<ListenerWrapper>>{};
-  final legalEvents = <String>{extractType(ErrorMonitor)};
+  var legalEvents = <String>{extractType(ErrorMonitor)};
 
   void addLegalEvent<T extends Event>() => legalEvents.add(extractType<T>());
 
@@ -65,7 +65,7 @@ mixin EventEmitter {
     setAsFirst ??= false;
     var key = extractType<T>();
     if (!legalEvents.contains(key)) {
-      throw MongoError(
+      throw MongoDbError(
           'The class "${extractType(this)}" does not emit $key events');
     }
     var listeners = _listeners[key] ?? <ListenerWrapper<T>>{};
@@ -94,7 +94,7 @@ mixin EventEmitter {
     setAsFirst ??= false;
     var key = extractType<T>();
     if (!legalEvents.contains(key)) {
-      throw MongoError(
+      throw MongoDbError(
           'The class "${extractType(this)}" does not emit $key events');
     }
     var listeners = _listeners[key] ?? <ListenerWrapper<T>>{};
@@ -126,7 +126,7 @@ mixin EventEmitter {
   Future<bool> emit<T extends Event>(T event) async {
     var key = extractType<T>();
     if (!legalEvents.contains(key)) {
-      throw MongoError(
+      throw MongoDbError(
           'The class "${extractType(this)}" does not emit $key events');
     }
     var atLeastOneListener = false;
@@ -144,7 +144,7 @@ mixin EventEmitter {
   int listenerCount<T extends Event>([T? event]) {
     var key = extractType(event);
     if (!legalEvents.contains(key)) {
-      throw MongoError(
+      throw MongoDbError(
           'The class "${extractType(this)}" does not emit $key events');
     }
     if (_listeners.containsKey(key)) {
@@ -158,7 +158,7 @@ mixin EventEmitter {
   List<ListenerFunction<T>> rawListeners<T extends Event>([T? event]) {
     var key = extractType(event);
     if (!legalEvents.contains(key)) {
-      throw MongoError(
+      throw MongoDbError(
           'The class "${extractType(this)}" does not emit $key events');
     }
     var ret = <ListenerFunction<T>>[];

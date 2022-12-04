@@ -1,4 +1,4 @@
-import '../../../utils/error.dart';
+import '../../../utils/generic_error.dart';
 import '../../../utils/events.dart';
 import '../../message/mongo_modern_message.dart';
 
@@ -24,7 +24,7 @@ class Connected extends ConnectionEvent {
 class ConnectionError extends ConnectionEvent {
   ConnectionError(super.id, this.error);
 
-  MongoError error;
+  GenericError error;
 }
 
 /// This Message is sent when the connection is closed

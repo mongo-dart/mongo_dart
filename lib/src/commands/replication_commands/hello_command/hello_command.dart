@@ -1,9 +1,10 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/commands/base/simple_command.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
+import '../../../core/error/mongo_dart_error.dart';
 import '../../../database/mongo_database.dart';
-import '../../../topology/abstract/topology.dart';
+import '../../../topology/server.dart';
+import '../../base/server_command.dart';
 
 var _command = <String, Object>{keyHello: 1};
 
@@ -18,14 +19,13 @@ var _command = <String, Object>{keyHello: 1};
 ///
 /// `db.runCommand( { hello: 1, saslSupportedMechs: "<db.username>",
 /// comment: <String> } )`
-class HelloCommand extends SimpleCommand {
-  HelloCommand(Topology topology,
+class HelloCommand extends ServerCommand {
+  HelloCommand(this.server,
       {MongoDatabase? db,
       String? username,
       HelloOptions? helloOptions,
       Map<String, Object>? rawOptions})
       : super(
-          topology,
           {
             ..._command,
             keyDatabaseName: db?.databaseName ?? 'admin',
@@ -35,19 +35,16 @@ class HelloCommand extends SimpleCommand {
           <String, Object>{...?helloOptions?.options, ...?rawOptions},
         );
 
+  Server server;
+
   Future<HelloResult> executeDocument() async {
-    var result = await super.execute();
+    var result = await execute();
     return HelloResult(result);
   }
-/* 
+
+  Future<Map<String, Object?>> execute() async => super.executeOnServer(server);
+
   @override
-  Future<Map<String, Object?>> executeOnServer(Server server) async {
-    var command = $buildCommand();
-    processOptions(command);
-    command.addAll(options);
-
-    var message = MongoModernMessage(command);
-
-    return server.executeMessage(message);
-  } */
+  Future<Map<String, Object?>> executeOnServer(Server server) async =>
+      throw MongoDartError('Do not use this methos, use execute instead');
 }

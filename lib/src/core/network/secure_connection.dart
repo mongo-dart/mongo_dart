@@ -12,7 +12,7 @@ class SecureConnection extends ConnectionBase {
   SecureConnection(ServerConfig serverConfig) : super.protected(serverConfig);
 
   @override
-  Future<void> connect() async {
+  Future<void> internalConnect() async {
     Socket locSocket;
     try {
       var securityContext = SecurityContext.defaultContext;

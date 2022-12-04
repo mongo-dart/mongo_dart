@@ -9,7 +9,7 @@ import '../info/server_config.dart';
 class Connection extends ConnectionBase {
   Connection(ServerConfig serverConfig) : super.protected(serverConfig);
   @override
-  Future<void> connect() async {
+  Future<void> internalConnect() async {
     Socket locSocket;
     try {
       locSocket = await Socket.connect(serverConfig.host, serverConfig.port);
