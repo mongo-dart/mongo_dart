@@ -10,7 +10,7 @@ const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 void main() async {
   hierarchicalLoggingEnabled = true;
   //Logger.root.level = Level.OFF;
-  Logger('Mongoconnection example').level = Level.FINE;
+  Logger('Mongoconnection example').level = Level.INFO;
 
   void listener(LogRecord r) {
     var name = r.loggerName;
@@ -21,13 +21,6 @@ void main() async {
 
   var client = MongoClient(defaultUri);
   await client.connect();
-  client.topology?.servers.first.refreshStatus();
-  client.topology?.servers.first.refreshStatus();
-  client.topology?.servers.first.refreshStatus();
-  await client.topology?.servers.first.refreshStatus();
-  await Future.delayed(Duration(seconds: 2));
-  print(client.topology?.servers.first.connectionPool.connectionsNumber);
-
   //var db = client.db();
 
   Future cleanupDatabase() async {

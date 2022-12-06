@@ -59,11 +59,14 @@ class ConnectionPool {
 
   Future<ConnectionBase> getAvailableConnection() async {
     if (availableConnections.isNotEmpty) {
+      log.finer('Connection available - first '
+          '${availableConnections.entries.first.key}');
       return pickAvailableConnection();
     }
+    log.finer('No connection available - adding a new one');
     var connection = addConnection();
     await connectConnection(connection);
-    return pickAvailableConnection();
+    return connection.isAvailable ? connection : pickAvailableConnection();
   }
 
   ConnectionBase pickAvailableConnection() {
@@ -72,7 +75,7 @@ class ConnectionPool {
     }
     var entry = availableConnections.entries.first;
     availableConnections.remove(entry.key);
-    log.info('Got available connection No ${entry.value.id}');
+    log.finer('Got available connection No ${entry.value.id}');
     return entry.value;
   }
 
@@ -128,14 +131,14 @@ class ConnectionPool {
   }
 
   FutureOr<void> connectionAvailable(ConnectionAvailable event) {
-    log.info('Connection ${event.id} available');
+    log.finer('Connection ${event.id} available');
 
     availableConnections[event.id] =
         _connections.firstWhere((element) => element.id == event.id);
   }
 
   FutureOr<void> connectionMessageReceived(ConnectionMessageReceived event) {
-    log.info('Received message on connection ${event.id}');
+    log.finer('Received message on connection ${event.id}');
     availableConnections[event.id] =
         _connections.firstWhere((element) => element.id == event.id);
   }
