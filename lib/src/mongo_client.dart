@@ -5,7 +5,7 @@ import 'package:mongo_dart/src/topology/discover.dart';
 import 'session/client_session.dart';
 import 'core/error/mongo_dart_error.dart';
 import 'topology/abstract/topology.dart';
-import 'configuration/default_settings.dart';
+import 'settings/default_settings.dart';
 import 'mongo_client_options.dart';
 import 'utils/decode_dns_seed_list.dart';
 import 'utils/decode_url_parameters.dart';

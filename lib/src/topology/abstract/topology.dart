@@ -7,7 +7,7 @@ import 'package:universal_io/io.dart';
 
 import '../../core/error/mongo_dart_error.dart';
 import '../../core/info/server_config.dart';
-import '../../configuration/default_settings.dart';
+import '../../settings/default_settings.dart';
 import '../../mongo_client_options.dart';
 import '../server.dart';
 import '../standalone.dart';

@@ -37,7 +37,7 @@ class ConnectionActive extends ConnectionEvent {
   ConnectionActive(super.id);
 }
 
-/// This Message is sent when the connection is available againa after
+/// This Message is sent when the connection is available again after
 /// beeign used
 class ConnectionAvailable extends ConnectionEvent {
   ConnectionAvailable(super.id);

@@ -2,11 +2,11 @@ import 'dart:typed_data' show Uint8List;
 
 import 'package:universal_io/io.dart' show File;
 
-import '../configuration/connection_string_options.dart';
+import '../settings/connection_string_options.dart';
 import '../core/auth/select_authentication_mechanism.dart';
 import '../core/error/mongo_dart_error.dart';
 import '../core/info/server_config.dart';
-import '../configuration/default_settings.dart';
+import '../settings/default_settings.dart';
 import '../mongo_client_options.dart';
 
 /// Decode the url paramters

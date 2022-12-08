@@ -1,16 +1,20 @@
 import 'dart:async';
 
 import 'package:logging/logging.dart';
-import 'package:mongo_dart/src/core/error/connection_exception.dart';
 import 'package:mongo_dart/src/settings/connection_pool_settings.dart';
 
+import '../../settings/default_settings.dart';
+import '../../utils/events.dart';
+import '../../utils/generic_error.dart';
+import '../error/mongo_dart_error.dart';
 import '../info/server_config.dart';
 import 'abstract/connection_base.dart';
 import 'abstract/connection_events.dart';
+import 'connection_pool_events.dart';
 
 enum PoolState { closed, connected, unknown }
 
-class ConnectionPool {
+class ConnectionPool with EventEmitter {
   ConnectionPool(this.serverConfig, this.poolSettings);
 
   final log = Logger('Connection Pool');
@@ -46,6 +50,7 @@ class ConnectionPool {
   final Set<ConnectionBase> _connections = <ConnectionBase>{};
   final Map<int, ConnectionBase> availableConnections = <int, ConnectionBase>{};
   bool doNotAcceptAnyRequest = false;
+  final waitingList = <int>[];
 
   bool get isConnected => state == PoolState.connected;
   int get connectionsNumber => _connections.length;
@@ -95,20 +100,36 @@ class ConnectionPool {
     if (availableConnections.isNotEmpty) {
       log.finer('Connection available - first '
           '${availableConnections.entries.first.key}');
-      return pickAvailableConnection();
+      return _pickAvailableConnection();
     }
     if (maxPoolSize <= connectionsNumber) {
-      // Todo throw error? create a wait list?
+      return _queueForAvailableConnection();
     }
     log.finer('No connection available - adding a new one');
     var connection = addConnection();
     await connectConnection(connection);
-    return connection.isAvailable ? connection : pickAvailableConnection();
+    return connection.isAvailable ? connection : _pickAvailableConnection();
   }
 
-  ConnectionBase pickAvailableConnection() {
+  Future<ConnectionBase> _queueForAvailableConnection() async {
+    var startMS = DateTime.now().millisecondsSinceEpoch;
+    waitingList.add(startMS);
+    while (availableConnections.isEmpty || startMS != waitingList.first) {
+      await Future.delayed(Duration(milliseconds: defQueueTimeoutPollingMS));
+      if (waitQueueTimeoutMS > 0) {
+        var checkMS = DateTime.now().millisecondsSinceEpoch;
+        if ((checkMS - startMS) > waitQueueTimeoutMS) {
+          // throw error
+        }
+      }
+    }
+    waitingList.removeAt(0);
+    return _pickAvailableConnection();
+  }
+
+  ConnectionBase _pickAvailableConnection() {
     if (availableConnections.isEmpty) {
-      throw ConnectionException('No available Connection');
+      _closeOnError(MongoDartError('No Available Connection'));
     }
     var entry = availableConnections.entries.first;
     availableConnections.remove(entry.key);
@@ -134,14 +155,24 @@ class ConnectionPool {
     connection.off<ConnectionMessageReceived>(connectionMessageReceived);
   }
 
-  Future<void> closePool() async {
+  Future<void> _closePool() async {
     doNotAcceptAnyRequest = true;
     for (var connection in _connections) {
       await connection.close();
     }
+    emit(ConnectionPoolClosed());
     state = PoolState.closed;
     doNotAcceptAnyRequest = false;
   }
+
+  Future<void> _closeOnError(GenericError error) async {
+    await _closePool();
+    emit(ConnectionPoolError(error));
+    log.severe(error.originalErrorMessage);
+    /* _completer == null ? */ throw error /* : _completer!.completeError(error) */;
+  }
+
+  Future<void> closePool() => _closePool();
 
   // *************  Listeners ************************
   FutureOr<void> connectionErrorListener(ConnectionError event) {
