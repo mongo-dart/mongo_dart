@@ -45,64 +45,57 @@ Future<ServerConfig> decodeUrlParameters(
         options.tlsCertificateKeyFile = value;
         options.tls = true;
         break;
+      case ConnectionStringOptions.tlsCertificateKeyFilePassword:
+        options.tlsCertificateKeyFilePassword = value;
+        break;
+      case ConnectionStringOptions.tlsCAFile:
+        options.tlsCAFile = value;
+        options.tls = true;
+        break;
+      case ConnectionStringOptions.tlsAllowInvalidCertificates:
+        if (value == 'true') {
+          options.tlsAllowInvalidCertificates = true;
+          options.tls = true;
+        }
+        break;
+      case ConnectionStringOptions.authSource:
+        localAuthDbName = value;
+        break;
+      case ConnectionStringOptions.authMechanism:
+        options.authenticationMechanism = selectAuthenticationMechanism(value);
+        break;
+      case ConnectionStringOptions.maxPoolSize:
+        var intValue = int.tryParse(value);
+        if (intValue != null && intValue >= 0) {
+          options.maxPoolSize = intValue;
+        }
+        break;
+      case ConnectionStringOptions.minPoolSize:
+        var intValue = int.tryParse(value);
+        if (intValue != null && intValue >= 0) {
+          options.minPoolSize = intValue;
+        }
+        break;
+      case ConnectionStringOptions.maxIdleTimeMS:
+        var intValue = int.tryParse(value);
+        if (intValue != null && intValue >= 0) {
+          options.maxIdleTimeMS = intValue;
+        }
+        break;
+      case ConnectionStringOptions.waitQueueMultiple:
+        var intValue = int.tryParse(value);
+        if (intValue != null && intValue >= 0) {
+          options.waitQueueMultiple = intValue;
+        }
+        break;
+      case ConnectionStringOptions.waitQueueTimeoutMS:
+        var intValue = int.tryParse(value);
+        if (intValue != null && intValue >= 0) {
+          options.waitQueueTimeoutMS = intValue;
+        }
+        break;
       default:
         throw MongoDartError('Unknown CL parameter: $queryParam');
-    }
-    if (queryParam == ConnectionStringOptions.tlsCertificateKeyFilePassword &&
-        value.isNotEmpty) {
-      options.tlsCertificateKeyFilePassword = value;
-    }
-    if (queryParam == ConnectionStringOptions.tlsCAFile && value.isNotEmpty) {
-      options.tlsCAFile = value;
-      options.tls = true;
-    }
-
-    if (queryParam == ConnectionStringOptions.tlsAllowInvalidCertificates &&
-        value == 'true') {
-      options.tlsAllowInvalidCertificates = true;
-      options.tls = true;
-    }
-    if (queryParam == ConnectionStringOptions.authSource) {
-      localAuthDbName = value;
-    }
-
-    if (queryParam == ConnectionStringOptions.authMechanism) {
-      options.authenticationMechanism = selectAuthenticationMechanism(value);
-    }
-
-    // ******************** POOL SETTINGS ***
-    if (queryParam == ConnectionStringOptions.maxPoolSize && value.isNotEmpty) {
-      var intValue = int.tryParse(value);
-      if (intValue != null && intValue >= 0) {
-        options.maxPoolSize = intValue;
-      }
-    }
-    if (queryParam == ConnectionStringOptions.minPoolSize && value.isNotEmpty) {
-      var intValue = int.tryParse(value);
-      if (intValue != null && intValue >= 0) {
-        options.minPoolSize = intValue;
-      }
-    }
-    if (queryParam == ConnectionStringOptions.maxIdleTimeMS &&
-        value.isNotEmpty) {
-      var intValue = int.tryParse(value);
-      if (intValue != null && intValue >= 0) {
-        options.maxIdleTimeMS = intValue;
-      }
-    }
-    if (queryParam == ConnectionStringOptions.waitQueueMultiple &&
-        value.isNotEmpty) {
-      var intValue = int.tryParse(value);
-      if (intValue != null && intValue >= 0) {
-        options.waitQueueMultiple = intValue;
-      }
-    }
-    if (queryParam == ConnectionStringOptions.waitQueueTimeoutMS &&
-        value.isNotEmpty) {
-      var intValue = int.tryParse(value);
-      if (intValue != null && intValue >= 0) {
-        options.waitQueueTimeoutMS = intValue;
-      }
     }
   });
 

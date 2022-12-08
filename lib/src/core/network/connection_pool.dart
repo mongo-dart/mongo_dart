@@ -23,6 +23,7 @@ class ConnectionPool {
   int get maxPoolSize => poolSettings.maxPoolSize;
 
   /// The minimum number of connections in the connection pool.
+  /// They are created during the initial pool connection phase.
   /// The default value is 0.
   int get minPoolSize => poolSettings.minPoolSize;
 
@@ -63,6 +64,13 @@ class ConnectionPool {
         orElse: addConnection);
 
     await connectConnection(connection);
+
+    if (minPoolSize > 0) {
+      while (minPoolSize < connectionsNumber) {
+        var connection = addConnection();
+        await connectConnection(connection);
+      }
+    }
   }
 
   ConnectionBase addConnection() {
@@ -88,6 +96,9 @@ class ConnectionPool {
       log.finer('Connection available - first '
           '${availableConnections.entries.first.key}');
       return pickAvailableConnection();
+    }
+    if (maxPoolSize <= connectionsNumber) {
+      // Todo throw error? create a wait list?
     }
     log.finer('No connection available - adding a new one');
     var connection = addConnection();
