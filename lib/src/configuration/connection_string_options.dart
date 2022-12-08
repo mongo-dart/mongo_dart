@@ -124,12 +124,10 @@ class ConnectionStringOptions {
 
   /// The maximum number of connections in the connection pool.
   ///   The default value is 100.
-  /// *********    NOT YET MANAGED     *******************
   static const maxPoolSize = 'maxPoolSize';
 
   /// The minimum number of connections in the connection pool.
   /// The default value is 0.
-  /// *********    NOT YET MANAGED     *******************
   static const minPoolSize = 'minPoolSize';
 
   /// The maximum number of milliseconds that a connection can remain

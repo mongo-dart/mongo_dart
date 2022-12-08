@@ -1,3 +1,5 @@
+import 'package:mongo_dart/src/settings/connection_pool_settings.dart';
+
 import 'core/auth/auth.dart';
 import 'core/compression.dart';
 import 'mongo_client.dart';
@@ -6,7 +8,9 @@ import 'parameters/read_concern.dart';
 /// Describes all possible URI query options for the mongo client
 /// @public
 /// @see https://docs.mongodb.com/manual/reference/connection-string
-class MongoClientOptions /*extends BSONSerializeOptions,  SupportedNodeConnectionOptions*/ {
+class MongoClientOptions
+    with
+        ConnectionPoolSettings /*extends BSONSerializeOptions,  SupportedNodeConnectionOptions*/ {
   /// Specifies the name of the replica set, if the mongod is a member of a
   /// replica set.
   String? replicaSet;
@@ -79,19 +83,22 @@ class MongoClientOptions /*extends BSONSerializeOptions,  SupportedNodeConnectio
   /// Querying this DNS URI is expected to respond with SRV records
   String? srvServiceName;
 
+  /* /// An object cotaing all the pool settings
+  ConnectionPoolSettings poolSettings = ConnectionPoolSettings();
+
   /// The maximum number of connections in the connection pool.
-  int? maxPoolSize;
+  int get maxPoolSize => poolSettings.maxPoolSize;
 
   /// The minimum number of connections in the connection pool.
-  int? minPoolSize;
+  int get minPoolSize => poolSettings.minPoolSize;
 
   /// The maximum number of milliseconds that a connection can remain
   /// idle in the pool before being removed and closed.
-  int? maxIdleTimeMS;
+  int get maxIdleTimeMS => poolSettings.maxIdleTimeMS;
 
   /// The maximum time in milliseconds that a thread can wait for a
   /// connection to become available.
-  int? waitQueueTimeoutMS;
+  int get waitQueueTimeoutMS => poolSettings.waitQueueTimeoutMS; */
 
   /// Specify a read concern for the collection (only MongoDB 3.2 or
   /// higher supported)
@@ -261,9 +268,4 @@ class MongoClientOptions /*extends BSONSerializeOptions,  SupportedNodeConnectio
   /// Configures a Socks5 proxy password when the proxy in proxyHost
   /// requires username/password authentication.
   String? proxyPassword;
-
-  /// @internal
-  // Todo SrvPoller? srvPoller;
-  /// @internal
-  // Todo Connection? connectionType;
 }

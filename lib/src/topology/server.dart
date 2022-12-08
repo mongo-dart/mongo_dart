@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/core/error/connection_exception.dart';
+import 'package:mongo_dart/src/settings/connection_pool_settings.dart';
 
 import '../core/error/mongo_dart_error.dart';
 import '../core/info/server_capabilities.dart';
@@ -15,7 +16,8 @@ import '../core/network/connection_pool.dart';
 enum ServerState { closed, connected }
 
 class Server {
-  Server(this.serverConfig) : connectionPool = ConnectionPool(serverConfig);
+  Server(this.serverConfig, ConnectionPoolSettings poolSettings)
+      : connectionPool = ConnectionPool(serverConfig, poolSettings);
 
   final Logger log = Logger('Server');
   final ServerConfig serverConfig;

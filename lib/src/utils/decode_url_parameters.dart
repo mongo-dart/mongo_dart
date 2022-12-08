@@ -28,19 +28,25 @@ Future<ServerConfig> decodeUrlParameters(
   String? localAuthDbName;
 
   uri.queryParameters.forEach((String queryParam, String value) {
-    if (queryParam == ConnectionStringOptions.replicaSet) {
-      options.replicaSet = value;
+    if (value.isEmpty) {
+      return;
     }
-
-    if ((queryParam == ConnectionStringOptions.tls ||
-            queryParam == ConnectionStringOptions.ssl) &&
-        value == 'true') {
-      options.tls = true;
-    }
-    if (queryParam == ConnectionStringOptions.tlsCertificateKeyFile &&
-        value.isNotEmpty) {
-      options.tlsCertificateKeyFile = value;
-      options.tls = true;
+    switch (queryParam) {
+      case ConnectionStringOptions.replicaSet:
+        options.replicaSet = value;
+        break;
+      case ConnectionStringOptions.ssl:
+      case ConnectionStringOptions.tls:
+        if (value == 'true') {
+          options.tls = true;
+        }
+        break;
+      case ConnectionStringOptions.tlsCertificateKeyFile:
+        options.tlsCertificateKeyFile = value;
+        options.tls = true;
+        break;
+      default:
+        throw MongoDartError('Unknown CL parameter: $queryParam');
     }
     if (queryParam == ConnectionStringOptions.tlsCertificateKeyFilePassword &&
         value.isNotEmpty) {
@@ -62,6 +68,41 @@ Future<ServerConfig> decodeUrlParameters(
 
     if (queryParam == ConnectionStringOptions.authMechanism) {
       options.authenticationMechanism = selectAuthenticationMechanism(value);
+    }
+
+    // ******************** POOL SETTINGS ***
+    if (queryParam == ConnectionStringOptions.maxPoolSize && value.isNotEmpty) {
+      var intValue = int.tryParse(value);
+      if (intValue != null && intValue >= 0) {
+        options.maxPoolSize = intValue;
+      }
+    }
+    if (queryParam == ConnectionStringOptions.minPoolSize && value.isNotEmpty) {
+      var intValue = int.tryParse(value);
+      if (intValue != null && intValue >= 0) {
+        options.minPoolSize = intValue;
+      }
+    }
+    if (queryParam == ConnectionStringOptions.maxIdleTimeMS &&
+        value.isNotEmpty) {
+      var intValue = int.tryParse(value);
+      if (intValue != null && intValue >= 0) {
+        options.maxIdleTimeMS = intValue;
+      }
+    }
+    if (queryParam == ConnectionStringOptions.waitQueueMultiple &&
+        value.isNotEmpty) {
+      var intValue = int.tryParse(value);
+      if (intValue != null && intValue >= 0) {
+        options.waitQueueMultiple = intValue;
+      }
+    }
+    if (queryParam == ConnectionStringOptions.waitQueueTimeoutMS &&
+        value.isNotEmpty) {
+      var intValue = int.tryParse(value);
+      if (intValue != null && intValue >= 0) {
+        options.waitQueueTimeoutMS = intValue;
+      }
     }
   });
 
