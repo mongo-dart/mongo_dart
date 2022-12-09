@@ -71,7 +71,7 @@ class ConnectionPool with EventEmitter {
     await connectConnection(connection);
 
     if (minPoolSize > 0) {
-      while (minPoolSize < connectionsNumber) {
+      while (minPoolSize > connectionsNumber) {
         var connection = addConnection();
         await connectConnection(connection);
       }
@@ -97,6 +97,14 @@ class ConnectionPool with EventEmitter {
   }
 
   Future<ConnectionBase> getAvailableConnection() async {
+    if (doNotAcceptAnyRequest) {
+      var error =
+          MongoDartError('Request rejected as pool closing is running ');
+      log.finer('Request rejected as pool closing is running ');
+      emit(ConnectionPoolError(error));
+      log.severe(error.originalErrorMessage);
+      throw error;
+    }
     if (availableConnections.isNotEmpty) {
       log.finer('Connection available - first '
           '${availableConnections.entries.first.key}');
@@ -115,6 +123,9 @@ class ConnectionPool with EventEmitter {
     var startMS = DateTime.now().millisecondsSinceEpoch;
     waitingList.add(startMS);
     while (availableConnections.isEmpty || startMS != waitingList.first) {
+      if (doNotAcceptAnyRequest) {
+        break;
+      }
       await Future.delayed(Duration(milliseconds: defQueueTimeoutPollingMS));
       if (waitQueueTimeoutMS > 0) {
         var checkMS = DateTime.now().millisecondsSinceEpoch;
@@ -137,6 +148,35 @@ class ConnectionPool with EventEmitter {
     return entry.value;
   }
 
+  Future<void> _closePool() async {
+    if (doNotAcceptAnyRequest) {
+      var error = MongoDartError('Pool closing already in progress');
+      log.warning(error.originalErrorMessage);
+      emit(ConnectionPoolError(error));
+      throw error;
+    }
+    doNotAcceptAnyRequest = true;
+    for (var connection in _connections) {
+      await connection.close();
+    }
+    while (waitingList.isNotEmpty) {
+      await Future.delayed(Duration(milliseconds: defQueueTimeoutPollingMS));
+    }
+    emit(ConnectionPoolClosed());
+    state = PoolState.closed;
+    doNotAcceptAnyRequest = false;
+  }
+
+  Future<void> _closeOnError(GenericError error) async {
+    await _closePool();
+    log.severe(error.originalErrorMessage);
+    emit(ConnectionPoolError(error));
+    throw error;
+  }
+
+  Future<void> closePool() => _closePool();
+
+  // ****************  RECEIVING MESSAGES
   void addListeners(ConnectionBase connection) {
     connection.on<ConnectionError>(connectionErrorListener);
     connection.on<Connected>(connectedListener);
@@ -155,30 +195,11 @@ class ConnectionPool with EventEmitter {
     connection.off<ConnectionMessageReceived>(connectionMessageReceived);
   }
 
-  Future<void> _closePool() async {
-    doNotAcceptAnyRequest = true;
-    for (var connection in _connections) {
-      await connection.close();
-    }
-    emit(ConnectionPoolClosed());
-    state = PoolState.closed;
-    doNotAcceptAnyRequest = false;
-  }
-
-  Future<void> _closeOnError(GenericError error) async {
-    await _closePool();
-    emit(ConnectionPoolError(error));
-    log.severe(error.originalErrorMessage);
-    /* _completer == null ? */ throw error /* : _completer!.completeError(error) */;
-  }
-
-  Future<void> closePool() => _closePool();
-
-  // *************  Listeners ************************
+  // *************  Connection Listeners ************************
   FutureOr<void> connectionErrorListener(ConnectionError event) {
     _connections.removeWhere((element) => element.id == event.id);
     if (_connections.isEmpty) {
-      state = PoolState.closed;
+      _closeOnError(event.error);
     }
   }
 
@@ -188,13 +209,10 @@ class ConnectionPool with EventEmitter {
   FutureOr<void> connectionClosedListener(ConnectionClosed event) {
     availableConnections.remove(event.id);
     _connections.removeWhere((element) => element.id == event.id);
-    if (_connections.isEmpty) {
-      state = PoolState.closed;
-    }
   }
 
   FutureOr<void> connectionActive(ConnectionActive event) {
-    log.info('Connection ${event.id} active');
+    log.finer('Connection ${event.id} active');
     availableConnections.remove(event.id);
   }
 
