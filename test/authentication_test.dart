@@ -64,12 +64,15 @@ void main() async {
   group('Authentication', () {
     var serverRequiresAuth = false;
     var isVer3_6 = false;
+    var isVer3_2 = false;
+
     var isNoMoreMongodbCR = false;
 
     setUpAll(() async {
       serverRequiresAuth = await testDatabase(mongoDbUri);
       if (serverRequiresAuth) {
         var fcv = await getFcv(mongoDbUri);
+        isVer3_2 = fcv == '3.2';
         isVer3_6 = fcv == '3.6';
         if (fcv != null) {
           isNoMoreMongodbCR = fcv.length != 3 || fcv.compareTo('5.9') == 1;
@@ -83,6 +86,25 @@ void main() async {
           var db = Db(mongoDbUri, 'test scram sha1');
 
           await db.open();
+          await db.collection('test').find().toList();
+          await db.close();
+        }
+      });
+      test('Should be able to connect and authenticate with MONGODB-CR on 3.2 ',
+          () async {
+        if (serverRequiresAuth && isVer3_2) {
+          var db = Db(
+              'mongodb://t:t@$dbAddress:27017/$dbName?authMechanism=${MongoDbCRAuthenticator.name}');
+
+          await db.open();
+          expect(db.masterConnection.isAuthenticated, isTrue);
+          await db.collection('test').find().toList();
+          await db.close();
+
+          db = Db('$mongoDbUri2?authMechanism=${MongoDbCRAuthenticator.name}');
+
+          await db.open();
+          expect(db.masterConnection.isAuthenticated, isTrue);
           await db.collection('test').find().toList();
           await db.close();
         }
@@ -102,7 +124,7 @@ void main() async {
       });
       test('Should be able to connect and authenticate with scram sha256',
           () async {
-        if (serverRequiresAuth && !isVer3_6) {
+        if (serverRequiresAuth && !isVer3_6 && !isVer3_2) {
           var db =
               Db('$mongoDbUri?authMechanism=${ScramSha256Authenticator.name}');
 
@@ -218,8 +240,9 @@ void main() async {
         try {
           db.selectAuthenticationMechanism('MONGODB-CR');
           await db.open();
-        } on MongoDartError {
+        } on MongoDartError catch (error) {
           // 6.0 does not connect with MongoDbCr
+          print(error);
           return;
         } catch (e) {
           err = e;

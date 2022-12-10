@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.2
+
+- Fixed a regression bug using MongoDb-CR authMethod
+
 ## 0.8.1
 
 - Fixed bug preventing pre 3.6 releases to work with mongo_dart
