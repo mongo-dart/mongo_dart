@@ -1,9 +1,26 @@
 class ConnectionPoolSettings {
   /// The maximum number of connections in the connection pool.
-  int maxPoolSize = 100;
+  int _maxPoolSize = 100;
+  int get maxPoolSize => _maxPoolSize;
+  set maxPoolSize(int value) {
+    if (value >= 0) {
+      _maxPoolSize = value;
+      if (_maxPoolSize != 0 && _minPoolSize > _maxPoolSize) {
+        _minPoolSize = _maxPoolSize;
+      }
+    }
+  }
 
   /// The minimum number of connections in the connection pool.
-  int minPoolSize = 0;
+  int _minPoolSize = 0;
+  int get minPoolSize => _minPoolSize;
+  set minPoolSize(int value) {
+    if (value >= 0) {
+      _maxPoolSize != 0 && _maxPoolSize < value
+          ? _minPoolSize = _maxPoolSize
+          : _minPoolSize = value;
+    }
+  }
 
   /// The maximum number of milliseconds that a connection can remain
   /// idle in the pool before being removed and closed.

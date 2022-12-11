@@ -68,12 +68,18 @@ Future<ServerConfig> decodeUrlParameters(
         var intValue = int.tryParse(value);
         if (intValue != null && intValue >= 0) {
           options.maxPoolSize = intValue;
+          if (options.maxPoolSize != 0 &&
+              options.minPoolSize > options.maxPoolSize) {
+            options.minPoolSize = options.maxPoolSize;
+          }
         }
         break;
       case ConnectionStringOptions.minPoolSize:
         var intValue = int.tryParse(value);
         if (intValue != null && intValue >= 0) {
-          options.minPoolSize = intValue;
+          options.maxPoolSize != 0 && options.maxPoolSize < intValue
+              ? options.minPoolSize = options.maxPoolSize
+              : options.minPoolSize = intValue;
         }
         break;
       case ConnectionStringOptions.maxIdleTimeMS:

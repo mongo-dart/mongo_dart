@@ -83,23 +83,6 @@ class MongoClientOptions
   /// Querying this DNS URI is expected to respond with SRV records
   String? srvServiceName;
 
-  /* /// An object cotaing all the pool settings
-  ConnectionPoolSettings poolSettings = ConnectionPoolSettings();
-
-  /// The maximum number of connections in the connection pool.
-  int get maxPoolSize => poolSettings.maxPoolSize;
-
-  /// The minimum number of connections in the connection pool.
-  int get minPoolSize => poolSettings.minPoolSize;
-
-  /// The maximum number of milliseconds that a connection can remain
-  /// idle in the pool before being removed and closed.
-  int get maxIdleTimeMS => poolSettings.maxIdleTimeMS;
-
-  /// The maximum time in milliseconds that a thread can wait for a
-  /// connection to become available.
-  int get waitQueueTimeoutMS => poolSettings.waitQueueTimeoutMS; */
-
   /// Specify a read concern for the collection (only MongoDB 3.2 or
   /// higher supported)
   // Todo ReadConcernLike? readConcern;

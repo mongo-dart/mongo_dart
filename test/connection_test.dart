@@ -92,74 +92,321 @@ void main() async {
       });
     });
     group('Connection Pool', () {
-      //var cannotRunTests = false;
-      //var running4_4orGreater = false;
-      //var running4_2orGreater = false;
+      group('Max Size', () {
+        Future<bool> checkVersion(MongoClient client) async {
+          await client.connect();
+          var db = client.db();
+          var serverFcv = db.server.serverCapabilities.fcv ?? '0.0';
 
-      //var isReplicaSet = false;
-      //var isStandalone = false;
-      //var isSharded = false;
-      Future<bool> checkVersion(MongoClient client) async {
-        await client.connect();
-        var db = client.db();
-        var serverFcv = db.server.serverCapabilities.fcv ?? '0.0';
+          return serverFcv.compareTo('4.2') != -1;
+        }
 
-        return serverFcv.compareTo('4.2') != -1;
-      }
+        setUp(() async {});
 
-      setUp(() async {});
+        tearDown(() async {
+          await cleanupDatabase();
+        });
 
-      tearDown(() async {
-        await cleanupDatabase();
+        test('options parm', () async {
+          var options = MongoClientOptions()..maxPoolSize = 5;
+          client = MongoClient(defaultUri, mongoClientOptions: options);
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          await client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              1);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 5);
+        });
+        test('uri - parm', () async {
+          client = MongoClient('$defaultUri?maxPoolSize=2');
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              2);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 2);
+        });
+        test('options && URI parms', () async {
+          var options = MongoClientOptions()..maxPoolSize = 2;
+          client = MongoClient('$defaultUri?maxPoolSize=5',
+              mongoClientOptions: options);
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              3);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 5);
+        });
+
+        test('Sequential connections', () async {
+          client = MongoClient('$defaultUri?maxPoolSize=2');
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          await client.topology?.servers.first.refreshStatus();
+          await client.topology?.servers.first.refreshStatus();
+          await client.topology?.servers.first.refreshStatus();
+          await client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              1);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 2);
+        });
+
+        test('Concurrent connections', () async {
+          client = MongoClient('$defaultUri?maxPoolSize=3');
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              3);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 3);
+        });
       });
 
-      test('One connection - min pool - options', () async {
-        var options = MongoClientOptions()..minPoolSize = 5;
-        client = MongoClient(defaultUri, mongoClientOptions: options);
-        var running4_2orGreater = await checkVersion(client);
-        expect(running4_2orGreater, isTrue);
-        await client.topology?.servers.first.refreshStatus();
-        expect(
-            client.topology?.servers.first.connectionPool.connectionsNumber, 5);
-      });
-      test('One connection - min pool - uri', () async {
-        client = MongoClient('$defaultUri?minPoolSize=4');
-        var running4_2orGreater = await checkVersion(client);
-        expect(running4_2orGreater, isTrue);
-        await client.topology?.servers.first.refreshStatus();
-        expect(
-            client.topology?.servers.first.connectionPool.connectionsNumber, 4);
-      });
-      test('One connection - min pool - options && URI', () async {
-        var options = MongoClientOptions()..minPoolSize = 5;
-        client = MongoClient('$defaultUri?minPoolSize=4',
-            mongoClientOptions: options);
-        var running4_2orGreater = await checkVersion(client);
-        expect(running4_2orGreater, isTrue);
-        await client.topology?.servers.first.refreshStatus();
-        expect(
-            client.topology?.servers.first.connectionPool.connectionsNumber, 4);
+      group('Min Size', () {
+        Future<bool> checkVersion(MongoClient client) async {
+          await client.connect();
+          var db = client.db();
+          var serverFcv = db.server.serverCapabilities.fcv ?? '0.0';
+
+          return serverFcv.compareTo('4.2') != -1;
+        }
+
+        setUp(() async {});
+
+        tearDown(() async {
+          await cleanupDatabase();
+        });
+
+        test('One connection - min pool - options', () async {
+          var options = MongoClientOptions()..minPoolSize = 5;
+          client = MongoClient(defaultUri, mongoClientOptions: options);
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          await client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              5);
+        });
+        test('One connection - min pool - uri', () async {
+          client = MongoClient('$defaultUri?minPoolSize=4');
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          await client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              4);
+        });
+        test('One connection - min pool - options && URI', () async {
+          var options = MongoClientOptions()..minPoolSize = 5;
+          client = MongoClient('$defaultUri?minPoolSize=4',
+              mongoClientOptions: options);
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          await client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              4);
+        });
+
+        test('Sequential connections', () async {
+          client = MongoClient('$defaultUri?minPoolSize=2');
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          await client.topology?.servers.first.refreshStatus();
+          await client.topology?.servers.first.refreshStatus();
+          await client.topology?.servers.first.refreshStatus();
+          await client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              2);
+        });
+
+        test('Concurrent connections', () async {
+          client = MongoClient('$defaultUri?minPoolSize=2');
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              5);
+        });
       });
 
-      test('Sequential connections', () async {
-        // expect(running4_2orGreater, isTrue);
-        // await client.topology?.servers.first.refreshStatus();
-        // await client.topology?.servers.first.refreshStatus();
-        // await client.topology?.servers.first.refreshStatus();
-        // await client.topology?.servers.first.refreshStatus();
-        // expect(
-        //     client.topology?.servers.first.connectionPool.connectionsNumber, 1);
-      });
+      group('Max && Min Size', () {
+        Future<bool> checkVersion(MongoClient client) async {
+          await client.connect();
+          var db = client.db();
+          var serverFcv = db.server.serverCapabilities.fcv ?? '0.0';
 
-      test('Concurrent connections', () async {
-        // expect(running4_2orGreater, isTrue);
-        // client.topology?.servers.first.refreshStatus();
-        // client.topology?.servers.first.refreshStatus();
-        // await Future.delayed(Duration(seconds: 2));
-        // client.topology?.servers.first.refreshStatus();
-        // await client.topology?.servers.first.refreshStatus();
-        // expect(
-        //     client.topology?.servers.first.connectionPool.connectionsNumber, 2);
+          return serverFcv.compareTo('4.2') != -1;
+        }
+
+        setUp(() async {});
+
+        tearDown(() async {
+          await cleanupDatabase();
+        });
+
+        test('options parm', () async {
+          var options = MongoClientOptions()
+            ..maxPoolSize = 5
+            ..minPoolSize = 3;
+          client = MongoClient(defaultUri, mongoClientOptions: options);
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          await client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              3);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 5);
+          expect(client.topology?.servers.first.connectionPool.minPoolSize, 3);
+        });
+        test('uri - parm', () async {
+          client = MongoClient('$defaultUri?maxPoolSize=2&minPoolSize=1');
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              2);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 2);
+          expect(client.topology?.servers.first.connectionPool.minPoolSize, 1);
+        });
+        test('options && URI parms', () async {
+          var options = MongoClientOptions()
+            ..maxPoolSize = 2
+            ..minPoolSize = 1;
+          client = MongoClient('$defaultUri?maxPoolSize=5&minPoolSize=2',
+              mongoClientOptions: options);
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              3);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 5);
+          expect(client.topology?.servers.first.connectionPool.minPoolSize, 2);
+        });
+
+        test('Sequential connections', () async {
+          client = MongoClient('$defaultUri?maxPoolSize=2');
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          await client.topology?.servers.first.refreshStatus();
+          await client.topology?.servers.first.refreshStatus();
+          await client.topology?.servers.first.refreshStatus();
+          await client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              1);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 2);
+          expect(client.topology?.servers.first.connectionPool.minPoolSize, 0);
+        });
+
+        test('Concurrent connections', () async {
+          client = MongoClient('$defaultUri?maxPoolSize=3&minPoolSize=2');
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              3);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 3);
+          expect(client.topology?.servers.first.connectionPool.minPoolSize, 2);
+        });
+        test('Auto fix min', () async {
+          client = MongoClient('$defaultUri?maxPoolSize=3&minPoolSize=4');
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              3);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 3);
+          expect(client.topology?.servers.first.connectionPool.minPoolSize, 3);
+        });
+        test('Auto fix min 2', () async {
+          client = MongoClient('$defaultUri?minPoolSize=4&maxPoolSize=3');
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              3);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 3);
+          expect(client.topology?.servers.first.connectionPool.minPoolSize, 3);
+        });
+        test('Auto fix min 3', () async {
+          var options = MongoClientOptions()..maxPoolSize = 3;
+          client = MongoClient('$defaultUri?minPoolSize=4',
+              mongoClientOptions: options);
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              3);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 3);
+          expect(client.topology?.servers.first.connectionPool.minPoolSize, 3);
+        });
+        test('Auto fix min 4', () async {
+          var options = MongoClientOptions()..minPoolSize = 4;
+          client = MongoClient('$defaultUri?maxPoolSize=3',
+              mongoClientOptions: options);
+          var running4_2orGreater = await checkVersion(client);
+          expect(running4_2orGreater, isTrue);
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          client.topology?.servers.first.refreshStatus();
+          expect(
+              client.topology?.servers.first.connectionPool.connectionsNumber,
+              3);
+          expect(client.topology?.servers.first.connectionPool.maxPoolSize, 3);
+          expect(client.topology?.servers.first.connectionPool.minPoolSize, 3);
+        });
       });
     });
   });
