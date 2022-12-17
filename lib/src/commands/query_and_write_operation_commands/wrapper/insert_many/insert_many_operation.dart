@@ -2,9 +2,7 @@ import 'package:mongo_dart/src/commands/query_and_write_operation_commands/inser
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/return_classes/bulk_write_result.dart';
 
-import '../../../../core/network/abstract/connection_base.dart';
 import '../../../../database/mongo_collection.dart';
-import '../../../../topology/server.dart';
 import 'insert_many_options.dart';
 
 class InsertManyOperation extends InsertOperation {
@@ -23,10 +21,8 @@ class InsertManyOperation extends InsertOperation {
     }
   }
 
-  Future<BulkWriteResult> executeDocument(Server server,
-      {ConnectionBase? connection}) async {
-    var ret = await super.executeOnServer(server);
-    return BulkWriteResult.fromMap(WriteCommandType.insert, ret)
+  Future<BulkWriteResult> executeDocument() async {
+    return BulkWriteResult.fromMap(WriteCommandType.insert, await execute())
       ..ids = ids
       ..documents = documents;
   }

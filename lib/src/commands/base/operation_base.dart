@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 import '../../../mongo_dart_old.dart' show keySession;
 import '../../topology/server.dart';
 
@@ -32,6 +34,7 @@ abstract class OperationBase {
 
   Future<Map<String, Object?>> execute();
 
+  @protected
   Future<Map<String, Object?>> executeOnServer(Server server) async =>
       throw UnsupportedError(
           '"execute" must be implemented for OperationBase subclasses');

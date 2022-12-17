@@ -397,7 +397,7 @@ class MongoCollection {
     var indexOperation =
         CreateIndexOperation(db, this, _setKeys(key, keys), indexOptions);
 
-    var res = await indexOperation.executeOnServer(db.server);
+    var res = await indexOperation.execute();
     if (res[keyOk] == 0.0) {
       // It should be better to create a MongoDartError,
       // but, for compatibility reasons, we throw the received map.
@@ -428,7 +428,7 @@ class MongoCollection {
     var command = DropIndexesCommand(db, this, index,
         dropIndexesOptions: indexOptions, rawOptions: rawOptions);
 
-    return command.executeOnServer(db.server);
+    return command.execute();
   }
 
   // This method has been made available since version 3.2
@@ -466,7 +466,7 @@ class MongoCollection {
       var insertManyOperation = InsertManyOperation(this, documents,
           insertManyOptions: insertManyOptions);
 
-      return insertManyOperation.executeDocument(db.server);
+      return insertManyOperation.executeDocument();
     });
   }
 
@@ -480,7 +480,7 @@ class MongoCollection {
         DeleteOneStatement(_selectorBuilder2Map(selector),
             collation: collation, hint: hint, hintDocument: hintDocument),
         deleteOneOptions: DeleteOneOptions(writeConcern: writeConcern));
-    return deleteOperation.executeDocument(db.server);
+    return deleteOperation.executeDocument();
   }
 
   Future<WriteResult> deleteMany(selector,
@@ -517,7 +517,7 @@ class MongoCollection {
               hintDocument: hintDocument)
         ],
         updateOptions: UpdateOptions(writeConcern: writeConcern));
-    return updateOperation.executeOnServer(db.server);
+    return updateOperation.execute();
   }
 
   Future<WriteResult> replaceOne(selector, Map<String, dynamic> update,
@@ -534,7 +534,7 @@ class MongoCollection {
             hint: hint,
             hintDocument: hintDocument),
         replaceOneOptions: ReplaceOneOptions(writeConcern: writeConcern));
-    return replaceOneOperation.executeDocument(db.server);
+    return replaceOneOperation.executeDocument();
   }
 
   Future<WriteResult> updateOne(selector, update,
@@ -554,7 +554,7 @@ class MongoCollection {
             hint: hint,
             hintDocument: hintDocument),
         updateOneOptions: UpdateOneOptions(writeConcern: writeConcern));
-    return updateOneOperation.executeDocument(db.server);
+    return updateOneOperation.executeDocument();
   }
 
   Future<WriteResult> updateMany(selector, update,
@@ -574,7 +574,7 @@ class MongoCollection {
             hint: hint,
             hintDocument: hintDocument),
         updateManyOptions: UpdateManyOptions(writeConcern: writeConcern));
-    return updateManyOperation.executeDocument(db.server);
+    return updateManyOperation.executeDocument();
   }
 
   Future<FindAndModifyResult> modernFindAndModify(
@@ -614,7 +614,7 @@ class MongoCollection {
         hintDocument: hintDocument,
         findAndModifyOptions: findAndModifyOptions,
         rawOptions: rawOptions);
-    return famOperation.executeDocument(db.server);
+    return famOperation.executeDocument();
   }
 
   // Find operation with the new OP_MSG (starting from release 3.6)
@@ -713,7 +713,7 @@ class MongoCollection {
           DistinctOptions? distinctOptions,
           Map<String, Object>? rawOptions}) async =>
       _prepareDistinct(field, query: query, distinctOptions: distinctOptions)
-          .executeDocument(db.server);
+          .executeDocument();
 
   /// Executes a Distinct command on this collection.
   /// Retuns a Map like received from the server.
@@ -723,7 +723,7 @@ class MongoCollection {
           DistinctOptions? distinctOptions,
           Map<String, Object>? rawOptions}) async =>
       _prepareDistinct(field, query: query, distinctOptions: distinctOptions)
-          .executeOnServer(db.server);
+          .execute();
 
   /// This method returns a stream that can be read or transformed into
   /// a list with `.toList()`

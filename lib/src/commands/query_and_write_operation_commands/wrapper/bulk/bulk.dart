@@ -390,8 +390,7 @@ abstract class Bulk extends CommandOperation {
   List<Map<int, int>> getBulkInputOrigins();
 
   @override
-  Future<Map<String, Object>> executeOnServer(Server server,
-          {ConnectionBase? connection}) =>
+  Future<Map<String, Object>> execute() =>
       throw StateError('Call executeBulk() for bulk operations');
   @override
   Map<String, Object> $buildCommand() =>

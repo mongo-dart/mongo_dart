@@ -63,8 +63,7 @@ void main() async {
 
     test('Simple create collection', () async {
       var collectionName = getRandomCollectionName();
-      var resultMap =
-          await CreateCommand(db, collectionName).executeOnServer(db.server);
+      var resultMap = await CreateCommand(db, collectionName).execute();
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
@@ -78,7 +77,7 @@ void main() async {
       var resultMap = await CreateCommand(db, collectionName,
               createOptions:
                   CreateOptions(capped: true, size: 5242880, max: 5000))
-          .executeOnServer(db.server);
+          .execute();
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
@@ -112,7 +111,7 @@ void main() async {
                 }
               }
             }
-          })).executeOnServer(db.server);
+          })).execute();
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
@@ -132,8 +131,7 @@ void main() async {
 
     test('Simple create collection with no collation', () async {
       var collectionName = getRandomCollectionName();
-      var resultMap =
-          await CreateCommand(db, collectionName).executeOnServer(db.server);
+      var resultMap = await CreateCommand(db, collectionName).execute();
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
@@ -156,7 +154,7 @@ void main() async {
       var collectionName = getRandomCollectionName();
       var resultMap = await CreateCommand(db, collectionName,
               createOptions: CreateOptions(collation: CollationOptions('fr')))
-          .executeOnServer(db.server);
+          .execute();
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
@@ -182,7 +180,7 @@ void main() async {
             'wiredTiger': {
               'configString': 'log=(enabled),block_compressor=snappy'
             }
-          })).executeOnServer(db.server);
+          })).execute();
       expect(resultMap[keyOk], 1.0);
     }, skip: cannotRunTests);
   });
@@ -211,7 +209,7 @@ void main() async {
                 'department': 1
               }
             }
-          ])).executeOnServer(db.server);
+          ])).execute();
       expect(resultMap[keyOk], 1.0);
 
       var collection = db.collection(collectionName);
@@ -254,7 +252,7 @@ void main() async {
               }
             },
             {r'$sortByCount': r'$department'}
-          ])).executeOnServer(db.server);
+          ])).execute();
       expect(resultMap[keyOk], 1.0);
 
       var collection = db.collection(collectionName);
@@ -295,7 +293,7 @@ void main() async {
                 'department': 1
               }
             }
-          ])).executeOnServer(db.server);
+          ])).execute();
       expect(resultMap[keyOk], 1.0);
 
       var collection = db.collection(collectionName);
@@ -390,7 +388,7 @@ void main() async {
             {
               r'$project': {'inventory_docs._id': 0, 'inventory_docs.sku': 0}
             }
-          ])).executeOnServer(db.server);
+          ])).execute();
       expect(resultMap[keyOk], 1.0);
 
       var view = db.collection(viewName);
@@ -478,7 +476,7 @@ void main() async {
             {
               r'$project': {'inventory_docs._id': 0, 'inventory_docs.sku': 0}
             }
-          ])).executeOnServer(db.server);
+          ])).execute();
       expect(resultMap[keyOk], 1.0);
 
       var view = db.collection(viewName);
@@ -521,7 +519,7 @@ void main() async {
               }
             ],
             collation: CollationOptions('fr')),
-      ).executeOnServer(db.server);
+      ).execute();
       expect(resultMap[keyOk], 1.0);
 
       var view = db.collection(viewName);
@@ -562,7 +560,7 @@ void main() async {
           ),
           rawOptions: {
             'collation': {'locale': 'fr', 'strength': 1}
-          }).executeOnServer(db.server);
+          }).execute();
       expect(resultMap[keyOk], 1.0);
 
       var view = db.collection(viewName);
@@ -598,7 +596,7 @@ void main() async {
               }
             ],
             collation: CollationOptions('fr')),
-      ).executeOnServer(db.server);
+      ).execute();
       expect(resultMap[keyOk], 1.0);
 
       var view = db.collection(viewName);

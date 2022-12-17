@@ -230,7 +230,7 @@ void main() async {
 
         var deleteOperation =
             DeleteOneOperation(collection, DeleteOneStatement({}));
-        var res = await deleteOperation.executeDocument(db.server);
+        var res = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -260,7 +260,7 @@ void main() async {
 
         var deleteOperation =
             DeleteOneOperation(collection, DeleteOneStatement({key_id: 7}));
-        var res = await deleteOperation.executeDocument(db.server);
+        var res = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -285,7 +285,7 @@ void main() async {
 
         var deleteOperation =
             DeleteOneOperation(collection, DeleteOneStatement({'status': 'D'}));
-        var res = await deleteOperation.executeDocument(db.server);
+        var res = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -747,7 +747,7 @@ void main() async {
         }, update: <String, dynamic>{
           r'$inc': {'score': 1}
         });
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -774,7 +774,7 @@ void main() async {
               r'$inc': {'score': 1}
             },
             returnNew: true);
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -801,7 +801,7 @@ void main() async {
               r'$inc': {'score': 1}
             },
             returnNew: true);
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.n, 0);
@@ -826,7 +826,7 @@ void main() async {
               r'$inc': {'score': 1}
             },
             upsert: true);
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, TypeMatcher<ObjectId>());
@@ -853,7 +853,7 @@ void main() async {
             },
             upsert: true,
             returnNew: true);
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, TypeMatcher<ObjectId>());
@@ -891,7 +891,7 @@ void main() async {
             },
             upsert: true,
             returnNew: true);
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.upserted, isNull);
@@ -915,7 +915,7 @@ void main() async {
             },
             sort: <String, Object>{'rating': 1},
             remove: true);
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, isNull);
@@ -944,7 +944,7 @@ void main() async {
             },
             findAndModifyOptions: FindAndModifyOptions(
                 collation: CollationOptions('fr', strength: 1)));
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -987,7 +987,7 @@ void main() async {
                 'element': {r'$gte': 100}
               }
             ]);
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -1032,7 +1032,7 @@ void main() async {
                 'element.grade': {r'$gte': 85}
               }
             ]);
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -1078,7 +1078,7 @@ void main() async {
               }
             ],
             returnNew: true);
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.upserted, isNull);
@@ -1110,7 +1110,7 @@ void main() async {
             },
             remove: true,
             hintDocument: {'status': 1});
-        var res = await famOperation.executeDocument(db.server);
+        var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, isNull);

@@ -47,5 +47,5 @@ class HelloCommand extends ServerCommand {
 
   @override
   Future<Map<String, Object?>> executeOnServer(Server server) async =>
-      throw MongoDartError('Do not use this methos, use execute instead');
+      throw MongoDartError('Do not use this method, use execute instead');
 }

@@ -311,8 +311,7 @@ class MongoDatabase {
   Future<Map<String, dynamic>> getLastError(Server server,
       {ConnectionBase? connection, WriteConcern? writeConcern}) async {
     writeConcern ??= _writeConcern;
-    return GetLastErrorCommand(this, writeConcern: writeConcern)
-        .executeOnServer(server);
+    return GetLastErrorCommand(this, writeConcern: writeConcern).execute();
   }
 
   @Deprecated('Deprecated since version 4.0.')
@@ -525,7 +524,7 @@ class MongoDatabase {
       Map<String, Object>? rawOptions}) async {
     var command = DropDatabaseCommand(this,
         dropDatabaseOptions: dropOptions, rawOptions: rawOptions);
-    return command.executeOnServer(server);
+    return command.execute();
   }
 
   /// This method return the status information on the
@@ -546,7 +545,7 @@ class MongoDatabase {
     var command = CreateCollectionCommand(this, name,
         createCollectionOptions: createCollectionOptions,
         rawOptions: rawOptions);
-    return command.executeOnServer(server);
+    return command.execute();
   }
 
   /// This method retuns a cursor to get a list of the collections
@@ -609,15 +608,11 @@ class MongoDatabase {
 
   /// Runs a command
   Future<Map<String, Object?>> runCommand(Map<String, Object> command) =>
-      CommandOperation(
-        this,
-        command,
-        <String, Object>{},
-      ).executeOnServer(server);
+      CommandOperation(this, command, <String, Object>{}).execute();
 
   /// Ping command
   Future<Map<String, Object?>> pingCommand() =>
       PingCommand(mongoClient.topology ??
               (throw MongoDartError('Topology not defined')))
-          .executeOnServer(server);
+          .execute();
 }

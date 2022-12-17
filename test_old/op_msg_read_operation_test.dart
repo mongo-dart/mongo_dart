@@ -410,7 +410,7 @@ void main() async {
         // a default 101 documents, so, when we run the getMore command
         // only 19 can be retrieved.
         var command = GetMoreCommand(collection, cursor.cursorId);
-        var resultCommand = await command.executeOnServer(db.server);
+        var resultCommand = await command.execute();
         expect(resultCommand, isNotNull);
         expect(resultCommand[keyCursor], isNotNull);
 
@@ -437,7 +437,7 @@ void main() async {
         await insertManyDocuments(collection, 110);
         var doc = await FindOperation(collection,
                 findOptions: FindOptions(tailable: true))
-            .executeOnServer(db.server);
+            .execute();
 
         var cursor = ModernCursor.fromOpenId(collection,
             BsonLong((doc[keyCursor] as Map)[keyId] as int), db.server,
@@ -488,7 +488,7 @@ void main() async {
         await insertManyDocuments(collection, 110);
         var doc = await FindOperation(collection,
                 findOptions: FindOptions(tailable: true, awaitData: true))
-            .executeOnServer(db.server);
+            .execute();
 
         var cursor = ModernCursor.fromOpenId(collection,
             BsonLong((doc[keyCursor] as Map)[keyId] as int), db.server,
@@ -781,7 +781,7 @@ db.runCommand(
 
         var aggregateOperation =
             AggregateOperation(pipeline, collection: collection);
-        var v = await aggregateOperation.executeOnServer(db.server);
+        var v = await aggregateOperation.execute();
         var cursor = v[keyCursor] as Map;
         var result = cursor[keyFirstBatch] as List;
         expect(result.first[key_id], 'Age of Steam');
@@ -888,7 +888,7 @@ db.runCommand(
 
         var aggregateOperation = AggregateOperation(pipeline,
             collection: collection, cursor: {'batchSize': 3});
-        var v = await aggregateOperation.executeOnServer(db.server);
+        var v = await aggregateOperation.execute();
         final cursor = v[keyCursor] as Map;
         expect(cursor['id'], const TypeMatcher<int>());
         final firstBatch = cursor[keyFirstBatch] as List;
@@ -1276,7 +1276,7 @@ db.runCommand(
 
         var operation = CountOperation(collection);
 
-        var result = await operation.executeOnServer(db.server);
+        var result = await operation.execute();
 
         expect(result[keyOk], 1.0);
         expect(result[keyN], 3);
@@ -1405,7 +1405,7 @@ db.runCommand(
 
         var operation = DistinctOperation(collection, 'dept');
 
-        var result = await operation.executeOnServer(db.server);
+        var result = await operation.execute();
 
         expect(result[keyOk], 1.0);
         expect(result[keyValues], isNotNull);
@@ -1447,7 +1447,7 @@ db.runCommand(
 
         var operation = DistinctOperation(collection, 'dept');
 
-        var result = await operation.executeDocument(db.server);
+        var result = await operation.executeDocument();
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);
@@ -1490,7 +1490,7 @@ db.runCommand(
 
         var operation = DistinctOperation(collection, 'item.sku');
 
-        var result = await operation.executeDocument(db.server);
+        var result = await operation.executeDocument();
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);
@@ -1533,7 +1533,7 @@ db.runCommand(
 
         var operation = DistinctOperation(collection, 'sizes');
 
-        var result = await operation.executeDocument(db.server);
+        var result = await operation.executeDocument();
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);
@@ -1582,7 +1582,7 @@ db.runCommand(
 
         var operation =
             DistinctOperation(collection, 'item.sku', query: {'dept': 'A'});
-        var result = await operation.executeDocument(db.server);
+        var result = await operation.executeDocument();
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);
@@ -1599,7 +1599,7 @@ db.runCommand(
         var operation = DistinctOperation(collection, 'category',
             distinctOptions: DistinctOptions(
                 collation: CollationOptions('fr', strength: 1)));
-        var result = await operation.executeDocument(db.server);
+        var result = await operation.executeDocument();
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);
@@ -1772,7 +1772,7 @@ db.runCommand(
 
         var operation = DistinctOperation(collection, 'sizes');
 
-        var result = await operation.executeDocument(db.server);
+        var result = await operation.executeDocument();
 
         expect(result.ok, 1.0);
         expect(result.values, isNotNull);

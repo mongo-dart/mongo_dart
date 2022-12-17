@@ -7,7 +7,6 @@ import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/commands/administration_commands/kill_cursors_command/kill_cursors_command.dart';
 import 'package:mongo_dart/src/commands/aggregation_commands/aggregate/return_classes/change_event.dart';
 import 'package:mongo_dart/src/commands/aggregation_commands/wrapper/change_stream/change_stream_handler.dart';
-import 'package:mongo_dart/src/commands/base/simple_command.dart';
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/get_more_command/get_more_options.dart';
 
@@ -229,7 +228,7 @@ class ModernCursor {
         collection!.collectionName == r'$cmd' &&
         operation is FindOperation &&
         (operation! as FindOperation).limit == 1) {
-      return operation!.executeOnServer(server);
+      return operation!.execute();
     }
 
     var justPrepareCursor = false;
@@ -239,11 +238,7 @@ class ModernCursor {
           operation!.options[keyBatchSize] == 0) {
         justPrepareCursor = true;
       }
-      if (operation is SimpleCommand) {
-        result = await operation!.execute();
-      } else {
-        result = await operation!.executeOnServer(server);
-      }
+      result = await operation!.execute();
       state = State.open;
     } else if (state == State.open) {
       if (cursorId.data == 0) {
@@ -254,7 +249,7 @@ class ModernCursor {
           db: db,
           collectionName: collectionName,
           getMoreOptions: GetMoreOptions(batchSize: _batchSize));
-      result = await command.executeOnServer(server);
+      result = await command.execute();
     }
     if (result == null) {
       throw MongoDartError('Could not execut a further search');
@@ -303,7 +298,7 @@ class ModernCursor {
     if (cursorId.value != 0 && collection != null) {
       var command = KillCursorsCommand(collection!, [cursorId], db: db);
       if (server.state == ServerState.connected) {
-        await command.executeOnServer(server);
+        await command.execute();
       }
       cursorId = BsonLong(0);
     }
