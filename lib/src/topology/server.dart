@@ -35,6 +35,8 @@ class Server {
   bool get isReplicaSet => serverCapabilities.isReplicaSet;
   bool get isShardedCluster => serverCapabilities.isShardedCluster;
 
+  bool get isWritablePrimary => hello?.isWritablePrimary ?? false;
+
   Future<void> connect() async {
     if (state == ServerState.connected) {
       return;
@@ -76,18 +78,15 @@ class Server {
       result = await helloCommand.execute();
     } on MongoDartError catch (err) {
       //Do nothing
-      print('Passe by _runHrllo() - Error ${err.message}');
+      print('Passed by _runHello() - Error ${err.message}');
     }
     if (result[keyOk] == 1.0) {
       hello = HelloResult(result);
-      var master = hello!.isWritablePrimary;
-      /* connection.isMaster = master;
-      if (master) {
-        _masterConnection = connection;
-        MongoModernMessage.maxBsonObjectSize = resultDoc.maxBsonObjectSize;
-        MongoModernMessage.maxMessageSizeBytes = resultDoc.maxMessageSizeBytes;
-        MongoModernMessage.maxWriteBatchSize = resultDoc.maxWriteBatchSize;
-      } */
+      if (isWritablePrimary) {
+        MongoModernMessage.maxBsonObjectSize = hello!.maxBsonObjectSize;
+        MongoModernMessage.maxMessageSizeBytes = hello!.maxMessageSizeBytes;
+        MongoModernMessage.maxWriteBatchSize = hello!.maxWriteBatchSize;
+      }
       serverCapabilities.getParamsFromHello(hello!);
       //Todo
       /*   if (serverConfig.authenticationScheme == null &&

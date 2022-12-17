@@ -1,4 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/topology/replica_set.dart';
+import 'package:mongo_dart/src/topology/sharded_cluster.dart';
 
 import 'abstract/topology.dart';
 import 'standalone.dart';
@@ -18,11 +20,10 @@ class Discover extends Topology {
     if (servers.first.isStandalone) {
       topology = Standalone(hostsSeedList, mongoClientOptions);
     } else if (servers.first.isReplicaSet) {
+      topology = ReplicaSet(hostsSeedList, mongoClientOptions);
+    } else if (servers.first.isShardedCluster) {
       // Todo
-      topology = Standalone(hostsSeedList, mongoClientOptions);
-    } else if (servers.first.isReplicaSet) {
-      // Todo
-      topology = Standalone(hostsSeedList, mongoClientOptions);
+      topology = SharderdCluster(hostsSeedList, mongoClientOptions);
     } else {
       throw MongoDartError('Unknown topology type');
     }

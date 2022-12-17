@@ -10,18 +10,16 @@ import '../../core/info/server_config.dart';
 import '../../settings/default_settings.dart';
 import '../../mongo_client_options.dart';
 import '../server.dart';
-import '../standalone.dart';
 
 enum TopologyType { standalone, replicaSet, shardedCluster, unknown }
 
 abstract class Topology {
   @protected
-  Topology.protected(this.hostsSeedList, this.mongoClientOptions);
-
-  factory Topology(List<Uri> hostSeedList, MongoClientOptions options) {
-    Topology topology = Standalone(hostSeedList, options);
-    topology.type = TopologyType.standalone;
-    return topology;
+  Topology.protected(this.hostsSeedList, this.mongoClientOptions,
+      {Server? connectedServer}) {
+    if (connectedServer != null) {
+      servers.add(connectedServer);
+    }
   }
 
   final log = Logger('Topology');
@@ -29,22 +27,35 @@ abstract class Topology {
   final List<Uri> hostsSeedList;
   MongoClientOptions mongoClientOptions;
 
-  List<Uri> get seedList => hostsSeedList.toList();
-
   List<Server> servers = <Server>[];
 
-  Server getServer(ReadPreference readPreference) {
-    // Todo manage server forwarding
-    return servers.first;
-  }
+  List<Uri> get seedList => hostsSeedList.toList();
+  bool get isConnected => servers.any((element) => element.isConnected);
+
+  // *** To be overridden. This behavior works just for standalone typology
+  /// The return value depends on the tipology
+  /// In case the tipology is not connected, the return values is meaningless.
+  /// - standalone -> returns always false
+  /// - replicaSet -> true if the tipology is connected but no primary it is, otherwise false
+  /// - sharderCluster -> true if all the mongos are in readOnlyMode.
+  bool get isReadOnly => false;
+
+  // *** To be overridden. This behavior works for standalone and replica set typology
+  /// Returns the primary writable server
+  Server get primary =>
+      servers.firstWhere((element) => element.isWritablePrimary);
+
+  // *** To be overridden. This behavior works just for standalone typology
+  /// Retruns the server based on the readPreference
+  Server getServer(ReadPreference readPreference) => servers.first;
 
   Future connect() async {
     if (servers.isEmpty) {
-      return initialConnection();
+      await initialConnection();
     }
   }
 
-  Future initialConnection() async {
+  Future<void> initialConnection() async {
     for (var element in hostsSeedList) {
       var serverConfig = await _parseUri(element, mongoClientOptions);
       var server = Server(serverConfig, mongoClientOptions);
@@ -52,6 +63,22 @@ abstract class Topology {
       await server.connect();
     }
   }
+
+  @protected
+  Future<void> updateServersStatus() async {
+    var additionalServers = <Server>{};
+    for (var server in servers) {
+      if (!server.isConnected) {
+        await server.connect();
+      }
+      await server.refreshStatus();
+      additionalServers.addAll(await addOtherServers());
+    }
+  }
+
+  // *** To be overridden. This behavior works just for standalone typology
+  @protected
+  Future<Set<Server>> addOtherServers() async => <Server>{};
 
   Future<ServerConfig> _parseUri(Uri uri, MongoClientOptions options) async {
     if (uri.scheme != 'mongodb') {
