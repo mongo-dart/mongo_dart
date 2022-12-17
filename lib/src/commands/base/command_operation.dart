@@ -12,7 +12,7 @@ import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
 import '../../database/mongo_database.dart';
 import '../../database/mongo_collection.dart';
-import 'operation_base.dart' show Aspect;
+import 'operation_base.dart' show Aspect, Options;
 
 class CommandOperation extends SimpleCommand {
   CommandOperation(
@@ -78,10 +78,8 @@ class CommandOperation extends SimpleCommand {
 /// @param {Object} sources sources where we can inherit default write concerns from
 /// @param {Object} [options] optional settings passed into a command for write concern overrides
 /// @returns {Object} the (now) decorated target
-Map<String, Object> applyWriteConcern(Map<String, Object> target,
-    {Map<String, Object>? options,
-    MongoDatabase? db,
-    MongoCollection? collection}) {
+Options applyWriteConcern(Options target,
+    {Options? options, MongoDatabase? db, MongoCollection? collection}) {
   options ??= <String, Object>{};
 
   //Todo Session not yet implemented

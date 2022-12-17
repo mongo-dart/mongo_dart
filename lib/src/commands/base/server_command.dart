@@ -3,22 +3,23 @@ import 'package:mongo_dart/src/core/message/mongo_modern_message.dart'
 import 'package:mongo_dart/src/utils/map_keys.dart' show keyWriteConcern;
 
 import '../../core/error/mongo_dart_error.dart';
+import '../../database/document_types.dart';
 import '../../topology/server.dart';
-import 'operation_base.dart' show Aspect, OperationBase;
+import 'operation_base.dart' show Aspect, Command, OperationBase, Options;
 
 /// Run a command on a required server
 ///
 /// Basic for all commands
 class ServerCommand extends OperationBase {
-  Map<String, Object> command;
+  Command command;
 
-  ServerCommand(this.command, Map<String, Object> options, {Aspect? aspect})
+  ServerCommand(this.command, Options options, {Aspect? aspect})
       : super(options, aspects: aspect);
 
-  Map<String, Object> $buildCommand() => command;
+  Command $buildCommand() => command;
 
   /// ReadPrefernce must be managed before
-  void processOptions(Map<String, Object?> command) {
+  void processOptions(Command command) {
     if (hasAspect(Aspect.writeOperation)) {
       applyWriteConcern(options, options: options);
     } else {
@@ -52,7 +53,7 @@ class ServerCommand extends OperationBase {
   ///Drivers MUST document the behavior of unacknowledged writes for both
   ///explicit and implicit sessions.
   @override
-  Future<Map<String, Object?>> executeOnServer(Server server) async {
+  Future<MongoDocument> executeOnServer(Server server) async {
     var command = $buildCommand();
 
     processOptions(command);
@@ -72,9 +73,8 @@ class ServerCommand extends OperationBase {
 /// @param {Object} sources sources where we can inherit default write concerns from
 /// @param {Object} [options] optional settings passed into a command for write concern overrides
 /// @returns {Object} the (now) decorated target
-Map<String, Object> applyWriteConcern(Map<String, Object> target,
-    {Map<String, Object>? options}) {
-  options ??= <String, Object>{};
+Options applyWriteConcern(Options target, {Options? options}) {
+  options ??= <String, dynamic>{};
 
   //Todo Session not yet implemented
   /*if (options[keySession] != null && options[keySession].inTransaction()) {

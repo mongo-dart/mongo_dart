@@ -1,6 +1,7 @@
 import 'package:bson/bson.dart' show BsonBinary;
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart'
     show MongoModernMessage;
+import 'package:mongo_dart/src/database/document_types.dart';
 import '../../error/mongo_dart_error.dart';
 import 'payload.dart' show Payload, Payload0, Payload1;
 
@@ -10,7 +11,7 @@ abstract class Section {
 
   Section._(this.payloadType, this.payload);
 
-  factory Section(int payloadType, Map<String, Object> data) {
+  factory Section(int payloadType, MongoDocument data) {
     if (payloadType == MongoModernMessage.basePayloadType) {
       return SectionType0.fromDocument(payloadType, data);
     } else if (payloadType == MongoModernMessage.documentsPayloadType) {
@@ -38,7 +39,7 @@ abstract class Section {
 }
 
 class SectionType0 extends Section {
-  SectionType0.fromDocument(int payloadType, Map<String, Object> document)
+  SectionType0.fromDocument(int payloadType, MongoDocument document)
       : super._(payloadType, Payload0(document));
 
   SectionType0(int payloadType, Payload0 payload)
@@ -46,8 +47,7 @@ class SectionType0 extends Section {
 }
 
 class SectionType1 extends Section {
-  factory SectionType1.fromDocument(
-      int payloadType, Map<String, Object> document) {
+  factory SectionType1.fromDocument(int payloadType, MongoDocument document) {
     if (document.length > 1) {
       throw MongoDartError('Expected only one element in the '
           'document while generating section 1');

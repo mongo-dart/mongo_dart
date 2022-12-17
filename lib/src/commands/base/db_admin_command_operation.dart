@@ -2,29 +2,28 @@ import 'package:meta/meta.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../core/network/abstract/connection_base.dart';
+import '../../database/document_types.dart';
 import '../../database/mongo_database.dart';
 import '../../topology/server.dart';
 import 'operation_base.dart';
 
 class DbAdminCommandOperation extends OperationBase {
   MongoDatabase db;
-  Map<String, Object> command;
+  Command command;
 
-  DbAdminCommandOperation(this.db, this.command,
-      {Map<String, Object>? options, ConnectionBase? connection})
+  DbAdminCommandOperation(this.db, this.command, {Map<String, Object>? options})
       : super(options);
 
-  Map<String, Object> $buildCommand() => command;
+  Command $buildCommand() => command;
 
   @override
-  Future<Map<String, Object?>> execute() async =>
-      super.executeOnServer(db.topology.getServer(db.readPreference));
+  Future<MongoDocument> execute() async =>
+      executeOnServer(db.topology.getServer(db.readPreference));
 
   @override
   @protected
-  Future<Map<String, Object?>> executeOnServer(Server server) async {
-    var command = <String, Object>{
+  Future<MongoDocument> executeOnServer(Server server) async {
+    var command = <String, dynamic>{
       ...$buildCommand(),
       keyDatabaseName: 'admin'
     };

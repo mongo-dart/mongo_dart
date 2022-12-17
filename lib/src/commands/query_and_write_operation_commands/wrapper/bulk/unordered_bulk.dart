@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/parameters/write_concern.dart';
 
 import '../../../../database/mongo_collection.dart';
@@ -27,7 +28,7 @@ class UnorderedBulk extends Bulk {
   ///   {'updateOne': {'filter': {'a': 1}, 'update': {'a': 10}}}
   ///   {'insertOne': {'document: {'a', 4}}},
   /// ])
-  Map<String, Object> insertCommand = <String, Object>{};
+  Command insertCommand = <String, Object>{};
 
   /// this contains the original insert command reference
   /// stored as pairs made of {<originaInputIndex>:
@@ -45,7 +46,7 @@ class UnorderedBulk extends Bulk {
   ///   {'updateOne': {'filter': {'a': 1}, 'update': {'a': 10}}}
   ///   {'insertOne': {'document: {'a', 4}}},
   /// ])
-  Map<String, Object> deleteCommand = <String, Object>{};
+  Command deleteCommand = <String, Object>{};
 
   /// this contains the original delete command reference
   /// stored as pairs made of {<originaInputIndex>:
@@ -63,7 +64,7 @@ class UnorderedBulk extends Bulk {
   ///   {'updateOne': {'filter': {'a': 1}, 'update': {'a': 10}}}
   ///   {'insertOne': {'document: {'a', 4}}},
   /// ])
-  Map<String, Object> updateCommand = <String, Object>{};
+  Command updateCommand = <String, Object>{};
 
   /// this contains the original update command reference
   /// stored as pairs made of {<originaInputIndex>:
@@ -72,14 +73,14 @@ class UnorderedBulk extends Bulk {
   Map<int, int> updateCommandsOrigin = <int, int>{};
 
   @override
-  List<Map<String, Object>> getBulkCommands() => [
+  List<Command> getBulkCommands() => [
         if (insertCommand.isNotEmpty) ...splitCommands(insertCommand),
         if (updateCommand.isNotEmpty) ...splitCommands(updateCommand),
         if (deleteCommand.isNotEmpty) ...splitCommands(deleteCommand)
       ];
 
   @override
-  void addCommand(Map<String, Object> command) {
+  void addCommand(Command command) {
     var commandKey = command.keys.first;
     var lastCommandValues = [];
     switch (commandKey) {

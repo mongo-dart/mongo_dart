@@ -1,3 +1,4 @@
+import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart'
     show
         keyHedgeOptions,
@@ -106,7 +107,7 @@ class ReadPreference {
   ///   In this this case we expect the other options to be inside the options
   ///   map itself (ex. options[keyReadPreferencTags])
   ///
-  factory ReadPreference.fromOptions(Map<String, Object> options) {
+  factory ReadPreference.fromOptions(Options options) {
     if (options[keyReadPreference] == null) {
       throw MongoDartError('ReadPreference mode is needed');
     }
@@ -165,7 +166,7 @@ class ReadPreference {
 /// preference, used for determining the inherited read preference.
 /// @param {Object} options The options passed into the method, potentially containing a read preference
 /// @returns {(ReadPreference|null)} The resolved read preference
-ReadPreference? resolveReadPreference(parent, Map<String, Object> options,
+ReadPreference? resolveReadPreference(parent, Options options,
     {bool? inheritReadPreference = true}) {
   //options ??= <String, Object>{};
   inheritReadPreference ??= true;

@@ -1,4 +1,5 @@
 import 'package:bson/bson.dart' show BsonBinary;
+import 'package:mongo_dart/src/database/document_types.dart';
 
 import '../../utils/map_keys.dart';
 import '../error/mongo_dart_error.dart';
@@ -160,7 +161,7 @@ class MongoModernMessage extends MongoResponseMessage {
     deserialize(buffer);
   }
 
-  MongoModernMessage(Map<String, Object> document,
+  MongoModernMessage(MongoDocument document,
       {bool? checksumPresent, bool? moreToCome, bool? exhaustAllowed}) {
     checksumPresent ??= false;
     moreToCome ??= false;
@@ -187,7 +188,7 @@ class MongoModernMessage extends MongoResponseMessage {
     }
   }
 
-  List<Section> createSections(Map<String, Object> doc) {
+  List<Section> createSections(MongoDocument doc) {
     var ret = <Section>[];
     var isPulledOutCommand = false;
     var keys = doc.keys.toList();

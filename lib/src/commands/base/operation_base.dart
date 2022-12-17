@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:mongo_dart/src/database/document_types.dart';
 
 import '../../../mongo_dart_old.dart' show keySession;
 import '../../topology/server.dart';
@@ -10,16 +11,19 @@ enum Aspect {
   retryable,
 }
 
+typedef Options = Map<String, dynamic>;
+typedef Command = Map<String, dynamic>;
+
 abstract class OperationBase {
-  Map<String, Object> options;
+  Options options;
   final Set<Aspect> _aspects;
 
-  OperationBase(Map<String, Object>? options, {Object? aspects})
-      : options = <String, Object>{...?options},
+  OperationBase(Options? options, {dynamic aspects})
+      // Leaves the orgina Options document untouched
+      : options = <String, dynamic>{...?options},
         _aspects = defineAspects(aspects);
 
-  bool hasAspect(Aspect aspect) =>
-      /* _aspects != null && */ _aspects.contains(aspect);
+  bool hasAspect(Aspect aspect) => _aspects.contains(aspect);
 
   Object? get session => options[keySession];
 
@@ -30,15 +34,6 @@ abstract class OperationBase {
 
   void clearSession() => options.remove(keySession);
 
-  bool get canRetryRead => true;
-
-  Future<Map<String, Object?>> execute();
-
-  @protected
-  Future<Map<String, Object?>> executeOnServer(Server server) async =>
-      throw UnsupportedError(
-          '"execute" must be implemented for OperationBase subclasses');
-
   static Set<Aspect> defineAspects(aspects) {
     if (aspects is Aspect) {
       return {aspects};
@@ -47,4 +42,10 @@ abstract class OperationBase {
     }
     return {Aspect.noInheritOptions};
   }
+
+  bool get canRetryRead => true;
+  Future<MongoDocument> execute();
+
+  @protected
+  Future<MongoDocument> executeOnServer(Server server);
 }

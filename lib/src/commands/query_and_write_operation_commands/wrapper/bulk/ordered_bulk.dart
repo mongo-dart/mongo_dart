@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/parameters/write_concern.dart';
 
 import '../../../../database/mongo_collection.dart';
@@ -29,7 +30,7 @@ class OrderedBulk extends Bulk {
   ///   {'insertOne': {'document: {'a', 4}}},
   ///   {'deleteOne': {'filter': {'a': 1}}}
   /// ])
-  List<Map<String, Object>> commands = <Map<String, Object>>[];
+  List<Command> commands = <Command>[];
 
   /// this contains the original command reference
   /// stored as pairs made of {
@@ -40,9 +41,8 @@ class OrderedBulk extends Bulk {
   List<Map<int, int>> commandsOrigin = <Map<int, int>>[];
 
   @override
-  List<Map<String, Object>> getBulkCommands() => <Map<String, Object>>[
-        for (var command in commands) ...splitCommands(command)
-      ];
+  List<Command> getBulkCommands() =>
+      <Command>[for (var command in commands) ...splitCommands(command)];
 
   @override
   List<Map<int, int>> getBulkInputOrigins() => <Map<int, int>>[
@@ -52,7 +52,7 @@ class OrderedBulk extends Bulk {
       ];
 
   @override
-  void addCommand(Map<String, Object> command) {
+  void addCommand(Command command) {
     if (commands.isEmpty) {
       commands.add(command);
       commandsOrigin.add({0: operationInputIndex++});

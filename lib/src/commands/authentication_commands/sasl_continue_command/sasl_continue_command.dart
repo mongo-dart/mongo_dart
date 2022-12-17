@@ -5,6 +5,7 @@ import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import '../../../core/network/abstract/connection_base.dart';
+import '../../../database/document_types.dart';
 import '../../../database/mongo_database.dart';
 import '../../../topology/server.dart';
 import 'sasl_continue_options.dart';
@@ -24,7 +25,7 @@ class SaslContinueCommand extends CommandOperation {
         });
 
   @override
-  Future<Map<String, Object?>> executeOnServer(Server server,
+  Future<MongoDocument> executeOnServer(Server server,
       {ConnectionBase? connection}) async {
     var command = $buildCommand();
     processOptions(command);

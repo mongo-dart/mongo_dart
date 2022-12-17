@@ -142,12 +142,11 @@ Future testRunCommand() async {
     var ret = await db.runCommand({'ping': 1});
     expect(ret[keyOk], 1.0);
 
-    var ret2 = await CommandOperation(db, {'ping': 1}, <String, Object>{})
-        .execute();
+    var ret2 =
+        await CommandOperation(db, {'ping': 1}, <String, Object>{}).execute();
     expect(ret2[keyOk], 1.0);
 
-    ret2 =
-        await PingCommand(db.mongoClient.topology!).execute();
+    ret2 = await PingCommand(db.mongoClient.topology!).execute();
     expect(ret[keyOk], 1.0);
 
     ret2 = await db.pingCommand();
@@ -1009,8 +1008,7 @@ void testDbCommandCreation() {
 }
  */
 Future testPingDbCommand() async {
-  var res =
-      await PingCommand(db.mongoClient.topology!).execute();
+  var res = await PingCommand(db.mongoClient.topology!).execute();
   expect(res[keyOk], 1.0);
   res = await db.pingCommand();
   expect(res[keyOk], 1.0);

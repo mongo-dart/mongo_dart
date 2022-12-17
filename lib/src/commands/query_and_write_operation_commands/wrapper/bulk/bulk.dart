@@ -6,6 +6,7 @@ import 'package:mongo_dart/src/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/commands/base/operation_base.dart';
 
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
+import 'package:mongo_dart/src/database/document_types.dart';
 
 import '../../../../core/error/mongo_dart_error.dart';
 import '../../../../core/network/abstract/connection_base.dart';
@@ -383,20 +384,20 @@ abstract class Bulk extends CommandOperation {
   void _setCommand(CommandOperation operation) =>
       addCommand(operation.$buildCommand());
 
-  void addCommand(Map<String, Object> command);
+  void addCommand(Command command);
 
-  List<Map<String, Object>> getBulkCommands();
+  List<Command> getBulkCommands();
 
   List<Map<int, int>> getBulkInputOrigins();
 
   @override
-  Future<Map<String, Object>> execute() =>
+  Future<MongoDocument> execute() =>
       throw StateError('Call executeBulk() for bulk operations');
   @override
-  Map<String, Object> $buildCommand() =>
+  Command $buildCommand() =>
       throw StateError('Call getBulkCommands() for bulk operations');
 
-  Future<List<Map<String, Object?>>> executeBulk(Server server,
+  Future<List<MongoDocument>> executeBulk(Server server,
       {ConnectionBase? connection}) async {
     var retList = <Map<String, Object?>>[];
     var isOrdered = options[keyOrdered] as bool? ?? true;
@@ -414,7 +415,7 @@ abstract class Bulk extends CommandOperation {
 
     var commands = getBulkCommands();
     var origins = getBulkInputOrigins();
-    var saveOptions = Map<String, Object>.from(options);
+    var saveOptions = Map<String, dynamic>.from(options);
 
     var batchIndex = 0;
     for (var command in commands) {
@@ -536,8 +537,8 @@ abstract class Bulk extends CommandOperation {
   /// Here we assume that the command is made this way:
   /// { <commandType>: <collectionName>, <commandArgument> : <documentsList>,
   /// ...maybe others}
-  List<Map<String, Object>> splitCommands(Map<String, Object> command) {
-    var ret = <Map<String, Object>>[];
+  List<Command> splitCommands(Command command) {
+    var ret = <Command>[];
     if (command.isEmpty) {
       return ret;
     }

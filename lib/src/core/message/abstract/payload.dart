@@ -1,4 +1,5 @@
 import 'package:bson/bson.dart' show BsonBinary, BsonCString, BsonMap;
+import 'package:mongo_dart/src/database/document_types.dart';
 
 abstract class Payload {
   void packValue(BsonBinary buffer);
@@ -11,7 +12,7 @@ abstract class Payload {
 class Payload0 extends Payload {
   BsonMap document;
 
-  Payload0(Map<String, Object> document) : document = BsonMap(document);
+  Payload0(MongoDocument document) : document = BsonMap(document);
 
   Payload0.fromBuffer(BsonBinary buffer)
       : document = BsonMap(<String, Object>{})
