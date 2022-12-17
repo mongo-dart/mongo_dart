@@ -60,7 +60,7 @@ class CountOperation extends CommandOperation {
 
   Future<CountResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {
-    var result = await super.executeOnServer(server);
+    var result = await super.execute();
     return CountResult(result);
   }
 }

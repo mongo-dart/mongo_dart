@@ -2,6 +2,7 @@ import 'package:mongo_dart/src/core/message/mongo_modern_message.dart'
     show MongoModernMessage;
 import 'package:mongo_dart/src/utils/map_keys.dart' show keyWriteConcern;
 
+import '../../core/error/mongo_dart_error.dart';
 import '../../topology/server.dart';
 import 'operation_base.dart' show Aspect, OperationBase;
 
@@ -27,6 +28,10 @@ class ServerCommand extends OperationBase {
 
     options.removeWhere((key, value) => command.containsKey(key));
   }
+
+  @override
+  Future<Map<String, Object?>> execute() =>
+      throw MongoDartError('Use executOnServer() instead');
 
   /// A session ID MUST NOT be used simultaneously by more than one operation.
   ///  Since drivers don't wait for a response for an unacknowledged write a

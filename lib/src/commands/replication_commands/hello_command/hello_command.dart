@@ -42,6 +42,7 @@ class HelloCommand extends ServerCommand {
     return HelloResult(result);
   }
 
+  @override
   Future<Map<String, Object?>> execute() async => super.executeOnServer(server);
 
   @override

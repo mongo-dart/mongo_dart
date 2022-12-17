@@ -114,19 +114,19 @@ Future tesSomeChunks() async {
 }
 
 Future<List<int>> getInitialState(GridFS gridFS) async {
-  var completer = Completer<List<int>>();
   var futures = <Future<int>>[];
   /* futures.add(gridFS.files.legacyCount());
   futures.add(gridFS.chunks.legacyCount()); */
   futures.add(gridFS.files.count());
   futures.add(gridFS.chunks.count());
-  Future.wait(futures).then((List<int> futureResults) {
-    var result = List<int>.filled(2, 0);
-    result[0] = futureResults[0].toInt();
-    result[1] = futureResults[1].toInt();
-    completer.complete(result);
-  });
-  return completer.future;
+  return Future.wait(futures);
+  /*  var futureResults = await Future.wait(futures);
+
+  var result = List<int>.filled(2, 0);
+  result[0] = futureResults[0].toInt();
+  result[1] = futureResults[1].toInt();
+
+  return result; */
 }
 
 Future testInOut(List<int> data, GridFS gridFS,

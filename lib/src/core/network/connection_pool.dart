@@ -101,7 +101,7 @@ class ConnectionPool with EventEmitter {
       var error =
           MongoDartError('Request rejected as pool closing is running ');
       log.finer('Request rejected as pool closing is running ');
-      emit(ConnectionPoolError(error));
+      await emit(ConnectionPoolError(error));
       log.severe(error.originalErrorMessage);
       throw error;
     }
@@ -116,7 +116,9 @@ class ConnectionPool with EventEmitter {
     log.finer('No connection available - adding a new one');
     var connection = addConnection();
     await connectConnection(connection);
-    return connection.isAvailable ? connection : _pickAvailableConnection();
+    return connection.isAvailable
+        ? connection
+        : await _pickAvailableConnection();
   }
 
   Future<ConnectionBase> _queueForAvailableConnection() async {
@@ -126,21 +128,32 @@ class ConnectionPool with EventEmitter {
       if (doNotAcceptAnyRequest) {
         break;
       }
+      log.finer('Waiting in available connection queue');
+      print('Waiting for available connection queue');
       await Future.delayed(Duration(milliseconds: defQueueTimeoutPollingMS));
+      print(
+          'Waited for available connection queue, waitQueueMS is $waitQueueTimeoutMS');
       if (waitQueueTimeoutMS > 0) {
         var checkMS = DateTime.now().millisecondsSinceEpoch;
+        print('${(checkMS - startMS)} > $waitQueueTimeoutMS');
         if ((checkMS - startMS) > waitQueueTimeoutMS) {
-          // throw error
+          waitingList.remove(startMS);
+          var error = MongoDartError(
+              'Waiting time for available connection has been exceeded');
+          log.warning(error.originalErrorMessage);
+          await emit(ConnectionPoolError(error));
+          throw error;
         }
       }
+      print('Checking for exit from while loop on queue');
     }
     waitingList.removeAt(0);
     return _pickAvailableConnection();
   }
 
-  ConnectionBase _pickAvailableConnection() {
+  Future<ConnectionBase> _pickAvailableConnection() async {
     if (availableConnections.isEmpty) {
-      _closeOnError(MongoDartError('No Available Connection'));
+      await _closeOnError(MongoDartError('No Available Connection'));
     }
     var entry = availableConnections.entries.first;
     availableConnections.remove(entry.key);
@@ -152,7 +165,7 @@ class ConnectionPool with EventEmitter {
     if (doNotAcceptAnyRequest) {
       var error = MongoDartError('Pool closing already in progress');
       log.warning(error.originalErrorMessage);
-      emit(ConnectionPoolError(error));
+      await emit(ConnectionPoolError(error));
       throw error;
     }
     doNotAcceptAnyRequest = true;
@@ -162,7 +175,7 @@ class ConnectionPool with EventEmitter {
     while (waitingList.isNotEmpty) {
       await Future.delayed(Duration(milliseconds: defQueueTimeoutPollingMS));
     }
-    emit(ConnectionPoolClosed());
+    await emit(ConnectionPoolClosed());
     state = PoolState.closed;
     doNotAcceptAnyRequest = false;
   }
@@ -170,7 +183,7 @@ class ConnectionPool with EventEmitter {
   Future<void> _closeOnError(GenericError error) async {
     await _closePool();
     log.severe(error.originalErrorMessage);
-    emit(ConnectionPoolError(error));
+    await emit(ConnectionPoolError(error));
     throw error;
   }
 
@@ -196,10 +209,10 @@ class ConnectionPool with EventEmitter {
   }
 
   // *************  Connection Listeners ************************
-  FutureOr<void> connectionErrorListener(ConnectionError event) {
+  FutureOr<void> connectionErrorListener(ConnectionError event) async {
     _connections.removeWhere((element) => element.id == event.id);
     if (_connections.isEmpty) {
-      _closeOnError(event.error);
+      await _closeOnError(event.error);
     }
   }
 

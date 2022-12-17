@@ -74,8 +74,9 @@ class Server {
     try {
       var helloCommand = HelloCommand(this, username: serverConfig.userName);
       result = await helloCommand.execute();
-    } catch (e) {
+    } on MongoDartError catch (err) {
       //Do nothing
+      print('Passe by _runHrllo() - Error ${err.message}');
     }
     if (result[keyOk] == 1.0) {
       hello = HelloResult(result);

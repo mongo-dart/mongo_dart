@@ -581,7 +581,7 @@ class MongoDatabase {
       {DropOptions? dropOptions, Map<String, Object>? rawOptions}) async {
     var command = DropCommand(this, collectionNAme,
         dropOptions: dropOptions, rawOptions: rawOptions);
-    return command.executeOnServer(server);
+    return command.execute();
   }
 
   /// Runs a specified admin/diagnostic pipeline which does not require an

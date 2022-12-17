@@ -75,14 +75,14 @@ abstract class ConnectionBase with EventEmitter {
 
   Future<void> _closeOnError(GenericError error) async {
     await _closeConnection();
-    emit(ConnectionError(id, error));
+    await emit(ConnectionError(id, error));
     log.severe(error.originalErrorMessage);
     _completer == null ? throw error : _completer!.completeError(error);
   }
 
   Future<void> _closeConnection() async {
     if (!isClosed) {
-      emit(ConnectionClosed(id));
+      await emit(ConnectionClosed(id));
       _state = ConnectionState.closed;
     }
     if (socket != null) {
@@ -131,7 +131,7 @@ abstract class ConnectionBase with EventEmitter {
       await _closeOnError(
           MongoDartError('Invalid state: Connection already processing.'));
     }
-    emit(ConnectionActive(id));
+    await emit(ConnectionActive(id));
 
     var message = <int>[];
     message.addAll(modernMessage.serialize().byteList);
@@ -149,8 +149,8 @@ abstract class ConnectionBase with EventEmitter {
 
     if (_completer != null) {
       log.fine(() => 'Completing $reply');
-      emit(ConnectionMessageReceived(id, reply));
-      emit(ConnectionAvailable(id));
+      await emit(ConnectionMessageReceived(id, reply));
+      await emit(ConnectionAvailable(id));
       _completer!.complete(reply);
     } else {
       await _closeOnError(

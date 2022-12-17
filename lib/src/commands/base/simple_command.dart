@@ -17,6 +17,7 @@ class SimpleCommand extends ServerCommand {
   ReadPreference readPreference;
   Topology topology;
 
+  @override
   Future<Map<String, Object?>> execute() async {
     var server = topology.getServer(readPreference);
     return super.executeOnServer(server);

@@ -17,6 +17,12 @@ class DbAdminCommandOperation extends OperationBase {
   Map<String, Object> $buildCommand() => command;
 
   @override
+  Future<Map<String, Object?>> execute() async {
+    var server = db.topology.getServer(db.readPreference);
+    return super.executeOnServer(server);
+  }
+
+  @override
   Future<Map<String, Object?>> executeOnServer(Server server) async {
     var command = <String, Object>{
       ...$buildCommand(),

@@ -21,9 +21,10 @@ void main() async {
     var client = MongoClient(uri);
     try {
       await client.connect();
-      client.db();
+      var db = client.db();
+      var val = db.server.isAuthenticated;
       await client.close();
-      return true;
+      return val;
     } on MongoDartError catch (e) {
       if (e.mongoCode == 18) {
         return false;

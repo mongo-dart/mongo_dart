@@ -30,6 +30,8 @@ abstract class OperationBase {
 
   bool get canRetryRead => true;
 
+  Future<Map<String, Object?>> execute();
+
   Future<Map<String, Object?>> executeOnServer(Server server) async =>
       throw UnsupportedError(
           '"execute" must be implemented for OperationBase subclasses');
