@@ -12,6 +12,9 @@ linter:
     - unawaited_futures
     
 
+analyzer:
+  errors:
+    todo: info
 
 # analyzer:
 ###   exclude:

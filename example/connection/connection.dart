@@ -3,7 +3,7 @@ import 'package:logging/logging.dart'
 import 'package:mongo_dart/src/mongo_client.dart';
 
 const dbName = 'mongo-dart-example';
-const dbAddress = '127.0.0.1';
+const dbAddress = 'localhost';
 
 const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
 

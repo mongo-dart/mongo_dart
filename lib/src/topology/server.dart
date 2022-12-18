@@ -36,6 +36,9 @@ class Server {
   bool get isShardedCluster => serverCapabilities.isShardedCluster;
 
   bool get isWritablePrimary => hello?.isWritablePrimary ?? false;
+  bool get isReadOnlyMode => hello?.readOnly ?? true;
+  // Todo check on replica sets how names are formed
+  String get url => serverConfig.hostUrl;
 
   Future<void> connect() async {
     if (state == ServerState.connected) {

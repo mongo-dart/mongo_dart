@@ -18,16 +18,18 @@ class Discover extends Topology {
   Topology getEffectiveTopology() {
     Topology topology;
     if (servers.first.isStandalone) {
-      topology = Standalone(hostsSeedList, mongoClientOptions);
+      topology = Standalone(hostsSeedList, mongoClientOptions,
+          detectedServers: servers);
     } else if (servers.first.isReplicaSet) {
-      topology = ReplicaSet(hostsSeedList, mongoClientOptions);
+      topology = ReplicaSet(hostsSeedList, mongoClientOptions,
+          detectedServers: servers);
     } else if (servers.first.isShardedCluster) {
       // Todo
-      topology = SharderdCluster(hostsSeedList, mongoClientOptions);
+      topology = SharderdCluster(hostsSeedList, mongoClientOptions,
+          detectedServers: servers);
     } else {
       throw MongoDartError('Unknown topology type');
     }
-    topology.servers.add(servers.first);
 
     return topology;
   }

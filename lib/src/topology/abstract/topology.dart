@@ -16,9 +16,9 @@ enum TopologyType { standalone, replicaSet, shardedCluster, unknown }
 abstract class Topology {
   @protected
   Topology.protected(this.hostsSeedList, this.mongoClientOptions,
-      {Server? connectedServer}) {
-    if (connectedServer != null) {
-      servers.add(connectedServer);
+      {List<Server>? detectedServers}) {
+    if (detectedServers != null) {
+      servers.addAll(detectedServers);
     }
   }
 
@@ -32,32 +32,33 @@ abstract class Topology {
   List<Uri> get seedList => hostsSeedList.toList();
   bool get isConnected => servers.any((element) => element.isConnected);
 
-  // *** To be overridden. This behavior works just for standalone typology
-  /// The return value depends on the tipology
-  /// In case the tipology is not connected, the return values is meaningless.
-  /// - standalone -> returns always false
-  /// - replicaSet -> true if the tipology is connected but no primary it is, otherwise false
+  // *** To be overridden. This behavior works just for standalone topology
+  /// The return value depends on the topology
+  /// In case the topology is not connected, the return values is meaningless.
+  /// - standalone -> returns readOnly state of the server
+  /// - replicaSet -> true if the topology is connected but no primary it is, otherwise false
   /// - sharderCluster -> true if all the mongos are in readOnlyMode.
-  bool get isReadOnly => false;
+  bool get isReadOnly => isConnected ? servers.first.isReadOnlyMode : true;
 
   // *** To be overridden. This behavior works for standalone and replica set typology
   /// Returns the primary writable server
-  Server get primary =>
-      servers.firstWhere((element) => element.isWritablePrimary);
+  Server? get primary => isConnected ? servers.first : null;
 
   // *** To be overridden. This behavior works just for standalone typology
   /// Retruns the server based on the readPreference
-  Server getServer(ReadPreference readPreference) => servers.first;
+  Server getServer(ReadPreference readPreference) =>
+      isConnected ? servers.first : throw MongoDartError('No connected server');
 
   Future connect() async {
     if (servers.isEmpty) {
-      await initialConnection();
+      await addServersFromSeedList();
+      await updateServersStatus();
     }
   }
 
-  Future<void> initialConnection() async {
+  Future<void> addServersFromSeedList() async {
     for (var element in hostsSeedList) {
-      var serverConfig = await _parseUri(element, mongoClientOptions);
+      var serverConfig = await parseUri(element, mongoClientOptions);
       var server = Server(serverConfig, mongoClientOptions);
       servers.add(server);
       await server.connect();
@@ -72,15 +73,26 @@ abstract class Topology {
         await server.connect();
       }
       await server.refreshStatus();
-      additionalServers.addAll(await addOtherServers());
+      additionalServers
+          .addAll(await addOtherServers(server, additionalServers));
+    }
+
+    for (var server in additionalServers) {
+      if (!server.isConnected) {
+        await server.connect();
+      }
+      await server.refreshStatus();
+      servers.add(server);
     }
   }
 
   // *** To be overridden. This behavior works just for standalone typology
   @protected
-  Future<Set<Server>> addOtherServers() async => <Server>{};
+  Future<Set<Server>> addOtherServers(
+          Server server, Set<Server> additionalServers) async =>
+      <Server>{};
 
-  Future<ServerConfig> _parseUri(Uri uri, MongoClientOptions options) async {
+  Future<ServerConfig> parseUri(Uri uri, MongoClientOptions options) async {
     if (uri.scheme != 'mongodb') {
       throw MongoDartError('Invalid scheme in uri: ${uri.scheme}');
     }
