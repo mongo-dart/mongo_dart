@@ -27,6 +27,7 @@ class Server {
 
   ServerState state = ServerState.closed;
   HelloResult? hello;
+  int lastHelloExecutionMS = 0;
 
   bool get isAuthenticated => serverConfig.isAuthenticated;
   bool get isConnected => state == ServerState.connected;
@@ -37,8 +38,25 @@ class Server {
 
   bool get isWritablePrimary => hello?.isWritablePrimary ?? false;
   bool get isReadOnlyMode => hello?.readOnly ?? true;
-  // Todo check on replica sets how names are formed
-  String get url => serverConfig.hostUrl;
+
+  /// Return the server url (no scheme)
+  /// Url can be considered correct only after receiving the first hello message
+  String get url => hello?.me == null ? serverConfig.hostUrl : hello!.me!;
+
+  /// Comparison operator.
+  /// Note, it is correct only after the first hello message (connection)
+  /// Do not add to containers before that.
+  @override
+  bool operator ==(other) => other is Server && url == other.url;
+
+  /// Hash Code.
+  /// Note, it is correct only after the first hello message (connection)
+  /// Do not add to containers before that.
+  @override
+  int get hashCode => url.hashCode;
+
+  @override
+  String toString() => 'Server -> $url';
 
   Future<void> connect() async {
     if (state == ServerState.connected) {
@@ -78,7 +96,10 @@ class Server {
     Map<String, Object?> result = {keyOk: 0.0};
     try {
       var helloCommand = HelloCommand(this, username: serverConfig.userName);
+      var actualTimeMS = DateTime.now().millisecondsSinceEpoch;
       result = await helloCommand.execute();
+      lastHelloExecutionMS =
+          DateTime.now().millisecondsSinceEpoch - actualTimeMS;
     } on MongoDartError catch (err) {
       //Do nothing
       print('Passed by _runHello() - Error ${err.message}');

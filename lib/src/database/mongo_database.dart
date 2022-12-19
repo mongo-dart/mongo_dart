@@ -63,7 +63,7 @@ class MongoDatabase {
   ReadPreference readPreference = ReadPreference.primary;
 
   //Todo temp solution
-  Server get server => topology.getServer(ReadPreference.primary);
+  Server get server => topology.getServer();
   Topology get topology =>
       mongoClient.topology ??
       (throw MongoDartError('Topology not yet assigned'));

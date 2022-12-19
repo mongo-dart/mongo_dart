@@ -17,8 +17,8 @@ class DbAdminCommandOperation extends OperationBase {
   Command $buildCommand() => command;
 
   @override
-  Future<MongoDocument> execute() async =>
-      executeOnServer(db.topology.getServer(db.readPreference));
+  Future<MongoDocument> execute() async => executeOnServer(
+      db.topology.getServer(readPreferenceMode: db.readPreference.mode));
 
   @override
   @protected

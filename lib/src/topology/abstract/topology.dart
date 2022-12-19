@@ -25,7 +25,10 @@ abstract class Topology {
   final log = Logger('Topology');
   TopologyType? type;
   final List<Uri> hostsSeedList;
-  MongoClientOptions mongoClientOptions;
+  final MongoClientOptions mongoClientOptions;
+
+  /// Returns the primary writable server
+  Server? primary;
 
   List<Server> servers = <Server>[];
 
@@ -40,14 +43,12 @@ abstract class Topology {
   /// - sharderCluster -> true if all the mongos are in readOnlyMode.
   bool get isReadOnly => isConnected ? servers.first.isReadOnlyMode : true;
 
-  // *** To be overridden. This behavior works for standalone and replica set typology
-  /// Returns the primary writable server
-  Server? get primary => isConnected ? servers.first : null;
-
   // *** To be overridden. This behavior works just for standalone typology
   /// Retruns the server based on the readPreference
-  Server getServer(ReadPreference readPreference) =>
-      isConnected ? servers.first : throw MongoDartError('No connected server');
+  Server getServer(
+          {ReadPreferenceMode readPreferenceMode =
+              ReadPreferenceMode.primary}) =>
+      isConnected ? servers.first : throw MongoDartError('No primary detected');
 
   Future connect() async {
     if (servers.isEmpty) {
@@ -128,5 +129,19 @@ abstract class Topology {
     serverConfig.password = options.auth?.password;
 
     return serverConfig;
+  }
+
+  Server nearest() {
+    int? lowestMS;
+    Server? selectedServer;
+    for (Server server in servers) {
+      if (server.isConnected) {
+        if (lowestMS == null || server.lastHelloExecutionMS < lowestMS) {
+          lowestMS = server.hello!.localTime.millisecondsSinceEpoch;
+          selectedServer = server;
+        }
+      }
+    }
+    return selectedServer ?? (throw MongoDartError('No server detected'));
   }
 }

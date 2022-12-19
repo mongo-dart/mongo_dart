@@ -113,9 +113,8 @@ Options applyWriteConcern(Options target,
   }*/
 
   if (db != null && db.writeConcern != null) {
-    target[keyWriteConcern] = db.writeConcern!.asMap(db.mongoClient.topology!
-        .getServer(ReadPreference.primary)
-        .serverStatus);
+    target[keyWriteConcern] = db.writeConcern!
+        .asMap(db.mongoClient.topology!.getServer().serverStatus);
     return target;
   }
 

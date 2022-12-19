@@ -97,8 +97,7 @@ void main() async {
   /// document is available in the `BulkWriteResult` object.
   /// or you can run the executeBulk() method that directly returns the server
   /// response
-  var ret = await bulk
-      .executeDocument(client.topology!.getServer(ReadPreference.primary));
+  var ret = await bulk.executeDocument(client.topology!.getServer());
 
   print(ret.ok); // 1.0
   print(ret.operationSucceeded); // true
