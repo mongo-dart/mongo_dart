@@ -1,5 +1,6 @@
 import 'package:mongo_dart/src/settings/connection_pool_settings.dart';
 
+import 'commands/parameters/read_preference.dart';
 import 'core/auth/auth.dart';
 import 'core/compression.dart';
 import 'mongo_client.dart';
@@ -89,18 +90,20 @@ class MongoClientOptions
   /// The level of isolation */
   ReadConcernLevel? readConcernLevel;
 
-  /// Specifies the read preferences for this connection */
-  // Todo readPreference?: ReadPreferenceMode | ReadPreference;
+  /// Specifies the read preferences for this connection
+  ReadPreference? readPreference;
+
   /// Specifies, in seconds, how stale a secondary can be before the client
-  /// stops using it for read operations.
-  int? maxStalenessSeconds;
+  /// stops using it for read operations. Inside ReadPreference Object
+  //int? maxStalenessSeconds;
+
+  /// Specifies the tags document as a comma-separated list of colon-separated
+  /// key-value pairs. Inside ReadPreference Object
+  // List<TagSet>? readPreferenceTags;
 
   /// Specify the default database name for connection.
   String? defaultDbName;
 
-  /// Specifies the tags document as a comma-separated list of colon-separated
-  /// key-value pairs.
-  // Todo List<TagSet>? readPreferenceTags;
   /// The auth settings for when connection to server.
   Auth? auth;
 

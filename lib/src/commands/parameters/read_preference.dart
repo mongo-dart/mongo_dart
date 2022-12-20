@@ -12,6 +12,8 @@ import '../../core/error/mongo_dart_error.dart';
 import '../../database/mongo_database.dart';
 import '../../database/mongo_collection.dart';
 
+typedef TagSet = Map<String, String>;
+
 enum ReadPreferenceMode {
   primary,
   primaryPreferred,
@@ -68,14 +70,10 @@ class ReadPreference {
   }
 
   final ReadPreferenceMode mode;
-  final List? tags;
+  final List<TagSet>? tags;
   //final Map<String, Object> options;
   final int? maxStalenessSeconds;
   final Map<String, Object>? hedgeOptions;
-
-  /* @Deprecated('Support the deprecated `preference` property '
-      'introduced in the porcelain layer')
-  ReadPreferenceMode get preference => mode; */
 
   ReadPreference(this.mode,
       {this.tags, this.maxStalenessSeconds, this.hedgeOptions}) {
@@ -114,14 +112,14 @@ class ReadPreference {
     dynamic readPreference = options[keyReadPreference];
     if (readPreference is ReadPreferenceMode) {
       return ReadPreference(readPreference,
-          tags: options[keyReadPreferenceTags] as List?,
+          tags: options[keyReadPreferenceTags] as List<TagSet>?,
           maxStalenessSeconds: options[keyMaxStalenessSecond] as int?,
           hedgeOptions: options[keyHedgeOptions] as Map<String, Object>?);
     } else if (readPreference is Map) {
       var mode = readPreference[keyMode] as String?;
       if (mode != null) {
         return ReadPreference(getReadPreferenceModeFromString(mode),
-            tags: readPreference[keyReadPreferenceTags] as List?,
+            tags: readPreference[keyReadPreferenceTags] as List<TagSet>?,
             maxStalenessSeconds: readPreference[keyMaxStalenessSecond] as int?,
             hedgeOptions:
                 readPreference[keyHedgeOptions] as Map<String, Object>?);

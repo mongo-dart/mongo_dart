@@ -1,5 +1,6 @@
 import 'dart:typed_data' show Uint8List;
 
+import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:universal_io/io.dart' show File;
 
 import '../settings/connection_string_options.dart';
@@ -26,6 +27,7 @@ Future<ServerConfig> decodeUrlParameters(
   }
 
   String? localAuthDbName;
+  ReadPreference? localReadPreference;
 
   uri.queryParameters.forEach((String queryParam, String value) {
     if (value.isEmpty) {
@@ -99,6 +101,64 @@ Future<ServerConfig> decodeUrlParameters(
         if (intValue != null && intValue >= 0) {
           options.waitQueueTimeoutMS = intValue;
         }
+        break;
+      case ConnectionStringOptions.readPreference:
+        if (ReadPreferenceMode.values
+            .any((element) => element.toString() == value)) {
+          var mode = ReadPreferenceMode.values
+              .firstWhere((element) => element.toString() == value);
+          if (localReadPreference == null) {
+            localReadPreference = ReadPreference(mode);
+          } else {
+            ReadPreference readPref = localReadPreference!;
+            if (readPref.mode != mode) {
+              localReadPreference = ReadPreference(mode,
+                  tags: readPref.tags,
+                  maxStalenessSeconds: readPref.maxStalenessSeconds,
+                  hedgeOptions: readPref.hedgeOptions);
+            }
+          }
+        } else {
+          throw MongoDartError('The ${ConnectionStringOptions.readPreference} '
+              'parameter contains the wrong value $value');
+        }
+        break;
+      case ConnectionStringOptions.maxStalenessSeconds:
+        var locMaxStalenessSecond = int.tryParse(value);
+        if (locMaxStalenessSecond == null || locMaxStalenessSecond < 0) {
+          throw ArgumentError('maxStalenessSeconds must be a positive integer');
+        }
+        localReadPreference = ReadPreference(
+            localReadPreference?.mode ?? ReadPreferenceMode.primary,
+            tags: localReadPreference?.tags,
+            maxStalenessSeconds: locMaxStalenessSecond,
+            hedgeOptions: localReadPreference?.hedgeOptions);
+        break;
+      case ConnectionStringOptions.readPreferenceTags:
+        localReadPreference = ReadPreference(
+            localReadPreference?.mode ?? ReadPreferenceMode.primary,
+            tags: localReadPreference?.tags ?? <TagSet>[],
+            maxStalenessSeconds: localReadPreference?.maxStalenessSeconds,
+            hedgeOptions: localReadPreference?.hedgeOptions);
+        TagSet newTagSet = <String, String>{};
+        if (value.isNotEmpty) {
+          var pairs = value.split(',');
+
+          for (var element in pairs) {
+            if (element.isEmpty) {
+              throw ArgumentError('The value "$element" is not a valid '
+                  '${ConnectionStringOptions.readPreferenceTags} parameter');
+            }
+            var keyValue = element.split(':');
+            if (keyValue.length != 2) {
+              throw ArgumentError('The value "$element" is not a valid '
+                  '${ConnectionStringOptions.readPreferenceTags} parameter');
+            }
+            newTagSet[keyValue.first] = keyValue.last;
+          }
+          localReadPreference!.tags!.add(newTagSet);
+        }
+
         break;
       default:
         throw MongoDartError('Unknown CL parameter: $queryParam');
