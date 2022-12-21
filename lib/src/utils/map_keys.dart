@@ -208,6 +208,7 @@ const key$Query = r'$query';
 const keyReadConcern = 'readConcern';
 const keyReadOnly = 'readOnly';
 const keyReadPreference = 'readPreference';
+const key$ReadPreference = r'$readPreference';
 const keyReadPreferenceTags = 'readPreferenceTags';
 const keyRemove = 'remove';
 const keyRepl = 'repl';

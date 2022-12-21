@@ -1,3 +1,4 @@
+import 'package:mongo_dart/src/commands/operation.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart'
     show MongoModernMessage;
 import 'package:mongo_dart/src/utils/map_keys.dart' show keyWriteConcern;
@@ -21,6 +22,7 @@ class ServerCommand extends OperationBase {
   /// ReadPrefernce must be managed before
   void processOptions(Command command) {
     if (hasAspect(Aspect.writeOperation)) {
+      ReadPreference.removeReadPreferenceFromOptions(options);
       applyWriteConcern(options, options: options);
     } else {
       // Todo we have to manage Session
@@ -76,7 +78,7 @@ class ServerCommand extends OperationBase {
 Options applyWriteConcern(Options target, {Options? options}) {
   options ??= <String, dynamic>{};
 
-  //Todo Session not yet implemented
+  //TODO Session not yet implemented
   /*if (options[keySession] != null && options[keySession].inTransaction()) {
     // writeConcern is not allowed within a multi-statement transaction
     if (target.containsKey(keyWriteConcern)) {

@@ -1,6 +1,7 @@
 import 'package:mongo_dart/src/commands/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart'
     show
+        key$ReadPreference,
         keyHedgeOptions,
         keyMaxStalenessSecond,
         keyMode,
@@ -11,6 +12,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart'
 import '../../core/error/mongo_dart_error.dart';
 import '../../database/mongo_database.dart';
 import '../../database/mongo_collection.dart';
+import '../../mongo_client.dart';
 
 typedef TagSet = Map<String, String>;
 
@@ -21,6 +23,14 @@ enum ReadPreferenceMode {
   secondaryPreferred,
   nearest
 }
+
+var readPrefernceKeys = [
+  key$ReadPreference,
+  keyReadPreference,
+  keyReadPreferenceTags,
+  keyMaxStalenessSecond,
+  keyHedgeOptions
+];
 
 String getReadPreferenceModeString(ReadPreferenceMode mode) =>
     '$mode'.replaceFirst('ReadPreferenceMode.', '');
@@ -105,24 +115,38 @@ class ReadPreference {
   ///   In this this case we expect the other options to be inside the options
   ///   map itself (ex. options[keyReadPreferencTags])
   ///
-  factory ReadPreference.fromOptions(Options options) {
+  factory ReadPreference.fromOptions(Options options,
+      {bool? removeFromOriginalMap}) {
     if (options[keyReadPreference] == null) {
       throw MongoDartError('ReadPreference mode is needed');
     }
-    dynamic readPreference = options[keyReadPreference];
+    var remove = removeFromOriginalMap ?? false;
+    dynamic readPreference =
+        remove ? options.remove(keyReadPreference) : options[keyReadPreference];
     if (readPreference is ReadPreferenceMode) {
       return ReadPreference(readPreference,
-          tags: options[keyReadPreferenceTags] as List<TagSet>?,
-          maxStalenessSeconds: options[keyMaxStalenessSecond] as int?,
-          hedgeOptions: options[keyHedgeOptions] as Map<String, Object>?);
+          tags: (remove
+              ? options.remove(keyReadPreferenceTags)
+              : options[keyReadPreferenceTags]) as List<TagSet>?,
+          maxStalenessSeconds: (remove
+              ? options.remove(keyMaxStalenessSecond)
+              : options[keyMaxStalenessSecond]) as int?,
+          hedgeOptions: (remove
+              ? options.remove(keyHedgeOptions)
+              : options[keyHedgeOptions]) as Map<String, Object>?);
     } else if (readPreference is Map) {
       var mode = readPreference[keyMode] as String?;
       if (mode != null) {
         return ReadPreference(getReadPreferenceModeFromString(mode),
-            tags: readPreference[keyReadPreferenceTags] as List<TagSet>?,
-            maxStalenessSeconds: readPreference[keyMaxStalenessSecond] as int?,
-            hedgeOptions:
-                readPreference[keyHedgeOptions] as Map<String, Object>?);
+            tags: (remove
+                ? readPreference.remove(keyReadPreferenceTags)
+                : readPreference[keyReadPreferenceTags]) as List<TagSet>?,
+            maxStalenessSeconds: (remove
+                ? readPreference.remove(keyMaxStalenessSecond)
+                : readPreference[keyMaxStalenessSecond]) as int?,
+            hedgeOptions: (remove
+                ? readPreference.remove(keyHedgeOptions)
+                : readPreference[keyHedgeOptions]) as Map<String, Object>?);
       }
     } else if (options[keyReadPreference] is ReadPreference) {
       return options[keyReadPreference] as ReadPreference;
@@ -148,12 +172,15 @@ class ReadPreference {
   int get hashCode => mode.hashCode;
 
   Map<String, Object> toMap() => <String, Object>{
-        keyMode: getReadPreferenceModeString(mode),
+        key$ReadPreference: getReadPreferenceModeString(mode),
         if (tags != null) keyTags: tags!,
         if (maxStalenessSeconds != null)
           keyMaxStalenessSecond: maxStalenessSeconds!,
         if (hedgeOptions != null) keyHedgeOptions: hedgeOptions!
       };
+
+  static void removeReadPreferenceFromOptions(Map<String, dynamic> options) =>
+      options.removeWhere((key, value) => readPrefernceKeys.contains(key));
 }
 
 /// Resolves a read preference based on well-defined inheritance rules. This method will not only
@@ -176,10 +203,9 @@ ReadPreference? resolveReadPreference(parent, Options options,
       inheritedReadPreference = parent.readPreference;
     } else if (parent is MongoDatabase) {
       inheritedReadPreference = parent.readPreference;
-    } //Todo MongoClient class not yet Implemented
-    /*else if (parent is MongoClient) {
-    inheritedReadPreference = parent.readPreference;
-  }*/
+    } else if (parent is MongoClient) {
+      inheritedReadPreference = parent.mongoClientOptions.readPreference;
+    }
   }
 
   if (options[keyReadPreference] != null) {
