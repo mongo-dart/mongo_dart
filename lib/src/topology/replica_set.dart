@@ -19,9 +19,10 @@ class ReplicaSet extends Topology {
       servers.every((element) => element.isConnected && element.isReadOnlyMode);
 
   @override
-  Server getServer(
-      {ReadPreferenceMode readPreferenceMode = ReadPreferenceMode.primary}) {
-    switch (readPreferenceMode) {
+  Server getServer({ReadPreferenceMode? readPreferenceMode}) {
+    var locReadPreferenceMode =
+        readPreferenceMode ?? ReadPreferenceMode.primary;
+    switch (locReadPreferenceMode) {
       case ReadPreferenceMode.primary:
         return primary != null
             ? primary!

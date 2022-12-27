@@ -172,41 +172,33 @@ class ReadPreference {
   int get hashCode => mode.hashCode;
 
   Map<String, Object> toMap() => <String, Object>{
-        key$ReadPreference: getReadPreferenceModeString(mode),
-        if (tags != null) keyTags: tags!,
-        if (maxStalenessSeconds != null)
-          keyMaxStalenessSecond: maxStalenessSeconds!,
-        if (hedgeOptions != null) keyHedgeOptions: hedgeOptions!
+        key$ReadPreference: {
+          keyMode: getReadPreferenceModeString(mode),
+          if (tags != null) keyTags: tags!,
+          if (maxStalenessSeconds != null)
+            keyMaxStalenessSecond: maxStalenessSeconds!,
+          if (hedgeOptions != null) keyHedgeOptions: hedgeOptions!
+        }
       };
 
   static void removeReadPreferenceFromOptions(Map<String, dynamic> options) =>
       options.removeWhere((key, value) => readPrefernceKeys.contains(key));
 }
 
-/// Resolves a read preference based on well-defined inheritance rules. This method will not only
-/// determine the read preference (if there is one), but will also ensure the returned value is a
-/// properly constructed instance of `ReadPreference`.
+/// Resolves a read preference based on well-defined inheritance rules.
+/// This method will not only determine the read preference (if there is one),
+/// but will also ensure the returned value is a properly constructed
+/// instance of `ReadPreference`.
 ///
-/// @param {Collection|Db|MongoClient} parent The parent of the operation on which to determine the read
-/// preference, used for determining the inherited read preference.
-/// @param {Object} options The options passed into the method, potentially containing a read preference
-/// @returns {(ReadPreference|null)} The resolved read preference
-ReadPreference? resolveReadPreference(parent, Options options,
-    {bool? inheritReadPreference = true}) {
-  //options ??= <String, Object>{};
+/// @param {Collection|Db|MongoClient} parent The parent of the operation on
+/// which to determine the read preference, used for determining the inherited
+/// read preference.
+/// @param {Object} options The options passed into the method,
+/// potentially containing a read preference
+ReadPreference? resolveReadPreference(parent,
+    {Options? options, bool? inheritReadPreference = true}) {
+  options ??= <String, dynamic>{};
   inheritReadPreference ??= true;
-
-  ReadPreference? inheritedReadPreference;
-
-  if (inheritReadPreference) {
-    if (parent is MongoCollection) {
-      inheritedReadPreference = parent.readPreference;
-    } else if (parent is MongoDatabase) {
-      inheritedReadPreference = parent.readPreference;
-    } else if (parent is MongoClient) {
-      inheritedReadPreference = parent.mongoClientOptions.readPreference;
-    }
-  }
 
   if (options[keyReadPreference] != null) {
     return ReadPreference.fromOptions(options);
@@ -215,12 +207,24 @@ ReadPreference? resolveReadPreference(parent, Options options,
     // The transaction’s read preference MUST override all other user configurable read preferences.
     readPreference = session.transaction.options[CommandOperation.keyReadPreference];
   }*/
-  else if (inheritedReadPreference != null) {
-    return inheritedReadPreference;
-  } else {
-    if (inheritReadPreference) {
-      throw ArgumentError('No readPreference was provided or inherited.');
+
+  ReadPreference? inheritedReadPreference;
+
+  if (inheritReadPreference) {
+    if (parent is MongoCollection) {
+      inheritedReadPreference = parent.readPreference ??
+          parent.db.readPreference ??
+          parent.db.mongoClient.mongoClientOptions.readPreference;
+    } else if (parent is MongoDatabase) {
+      inheritedReadPreference = parent.readPreference ??
+          parent.mongoClient.mongoClientOptions.readPreference;
+    } else if (parent is MongoClient) {
+      inheritedReadPreference = parent.mongoClientOptions.readPreference;
+    }
+    if (inheritedReadPreference == null) {
+      throw MongoDartError('No readPreference was provided or inherited.');
     }
   }
-  return null;
+
+  return inheritedReadPreference;
 }

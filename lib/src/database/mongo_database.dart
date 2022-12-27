@@ -1,6 +1,7 @@
 //part of mongo_dart;
 
 import 'package:logging/logging.dart';
+import 'package:mongo_dart/src_old/database/utils/dns_lookup.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
 import '../../mongo_dart_old.dart'
@@ -12,7 +13,6 @@ import '../../mongo_dart_old.dart'
         CreateViewCommand,
         CreateViewOptions,
         GetLastErrorCommand,
-        ReadPreference,
         SelectorBuilder,
         ServerStatusCommand,
         ServerStatusOptions,
@@ -20,6 +20,7 @@ import '../../mongo_dart_old.dart'
         key$Query,
         keyName,
         keyOk;
+import '../commands/parameters/read_preference.dart';
 import '../core/auth/auth.dart';
 import '../../src_old/auth/mongodb_cr_authenticator.dart';
 import '../core/auth/scram_sha1_authenticator.dart';
@@ -33,7 +34,6 @@ import '../commands/administration_commands/list_collections_command/list_collec
 import '../commands/diagnostic_commands/ping_command/ping_command.dart';
 import '../topology/abstract/topology.dart';
 import 'modern_cursor.dart';
-import '../../src_old/database/utils/dns_lookup.dart';
 import '../commands/base/command_operation.dart';
 import '../core/error/mongo_dart_error.dart';
 import '../core/message/abstract/mongo_message.dart';
@@ -60,7 +60,7 @@ class MongoDatabase {
 
   WriteConcern? _writeConcern;
   AuthenticationScheme? authenticationScheme;
-  ReadPreference readPreference = ReadPreference.primary;
+  ReadPreference? readPreference;
 
   //Todo temp solution
   Server get server => topology.getServer();
@@ -70,6 +70,10 @@ class MongoDatabase {
 
   @override
   String toString() => 'Db($databaseName,$_debugInfo)';
+
+  /// Sets the readPreference at Database level
+  void setReadPref(ReadPreference? readPreference) =>
+      this.readPreference = readPreference;
 
   /// Db constructor expects [valid mongodb URI](https://docs.mongodb.com/manual/reference/connection-string/).
   /// For example next code points to local mongodb server on default mongodb port, database *testdb*

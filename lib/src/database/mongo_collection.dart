@@ -24,11 +24,15 @@ import '../../src_old/database/utils/parms_utils.dart';
 class MongoCollection {
   MongoDatabase db;
   String collectionName;
-  ReadPreference readPreference = ReadPreference.primary;
+  ReadPreference? readPreference;
 
   MongoCollection(this.db, this.collectionName);
 
   String fullName() => '${db.databaseName}.$collectionName';
+
+  /// Sets the readPreference at Collection level
+  void setReadPref(ReadPreference? readPreference) =>
+      this.readPreference = readPreference;
 
   @Deprecated('Since version 4.2. Use insertOne() or replaceOne() instead.')
   Future<Map<String, dynamic>> save(Map<String, dynamic> document,

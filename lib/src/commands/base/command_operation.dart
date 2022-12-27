@@ -56,11 +56,13 @@ class CommandOperation extends SimpleCommand {
       // even if not necessary, waiting for the future check of the session
       // value.
       if (collection != null) {
-        readPreference = resolveReadPreference(collection, options,
+        readPreference = resolveReadPreference(collection,
+                options: options,
                 inheritReadPreference: !hasAspect(Aspect.noInheritOptions)) ??
             ReadPreference.primary;
       } else {
-        readPreference = resolveReadPreference(db, options,
+        readPreference = resolveReadPreference(db,
+                options: options,
                 inheritReadPreference: !hasAspect(Aspect.noInheritOptions)) ??
             ReadPreference.primary;
       }

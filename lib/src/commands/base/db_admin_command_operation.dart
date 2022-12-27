@@ -18,7 +18,7 @@ class DbAdminCommandOperation extends OperationBase {
 
   @override
   Future<MongoDocument> execute() async => executeOnServer(
-      db.topology.getServer(readPreferenceMode: db.readPreference.mode));
+      db.topology.getServer(readPreferenceMode: db.readPreference?.mode));
 
   @override
   @protected

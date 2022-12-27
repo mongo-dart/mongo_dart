@@ -46,7 +46,7 @@ abstract class Topology {
   // *** To be overridden. This behavior works just for standalone typology
   /// Retruns the server based on the readPreference
   Server getServer(
-          {ReadPreferenceMode readPreferenceMode =
+          {ReadPreferenceMode? readPreferenceMode =
               ReadPreferenceMode.primary}) =>
       isConnected ? servers.first : throw MongoDartError('No primary detected');
 
