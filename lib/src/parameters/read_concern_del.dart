@@ -1,4 +1,4 @@
-/// Read Concern Levels
+/* /// Read Concern Levels
 /// The following read concern levels are available:
 
 /// | Level | Description |
@@ -29,3 +29,4 @@ class ReadConcern {
   ReadConcern.fromString(String levelString)
       : level = ReadConcernLevel.values.byName(levelString);
 }
+ */

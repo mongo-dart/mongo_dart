@@ -1,5 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/parameters/write_concern.dart';
+import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
 import '../../../database/mongo_database.dart';

@@ -3,7 +3,7 @@ import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/database/mongo_database.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/parameters/write_concern.dart';
+import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
 import 'package:mongo_dart/src/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';

@@ -12,7 +12,7 @@ import 'package:mongo_dart/mongo_dart_old.dart'
         keySparseIndex,
         keyUniqueIndex,
         keyWriteConcern;
-import 'package:mongo_dart/src/parameters/write_concern.dart';
+import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
 
 import '../../../database/mongo_collection.dart';
 

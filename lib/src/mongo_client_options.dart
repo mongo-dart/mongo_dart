@@ -1,10 +1,10 @@
 import 'package:mongo_dart/src/settings/connection_pool_settings.dart';
 
+import 'commands/parameters/read_concern.dart';
 import 'commands/parameters/read_preference.dart';
 import 'core/auth/auth.dart';
 import 'core/compression.dart';
 import 'mongo_client.dart';
-import 'parameters/read_concern.dart';
 
 /// Describes all possible URI query options for the mongo client
 /// @public

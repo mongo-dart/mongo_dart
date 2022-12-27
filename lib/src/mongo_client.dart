@@ -10,7 +10,7 @@ import 'mongo_client_options.dart';
 import 'utils/decode_dns_seed_list.dart';
 import 'utils/decode_url_parameters.dart';
 import 'utils/split_hosts.dart';
-import 'parameters/write_concern.dart';
+import 'commands/parameters/write_concern.dart';
 import 'database/mongo_database.dart';
 
 typedef ServerApiVersion = Map<String, String>;

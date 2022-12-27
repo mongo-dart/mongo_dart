@@ -133,6 +133,9 @@ enum ReadConcernLevel {
 /// see https://docs.mongodb.com/manual/reference/read-concern/
 class ReadConcern {
   ReadConcern(this.level);
+  ReadConcern.fromString(String levelString)
+      : level = ReadConcernLevel.values.byName(levelString);
+
   ReadConcernLevel level;
 
   Map<String, Object> toMap() =>

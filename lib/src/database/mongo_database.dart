@@ -43,7 +43,7 @@ import '../core/network/abstract/connection_base.dart';
 import '../topology/server.dart';
 import '../mongo_client.dart';
 import '../utils/split_hosts.dart';
-import '../parameters/write_concern.dart';
+import '../commands/parameters/write_concern.dart';
 import 'mongo_collection.dart';
 
 class MongoDatabase {

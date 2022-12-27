@@ -1,7 +1,8 @@
-import '../core/info/server_status.dart';
-import '../utils/map_keys.dart';
+import '../../core/info/server_status.dart';
+import '../../utils/map_keys.dart';
 
-/// [WriteConcern] control the acknowledgment of write operations with various paramaters.
+/// [WriteConcern] control the acknowledgment of write operations with
+/// various paramaters.
 class WriteConcern {
   /// Denotes the Write Concern level that takes the following values
   /// ([int] or [String]):
@@ -44,11 +45,14 @@ class WriteConcern {
   /// - clientSupplied
   ///   - The write concern was specified in the application.
   /// - customDefault
-  ///   - The write concern originated from a custom defined default value. See setDefaultRWConcern.
+  ///   - The write concern originated from a custom defined default value.
+  ///     See setDefaultRWConcern.
   /// - getLastErrorDefaults
-  ///   - The write concern originated from the replica set’s settings.getLastErrorDefaults field.
+  ///   - The write concern originated from the replica set’s
+  ///       settings.getLastErrorDefaults field.
   /// - implicitDefault
-  ///   - The write concern originated from the server in absence of all other write concern specifications.
+  ///   - The write concern originated from the server in absence of all other
+  ///       write concern specifications.
   ///
   /// ** NOTE **
   ///
@@ -71,21 +75,11 @@ class WriteConcern {
         j = writeConcernMap[keyJ] as bool? ?? false,
         provenance = writeConcernMap[keyProvenance] as String?;
 
-  /// No exceptions are raised, even for network issues.
-  @Deprecated('No more used')
-  // ignore: constant_identifier_names
-  static const ERRORS_IGNORED =
-      WriteConcern(w: -1, wtimeout: 0, fsync: false, j: false);
-
   /// Write operations that use this write concern will return as soon as the
   /// message is written to the socket.
   /// Exceptions are raised for network issues, but not server errors.
   static const unacknowledged =
       WriteConcern(w: 0, wtimeout: 0, fsync: false, j: false);
-
-  @Deprecated('Use unacknowledged instead')
-  // ignore: constant_identifier_names
-  static const UNACKNOWLEDGED = unacknowledged;
 
   /// Write operations that use this write concern will wait for
   /// acknowledgement from the primary server before returning.
@@ -93,25 +87,10 @@ class WriteConcern {
   static const acknowledged =
       WriteConcern(w: 1, wtimeout: 0, fsync: false, j: false);
 
-  @Deprecated('Use acknowledged instead')
-  // ignore: constant_identifier_names
-  static const ACKNOWLEDGED = acknowledged;
-
   /// Exceptions are raised for network issues, and server errors;
   /// waits for at least 2 servers for the write operation.
   static const replicaAcknowledged =
       WriteConcern(w: 2, wtimeout: 0, fsync: false, j: false);
-
-  @Deprecated('Use replicaAcknowledged instead')
-  // ignore: constant_identifier_names
-  static const REPLICA_ACKNOWLEDGED = replicaAcknowledged;
-
-  /// Exceptions are raised for network issues, and server errors;
-  /// the write operation waits for the server to flush
-  /// the data to disk.
-  @Deprecated('No more used')
-  // ignore: constant_identifier_names
-  static const FSYNCED = WriteConcern(w: 1, wtimeout: 0, fsync: true, j: false);
 
   /// Exceptions are raised for network issues, and server errors; the write
   /// operation waits for the server to
@@ -119,18 +98,10 @@ class WriteConcern {
   static const journaled =
       WriteConcern(w: 1, wtimeout: 0, fsync: false, j: true);
 
-  @Deprecated('Use journaled instead')
-  // ignore: constant_identifier_names
-  static const JOURNALED = journaled;
-
   /// Exceptions are raised for network issues, and server errors; waits on a
   /// majority of servers for the write operation.
   static const majority =
       WriteConcern(w: 'majority', wtimeout: 0, fsync: false, j: false);
-
-  @Deprecated('Use majority instead')
-  // ignore: constant_identifier_names
-  static const MAJORITY = majority;
 
   /// Gets the getlasterror command for this write concern.
   Map<String, dynamic> get command {

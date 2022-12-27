@@ -15,7 +15,7 @@ import 'package:mongo_dart/mongo_dart_old.dart'
         keyValidator,
         keyViewOn,
         keyWriteConcern;
-import 'package:mongo_dart/src/parameters/write_concern.dart';
+import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
 
 import '../../../database/mongo_database.dart';
 

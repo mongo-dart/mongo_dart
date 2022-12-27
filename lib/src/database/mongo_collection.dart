@@ -4,7 +4,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 import '../../mongo_dart_old.dart';
 import 'mongo_database.dart';
-import '../parameters/write_concern.dart';
+import '../commands/parameters/write_concern.dart';
 import '../commands/administration_commands/drop_indexes_command/drop_indexes_command.dart';
 import '../commands/administration_commands/drop_indexes_command/drop_indexes_options.dart';
 import '../commands/administration_commands/listt_indexes_command/list_indexes_command.dart';
