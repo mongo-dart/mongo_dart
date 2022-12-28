@@ -20,21 +20,21 @@ import '../../mongo_dart_old.dart'
         key$Query,
         keyName,
         keyOk;
-import '../commands/parameters/read_preference.dart';
+import '../command/parameters/read_preference.dart';
 import '../core/auth/auth.dart';
 import '../../src_old/auth/mongodb_cr_authenticator.dart';
 import '../core/auth/scram_sha1_authenticator.dart';
 import '../core/auth/scram_sha256_authenticator.dart';
-import '../commands/administration_commands/drop_command/drop_command.dart';
-import '../commands/administration_commands/drop_command/drop_options.dart';
-import '../commands/administration_commands/drop_database_command/drop_database_command.dart';
-import '../commands/administration_commands/drop_database_command/drop_database_options.dart';
-import '../commands/administration_commands/list_collections_command/list_collections_command.dart';
-import '../commands/administration_commands/list_collections_command/list_collections_options.dart';
-import '../commands/diagnostic_commands/ping_command/ping_command.dart';
+import '../command/administration_commands/drop_command/drop_command.dart';
+import '../command/administration_commands/drop_command/drop_options.dart';
+import '../command/administration_commands/drop_database_command/drop_database_command.dart';
+import '../command/administration_commands/drop_database_command/drop_database_options.dart';
+import '../command/administration_commands/list_collections_command/list_collections_command.dart';
+import '../command/administration_commands/list_collections_command/list_collections_options.dart';
+import '../command/diagnostic_commands/ping_command/ping_command.dart';
 import '../topology/abstract/topology.dart';
 import 'modern_cursor.dart';
-import '../commands/base/command_operation.dart';
+import '../command/base/command_operation.dart';
 import '../core/error/mongo_dart_error.dart';
 import '../core/message/abstract/mongo_message.dart';
 import '../core/message/deprecated/mongo_reply_message.dart';
@@ -43,7 +43,7 @@ import '../core/network/abstract/connection_base.dart';
 import '../topology/server.dart';
 import '../mongo_client.dart';
 import '../utils/split_hosts.dart';
-import '../commands/parameters/write_concern.dart';
+import '../command/parameters/write_concern.dart';
 import 'mongo_collection.dart';
 
 class MongoDatabase {

@@ -2,6 +2,8 @@ import 'package:logging/logging.dart';
 import 'package:mongo_dart/src/session/session_options.dart';
 import 'package:mongo_dart/src/topology/discover.dart';
 
+import 'command/parameters/read_concern.dart';
+import 'command/parameters/read_preference.dart';
 import 'session/client_session.dart';
 import 'core/error/mongo_dart_error.dart';
 import 'topology/abstract/topology.dart';
@@ -10,7 +12,7 @@ import 'mongo_client_options.dart';
 import 'utils/decode_dns_seed_list.dart';
 import 'utils/decode_url_parameters.dart';
 import 'utils/split_hosts.dart';
-import 'commands/parameters/write_concern.dart';
+import 'command/parameters/write_concern.dart';
 import 'database/mongo_database.dart';
 
 typedef ServerApiVersion = Map<String, String>;
@@ -70,9 +72,9 @@ class MongoClient {
 
   DateTime? clientClusterTime;
 
-  // ReadConcern
-  // Read Preference
-  WriteConcern? writeConcern;
+  ReadConcern? get readConvern => mongoClientOptions.readConcern;
+  ReadPreference? get readPreference => mongoClientOptions.readPreference;
+  WriteConcern? get writeConcern => mongoClientOptions.writeConcern;
 
   Set<MongoDatabase> databases = <MongoDatabase>{};
 

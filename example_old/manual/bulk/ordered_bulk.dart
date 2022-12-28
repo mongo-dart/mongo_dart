@@ -1,6 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
 
 void main() async {
   var client = MongoClient('mongodb://127.0.0.1/testdb');
@@ -13,7 +12,7 @@ void main() async {
 
   /// Here we create the bulk object. OrderedBulk will execute
   /// all the operations in the same order as their declaration
-  var bulk = OrderedBulk(collection, writeConcern: WriteConcern(w: 1));
+  var bulk = OrderedBulk(collection, writeConcern: WriteConcern(w: W(1)));
 
   /// Bulk has the following methods for inserting operations:
   /// - insertOne

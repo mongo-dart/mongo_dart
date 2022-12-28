@@ -1,6 +1,6 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
+import 'package:mongo_dart_query/mongo_dart_query.dart';
 
 /// Watch does not work on Standalone systems
 /// Only Replica Set and Sharded Cluster

@@ -1,7 +1,8 @@
+import 'package:mongo_dart/src/command/parameters/write_concern.dart';
 import 'package:mongo_dart/src/settings/connection_pool_settings.dart';
 
-import 'commands/parameters/read_concern.dart';
-import 'commands/parameters/read_preference.dart';
+import 'command/parameters/read_concern.dart';
+import 'command/parameters/read_preference.dart';
 import 'core/auth/auth.dart';
 import 'core/compression.dart';
 import 'mongo_client.dart';
@@ -88,7 +89,8 @@ class MongoClientOptions
   /// higher supported)
   // Todo ReadConcernLike? readConcern;
   /// The level of isolation */
-  ReadConcernLevel? readConcernLevel;
+  //ReadConcernLevel? readConcernLevel;
+  ReadConcern? readConcern;
 
   /// Specifies the read preferences for this connection
   ReadPreference? readPreference;
@@ -157,13 +159,14 @@ class MongoClientOptions
   /// mongos like service
   bool? loadBalanced;
 
+  WriteConcern? writeConcern;
+
   /// The write concern w value
   // Todo W? w;
   /// The write concern timeout
-  int? wtimeoutMS;
-
+  //int? wtimeoutMS;
   /// The journal write concern
-  bool? journal;
+  //bool? journal;
 
   /// Validate mongod server certificate against Certificate Authority
   bool? sslValidate;

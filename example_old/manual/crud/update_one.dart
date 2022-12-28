@@ -1,6 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
 
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
@@ -43,7 +42,7 @@ void main() async {
 
   var res = await collection.updateOne(where.eq('member', 'abc123'),
       ModifierBuilder().set('status', 'A').inc('points', 1),
-      writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+      writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
   print('Modified documents: ${res.nModified}'); // 1
 

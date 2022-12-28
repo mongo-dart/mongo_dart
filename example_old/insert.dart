@@ -1,6 +1,6 @@
 import 'package:mongo_dart/src/database/mongo_collection.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
+import 'package:mongo_dart/src/command/parameters/write_concern.dart';
 
 void main() async {
   var client = MongoClient('mongodb://127.0.0.1/test_insert');

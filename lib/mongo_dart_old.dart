@@ -21,7 +21,7 @@ import 'src/core/message/abstract/mongo_message.dart';
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_aggregation.dart';
 export 'package:mongo_dart_query/mongo_dart_query.dart' hide keyQuery;
-export 'package:mongo_dart/src/commands/operation.dart';
+export 'package:mongo_dart/src/command/command.dart';
 export 'package:mongo_dart/src/utils/map_keys.dart';
 
 //part 'src_old/connection_pool.dart';

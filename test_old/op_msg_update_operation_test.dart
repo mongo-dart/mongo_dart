@@ -2,10 +2,9 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/mongo_database.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
-import 'package:mongo_dart/src/commands/query_and_write_operation_commands/update_operation/update_operation.dart';
-import 'package:mongo_dart/src/commands/query_and_write_operation_commands/update_operation/update_options.dart';
-import 'package:mongo_dart/src/commands/query_and_write_operation_commands/update_operation/update_statement.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/update_operation.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/update_options.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/update_statement.dart';
 import 'package:mongo_dart/src_old/database/utils/update_document_check.dart';
 import 'package:test/test.dart';
 
@@ -142,7 +141,7 @@ void main() async {
             ],
             ordered: false,
             updateOptions: UpdateOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateOperation.execute();
 
         expect(res, isNotNull);
@@ -185,7 +184,7 @@ void main() async {
             ],
             ordered: false,
             updateOptions: UpdateOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateOperation.execute();
 
         expect(res, isNotNull);
@@ -229,7 +228,7 @@ void main() async {
             ],
             ordered: false,
             updateOptions: UpdateOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateOperation.execute();
 
         expect(res, isNotNull);
@@ -277,7 +276,7 @@ void main() async {
             ],
             ordered: false,
             updateOptions: UpdateOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateOperation.execute();
 
         expect(res, isNotNull);
@@ -331,7 +330,7 @@ void main() async {
             ],
             ordered: false,
             updateOptions: UpdateOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateOperation.execute();
 
         expect(res, isNotNull);
@@ -412,7 +411,7 @@ void main() async {
             ],
             ordered: false,
             updateOptions: UpdateOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateOperation.execute();
 
         expect(res, isNotNull);
@@ -449,7 +448,7 @@ void main() async {
             ],
             ordered: false,
             updateOptions: UpdateOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateOperation.execute();
 
         expect(res, isNotNull);
@@ -646,7 +645,7 @@ void main() async {
               r'$inc': {'points': 1}
             }),
             updateOneOptions: UpdateOneOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateOneOperation.executeDocument();
 
         expect(res, isNotNull);
@@ -687,7 +686,7 @@ void main() async {
               r'$inc': {'points': 1}
             }),
             updateManyOptions: UpdateManyOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateManyOperation.executeDocument();
 
         expect(res, isNotNull);
@@ -775,7 +774,7 @@ void main() async {
             ]),
             ordered: false,
             updateManyOptions: UpdateManyOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateManyOperation.executeDocument();
 
         expect(res, isNotNull);
@@ -854,7 +853,7 @@ void main() async {
             ]),
             ordered: false,
             updateManyOptions: UpdateManyOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateManyOperation.executeDocument();
 
         expect(res, isNotNull);
@@ -1033,7 +1032,7 @@ void main() async {
 
         var res = await collection.modernUpdate(where.eq('member', 'abc123'),
             ModifierBuilder().set('status', 'A').inc('points', 1),
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+            writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -1074,7 +1073,7 @@ void main() async {
 
         var res = await collection.modernUpdate(where.eq('member', 'abc123'),
             ModifierBuilder().set('status', 'A').inc('points', 1),
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+            writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -1116,7 +1115,7 @@ void main() async {
         var res = await collection.modernUpdate(
             where, ModifierBuilder().set('status', 'A').inc('points', 1),
             multi: true,
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+            writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -1169,7 +1168,7 @@ void main() async {
                   ..addStage(Unset(['misc1', 'misc2'])))
                 .build(),
             multi: true,
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+            writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -1250,7 +1249,7 @@ void main() async {
                   })))
                 .build(),
             multi: true,
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+            writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -1445,7 +1444,7 @@ void main() async {
 
         var res = await collection.updateOne(where.eq('member', 'abc123'),
             ModifierBuilder().set('status', 'A').inc('points', 1),
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+            writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -1517,7 +1516,7 @@ void main() async {
 
         var res = await collection.updateMany(
             where, ModifierBuilder().set('status', 'A').inc('points', 1),
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+            writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -1564,7 +1563,7 @@ void main() async {
               'status': '1',
               'points': 0,
             },
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+            writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -1697,7 +1696,7 @@ void main() async {
                   }))
                   ..addStage(Unset(['misc1', 'misc2'])))
                 .build(),
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+            writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -1777,7 +1776,7 @@ void main() async {
                     }
                   })))
                 .build(),
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+            writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);

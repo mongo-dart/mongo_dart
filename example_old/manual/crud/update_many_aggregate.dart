@@ -1,6 +1,6 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
+import 'package:mongo_dart_query/mongo_aggregation.dart';
 
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
@@ -50,7 +50,7 @@ void main() async {
             }))
             ..addStage(Unset(['misc1', 'misc2'])))
           .build(),
-      writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+      writeConcern: WriteConcern(w: W('majority'), wtimeout: 5000));
 
   print('Modified documents: ${res.nModified}'); // 2
 

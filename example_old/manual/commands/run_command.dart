@@ -1,5 +1,5 @@
-import 'package:mongo_dart/src/commands/base/command_operation.dart';
-import 'package:mongo_dart/src/commands/diagnostic_commands/ping_command/ping_command.dart';
+import 'package:mongo_dart/src/command/base/command_operation.dart';
+import 'package:mongo_dart/src/command/diagnostic_commands/ping_command/ping_command.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 
 const dbName = 'mongo-dart-example';

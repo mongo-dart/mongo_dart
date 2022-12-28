@@ -3,8 +3,7 @@ import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/database/mongo_database.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
-import 'package:mongo_dart/src/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
 
@@ -144,7 +143,7 @@ void main() async {
         // environment with at most three replica set members).
         var ret = await collection.insertOne(
             {'item': 'envelopes', 'qty': 100, 'type': 'Self-Sealing'},
-            writeConcern: WriteConcern(w: 4, wtimeout: 5000, j: true));
+            writeConcern: WriteConcern(w: W(4), wtimeout: 5000, j: true));
         if (isStandalone) {
           expect(ret.ok, 0.0);
           expect(ret.operationSucceeded, isFalse);
@@ -479,7 +478,7 @@ void main() async {
         var deleteOperation = DeleteManyOperation(
             collection, DeleteManyStatement({}),
             deleteManyOptions: DeleteManyOptions(
-                writeConcern: WriteConcern(w: 'majority', wtimeout: 5000)));
+                writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await deleteOperation.executeDocument(db.server);
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -650,7 +649,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var res = await collection.deleteMany(<String, Object>{},
-            writeConcern: WriteConcern(w: 'majority', wtimeout: 5000));
+            writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);

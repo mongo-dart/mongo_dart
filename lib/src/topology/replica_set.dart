@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/src/topology/server.dart';
 
-import '../commands/parameters/read_preference.dart';
+import '../command/parameters/read_preference.dart';
 import '../core/error/mongo_dart_error.dart';
 import 'abstract/topology.dart';
 

@@ -3,12 +3,12 @@ import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/mongo_database.dart';
 import 'package:mongo_dart/src/database/mongo_collection.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
-import 'package:mongo_dart/src/commands/administration_commands/get_parameter_command/get_parameter_command.dart';
-import 'package:mongo_dart/src/commands/administration_commands/kill_cursors_command/kill_cursors_command.dart';
-import 'package:mongo_dart/src/commands/administration_commands/get_all_parameters_command/get_all_parameters_command.dart';
+import 'package:mongo_dart/src/command/administration_commands/get_parameter_command/get_parameter_command.dart';
+import 'package:mongo_dart/src/command/administration_commands/kill_cursors_command/kill_cursors_command.dart';
+import 'package:mongo_dart/src/command/administration_commands/get_all_parameters_command/get_all_parameters_command.dart';
 
-import 'package:mongo_dart/src/commands/query_and_write_operation_commands/get_more_command/get_more_command.dart';
-import 'package:mongo_dart/src/commands/query_and_write_operation_commands/get_more_command/get_more_options.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/get_more_command/get_more_command.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/get_more_command/get_more_options.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:test/test.dart';
 

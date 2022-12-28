@@ -3,8 +3,7 @@ import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/database/mongo_database.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/commands/parameters/write_concern.dart';
-import 'package:mongo_dart/src/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:test/test.dart';
 
 import '../test/utils/insert_data.dart';
@@ -270,7 +269,8 @@ void main() async {
         expect(retOrders.ok, 1.0);
         expect(retOrders.isSuccess, isTrue);
 
-        var bulk = UnorderedBulk(collection, writeConcern: WriteConcern(w: 1));
+        var bulk = UnorderedBulk(collection,
+            writeConcern: WriteConcern(w: primaryAcknowledged));
         bulk.deleteMany(DeleteManyStatement({'status': 'D'}));
 
         bulk.deleteOne(DeleteOneStatement(
@@ -345,7 +345,8 @@ void main() async {
         expect(retOrders.ok, 1.0);
         expect(retOrders.isSuccess, isTrue);
 
-        var bulk = OrderedBulk(collection, writeConcern: WriteConcern(w: 1));
+        var bulk = OrderedBulk(collection,
+            writeConcern: WriteConcern(w: primaryAcknowledged));
         bulk.deleteMany(DeleteManyStatement({'status': 'D'}));
 
         bulk.deleteOne(DeleteOneStatement(
@@ -379,7 +380,8 @@ void main() async {
         expect(retOrders.ok, 1.0);
         expect(retOrders.isSuccess, isTrue);
 
-        var bulk = UnorderedBulk(collection, writeConcern: WriteConcern(w: 1));
+        var bulk = UnorderedBulk(collection,
+            writeConcern: WriteConcern(w: primaryAcknowledged));
         bulk.updateMany(UpdateManyStatement(
             where.eq('status', 'D').map[key$Query],
             ModifierBuilder().set('status', 'd').map));
@@ -422,7 +424,8 @@ void main() async {
         expect(retOrders.ok, 1.0);
         expect(retOrders.isSuccess, isTrue);
 
-        var bulk = OrderedBulk(collection, writeConcern: WriteConcern(w: 1));
+        var bulk = OrderedBulk(collection,
+            writeConcern: WriteConcern(w: primaryAcknowledged));
         bulk.updateMany(UpdateManyStatement(
             where.eq('status', 'D').map[key$Query],
             ModifierBuilder().set('status', 'd').map));
@@ -1326,7 +1329,7 @@ void main() async {
         ],
             ordered: true,
             writeConcern: WriteConcern(
-              w: 4,
+              w: W(4),
               wtimeout: 100,
             ));
 
@@ -1408,12 +1411,7 @@ void main() async {
               }
             }
           }
-        ],
-            ordered: false,
-            writeConcern: WriteConcern(
-              w: 4,
-              wtimeout: 100,
-            ));
+        ], ordered: false, writeConcern: WriteConcern(w: W(4), wtimeout: 100));
 
         if (isStandalone) {
           expect(ret.ok, 0.0);
