@@ -1,8 +1,5 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/update_statement.dart';
-import 'package:mongo_dart/src_old/database/utils/update_document_check.dart';
-
-import '../../../../core/error/mongo_dart_error.dart';
+import 'package:mongo_dart/mongo_dart.dart';
+import ' ../../../../../../utils/update_document_check.dart';
 
 class UpdateOneStatement extends UpdateStatement {
   UpdateOneStatement(Map<String, Object?> q, Object u,

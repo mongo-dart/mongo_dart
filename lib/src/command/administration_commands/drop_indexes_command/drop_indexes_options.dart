@@ -1,7 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../../../database/mongo_collection.dart';
-
 class DropIndexesOptions {
   /// The WriteConcern for this insert operation
   WriteConcern? writeConcern;

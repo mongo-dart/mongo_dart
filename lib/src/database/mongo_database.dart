@@ -16,7 +16,6 @@ import '../../mongo_dart_old.dart'
         SelectorBuilder,
         ServerStatusCommand,
         ServerStatusOptions,
-        State,
         key$Query,
         keyName,
         keyOk;
@@ -45,6 +44,7 @@ import '../mongo_client.dart';
 import '../utils/split_hosts.dart';
 import '../command/parameters/write_concern.dart';
 import 'mongo_collection.dart';
+import 'state.dart';
 
 class MongoDatabase {
   MongoDatabase.modern(this.mongoClient, this.databaseName);

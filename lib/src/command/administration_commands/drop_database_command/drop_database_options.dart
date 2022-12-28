@@ -1,7 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../../../database/mongo_database.dart';
-
 /// DropDatabase command options;
 ///
 /// Optional parameters that can be used whith the drop command:

@@ -1,5 +1,4 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 
 /// Watch does not work on Standalone systems
@@ -69,7 +68,7 @@ void main() async {
       writeConcern: WriteConcern.majority);
 
   await collection.insertOne({'custId': 4, 'name': 'Nathan'},
-      writeConcern: WriteConcern.majority);
+      insertOneOptions: InsertOneOptions(writeConcern: WriteConcern.majority));
 
   var waitingCount = 0;
   await Future.doWhile(() async {

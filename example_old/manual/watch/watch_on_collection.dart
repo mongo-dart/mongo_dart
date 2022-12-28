@@ -1,5 +1,4 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart_query/mongo_aggregation.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 

@@ -1,8 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/mongo_database.dart';
-import 'package:mongo_dart/src/database/mongo_collection.dart';
-import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src/command/administration_commands/create_command/create_command.dart';
 import 'package:mongo_dart/src/command/administration_commands/create_command/create_options.dart';
 import 'package:decimal/decimal.dart';
@@ -116,12 +113,14 @@ void main() async {
 
       var writeResult = await collection.insertOne(
           {'name': 'Anand', 'phone': '451 3874643', 'status': 'Incomplete'},
-          writeConcern: WriteConcern.majority);
+          insertOneOptions:
+              InsertOneOptions(writeConcern: WriteConcern.majority));
       expect(writeResult.isSuccess, isTrue);
 
       writeResult = await collection.insertOne(
           {'name': 'Amanda', 'status': 'Updated'},
-          writeConcern: WriteConcern.majority);
+          insertOneOptions:
+              InsertOneOptions(writeConcern: WriteConcern.majority));
       expect(writeResult.isSuccess, isFalse);
       expect(writeResult.operationSucceeded, isTrue);
       expect(writeResult.hasWriteErrors, isTrue);

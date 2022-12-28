@@ -1,6 +1,4 @@
-import 'package:mongo_dart/src/database/mongo_collection.dart';
-import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/command/parameters/write_concern.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 
 void main() async {
   var client = MongoClient('mongodb://127.0.0.1/test_insert');
@@ -16,7 +14,9 @@ void main() async {
   await test.drop();
   print('Sequentially inserting 1000 records with aknowledgment');
   for (var elem in data) {
-    await test.insertOne(elem, writeConcern: WriteConcern.acknowledged);
+    await test.insertOne(elem,
+        insertOneOptions:
+            InsertOneOptions(writeConcern: WriteConcern.acknowledged));
   }
 
   print(stopwatch.elapsed);

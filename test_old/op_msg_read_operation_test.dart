@@ -2,15 +2,9 @@
 
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/mongo_database.dart';
-import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
-import 'package:mongo_dart/src/command/aggregation_commands/count/count_operation.dart';
-import 'package:mongo_dart/src/command/aggregation_commands/count/count_options.dart';
-import 'package:mongo_dart/src/command/aggregation_commands/distinct/distinct_operation.dart';
-import 'package:mongo_dart/src/command/aggregation_commands/distinct/distinct_options.dart';
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/get_more_command/get_more_command.dart';
 import 'package:decimal/decimal.dart';
+import 'package:mongo_dart/src/database/state.dart';
 import 'package:test/test.dart';
 
 import '../test/utils/insert_data.dart';
@@ -1158,7 +1152,9 @@ db.runCommand(
 
       await Future.delayed(Duration(seconds: 2));
 
-      await collection.insertOne({'a': 3}, writeConcern: WriteConcern.majority);
+      await collection.insertOne({'a': 3},
+          insertOneOptions:
+              InsertOneOptions(writeConcern: WriteConcern.majority));
 
       await Future.doWhile(() async {
         if (gotFifth) {
@@ -1219,7 +1215,9 @@ db.runCommand(
 
       await Future.delayed(Duration(seconds: 2));
 
-      await collection.insertOne({'a': 3}, writeConcern: WriteConcern.majority);
+      await collection.insertOne({'a': 3},
+          insertOneOptions:
+              InsertOneOptions(writeConcern: WriteConcern.majority));
 
       await Future.doWhile(() async {
         if (gotFifth) {

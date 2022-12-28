@@ -5,12 +5,12 @@ import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:mongo_dart/src/database/document_types.dart';
 
 import '../../../../core/error/mongo_dart_error.dart';
 import '../../../../core/network/abstract/connection_base.dart';
 import '../../../../database/mongo_collection.dart';
+import '../../../../database/state.dart';
 import '../../../../topology/server.dart';
 import 'bulk_options.dart';
 

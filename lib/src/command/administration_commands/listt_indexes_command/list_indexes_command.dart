@@ -1,8 +1,5 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
-import '../../../database/mongo_database.dart';
-import '../../../database/mongo_collection.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 import '../../base/command_operation.dart';
-import 'list_indexes_options.dart';
 
 /// listIndexes command.
 ///

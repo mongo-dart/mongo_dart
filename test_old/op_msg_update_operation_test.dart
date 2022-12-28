@@ -1,11 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/mongo_database.dart';
-import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/update_operation.dart';
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/update_options.dart';
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/update_statement.dart';
-import 'package:mongo_dart/src_old/database/utils/update_document_check.dart';
+import 'package:mongo_dart/src/utils/update_document_check.dart';
 import 'package:test/test.dart';
 
 import '../test/utils/insert_data.dart';

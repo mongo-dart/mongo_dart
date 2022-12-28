@@ -4,12 +4,10 @@ library database_tests;
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:mongo_dart/src/database/mongo_database.dart';
-import 'package:mongo_dart/src/database/mongo_collection.dart';
-import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/command/diagnostic_commands/ping_command/ping_command.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
+import 'package:mongo_dart/src/database/state.dart';
 import 'dart:async';
 import 'package:test/test.dart';
 
@@ -1168,8 +1166,9 @@ Future testIndexCreationOnCollection() async {
     }
     await collection.insertAll(toInsert);
 
-    /* var resInsert = */ await collection
-        .insertOne({'a': 200}, writeConcern: WriteConcern.unacknowledged);
+    /* var resInsert = */ await collection.insertOne({'a': 200},
+        insertOneOptions:
+            InsertOneOptions(writeConcern: WriteConcern.unacknowledged));
 
     // Todo correct
     //expect(resInsert['ok'], 1.0);

@@ -1,7 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../../../database/mongo_database.dart';
-
 class AggregateOptions {
   /// Enables writing to temporary files. When set to true, a
   /// ggregation stages can write data to the _tmp subdirectory in the dbPath

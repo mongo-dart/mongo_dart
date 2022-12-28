@@ -1,5 +1,4 @@
-part of mongo_dart;
-
+@Deprecated('Db has no more state')
 class State {
   final String _value;
   const State._internal(this._value);

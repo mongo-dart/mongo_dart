@@ -1,5 +1,11 @@
-import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/mongo_client.dart';
+import 'package:mongo_dart/mongo_dart.dart'
+    show
+        CreateCollectionOptions,
+        InsertOneOptions,
+        MongoClient,
+        WriteConcern,
+        keyErrmsg,
+        keyOk;
 
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
@@ -50,14 +56,14 @@ void main() async {
 
   var ret = await collection.insertOne(
       {'name': 'Anand', 'phone': '451 3874643', 'status': 'Incomplete'},
-      writeConcern: WriteConcern.majority);
+      insertOneOptions: InsertOneOptions(writeConcern: WriteConcern.majority));
 
   if (!ret.isSuccess) {
     print('Error detected in record insertion');
   }
 
   ret = await collection.insertOne({'name': 'Amanda', 'status': 'Updated'},
-      writeConcern: WriteConcern.majority);
+      insertOneOptions: InsertOneOptions(writeConcern: WriteConcern.majority));
 
   if (!ret.isSuccess) {
     print(ret.writeError?.errmsg);

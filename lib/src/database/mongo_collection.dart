@@ -1,24 +1,8 @@
-//part of mongo_dart;
-
+import 'package:bson/bson.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-
-import '../../mongo_dart_old.dart';
-import 'mongo_database.dart';
-import '../command/administration_commands/drop_indexes_command/drop_indexes_command.dart';
-import '../command/administration_commands/drop_indexes_command/drop_indexes_options.dart';
-import '../command/administration_commands/listt_indexes_command/list_indexes_command.dart';
-import '../command/administration_commands/listt_indexes_command/list_indexes_options.dart';
-import '../command/aggregation_commands/count/count_operation.dart';
-import '../command/aggregation_commands/count/count_options.dart';
-import '../command/aggregation_commands/count/count_result.dart';
-import '../command/aggregation_commands/distinct/distinct_operation.dart';
-import '../command/aggregation_commands/distinct/distinct_options.dart';
-import '../command/aggregation_commands/distinct/distinct_result.dart';
-import '../command/query_and_write_operation_commands/update_operation/update_operation.dart';
-import '../command/query_and_write_operation_commands/update_operation/update_options.dart';
-import '../command/query_and_write_operation_commands/update_operation/update_statement.dart';
+import 'package:mongo_dart_query/mongo_dart_query.dart';
+import '../utils/parms_utils.dart';
 import 'modern_cursor.dart';
-import '../../src_old/database/utils/parms_utils.dart';
 
 class MongoCollection {
   MongoDatabase db;
@@ -32,6 +16,17 @@ class MongoCollection {
   /// Sets the readPreference at Collection level
   void setReadPref(ReadPreference? readPreference) =>
       this.readPreference = readPreference;
+
+  // Insert one document into this collection
+  // Returns a WriteResult object
+  Future<WriteResult> insertOne(MongoDocument document,
+          {InsertOneOptions? insertOneOptions}) async =>
+      InsertOneOperation(this, document, insertOneOptions: insertOneOptions)
+          .executeDocument();
+
+  // ****************************************************
+  // ***********        OLD       ***********************
+  // ****************************************************
 
   @Deprecated('Since version 4.2. Use insertOne() or replaceOne() instead.')
   Future<Map<String, dynamic>> save(Map<String, dynamic> document,
@@ -277,7 +272,8 @@ class MongoCollection {
   /// Inserts a document into a collection
   Future<Map<String, dynamic>> insert(Map<String, dynamic> document,
       {WriteConcern? writeConcern}) async {
-    await insertOne(document, writeConcern: writeConcern);
+    await insertOne(document,
+        insertOneOptions: InsertOneOptions(writeConcern: writeConcern));
     // Todo change return type
     return {keyOk: 1.0};
   }
@@ -432,24 +428,6 @@ class MongoCollection {
         dropIndexesOptions: indexOptions, rawOptions: rawOptions);
 
     return command.execute();
-  }
-
-  // This method has been made available since version 3.2
-  // As we will use this with the new wire message available
-  // since version 3.6, we will check this last version
-  // in order to allow the execution
-  Future<WriteResult> insertOne(Map<String, dynamic> document,
-      {WriteConcern? writeConcern, bool? bypassDocumentValidation}) async {
-    return Future.sync(() {
-      var insertOneOptions = InsertOneOptions(
-          writeConcern: writeConcern,
-          bypassDocumentValidation: bypassDocumentValidation);
-
-      var insertOneOperation = InsertOneOperation(this, document,
-          insertOneOptions: insertOneOptions);
-
-      return insertOneOperation.executeDocument(db.server);
-    });
   }
 
   // This method has been made available since version 3.2

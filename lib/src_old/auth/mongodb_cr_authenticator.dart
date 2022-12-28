@@ -4,7 +4,6 @@ import 'package:mongo_dart/src/core/auth/auth.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
 import '../../src/core/network/abstract/connection_base.dart';
-import '../../src/database/mongo_database.dart';
 import '../../src/topology/server.dart';
 
 class MongoDbCRAuthenticator extends Authenticator {

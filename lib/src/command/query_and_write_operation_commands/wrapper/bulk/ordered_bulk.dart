@@ -1,7 +1,7 @@
-import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/mongo_dart.dart'
+    show Bulk, MongoCollection, WriteConcern, keyOrdered;
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 
-import '../../../../database/mongo_collection.dart';
 import 'bulk_options.dart';
 
 class OrderedBulk extends Bulk {

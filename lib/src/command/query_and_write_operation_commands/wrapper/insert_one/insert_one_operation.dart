@@ -1,11 +1,10 @@
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/insert_operation/insert_operation.dart';
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/return_classes/write_result.dart';
-
-import '../../../../core/network/abstract/connection_base.dart';
-import '../../../../database/mongo_collection.dart';
-import '../../../../topology/server.dart';
-import 'insert_one_options.dart';
+import 'package:mongo_dart/mongo_dart.dart'
+    show
+        InsertOneOptions,
+        InsertOperation,
+        MongoCollection,
+        WriteCommandType,
+        WriteResult;
 
 class InsertOneOperation extends InsertOperation {
   Map<String, Object?> document;
@@ -19,8 +18,7 @@ class InsertOneOperation extends InsertOperation {
           rawOptions: rawOptions,
         );
 
-  Future<WriteResult> executeDocument(Server server,
-      {ConnectionBase? connection}) async {
+  Future<WriteResult> executeDocument() async {
     var ret = await super.execute();
     return WriteResult.fromMap(WriteCommandType.insert, ret)
       ..id = ids.first

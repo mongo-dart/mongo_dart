@@ -1,7 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../../../database/mongo_database.dart';
-
 class UpdateOptions {
   /// A document expressing the [write concern](https://docs.mongodb.com/manual/reference/write-concern/).
   /// of the update operation. Omit to use the default write concern.

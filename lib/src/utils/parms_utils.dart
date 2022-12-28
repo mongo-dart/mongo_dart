@@ -1,6 +1,5 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show SelectorBuilder, key$Query;
-
-import '../../../src/core/error/mongo_dart_error.dart';
+import 'package:mongo_dart/mongo_dart.dart' show MongoDartError, key$Query;
+import 'package:mongo_dart_query/mongo_dart_query.dart';
 
 Map<String, dynamic> extractfilterMap(filter) {
   if (filter == null) {
