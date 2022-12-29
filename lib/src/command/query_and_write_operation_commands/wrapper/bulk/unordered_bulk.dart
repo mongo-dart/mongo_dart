@@ -26,7 +26,7 @@ class UnorderedBulk extends Bulk {
   ///   {'updateOne': {'filter': {'a': 1}, 'update': {'a': 10}}}
   ///   {'insertOne': {'document: {'a', 4}}},
   /// ])
-  Command insertCommand = <String, Object>{};
+  Command insertCommand = <String, dynamic>{};
 
   /// this contains the original insert command reference
   /// stored as pairs made of {<originaInputIndex>:
@@ -44,7 +44,7 @@ class UnorderedBulk extends Bulk {
   ///   {'updateOne': {'filter': {'a': 1}, 'update': {'a': 10}}}
   ///   {'insertOne': {'document: {'a', 4}}},
   /// ])
-  Command deleteCommand = <String, Object>{};
+  Command deleteCommand = <String, dynamic>{};
 
   /// this contains the original delete command reference
   /// stored as pairs made of {<originaInputIndex>:
@@ -62,7 +62,7 @@ class UnorderedBulk extends Bulk {
   ///   {'updateOne': {'filter': {'a': 1}, 'update': {'a': 10}}}
   ///   {'insertOne': {'document: {'a', 4}}},
   /// ])
-  Command updateCommand = <String, Object>{};
+  Command updateCommand = <String, dynamic>{};
 
   /// this contains the original update command reference
   /// stored as pairs made of {<originaInputIndex>:

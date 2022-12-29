@@ -7,10 +7,10 @@ class GetParameterCommand extends DbAdminCommandOperation {
   GetParameterCommand(MongoDatabase db, String parameterName,
       {GetParameterOptions? getParameterOptions,
       Map<String, Object>? rawOptions})
-      : super(db, <String, Object>{
+      : super(db, <String, dynamic>{
           keyGetParameter: 1,
           parameterName: 1
-        }, options: <String, Object>{
+        }, options: <String, dynamic>{
           ...?getParameterOptions?.options,
           ...?rawOptions
         });

@@ -32,7 +32,7 @@ class CursorResult {
   }
 
   void _extract(Map<String, Object> document) {
-    //document ??= <String, Object>{};
+    //document ??= <String, dynamic>{};
     if (document[keyId] == null) {
       throw MongoDartError('Missing cursor Id');
     }

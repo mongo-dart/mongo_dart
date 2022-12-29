@@ -20,7 +20,7 @@ abstract class Bulk extends CommandOperation {
       : super(
             collection.db,
             {},
-            <String, Object>{
+            <String, dynamic>{
               ...?bulkOptions?.getOptions(collection.db),
               ...?rawOptions
             },

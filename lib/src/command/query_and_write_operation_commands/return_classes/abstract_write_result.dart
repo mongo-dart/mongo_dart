@@ -32,7 +32,7 @@ abstract class AbstractWriteResult with BasicResult {
     }
     if (result.containsKey(keyWriteConcernError)) {
       writeConcernError = WriteConcernError.fromMap(
-          <String, Object>{...?(result[keyWriteConcernError] as Map?)});
+          <String, dynamic>{...?(result[keyWriteConcernError] as Map?)});
     }
   }
 

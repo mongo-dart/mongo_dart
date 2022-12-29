@@ -26,8 +26,8 @@ class CreateIndexOperation extends CommandOperation {
   CreateIndexOperation(MongoDatabase db, MongoCollection collection,
       this.fieldOrSpec, CreateIndexOptions? indexOptions,
       {ConnectionBase? connection, Map<String, Object>? rawOptions})
-      : super(
-            db, {}, <String, Object>{...?indexOptions?.options, ...?rawOptions},
+      : super(db, {},
+            <String, dynamic>{...?indexOptions?.options, ...?rawOptions},
             collection: collection, aspect: Aspect.writeOperation) {
     // parseIndexOptions alway returns a filled "keyName" and a "keyFieldHash"
     // elements
@@ -40,7 +40,7 @@ class CreateIndexOperation extends CommandOperation {
   }
 
   @override
-  Map<String, Object> $buildCommand() {
+  Command $buildCommand() {
     var indexes = this.indexes;
 
     // merge all options
@@ -56,7 +56,7 @@ class CreateIndexOperation extends CommandOperation {
     }
 
     // Create command, apply write concern to command
-    return <String, Object>{
+    return <String, dynamic>{
       keyCreateIndexes: collection!.collectionName,
       keyCreateIndexesArgument: [indexes]
     };
@@ -64,7 +64,7 @@ class CreateIndexOperation extends CommandOperation {
 }
 
 Map<String, Object> parseIndexOptions(Object fieldOrSpec) {
-  var fieldHash = <String, Object>{};
+  var fieldHash = <String, dynamic>{};
   var indexes = <String>[];
   Iterable? keys;
 

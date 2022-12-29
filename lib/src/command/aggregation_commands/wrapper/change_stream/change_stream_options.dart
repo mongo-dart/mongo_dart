@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 
 /// Parameters for the ChangeStream Operation
 ///
@@ -80,7 +81,7 @@ class ChangeStreamOptions extends AggregateOptions {
 
   /// These options mut be passed to the $changeStream key in the aggregate
   /// command
-  Map<String, Object> changeStreamSpecificOptions() => <String, Object>{
+  Options changeStreamSpecificOptions() => <String, dynamic>{
         if (resumeAfter != null) keyResumeAfter: resumeAfter!,
         if (startAfter != null) keyStartAfter: startAfter!,
         if (fullDocument != null) keyFullDocument: fullDocument!,

@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 
 import '../../core/error/mongo_dart_error.dart';
 
@@ -171,7 +172,7 @@ class CollationOptions {
         normalization: collationMap[keyNormalization] as bool? ?? false);
   }
 
-  Map<String, Object> get options => <String, Object>{
+  Options get options => <String, dynamic>{
         keyLocale: locale,
         if (strength != null) keyStrength: strength!,
         if (caseLevel) keyCaseLevel: caseLevel,

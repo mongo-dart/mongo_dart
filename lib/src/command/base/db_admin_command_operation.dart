@@ -11,7 +11,7 @@ class DbAdminCommandOperation extends OperationBase {
   MongoDatabase db;
   Command command;
 
-  DbAdminCommandOperation(this.db, this.command, {Map<String, Object>? options})
+  DbAdminCommandOperation(this.db, this.command, {Options? options})
       : super(options);
 
   Command $buildCommand() => command;
@@ -23,10 +23,7 @@ class DbAdminCommandOperation extends OperationBase {
   @override
   @protected
   Future<MongoDocument> executeOnServer(Server server) async {
-    var command = <String, dynamic>{
-      ...$buildCommand(),
-      keyDatabaseName: 'admin'
-    };
+    var command = <String, dynamic>{...$buildCommand(), key$Db: 'admin'};
     options.removeWhere((key, value) => command.containsKey(key));
 
     command.addAll(options);

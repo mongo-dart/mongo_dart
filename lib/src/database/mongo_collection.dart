@@ -1,6 +1,7 @@
 import 'package:bson/bson.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
+import '../server_api.dart';
 import '../utils/parms_utils.dart';
 import 'modern_cursor.dart';
 
@@ -16,6 +17,9 @@ class MongoCollection {
   /// Sets the readPreference at Collection level
   void setReadPref(ReadPreference? readPreference) =>
       this.readPreference = readPreference;
+
+  /// At present it can be defined only at client level
+  ServerApi? get serverApi => db.serverApi;
 
   // Insert one document into this collection
   // Returns a WriteResult object

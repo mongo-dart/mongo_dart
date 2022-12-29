@@ -1,4 +1,5 @@
 import 'package:mongo_dart/src/command/base/command_operation.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../database/mongo_database.dart';
@@ -20,10 +21,10 @@ import 'drop_options.dart';
 ///   (must be manually set)
 class DropCommand extends CommandOperation {
   DropCommand(MongoDatabase db, String collectionName,
-      {DropOptions? dropOptions, Map<String, Object>? rawOptions})
-      : super(db, <String, Object>{
+      {DropOptions? dropOptions, Options? rawOptions})
+      : super(db, <String, dynamic>{
           keyDrop: collectionName,
-        }, <String, Object>{
+        }, <String, dynamic>{
           ...?dropOptions?.getOptions(db),
           ...?rawOptions
         });

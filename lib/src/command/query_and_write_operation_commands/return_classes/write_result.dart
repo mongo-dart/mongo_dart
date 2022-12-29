@@ -19,7 +19,7 @@ class WriteResult extends AbstractWriteResult {
     if (result[keyWriteErrors] != null &&
         (result[keyWriteErrors] as List).isNotEmpty) {
       writeError = WriteError.fromMap(
-          <String, Object>{...?(result[keyWriteErrors] as List).first});
+          <String, dynamic>{...?(result[keyWriteErrors] as List).first});
     }
   }
 

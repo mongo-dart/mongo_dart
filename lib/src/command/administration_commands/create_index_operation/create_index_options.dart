@@ -12,6 +12,7 @@ import 'package:mongo_dart/mongo_dart_old.dart'
         keySparseIndex,
         keyUniqueIndex,
         keyWriteConcern;
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/command/parameters/write_concern.dart';
 
 import '../../../database/mongo_collection.dart';
@@ -63,7 +64,7 @@ class CreateIndexOptions {
     /* this.session*/
   });
 
-  Map<String, Object> get options => <String, Object>{
+  Options get options => <String, dynamic>{
         if (writeConcern != null)
           keyWriteConcern:
               writeConcern!.asMap(collection.db.server.serverStatus),

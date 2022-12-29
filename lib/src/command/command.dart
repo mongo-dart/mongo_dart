@@ -35,7 +35,7 @@ export 'query_and_write_operation_commands/find_and_modify_operation/find_and_mo
 export 'query_and_write_operation_commands/find_and_modify_operation/find_and_modify_result.dart';
 export 'query_and_write_operation_commands/get_more_command/get_more_command.dart';
 export 'query_and_write_operation_commands/get_more_command/get_more_options.dart';
-export 'query_and_write_operation_commands/insert_operation/insert_operation.dart';
+export 'query_and_write_operation_commands/insert_operation/base/insert_operation.dart';
 export 'query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 export 'query_and_write_operation_commands/return_classes/bulk_write_result.dart';
 export 'query_and_write_operation_commands/return_classes/write_result.dart';
@@ -62,7 +62,7 @@ export 'query_and_write_operation_commands/wrapper/update_one/update_one_stateme
 export 'query_and_write_operation_commands/wrapper/replace_one/replace_one_operation.dart';
 export 'query_and_write_operation_commands/wrapper/replace_one/replace_one_options.dart';
 export 'query_and_write_operation_commands/wrapper/replace_one/replace_one_statement.dart';
-export 'query_and_write_operation_commands/wrapper/insert_many/insert_many_options.dart';
+export 'query_and_write_operation_commands/wrapper/insert_many/base/insert_many_options.dart';
 
 export 'replication_commands/hello_command/hello_command.dart';
 export 'replication_commands/hello_command/hello_options.dart';
@@ -74,8 +74,8 @@ export 'parameters/read_concern.dart';
 export 'parameters/w.dart';
 export 'parameters/write_concern.dart';
 export 'administration_commands/create_index_operation/create_index_operation.dart';
-export 'query_and_write_operation_commands/wrapper/insert_one/insert_one_operation.dart';
-export 'query_and_write_operation_commands/wrapper/insert_many/insert_many_operation.dart';
+export 'query_and_write_operation_commands/wrapper/insert_one/base/insert_one_operation.dart';
+export 'query_and_write_operation_commands/wrapper/insert_many/base/insert_many_operation.dart';
 export 'administration_commands/create_index_operation/create_index_options.dart';
-export 'query_and_write_operation_commands/wrapper/insert_one/insert_one_options.dart';
+export 'query_and_write_operation_commands/wrapper/insert_one/base/insert_one_options.dart';
 export 'query_and_write_operation_commands/find_operation/find_options.dart';

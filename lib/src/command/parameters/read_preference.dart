@@ -171,7 +171,7 @@ class ReadPreference {
   @override
   int get hashCode => mode.hashCode;
 
-  Map<String, Object> toMap() => <String, Object>{
+  Options toMap() => <String, dynamic>{
         key$ReadPreference: {
           keyMode: getReadPreferenceModeString(mode),
           if (tags != null) keyTags: tags!,

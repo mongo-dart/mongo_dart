@@ -1,3 +1,4 @@
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 /// GetLastError command options;
@@ -25,7 +26,7 @@ class GetLastErrorOptions {
 
   GetLastErrorOptions({this.wtimeout, this.comment});
 
-  Map<String, Object> get options => <String, Object>{
+  Options get options => <String, dynamic>{
         if (wtimeout != null) keyWtimeout: wtimeout!,
         if (comment != null) keyComment: comment!,
       };

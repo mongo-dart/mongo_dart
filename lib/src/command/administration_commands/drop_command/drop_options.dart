@@ -3,6 +3,7 @@ import 'package:mongo_dart/mongo_dart_old.dart'
 import 'package:mongo_dart/src/command/parameters/write_concern.dart';
 
 import '../../../database/mongo_database.dart';
+import '../../base/operation_base.dart';
 
 /// Drop command options;
 ///
@@ -32,7 +33,7 @@ class DropOptions {
     this.writeConcern,
   });
 
-  Map<String, Object> getOptions(MongoDatabase db) => <String, Object>{
+  Options getOptions(MongoDatabase db) => <String, dynamic>{
         if (writeConcern != null)
           keyWriteConcern: writeConcern!.asMap(db.server.serverStatus),
         if (comment != null) keyComment: comment!,

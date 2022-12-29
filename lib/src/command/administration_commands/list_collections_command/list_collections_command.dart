@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import '../../../database/mongo_database.dart';
 import '../../base/command_operation.dart';
 import 'list_collections_options.dart';
@@ -33,9 +34,9 @@ class ListCollectionsCommand extends CommandOperation {
       {this.filter,
       ListCollectionsOptions? listCollectionsOptions,
       Map<String, Object>? rawOptions})
-      : super(db, <String, Object>{
+      : super(db, <String, dynamic>{
           keyListCollections: 1,
-        }, <String, Object>{
+        }, <String, dynamic>{
           ...?listCollectionsOptions?.options,
           ...?rawOptions
         });
@@ -47,10 +48,8 @@ class ListCollectionsCommand extends CommandOperation {
   Map<String, Object?>? filter;
 
   @override
-  Map<String, Object> $buildCommand() {
-    return <String, Object>{
-      keyListCollections: 1,
-      if (filter != null) keyFilter: filter!,
-    };
-  }
+  Command $buildCommand() => <String, dynamic>{
+        keyListCollections: 1,
+        if (filter != null) keyFilter: filter!,
+      };
 }

@@ -36,10 +36,10 @@ class GetLastErrorCommand extends CommandOperation {
       {WriteConcern? writeConcern,
       GetLastErrorOptions? getLastErrorOptions,
       Map<String, Object>? rawOptions})
-      : super(db, <String, Object>{
+      : super(db, <String, dynamic>{
           keyGetLastError: 1,
           //keyDbName: db.databaseName,
-        }, <String, Object>{
+        }, <String, dynamic>{
           ...?getLastErrorOptions?.options,
           ...?rawOptions
         }) {

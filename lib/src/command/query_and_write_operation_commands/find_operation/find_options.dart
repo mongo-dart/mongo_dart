@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 
 class FindOptions {
   /// The number of documents to return in the first batch. Defaults to **101**.
@@ -149,7 +150,7 @@ class FindOptions {
     }
   }
 
-  Map<String, Object> get options => <String, Object>{
+  Options get options => <String, dynamic>{
         if (batchSize != null) keyBatchSize: batchSize!,
         if (singleBatch) keySingleBatch: singleBatch,
         if (comment != null) keyComment: comment!,

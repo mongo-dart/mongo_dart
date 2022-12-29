@@ -44,11 +44,11 @@ class KillCursorsCommand extends CommandOperation {
       Map<String, Object>? rawOptions})
       : super(
           db ?? collection.db,
-          <String, Object>{
+          <String, dynamic>{
             keyKillCursors: collection.collectionName,
             keyCursors: cursorIds,
           },
-          <String, Object>{...?killCursorsOptions?.options, ...?rawOptions},
+          <String, dynamic>{...?killCursorsOptions?.options, ...?rawOptions},
           collection: collection,
         ) {
     // In case of aggregate collection agnostic commands, collection is

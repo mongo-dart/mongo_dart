@@ -1,3 +1,4 @@
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 /// ListCollections command options;
@@ -18,7 +19,7 @@ class ListIndexesOptions {
 
   const ListIndexesOptions({this.batchSize, this.comment});
 
-  Map<String, Object> get options => <String, Object>{
+  Options get options => <String, dynamic>{
         if (batchSize != null) keyCursor: {keyBatchSize: batchSize},
         if (comment != null) keyComment: comment!,
       };

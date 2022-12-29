@@ -1,5 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
+import '../../base/operation_base.dart';
+
 class FindAndModifyOptions {
   /// Enables findAndModify to bypass document validation during the operation.
   /// This lets you update documents that do not meet the validation
@@ -71,7 +73,7 @@ class FindAndModifyOptions {
     }
   }
 
-  Map<String, Object> getOptions(MongoDatabase db) => <String, Object>{
+  Options getOptions(MongoDatabase db) => <String, dynamic>{
         if (bypassDocumentValidation)
           keyBypassDocumentValidation: bypassDocumentValidation,
         if (writeConcern != null)

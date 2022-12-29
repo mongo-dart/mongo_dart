@@ -33,6 +33,7 @@ import '../command/administration_commands/drop_database_command/drop_database_o
 import '../command/administration_commands/list_collections_command/list_collections_command.dart';
 import '../command/administration_commands/list_collections_command/list_collections_options.dart';
 import '../command/diagnostic_commands/ping_command/ping_command.dart';
+import '../server_api.dart';
 import '../topology/abstract/topology.dart';
 import 'modern_cursor.dart';
 import '../command/base/command_operation.dart';
@@ -80,6 +81,9 @@ class MongoDatabase {
   /// Creates a collection object
   MongoCollection collection(String collectionName) =>
       MongoCollection(this, collectionName);
+
+  /// At present it can be defined only at client level
+  ServerApi? get serverApi => mongoClient.serverApi;
 
   // ********************************************************************
   // ********************          OLD          *************************

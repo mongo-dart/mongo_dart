@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 
 class DistinctOptions {
   /// Starting in MongoDB 3.6, the readConcern option has the following syntax:
@@ -47,7 +48,7 @@ class DistinctOptions {
 
   DistinctOptions({this.readConcern, this.collation, this.comment});
 
-  Map<String, Object> get options => <String, Object>{
+  Options get options => <String, dynamic>{
         if (readConcern != null) keyReadConcern: readConcern!.toMap(),
         if (collation != null) keyCollation: collation!.options,
         if (comment != null) keyComment: comment!,

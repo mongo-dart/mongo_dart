@@ -14,7 +14,7 @@ class MongoDBNamespace {
         collection: parts.length > 1 ? parts[1] : null);
   }
 
-  factory MongoDBNamespace.fromMap(Map<String, Object> namespaceMap) {
+  factory MongoDBNamespace.fromMap(Map<String, dynamic> namespaceMap) {
     if (namespaceMap[keyDb] == null) {
       throw MongoDartError('Missing database name (element $keyDb) in Map');
     }

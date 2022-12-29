@@ -2,11 +2,11 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 import 'package:mongo_dart/src_old/database/utils/mongo_db_namespace.dart';
 
 class ChangeEvent {
-  ChangeEvent.fromMap(Map<String, Object?> streamData) {
+  ChangeEvent.fromMap(Map<String, dynamic> streamData) {
     serverResponse = _extractEventData(streamData);
   }
 
-  late Map<String, Object?> serverResponse;
+  late Map<String, dynamic> serverResponse;
 
   /// Metadata related to the operation. Acts as the resumeToken for the
   /// resumeAfter parameter when resuming a change stream.
@@ -17,7 +17,7 @@ class ChangeEvent {
   /// The _data type depends on the MongoDB versions and, in some cases,
   /// the feature compatibility version (fcv) at the time of the change stream’s
   /// opening/resumption. For details, see [Resume Tokens](https://docs.mongodb.com/manual/changeStreams/#change-stream-resume-token).
-  Map<String, Object>? id;
+  Map<String, dynamic>? id;
 
   /// The type of operation that occurred. Can be any of the following values:
   /// - insert
@@ -61,15 +61,15 @@ class ChangeEvent {
   bool get isDropDatabase => operationType == 'dropDatabase';
   bool get isInvalidate => operationType == 'invalidate';
 
-  Map<String, Object?> _extractEventData(Map<String, Object?> streamData) {
+  Map<String, dynamic> _extractEventData(Map<String, Object?> streamData) {
     if (streamData[key_id] != null) {
-      id = <String, Object>{...streamData[key_id] as Map};
+      id = <String, dynamic>{...streamData[key_id] as Map};
     }
     operationType = streamData[keyOperationType] as String?;
     fullDocument = streamData[keyFullDocument] as Map<String, Object?>?;
     if (streamData[keyNs] != null) {
       ns = MongoDBNamespace.fromMap(
-          <String, Object>{...streamData[keyNs] as Map});
+          <String, dynamic>{...streamData[keyNs] as Map});
     }
     return Map.from(streamData);
   }

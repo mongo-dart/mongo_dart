@@ -1,11 +1,6 @@
 import 'package:mongo_dart/src/command/base/simple_command.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart'
-    show
-        keyAuthdb,
-        keyDatabaseName,
-        keyDbName,
-        keyReadPreference,
-        keyWriteConcern;
+    show key$Db, keyAuthdb, keyDbName, keyReadPreference, keyWriteConcern;
 
 import '../../core/error/mongo_dart_error.dart';
 import '../parameters/read_preference.dart'
@@ -33,7 +28,7 @@ class CommandOperation extends SimpleCommand {
   MongoCollection? collection;
 
   @override
-  void processOptions(Map<String, Object?> command) {
+  void processOptions(Command command) {
     // Get the db name we are executing against
     final dbName = (options[keyDbName] as String?) ??
         ((options[keyAuthdb] as String?) ?? db.databaseName);
@@ -42,7 +37,7 @@ class CommandOperation extends SimpleCommand {
     }
     options.removeWhere((key, value) => key == keyDbName || key == keyAuthdb);
     //if (dbName != null) {
-    command[keyDatabaseName] = dbName;
+    command[key$Db] = dbName;
     //}
     if (hasAspect(Aspect.writeOperation)) {
       applyWriteConcern(options,
@@ -69,6 +64,10 @@ class CommandOperation extends SimpleCommand {
     options.remove(keyReadPreference);
 
     options.removeWhere((key, value) => command.containsKey(key));
+
+    if (db.mongoClient.serverApi != null) {
+      command.addAll(db.mongoClient.serverApi!.options);
+    }
   }
 }
 
@@ -81,7 +80,7 @@ class CommandOperation extends SimpleCommand {
 /// @returns {Object} the (now) decorated target
 Options applyWriteConcern(Options target,
     {Options? options, MongoDatabase? db, MongoCollection? collection}) {
-  options ??= <String, Object>{};
+  options ??= <String, dynamic>{};
 
   //Todo Session not yet implemented
   /*if (options[keySession] != null && options[keySession].inTransaction()) {

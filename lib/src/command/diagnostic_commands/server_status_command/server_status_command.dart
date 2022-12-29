@@ -5,7 +5,7 @@ import '../../../database/mongo_database.dart';
 import '../../../topology/server.dart';
 import 'server_status_result.dart';
 
-var _command = <String, Object>{keyServerStatus: 1};
+var _command = <String, dynamic>{keyServerStatus: 1};
 
 class ServerStatusCommand extends CommandOperation {
   ServerStatusCommand(MongoDatabase db,
@@ -14,7 +14,7 @@ class ServerStatusCommand extends CommandOperation {
       : super(
           db,
           _command,
-          <String, Object>{...?serverStatusOptions?.options, ...?rawOptions},
+          <String, dynamic>{...?serverStatusOptions?.options, ...?rawOptions},
         );
 
   Future<ServerStatusResult> executeDocument(Server server,

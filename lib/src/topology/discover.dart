@@ -13,14 +13,16 @@ import 'standalone.dart';
 /// Here the connection is made only on one server.
 /// The correct topology object will have to complete all the connections.
 class Discover extends Topology {
-  Discover(super.hostsSeedList, super.mongoClientOptions) : super.protected();
+  Discover(super.hostsSeedList, super.mongoClientOptions) : super.protected() {
+    type = TopologyType.unknown;
+  }
 
   Topology getEffectiveTopology() {
     Topology topology;
     if (servers.first.isStandalone) {
       topology = Standalone(hostsSeedList, mongoClientOptions,
           detectedServers: servers);
-      topology.primary = primary;
+      topology.primary = servers.first;
     } else if (servers.first.isReplicaSet) {
       topology = ReplicaSet(hostsSeedList, mongoClientOptions,
           detectedServers: servers);

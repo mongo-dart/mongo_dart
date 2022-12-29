@@ -30,11 +30,11 @@ class GetMoreCommand extends CommandOperation {
             db ??
                 collection?.db ??
                 (throw MongoDartError('At least a Db must be specified')),
-            <String, Object>{
+            <String, dynamic>{
               keyGetMore: cursorId,
               keyCollection: collection?.collectionName ?? collectionName ?? '',
             },
-            <String, Object>{...?getMoreOptions?.options, ...?rawOptions},
+            <String, dynamic>{...?getMoreOptions?.options, ...?rawOptions},
             collection: collection) {
     // In case of aggregate collection agnostic commands, collection is
     // not needed

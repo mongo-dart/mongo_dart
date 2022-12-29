@@ -1,5 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
+import '../../base/operation_base.dart';
+
 class AggregateOptions {
   /// Enables writing to temporary files. When set to true, a
   /// ggregation stages can write data to the _tmp subdirectory in the dbPath
@@ -103,7 +105,7 @@ class AggregateOptions {
     }
   }
 
-  Map<String, Object> getOptions(MongoDatabase? db) => <String, Object>{
+  Options getOptions(MongoDatabase? db) => <String, dynamic>{
         if (allowDiskUse) keyAllowDiskUse: allowDiskUse,
         if (maxTimeMS != null) keyMaxTimeMS: maxTimeMS!,
         if (bypassDocumentValidation)

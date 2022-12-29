@@ -29,9 +29,9 @@ import 'create_options.dart';
 class CreateCommand extends CommandOperation {
   CreateCommand(MongoDatabase db, String name,
       {CreateOptions? createOptions, Map<String, Object>? rawOptions})
-      : super(db, <String, Object>{
+      : super(db, <String, dynamic>{
           keyCreate: name,
-        }, <String, Object>{
+        }, <String, dynamic>{
           ...?createOptions?.getOptions(db),
           ...?rawOptions
         }) {

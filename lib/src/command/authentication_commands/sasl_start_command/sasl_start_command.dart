@@ -14,11 +14,11 @@ class SaslStartCommand extends CommandOperation {
       {SaslStartOptions? saslStartOptions,
       Map<String, Object>? rawOptions,
       ConnectionBase? connection})
-      : super(db, <String, Object>{
+      : super(db, <String, dynamic>{
           keySaslStart: 1,
           keyMechanism: mechanism,
           keyPayload: base64.encode(payload)
-        }, <String, Object>{
+        }, <String, dynamic>{
           ...?saslStartOptions?.options,
           ...?rawOptions
         });

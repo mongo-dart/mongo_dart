@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 
 class DeleteStatement {
   DeleteStatement(this.filter,
@@ -57,8 +58,8 @@ class DeleteStatement {
   String? hint;
   Map<String, Object>? hintDocument;
 
-  Map<String, Object> toMap() {
-    return <String, Object>{
+  Options toMap() {
+    return <String, dynamic>{
       keyQ: filter,
       keyLimit: limit,
       if (collation != null) keyCollation: collation!.options,

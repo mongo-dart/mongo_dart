@@ -19,7 +19,7 @@ class DropIndexesCommand extends CommandOperation {
       : super(
             db,
             {},
-            <String, Object>{
+            <String, dynamic>{
               ...?dropIndexesOptions?.getOptions(collection),
               ...?rawOptions
             },
@@ -32,10 +32,8 @@ class DropIndexesCommand extends CommandOperation {
   }
 
   @override
-  Map<String, Object> $buildCommand() {
-    return <String, Object>{
-      keyDropIndexes: collection!.collectionName,
-      keyIndex: index
-    };
-  }
+  Command $buildCommand() => <String, dynamic>{
+        keyDropIndexes: collection!.collectionName,
+        keyIndex: index
+      };
 }

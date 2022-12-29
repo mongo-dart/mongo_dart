@@ -20,15 +20,15 @@ class ChangeStreamOperation extends AggregateOperation {
           db: db,
           cursor: batchSize == null
               ? null
-              : <String, Object>{keyBatchSize: batchSize},
+              : <String, dynamic>{keyBatchSize: batchSize},
           hint: hint,
           hintDocument: hintDocument,
           aggregateOptions: changeStreamOptions,
           rawOptions: rawOptions,
         ) {
-    this.pipeline.insert(0, <String, Object>{
+    this.pipeline.insert(0, <String, dynamic>{
       if (changeStreamOptions == null)
-        aggregateChangeStream: <String, Object>{}
+        aggregateChangeStream: <String, dynamic>{}
       else
         aggregateChangeStream: changeStreamOptions.changeStreamSpecificOptions()
     });

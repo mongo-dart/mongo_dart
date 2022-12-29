@@ -1,13 +1,21 @@
-import 'package:mongo_dart/mongo_dart_old.dart' show AggregationPipelineBuilder;
+import 'package:mongo_dart/mongo_dart.dart'
+    show
+        AggregateOptions,
+        MongoCollection,
+        MongoDartError,
+        MongoDatabase,
+        MongoDocument,
+        keyAggregate,
+        keyCursor,
+        keyDbName,
+        keyExplain,
+        keyHint,
+        keyPipeline;
 import 'package:mongo_dart/src/command/base/operation_base.dart';
-import 'package:mongo_dart/src/utils/map_keys.dart';
+import 'package:mongo_dart_query/mongo_aggregation.dart';
 
-import '../../../core/error/mongo_dart_error.dart';
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/mongo_database.dart';
-import '../../../database/mongo_collection.dart';
 import '../../../topology/server.dart';
-import 'aggregate_options.dart';
 import '../../base/command_operation.dart';
 import 'aggregate_result.dart';
 
@@ -19,11 +27,11 @@ class AggregateOperation extends CommandOperation {
       {MongoCollection? collection,
       MongoDatabase? db,
       bool? explain,
-      Map<String, Object>? cursor,
+      MongoDocument? cursor,
       this.hint,
       this.hintDocument,
       AggregateOptions? aggregateOptions,
-      Map<String, Object>? rawOptions})
+      Options? rawOptions})
       : cursor = cursor ?? <String, Object>{},
         explain = explain ?? false,
         super(
@@ -31,7 +39,7 @@ class AggregateOperation extends CommandOperation {
                 db ??
                 (throw MongoDartError('At least a Db must be specified')),
             {},
-            <String, Object>{
+            <String, dynamic>{
               ...?aggregateOptions?.getOptions(collection?.db ?? db),
               ...?rawOptions
             },
@@ -50,7 +58,7 @@ class AggregateOperation extends CommandOperation {
 
   /// An array of aggregation pipeline stages that process and transform
   /// the document stream as part of the aggregation pipeline.
-  late List<Map<String, Object>> pipeline;
+  late List<MongoDocument> pipeline;
 
   /// Specifies to return the information on the processing of the pipeline.
   ///
@@ -67,7 +75,7 @@ class AggregateOperation extends CommandOperation {
   /// To indicate a cursor with the default batch size, specify `cursor: {}`.
   /// To indicate a cursor with a non-default batch size, use
   /// `cursor: { batchSize: <num> }`.
-  Map<String, Object> cursor;
+  MongoDocument cursor;
 
   /// Optional. Index specification. Specify either the index name
   /// as a string (hint field) or the index key pattern (hintDocument field).
@@ -81,13 +89,13 @@ class AggregateOperation extends CommandOperation {
   Map<String, Object>? hintDocument;
 
   @override
-  Map<String, Object> $buildCommand() {
+  Command $buildCommand() {
     // on null collections (only aggregate) the query is performed
     // on the admin database
     if (collection == null) {
       options[keyDbName] = 'admin';
     }
-    return <String, Object>{
+    return <String, dynamic>{
       keyAggregate: collection?.collectionName ?? 1,
       keyPipeline: pipeline,
       if (explain) keyExplain: explain,

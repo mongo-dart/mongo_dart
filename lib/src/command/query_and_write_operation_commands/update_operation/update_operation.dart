@@ -15,7 +15,7 @@ class UpdateOperation extends CommandOperation {
         super(
             collection.db,
             {},
-            <String, Object>{
+            <String, dynamic>{
               ...?updateOptions?.getOptions(collection.db),
               ...?rawOptions
             },
@@ -33,7 +33,7 @@ class UpdateOperation extends CommandOperation {
   bool ordered;
 
   @override
-  Map<String, Object> $buildCommand() => <String, Object>{
+  Command $buildCommand() => <String, dynamic>{
         keyUpdate: collection!.collectionName,
         keyUpdates: [for (var request in updates) request.toMap()],
         if (ordered) keyOrdered: ordered,

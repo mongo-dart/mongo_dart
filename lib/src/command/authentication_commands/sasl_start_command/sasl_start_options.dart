@@ -1,3 +1,4 @@
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 /// SaslStart command options;
@@ -11,7 +12,7 @@ class SaslStartOptions {
   const SaslStartOptions(
       {this.skipEmptyExchange = true, this.autoAuthorize = 1});
 
-  Map<String, Object> get options => <String, Object>{
+  Options get options => <String, dynamic>{
         keyOptions: {keySkipEmptyExchange: skipEmptyExchange},
         keyAutoAuthorize: 1
       };

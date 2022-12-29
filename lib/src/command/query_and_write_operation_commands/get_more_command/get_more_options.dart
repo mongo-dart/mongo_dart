@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
 
@@ -47,7 +48,7 @@ class GetMoreOptions {
     }
   }
 
-  Map<String, Object> get options => <String, Object>{
+  Options get options => <String, dynamic>{
         keyBatchSize: batchSize,
         if (maxTimeMS != null) keyMaxTimeMS: maxTimeMS!,
         if (comment != null) keyComment: comment!,

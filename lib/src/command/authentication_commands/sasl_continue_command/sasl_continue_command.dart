@@ -15,11 +15,11 @@ class SaslContinueCommand extends CommandOperation {
       {SaslContinueOptions? saslContinueOptions,
       Map<String, Object>? rawOptions,
       ConnectionBase? connection})
-      : super(db, <String, Object>{
+      : super(db, <String, dynamic>{
           keySaslContinue: 1,
           keyConversationId: conversationId,
           keyPayload: base64.encode(payload)
-        }, <String, Object>{
+        }, <String, dynamic>{
           ...?saslContinueOptions?.options,
           ...?rawOptions
         });

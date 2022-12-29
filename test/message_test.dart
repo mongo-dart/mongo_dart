@@ -12,7 +12,7 @@ import 'package:test/test.dart';
 Future testCreatePayload0FromDocument() async {
   var data = <String, Object>{
     keyInsert: 'collectionName',
-    keyDatabaseName: 'databaseName',
+    key$Db: 'databaseName',
     keyWriteConcern: {'w': 'majority'}
   };
   var payload0 = Payload0(data);
@@ -31,7 +31,7 @@ Future testCreatePayload0FromDocument() async {
 Future testCreatePayload0FromBuffer() async {
   var data = <String, Object>{
     keyInsert: 'collectionName',
-    keyDatabaseName: 'databaseName',
+    key$Db: 'databaseName',
     keyWriteConcern: {'w': 'majority'}
   };
   var check = Payload0(data);
@@ -96,7 +96,7 @@ Future testCreatePayload1FromBuffer() async {
 Future testCreateSectionType0FromDocument() async {
   var data = <String, Object>{
     'insert': 'collectionName',
-    keyDatabaseName: 'databaseName',
+    key$Db: 'databaseName',
     'writeConcern': {'w': 'majority'}
   };
   var section0 = Section(MongoModernMessage.basePayloadType, data);
@@ -117,7 +117,7 @@ Future testCreateSectionType0FromDocument() async {
 Future testCreateSectionType0FromBuffer() async {
   var data = <String, Object>{
     'insert': 'collectionName',
-    keyDatabaseName: 'databaseName',
+    key$Db: 'databaseName',
     'writeConcern': {'w': 'majority'}
   };
   var check = Section(MongoModernMessage.basePayloadType, data);
@@ -188,7 +188,7 @@ Future testCreateSectionType1FromBuffer() async {
 Future testCreateModernMessageFromDocument() async {
   var data = <String, Object>{
     keyInsert: 'collectionName',
-    keyDatabaseName: 'databaseName',
+    key$Db: 'databaseName',
     keyWriteConcern: {'w': 'majority'}
   };
   var documents = <Map<String, Object>>[];
@@ -230,7 +230,7 @@ Future testCreateModernMessageFromDocument() async {
 Future testCreateModernMessageFromBuffer() async {
   var data = <String, Object>{
     'insert': 'collectionName',
-    keyDatabaseName: 'databaseName',
+    key$Db: 'databaseName',
     'writeConcern': {'w': 'majority'}
   };
   var check = Section(MongoModernMessage.basePayloadType, data);

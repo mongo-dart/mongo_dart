@@ -27,7 +27,7 @@ class FindAndModifyOperation extends CommandOperation {
         super(
             collection.db,
             {},
-            <String, Object>{
+            <String, dynamic>{
               ...?findAndModifyOptions?.getOptions(collection.db),
               ...?rawOptions
             },
@@ -188,23 +188,21 @@ class FindAndModifyOperation extends CommandOperation {
   Map<String, Object>? hintDocument;
 
   @override
-  Map<String, Object> $buildCommand() {
-    return <String, Object>{
-      keyFindAndModify: collection!.collectionName,
-      if (query != null) keyQuery: query!,
-      if (sort != null) keySort: sort!,
-      if (remove) keyRemove: remove,
-      if (update != null) keyUpdate: update!,
-      if (returnNew) keyNew: returnNew,
-      if (fields != null) keyFields: fields!,
-      if (upsert) keyUpsert: upsert,
-      if (arrayFilters != null) keyArrayFilters: arrayFilters!,
-      if (hint != null)
-        keyHint: hint!
-      else if (hintDocument != null)
-        keyHint: hintDocument!,
-    };
-  }
+  Command $buildCommand() => <String, dynamic>{
+        keyFindAndModify: collection!.collectionName,
+        if (query != null) keyQuery: query!,
+        if (sort != null) keySort: sort!,
+        if (remove) keyRemove: remove,
+        if (update != null) keyUpdate: update!,
+        if (returnNew) keyNew: returnNew,
+        if (fields != null) keyFields: fields!,
+        if (upsert) keyUpsert: upsert,
+        if (arrayFilters != null) keyArrayFilters: arrayFilters!,
+        if (hint != null)
+          keyHint: hint!
+        else if (hintDocument != null)
+          keyHint: hintDocument!,
+      };
 
   Future<FindAndModifyResult> executeDocument() async =>
       FindAndModifyResult(await execute());

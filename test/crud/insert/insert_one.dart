@@ -18,16 +18,11 @@ Future insertDocumentWithoutIdRaw(
     'comment': 'Test comment'
   });
 
-  MongoDocument result2;
-  try {
-    result2 = await collection.insertOneRaw({'item': "card", 'qty': 15});
-  } catch (e) {
-    print(e);
-    return;
-  }
+  MongoDocument result2 =
+      await collection.insertOneRaw({'item': "card", 'qty': 15});
 
   expect(result.length, 2);
   expect(result.length, result2.length);
-  expect(result['acknowledged'], result2['acknowledged']);
-  expect(result['insertedId'] != result2['insertedId'], isTrue);
+  expect(result, {'n': 1, 'ok': 1.0});
+  expect(result, result2);
 }

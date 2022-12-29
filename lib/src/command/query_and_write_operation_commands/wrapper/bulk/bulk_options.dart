@@ -2,6 +2,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 import 'package:mongo_dart/src/command/parameters/write_concern.dart';
 
 import '../../../../database/mongo_database.dart';
+import '../../../base/operation_base.dart';
 
 class BulkOptions {
   /// The WriteConcern for this insert operation
@@ -31,13 +32,11 @@ class BulkOptions {
 
   // The db parameter is used to transform the writeConcern into a Map
   /// When a writeConcern is given a Db object must be specified
-  Map<String, Object> getOptions(MongoDatabase db) {
-    return <String, Object>{
-      if (writeConcern != null)
-        keyWriteConcern: writeConcern!.asMap(db.server.serverStatus),
-      if (!ordered) keyOrdered: ordered,
-      if (bypassDocumentValidation)
-        keyBypassDocumentValidation: bypassDocumentValidation,
-    };
-  }
+  Options getOptions(MongoDatabase db) => <String, dynamic>{
+        if (writeConcern != null)
+          keyWriteConcern: writeConcern!.asMap(db.server.serverStatus),
+        if (!ordered) keyOrdered: ordered,
+        if (bypassDocumentValidation)
+          keyBypassDocumentValidation: bypassDocumentValidation,
+      };
 }

@@ -6,7 +6,7 @@ import '../../../database/mongo_database.dart';
 import '../../../topology/server.dart';
 import '../../base/server_command.dart';
 
-var _command = <String, Object>{keyHello: 1};
+var _command = <String, dynamic>{keyHello: 1};
 
 /// The Hello command takes the following form:
 ///
@@ -28,11 +28,11 @@ class HelloCommand extends ServerCommand {
       : super(
           {
             ..._command,
-            keyDatabaseName: db?.databaseName ?? 'admin',
+            key$Db: db?.databaseName ?? 'admin',
             if (filled(username))
               keySaslSupportedMechs: '${db?.databaseName ?? 'admin'}.$username'
           },
-          <String, Object>{...?helloOptions?.options, ...?rawOptions},
+          <String, dynamic>{...?helloOptions?.options, ...?rawOptions},
         );
 
   Server server;

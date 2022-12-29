@@ -22,7 +22,7 @@ mixin BasicResult {
   bool get failure => ok == 0.0;
 
   void extractBasic(Map<String, Object?> document) {
-    //document ??= <String, Object>{};
+    //document ??= <String, dynamic>{};
     var documentOk = document[keyOk];
     if (documentOk is int) {
       ok = documentOk.toDouble();

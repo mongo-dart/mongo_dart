@@ -19,7 +19,7 @@ class FindOperation extends CommandOperation {
       FindOptions? findOptions,
       Map<String, Object>? rawOptions})
       : super(collection.db, {},
-            <String, Object>{...?findOptions?.options, ...?rawOptions},
+            <String, dynamic>{...?findOptions?.options, ...?rawOptions},
             collection: collection, aspect: Aspect.readOperation) {
     if (skip != null && skip! < 1) {
       throw MongoDartError('Skip parameter must be a positive integer');
@@ -76,16 +76,16 @@ class FindOperation extends CommandOperation {
   bool get isAwaitData => options[keyAwaitData] as bool? ?? false;
 
   @override
-  Map<String, Object> $buildCommand() {
+  Command $buildCommand() {
     if (collection!.collectionName == r'$cmd' &&
         filter != null &&
         limit != null &&
         limit! == 1) {
-      return <String, Object>{
+      return <String, dynamic>{
         for (var key in filter!.keys) key: filter![key] ?? ''
       };
     }
-    return <String, Object>{
+    return <String, dynamic>{
       keyFind: collection!.collectionName,
       if (filter != null) keyFilter: filter!,
       if (sort != null) keySort: sort!,

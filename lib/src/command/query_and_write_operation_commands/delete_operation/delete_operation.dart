@@ -12,7 +12,7 @@ class DeleteOperation extends CommandOperation {
       : super(
             collection.db,
             {},
-            <String, Object>{
+            <String, dynamic>{
               ...?deleteOptions?.getOptions(collection.db),
               ...?rawOptions
             },
@@ -25,7 +25,7 @@ class DeleteOperation extends CommandOperation {
   List<DeleteStatement> deleteRequests;
 
   @override
-  Map<String, Object> $buildCommand() => <String, Object>{
+  Command $buildCommand() => <String, dynamic>{
         keyDelete: collection!.collectionName,
         keyDeletes: [for (var request in deleteRequests) request.toMap()]
       };

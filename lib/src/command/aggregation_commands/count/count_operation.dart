@@ -21,7 +21,7 @@ class CountOperation extends CommandOperation {
       CountOptions? countOptions,
       Map<String, Object>? rawOptions})
       : super(collection.db, {},
-            <String, Object>{...?countOptions?.options, ...?rawOptions},
+            <String, dynamic>{...?countOptions?.options, ...?rawOptions},
             collection: collection, aspect: Aspect.readOperation);
 
   /// A query that selects which documents to count in the collection or view.
@@ -45,18 +45,16 @@ class CountOperation extends CommandOperation {
   Map<String, Object>? hintDocument;
 
   @override
-  Map<String, Object> $buildCommand() {
-    return <String, Object>{
-      keyCount: collection!.collectionName,
-      if (query != null) keyQuery: query!,
-      if (limit != null && limit! > 0) keyLimit: limit!,
-      if (skip != null && skip! > 0) keySkip: skip!,
-      if (hint != null)
-        keyHint: hint!
-      else if (hintDocument != null)
-        keyHint: hintDocument!,
-    };
-  }
+  Command $buildCommand() => <String, dynamic>{
+        keyCount: collection!.collectionName,
+        if (query != null) keyQuery: query!,
+        if (limit != null && limit! > 0) keyLimit: limit!,
+        if (skip != null && skip! > 0) keySkip: skip!,
+        if (hint != null)
+          keyHint: hint!
+        else if (hintDocument != null)
+          keyHint: hintDocument!,
+      };
 
   Future<CountResult> executeDocument(Server server,
       {ConnectionBase? connection}) async {

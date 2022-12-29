@@ -1,5 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
+import '../../base/operation_base.dart';
+
 /// DropDatabase command options;
 ///
 /// Optional parameters that can be used whith the drop command:
@@ -28,7 +30,7 @@ class DropDatabaseOptions {
     this.writeConcern,
   });
 
-  Map<String, Object> getOptions(MongoDatabase db) => <String, Object>{
+  Options getOptions(MongoDatabase db) => <String, dynamic>{
         if (writeConcern != null)
           keyWriteConcern: writeConcern!.asMap(db.server.serverStatus),
         if (comment != null) keyComment: comment!,

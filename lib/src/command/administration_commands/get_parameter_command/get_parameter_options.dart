@@ -1,3 +1,4 @@
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 /// GetParameter command options;
@@ -15,7 +16,7 @@ class GetParameterOptions {
 
   const GetParameterOptions({this.comment});
 
-  Map<String, Object> get options => <String, Object>{
+  Options get options => <String, dynamic>{
         if (comment != null) keyComment: comment!,
       };
 }

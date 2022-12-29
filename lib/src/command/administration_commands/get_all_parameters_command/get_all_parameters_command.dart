@@ -7,9 +7,9 @@ class GetAllParametersCommand extends DbAdminCommandOperation {
   GetAllParametersCommand(MongoDatabase db,
       {GetAllParametersOptions? getAllParametersOptions,
       Map<String, Object>? rawOptions})
-      : super(db, <String, Object>{
+      : super(db, <String, dynamic>{
           keyGetParameter: '*'
-        }, options: <String, Object>{
+        }, options: <String, dynamic>{
           ...?getAllParametersOptions?.options,
           ...?rawOptions
         });

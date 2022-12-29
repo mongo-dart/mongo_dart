@@ -4,6 +4,7 @@ import 'package:mongo_dart/src/topology/discover.dart';
 
 import 'command/parameters/read_concern.dart';
 import 'command/parameters/read_preference.dart';
+import 'server_api.dart';
 import 'session/client_session.dart';
 import 'core/error/mongo_dart_error.dart';
 import 'topology/abstract/topology.dart';
@@ -14,17 +15,6 @@ import 'utils/decode_url_parameters.dart';
 import 'utils/split_hosts.dart';
 import 'command/parameters/write_concern.dart';
 import 'database/mongo_database.dart';
-
-typedef ServerApiVersion = Map<String, String>;
-const ServerApiVersion serverApiVersion = <String, String>{'v1': '1'};
-
-abstract class ServerApi {
-  ServerApi(this.version);
-
-  ServerApiVersion version;
-  bool? strict;
-  bool? deprecationErrors;
-}
 
 abstract class DriverInfo {
   String? name;
@@ -75,6 +65,8 @@ class MongoClient {
   ReadConcern? get readConvern => mongoClientOptions.readConcern;
   ReadPreference? get readPreference => mongoClientOptions.readPreference;
   WriteConcern? get writeConcern => mongoClientOptions.writeConcern;
+
+  ServerApi? get serverApi => mongoClientOptions.serverApi;
 
   Set<MongoDatabase> databases = <MongoDatabase>{};
 

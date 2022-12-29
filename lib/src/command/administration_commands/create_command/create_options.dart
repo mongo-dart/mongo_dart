@@ -18,6 +18,7 @@ import 'package:mongo_dart/mongo_dart_old.dart'
 import 'package:mongo_dart/src/command/parameters/write_concern.dart';
 
 import '../../../database/mongo_database.dart';
+import '../../base/operation_base.dart';
 
 /// Create command options;
 ///
@@ -229,7 +230,7 @@ class CreateOptions {
     }
   }
 
-  Map<String, Object> getOptions(MongoDatabase db) => <String, Object>{
+  Options getOptions(MongoDatabase db) => <String, dynamic>{
         if (/* capped != null && */ capped) keyCapped: capped,
         if (autoIndexId != null && !autoIndexId!) keyAutoIndexId: autoIndexId!,
         if (size != null) keySize: size!,

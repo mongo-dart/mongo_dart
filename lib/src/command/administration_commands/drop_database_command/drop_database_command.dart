@@ -21,9 +21,9 @@ class DropDatabaseCommand extends CommandOperation {
   DropDatabaseCommand(MongoDatabase db,
       {DropDatabaseOptions? dropDatabaseOptions,
       Map<String, Object>? rawOptions})
-      : super(db, <String, Object>{
+      : super(db, <String, dynamic>{
           keyDropDatabase: 1,
-        }, <String, Object>{
+        }, <String, dynamic>{
           ...?dropDatabaseOptions?.getOptions(db),
           ...?rawOptions
         });

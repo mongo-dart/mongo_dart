@@ -11,7 +11,7 @@ class WriteError {
 
   WriteError(this.code, this.errmsg);
 
-  WriteError.fromMap(Map<String, Object> writeErrorMap)
+  WriteError.fromMap(Map<String, dynamic> writeErrorMap)
       : code = writeErrorMap[keyCode] as int?,
         errmsg = writeErrorMap[keyErrmsg] as String?;
 }

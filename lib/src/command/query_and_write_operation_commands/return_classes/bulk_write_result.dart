@@ -12,13 +12,13 @@ class BulkWriteResult extends AbstractWriteResult {
   List<Map<String, Object?>>? documents;
 
   BulkWriteResult.fromMap(
-      WriteCommandType writeCommandType, Map<String, Object?> result)
+      WriteCommandType writeCommandType, Map<String, dynamic> result)
       : super.fromMap(writeCommandType, result) {
     if (result[keyWriteErrors] != null &&
         (result[keyWriteErrors] as List).isNotEmpty) {
-      var writeErrorsList = <Map<String, Object>>[];
+      var writeErrorsList = <Map<String, dynamic>>[];
       for (var element in result[keyWriteErrors] as List) {
-        writeErrorsList.add(<String, Object>{...element});
+        writeErrorsList.add(<String, dynamic>{...element});
       }
       writeErrors = [
         for (var errorMap in writeErrorsList) BulkWriteError.fromMap(errorMap)
@@ -63,16 +63,16 @@ class BulkWriteResult extends AbstractWriteResult {
       nUpserted += (result[keyUpserted] as List).length;
     }
     if (result[keyWriteConcernError] != null) {
-      var writeConcernMap = <String, Object>{
+      var writeConcernMap = <String, dynamic>{
         ...result[keyWriteConcernError] as Map
       };
       writeConcernError = WriteConcernError.fromMap(writeConcernMap);
     }
     if (result[keyWriteErrors] != null &&
         (result[keyWriteErrors] as List).isNotEmpty) {
-      var writeErrorsList = <Map<String, Object>>[];
+      var writeErrorsList = <Map<String, dynamic>>[];
       for (var element in result[keyWriteErrors] as List) {
-        writeErrorsList.add(<String, Object>{...element});
+        writeErrorsList.add(<String, dynamic>{...element});
       }
       writeErrors = [
         ...writeErrors,

@@ -15,7 +15,7 @@ class DistinctOperation extends CommandOperation {
       DistinctOptions? distinctOptions,
       Map<String, Object>? rawOptions})
       : super(collection.db, {},
-            <String, Object>{...?distinctOptions?.options, ...?rawOptions},
+            <String, dynamic>{...?distinctOptions?.options, ...?rawOptions},
             collection: collection, aspect: Aspect.readOperation);
 
   /// The field for which to return distinct values.
@@ -26,13 +26,11 @@ class DistinctOperation extends CommandOperation {
   Map<String, Object?>? query;
 
   @override
-  Map<String, Object> $buildCommand() {
-    return <String, Object>{
-      keyDistinct: collection!.collectionName,
-      keyKey: key,
-      if (query != null) keyQuery: query!,
-    };
-  }
+  Command $buildCommand() => <String, dynamic>{
+        keyDistinct: collection!.collectionName,
+        keyKey: key,
+        if (query != null) keyQuery: query!,
+      };
 
   Future<DistinctResult> executeDocument() async =>
       DistinctResult(await super.execute());

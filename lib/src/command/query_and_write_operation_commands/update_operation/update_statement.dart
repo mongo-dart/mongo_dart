@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
 
@@ -131,18 +132,16 @@ class UpdateStatement {
   String? hint;
   Map<String, Object>? hintDocument;
 
-  Map<String, Object> toMap() {
-    return <String, Object>{
-      keyQ: q,
-      keyU: u,
-      if (upsert) keyUpsert: upsert,
-      if (multi) keyMulti: multi,
-      if (collation != null) keyCollation: collation!.options,
-      if (arrayFilters != null) keyArrayFilters: arrayFilters!,
-      if (hint != null)
-        keyHint: hint!
-      else if (hintDocument != null)
-        keyHint: hintDocument!,
-    };
-  }
+  Options toMap() => <String, dynamic>{
+        keyQ: q,
+        keyU: u,
+        if (upsert) keyUpsert: upsert,
+        if (multi) keyMulti: multi,
+        if (collation != null) keyCollation: collation!.options,
+        if (arrayFilters != null) keyArrayFilters: arrayFilters!,
+        if (hint != null)
+          keyHint: hint!
+        else if (hintDocument != null)
+          keyHint: hintDocument!,
+      };
 }

@@ -1,3 +1,5 @@
+import 'package:mongo_dart/src/command/base/operation_base.dart';
+
 /// SaslContinue command options;
 class SaslContinueOptions {
   /// Undocumented command
@@ -7,5 +9,5 @@ class SaslContinueOptions {
   /// No Options at present
   const SaslContinueOptions();
 
-  Map<String, Object> get options => <String, Object>{};
+  Options get options => <String, dynamic>{};
 }

@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import '../../base/command_operation.dart';
 
 /// listIndexes command.
@@ -23,13 +24,11 @@ class ListIndexesCommand extends CommandOperation {
   ListIndexesCommand(MongoDatabase db, MongoCollection collection,
       {ListIndexesOptions? listIndexesOptions, Map<String, Object>? rawOptions})
       : super(db, {},
-            <String, Object>{...?listIndexesOptions?.options, ...?rawOptions},
+            <String, dynamic>{...?listIndexesOptions?.options, ...?rawOptions},
             collection: collection);
 
   @override
-  Map<String, Object> $buildCommand() {
-    return <String, Object>{
-      keyListIndexes: collection?.collectionName ?? '',
-    };
-  }
+  Command $buildCommand() => <String, dynamic>{
+        keyListIndexes: collection?.collectionName ?? '',
+      };
 }

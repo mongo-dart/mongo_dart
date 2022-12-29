@@ -1,3 +1,4 @@
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 enum ReadConcernLevel {
@@ -138,6 +139,5 @@ class ReadConcern {
 
   ReadConcernLevel level;
 
-  Map<String, Object> toMap() =>
-      <String, Object>{keyLevel: '$level'.split('.').last};
+  Options toMap() => <String, dynamic>{keyLevel: '$level'.split('.').last};
 }

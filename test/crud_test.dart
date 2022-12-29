@@ -6,8 +6,6 @@ import 'dart:async';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
-import '../test/utils/matcher/mongo_dart_error_matcher.dart';
-
 part 'crud/insert/insert_one.dart';
 part 'crud/insert/insert.dart';
 

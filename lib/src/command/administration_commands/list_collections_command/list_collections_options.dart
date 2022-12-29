@@ -1,3 +1,4 @@
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 /// ListCollections command options;
@@ -54,7 +55,7 @@ class ListCollectionsOptions {
   const ListCollectionsOptions(
       {this.nameOnly, this.authorizedCollections, this.comment});
 
-  Map<String, Object> get options => <String, Object>{
+  Options get options => <String, dynamic>{
         if (nameOnly != null && nameOnly!) keyNameOnly: nameOnly!,
         if (authorizedCollections != null && authorizedCollections!)
           keyAuthorizedCollections: authorizedCollections!,

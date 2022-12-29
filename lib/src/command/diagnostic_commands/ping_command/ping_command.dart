@@ -5,5 +5,5 @@ import '../../../topology/abstract/topology.dart';
 class PingCommand extends SimpleCommand {
   PingCommand(
     Topology topology,
-  ) : super(topology, {'ping': 1}, <String, Object>{});
+  ) : super(topology, {'ping': 1}, <String, dynamic>{});
 }

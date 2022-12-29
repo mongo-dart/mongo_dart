@@ -1,3 +1,5 @@
+import 'package:mongo_dart/src/command/base/operation_base.dart';
+
 import '../../core/info/server_status.dart';
 import '../../utils/map_keys.dart';
 import 'w.dart';
@@ -128,7 +130,7 @@ class WriteConcern {
   /// "fsync means sync using a journal if present otherwise the datafiles")
   /// In 4.0 journal cannot be disabled on wiredTiger engine
   /// In 4.2 only wiredTiger can be used
-  Map<String, Object> asMap(ServerStatus serverStatus) => <String, Object>{
+  Options asMap(ServerStatus serverStatus) => <String, dynamic>{
         keyW: w.value,
         if (wtimeout != null) keyWtimeout: wtimeout!,
         if (serverStatus.isPersistent)

@@ -1,3 +1,4 @@
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 /// ServerStatus command options;
@@ -143,7 +144,7 @@ class ServerStatusOptions {
       watchdogExcluded: true,
       wiredTigerExcluded: true);
 
-  Map<String, Object> get options => <String, Object>{
+  Options get options => <String, dynamic>{
         // The default has partial values, "1" - all, "0" - nothing
         if (repl != null)
           if (repl!) keyRepl: 1 else keyRepl: 0,
