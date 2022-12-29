@@ -1,11 +1,8 @@
+import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/server_command.dart';
 
-import '../../core/error/mongo_dart_error.dart';
 import '../../topology/abstract/topology.dart';
 import '../../topology/server.dart';
-import '../../utils/map_keys.dart';
-import '../parameters/read_preference.dart'
-    show ReadPreference, ReadPreferenceMode;
 
 /// Run a simple command
 ///
@@ -21,7 +18,7 @@ class SimpleCommand extends ServerCommand {
   Topology topology;
 
   @override
-  Future<Map<String, Object?>> execute() async {
+  Future<MongoDocument> execute() async {
     Server? server;
     if (topology.type == TopologyType.standalone) {
       ReadPreference.removeReadPreferenceFromOptions(options);
@@ -35,11 +32,10 @@ class SimpleCommand extends ServerCommand {
       readPreference ??= options[keyReadPreference] == null
           ? null
           : ReadPreference.fromOptions(options, removeFromOriginalMap: true);
+      ReadPreference.removeReadPreferenceFromOptions(options);
       if (readPreference != null) {
         options = {...options, ...readPreference!.toMap()};
       }
-
-      ReadPreference.removeReadPreferenceFromOptions(options);
     }
 
     return super.executeOnServer(
@@ -48,5 +44,5 @@ class SimpleCommand extends ServerCommand {
 
   @override
   Future<Map<String, Object?>> executeOnServer(Server server) async =>
-      throw MongoDartError('Do not use this methos, use execute instead');
+      throw MongoDartError('Do not use this method, use execute instead');
 }

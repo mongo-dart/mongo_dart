@@ -20,6 +20,7 @@ class Discover extends Topology {
     if (servers.first.isStandalone) {
       topology = Standalone(hostsSeedList, mongoClientOptions,
           detectedServers: servers);
+      topology.primary = primary;
     } else if (servers.first.isReplicaSet) {
       topology = ReplicaSet(hostsSeedList, mongoClientOptions,
           detectedServers: servers);

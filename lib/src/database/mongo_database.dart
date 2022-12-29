@@ -1,25 +1,27 @@
 //part of mongo_dart;
 
 import 'package:logging/logging.dart';
+import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src_old/database/utils/dns_lookup.dart';
+import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
-import '../../mongo_dart_old.dart'
-    show
-        AggregateOperation,
-        AggregateOptions,
-        CreateCollectionCommand,
-        CreateCollectionOptions,
-        CreateViewCommand,
-        CreateViewOptions,
-        GetLastErrorCommand,
-        SelectorBuilder,
-        ServerStatusCommand,
-        ServerStatusOptions,
-        key$Query,
-        keyName,
-        keyOk;
-import '../command/parameters/read_preference.dart';
+//import '../../mongo_dart_old.dart'
+// show
+//AggregateOperation,
+// AggregateOptions,
+//CreateCollectionCommand,
+//CreateCollectionOptions,
+//CreateViewCommand,
+//CreateViewOptions,
+//GetLastErrorCommand,
+//SelectorBuilder,
+//ServerStatusCommand,
+//ServerStatusOptions,
+// key$Query,
+//keyName,
+//keyOk;
 import '../core/auth/auth.dart';
 import '../../src_old/auth/mongodb_cr_authenticator.dart';
 import '../core/auth/scram_sha1_authenticator.dart';
@@ -34,16 +36,12 @@ import '../command/diagnostic_commands/ping_command/ping_command.dart';
 import '../topology/abstract/topology.dart';
 import 'modern_cursor.dart';
 import '../command/base/command_operation.dart';
-import '../core/error/mongo_dart_error.dart';
 import '../core/message/abstract/mongo_message.dart';
 import '../core/message/deprecated/mongo_reply_message.dart';
 import '../core/message/mongo_modern_message.dart';
 import '../core/network/abstract/connection_base.dart';
 import '../topology/server.dart';
-import '../mongo_client.dart';
 import '../utils/split_hosts.dart';
-import '../command/parameters/write_concern.dart';
-import 'mongo_collection.dart';
 import 'state.dart';
 
 class MongoDatabase {
@@ -74,6 +72,18 @@ class MongoDatabase {
   /// Sets the readPreference at Database level
   void setReadPref(ReadPreference? readPreference) =>
       this.readPreference = readPreference;
+
+  /// Runs a database command
+  Future<MongoDocument> runCommand(Command command) =>
+      CommandOperation(this, command, <String, dynamic>{}).execute();
+
+  /// Creates a collection object
+  MongoCollection collection(String collectionName) =>
+      MongoCollection(this, collectionName);
+
+  // ********************************************************************
+  // ********************          OLD          *************************
+  // ********************************************************************
 
   /// Db constructor expects [valid mongodb URI](https://docs.mongodb.com/manual/reference/connection-string/).
   /// For example next code points to local mongodb server on default mongodb port, database *testdb*
@@ -244,10 +254,6 @@ class MongoDatabase {
       throw MongoDartError('Provided authentication scheme is '
           'not supported : $authenticationSchemeName');
     }
-  }
-
-  MongoCollection collection(String collectionName) {
-    return MongoCollection(this, collectionName);
   }
 
   Future<MongoReplyMessage> queryMessage(MongoMessage queryMessage,
@@ -610,13 +616,8 @@ class MongoDatabase {
         .stream;
   }
 
-  /// Runs a command
-  Future<Map<String, Object?>> runCommand(Map<String, Object> command) =>
-      CommandOperation(this, command, <String, Object>{}).execute();
-
   /// Ping command
-  Future<Map<String, Object?>> pingCommand() =>
-      PingCommand(mongoClient.topology ??
-              (throw MongoDartError('Topology not defined')))
-          .execute();
+  Future<MongoDocument> pingCommand() => PingCommand(mongoClient.topology ??
+          (throw MongoDartError('Topology not defined')))
+      .execute();
 }

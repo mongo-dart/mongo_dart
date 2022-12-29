@@ -12,11 +12,10 @@ import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
 import '../../database/mongo_database.dart';
 import '../../database/mongo_collection.dart';
-import 'operation_base.dart' show Aspect, Options;
+import 'operation_base.dart' show Aspect, Command, Options;
 
 class CommandOperation extends SimpleCommand {
-  CommandOperation(
-      this.db, Map<String, Object> command, Map<String, Object> options,
+  CommandOperation(this.db, Command command, Options options,
       {this.collection, ReadPreference? readPreference, Aspect? aspect})
       : super(
             db.mongoClient.topology ??

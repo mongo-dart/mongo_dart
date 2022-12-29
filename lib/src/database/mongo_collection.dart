@@ -24,6 +24,13 @@ class MongoCollection {
       InsertOneOperation(this, document, insertOneOptions: insertOneOptions)
           .executeDocument();
 
+  // Insert one document into this collection
+  // Returns the server Map response
+  Future<MongoDocument> insertOneRaw(MongoDocument document,
+          {InsertOneOptions? insertOneOptions}) async =>
+      InsertOneOperation(this, document, insertOneOptions: insertOneOptions)
+          .execute();
+
   // ****************************************************
   // ***********        OLD       ***********************
   // ****************************************************
