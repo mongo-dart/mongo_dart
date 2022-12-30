@@ -2,7 +2,7 @@ import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../database/mongo_database.dart';
+import '../../../database/base/mongo_database.dart';
 import 'drop_options.dart';
 
 /// drop command.

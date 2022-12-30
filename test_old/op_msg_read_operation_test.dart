@@ -4,7 +4,6 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:decimal/decimal.dart';
-import 'package:mongo_dart/src/database/state.dart';
 import 'package:test/test.dart';
 
 import '../test/utils/insert_data.dart';
@@ -390,7 +389,7 @@ void main() async {
 
         var cursor = ModernCursor(FindOperation(collection), db.server);
 
-        expect(cursor.state, State.init);
+        expect(cursor.state, ModernCursorState.init);
 
         await cursor.nextObject();
 
@@ -435,10 +434,10 @@ void main() async {
             BsonLong((doc[keyCursor] as Map)[keyId] as int), db.server,
             tailable: true);
 
-        expect(cursor.state, State.open);
+        expect(cursor.state, ModernCursorState.open);
 
         var cursorResult = await cursor.nextObject();
-        expect(cursor.state, State.open);
+        expect(cursor.state, ModernCursorState.open);
         expect(cursor.cursorId.value, isPositive);
         expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
@@ -452,7 +451,7 @@ void main() async {
           }
         });
 
-        expect(cursor.state, State.open);
+        expect(cursor.state, ModernCursorState.open);
 
         await Future.delayed(Duration(seconds: 3));
 
@@ -467,7 +466,7 @@ void main() async {
 
           return true;
         });
-        expect(cursor.state, State.closed);
+        expect(cursor.state, ModernCursorState.closed);
       });
       test('Simple read from capped collection with awaitData', () async {
         var collectionName = getRandomCollectionName();
@@ -486,10 +485,10 @@ void main() async {
             BsonLong((doc[keyCursor] as Map)[keyId] as int), db.server,
             tailable: true);
 
-        expect(cursor.state, State.open);
+        expect(cursor.state, ModernCursorState.open);
 
         var cursorResult = await cursor.nextObject();
-        expect(cursor.state, State.open);
+        expect(cursor.state, ModernCursorState.open);
         expect(cursor.cursorId.value, isPositive);
         expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
@@ -507,7 +506,7 @@ void main() async {
           }
         });
 
-        expect(cursor.state, State.open);
+        expect(cursor.state, ModernCursorState.open);
 
         await Future.delayed(Duration(seconds: 2));
 
@@ -524,7 +523,7 @@ void main() async {
 
           return true;
         });
-        expect(cursor.state, State.closed);
+        expect(cursor.state, ModernCursorState.closed);
       });
 
       // Reading with a tailable cursor on a capped collection
@@ -540,7 +539,7 @@ void main() async {
         var cursor = ModernCursor(
             FindOperation(collection, findOptions: FindOptions(tailable: true)),
             db.server);
-        expect(cursor.state, State.init);
+        expect(cursor.state, ModernCursorState.init);
 
         expect(() => cursor.nextObject(), throwsMongoDartError);
       });
@@ -564,11 +563,11 @@ void main() async {
                 filter: <String, Object>{'state': 'C'},
                 findOptions: FindOptions(tailable: true)),
             db.server);
-        expect(cursor.state, State.init);
+        expect(cursor.state, ModernCursorState.init);
 
         var cursorResult = await cursor.nextObject();
         expect(cursorResult, isNull);
-        expect(cursor.state, State.open);
+        expect(cursor.state, ModernCursorState.open);
         expect(cursor.cursorId.value, isNonZero);
 
         await cursor.close();
@@ -1076,7 +1075,7 @@ db.runCommand(
         }
       });
 
-      expect(cursor.state, State.init);
+      expect(cursor.state, ModernCursorState.init);
 
       await Future.delayed(Duration(seconds: 2));
 
@@ -1098,7 +1097,7 @@ db.runCommand(
 
         return true;
       });
-      expect(cursor.state, State.closed);
+      expect(cursor.state, ModernCursorState.closed);
     }, skip: cannotRunTests);
 
     test('Change with match from collection with changeStream', () async {
@@ -1148,7 +1147,7 @@ db.runCommand(
         }
       });
 
-      expect(cursor.state, State.init);
+      expect(cursor.state, ModernCursorState.init);
 
       await Future.delayed(Duration(seconds: 2));
 
@@ -1173,7 +1172,7 @@ db.runCommand(
         return true;
       });
 
-      expect(cursor.state, State.closed);
+      expect(cursor.state, ModernCursorState.closed);
     }, skip: cannotRunTests);
 
     test('Change with match from collection.watch()', () async {

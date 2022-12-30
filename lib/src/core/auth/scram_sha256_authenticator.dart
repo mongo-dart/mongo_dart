@@ -6,7 +6,7 @@ import 'package:sasl_scram/sasl_scram.dart'
         UsernamePasswordCredential,
         CryptoStrengthStringGenerator;
 
-import '../../database/mongo_database.dart';
+import '../../database/base/mongo_database.dart';
 import 'sasl_authenticator.dart';
 
 class ScramSha256Authenticator extends SaslAuthenticator {

@@ -6,7 +6,7 @@ import 'package:mongo_dart/src/server_api_version.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 import 'package:mongo_dart/src/command/parameters/write_concern.dart';
 
-import '../../../../database/mongo_database.dart';
+import '../../../../database/base/mongo_database.dart';
 import '../../../base/operation_base.dart';
 
 abstract class InsertOptions {

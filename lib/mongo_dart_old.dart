@@ -13,8 +13,8 @@ import 'package:mongo_dart_query/mongo_dart_query.dart';
 
 import 'src/core/error/mongo_dart_error.dart';
 
-import 'src/database/mongo_database.dart';
-import 'src/database/mongo_collection.dart';
+import 'src/database/base/mongo_database.dart';
+import 'src/database/base/mongo_collection.dart';
 
 import 'src/core/message/abstract/mongo_message.dart';
 

@@ -1,7 +1,7 @@
 import 'package:mongo_dart/src/command/administration_commands/create_command/create_command.dart';
 import 'package:mongo_dart/src/command/administration_commands/create_command/create_options.dart';
 
-import '../../../../database/mongo_database.dart';
+import '../../../../database/base/mongo_database.dart';
 import 'create_view_options.dart';
 
 /// createView command.

@@ -1,8 +1,8 @@
 import 'package:bson/bson.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
 import '../../../core/error/mongo_dart_error.dart';
-import '../../../database/mongo_database.dart';
-import '../../../database/mongo_collection.dart';
+import '../../../database/base/mongo_database.dart';
+import '../../../database/base/mongo_collection.dart';
 import 'get_more_options.dart';
 import 'get_more_result.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';

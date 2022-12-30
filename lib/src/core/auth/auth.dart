@@ -2,7 +2,7 @@ import 'package:mongo_dart/src/core/network/abstract/connection_base.dart';
 import 'package:mongo_dart/src/topology/server.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
-import '../../database/mongo_database.dart';
+import '../../database/base/mongo_database.dart';
 import '../error/mongo_dart_error.dart';
 
 import '../../../src_old/auth/mongodb_cr_authenticator.dart';

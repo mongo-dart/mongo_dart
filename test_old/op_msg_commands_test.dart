@@ -1,7 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
-import 'package:mongo_dart/src/database/state.dart';
 import 'package:test/test.dart';
 
 const dbName = 'test-mongo-dart';
@@ -36,7 +35,7 @@ void main() async {
       toInsert.add({'a': n});
     }
 
-    await collection.insertAll(toInsert);
+    await collection.insertMany(toInsert);
   }
 
   Future cleanupDatabase() async {
@@ -62,10 +61,10 @@ void main() async {
 
           var cursor = ModernCursor(FindOperation(collection), db.server);
 
-          expect(cursor.state, State.init);
+          expect(cursor.state, ModernCursorState.init);
 
           var cursorResult = await cursor.nextObject();
-          expect(cursor.state, State.open);
+          expect(cursor.state, ModernCursorState.open);
           expect(cursor.cursorId.value, isPositive);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
@@ -111,7 +110,7 @@ void main() async {
           var collection = db.collection(collectionName);
           await insertManyDocuments(collection, 10000);
           var cursor = ModernCursor(FindOperation(collection), db.server);
-          expect(cursor.state, State.init);
+          expect(cursor.state, ModernCursorState.init);
           await cursor.nextObject();
           var command = KillCursorsCommand(collection, [BsonLong(1)]);
           var result = await command.execute();
@@ -157,10 +156,10 @@ void main() async {
 
           var cursor = ModernCursor(FindOperation(collection), db.server);
 
-          expect(cursor.state, State.init);
+          expect(cursor.state, ModernCursorState.init);
 
           var cursorResult = await cursor.nextObject();
-          expect(cursor.state, State.open);
+          expect(cursor.state, ModernCursorState.open);
           expect(cursor.cursorId.value, isPositive);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
@@ -193,10 +192,10 @@ void main() async {
 
           var cursor = ModernCursor(FindOperation(collection), db.server);
 
-          expect(cursor.state, State.init);
+          expect(cursor.state, ModernCursorState.init);
 
           var cursorResult = await cursor.nextObject();
-          expect(cursor.state, State.open);
+          expect(cursor.state, ModernCursorState.open);
           expect(cursor.cursorId.value, isPositive);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);

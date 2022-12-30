@@ -15,7 +15,7 @@ import 'package:mongo_dart/mongo_dart_old.dart'
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/command/parameters/write_concern.dart';
 
-import '../../../database/mongo_collection.dart';
+import '../../../database/base/mongo_collection.dart';
 
 /// @param {object} [options] Optional settings.
 /// @param {(number|string)} [options.writeConcern] The write concern.

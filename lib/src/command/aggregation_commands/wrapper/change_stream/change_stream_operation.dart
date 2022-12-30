@@ -1,8 +1,8 @@
 import 'package:mongo_dart/src/command/aggregation_commands/aggregate/aggregate_operation.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../../database/mongo_database.dart';
-import '../../../../database/mongo_collection.dart';
+import '../../../../database/base/mongo_database.dart';
+import '../../../../database/base/mongo_collection.dart';
 import 'change_stream_options.dart';
 
 class ChangeStreamOperation extends AggregateOperation {

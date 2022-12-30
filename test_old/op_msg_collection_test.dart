@@ -37,7 +37,7 @@ void main() async {
       toInsert.add({'a': n});
     }
 
-    await collection.insertAll(toInsert);
+    await collection.insertMany(toInsert);
   }
 
   Future cleanupDatabase() async {

@@ -4,8 +4,8 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/mongo_database.dart';
-import '../../../database/mongo_collection.dart';
+import '../../../database/base/mongo_database.dart';
+import '../../../database/base/mongo_collection.dart';
 import '../../../topology/server.dart';
 import 'kill_cursors_options.dart';
 import 'kill_cursors_result.dart';

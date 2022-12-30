@@ -18,8 +18,8 @@ Future insertDocumentWithoutIdRaw(
     'comment': 'Test comment'
   });
 
-  MongoDocument result2 =
-      await collection.insertOneRaw({'item': "card", 'qty': 15});
+  var doc = await collection.insertOne({'item': "card", 'qty': 15});
+  MongoDocument result2 = doc.serverResponses.first;
 
   expect(result.length, 2);
   expect(result.length, result2.length);

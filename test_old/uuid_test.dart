@@ -1,7 +1,7 @@
 @Timeout(Duration(seconds: 100))
 
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/mongo_database.dart';
+import 'package:mongo_dart/src/database/base/mongo_database.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:test/test.dart';
 

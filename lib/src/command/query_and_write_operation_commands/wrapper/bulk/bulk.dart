@@ -9,8 +9,7 @@ import 'package:mongo_dart/src/database/document_types.dart';
 
 import '../../../../core/error/mongo_dart_error.dart';
 import '../../../../core/network/abstract/connection_base.dart';
-import '../../../../database/mongo_collection.dart';
-import '../../../../database/state.dart';
+import '../../../../database/base/mongo_collection.dart';
 import '../../../../topology/server.dart';
 import 'bulk_options.dart';
 
@@ -401,10 +400,7 @@ abstract class Bulk extends CommandOperation {
       {ConnectionBase? connection}) async {
     var retList = <Map<String, Object?>>[];
     var isOrdered = options[keyOrdered] as bool? ?? true;
-    final db = this.db;
-    if (db.state != State.open) {
-      throw MongoDartError('Db is in the wrong state: ${db.state}');
-    }
+
     //final options = Map.from(this.options);
 
     // Todo implement topology

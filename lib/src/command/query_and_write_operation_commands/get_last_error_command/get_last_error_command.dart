@@ -1,6 +1,6 @@
 import 'package:mongo_dart/src/command/parameters/write_concern.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
-import '../../../database/mongo_database.dart';
+import '../../../database/base/mongo_database.dart';
 import 'get_last_error_options.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 

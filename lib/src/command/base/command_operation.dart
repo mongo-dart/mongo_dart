@@ -5,8 +5,8 @@ import 'package:mongo_dart/src/utils/map_keys.dart'
 import '../../core/error/mongo_dart_error.dart';
 import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
-import '../../database/mongo_database.dart';
-import '../../database/mongo_collection.dart';
+import '../../database/base/mongo_database.dart';
+import '../../database/base/mongo_collection.dart';
 import 'operation_base.dart' show Aspect, Command, Options;
 
 class CommandOperation extends SimpleCommand {

@@ -2,7 +2,7 @@ import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
-import '../../../database/mongo_collection.dart';
+import '../../../database/base/mongo_collection.dart';
 import 'find_and_modify_options.dart';
 import '../../base/command_operation.dart';
 import 'find_and_modify_result.dart';

@@ -14,7 +14,7 @@ void main() async {
     {'name': 'c', 'value': 30},
     {'name': 'd', 'value': 40}
   ];
-  await coll.insertAll(toInsert);
+  await coll.insertMany(toInsert);
   var v1 = await coll.findOne({'name': 'c'});
   if (v1 == null) {
     print('Record not found');
@@ -36,7 +36,7 @@ void main() async {
     {'name': 'c', 'value': 30},
     {'name': 'd', 'value': 40}
   ];
-  await coll.insertAll(toInsert);
+  await coll.insertMany(toInsert);
   v1 = await coll.findOne({'name': 'c'});
   print('Record c: $v1');
   await coll.update(where.eq('name', 'c'), modify.set('value', 31));
@@ -53,7 +53,7 @@ void main() async {
     {'name': 'c', 'value': 30},
     {'name': 'd', 'value': 40}
   ];
-  await coll.insertAll(toInsert);
+  await coll.insertMany(toInsert);
   v1 = await coll.findOne({'name': 'c'});
   print('Record c: $v1');
   await coll.update(where.eq('name', 'c'), modify.inc('value', 1));

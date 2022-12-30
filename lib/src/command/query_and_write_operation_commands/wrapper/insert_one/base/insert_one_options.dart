@@ -7,6 +7,9 @@ import 'package:mongo_dart/src/server_api_version.dart';
 import '../insert_one_options_open.dart';
 import '../insert_one_options_v1.dart';
 
+/// This class should contain all possible options.
+/// Version option are managed through the specialized
+/// getters toXXX()
 abstract class InsertOneOptions extends InsertOptions {
   @protected
   InsertOneOptions.protected(

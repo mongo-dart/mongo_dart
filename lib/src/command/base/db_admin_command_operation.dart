@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../database/document_types.dart';
-import '../../database/mongo_database.dart';
+import '../../database/base/mongo_database.dart';
 import '../../topology/server.dart';
 import 'operation_base.dart';
 

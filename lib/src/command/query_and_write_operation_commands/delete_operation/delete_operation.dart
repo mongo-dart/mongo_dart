@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/command/query_and_write_operation_commands/delete_operation/delete_statement.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../database/mongo_collection.dart';
+import '../../../database/base/mongo_collection.dart';
 import 'delete_options.dart';
 
 class DeleteOperation extends CommandOperation {

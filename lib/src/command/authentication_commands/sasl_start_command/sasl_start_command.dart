@@ -6,7 +6,7 @@ import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/core/network/abstract/connection_base.dart';
 
-import '../../../database/mongo_database.dart';
+import '../../../database/base/mongo_database.dart';
 import '../../../topology/server.dart';
 
 class SaslStartCommand extends CommandOperation {

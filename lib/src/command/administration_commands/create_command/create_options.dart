@@ -17,7 +17,7 @@ import 'package:mongo_dart/mongo_dart_old.dart'
         keyWriteConcern;
 import 'package:mongo_dart/src/command/parameters/write_concern.dart';
 
-import '../../../database/mongo_database.dart';
+import '../../../database/base/mongo_database.dart';
 import '../../base/operation_base.dart';
 
 /// Create command options;

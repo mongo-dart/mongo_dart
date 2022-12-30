@@ -1,16 +1,32 @@
 import 'package:bson/bson.dart';
+import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/server_api_version.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
-import '../server_api.dart';
-import '../utils/parms_utils.dart';
-import 'modern_cursor.dart';
+import '../../server_api.dart';
+import '../../utils/parms_utils.dart';
+import '../modern_cursor.dart';
 
-class MongoCollection {
+abstract class MongoCollection {
   MongoDatabase db;
   String collectionName;
   ReadPreference? readPreference;
 
-  MongoCollection(this.db, this.collectionName);
+  @protected
+  MongoCollection.protected(this.db, this.collectionName);
+
+  factory MongoCollection(MongoDatabase db, String collectionName) {
+    if (db.serverApi != null) {
+      switch (db.serverApi!.version) {
+        case ServerApiVersion.v1:
+          return MongoCollectionV1(db, collectionName);
+        default:
+          throw MongoDartError(
+              'Stable Api ${db.serverApi!.version} not managed');
+      }
+    }
+    return MongoCollectionOpen(db, collectionName);
+  }
 
   String fullName() => '${db.databaseName}.$collectionName';
 
@@ -21,19 +37,20 @@ class MongoCollection {
   /// At present it can be defined only at client level
   ServerApi? get serverApi => db.serverApi;
 
-  // Insert one document into this collection
-  // Returns a WriteResult object
+  /// Insert one document into this collection
+  /// Returns a WriteResult object
   Future<WriteResult> insertOne(MongoDocument document,
-          {InsertOneOptions? insertOneOptions}) async =>
-      InsertOneOperation(this, document, insertOneOptions: insertOneOptions)
-          .executeDocument();
+      {InsertOneOptions? insertOneOptions});
 
-  // Insert one document into this collection
-  // Returns the server Map response
-  Future<MongoDocument> insertOneRaw(MongoDocument document,
-          {InsertOneOptions? insertOneOptions}) async =>
-      InsertOneOperation(this, document, insertOneOptions: insertOneOptions)
-          .execute();
+  /// Insert many document into this collection
+  /// Returns a BulkWriteResult object
+  Future<BulkWriteResult> insertMany(List<MongoDocument> documents,
+      {InsertManyOptions? insertManyOptions}) async {
+    var insertManyOperation = InsertManyOperation(this, documents,
+        insertManyOptions: insertManyOptions);
+
+    return insertManyOperation.executeDocument();
+  }
 
   // ****************************************************
   // ***********        OLD       ***********************
@@ -61,13 +78,10 @@ class MongoCollection {
     }
   }
 
-  /// Allows to insert many documents at a time.
-  /// This is the legacy version of the insertMany() method
+  @Deprecated('No More Used')
   Future<Map<String, dynamic>> insertAll(List<Map<String, dynamic>> documents,
       {WriteConcern? writeConcern}) async {
-    await insertMany(documents, writeConcern: writeConcern);
-    // Todo change return type
-    return {keyOk: 1.0};
+    throw MongoDartError('To be deleted');
   }
 
   /// Allows to insert many documents at a time.
@@ -439,27 +453,6 @@ class MongoCollection {
         dropIndexesOptions: indexOptions, rawOptions: rawOptions);
 
     return command.execute();
-  }
-
-  // This method has been made available since version 3.2
-  // As we will use this with the new wire message available
-  // since version 3.6, we will check this last version
-  // in order to allow the execution
-  Future<BulkWriteResult> insertMany(List<Map<String, dynamic>> documents,
-      {WriteConcern? writeConcern,
-      bool? ordered,
-      bool? bypassDocumentValidation}) async {
-    return Future.sync(() {
-      var insertManyOptions = InsertManyOptions(
-          writeConcern: writeConcern,
-          ordered: ordered,
-          bypassDocumentValidation: bypassDocumentValidation);
-
-      var insertManyOperation = InsertManyOperation(this, documents,
-          insertManyOptions: insertManyOptions);
-
-      return insertManyOperation.executeDocument();
-    });
   }
 
   Future<WriteResult> deleteOne(selector,

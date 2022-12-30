@@ -1,8 +1,10 @@
 //part of mongo_dart;
 
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
+import 'package:mongo_dart/src/server_api_version.dart';
 import 'package:mongo_dart/src_old/database/utils/dns_lookup.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
@@ -22,37 +24,49 @@ import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 // key$Query,
 //keyName,
 //keyOk;
-import '../core/auth/auth.dart';
-import '../../src_old/auth/mongodb_cr_authenticator.dart';
-import '../core/auth/scram_sha1_authenticator.dart';
-import '../core/auth/scram_sha256_authenticator.dart';
-import '../command/administration_commands/drop_command/drop_command.dart';
-import '../command/administration_commands/drop_command/drop_options.dart';
-import '../command/administration_commands/drop_database_command/drop_database_command.dart';
-import '../command/administration_commands/drop_database_command/drop_database_options.dart';
-import '../command/administration_commands/list_collections_command/list_collections_command.dart';
-import '../command/administration_commands/list_collections_command/list_collections_options.dart';
-import '../command/diagnostic_commands/ping_command/ping_command.dart';
-import '../server_api.dart';
-import '../topology/abstract/topology.dart';
-import 'modern_cursor.dart';
-import '../command/base/command_operation.dart';
-import '../core/message/abstract/mongo_message.dart';
-import '../core/message/deprecated/mongo_reply_message.dart';
-import '../core/message/mongo_modern_message.dart';
-import '../core/network/abstract/connection_base.dart';
-import '../topology/server.dart';
-import '../utils/split_hosts.dart';
-import 'state.dart';
+import '../../core/auth/auth.dart';
+import '../../../src_old/auth/mongodb_cr_authenticator.dart';
+import '../../core/auth/scram_sha1_authenticator.dart';
+import '../../core/auth/scram_sha256_authenticator.dart';
+import '../../command/administration_commands/drop_command/drop_command.dart';
+import '../../command/administration_commands/drop_command/drop_options.dart';
+import '../../command/administration_commands/drop_database_command/drop_database_command.dart';
+import '../../command/administration_commands/drop_database_command/drop_database_options.dart';
+import '../../command/administration_commands/list_collections_command/list_collections_command.dart';
+import '../../command/administration_commands/list_collections_command/list_collections_options.dart';
+import '../../command/diagnostic_commands/ping_command/ping_command.dart';
+import '../../server_api.dart';
+import '../../topology/abstract/topology.dart';
+import '../modern_cursor.dart';
+import '../../command/base/command_operation.dart';
+import '../../core/message/abstract/mongo_message.dart';
+import '../../core/message/deprecated/mongo_reply_message.dart';
+import '../../core/network/abstract/connection_base.dart';
+import '../../topology/server.dart';
+import '../../utils/split_hosts.dart';
 
 class MongoDatabase {
-  MongoDatabase.modern(this.mongoClient, this.databaseName);
+  @protected
+  MongoDatabase.protected(this.mongoClient, this.databaseName);
+
+  factory MongoDatabase(MongoClient mongoClient, String databaseName) {
+    if (mongoClient.serverApi != null) {
+      switch (mongoClient.serverApi!.version) {
+        case ServerApiVersion.v1:
+          return MongoDatabaseV1(mongoClient, databaseName);
+        default:
+          throw MongoDartError(
+              'Stable Api ${mongoClient.serverApi!.version} not managed');
+      }
+    }
+    return MongoDatabaseOpen(mongoClient, databaseName);
+  }
 
   final log = Logger('Db');
   final List<String> _uriList = <String>[];
   late MongoClient mongoClient;
 
-  State state = State.init;
+  //State state = State.init;
   String? databaseName;
   String? _debugInfo;
   MongoDatabase? authSourceDb;
@@ -99,13 +113,14 @@ class MongoDatabase {
   ///     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
   ///```
   @Deprecated('No more used')
-  MongoDatabase(String uriString, [this._debugInfo]) {
+  MongoDatabase._(String uriString, [this._debugInfo]) {
     if (uriString.contains(',')) {
       _uriList.addAll(splitHosts(uriString));
     } else {
       _uriList.add(uriString);
     }
   }
+
   @Deprecated('No more used')
   MongoDatabase.pool(List<String> uriList, [this._debugInfo]) {
     _uriList.addAll(uriList);
@@ -130,7 +145,7 @@ class MongoDatabase {
   static Future<MongoDatabase> create(String uriString,
       [String? debugInfo]) async {
     if (uriString.startsWith('mongodb://')) {
-      return MongoDatabase(uriString, debugInfo);
+      return MongoDatabase._(uriString, debugInfo);
     } else if (uriString.startsWith('mongodb+srv://')) {
       var uriList = await dnsLookup(Uri.parse(uriString));
       return MongoDatabase.pool(uriList, debugInfo);
@@ -269,7 +284,7 @@ class MongoDatabase {
       {ConnectionBase? connection}) {
     throw MongoDartError('No More used');
   }
-
+/* 
   Future<Map<String, Object?>> executeModernMessage(MongoModernMessage message,
       {ConnectionBase? connection}) async {
     if (state != State.open) {
@@ -277,7 +292,7 @@ class MongoDatabase {
     }
 
     return server.executeMessage(message);
-  }
+  } */
 
   @Deprecated('Do Not USe')
   Future open(Server server,

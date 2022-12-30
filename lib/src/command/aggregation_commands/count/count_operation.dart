@@ -2,7 +2,7 @@ import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/mongo_collection.dart';
+import '../../../database/base/mongo_collection.dart';
 import '../../../topology/server.dart';
 import 'count_options.dart';
 import '../../base/command_operation.dart';

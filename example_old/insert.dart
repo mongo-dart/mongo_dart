@@ -22,11 +22,14 @@ void main() async {
   print(stopwatch.elapsed);
   print('Inserting array of 1000 records with aknowledgment');
 
-  await test.insertMany(data, writeConcern: WriteConcern.acknowledged);
+  await test.insertMany(data,
+      insertManyOptions:
+          InsertManyOptions(writeConcern: WriteConcern.acknowledged));
   print(stopwatch.elapsed);
   print('Inserting array of 500 records with aknowledgment');
   await test.insertMany(data.sublist(500),
-      writeConcern: WriteConcern.acknowledged);
+      insertManyOptions:
+          InsertManyOptions(writeConcern: WriteConcern.acknowledged));
   print(stopwatch.elapsed);
 
   await client.close();

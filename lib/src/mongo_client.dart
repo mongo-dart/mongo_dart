@@ -14,7 +14,7 @@ import 'utils/decode_dns_seed_list.dart';
 import 'utils/decode_url_parameters.dart';
 import 'utils/split_hosts.dart';
 import 'command/parameters/write_concern.dart';
-import 'database/mongo_database.dart';
+import 'database/base/mongo_database.dart';
 
 abstract class DriverInfo {
   String? name;
@@ -110,7 +110,8 @@ class MongoClient {
     return db;
   }
 
-  MongoDatabase _createDb(String dbName) => MongoDatabase.modern(this, dbName);
+  MongoDatabase _createDb(String dbName) =>
+      MongoDatabase.protected(this, dbName);
 
   // Todo
   ClientSession startSession() {

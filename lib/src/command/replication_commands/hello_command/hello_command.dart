@@ -2,7 +2,7 @@ import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
-import '../../../database/mongo_database.dart';
+import '../../../database/base/mongo_database.dart';
 import '../../../topology/server.dart';
 import '../../base/server_command.dart';
 

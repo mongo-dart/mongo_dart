@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
-import 'package:mongo_dart/src/database/mongo_database.dart';
+import 'package:mongo_dart/src/database/base/mongo_database.dart';
 import 'package:mongo_dart/src/mongo_client_options.dart';
 import 'package:mongo_dart/src/utils/mongo_db_error.dart';
 import 'package:test/test.dart';

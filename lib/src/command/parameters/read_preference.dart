@@ -10,8 +10,8 @@ import 'package:mongo_dart/src/utils/map_keys.dart'
         keyTags;
 
 import '../../core/error/mongo_dart_error.dart';
-import '../../database/mongo_database.dart';
-import '../../database/mongo_collection.dart';
+import '../../database/base/mongo_database.dart';
+import '../../database/base/mongo_collection.dart';
 import '../../mongo_client.dart';
 
 typedef TagSet = Map<String, String>;

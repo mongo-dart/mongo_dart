@@ -1,7 +1,7 @@
 library replica_tests;
 
 import 'package:mongo_dart/src/core/auth/scram_sha256_authenticator.dart';
-import 'package:mongo_dart/src/database/mongo_collection.dart';
+import 'package:mongo_dart/src/database/base/mongo_collection.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 import 'dart:async';
 import 'package:test/test.dart';
@@ -22,7 +22,7 @@ Future testCollectionInfoCursor() async {
   newColl = db.collection('new_collecion');
   await newColl.remove({});
 
-  await newColl.insertAll([
+  await newColl.insertMany([
     {'a': 1}
   ]);
 

@@ -2,7 +2,7 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/return
 import 'package:mongo_dart/src/command/query_and_write_operation_commands/return_classes/write_result.dart';
 import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/update_operation.dart';
 
-import '../../../../database/mongo_collection.dart';
+import '../../../../database/base/mongo_collection.dart';
 import 'update_one_options.dart';
 import 'update_one_statement.dart';
 

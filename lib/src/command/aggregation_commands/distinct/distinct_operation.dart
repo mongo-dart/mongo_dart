@@ -1,7 +1,7 @@
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../database/mongo_collection.dart';
+import '../../../database/base/mongo_collection.dart';
 import 'distinct_options.dart';
 import '../../base/command_operation.dart';
 import 'distinct_result.dart';

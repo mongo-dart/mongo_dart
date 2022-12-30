@@ -1,6 +1,6 @@
 import 'package:mongo_dart/src/command/administration_commands/create_command/create_command.dart';
 
-import '../../../../database/mongo_database.dart';
+import '../../../../database/base/mongo_database.dart';
 import 'create_collection_options.dart';
 
 /// createCollection command.

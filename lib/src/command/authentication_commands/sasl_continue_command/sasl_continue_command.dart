@@ -6,7 +6,7 @@ import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import '../../../core/network/abstract/connection_base.dart';
 import '../../../database/document_types.dart';
-import '../../../database/mongo_database.dart';
+import '../../../database/base/mongo_database.dart';
 import '../../../topology/server.dart';
 import 'sasl_continue_options.dart';
 

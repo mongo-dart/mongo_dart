@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/return
 import 'package:mongo_dart/src/command/query_and_write_operation_commands/return_classes/write_result.dart';
 
 import '../../../../core/network/abstract/connection_base.dart';
-import '../../../../database/mongo_collection.dart';
+import '../../../../database/base/mongo_collection.dart';
 import '../../../../topology/server.dart';
 import 'delete_many_options.dart';
 import 'delete_many_statement.dart';

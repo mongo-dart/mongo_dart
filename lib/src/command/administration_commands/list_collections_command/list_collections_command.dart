@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
-import '../../../database/mongo_database.dart';
+import '../../../database/base/mongo_database.dart';
 import '../../base/command_operation.dart';
 import 'list_collections_options.dart';
 

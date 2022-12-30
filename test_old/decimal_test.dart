@@ -2,8 +2,8 @@
 
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:decimal/decimal.dart';
-import 'package:mongo_dart/src/database/mongo_database.dart';
-import 'package:mongo_dart/src/database/mongo_collection.dart';
+import 'package:mongo_dart/src/database/base/mongo_database.dart';
+import 'package:mongo_dart/src/database/base/mongo_collection.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:test/test.dart';
 
@@ -38,7 +38,7 @@ void main() async {
       toInsert.add({'a': Decimal.fromInt(n)});
     }
 
-    await collection.insertAll(toInsert);
+    await collection.insertMany(toInsert);
   }
 
   Future cleanupDatabase() async {
