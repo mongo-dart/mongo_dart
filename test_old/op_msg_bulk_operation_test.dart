@@ -381,11 +381,11 @@ void main() async {
             writeConcern: WriteConcern(w: primaryAcknowledged));
         bulk.updateMany(UpdateManyStatement(
             where.eq('status', 'D').map[key$Query],
-            ModifierBuilder().set('status', 'd').map));
+            ModifierBuilder().set('status', 'd').map as UpdateSpecs));
 
         bulk.updateOne(UpdateOneStatement(
             {'cust_num': 99999, 'item': 'abc123', 'status': 'A'},
-            ModifierBuilder().inc('ordered', 1).map));
+            ModifierBuilder().inc('ordered', 1).map as UpdateSpecs));
 
         bulk.replaceOne(ReplaceOneStatement({
           'cust_num': 12345,
@@ -425,11 +425,11 @@ void main() async {
             writeConcern: WriteConcern(w: primaryAcknowledged));
         bulk.updateMany(UpdateManyStatement(
             where.eq('status', 'D').map[key$Query],
-            ModifierBuilder().set('status', 'd').map));
+            ModifierBuilder().set('status', 'd').map as UpdateSpecs));
 
         bulk.updateOne(UpdateOneStatement(
             {'cust_num': 99999, 'item': 'abc123', 'status': 'A'},
-            ModifierBuilder().inc('ordered', 1).map));
+            ModifierBuilder().inc('ordered', 1).map as UpdateSpecs));
         bulk.replaceOne(ReplaceOneStatement({
           'cust_num': 12345,
           'item': 'tst24',

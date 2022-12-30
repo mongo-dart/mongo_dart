@@ -10,25 +10,6 @@ import '../../../../database/base/mongo_database.dart';
 import '../../../base/operation_base.dart';
 
 abstract class InsertOptions {
-  /// The WriteConcern for this insert operation
-  final WriteConcern? writeConcern;
-
-  /// If true, perform an ordered insert of the documents in the array,
-  /// and if an error occurs with one of documents, MongoDB will return without
-  /// processing the remaining documents in the array.
-  ///
-  /// If false, perform an unordered insert, and if an error occurs with one of
-  /// documents, continue processing the remaining documents in the array.
-  ///
-  /// Defaults to true.
-  final bool ordered;
-
-  /// Enables insert to bypass document validation during the operation.
-  ///  This lets you insert documents that do not meet the validation
-  /// requirements.
-  ///
-  /// **New in version 3.2.**
-  final bool bypassDocumentValidation;
   @protected
   InsertOptions.protected(
       {this.writeConcern,
@@ -53,6 +34,26 @@ abstract class InsertOptions {
         ordered: ordered,
         bypassDocumentValidation: bypassDocumentValidation);
   }
+
+  /// The WriteConcern for this insert operation
+  final WriteConcern? writeConcern;
+
+  /// If true, perform an ordered insert of the documents in the array,
+  /// and if an error occurs with one of documents, MongoDB will return without
+  /// processing the remaining documents in the array.
+  ///
+  /// If false, perform an unordered insert, and if an error occurs with one of
+  /// documents, continue processing the remaining documents in the array.
+  ///
+  /// Defaults to true.
+  final bool ordered;
+
+  /// Enables insert to bypass document validation during the operation.
+  ///  This lets you insert documents that do not meet the validation
+  /// requirements.
+  ///
+  /// **New in version 3.2.**
+  final bool bypassDocumentValidation;
 
   InsertOptionsOpen get toOpen => this is InsertOptionsOpen
       ? this as InsertOptionsOpen

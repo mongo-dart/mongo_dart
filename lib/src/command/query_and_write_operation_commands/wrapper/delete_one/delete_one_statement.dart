@@ -2,7 +2,7 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/delete
 import 'package:mongo_dart/src/command/parameters/collation_options.dart';
 
 class DeleteOneStatement extends DeleteStatement {
-  DeleteOneStatement(Map<String, Object?> filter,
+  DeleteOneStatement(Map<String, dynamic> filter,
       {CollationOptions? collation,
       String? hint,
       Map<String, Object>? hintDocument})

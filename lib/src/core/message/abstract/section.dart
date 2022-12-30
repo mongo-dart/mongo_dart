@@ -57,7 +57,7 @@ class SectionType1 extends Section {
           'The value of the document parameter must be a List of documents');
     }
     var identifier = document.keys.first;
-    var documents = document.values.first as List<Map<String, Object?>>;
+    var documents = document.values.first as List<Map<String, dynamic>>;
     //payload = Payload1(identifier, documents);
     return SectionType1(payloadType, Payload1(identifier, documents));
   }

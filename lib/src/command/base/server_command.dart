@@ -33,7 +33,7 @@ class ServerCommand extends OperationBase {
   }
 
   @override
-  Future<Map<String, Object?>> execute() =>
+  Future<Map<String, dynamic>> execute() =>
       throw MongoDartError('Use executOnServer() instead');
 
   /// A session ID MUST NOT be used simultaneously by more than one operation.

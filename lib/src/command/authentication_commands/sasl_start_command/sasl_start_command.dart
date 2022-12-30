@@ -24,11 +24,11 @@ class SaslStartCommand extends CommandOperation {
         });
 
   /*  @override
-  Future<Map<String, Object?>> execute({bool skipStateCheck = false}) async =>
+  Future<Map<String, dynamic>> execute({bool skipStateCheck = false}) async =>
       super.execute(skipStateCheck: true); */
 
   @override
-  Future<Map<String, Object?>> executeOnServer(Server server,
+  Future<Map<String, dynamic>> executeOnServer(Server server,
       {ConnectionBase? connection, bool skipStateCheck = false}) async {
     var command = $buildCommand();
     processOptions(command);

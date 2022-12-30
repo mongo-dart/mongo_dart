@@ -44,7 +44,7 @@ class ListCollectionsCommand extends CommandOperation {
   ///
   /// You can specify a query expression on any of the fields returned
   /// by listCollections
-  Map<String, Object?>? filter;
+  Map<String, dynamic>? filter;
 
   @override
   Command $buildCommand() => <String, dynamic>{

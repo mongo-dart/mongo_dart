@@ -9,7 +9,7 @@ class BulkWriteResult extends AbstractWriteResult {
   List<UpsertedInfo> upserted = [];
   List<BulkWriteError> writeErrors = [];
   List? ids;
-  List<Map<String, Object?>>? documents;
+  List<Map<String, dynamic>>? documents;
 
   BulkWriteResult.fromMap(
       WriteCommandType writeCommandType, Map<String, dynamic> result)
@@ -33,7 +33,7 @@ class BulkWriteResult extends AbstractWriteResult {
   int get writeErrorsNumber => writeErrors.length;
 
   void mergeFromMap(
-      WriteCommandType writeCommandType, Map<String, Object?> result) {
+      WriteCommandType writeCommandType, Map<String, dynamic> result) {
     if (this.writeCommandType != writeCommandType) {
       this.writeCommandType = null;
     }

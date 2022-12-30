@@ -75,7 +75,7 @@ class Server {
     return;
   }
 
-  Future<Map<String, Object?>> executeMessage(
+  Future<Map<String, dynamic>> executeMessage(
       MongoModernMessage message) async {
     if (state != ServerState.connected) {
       throw MongoDartError('Server is not is not connected. $state');
@@ -93,7 +93,7 @@ class Server {
   Future<void> refreshStatus() => _runHello();
 
   Future<void> _runHello() async {
-    Map<String, Object?> result = {keyOk: 0.0};
+    Map<String, dynamic> result = {keyOk: 0.0};
     try {
       var helloCommand = HelloCommand(this, username: serverConfig.userName);
       var actualTimeMS = DateTime.now().millisecondsSinceEpoch;

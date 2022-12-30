@@ -4,14 +4,14 @@ import 'package:mongo_dart/src/command/aggregation_commands/aggregate/return_cla
 
 class ChangeStreamHandler {
   void handleData(
-          Map<String, Object?> streamData, EventSink<ChangeEvent> sink) =>
+          Map<String, dynamic> streamData, EventSink<ChangeEvent> sink) =>
       sink.add(ChangeEvent.fromMap(streamData));
 
   void handleDone(EventSink<ChangeEvent> sink) => sink.close();
   void handleError(error, stacktrace, sink) => sink.addError(error);
 
-  StreamTransformer<Map<String, Object?>, ChangeEvent> get transformer =>
-      StreamTransformer<Map<String, Object?>, ChangeEvent>.fromHandlers(
+  StreamTransformer<Map<String, dynamic>, ChangeEvent> get transformer =>
+      StreamTransformer<Map<String, dynamic>, ChangeEvent>.fromHandlers(
           handleData: handleData,
           handleError: handleError,
           handleDone: handleDone);

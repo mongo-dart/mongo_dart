@@ -635,7 +635,7 @@ void main() async {
             collection,
             UpdateOneStatement(<String, Object>{
               'member': 'abc123'
-            }, <String, Object>{
+            }, <String, Map<String, dynamic>>{
               r'$set': {'status': 'A'},
               r'$inc': {'points': 1}
             }),
@@ -676,10 +676,12 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
             collection,
-            UpdateManyStatement(<String, Object>{}, <String, Object>{
-              r'$set': {'status': 'A'},
-              r'$inc': {'points': 1}
-            }),
+            UpdateManyStatement(
+                <String, Object>{},
+                <String, Map<String, dynamic>>{
+                  r'$set': {'status': 'A'},
+                  r'$inc': {'points': 1}
+                }),
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateManyOperation.executeDocument();
@@ -870,7 +872,7 @@ void main() async {
           UpdateOneStatement(<String, Object>{
             'category': 'cafe',
             'status': 'a'
-          }, <String, Object>{
+          }, <String, Map<String, dynamic>>{
             r'$set': {'status': 'Updated'},
           }, collation: CollationOptions('fr', strength: 1)),
         );
@@ -907,7 +909,7 @@ void main() async {
           collection,
           UpdateManyStatement(<String, Object>{
             'grades': {r'$gte': 100}
-          }, <String, Object>{
+          }, <String, Map<String, dynamic>>{
             r'$set': {r'grades.$[element]': 100},
           }, arrayFilters: [
             {
@@ -950,13 +952,16 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
           collection,
-          UpdateManyStatement(<String, Object>{}, <String, Object>{
-            r'$set': {r'grades.$[element].mean': 100},
-          }, arrayFilters: [
-            {
-              'element.grade': {r'$gte': 85}
-            }
-          ]),
+          UpdateManyStatement(
+              <String, Object>{},
+              <String, Map<String, dynamic>>{
+                r'$set': {r'grades.$[element].mean': 100},
+              },
+              arrayFilters: [
+                {
+                  'element.grade': {r'$gte': 85}
+                }
+              ]),
         );
         var res = await updateManyOperation.executeDocument();
 
@@ -984,7 +989,7 @@ void main() async {
           UpdateManyStatement(<String, Object>{
             'points': {r'$lte': 20},
             'status': 'P'
-          }, <String, Object>{
+          }, <String, Map<String, dynamic>>{
             r'$set': {'misc1': 'Need to activate'},
           }, hintDocument: <String, Object>{
             'status': 1

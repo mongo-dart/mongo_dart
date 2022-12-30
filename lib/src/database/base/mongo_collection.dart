@@ -244,7 +244,7 @@ abstract class MongoCollection {
   Future<int> count([selector]) async {
     var result = await modernCount(
         selector: selector is SelectorBuilder ? selector : null,
-        filter: selector is Map<String, Object?> ? selector : null);
+        filter: selector is Map<String, dynamic> ? selector : null);
     return result.count;
   }
 
@@ -365,11 +365,11 @@ abstract class MongoCollection {
     return fields as Map<String, dynamic>?;
   }
 
-  Map<String, dynamic> _updateBuilder2Map(update) {
+  UpdateSpecs _updateBuilder2Map(update) {
     if (update is ModifierBuilder) {
       update = update.map;
     }
-    return update as Map<String, dynamic>;
+    return update as UpdateSpecs;
   }
 
   // ****************************************************************+
@@ -529,8 +529,8 @@ abstract class MongoCollection {
       Map<String, Object>? hintDocument}) async {
     var updateOneOperation = UpdateOneOperation(
         this,
-        UpdateOneStatement(_selectorBuilder2Map(selector),
-            update is List ? update : _updateBuilder2Map(update),
+        UpdateOneStatement(
+            _selectorBuilder2Map(selector), _updateBuilder2Map(update),
             upsert: upsert,
             collation: collation,
             arrayFilters: arrayFilters,
@@ -549,8 +549,8 @@ abstract class MongoCollection {
       Map<String, Object>? hintDocument}) async {
     var updateManyOperation = UpdateManyOperation(
         this,
-        UpdateManyStatement(_selectorBuilder2Map(selector),
-            update is List ? update : _updateBuilder2Map(update),
+        UpdateManyStatement(
+            _selectorBuilder2Map(selector), _updateBuilder2Map(update),
             upsert: upsert,
             collation: collation,
             arrayFilters: arrayFilters,
@@ -603,7 +603,7 @@ abstract class MongoCollection {
   // Find operation with the new OP_MSG (starting from release 3.6)
   Stream<Map<String, dynamic>> modernFind(
       {SelectorBuilder? selector,
-      Map<String, Object?>? filter,
+      Map<String, dynamic>? filter,
       Map<String, Object>? sort,
       Map<String, Object>? projection,
       String? hint,
@@ -649,7 +649,7 @@ abstract class MongoCollection {
   /// a document instead of a stream.
   Future<Map<String, dynamic>?> modernFindOne(
       {SelectorBuilder? selector,
-      Map<String, Object?>? filter,
+      Map<String, dynamic>? filter,
       Map<String, Object>? sort,
       Map<String, Object>? projection,
       String? hint,
@@ -701,7 +701,7 @@ abstract class MongoCollection {
   /// Executes a Distinct command on this collection.
   /// Retuns a Map like received from the server.
   /// Used for compatibility with the legacy method
-  Future<Map<String, Object?>> modernDistinctMap(String field,
+  Future<Map<String, dynamic>> modernDistinctMap(String field,
           {query,
           DistinctOptions? distinctOptions,
           Map<String, Object>? rawOptions}) async =>
@@ -816,7 +816,7 @@ abstract class MongoCollection {
                 '"$bulkInsertOne" element at index $index must '
                 'contain a Map');
           }
-          bulk.insertOne(docMap[bulkDocument] as Map<String, Object?>);
+          bulk.insertOne(docMap[bulkDocument] as Map<String, dynamic>);
 
           break;
         case bulkInsertMany:
@@ -825,7 +825,7 @@ abstract class MongoCollection {
                 '"$bulkInsertMany" element at index $index must '
                 'contain a List of Maps');
           }
-          bulk.insertMany(docMap[bulkDocuments] as List<Map<String, Object?>>);
+          bulk.insertMany(docMap[bulkDocuments] as List<Map<String, dynamic>>);
           break;
         case bulkUpdateOne:
           bulk.updateOneFromMap(docMap, index: index);
@@ -852,7 +852,7 @@ abstract class MongoCollection {
 
   Future<CountResult> modernCount(
       {SelectorBuilder? selector,
-      Map<String, Object?>? filter,
+      Map<String, dynamic>? filter,
       int? limit,
       int? skip,
       CollationOptions? collation,

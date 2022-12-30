@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/database/database.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 
 void main() async {
@@ -74,11 +75,11 @@ void main() async {
   ///});
   ///'''
   bulk.updateMany(UpdateManyStatement(where.eq('status', 'D').map[key$Query],
-      ModifierBuilder().set('status', 'd').map));
+      ModifierBuilder().set('status', 'd').map as UpdateSpecs));
 
   bulk.updateOne(UpdateOneStatement(
       {'cust_num': 99999, 'item': 'abc123', 'status': 'A'},
-      ModifierBuilder().inc('ordered', 1).map));
+      ModifierBuilder().inc('ordered', 1).map as UpdateSpecs));
 
   bulk.replaceOne(ReplaceOneStatement({
     'cust_num': 12345,

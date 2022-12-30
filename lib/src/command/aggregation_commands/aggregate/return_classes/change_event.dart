@@ -46,7 +46,7 @@ class ChangeEvent {
   /// This document may differ from the changes described in updateDescription
   /// if other majority-committed operations modified the document between
   /// the original update operation and the full document lookup.
-  Map<String, Object?>? fullDocument;
+  Map<String, dynamic>? fullDocument;
 
   /// The namespace (database and or collection) affected by the event.
   MongoDBNamespace? ns;
@@ -61,12 +61,12 @@ class ChangeEvent {
   bool get isDropDatabase => operationType == 'dropDatabase';
   bool get isInvalidate => operationType == 'invalidate';
 
-  Map<String, dynamic> _extractEventData(Map<String, Object?> streamData) {
+  Map<String, dynamic> _extractEventData(Map<String, dynamic> streamData) {
     if (streamData[key_id] != null) {
       id = <String, dynamic>{...streamData[key_id] as Map};
     }
     operationType = streamData[keyOperationType] as String?;
-    fullDocument = streamData[keyFullDocument] as Map<String, Object?>?;
+    fullDocument = streamData[keyFullDocument] as Map<String, dynamic>?;
     if (streamData[keyNs] != null) {
       ns = MongoDBNamespace.fromMap(
           <String, dynamic>{...streamData[keyNs] as Map});

@@ -15,7 +15,7 @@ import '../insert_one_operation_open.dart';
 import '../insert_one_operation_v1.dart';
 
 abstract class InsertOneOperation extends InsertOperation {
-  Map<String, Object?> document;
+  Map<String, dynamic> document;
 
   @protected
   InsertOneOperation.protected(MongoCollection collection, this.document,

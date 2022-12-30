@@ -10,11 +10,11 @@ import 'write_error.dart';
 /// - save
 class WriteResult extends AbstractWriteResult {
   dynamic id;
-  Map<String, Object?>? document;
+  Map<String, dynamic>? document;
   WriteError? writeError;
 
   WriteResult.fromMap(
-      WriteCommandType writeCommandType, Map<String, Object?> result)
+      WriteCommandType writeCommandType, Map<String, dynamic> result)
       : super.fromMap(writeCommandType, result) {
     if (result[keyWriteErrors] != null &&
         (result[keyWriteErrors] as List).isNotEmpty) {

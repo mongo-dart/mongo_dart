@@ -24,7 +24,7 @@ class CursorResult {
   /// alternative container for documents:
   /// * firstBatch in response to a find/aggreagate operation
   /// * nextBatch in response to a getMore command
-  late List<Map<String, Object?>> firstBatch, nextBatch;
+  late List<Map<String, dynamic>> firstBatch, nextBatch;
   late bool partialResultsReturned;
 
   CursorResult(Map<String, Object> document) {

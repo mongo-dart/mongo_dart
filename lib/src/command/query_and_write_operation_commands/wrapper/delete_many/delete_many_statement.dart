@@ -2,7 +2,7 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/delete
 import 'package:mongo_dart/src/command/parameters/collation_options.dart';
 
 class DeleteManyStatement extends DeleteStatement {
-  DeleteManyStatement(Map<String, Object?> filter,
+  DeleteManyStatement(Map<String, dynamic> filter,
       {CollationOptions? collation,
       String? hint,
       Map<String, Object>? hintDocument})

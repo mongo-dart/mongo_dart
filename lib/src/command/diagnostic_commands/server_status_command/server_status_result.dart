@@ -13,7 +13,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 /// refer to the appropriate version of the MongoDB Manual.
 
 class ServerStatusResult with BasicResult {
-  ServerStatusResult(Map<String, Object?> document)
+  ServerStatusResult(Map<String, dynamic> document)
       : writeBacksQueued = document[keyWriteBacksQueued] as bool? ?? false {
     extractBasic(document);
     extractInstanceInfo(document);
@@ -1415,7 +1415,7 @@ class ServerStatusResult with BasicResult {
   /// }
   Map<String, dynamic>? watchdog;
 
-  void extractInstanceInfo(Map<String, Object?> document) {
+  void extractInstanceInfo(Map<String, dynamic> document) {
     host = document[keyHost] as String?;
     advisoryHostFQDNs = document[keyAdvisoryHostFQDNs] as List<String>?;
     version = document[keyVersion] as String?;

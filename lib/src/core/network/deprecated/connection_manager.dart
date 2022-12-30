@@ -45,7 +45,7 @@ class ConnectionManager {
 
   Future _connect(Server server, {ConnectionBase? connection}) async {
     await server.connect();
-    var result = <String, Object?>{keyOk: 0.0};
+    var result = <String, dynamic>{keyOk: 0.0};
     // As I couldn't set-up a pre 3.6 environment, I check not only for
     // a {ok: 0.0} but also for any other error
     try {

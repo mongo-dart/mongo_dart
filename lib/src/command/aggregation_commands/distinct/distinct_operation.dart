@@ -23,7 +23,7 @@ class DistinctOperation extends CommandOperation {
 
   /// A query that specifies the documents from which to retrieve
   /// the distinct values.
-  Map<String, Object?>? query;
+  Map<String, dynamic>? query;
 
   @override
   Command $buildCommand() => <String, dynamic>{

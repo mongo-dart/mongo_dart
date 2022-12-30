@@ -10,7 +10,7 @@ class DeleteStatement {
   /// collection will match the predicate.
   ///
   /// internal document key is "q"
-  Map<String, Object?> filter;
+  Map<String, dynamic> filter;
 
   /// The number of matching documents to delete.
   /// Specify either a 0 to delete all matching documents or 1 to delete a

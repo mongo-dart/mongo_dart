@@ -318,7 +318,7 @@ class MongoDatabase {
   // ***********************************************************
 
   /// This method drops the current DB
-  Future<Map<String, Object?>> modernDropDatabase(
+  Future<Map<String, dynamic>> modernDropDatabase(
       {DropDatabaseOptions? dropOptions,
       Map<String, Object>? rawOptions}) async {
     var command = DropDatabaseCommand(this,
@@ -330,7 +330,7 @@ class MongoDatabase {
   /// connection.
   ///
   /// Only works from version 3.6
-  Future<Map<String, Object?>> serverStatus(
+  Future<Map<String, dynamic>> serverStatus(
       {Map<String, Object>? options}) async {
     var operation = ServerStatusCommand(this,
         serverStatusOptions: ServerStatusOptions.instance);
@@ -338,7 +338,7 @@ class MongoDatabase {
   }
 
   /// This method explicitly creates a collection
-  Future<Map<String, Object?>> createCollection(String name,
+  Future<Map<String, dynamic>> createCollection(String name,
       {CreateCollectionOptions? createCollectionOptions,
       Map<String, Object>? rawOptions}) async {
     var command = CreateCollectionCommand(this, name,
@@ -352,7 +352,7 @@ class MongoDatabase {
   ///
   Stream<Map<String, dynamic>> modernListCollections(
       {SelectorBuilder? selector,
-      Map<String, Object?>? filter,
+      Map<String, dynamic>? filter,
       ListCollectionsOptions? findOptions,
       Map<String, Object>? rawOptions}) {
     var command = ListCollectionsCommand(this,
@@ -365,7 +365,7 @@ class MongoDatabase {
   }
 
   /// This method creates a view
-  Future<Map<String, Object?>> createView(
+  Future<Map<String, dynamic>> createView(
       String view, String source, List pipeline,
       {CreateViewOptions? createViewOptions,
       Map<String, Object>? rawOptions}) async {
@@ -375,7 +375,7 @@ class MongoDatabase {
   }
 
   /// This method drops a collection
-  Future<Map<String, Object?>> modernDrop(String collectionNAme,
+  Future<Map<String, dynamic>> modernDrop(String collectionNAme,
       {DropOptions? dropOptions, Map<String, Object>? rawOptions}) async {
     var command = DropCommand(this, collectionNAme,
         dropOptions: dropOptions, rawOptions: rawOptions);

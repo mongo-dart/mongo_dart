@@ -1,10 +1,11 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 
-import '../../../core/error/mongo_dart_error.dart';
+import '../update_statement_open.dart';
+import '../update_statement_v1.dart';
 
 class UpdateStatement {
-  UpdateStatement(this.q, this.u,
+  UpdateStatement.protected(this.q, this.u,
       {bool? upsert,
       bool? multi,
       this.collation,
@@ -19,9 +20,35 @@ class UpdateStatement {
     }
   }
 
+  factory UpdateStatement(QueryFilter q, dynamic u,
+      {ServerApi? serverApi,
+      bool? upsert,
+      bool? multi,
+      CollationOptions? collation,
+      List? arrayFilters,
+      String? hint,
+      Map<String, Object>? hintDocument}) {
+    if (serverApi != null && serverApi.version == ServerApiVersion.v1) {
+      return UpdateStatementV1(q, u,
+          upsert: upsert,
+          multi: multi,
+          collation: collation,
+          arrayFilters: arrayFilters,
+          hint: hint,
+          hintDocument: hintDocument);
+    }
+    return UpdateStatementOpen(q, u,
+        upsert: upsert,
+        multi: multi,
+        collation: collation,
+        arrayFilters: arrayFilters,
+        hint: hint,
+        hintDocument: hintDocument);
+  }
+
   /// The query that matches documents to update.
   /// Use the same query selectors as used in the find() method.
-  Map<String, Object?> q;
+  QueryFilter q;
 
   /// The modifications to apply.
   ///
@@ -131,6 +158,26 @@ class UpdateStatement {
   /// New in 4.4
   String? hint;
   Map<String, Object>? hintDocument;
+
+  UpdateStatementOpen get toOpen => this is UpdateStatementOpen
+      ? this as UpdateStatementOpen
+      : UpdateStatementOpen(q, u,
+          upsert: upsert,
+          multi: multi,
+          collation: collation,
+          arrayFilters: arrayFilters,
+          hint: hint,
+          hintDocument: hintDocument);
+
+  UpdateStatementV1 get toV1 => this is UpdateStatementV1
+      ? this as UpdateStatementV1
+      : UpdateStatementV1(q, u,
+          upsert: upsert,
+          multi: multi,
+          collation: collation,
+          arrayFilters: arrayFilters,
+          hint: hint,
+          hintDocument: hintDocument);
 
   Options toMap() => <String, dynamic>{
         keyQ: q,

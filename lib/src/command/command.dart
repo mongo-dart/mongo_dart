@@ -47,9 +47,9 @@ export 'query_and_write_operation_commands/return_classes/abstract_write_result.
 export 'query_and_write_operation_commands/return_classes/bulk_write_result.dart';
 export 'query_and_write_operation_commands/return_classes/write_result.dart';
 
-export 'query_and_write_operation_commands/update_operation/update_operation.dart';
-export 'query_and_write_operation_commands/update_operation/update_options.dart';
-export 'query_and_write_operation_commands/update_operation/update_statement.dart';
+export 'query_and_write_operation_commands/update_operation/base/update_operation.dart';
+export 'query_and_write_operation_commands/update_operation/base/update_options.dart';
+export 'query_and_write_operation_commands/update_operation/base/update_statement.dart';
 
 export 'query_and_write_operation_commands/wrapper/bulk/bulk.dart';
 export 'query_and_write_operation_commands/wrapper/bulk/ordered_bulk.dart';
@@ -60,15 +60,15 @@ export 'query_and_write_operation_commands/wrapper/delete_many/delete_many_state
 export 'query_and_write_operation_commands/wrapper/delete_one/delete_one_operation.dart';
 export 'query_and_write_operation_commands/wrapper/delete_one/delete_one_options.dart';
 export 'query_and_write_operation_commands/wrapper/delete_one/delete_one_statement.dart';
-export 'query_and_write_operation_commands/wrapper/update_many/update_many_operation.dart';
-export 'query_and_write_operation_commands/wrapper/update_many/update_many_options.dart';
-export 'query_and_write_operation_commands/wrapper/update_many/update_many_statement.dart';
-export 'query_and_write_operation_commands/wrapper/update_one/update_one_operation.dart';
-export 'query_and_write_operation_commands/wrapper/update_one/update_one_options.dart';
-export 'query_and_write_operation_commands/wrapper/update_one/update_one_statement.dart';
-export 'query_and_write_operation_commands/wrapper/replace_one/replace_one_operation.dart';
-export 'query_and_write_operation_commands/wrapper/replace_one/replace_one_options.dart';
-export 'query_and_write_operation_commands/wrapper/replace_one/replace_one_statement.dart';
+export 'query_and_write_operation_commands/wrapper/update_many/base/update_many_operation.dart';
+export 'query_and_write_operation_commands/wrapper/update_many/base/update_many_options.dart';
+export 'query_and_write_operation_commands/wrapper/update_many/base/update_many_statement.dart';
+export 'query_and_write_operation_commands/wrapper/update_one/base/update_one_operation.dart';
+export 'query_and_write_operation_commands/wrapper/update_one/base/update_one_options.dart';
+export 'query_and_write_operation_commands/wrapper/update_one/base/update_one_statement.dart';
+export 'query_and_write_operation_commands/wrapper/replace_one/base/replace_one_operation.dart';
+export 'query_and_write_operation_commands/wrapper/replace_one/base/replace_one_options.dart';
+export 'query_and_write_operation_commands/wrapper/replace_one/base/replace_one_statement.dart';
 export 'query_and_write_operation_commands/wrapper/insert_many/base/insert_many_options.dart';
 
 export 'replication_commands/hello_command/hello_command.dart';
