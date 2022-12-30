@@ -4,38 +4,13 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
-import 'package:mongo_dart/src/server_api_version.dart';
-import 'package:mongo_dart/src_old/database/utils/dns_lookup.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
-//import '../../mongo_dart_old.dart'
-// show
-//AggregateOperation,
-// AggregateOptions,
-//CreateCollectionCommand,
-//CreateCollectionOptions,
-//CreateViewCommand,
-//CreateViewOptions,
-//GetLastErrorCommand,
-//SelectorBuilder,
-//ServerStatusCommand,
-//ServerStatusOptions,
-// key$Query,
-//keyName,
-//keyOk;
 import '../../core/auth/auth.dart';
 import '../../../src_old/auth/mongodb_cr_authenticator.dart';
 import '../../core/auth/scram_sha1_authenticator.dart';
 import '../../core/auth/scram_sha256_authenticator.dart';
-import '../../command/administration_commands/drop_command/drop_command.dart';
-import '../../command/administration_commands/drop_command/drop_options.dart';
-import '../../command/administration_commands/drop_database_command/drop_database_command.dart';
-import '../../command/administration_commands/drop_database_command/drop_database_options.dart';
-import '../../command/administration_commands/list_collections_command/list_collections_command.dart';
-import '../../command/administration_commands/list_collections_command/list_collections_options.dart';
-import '../../command/diagnostic_commands/ping_command/ping_command.dart';
-import '../../server_api.dart';
 import '../../topology/abstract/topology.dart';
 import '../modern_cursor.dart';
 import '../../command/base/command_operation.dart';
@@ -43,7 +18,6 @@ import '../../core/message/abstract/mongo_message.dart';
 import '../../core/message/deprecated/mongo_reply_message.dart';
 import '../../core/network/abstract/connection_base.dart';
 import '../../topology/server.dart';
-import '../../utils/split_hosts.dart';
 
 class MongoDatabase {
   @protected
@@ -71,8 +45,9 @@ class MongoDatabase {
   String? _debugInfo;
   MongoDatabase? authSourceDb;
 
-  WriteConcern? _writeConcern;
   AuthenticationScheme? authenticationScheme;
+  WriteConcern? _writeConcern;
+  ReadConcern? _readConcern;
   ReadPreference? readPreference;
 
   //Todo temp solution
@@ -99,168 +74,16 @@ class MongoDatabase {
   /// At present it can be defined only at client level
   ServerApi? get serverApi => mongoClient.serverApi;
 
+  WriteConcern? get writeConcern => _writeConcern ?? mongoClient.writeConcern;
+  ReadConcern? get readConcern => _readConcern ?? mongoClient.readConcern;
+
   // ********************************************************************
   // ********************          OLD          *************************
   // ********************************************************************
 
-  /// Db constructor expects [valid mongodb URI](https://docs.mongodb.com/manual/reference/connection-string/).
-  /// For example next code points to local mongodb server on default mongodb port, database *testdb*
-  ///```dart
-  ///     var db = new Db('mongodb://127.0.0.1/testdb');
-  ///```
-  /// And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
-  ///```dart
-  ///     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
-  ///```
-  @Deprecated('No more used')
-  MongoDatabase._(String uriString, [this._debugInfo]) {
-    if (uriString.contains(',')) {
-      _uriList.addAll(splitHosts(uriString));
-    } else {
-      _uriList.add(uriString);
-    }
-  }
-
-  @Deprecated('No more used')
-  MongoDatabase.pool(List<String> uriList, [this._debugInfo]) {
-    _uriList.addAll(uriList);
-  }
-  //@Deprecated('No more used')
-  //Db._authDb(this.databaseName);
-  /// This method allow to create a Db object both with the Standard
-  /// Connection String Format (`mongodb://`) or with the DNS Seedlist
-  /// Connection Format (`mongodb+srv://`).
-  /// The former has the format:
-  /// mongodb://[username:password@]host1[:port1]
-  ///      [,...hostN[:portN]][/[defaultauthdb][?options]]
-  /// The latter is available from version 3.6. The format is:
-  /// mongodb+srv://[username:password@]host1[:port1]
-  ///      [/[databaseName][?options]]
-  /// More info are available [here](https://docs.mongodb.com/manual/reference/connection-string/)
-  ///
-  /// This is an asynchronous constructor.
-  /// In order to resolve the Seedlist, a call to a DNS server is needed
-  /// If the DNS server is unreachable, the constructor throws an error.
-  @Deprecated('No more used')
-  static Future<MongoDatabase> create(String uriString,
-      [String? debugInfo]) async {
-    if (uriString.startsWith('mongodb://')) {
-      return MongoDatabase._(uriString, debugInfo);
-    } else if (uriString.startsWith('mongodb+srv://')) {
-      var uriList = await dnsLookup(Uri.parse(uriString));
-      return MongoDatabase.pool(uriList, debugInfo);
-    } else {
-      throw MongoDartError(
-          'The only valid schemas for Db are: "mongodb" and "mongodb+srv".');
-    }
-  }
-
-  WriteConcern? get writeConcern => _writeConcern;
-
   MongoDatabase getSibling(String dbName) => mongoClient.db(dbName: dbName);
 
   List<String> get uriList => _uriList.toList();
-/* 
-  Future<ServerConfig> _parseUri(String uriString,
-      {bool? isSecure,
-      bool? tlsAllowInvalidCertificates,
-      String? tlsCAFile,
-      String? tlsCertificateKeyFile,
-      String? tlsCertificateKeyFilePassword}) async {
-    isSecure ??= false;
-    tlsAllowInvalidCertificates ??= false;
-    if (tlsAllowInvalidCertificates ||
-        tlsCAFile != null ||
-        tlsCertificateKeyFile != null) {
-      isSecure = true;
-    }
-    var uri = Uri.parse(uriString);
-
-    if (uri.scheme != 'mongodb') {
-      throw MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
-    }
-
-    uri.queryParameters.forEach((String queryParam, String value) {
-      if (queryParam == ConnectionStringOptions.authMechanism) {
-        selectAuthenticationMechanism(value);
-      }
-
-      if (queryParam == ConnectionStringOptions.authSource) {
-        authSourceDb = Db._authDb(value);
-      }
-
-      if ((queryParam == ConnectionStringOptions.tls ||
-              queryParam == ConnectionStringOptions.ssl) &&
-          value == 'true') {
-        isSecure = true;
-      }
-      if (queryParam == ConnectionStringOptions.tlsAllowInvalidCertificates &&
-          value == 'true') {
-        tlsAllowInvalidCertificates = true;
-        isSecure = true;
-      }
-      if (queryParam == ConnectionStringOptions.tlsCAFile && value.isNotEmpty) {
-        tlsCAFile = value;
-        isSecure = true;
-      }
-      if (queryParam == ConnectionStringOptions.tlsCertificateKeyFile &&
-          value.isNotEmpty) {
-        tlsCertificateKeyFile = value;
-        isSecure = true;
-      }
-      if (queryParam == ConnectionStringOptions.tlsCertificateKeyFilePassword &&
-          value.isNotEmpty) {
-        tlsCertificateKeyFilePassword = value;
-      }
-    });
-
-    Uint8List? tlsCAFileContent;
-    if (tlsCAFile != null) {
-      tlsCAFileContent = await File(tlsCAFile!).readAsBytes();
-    }
-    Uint8List? tlsCertificateKeyFileContent;
-    if (tlsCertificateKeyFile != null) {
-      tlsCertificateKeyFileContent =
-          await File(tlsCertificateKeyFile!).readAsBytes();
-    }
-    if (tlsCertificateKeyFilePassword != null &&
-        tlsCertificateKeyFile == null) {
-      throw MongoDartError('Missing tlsCertificateKeyFile parameter');
-    }
-
-    var serverConfig = ServerConfig(
-        host: uri.host,
-        port: uri.port,
-        isSecure: isSecure,
-        tlsAllowInvalidCertificates: tlsAllowInvalidCertificates,
-        tlsCAFileContent: tlsCAFileContent,
-        tlsCertificateKeyFileContent: tlsCertificateKeyFileContent,
-        tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword);
-
-    if (serverConfig.port == 0) {
-      serverConfig.port = defMongoPort;
-    }
-
-    if (uri.userInfo.isNotEmpty) {
-      var userInfo = uri.userInfo.split(':');
-
-      if (userInfo.length != 2) {
-        throw MongoDartError('Invalid format of userInfo field: $uri.userInfo');
-      }
-
-      serverConfig.userName = Uri.decodeComponent(userInfo[0]);
-      serverConfig.password = Uri.decodeComponent(userInfo[1]);
-    }
-
-    if (uri.path.isNotEmpty) {
-      databaseName = uri.path.replaceAll('/', '');
-    }
-    if (unfilled(databaseName)) {
-      databaseName = 'test';
-    }
-
-    return serverConfig;
-  } */
 
   void selectAuthenticationMechanism(String authenticationSchemeName) {
     if (authenticationSchemeName == ScramSha1Authenticator.name) {
@@ -284,15 +107,6 @@ class MongoDatabase {
       {ConnectionBase? connection}) {
     throw MongoDartError('No More used');
   }
-/* 
-  Future<Map<String, Object?>> executeModernMessage(MongoModernMessage message,
-      {ConnectionBase? connection}) async {
-    if (state != State.open) {
-      throw MongoDartError('DB is not open. $state');
-    }
-
-    return server.executeMessage(message);
-  } */
 
   @Deprecated('Do Not USe')
   Future open(Server server,
@@ -354,41 +168,12 @@ class MongoDatabase {
     throw MongoDartError('No More used');
   }
 
-  @Deprecated('No More Used')
-  Future<Map<String, dynamic>> isMaster({ConnectionBase? connection}) =>
-      throw MongoDartError('No More used');
-
   Future<Map<String, dynamic>> wait() => throw MongoDartError('No More used');
-
-  @Deprecated('No More Used')
-  Future close() async {
-    throw MongoDartError('No More used');
-  }
 
   // Todo new version ?
   /// Analogue to shell's `show dbs`. Helper for `listDatabases` mongodb command.
   ///   @Deprecated('No More Used')
   Future<List> listDatabases() async {
-    throw MongoDartError('No More used');
-  }
-/* 
-  @Deprecated('No More Used')
-  Stream<Map<String, dynamic>> _listCollectionsCursor(
-      [Map<String, dynamic> filter = const {}]) {
-    throw MongoDartError('No More used');
-  } */
-
-  /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
-  /// with WiredTiger
-  /// Use `getCollectionInfos` instead
-  @Deprecated('Use `getCollectionInfos` instead')
-  Stream<Map<String, dynamic>> collectionsInfoCursor(
-          [String? collectionName]) =>
-      _collectionsInfoCursor(collectionName);
-
-  @Deprecated('No More Used')
-  Stream<Map<String, dynamic>> _collectionsInfoCursor(
-      [String? collectionName]) {
     throw MongoDartError('No More used');
   }
 
@@ -442,14 +227,6 @@ class MongoDatabase {
 
     server.serverConfig.isAuthenticated = true;
     return true;
-  }
-
-  /// This method uses system collections and therefore do not work on MongoDB v3.0 with and upward
-  /// with WiredTiger
-  /// Use `DbCollection.getIndexes()` instead
-  @Deprecated('Use `DbCollection.getIndexes()` instead')
-  Future<List> indexInformation([String? collectionName]) {
-    throw MongoDartError('No More used');
   }
 
   String _createIndexName(Map<String, dynamic> keys) {
@@ -535,13 +312,6 @@ class MongoDatabase {
 
     return createdIndex;
   }
-/* 
-  @Deprecated('No More Used')
-  Future<Map<String, dynamic>> _getAcknowledgement(
-      {WriteConcern? writeConcern}) {
-    writeConcern ??= _writeConcern;
-    throw MongoDartError('No More Used');
-  } */
 
   // **********************************************************+
   // ************** OP_MSG_COMMANDS ****************************

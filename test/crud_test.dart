@@ -7,6 +7,8 @@ import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
 part 'crud/insert/insert_one.dart';
+part 'crud/insert/insert_many.dart';
+
 part 'crud/insert/insert.dart';
 
 const dbName = 'test-mongo-dart-crud';

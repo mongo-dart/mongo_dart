@@ -1,9 +1,7 @@
 import 'package:bson/bson.dart';
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/server_api_version.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
-import '../../server_api.dart';
 import '../../utils/parms_utils.dart';
 import '../modern_cursor.dart';
 

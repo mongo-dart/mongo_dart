@@ -1,10 +1,16 @@
 export 'administration_commands/drop_indexes_command/drop_indexes_command.dart';
 export 'administration_commands/drop_indexes_command/drop_indexes_options.dart';
+export 'administration_commands/drop_command/drop_command.dart';
+export 'administration_commands/drop_command/drop_options.dart';
+export 'administration_commands/drop_database_command/drop_database_command.dart';
+export 'administration_commands/drop_database_command/drop_database_options.dart';
 export 'administration_commands/get_parameter_command/get_parameter_command.dart';
 export 'administration_commands/kill_cursors_command/kill_cursors_command.dart';
 export 'administration_commands/get_all_parameters_command/get_all_parameters_command.dart';
 export 'administration_commands/listt_indexes_command/list_indexes_command.dart';
 export 'administration_commands/listt_indexes_command/list_indexes_options.dart';
+export 'administration_commands/list_collections_command/list_collections_command.dart';
+export 'administration_commands/list_collections_command/list_collections_options.dart';
 export 'administration_commands/wrapper/create_collection/create_collection_command.dart';
 export 'administration_commands/wrapper/create_collection/create_collection_options.dart';
 export 'administration_commands/wrapper/create_view/create_view_command.dart';
@@ -24,6 +30,7 @@ export 'authentication_commands/sasl_continue_command/sasl_continue_command.dart
 export 'authentication_commands/sasl_start_command/sasl_start_command.dart';
 export 'authentication_commands/sasl_start_command/sasl_start_options.dart';
 
+export 'diagnostic_commands/ping_command/ping_command.dart';
 export 'diagnostic_commands/server_status_command/server_status_command.dart';
 
 export 'diagnostic_commands/server_status_command/server_status_options.dart';

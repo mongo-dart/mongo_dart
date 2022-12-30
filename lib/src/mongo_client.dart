@@ -62,9 +62,9 @@ class MongoClient {
 
   DateTime? clientClusterTime;
 
-  ReadConcern? get readConvern => mongoClientOptions.readConcern;
-  ReadPreference? get readPreference => mongoClientOptions.readPreference;
   WriteConcern? get writeConcern => mongoClientOptions.writeConcern;
+  ReadConcern? get readConcern => mongoClientOptions.readConcern;
+  ReadPreference? get readPreference => mongoClientOptions.readPreference;
 
   ServerApi? get serverApi => mongoClientOptions.serverApi;
 

@@ -7,7 +7,6 @@ import 'package:mongo_dart/mongo_dart.dart';
 //import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:mongo_dart/src/command/base/command_operation.dart';
-import 'package:mongo_dart/src/command/diagnostic_commands/ping_command/ping_command.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:test/test.dart';

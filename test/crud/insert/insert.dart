@@ -14,16 +14,17 @@ Future insertTest() async {
     tearDown(() async {
       await cleanupDatabase(client);
     });
-    test('', () async {
-      await insertDocumentWithoutIdRaw(db, usedCollectionNames);
+
+    group('Insert One', () {
+      test('', () async {
+        await insertDocumentWithoutIdRaw(db, usedCollectionNames);
+      });
     });
 
-/* 
-    group('InsertOne', () {
-      test('Insert Document Without Id', insertDocumentWithoutIdRaw);
-    }); */
-    group('DbCollection tests:', () {
-      //test('testAuthComponents', testAuthComponents);
+    group('Insert many', () {
+      test('', () async {
+        await insertManyDocumentsWithoutIdRaw(db, usedCollectionNames);
+      });
     });
   });
   tearDownAll(() async {

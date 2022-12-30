@@ -3,7 +3,6 @@ import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
-import 'package:mongo_dart/src/server_api_version.dart';
 
 import '../insert_operation_open.dart';
 import '../insert_operation_v1.dart';
