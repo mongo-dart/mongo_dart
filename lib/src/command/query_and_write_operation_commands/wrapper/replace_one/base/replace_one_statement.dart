@@ -2,8 +2,8 @@ import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/utils/update_document_check.dart';
 
-import '../replace_one_statement_open.dart';
-import '../replace_one_statement_v1.dart';
+import '../open/replace_one_statement_open.dart';
+import '../v1/replace_one_statement_v1.dart';
 
 abstract class ReplaceOneStatement extends UpdateStatement {
   @protected

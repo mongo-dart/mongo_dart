@@ -75,11 +75,11 @@ void main() async {
   ///});
   ///'''
   bulk.updateMany(UpdateManyStatement(where.eq('status', 'D').map[key$Query],
-      ModifierBuilder().set('status', 'd').map as UpdateSpecs));
+      ModifierBuilder().set('status', 'd').map as UpdateDocument));
 
   bulk.updateOne(UpdateOneStatement(
       {'cust_num': 99999, 'item': 'abc123', 'status': 'A'},
-      ModifierBuilder().inc('ordered', 1).map as UpdateSpecs));
+      ModifierBuilder().inc('ordered', 1).map as UpdateDocument));
 
   bulk.replaceOne(ReplaceOneStatement({
     'cust_num': 12345,

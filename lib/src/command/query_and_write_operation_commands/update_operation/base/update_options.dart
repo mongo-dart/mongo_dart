@@ -10,8 +10,8 @@ import 'package:mongo_dart/mongo_dart.dart'
         keyWriteConcern;
 
 import '../../../base/operation_base.dart';
-import '../update_options_open.dart';
-import '../update_options_v1.dart';
+import '../open/update_options_open.dart';
+import '../v1/update_options_v1.dart';
 
 abstract class UpdateOptions {
   @protected

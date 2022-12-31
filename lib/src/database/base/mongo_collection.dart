@@ -365,11 +365,11 @@ abstract class MongoCollection {
     return fields as Map<String, dynamic>?;
   }
 
-  UpdateSpecs _updateBuilder2Map(update) {
+  UpdateDocument _updateBuilder2Map(update) {
     if (update is ModifierBuilder) {
       update = update.map;
     }
-    return update as UpdateSpecs;
+    return update as UpdateDocument;
   }
 
   // ****************************************************************+

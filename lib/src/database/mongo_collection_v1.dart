@@ -1,5 +1,5 @@
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/insert_many/insert_many_operation_v1.dart';
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/insert_one/insert_one_operation_v1.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/insert_many/v1/insert_many_operation_v1.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/insert_one/v1/insert_one_operation_v1.dart';
 
 import '../command/command.dart';
 import 'database.dart';

@@ -4,8 +4,8 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/insert
 
 import '../../../../../server_api.dart';
 import '../../../../../server_api_version.dart';
-import '../insert_many_options_open.dart';
-import '../insert_many_options_v1.dart';
+import '../open/insert_many_options_open.dart';
+import '../v1/insert_many_options_v1.dart';
 
 class InsertManyOptions extends InsertOptions {
   @protected

@@ -292,7 +292,8 @@ abstract class Bulk extends CommandOperation {
           '${index == null ? '' : 'at index $index '}must '
           'contain a Map');
     }
-    updateOne(UpdateOneStatement(filterMap, docMap[bulkUpdate] as UpdateSpecs,
+    updateOne(UpdateOneStatement(
+        filterMap, docMap[bulkUpdate] as UpdateDocument,
         upsert: docMap[bulkUpsert] as bool?,
         collation: docMap[bulkCollation] is Map<String, dynamic>
             ? CollationOptions.fromMap(
@@ -369,7 +370,8 @@ abstract class Bulk extends CommandOperation {
           '${index == null ? '' : 'at index $index '}must '
           'contain a Map');
     }
-    updateMany(UpdateManyStatement(filterMap, docMap[bulkUpdate] as UpdateSpecs,
+    updateMany(UpdateManyStatement(
+        filterMap, docMap[bulkUpdate] as UpdateDocument,
         upsert: docMap[bulkUpsert] as bool?,
         collation: docMap[bulkCollation] is Map<String, dynamic>
             ? CollationOptions.fromMap(

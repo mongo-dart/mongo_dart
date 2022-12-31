@@ -1,18 +1,20 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 
-import '../update_statement_open.dart';
-import '../update_statement_v1.dart';
+import '../open/update_statement_open.dart';
+import '../v1/update_statement_v1.dart';
+import 'update_specs.dart';
 
 class UpdateStatement {
-  UpdateStatement.protected(this.q, this.u,
+  UpdateStatement.protected(this.q, Object u,
       {bool? upsert,
       bool? multi,
       this.collation,
       this.arrayFilters,
       this.hint,
       this.hintDocument})
-      : upsert = upsert ?? false,
+      : u = UpdateSpecs(u).documents,
+        upsert = upsert ?? false,
         multi = multi ?? false {
     if (arrayFilters != null && arrayFilters is! List && arrayFilters is! Map) {
       throw MongoDartError(
@@ -20,7 +22,7 @@ class UpdateStatement {
     }
   }
 
-  factory UpdateStatement(QueryFilter q, dynamic u,
+  factory UpdateStatement(QueryFilter q, Object u,
       {ServerApi? serverApi,
       bool? upsert,
       bool? multi,
@@ -59,7 +61,7 @@ class UpdateStatement {
   ///   * `$addFields` and its alias `$set`
   ///   * `$project` and its alias `$unset`
   ///   * `$replaceRoot` and its alias `$replaceWith`.
-  Object u;
+  List<MongoDocument> u;
 
   /// If true, perform an insert if no documents match the query.
   /// If both upsert and multi are true and no documents match the query,

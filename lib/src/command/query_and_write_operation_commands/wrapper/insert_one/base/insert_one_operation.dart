@@ -11,8 +11,8 @@ import 'package:mongo_dart/mongo_dart.dart'
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/server_api_version.dart';
 
-import '../insert_one_operation_open.dart';
-import '../insert_one_operation_v1.dart';
+import '../open/insert_one_operation_open.dart';
+import '../v1/insert_one_operation_v1.dart';
 
 abstract class InsertOneOperation extends InsertOperation {
   Map<String, dynamic> document;

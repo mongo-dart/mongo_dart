@@ -11,8 +11,8 @@ import 'package:mongo_dart/mongo_dart.dart'
 
 import '../../../../../server_api_version.dart';
 import '../../../../base/operation_base.dart';
-import '../insert_many_operation_open.dart';
-import '../insert_many_operation_v1.dart';
+import '../open/insert_many_operation_open.dart';
+import '../v1/insert_many_operation_v1.dart';
 
 abstract class InsertManyOperation extends InsertOperation {
   @protected

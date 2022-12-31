@@ -1,12 +1,12 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import '../../../../../utils/update_document_check.dart';
-import '../update_one_statement_open.dart';
-import '../update_one_statement_v1.dart';
+import '../open/update_one_statement_open.dart';
+import '../v1/update_one_statement_v1.dart';
 
 abstract class UpdateOneStatement extends UpdateStatement {
   @protected
-  UpdateOneStatement.protected(QueryFilter q, UpdateSpecs u,
+  UpdateOneStatement.protected(QueryFilter q, UpdateDocument u,
       {bool? upsert,
       CollationOptions? collation,
       List<dynamic>? arrayFilters,
@@ -25,7 +25,7 @@ abstract class UpdateOneStatement extends UpdateStatement {
     }
   }
 
-  factory UpdateOneStatement(QueryFilter q, UpdateSpecs u,
+  factory UpdateOneStatement(QueryFilter q, UpdateDocument u,
       {ServerApi? serverApi,
       bool? upsert,
       CollationOptions? collation,
@@ -50,7 +50,7 @@ abstract class UpdateOneStatement extends UpdateStatement {
 
   UpdateOneStatementOpen get toUpdateOneOpen => this is UpdateOneStatementOpen
       ? this as UpdateOneStatementOpen
-      : UpdateOneStatementOpen(q, u as UpdateSpecs,
+      : UpdateOneStatementOpen(q, u as UpdateDocument,
           upsert: upsert,
           collation: collation,
           arrayFilters: arrayFilters,
@@ -59,7 +59,7 @@ abstract class UpdateOneStatement extends UpdateStatement {
 
   UpdateOneStatementV1 get toUpdateOneV1 => this is UpdateOneStatementV1
       ? this as UpdateOneStatementV1
-      : UpdateOneStatementV1(q, u as UpdateSpecs,
+      : UpdateOneStatementV1(q, u as UpdateDocument,
           upsert: upsert,
           collation: collation,
           arrayFilters: arrayFilters,

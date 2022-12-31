@@ -1,8 +1,8 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../replace_one_options_open.dart';
-import '../replace_one_options_v1.dart';
+import '../open/replace_one_options_open.dart';
+import '../v1/replace_one_options_v1.dart';
 
 abstract class ReplaceOneOptions extends UpdateOptions {
   @protected

@@ -12,8 +12,8 @@ import 'package:mongo_dart/mongo_dart.dart'
         keyUpdates;
 
 import '../../../base/command_operation.dart';
-import '../update_operation_open.dart';
-import '../update_operation_v1.dart';
+import '../open/update_operation_open.dart';
+import '../v1/update_operation_v1.dart';
 
 abstract class UpdateOperation extends CommandOperation {
   @protected

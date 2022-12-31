@@ -10,8 +10,8 @@ import 'package:mongo_dart/mongo_dart.dart'
         WriteCommandType,
         WriteResult;
 
-import '../update_one_operation_open.dart';
-import '../update_one_operation_v1.dart';
+import '../open/update_one_operation_open.dart';
+import '../v1/update_one_operation_v1.dart';
 
 abstract class UpdateOneOperation extends UpdateOperation {
   @protected

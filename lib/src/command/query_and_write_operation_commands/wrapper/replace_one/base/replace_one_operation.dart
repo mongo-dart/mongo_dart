@@ -1,8 +1,8 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/replace_one/replace_one_operation_open.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/replace_one/open/replace_one_operation_open.dart';
 
-import '../replace_one_operation_v1.dart';
+import '../v1/replace_one_operation_v1.dart';
 
 abstract class ReplaceOneOperation extends UpdateOperation {
   @protected

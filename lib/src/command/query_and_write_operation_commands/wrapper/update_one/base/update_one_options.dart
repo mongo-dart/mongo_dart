@@ -1,8 +1,8 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../update_one_options_open.dart';
-import '../update_one_options_v1.dart';
+import '../open/update_one_options_open.dart';
+import '../v1/update_one_options_v1.dart';
 
 abstract class UpdateOneOptions extends UpdateOptions {
   @protected

@@ -1,8 +1,8 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../update_many_operation_open.dart';
-import '../update_many_operation_v1.dart';
+import '../open/update_many_operation_open.dart';
+import '../v1/update_many_operation_v1.dart';
 
 abstract class UpdateManyOperation extends UpdateOperation {
   @protected
