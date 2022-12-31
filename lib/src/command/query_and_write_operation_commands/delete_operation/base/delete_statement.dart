@@ -1,10 +1,35 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:meta/meta.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 
-class DeleteStatement {
-  DeleteStatement(this.filter,
+import '../open/delete_statement_open.dart';
+import '../v1/delete_statement_v1.dart';
+
+abstract class DeleteStatement {
+  @protected
+  DeleteStatement.protected(this.filter,
       {this.collation, this.hint, this.hintDocument, int? limit})
       : limit = limit ?? 1;
+
+  factory DeleteStatement(QueryFilter filter,
+      {ServerApi? serverApi,
+      CollationOptions? collation,
+      String? hint,
+      Map<String, Object>? hintDocument,
+      int? limit}) {
+    if (serverApi != null && serverApi.version == ServerApiVersion.v1) {
+      return DeleteStatementV1(filter,
+          collation: collation,
+          hint: hint,
+          hintDocument: hintDocument,
+          limit: limit);
+    }
+    return DeleteStatementOpen(filter,
+        collation: collation,
+        hint: hint,
+        hintDocument: hintDocument,
+        limit: limit);
+  }
 
   /// Optional. The query predicate. If unspecified, then all documents in the
   /// collection will match the predicate.
@@ -57,6 +82,22 @@ class DeleteStatement {
   /// New in 4.4
   String? hint;
   Map<String, Object>? hintDocument;
+
+  DeleteStatementOpen get toOpen => this is DeleteStatementOpen
+      ? this as DeleteStatementOpen
+      : DeleteStatementOpen(filter,
+          collation: collation,
+          hint: hint,
+          hintDocument: hintDocument,
+          limit: limit);
+
+  DeleteStatementV1 get toV1 => this is DeleteStatementV1
+      ? this as DeleteStatementV1
+      : DeleteStatementV1(filter,
+          collation: collation,
+          hint: hint,
+          hintDocument: hintDocument,
+          limit: limit);
 
   Options toMap() {
     return <String, dynamic>{

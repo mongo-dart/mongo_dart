@@ -54,9 +54,9 @@ export 'query_and_write_operation_commands/update_operation/base/update_statemen
 export 'query_and_write_operation_commands/wrapper/bulk/bulk.dart';
 export 'query_and_write_operation_commands/wrapper/bulk/ordered_bulk.dart';
 export 'query_and_write_operation_commands/wrapper/bulk/unordered_bulk.dart';
-export 'query_and_write_operation_commands/wrapper/delete_many/delete_many_operation.dart';
-export 'query_and_write_operation_commands/wrapper/delete_many/delete_many_options.dart';
-export 'query_and_write_operation_commands/wrapper/delete_many/delete_many_statement.dart';
+export 'query_and_write_operation_commands/wrapper/delete_many/base/delete_many_operation.dart';
+export 'query_and_write_operation_commands/wrapper/delete_many/base/delete_many_options.dart';
+export 'query_and_write_operation_commands/wrapper/delete_many/base/delete_many_statement.dart';
 export 'query_and_write_operation_commands/wrapper/delete_one/base/delete_one_operation.dart';
 export 'query_and_write_operation_commands/wrapper/delete_one/base/delete_one_options.dart';
 export 'query_and_write_operation_commands/wrapper/delete_one/base/delete_one_statement.dart';
