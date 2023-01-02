@@ -1,7 +1,6 @@
-import 'package:mongo_dart/src/command/command.dart';
+import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart'
     show MongoModernMessage;
-import 'package:mongo_dart/src/utils/map_keys.dart' show keyWriteConcern;
 
 import '../../core/error/mongo_dart_error.dart';
 import '../../database/document_types.dart';
@@ -62,9 +61,9 @@ class ServerCommand extends OperationBase {
 
     command.addAll(options);
 
-    var modernMessage = MongoModernMessage(command);
-
-    return server.executeMessage(modernMessage);
+    // var modernMessage = MongoModernMessage(command);
+    // return server.executeMessage(modernMessage);
+    return server.executeCommand(command);
   }
 }
 

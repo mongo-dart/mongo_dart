@@ -7,6 +7,7 @@ import 'package:universal_io/io.dart';
 
 import '../../core/error/mongo_dart_error.dart';
 import '../../core/info/server_config.dart';
+import '../../mongo_client.dart';
 import '../../settings/default_settings.dart';
 import '../../mongo_client_options.dart';
 import '../server.dart';
@@ -15,7 +16,7 @@ enum TopologyType { standalone, replicaSet, shardedCluster, unknown }
 
 abstract class Topology {
   @protected
-  Topology.protected(this.hostsSeedList, this.mongoClientOptions,
+  Topology.protected(this.mongoClient, this.hostsSeedList,
       {List<Server>? detectedServers}) {
     if (detectedServers != null) {
       servers.addAll(detectedServers);
@@ -25,7 +26,8 @@ abstract class Topology {
   final log = Logger('Topology');
   TopologyType? type;
   final List<Uri> hostsSeedList;
-  final MongoClientOptions mongoClientOptions;
+  final MongoClient mongoClient;
+  MongoClientOptions get mongoClientOptions => mongoClient.mongoClientOptions;
 
   /// Returns the primary writable server
   Server? primary;
@@ -60,7 +62,7 @@ abstract class Topology {
   Future<void> addServersFromSeedList() async {
     for (var element in hostsSeedList) {
       var serverConfig = await parseUri(element, mongoClientOptions);
-      var server = Server(serverConfig, mongoClientOptions);
+      var server = Server(mongoClient, serverConfig, mongoClientOptions);
       servers.add(server);
       await server.connect();
     }

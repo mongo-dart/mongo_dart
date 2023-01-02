@@ -95,7 +95,7 @@ class MongoClientOptions
 
   /// Specifies the read preferences for this connection
   /// The default is reading from the primary
-  ReadPreference readPreference = ReadPreference.primary;
+  ReadPreference readPreference = ReadPreference.preferenceDefault;
 
   /// Specify the default database name for connection.
   String? defaultDbName;

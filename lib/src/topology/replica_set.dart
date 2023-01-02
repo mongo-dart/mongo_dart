@@ -6,7 +6,7 @@ import '../core/error/mongo_dart_error.dart';
 import 'abstract/topology.dart';
 
 class ReplicaSet extends Topology {
-  ReplicaSet(super.hostsSeedList, super.mongoClientOptions,
+  ReplicaSet(super.mongoClient, super.hostsSeedList, 
       {super.detectedServers})
       : super.protected() {
     type = TopologyType.replicaSet;
@@ -62,7 +62,7 @@ class ReplicaSet extends Topology {
         }
         var serverConfig =
             await parseUri(Uri.parse('mongodb://$url'), mongoClientOptions);
-        var server = Server(serverConfig, mongoClientOptions);
+        var server = Server(mongoClient, serverConfig, mongoClientOptions);
         addedServers.add(server);
       }
     }

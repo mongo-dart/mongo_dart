@@ -1,8 +1,7 @@
 import 'abstract/topology.dart';
 
 class Standalone extends Topology {
-  Standalone(super.hostsSeedList, super.mongoClientOptionser,
-      {super.detectedServers})
+  Standalone(super.mongoClient, super.hostsSeedList, {super.detectedServers})
       : super.protected() {
     type = TopologyType.standalone;
   }

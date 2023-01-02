@@ -44,8 +44,8 @@ ReadPreferenceMode getReadPreferenceModeFromString(String mode) =>
 ///  @class
 /// @param {string} mode A string describing the read preference mode (primary|primaryPreferred|secondary|secondaryPreferred|nearest)
 /// @param {array} tags The tags object
-/// @param {object} [options] Additional read preference options
-/// @param {number} [options.maxStalenessSeconds] Max secondary read staleness in seconds, Minimum value is 90 seconds.
+/// @param {object} [toMap] Additional read preference options
+/// @param {number} [toMap.maxStalenessSeconds] Max secondary read staleness in seconds, Minimum value is 90 seconds.
 /// @see https://docs.mongodb.com/manual/core/read-preference/
 /// @return {ReadPreference}
 class ReadPreference {
@@ -64,6 +64,11 @@ class ReadPreference {
   static ReadPreference secondaryPreferred =
       ReadPreference(ReadPreferenceMode.secondaryPreferred);
   static ReadPreference nearest = ReadPreference(ReadPreferenceMode.nearest);
+
+  /// Default choice as per [specifications](https://github.com/mongodb/specifications/blob/master/source/server-selection/server-selection.rst#components-of-a-read-preference)
+  static ReadPreference preferenceDefault = ReadPreference(
+      ReadPreferenceMode.primary,
+      tags: <Map<String, String>>[<String, String>{}]);
 
   static int? getMaxStalenessSeconds(Map<String, Object>? options) {
     if (options == null) {
@@ -89,8 +94,10 @@ class ReadPreference {
       {this.tags, this.maxStalenessSeconds, this.hedgeOptions}) {
     if (mode == ReadPreferenceMode.primary) {
       if (tags != null && tags!.isNotEmpty) {
-        throw ArgumentError(
-            'Primary read preference cannot be combined with tags');
+        if (tags!.length > 1 || tags!.first.isNotEmpty) {
+          throw ArgumentError(
+              'Primary read preference cannot be combined with tags');
+        }
       }
       if (maxStalenessSeconds != null) {
         throw ArgumentError(

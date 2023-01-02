@@ -5,6 +5,7 @@ import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/core/error/connection_exception.dart';
 import 'package:mongo_dart/src/settings/connection_pool_settings.dart';
 
+import '../command/base/operation_base.dart';
 import '../core/error/mongo_dart_error.dart';
 import '../core/info/server_capabilities.dart';
 import '../core/info/server_config.dart';
@@ -12,14 +13,18 @@ import '../core/info/server_status.dart';
 import '../core/message/abstract/section.dart';
 import '../core/message/mongo_modern_message.dart';
 import '../core/network/connection_pool.dart';
+import '../mongo_client.dart';
+import '../session/client_session.dart';
 
 enum ServerState { closed, connected }
 
 class Server {
-  Server(this.serverConfig, ConnectionPoolSettings poolSettings)
+  Server(
+      this.mongoClient, this.serverConfig, ConnectionPoolSettings poolSettings)
       : connectionPool = ConnectionPool(serverConfig, poolSettings);
 
   final Logger log = Logger('Server');
+  final MongoClient mongoClient;
   final ServerConfig serverConfig;
   final ServerCapabilities serverCapabilities = ServerCapabilities();
   final ServerStatus serverStatus = ServerStatus();
@@ -75,6 +80,7 @@ class Server {
     return;
   }
 
+  @Deprecated('To be substituted by executeCommand')
   Future<Map<String, dynamic>> executeMessage(
       MongoModernMessage message) async {
     if (state != ServerState.connected) {
@@ -84,6 +90,28 @@ class Server {
     var connection = await connectionPool.getAvailableConnection();
 
     var response = await connection.execute(message);
+
+    var section = response.sections.firstWhere((Section section) =>
+        section.payloadType == MongoModernMessage.basePayloadType);
+    return section.payload.content;
+  }
+
+  Future<Map<String, dynamic>> executeCommand(Command command,
+      {ClientSession? session}) async {
+    if (state != ServerState.connected) {
+      throw MongoDartError('Server is not is not connected. $state');
+    }
+    var isImplicitSession = session == null;
+
+    var connection = await connectionPool.getAvailableConnection();
+    session ??= ClientSession(mongoClient);
+    session.serverSession = mongoClient.serverSessionPool.acquireSession();
+    command[keyLsid] = session.serverSession!.toMap; // {keyId: Uuid().v4obj()};
+
+    var response = await connection.execute(MongoModernMessage(command));
+    if (isImplicitSession) {
+      session.endSession();
+    }
 
     var section = response.sections.firstWhere((Section section) =>
         section.payloadType == MongoModernMessage.basePayloadType);

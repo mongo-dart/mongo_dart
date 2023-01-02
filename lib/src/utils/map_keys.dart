@@ -146,6 +146,7 @@ const keyLog = 'log';
 const keyLogicalSessionRecordCache = 'logicalSessionRecordCache';
 const keyLogicalSessionTimeoutMinutes = 'logicalSessionTimeoutMinutes';
 const keyLogLevel = 'logLevel';
+const keyLsid = 'lsid';
 const keyMax = 'max';
 const keyMaxAwaitTimeMS = 'maxAwaitTimeMS';
 const keyMaxBsonObjectSize = 'maxBsonObjectSize';

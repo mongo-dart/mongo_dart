@@ -5,6 +5,7 @@ import 'package:mongo_dart/src/topology/discover.dart';
 import 'command/parameters/read_concern.dart';
 import 'command/parameters/read_preference.dart';
 import 'server_api.dart';
+import 'server_side/server_session_pool.dart';
 import 'session/client_session.dart';
 import 'core/error/mongo_dart_error.dart';
 import 'topology/abstract/topology.dart';
@@ -56,9 +57,11 @@ class MongoClient {
   late MongoClientOptions mongoClientOptions;
   final List<Uri> seedServers = <Uri>[];
   Topology? topology;
-  Set activeSessions = {}; // Todo, create the session object
   String defaultDatabaseName = defMongoDbName;
   String defaultAuthDbName = defMongoAuthDbName;
+
+  ServerSessionPool serverSessionPool = ServerSessionPool();
+  Set<ClientSession> activeSessions = <ClientSession>{};
 
   DateTime? clientClusterTime;
 
@@ -90,7 +93,7 @@ class MongoClient {
     seedServers.addAll([for (var element in hostsSeedList) Uri.parse(element)]);
     await decodeUrlParameters(connectionUri, mongoClientOptions);
 
-    var discoverTopology = Discover(seedServers, mongoClientOptions);
+    var discoverTopology = Discover(this, seedServers);
 
     await discoverTopology.connect();
 
@@ -111,8 +114,8 @@ class MongoClient {
   }
 
   // Todo
-  ClientSession startSession() {
+  ClientSession startSession({SessionOptions? clientSessionOptions}) {
     // here also the server session must be assigned
-    return ClientSession(this, SessionOptions());
+    return ClientSession(this, sessionOptions: clientSessionOptions);
   }
 }

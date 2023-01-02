@@ -10,7 +10,11 @@ import 'session_options.dart';
 ///  threads or processes
 ///
 class ClientSession {
-  ClientSession(this.client, this.sessionOptions) : sessionId = Uuid().v4obj();
+  ClientSession(this.client, {SessionOptions? sessionOptions})
+      : sessionId = Uuid().v4obj(),
+        sessionOptions = sessionOptions ?? SessionOptions() {
+    client.activeSessions.add(this);
+  }
 
   final MongoClient client;
 
@@ -27,8 +31,11 @@ class ClientSession {
   ///
   /// **Note** that since ServerSessions are pooled, different ClientSession
   /// instances can have the same session ID, but never at the same time.
-  UuidValue sessionId;
+  final UuidValue sessionId;
+
   ServerSession? serverSession;
+
+  bool hasEnded = false;
 
   void advanceClusterTime(DateTime detectedClusterTime) {
     clusterTime ??= detectedClusterTime;
@@ -50,5 +57,8 @@ class ClientSession {
   /// for reuse (see Server Session Pool).
   /// Once a ClientSession has ended, drivers MUST report an error if
   /// any operations are attempted with that ClientSession.
-  endSession() {}
+  endSession() {
+    hasEnded = true;
+    client.activeSessions.remove(this);
+  }
 }

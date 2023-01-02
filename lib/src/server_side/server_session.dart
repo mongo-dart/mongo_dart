@@ -1,3 +1,4 @@
+import 'package:mongo_dart/mongo_dart.dart';
 import 'package:uuid/uuid.dart';
 
 /// Server session must be assigned 1:1 with client sessions
@@ -11,12 +12,16 @@ class ServerSession {
   /// startSession command, or it can generate it locally.
   /// In either case, the lastUse field of the ServerSession MUST be set to
   /// the current time when the ServerSession is created.
-  ServerSession(this.id) : lastUse = DateTime.now();
-  UuidValue id;
+  ServerSession({UuidValue? id})
+      : lastUse = DateTime.now(),
+        id = id ?? Uuid().v4obj();
+  final UuidValue id;
 
   /// The driver MUST update the value of this property with the current
   /// DateTime every time the server session ID is sent to the server.
   /// This allows the driver to track with reasonable accuracy
   /// the server's view of when a server session was last used.
   DateTime lastUse;
+
+  MongoDocument get toMap => {keyId: id};
 }

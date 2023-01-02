@@ -13,23 +13,23 @@ import 'standalone.dart';
 /// Here the connection is made only on one server.
 /// The correct topology object will have to complete all the connections.
 class Discover extends Topology {
-  Discover(super.hostsSeedList, super.mongoClientOptions) : super.protected() {
+  Discover(super.mongoClient, super.hostsSeedList) : super.protected() {
     type = TopologyType.unknown;
   }
 
   Topology getEffectiveTopology() {
     Topology topology;
     if (servers.first.isStandalone) {
-      topology = Standalone(hostsSeedList, mongoClientOptions,
-          detectedServers: servers);
+      topology =
+          Standalone(mongoClient, hostsSeedList, detectedServers: servers);
       topology.primary = servers.first;
     } else if (servers.first.isReplicaSet) {
-      topology = ReplicaSet(hostsSeedList, mongoClientOptions,
-          detectedServers: servers);
+      topology =
+          ReplicaSet(mongoClient, hostsSeedList, detectedServers: servers);
     } else if (servers.first.isShardedCluster) {
       // Todo
-      topology = SharderdCluster(hostsSeedList, mongoClientOptions,
-          detectedServers: servers);
+      topology =
+          SharderdCluster(mongoClient, hostsSeedList, detectedServers: servers);
     } else {
       throw MongoDartError('Unknown topology type');
     }
