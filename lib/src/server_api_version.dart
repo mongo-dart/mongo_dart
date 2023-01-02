@@ -1,6 +1,6 @@
 enum ServerApiVersion {
-  v1(1);
+  v1('1');
 
   const ServerApiVersion(this.version);
-  final int version;
+  final String version;
 }

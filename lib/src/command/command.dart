@@ -37,6 +37,7 @@ export 'diagnostic_commands/server_status_command/server_status_options.dart';
 export 'query_and_write_operation_commands/get_last_error_command/get_last_error_command.dart';
 export 'query_and_write_operation_commands/find_operation/find_operation.dart';
 export 'query_and_write_operation_commands/find_operation/find_options.dart';
+
 export 'query_and_write_operation_commands/find_and_modify_operation/find_and_modify_operation.dart';
 export 'query_and_write_operation_commands/find_and_modify_operation/find_and_modify_options.dart';
 export 'query_and_write_operation_commands/find_and_modify_operation/find_and_modify_result.dart';
@@ -60,6 +61,15 @@ export 'query_and_write_operation_commands/wrapper/delete_many/base/delete_many_
 export 'query_and_write_operation_commands/wrapper/delete_one/base/delete_one_operation.dart';
 export 'query_and_write_operation_commands/wrapper/delete_one/base/delete_one_options.dart';
 export 'query_and_write_operation_commands/wrapper/delete_one/base/delete_one_statement.dart';
+
+export 'query_and_write_operation_commands/wrapper/insert_many/base/insert_many_operation.dart';
+export 'query_and_write_operation_commands/wrapper/insert_many/open/insert_many_operation_open.dart';
+export 'query_and_write_operation_commands/wrapper/insert_many/v1/insert_many_operation_v1.dart';
+export 'query_and_write_operation_commands/wrapper/insert_one/base/insert_one_operation.dart';
+export 'query_and_write_operation_commands/wrapper/insert_one/base/insert_one_options.dart';
+export 'query_and_write_operation_commands/wrapper/insert_one/open/insert_one_operation_open.dart';
+export 'query_and_write_operation_commands/wrapper/insert_one/v1/insert_one_operation_v1.dart';
+
 export 'query_and_write_operation_commands/wrapper/update_many/base/update_many_operation.dart';
 export 'query_and_write_operation_commands/wrapper/update_many/base/update_many_options.dart';
 export 'query_and_write_operation_commands/wrapper/update_many/base/update_many_statement.dart';
@@ -81,8 +91,4 @@ export 'parameters/read_concern.dart';
 export 'parameters/w.dart';
 export 'parameters/write_concern.dart';
 export 'administration_commands/create_index_operation/create_index_operation.dart';
-export 'query_and_write_operation_commands/wrapper/insert_one/base/insert_one_operation.dart';
-export 'query_and_write_operation_commands/wrapper/insert_many/base/insert_many_operation.dart';
 export 'administration_commands/create_index_operation/create_index_options.dart';
-export 'query_and_write_operation_commands/wrapper/insert_one/base/insert_one_options.dart';
-export 'query_and_write_operation_commands/find_operation/find_options.dart';

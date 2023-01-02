@@ -105,13 +105,10 @@ class MongoClient {
     try {
       return databases.firstWhere((element) => element.databaseName == dbName);
     } catch (_) {}
-    var db = _createDb(dbName!);
+    var db = MongoDatabase(this, dbName!);
     databases.add(db);
     return db;
   }
-
-  MongoDatabase _createDb(String dbName) =>
-      MongoDatabase.protected(this, dbName);
 
   // Todo
   ClientSession startSession() {

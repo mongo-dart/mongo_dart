@@ -6,17 +6,21 @@ import '../../utils/parms_utils.dart';
 import '../modern_cursor.dart';
 
 abstract class MongoCollection {
-  MongoDatabase db;
-  String collectionName;
-  ReadPreference? readPreference;
-
   @protected
   MongoCollection.protected(this.db, this.collectionName);
 
   factory MongoCollection(MongoDatabase db, String collectionName) {
+    // Todo if the serverApi will be available also by collection
+    //      receive tha appropriate parameter ad use it instead of
+    //      the one from the db class
     if (db.serverApi != null) {
       switch (db.serverApi!.version) {
         case ServerApiVersion.v1:
+
+          /// Release 6.0 has a slight change
+          if (db.server.serverCapabilities.maxWireVersion >= 17) {
+            return MongoCollectionV117(db, collectionName);
+          }
           return MongoCollectionV1(db, collectionName);
         default:
           throw MongoDartError(
@@ -25,6 +29,10 @@ abstract class MongoCollection {
     }
     return MongoCollectionOpen(db, collectionName);
   }
+
+  MongoDatabase db;
+  String collectionName;
+  ReadPreference? readPreference;
 
   String fullName() => '${db.databaseName}.$collectionName';
 
@@ -35,6 +43,9 @@ abstract class MongoCollection {
   /// At present it can be defined only at client level
   ServerApi? get serverApi => db.serverApi;
 
+  /// returns true if a Strict Stable Api is required
+  bool get isStrict => serverApi?.strict ?? false;
+
   /// Insert one document into this collection
   /// Returns a WriteResult object
   Future<WriteResult> insertOne(MongoDocument document,
@@ -43,12 +54,7 @@ abstract class MongoCollection {
   /// Insert many document into this collection
   /// Returns a BulkWriteResult object
   Future<BulkWriteResult> insertMany(List<MongoDocument> documents,
-      {InsertManyOptions? insertManyOptions}) async {
-    var insertManyOperation = InsertManyOperation(this, documents,
-        insertManyOptions: insertManyOptions);
-
-    return insertManyOperation.executeDocument();
-  }
+      {InsertManyOptions? insertManyOptions});
 
   // ****************************************************
   // ***********        OLD       ***********************

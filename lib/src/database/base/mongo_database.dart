@@ -24,6 +24,9 @@ class MongoDatabase {
   MongoDatabase.protected(this.mongoClient, this.databaseName);
 
   factory MongoDatabase(MongoClient mongoClient, String databaseName) {
+    // Todo if the serverApi will be available also by Database
+    //      receive tha appropriate parameter ad use it instead of
+    //      the one from the client class
     if (mongoClient.serverApi != null) {
       switch (mongoClient.serverApi!.version) {
         case ServerApiVersion.v1:

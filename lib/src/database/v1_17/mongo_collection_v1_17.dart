@@ -1,11 +1,9 @@
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/insert_many/v1/insert_many_operation_v1.dart';
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/insert_one/v1/insert_one_operation_v1.dart';
+import '../../command/command.dart';
+import '../database.dart';
 
-import '../command/command.dart';
-import 'database.dart';
-
-class MongoCollectionV1 extends MongoCollection {
-  MongoCollectionV1(super.db, super.collectionName) : super.protected();
+/// Collection clss for Stavle Api V1 and release greater or equal to 6.0
+class MongoCollectionV117 extends MongoCollection {
+  MongoCollectionV117(super.db, super.collectionName) : super.protected();
 
   // Insert one document into this collection
   // Returns a WriteResult object
