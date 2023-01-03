@@ -1,5 +1,4 @@
 import 'package:meta/meta.dart';
-import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../database/document_types.dart';
@@ -28,7 +27,8 @@ class DbAdminCommandOperation extends OperationBase {
 
     command.addAll(options);
 
-    var modernMessage = MongoModernMessage(command);
-    return server.executeMessage(modernMessage);
+    //var modernMessage = MongoModernMessage(command);
+    //return server.executeMessage(modernMessage);
+    return server.executeCommand(command);
   }
 }

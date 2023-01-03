@@ -44,6 +44,7 @@ const keyBypassDocumentValidation = 'bypassDocumentValidation';
 const keyCapped = 'capped';
 const keyCaseFirst = 'caseFirst';
 const keyCaseLevel = 'caseLevel';
+const key$Clustertime = r'$clusterTime';
 const keyClusterTime = 'clusterTime';
 const keyCode = 'code';
 const keyCodeName = 'codeName';

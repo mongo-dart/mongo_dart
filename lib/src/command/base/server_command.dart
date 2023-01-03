@@ -1,9 +1,5 @@
-import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/core/message/mongo_modern_message.dart'
-    show MongoModernMessage;
+import 'package:mongo_dart/mongo_dart.dart';
 
-import '../../core/error/mongo_dart_error.dart';
-import '../../database/document_types.dart';
 import '../../topology/server.dart';
 import 'operation_base.dart' show Aspect, Command, OperationBase, Options;
 

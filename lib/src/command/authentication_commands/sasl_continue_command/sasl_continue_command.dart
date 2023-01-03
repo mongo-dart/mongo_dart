@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
-import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import '../../../core/network/abstract/connection_base.dart';
 import '../../../database/document_types.dart';
 import '../../../database/base/mongo_database.dart';
@@ -31,8 +30,9 @@ class SaslContinueCommand extends CommandOperation {
     processOptions(command);
     command.addAll(options);
 
-    var message = MongoModernMessage(command);
+    return server.executeCommand(command);
 
-    return server.executeMessage(message);
+    //var message = MongoModernMessage(command);
+    //return server.executeMessage(message);
   }
 }

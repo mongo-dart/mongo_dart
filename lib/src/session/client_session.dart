@@ -24,6 +24,17 @@ class ClientSession {
   /// null when a cluster does not report cluster times.
   /// When a driver is gossiping the cluster time it should send the more
   /// recent clusterTime of the ClientSession and the MongoClient
+  ///
+  /// The safe way to compute the $clusterTime to send to a server is:
+  /// 1. When the ClientSession is first started its clusterTime is set to null.
+  /// 2. When the driver sends $clusterTime to the server it should send the
+  ///    greater of the ClientSession clusterTime and the MongoClient
+  ///    clusterTime (either one could be null).
+  /// 3. When the driver receives a $clusterTime from the server it should
+  ///    advance both the ClientSession and the MongoClient clusterTime.
+  ///    The clusterTime of a ClientSession can also be advanced by calling
+  ///    advanceClusterTime.
+  /// This sequence ensures that if the clusterTime of a ClientSession is invalid only that one session will be affected. The MongoClient clusterTime is only updated with $clusterTime values known to be valid because they were received directly from a server.
   DateTime? clusterTime;
   final SessionOptions sessionOptions;
 

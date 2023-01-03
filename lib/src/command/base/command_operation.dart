@@ -44,7 +44,6 @@ class CommandOperation extends SimpleCommand {
           options: options, db: db, collection: collection);
       readPreference = ReadPreference.primary;
     } else {
-      // TODO we have to manage Session
       options.remove(keyWriteConcern);
       // if Aspect is noInheritOptions, here a separated method is maintained
       // even if not necessary, waiting for the future check of the session

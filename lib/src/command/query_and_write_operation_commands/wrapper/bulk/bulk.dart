@@ -424,9 +424,9 @@ abstract class Bulk extends CommandOperation {
         // search for the right connection
       }
 
-      var modernMessage = MongoModernMessage(command);
-
-      var ret = await server.executeMessage(modernMessage);
+      //var modernMessage = MongoModernMessage(command);
+      //var ret = await server.executeMessage(modernMessage);
+      var ret = await server.executeCommand(command);
 
       ret[keyCommandType] = command.keys.first;
       if (ret.containsKey(keyWriteErrors)) {

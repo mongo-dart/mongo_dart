@@ -1,19 +1,17 @@
 import 'dart:async';
 
 import 'package:logging/logging.dart';
-import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/core/error/connection_exception.dart';
 import 'package:mongo_dart/src/settings/connection_pool_settings.dart';
 
 import '../command/base/operation_base.dart';
-import '../core/error/mongo_dart_error.dart';
 import '../core/info/server_capabilities.dart';
 import '../core/info/server_config.dart';
 import '../core/info/server_status.dart';
 import '../core/message/abstract/section.dart';
 import '../core/message/mongo_modern_message.dart';
 import '../core/network/connection_pool.dart';
-import '../mongo_client.dart';
 import '../session/client_session.dart';
 
 enum ServerState { closed, connected }
@@ -96,7 +94,7 @@ class Server {
     return section.payload.content;
   }
 
-  Future<Map<String, dynamic>> executeCommand(Command command,
+  Future<MongoDocument> executeCommand(Command command,
       {ClientSession? session}) async {
     if (state != ServerState.connected) {
       throw MongoDartError('Server is not is not connected. $state');
@@ -105,8 +103,9 @@ class Server {
 
     var connection = await connectionPool.getAvailableConnection();
     session ??= ClientSession(mongoClient);
-    session.serverSession = mongoClient.serverSessionPool.acquireSession();
-    command[keyLsid] = session.serverSession!.toMap; // {keyId: Uuid().v4obj()};
+    session.serverSession ??= mongoClient.serverSessionPool.acquireSession();
+    session.serverSession!.lastUse = DateTime.now();
+    command[keyLsid] = session.serverSession!.toMap;
 
     var response = await connection.execute(MongoModernMessage(command));
     if (isImplicitSession) {

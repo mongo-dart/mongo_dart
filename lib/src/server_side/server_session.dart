@@ -17,6 +17,8 @@ class ServerSession {
         id = id ?? Uuid().v4obj();
   final UuidValue id;
 
+  bool isDirty = false;
+
   /// The driver MUST update the value of this property with the current
   /// DateTime every time the server session ID is sent to the server.
   /// This allows the driver to track with reasonable accuracy

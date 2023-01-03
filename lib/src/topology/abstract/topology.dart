@@ -12,7 +12,13 @@ import '../../settings/default_settings.dart';
 import '../../mongo_client_options.dart';
 import '../server.dart';
 
-enum TopologyType { standalone, replicaSet, shardedCluster, unknown }
+enum TopologyType {
+  standalone,
+  replicaSet,
+  shardedCluster,
+  loadBalancer,
+  unknown
+}
 
 abstract class Topology {
   @protected
@@ -33,6 +39,10 @@ abstract class Topology {
   Server? primary;
 
   List<Server> servers = <Server>[];
+
+  /// This value is updated from the servers when receiving the hello
+  /// response. The smallest reported timeout is stored.
+  Duration? logicalSessionTimeoutMinutes = defLogicalSessionTimeoutMinutes;
 
   List<Uri> get seedList => hostsSeedList.toList();
   bool get isConnected => servers.any((element) => element.isConnected);
@@ -87,6 +97,19 @@ abstract class Topology {
       await server.refreshStatus();
       servers.add(server);
     }
+    var detectedLogicalSessionTimeoutMinutes = Duration(days: 1);
+    for (var server in servers) {
+      if (!server.isConnected) {
+        continue;
+      }
+      int calculatedMinutes = (server.hello?.logicalSessionTimeoutMinutes ??
+          defLogicalSessionTimeoutMinutes.inMinutes);
+      if (calculatedMinutes < detectedLogicalSessionTimeoutMinutes.inMinutes) {
+        detectedLogicalSessionTimeoutMinutes =
+            Duration(minutes: calculatedMinutes);
+      }
+    }
+    logicalSessionTimeoutMinutes = detectedLogicalSessionTimeoutMinutes;
   }
 
   // *** To be overridden. This behavior works just for standalone typology

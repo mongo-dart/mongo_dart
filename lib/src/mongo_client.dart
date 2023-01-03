@@ -49,6 +49,7 @@ class MongoClient {
       throw MongoDartError(
           'The only valid schemas for Db are: "mongodb" and "mongodb+srv".');
     }
+    serverSessionPool = ServerSessionPool(this);
   }
 
   final Logger log = Logger('Mongo Client');
@@ -60,7 +61,7 @@ class MongoClient {
   String defaultDatabaseName = defMongoDbName;
   String defaultAuthDbName = defMongoAuthDbName;
 
-  ServerSessionPool serverSessionPool = ServerSessionPool();
+  late ServerSessionPool serverSessionPool;
   Set<ClientSession> activeSessions = <ClientSession>{};
 
   DateTime? clientClusterTime;
@@ -100,6 +101,7 @@ class MongoClient {
     topology = discoverTopology.getEffectiveTopology();
   }
 
+  // TODO clean the serverSessionPool
   Future close() async {}
 
   /// If no name passed, the url specified db is used
