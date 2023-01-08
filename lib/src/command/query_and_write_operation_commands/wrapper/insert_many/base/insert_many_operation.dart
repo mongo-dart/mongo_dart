@@ -10,6 +10,7 @@ import 'package:mongo_dart/mongo_dart.dart'
         WriteCommandType;
 
 import '../../../../../server_api_version.dart';
+import '../../../../../session/client_session.dart';
 import '../../../../base/operation_base.dart';
 import '../open/insert_many_operation_open.dart';
 import '../v1/insert_many_operation_v1.dart';
@@ -50,9 +51,9 @@ abstract class InsertManyOperation extends InsertOperation {
         rawOptions: rawOptions);
   }
 
-  Future<BulkWriteResult> executeDocument() async {
-    return BulkWriteResult.fromMap(WriteCommandType.insert, await execute())
-      ..ids = ids
-      ..documents = documents;
-  }
+  Future<BulkWriteResult> executeDocument({ClientSession? session}) async =>
+      BulkWriteResult.fromMap(
+          WriteCommandType.insert, await execute(session: session))
+        ..ids = ids
+        ..documents = documents;
 }

@@ -1,7 +1,7 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
-import '../../../core/network/abstract/connection_base.dart';
 import '../../../database/base/mongo_database.dart';
+import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
 import 'server_status_result.dart';
 
@@ -18,15 +18,15 @@ class ServerStatusCommand extends CommandOperation {
         );
 
   Future<ServerStatusResult> executeDocument(Server server,
-      {ConnectionBase? connection}) async {
-    var result = await super.executeOnServer(server);
+      {ClientSession? session}) async {
+    var result = await super.execute(session: session);
     return ServerStatusResult(result);
   }
 
   /// Update basic server info + FeatureCompatibilityVersion
   Future<void> updateServerStatus(Server server,
-      {ConnectionBase? connection}) async {
-    var result = await super.executeOnServer(server);
+      {ClientSession? session}) async {
+    var result = await super.execute(session: session);
     // On error the ServerStatus class is not initialized
     // check the `isInitialized` flag.
     //

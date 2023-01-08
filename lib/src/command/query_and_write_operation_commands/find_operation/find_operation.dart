@@ -3,6 +3,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
 import '../../../database/base/mongo_collection.dart';
+import '../../../session/client_session.dart';
 import 'find_options.dart';
 import '../../base/command_operation.dart';
 import 'find_result.dart';
@@ -99,11 +100,11 @@ class FindOperation extends CommandOperation {
     };
   }
 
-  Future<FindResult> executeDocument() async {
+  Future<FindResult> executeDocument({ClientSession? session}) async {
     if (collection!.collectionName == r'$cmd') {
       throw MongoDartError('cannot return a FindResult object '
           r'for a coomand request ($cmd collection)');
     }
-    return FindResult(await execute());
+    return FindResult(await execute(session: session));
   }
 }

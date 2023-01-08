@@ -3,7 +3,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/core/auth/auth.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
-import '../../src/core/network/abstract/connection_base.dart';
+import '../../src/session/client_session.dart';
 import '../../src/topology/server.dart';
 
 class MongoDbCRAuthenticator extends Authenticator {
@@ -15,7 +15,7 @@ class MongoDbCRAuthenticator extends Authenticator {
   final UsernamePasswordCredential credentials;
 
   @override
-  Future authenticate(Server server, {ConnectionBase? connection}) {
+  Future authenticate(Server server, {ClientSession? session}) {
     throw MongoDartError('Authentication no more used');
   }
 /* 

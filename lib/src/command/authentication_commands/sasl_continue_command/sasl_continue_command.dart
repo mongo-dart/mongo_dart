@@ -6,6 +6,7 @@ import 'package:mongo_dart/src/command/base/command_operation.dart';
 import '../../../core/network/abstract/connection_base.dart';
 import '../../../database/document_types.dart';
 import '../../../database/base/mongo_database.dart';
+import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
 import 'sasl_continue_options.dart';
 
@@ -25,14 +26,11 @@ class SaslContinueCommand extends CommandOperation {
 
   @override
   Future<MongoDocument> executeOnServer(Server server,
-      {ConnectionBase? connection}) async {
+      {ClientSession? session}) async {
     var command = $buildCommand();
     processOptions(command);
     command.addAll(options);
 
-    return server.executeCommand(command);
-
-    //var message = MongoModernMessage(command);
-    //return server.executeMessage(message);
+    return server.executeCommand(command, session: session);
   }
 }

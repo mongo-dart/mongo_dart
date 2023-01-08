@@ -1,6 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/server_command.dart';
 
+import '../../session/client_session.dart';
 import '../../topology/abstract/topology.dart';
 import '../../topology/server.dart';
 
@@ -18,7 +19,7 @@ class SimpleCommand extends ServerCommand {
   Topology topology;
 
   @override
-  Future<MongoDocument> execute() async {
+  Future<MongoDocument> execute({ClientSession? session}) async {
     Server? server;
     if (topology.type == TopologyType.standalone) {
       ReadPreference.removeReadPreferenceFromOptions(options);
@@ -39,10 +40,13 @@ class SimpleCommand extends ServerCommand {
     }
 
     return super.executeOnServer(
-        server ?? (throw MongoDartError('No server detected')));
+        server ?? (throw MongoDartError('No server detected')),
+        session: session);
   }
 
   @override
-  Future<Map<String, dynamic>> executeOnServer(Server server) async =>
+  @Deprecated('Use execute instead')
+  Future<Map<String, dynamic>> executeOnServer(Server server,
+          {ClientSession? session}) async =>
       throw MongoDartError('Do not use this method, use execute instead');
 }

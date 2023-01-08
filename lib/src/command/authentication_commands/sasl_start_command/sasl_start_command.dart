@@ -6,6 +6,7 @@ import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/core/network/abstract/connection_base.dart';
 
 import '../../../database/base/mongo_database.dart';
+import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
 
 class SaslStartCommand extends CommandOperation {
@@ -28,13 +29,11 @@ class SaslStartCommand extends CommandOperation {
 
   @override
   Future<Map<String, dynamic>> executeOnServer(Server server,
-      {ConnectionBase? connection, bool skipStateCheck = false}) async {
+      {ClientSession? session, bool skipStateCheck = false}) async {
     var command = $buildCommand();
     processOptions(command);
     command.addAll(options);
 
-    return server.executeCommand(command);
-    //var message = MongoModernMessage(command);
-    //return server.executeMessage(message);
+    return server.executeCommand(command, session: session);
   }
 }

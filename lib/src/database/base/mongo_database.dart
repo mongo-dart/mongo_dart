@@ -11,6 +11,7 @@ import '../../core/auth/auth.dart';
 import '../../../src_old/auth/mongodb_cr_authenticator.dart';
 import '../../core/auth/scram_sha1_authenticator.dart';
 import '../../core/auth/scram_sha256_authenticator.dart';
+import '../../session/client_session.dart';
 import '../../topology/abstract/topology.dart';
 import '../modern_cursor.dart';
 import '../../command/base/command_operation.dart';
@@ -67,8 +68,9 @@ class MongoDatabase {
       this.readPreference = readPreference;
 
   /// Runs a database command
-  Future<MongoDocument> runCommand(Command command) =>
-      CommandOperation(this, command, <String, dynamic>{}).execute();
+  Future<MongoDocument> runCommand(Command command, {ClientSession? session}) =>
+      CommandOperation(this, command, <String, dynamic>{})
+          .execute(session: session);
 
   /// Creates a collection object
   MongoCollection collection(String collectionName) =>
@@ -212,7 +214,7 @@ class MongoDatabase {
   }
 
   Future<bool> authenticate(String userName, String password, Server server,
-      {ConnectionBase? connection}) async {
+      {ClientSession? session}) async {
     var credential = UsernamePasswordCredential()
       ..username = userName
       ..password = password;
@@ -226,7 +228,7 @@ class MongoDatabase {
     var authenticator =
         Authenticator.create(authenticationScheme!, this, credential);
 
-    await authenticator.authenticate(server, connection: connection);
+    await authenticator.authenticate(server, session: session);
 
     server.serverConfig.isAuthenticated = true;
     return true;
@@ -322,11 +324,12 @@ class MongoDatabase {
 
   /// This method drops the current DB
   Future<Map<String, dynamic>> modernDropDatabase(
-      {DropDatabaseOptions? dropOptions,
+      {ClientSession? session,
+      DropDatabaseOptions? dropOptions,
       Map<String, Object>? rawOptions}) async {
     var command = DropDatabaseCommand(this,
         dropDatabaseOptions: dropOptions, rawOptions: rawOptions);
-    return command.execute();
+    return command.execute(session: session);
   }
 
   /// This method return the status information on the
@@ -334,20 +337,21 @@ class MongoDatabase {
   ///
   /// Only works from version 3.6
   Future<Map<String, dynamic>> serverStatus(
-      {Map<String, Object>? options}) async {
+      {ClientSession? session, Map<String, Object>? options}) async {
     var operation = ServerStatusCommand(this,
         serverStatusOptions: ServerStatusOptions.instance);
-    return operation.executeOnServer(server);
+    return operation.execute(session: session);
   }
 
   /// This method explicitly creates a collection
   Future<Map<String, dynamic>> createCollection(String name,
-      {CreateCollectionOptions? createCollectionOptions,
+      {ClientSession? session,
+      CreateCollectionOptions? createCollectionOptions,
       Map<String, Object>? rawOptions}) async {
     var command = CreateCollectionCommand(this, name,
         createCollectionOptions: createCollectionOptions,
         rawOptions: rawOptions);
-    return command.execute();
+    return command.execute(session: session);
   }
 
   /// This method retuns a cursor to get a list of the collections
@@ -370,19 +374,22 @@ class MongoDatabase {
   /// This method creates a view
   Future<Map<String, dynamic>> createView(
       String view, String source, List pipeline,
-      {CreateViewOptions? createViewOptions,
+      {ClientSession? session,
+      CreateViewOptions? createViewOptions,
       Map<String, Object>? rawOptions}) async {
     var command = CreateViewCommand(this, view, source, pipeline,
         createViewOptions: createViewOptions, rawOptions: rawOptions);
-    return command.executeOnServer(server);
+    return command.execute(session: session);
   }
 
   /// This method drops a collection
   Future<Map<String, dynamic>> modernDrop(String collectionNAme,
-      {DropOptions? dropOptions, Map<String, Object>? rawOptions}) async {
+      {ClientSession? session,
+      DropOptions? dropOptions,
+      Map<String, Object>? rawOptions}) async {
     var command = DropCommand(this, collectionNAme,
         dropOptions: dropOptions, rawOptions: rawOptions);
-    return command.execute();
+    return command.execute(session: session);
   }
 
   /// Runs a specified admin/diagnostic pipeline which does not require an
@@ -409,7 +416,8 @@ class MongoDatabase {
   }
 
   /// Ping command
-  Future<MongoDocument> pingCommand() => PingCommand(mongoClient.topology ??
-          (throw MongoDartError('Topology not defined')))
-      .execute();
+  Future<MongoDocument> pingCommand({ClientSession? session}) =>
+      PingCommand(mongoClient.topology ??
+              (throw MongoDartError('Topology not defined')))
+          .execute(session: session);
 }

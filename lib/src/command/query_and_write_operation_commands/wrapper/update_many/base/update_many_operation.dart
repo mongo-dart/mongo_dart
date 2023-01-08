@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
+import '../../../../../session/client_session.dart';
 import '../open/update_many_operation_open.dart';
 import '../v1/update_many_operation_v1.dart';
 
@@ -44,6 +45,7 @@ abstract class UpdateManyOperation extends UpdateOperation {
         rawOptions: rawOptions);
   }
 
-  Future<WriteResult> executeDocument() async =>
-      WriteResult.fromMap(WriteCommandType.update, await execute());
+  Future<WriteResult> executeDocument({ClientSession? session}) async =>
+      WriteResult.fromMap(
+          WriteCommandType.update, await execute(session: session));
 }

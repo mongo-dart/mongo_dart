@@ -1,8 +1,8 @@
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../core/network/abstract/connection_base.dart';
 import '../../../database/base/mongo_collection.dart';
+import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
 import 'count_options.dart';
 import '../../base/command_operation.dart';
@@ -57,8 +57,8 @@ class CountOperation extends CommandOperation {
       };
 
   Future<CountResult> executeDocument(Server server,
-      {ConnectionBase? connection}) async {
-    var result = await super.execute();
+      {ClientSession? session}) async {
+    var result = await super.execute(session: session);
     return CountResult(result);
   }
 }

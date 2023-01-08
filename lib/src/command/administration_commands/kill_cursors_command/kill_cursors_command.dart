@@ -3,9 +3,9 @@ import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
-import '../../../core/network/abstract/connection_base.dart';
 import '../../../database/base/mongo_database.dart';
 import '../../../database/base/mongo_collection.dart';
+import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
 import 'kill_cursors_options.dart';
 import 'kill_cursors_result.dart';
@@ -64,8 +64,8 @@ class KillCursorsCommand extends CommandOperation {
   //List<BsonLong> cursorIds;
 
   Future<KillCursorsResult> executeDocument(Server server,
-      {ConnectionBase? connection}) async {
-    var result = await super.execute();
+      {ClientSession? session}) async {
+    var result = await super.execute(session: session);
     return KillCursorsResult(result);
   }
 }

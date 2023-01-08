@@ -17,6 +17,7 @@ import 'package:mongo_dart/mongo_dart_old.dart'
 import 'package:mongo_dart/src/core/auth/auth.dart';
 
 import '../../database/base/mongo_database.dart';
+import '../../session/client_session.dart';
 import '../error/mongo_dart_error.dart';
 import '../network/abstract/connection_base.dart';
 import '../../topology/server.dart';
@@ -28,8 +29,8 @@ abstract class SaslAuthenticator extends Authenticator {
   MongoDatabase db;
 
   @override
-  Future authenticate(Server server, {ConnectionBase? connection}) async {
-    return modernAuthenticate(server, connection: connection);
+  Future authenticate(Server server, {ClientSession? session}) async {
+    return modernAuthenticate(server, session: session);
   }
 
   @Deprecated('No More Used')
@@ -70,17 +71,17 @@ abstract class SaslAuthenticator extends Authenticator {
     } */
   }
 
-  Future modernAuthenticate(Server server, {ConnectionBase? connection}) async {
+  Future modernAuthenticate(Server server, {ClientSession? session}) async {
     var currentStep = mechanism.initialize(specifyUsername: true);
 
     CommandOperation command = SaslStartCommand(
         db.authSourceDb ?? db, mechanism.name, currentStep.bytesToSendToServer,
-        saslStartOptions: SaslStartOptions(), connection: connection);
+        saslStartOptions: SaslStartOptions());
 
     while (true) {
       Map<String, dynamic> result;
 
-      result = await command.executeOnServer(server);
+      result = await command.execute(session: session);
 
       if (result[keyOk] == 0.0) {
         throw MongoDartError(result[keyErrmsg],
@@ -110,8 +111,7 @@ abstract class SaslAuthenticator extends Authenticator {
       var conversationId = result['conversationId'] as int;
 
       command = SaslContinueCommand(db.authSourceDb ?? db, conversationId,
-          currentStep.bytesToSendToServer,
-          connection: connection);
+          currentStep.bytesToSendToServer);
     }
   }
 }

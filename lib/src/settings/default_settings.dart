@@ -11,3 +11,6 @@ int defQueueTimeoutPollingMS = 50;
 /// The effective value is received in the Hello response, as ti can be
 /// customized on the server
 Duration defLogicalSessionTimeoutMinutes = Duration(minutes: 30);
+
+bool defSessionCausalConsistency = false;
+bool defSessionRetryWrites = false;

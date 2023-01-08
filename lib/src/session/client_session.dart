@@ -1,8 +1,11 @@
 import 'package:uuid/uuid.dart';
 
+import '../core/error/mongo_dart_error.dart';
 import '../mongo_client.dart';
 import '../server_side/server_session.dart';
 import 'session_options.dart';
+import 'transaction.dart';
+import 'transaction_options.dart';
 
 /// ClientSession instances are not thread safe or fork safe.
 /// They can only be used by one thread or process at a time.
@@ -34,7 +37,10 @@ class ClientSession {
   ///    advance both the ClientSession and the MongoClient clusterTime.
   ///    The clusterTime of a ClientSession can also be advanced by calling
   ///    advanceClusterTime.
-  /// This sequence ensures that if the clusterTime of a ClientSession is invalid only that one session will be affected. The MongoClient clusterTime is only updated with $clusterTime values known to be valid because they were received directly from a server.
+  /// This sequence ensures that if the clusterTime of a ClientSession is
+  ///    invalid only that one session will be affected.
+  /// The MongoClient clusterTime is only updated with $clusterTime values
+  ///    known to be valid because they were received directly from a server.
   DateTime? clusterTime;
   final SessionOptions sessionOptions;
 
@@ -47,6 +53,12 @@ class ClientSession {
   ServerSession? serverSession;
 
   bool hasEnded = false;
+
+  Transaction? transaction;
+  int _transactionNumber = 0;
+
+  bool get isCausalConsistency => sessionOptions.causalConsistency;
+  bool get shouldRetryWrite => sessionOptions.retryWrites;
 
   void advanceClusterTime(DateTime detectedClusterTime) {
     clusterTime ??= detectedClusterTime;
@@ -71,5 +83,55 @@ class ClientSession {
   endSession() {
     hasEnded = true;
     client.activeSessions.remove(this);
+  }
+
+  // ************   TRANSACTIONS   **********************
+  bool get inTransaction => transaction?.isActive ?? false;
+  // TODO check the case load balanced
+  bool get isPinned => transaction?.isPinned ?? false;
+  bool get isTransactionCommitted => transaction?.isCommitted ?? false;
+
+  // TODO check the load balanced case
+  void unpin(/* dynamic options */) {
+    /*  if (this.loadBalanced) {
+      return maybeClearPinnedConnection(this, options);
+    } */
+
+    transaction?.unpinServer();
+  }
+
+  /// Increment the transaction number on the internal ServerSession
+  ///
+  /// This helper increments a value stored on the client session that will be
+  /// added to the serverSession's txnNumber upon applying it to a command.
+  /// This is because the serverSession is lazily acquired after a connection is obtained
+  void incrementTransactionNumber() => _transactionNumber += 1;
+
+  /// Starts a new transaction with the given options.
+  void startTransaction({TransactionOptions? transactionOptions}) {
+    TransactionOptions options = transactionOptions ?? TransactionOptions();
+    // TODO check
+    /* if (this[kSnapshotEnabled]) {
+      throw new MongoCompatibilityError('Transactions are not supported in snapshot sessions');
+    } */
+
+    if (inTransaction) {
+      throw MongoDartError('Transaction already in progress');
+    }
+
+    if (isPinned && isTransactionCommitted) {
+      unpin();
+    }
+    // increment txnNumber
+    incrementTransactionNumber();
+    // create transaction state
+    options.readConcern ??= sessionOptions.readConcern ?? client.readConcern;
+    options.readPreference ??=
+        sessionOptions.readPreference ?? client.readPreference;
+    options.writeConcern ??= sessionOptions.writeConcern ?? client.writeConcern;
+    options.maxCommitTimeMS ??= sessionOptions.defaultMaxCommitTimeMS;
+    transaction = Transaction(options: options);
+
+    transaction!.state = TransactionState.starting;
   }
 }

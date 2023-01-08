@@ -10,6 +10,7 @@ import 'package:mongo_dart/mongo_dart.dart'
         WriteCommandType,
         WriteResult;
 
+import '../../../../../session/client_session.dart';
 import '../open/update_one_operation_open.dart';
 import '../v1/update_one_operation_v1.dart';
 
@@ -46,6 +47,7 @@ abstract class UpdateOneOperation extends UpdateOperation {
         updateOneOptions: updateOneOptions?.toUpdateOneOpen,
         rawOptions: rawOptions);
   }
-  Future<WriteResult> executeDocument() async =>
-      WriteResult.fromMap(WriteCommandType.update, await execute());
+  Future<WriteResult> executeDocument({ClientSession? session}) async =>
+      WriteResult.fromMap(
+          WriteCommandType.update, await execute(session: session));
 }

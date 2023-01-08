@@ -78,6 +78,7 @@ class Server {
     return;
   }
 
+/* 
   @Deprecated('To be substituted by executeCommand')
   Future<Map<String, dynamic>> executeMessage(
       MongoModernMessage message) async {
@@ -93,6 +94,7 @@ class Server {
         section.payloadType == MongoModernMessage.basePayloadType);
     return section.payload.content;
   }
+ */
 
   Future<MongoDocument> executeCommand(Command command,
       {ClientSession? session}) async {
@@ -102,6 +104,7 @@ class Server {
     var isImplicitSession = session == null;
 
     var connection = await connectionPool.getAvailableConnection();
+
     session ??= ClientSession(mongoClient);
     session.serverSession ??= mongoClient.serverSessionPool.acquireSession();
     session.serverSession!.lastUse = DateTime.now();

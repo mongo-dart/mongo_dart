@@ -2,6 +2,7 @@ import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../database/base/mongo_collection.dart';
+import '../../../session/client_session.dart';
 import 'distinct_options.dart';
 import '../../base/command_operation.dart';
 import 'distinct_result.dart';
@@ -32,6 +33,6 @@ class DistinctOperation extends CommandOperation {
         if (query != null) keyQuery: query!,
       };
 
-  Future<DistinctResult> executeDocument() async =>
-      DistinctResult(await super.execute());
+  Future<DistinctResult> executeDocument({ClientSession? session}) async =>
+      DistinctResult(await super.execute(session: session));
 }

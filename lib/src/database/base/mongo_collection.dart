@@ -2,6 +2,7 @@ import 'package:bson/bson.dart';
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
+import '../../session/client_session.dart';
 import '../../utils/parms_utils.dart';
 import '../modern_cursor.dart';
 
@@ -406,7 +407,8 @@ abstract class MongoCollection {
   /// "err" -> null,
   /// "ok" -> 1.0}
   Future<Map<String, dynamic>> createIndex(
-      {String? key,
+      {ClientSession? session,
+      String? key,
       Map<String, dynamic>? keys,
       bool? unique,
       bool? sparse,
@@ -425,7 +427,7 @@ abstract class MongoCollection {
     var indexOperation =
         CreateIndexOperation(db, this, _setKeys(key, keys), indexOptions);
 
-    var res = await indexOperation.execute();
+    var res = await indexOperation.execute(session: session);
     if (res[keyOk] == 0.0) {
       // It should be better to create a MongoDartError,
       // but, for compatibility reasons, we throw the received map.
@@ -447,7 +449,8 @@ abstract class MongoCollection {
   }
 
   Future<Map<String, dynamic>> dropIndexes(Object index,
-      {WriteConcern? writeConcern,
+      {ClientSession? session,
+      WriteConcern? writeConcern,
       String? comment,
       Map<String, Object>? rawOptions}) {
     var indexOptions =
@@ -456,7 +459,7 @@ abstract class MongoCollection {
     var command = DropIndexesCommand(db, this, index,
         dropIndexesOptions: indexOptions, rawOptions: rawOptions);
 
-    return command.execute();
+    return command.execute(session: session);
   }
 
   Future<WriteResult> deleteOne(selector,
@@ -486,7 +489,8 @@ abstract class MongoCollection {
   }
 
   Future<Map<String, dynamic>> modernUpdate(selector, update,
-      {bool? upsert,
+      {ClientSession? session,
+      bool? upsert,
       bool? multi,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -506,7 +510,7 @@ abstract class MongoCollection {
               hintDocument: hintDocument)
         ],
         updateOptions: UpdateOptions(writeConcern: writeConcern));
-    return updateOperation.execute();
+    return updateOperation.execute(session: session);
   }
 
   Future<WriteResult> replaceOne(selector, Map<String, dynamic> update,
@@ -698,21 +702,23 @@ abstract class MongoCollection {
   /// Executes a Distinct command on this collection.
   /// Retuns a DistinctResult class.
   Future<DistinctResult> modernDistinct(String field,
-          {query,
+          {ClientSession? session,
+          query,
           DistinctOptions? distinctOptions,
           Map<String, Object>? rawOptions}) async =>
       _prepareDistinct(field, query: query, distinctOptions: distinctOptions)
-          .executeDocument();
+          .executeDocument(session: session);
 
   /// Executes a Distinct command on this collection.
   /// Retuns a Map like received from the server.
   /// Used for compatibility with the legacy method
   Future<Map<String, dynamic>> modernDistinctMap(String field,
-          {query,
+          {ClientSession? session,
+          query,
           DistinctOptions? distinctOptions,
           Map<String, Object>? rawOptions}) async =>
       _prepareDistinct(field, query: query, distinctOptions: distinctOptions)
-          .execute();
+          .execute(session: session);
 
   /// This method returns a stream that can be read or transformed into
   /// a list with `.toList()`

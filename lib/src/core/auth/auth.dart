@@ -1,4 +1,4 @@
-import 'package:mongo_dart/src/core/network/abstract/connection_base.dart';
+import 'package:mongo_dart/src/session/client_session.dart';
 import 'package:mongo_dart/src/topology/server.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
@@ -31,7 +31,7 @@ abstract class Authenticator {
 
   static String? name;
 
-  Future authenticate(Server server, {ConnectionBase? connection});
+  Future authenticate(Server server, {ClientSession? session});
 }
 
 abstract class RandomStringGenerator {

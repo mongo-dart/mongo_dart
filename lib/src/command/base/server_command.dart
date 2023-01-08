@@ -1,5 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
+import '../../session/client_session.dart';
 import '../../topology/server.dart';
 import 'operation_base.dart' show Aspect, Command, OperationBase, Options;
 
@@ -28,6 +29,7 @@ class ServerCommand extends OperationBase {
   }
 
   @override
+  @Deprecated('Use execute on server instead')
   Future<Map<String, dynamic>> execute() =>
       throw MongoDartError('Use executOnServer() instead');
 
@@ -50,7 +52,8 @@ class ServerCommand extends OperationBase {
   ///Drivers MUST document the behavior of unacknowledged writes for both
   ///explicit and implicit sessions.
   @override
-  Future<MongoDocument> executeOnServer(Server server) async {
+  Future<MongoDocument> executeOnServer(Server server,
+      {ClientSession? session}) async {
     var command = $buildCommand();
 
     processOptions(command);
@@ -59,7 +62,7 @@ class ServerCommand extends OperationBase {
 
     // var modernMessage = MongoModernMessage(command);
     // return server.executeMessage(modernMessage);
-    return server.executeCommand(command);
+    return server.executeCommand(command, session: session);
   }
 }
 

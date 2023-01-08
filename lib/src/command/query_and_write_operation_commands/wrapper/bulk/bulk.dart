@@ -8,8 +8,8 @@ import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/database/document_types.dart';
 
 import '../../../../core/error/mongo_dart_error.dart';
-import '../../../../core/network/abstract/connection_base.dart';
 import '../../../../database/base/mongo_collection.dart';
+import '../../../../session/client_session.dart';
 import '../../../../topology/server.dart';
 import 'bulk_options.dart';
 
@@ -392,14 +392,15 @@ abstract class Bulk extends CommandOperation {
   List<Map<int, int>> getBulkInputOrigins();
 
   @override
-  Future<MongoDocument> execute() =>
+  @Deprecated('Use executeBulk instead')
+  Future<MongoDocument> execute({ClientSession? session}) =>
       throw StateError('Call executeBulk() for bulk operations');
   @override
   Command $buildCommand() =>
       throw StateError('Call getBulkCommands() for bulk operations');
 
   Future<List<MongoDocument>> executeBulk(Server server,
-      {ConnectionBase? connection}) async {
+      {ClientSession? session}) async {
     var retList = <Map<String, dynamic>>[];
     var isOrdered = options[keyOrdered] as bool? ?? true;
 
@@ -426,7 +427,7 @@ abstract class Bulk extends CommandOperation {
 
       //var modernMessage = MongoModernMessage(command);
       //var ret = await server.executeMessage(modernMessage);
-      var ret = await server.executeCommand(command);
+      var ret = await server.executeCommand(command, session: session);
 
       ret[keyCommandType] = command.keys.first;
       if (ret.containsKey(keyWriteErrors)) {
@@ -462,8 +463,8 @@ abstract class Bulk extends CommandOperation {
   }
 
   Future<BulkWriteResult> executeDocument(Server server,
-      {ConnectionBase? connection}) async {
-    var executionRetList = await executeBulk(server, connection: connection);
+      {ClientSession? session}) async {
+    var executionRetList = await executeBulk(server, session: session);
     BulkWriteResult? ret;
     WriteCommandType writeCommandType;
 

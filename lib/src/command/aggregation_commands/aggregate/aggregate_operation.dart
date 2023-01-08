@@ -14,7 +14,7 @@ import 'package:mongo_dart/mongo_dart.dart'
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart_query/mongo_aggregation.dart';
 
-import '../../../core/network/abstract/connection_base.dart';
+import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
 import '../../base/command_operation.dart';
 import 'aggregate_result.dart';
@@ -108,8 +108,8 @@ class AggregateOperation extends CommandOperation {
   }
 
   Future<AggregateResult> executeDocument(Server server,
-      {ConnectionBase? connection}) async {
-    var result = await super.execute();
+      {ClientSession? session}) async {
+    var result = await super.execute(session: session);
     return AggregateResult(result);
   }
 }

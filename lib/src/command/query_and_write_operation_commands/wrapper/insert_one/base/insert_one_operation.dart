@@ -11,6 +11,7 @@ import 'package:mongo_dart/mongo_dart.dart'
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/server_api_version.dart';
 
+import '../../../../../session/client_session.dart';
 import '../open/insert_one_operation_open.dart';
 import '../v1/insert_one_operation_v1.dart';
 
@@ -44,8 +45,8 @@ abstract class InsertOneOperation extends InsertOperation {
         insertOneOptions: insertOneOptions?.toOneOpen, rawOptions: rawOptions);
   }
 
-  Future<WriteResult> executeDocument() async {
-    var ret = await super.execute();
+  Future<WriteResult> executeDocument({ClientSession? session}) async {
+    var ret = await super.execute(session: session);
     return WriteResult.fromMap(WriteCommandType.insert, ret)
       ..id = ids.first
       ..document = documents.first;

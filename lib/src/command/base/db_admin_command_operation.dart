@@ -3,6 +3,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../database/document_types.dart';
 import '../../database/base/mongo_database.dart';
+import '../../session/client_session.dart';
 import '../../topology/server.dart';
 import 'operation_base.dart';
 
@@ -21,7 +22,8 @@ class DbAdminCommandOperation extends OperationBase {
 
   @override
   @protected
-  Future<MongoDocument> executeOnServer(Server server) async {
+  Future<MongoDocument> executeOnServer(Server server,
+      {ClientSession? session}) async {
     var command = <String, dynamic>{...$buildCommand(), key$Db: 'admin'};
     options.removeWhere((key, value) => command.containsKey(key));
 
@@ -29,6 +31,6 @@ class DbAdminCommandOperation extends OperationBase {
 
     //var modernMessage = MongoModernMessage(command);
     //return server.executeMessage(modernMessage);
-    return server.executeCommand(command);
+    return server.executeCommand(command, session: session);
   }
 }

@@ -2,6 +2,7 @@ import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/replace_one/open/replace_one_operation_open.dart';
 
+import '../../../../../session/client_session.dart';
 import '../v1/replace_one_operation_v1.dart';
 
 abstract class ReplaceOneOperation extends UpdateOperation {
@@ -38,6 +39,7 @@ abstract class ReplaceOneOperation extends UpdateOperation {
         rawOptions: rawOptions);
   }
 
-  Future<WriteResult> executeDocument() async =>
-      WriteResult.fromMap(WriteCommandType.update, await execute());
+  Future<WriteResult> executeDocument({ClientSession? session}) async =>
+      WriteResult.fromMap(
+          WriteCommandType.update, await execute(session: session));
 }
