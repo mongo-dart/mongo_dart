@@ -1,11 +1,17 @@
+import 'package:fixnum/fixnum.dart';
+import 'package:mongo_dart/src/command/session_commands/abort_transaction_command%20copy/abort_transaction_command.dart';
+import 'package:mongo_dart/src/command/session_commands/abort_transaction_command%20copy/abort_transaction_options.dart';
 import 'package:uuid/uuid.dart';
 
+import '../command/base/operation_base.dart';
+import '../command/session_commands/commit_transaction_command/commit_transaction_command.dart';
+import '../command/session_commands/commit_transaction_command/commit_transaction_options.dart';
 import '../core/error/mongo_dart_error.dart';
 import '../database/document_types.dart';
 import '../mongo_client.dart';
 import '../server_side/server_session.dart';
 import 'session_options.dart';
-import 'transaction.dart';
+import 'transaction_info.dart';
 import 'transaction_options.dart';
 
 /// ClientSession instances are not thread safe or fork safe.
@@ -55,8 +61,8 @@ class ClientSession {
 
   bool hasEnded = false;
 
-  Transaction? transaction;
-  int _transactionNumber = 0;
+  TransactionInfo? transaction;
+  Int64 _lastTransactionNumber = Int64();
 
   bool get isCausalConsistency => sessionOptions.causalConsistency;
   bool get shouldRetryWrite => sessionOptions.retryWrites;
@@ -84,6 +90,10 @@ class ClientSession {
   endSession() {
     hasEnded = true;
     client.activeSessions.remove(this);
+    if (inTransaction) {
+      // TODO check which parameters are needed
+      abortTransaction();
+    }
   }
 
   // ************   TRANSACTIONS   **********************
@@ -106,7 +116,7 @@ class ClientSession {
   /// This helper increments a value stored on the client session that will be
   /// added to the serverSession's txnNumber upon applying it to a command.
   /// This is because the serverSession is lazily acquired after a connection is obtained
-  void incrementTransactionNumber() => _transactionNumber += 1;
+  Int64 get newTransactionNumber => ++_lastTransactionNumber;
 
   /// Starts a new transaction with the given options.
   void startTransaction({TransactionOptions? transactionOptions}) {
@@ -123,19 +133,87 @@ class ClientSession {
     if (isPinned && isTransactionCommitted) {
       unpin();
     }
-    // increment txnNumber
-    incrementTransactionNumber();
+
     // create transaction state
     options.readConcern ??= sessionOptions.readConcern ?? client.readConcern;
     options.readPreference ??=
         sessionOptions.readPreference ?? client.readPreference;
     options.writeConcern ??= sessionOptions.writeConcern ?? client.writeConcern;
     options.maxCommitTimeMS ??= sessionOptions.defaultMaxCommitTimeMS;
-    transaction = Transaction(options: options);
-
-    transaction!.state = TransactionState.starting;
+    transaction = TransactionInfo(newTransactionNumber, options: options)
+      ..state = TransactionState.starting;
   }
 
+  Future<MongoDocument?> abortTransaction(
+      {AbortTransactionOptions? abortTransactionOptions,
+      Options? options}) async {
+    if (transaction == null) {
+      throw MongoDartError('No transaction started');
+    }
+    // handle any initial problematic cases
+    TransactionState txnState = transaction?.state ?? TransactionState.none;
+
+    if (txnState == TransactionState.none) {
+      throw MongoDartError('No transaction started');
+    }
+
+    if (txnState == TransactionState.starting) {
+      // the transaction was never started, we can safely exit here
+      transaction!.state = TransactionState.aborted;
+      unpin();
+      return null;
+    }
+
+    if (txnState == TransactionState.aborted) {
+      throw MongoDartError('Cannot call abortTransaction twice');
+    }
+
+    if (txnState == TransactionState.committed ||
+        txnState == TransactionState.committedEmpty) {
+      throw MongoDartError(
+          'Cannot call abortTransaction after calling commitTransaction');
+    }
+
+    var command = AbortTransactionCommand(client, transaction!,
+        abortTransactionOptions: abortTransactionOptions, rawOptions: options);
+
+    return command.execute();
+  }
+
+  Future<MongoDocument?> commitTransaction(
+      {CommitTransactionOptions? commitTransactionOptions,
+      Options? options}) async {
+    if (transaction == null) {
+      throw MongoDartError('No transaction started');
+    }
+    // handle any initial problematic cases
+    TransactionState txnState = transaction?.state ?? TransactionState.none;
+
+    if (txnState == TransactionState.none) {
+      throw MongoDartError('No transaction started');
+    }
+
+    if (txnState == TransactionState.starting ||
+        txnState == TransactionState.committedEmpty) {
+      // the transaction was never started, we can safely exit here
+      transaction!.state = TransactionState.committedEmpty;
+      return null;
+    }
+
+    if (txnState == TransactionState.aborted) {
+      throw MongoDartError(
+          'Cannot call commitTransaction after calling abortTransaction');
+    }
+
+    var command = CommitTransactionCommand(client, transaction!,
+        commitTransactionOptions: commitTransactionOptions,
+        rawOptions: options);
+
+    return command.execute();
+  }
+
+// TODO Execute the commands
+/* Keep as reference
   Future<MongoDocument?> endTransaction(ClientSession session,
       {bool isAbort = false}) async {
     if (session.transaction == null) {
@@ -180,8 +258,8 @@ class ClientSession {
       }
     }
 
-// TODO Execute the commands
-/*   // construct and send the command
+
+   // construct and send the command
   const command: Document = { [commandName]: 1 };
 
   // apply a writeConcern if specified
@@ -278,7 +356,7 @@ class ClientSession {
 
       commandHandler(error, result);
     }
-  ); */
+  ); 
     return null;
-  }
+  }*/
 }

@@ -154,6 +154,7 @@ const keyLsid = 'lsid';
 const keyMax = 'max';
 const keyMaxAwaitTimeMS = 'maxAwaitTimeMS';
 const keyMaxBsonObjectSize = 'maxBsonObjectSize';
+const keyMaxCommitTimeMS = 'maxCommitTimeMS';
 const keyMaximumLogFileSize = 'maximum log file size';
 const keyMaxMessageSizeBytes = 'maxMessageSizeBytes';
 const keyMaxStalenessSecond = 'maxStalenessSeconds';
