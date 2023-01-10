@@ -1,6 +1,7 @@
 import 'package:uuid/uuid.dart';
 
 import '../core/error/mongo_dart_error.dart';
+import '../database/document_types.dart';
 import '../mongo_client.dart';
 import '../server_side/server_session.dart';
 import 'session_options.dart';
@@ -71,7 +72,7 @@ class ClientSession {
     }
   }
 
-  // Todo
+  // TODO
   /// A driver MUST allow multiple calls to endSession.
   /// All calls after the first one are ignored.
   /// Conceptually, calling endSession implies ending the corresponding
@@ -133,5 +134,151 @@ class ClientSession {
     transaction = Transaction(options: options);
 
     transaction!.state = TransactionState.starting;
+  }
+
+  Future<MongoDocument?> endTransaction(ClientSession session,
+      {bool isAbort = false}) async {
+    if (session.transaction == null) {
+      throw MongoDartError('No transaction started');
+    }
+    // handle any initial problematic cases
+    TransactionState txnState =
+        session.transaction?.state ?? TransactionState.none;
+
+    if (txnState == TransactionState.none) {
+      throw MongoDartError('No transaction started');
+    }
+
+    if (!isAbort) {
+      if (txnState == TransactionState.starting ||
+          txnState == TransactionState.committedEmpty) {
+        // the transaction was never started, we can safely exit here
+        session.transaction!.state = TransactionState.committedEmpty;
+        return null;
+      }
+
+      if (txnState == TransactionState.aborted) {
+        throw MongoDartError(
+            'Cannot call commitTransaction after calling abortTransaction');
+      }
+    } else {
+      if (txnState == TransactionState.starting) {
+        // the transaction was never started, we can safely exit here
+        session.transaction!.state = TransactionState.aborted;
+        unpin();
+        return null;
+      }
+
+      if (txnState == TransactionState.aborted) {
+        throw MongoDartError('Cannot call abortTransaction twice');
+      }
+
+      if (txnState == TransactionState.committed ||
+          txnState == TransactionState.committedEmpty) {
+        throw MongoDartError(
+            'Cannot call abortTransaction after calling commitTransaction');
+      }
+    }
+
+// TODO Execute the commands
+/*   // construct and send the command
+  const command: Document = { [commandName]: 1 };
+
+  // apply a writeConcern if specified
+  let writeConcern;
+  if (session.transaction.options.writeConcern) {
+    writeConcern = Object.assign({}, session.transaction.options.writeConcern);
+  } else if (session.clientOptions && session.clientOptions.writeConcern) {
+    writeConcern = { w: session.clientOptions.writeConcern.w };
+  }
+
+  if (txnState == TransactionState.committed) {
+    writeConcern = Object.assign({ wtimeout: 10000 }, writeConcern, { w: 'majority' });
+  }
+
+  if (writeConcern) {
+    Object.assign(command, { writeConcern });
+  }
+
+  if (!isAbort && session.transaction.options.maxTimeMS) {
+    Object.assign(command, { maxTimeMS: session.transaction.options.maxTimeMS });
+  }
+
+  function commandHandler(error?: Error, result?: Document) {
+    if (commandName !== 'commitTransaction') {
+      session.transaction.transition(TxnState.TRANSACTION_ABORTED);
+      if (session.loadBalanced) {
+        maybeClearPinnedConnection(session, { force: false });
+      }
+
+      // The spec indicates that we should ignore all errors on `abortTransaction`
+      return callback();
+    }
+
+    session.transaction.transition(TxnState.TRANSACTION_COMMITTED);
+    if (error instanceof MongoError) {
+      if (
+        error.hasErrorLabel(MongoErrorLabel.RetryableWriteError) ||
+        error instanceof MongoWriteConcernError ||
+        isMaxTimeMSExpiredError(error)
+      ) {
+        if (isUnknownTransactionCommitResult(error)) {
+          error.addErrorLabel(MongoErrorLabel.UnknownTransactionCommitResult);
+
+          // per txns spec, must unpin session in this case
+          session.unpin({ error });
+        }
+      } else if (error.hasErrorLabel(MongoErrorLabel.TransientTransactionError)) {
+        session.unpin({ error });
+      }
+    }
+
+    callback(error, result);
+  }
+
+  if (session.transaction.recoveryToken) {
+    command.recoveryToken = session.transaction.recoveryToken;
+  }
+
+  // send the command
+  executeOperation(
+    session.client,
+    RunAdminCommandOperation(undefined, command, {
+      session,
+      readPreference: ReadPreference.primary,
+      bypassPinningCheck: true
+    }),
+    (error, result) => {
+      if (command.abortTransaction) {
+        // always unpin on abort regardless of command outcome
+        session.unpin();
+      }
+
+      if (error instanceof MongoError && error.hasErrorLabel(MongoErrorLabel.RetryableWriteError)) {
+        // SPEC-1185: apply majority write concern when retrying commitTransaction
+        if (command.commitTransaction) {
+          // per txns spec, must unpin session in this case
+          session.unpin({ force: true });
+
+          command.writeConcern = Object.assign({ wtimeout: 10000 }, command.writeConcern, {
+            w: 'majority'
+          });
+        }
+
+        return executeOperation(
+          session.client,
+          RunAdminCommandOperation(undefined, command, {
+            session,
+            readPreference: ReadPreference.primary,
+            bypassPinningCheck: true
+          }),
+          commandHandler
+        );
+      }
+
+      commandHandler(error, result);
+    }
+  ); */
+    return null;
   }
 }

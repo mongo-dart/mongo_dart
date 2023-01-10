@@ -259,7 +259,7 @@ void main() async {
 
       group('Get All Parameters', () {
         test('Run command', () async {
-          var command = GetAllParametersCommand(db);
+          var command = GetAllParametersCommand(client);
           var ret = await command.execute();
           expect(ret[keyOk], 1.0);
           expect(ret[keyLogLevel], 0);
@@ -270,7 +270,7 @@ void main() async {
       });
       group('Get Parameter', () {
         test('Run command', () async {
-          var command = GetParameterCommand(db, keyLogLevel);
+          var command = GetParameterCommand(client, keyLogLevel);
           var ret = await command.execute();
           expect(ret[keyOk], 1.0);
           expect(ret[keyLogLevel], 0);

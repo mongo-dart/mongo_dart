@@ -1,24 +1,23 @@
 import 'package:meta/meta.dart';
-import 'package:mongo_dart/src/utils/map_keys.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 
-import '../../database/document_types.dart';
-import '../../database/base/mongo_database.dart';
 import '../../session/client_session.dart';
 import '../../topology/server.dart';
 import 'operation_base.dart';
 
 class DbAdminCommandOperation extends OperationBase {
-  MongoDatabase db;
-  Command command;
-
-  DbAdminCommandOperation(this.db, this.command, {Options? options})
+  DbAdminCommandOperation(this.client, this.command, {Options? options})
       : super(options);
+
+  MongoClient client;
+  Command command;
 
   Command $buildCommand() => command;
 
   @override
-  Future<MongoDocument> execute() async => executeOnServer(
-      db.topology.getServer(readPreferenceMode: db.readPreference?.mode));
+  Future<MongoDocument> execute() async => executeOnServer(client.topology
+          ?.getServer(readPreferenceMode: client.readPreference?.mode) ??
+      (throw MongoDartError('Server not found')));
 
   @override
   @protected

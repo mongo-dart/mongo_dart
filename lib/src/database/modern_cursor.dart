@@ -61,7 +61,7 @@ class ModernCursor {
       // ignore: prefer_initializing_formals
       : operation = command,
         //collection = command.collection,
-        db = command.db,
+        db = command.client.db(dbName: 'admin'),
         checksumPresent = checksumPresent ?? false,
         moreToCome = moreToCome ?? false,
         exhaustAllowed = exhaustAllowed ?? false {
