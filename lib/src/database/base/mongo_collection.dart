@@ -50,12 +50,12 @@ abstract class MongoCollection {
   /// Insert one document into this collection
   /// Returns a WriteResult object
   Future<WriteResult> insertOne(MongoDocument document,
-      {InsertOneOptions? insertOneOptions});
+      {ClientSession? session, InsertOneOptions? insertOneOptions});
 
   /// Insert many document into this collection
   /// Returns a BulkWriteResult object
   Future<BulkWriteResult> insertMany(List<MongoDocument> documents,
-      {InsertManyOptions? insertManyOptions});
+      {ClientSession? session, InsertManyOptions? insertManyOptions});
 
   // ****************************************************
   // ***********        OLD       ***********************

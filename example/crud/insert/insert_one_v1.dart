@@ -1,6 +1,7 @@
 import 'package:logging/logging.dart'
     show Level, LogRecord, Logger, hierarchicalLoggingEnabled;
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/mongo_dart_old.dart';
 
 const dbName = 'mongo-dart-example';
 const dbAddress = 'localhost';
@@ -32,6 +33,7 @@ void main() async {
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
+  // *** Simple case ***
   var ret = await collection.insertOne(<String, dynamic>{
     '_id': 1,
     'name': 'Tom',
@@ -48,6 +50,68 @@ void main() async {
 
   print('Fetched: "${res?['name']}"');
   // Tom
+
+// *** In Session ***
+  var session = client.startSession();
+  ret = await collection.insertOne(<String, dynamic>{
+    '_id': 2,
+    'name': 'Ezra',
+    'state': 'active',
+    'rating': 90,
+    'score': 6
+  }, session: session);
+
+  if (!ret.isSuccess) {
+    print('Error detected in record insertion');
+  }
+  await session.endSession();
+
+  res = await collection.findOne(where.eq('rating', 90));
+
+  print('Fetched: "${res?['name']}"');
+  // Ezra
+
+// *** In Transaction committed ***
+  session = client.startSession();
+  session.startTransaction();
+  ret = await collection.insertOne(<String, dynamic>{
+    '_id': 3,
+    'name': 'Nathan',
+    'state': 'active',
+    'rating': 98,
+    'score': 4
+  }, session: session);
+
+  if (!ret.isSuccess) {
+    print('Error detected in record insertion');
+  }
+  await session.commitTransaction();
+  await session.endSession();
+
+  res = await collection.findOne(where.sortBy('score'));
+
+  print('Fetched: "${res?['name']}"');
+  // Tom
+
+// *** In Transaction aborted ***
+  session = client.startSession();
+  session.startTransaction();
+  ret = await collection.insertOne(<String, dynamic>{
+    '_id': 4,
+    'name': 'Anne',
+    'state': 'inctive',
+    'rating': 120,
+  }, session: session);
+
+  if (!ret.isSuccess) {
+    print('Error detected in record insertion');
+  }
+  await session.endSession();
+
+  res = await collection.findOne(where.sortBy('_id', descending: true));
+
+  print('Fetched: "${res?['name']}"');
+  // Nathan
 
   await cleanupDatabase();
 }

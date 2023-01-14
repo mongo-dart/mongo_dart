@@ -1,4 +1,5 @@
 import '../../command/command.dart';
+import '../../session/client_session.dart';
 import '../database.dart';
 
 class MongoCollectionOpen extends MongoCollection {
@@ -8,17 +9,18 @@ class MongoCollectionOpen extends MongoCollection {
   // Returns a WriteResult object
   @override
   Future<WriteResult> insertOne(MongoDocument document,
-          {InsertOneOptions? insertOneOptions}) async =>
+          {ClientSession? session, InsertOneOptions? insertOneOptions}) async =>
       InsertOneOperationOpen(this, document,
               insertOneOptions: insertOneOptions?.toOneOpen)
-          .executeDocument();
+          .executeDocument(session: session);
 
   /// Insert many document into this collection
   /// Returns a BulkWriteResult object
   @override
   Future<BulkWriteResult> insertMany(List<MongoDocument> documents,
-          {InsertManyOptions? insertManyOptions}) async =>
+          {ClientSession? session,
+          InsertManyOptions? insertManyOptions}) async =>
       InsertManyOperationOpen(this, documents,
               insertManyOptions: insertManyOptions?.toManyOpen)
-          .executeDocument();
+          .executeDocument(session: session);
 }

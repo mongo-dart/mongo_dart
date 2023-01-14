@@ -9,8 +9,8 @@ class AbortTransactionCommand extends DbAdminCommandOperation {
       {AbortTransactionOptions? abortTransactionOptions, Options? rawOptions})
       : super(client, <String, dynamic>{
           keyCommitTransaction: 1,
-          keyTxnNumber: transactionInfo.transactionNumber,
-          keyAutocommit: false
+          //keyTxnNumber: transactionInfo.transactionNumber,
+          //keyAutocommit: false
         }, options: <String, dynamic>{
           ...transactionInfo.options.getOptions(client),
           ...?abortTransactionOptions?.getOptions(client),

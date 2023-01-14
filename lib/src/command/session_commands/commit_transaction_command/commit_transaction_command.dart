@@ -9,8 +9,8 @@ class CommitTransactionCommand extends DbAdminCommandOperation {
       {CommitTransactionOptions? commitTransactionOptions, Options? rawOptions})
       : super(client, <String, dynamic>{
           keyCommitTransaction: 1,
-          keyTxnNumber: transactionInfo.transactionNumber,
-          keyAutocommit: false
+          //keyTxnNumber: transactionInfo.transactionNumber,
+          //keyAutocommit: false
         }, options: <String, dynamic>{
           ...transactionInfo.options.getOptions(client),
           ...?commitTransactionOptions?.getOptions(client),

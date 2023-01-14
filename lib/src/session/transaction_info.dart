@@ -27,6 +27,7 @@ class TransactionInfo {
 
   bool get isPinned => _pinnedServer != null;
 
+  bool get isFirstTransaction => state == TransactionState.starting;
   bool get isActive =>
       state == TransactionState.inProgress ||
       state == TransactionState.starting;

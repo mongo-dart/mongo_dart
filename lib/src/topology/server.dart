@@ -106,13 +106,14 @@ class Server {
     var connection = await connectionPool.getAvailableConnection();
 
     session ??= ClientSession(mongoClient);
-    session.serverSession ??= mongoClient.serverSessionPool.acquireSession();
-    session.serverSession!.lastUse = DateTime.now();
-    command[keyLsid] = session.serverSession!.toMap;
+    //session.serverSession ??= mongoClient.serverSessionPool.acquireSession();
+    //session.serverSession!.lastUse = DateTime.now();
+    //command[keyLsid] = session.serverSession!.toMap;
+    session.prepareCommand(command);
 
     var response = await connection.execute(MongoModernMessage(command));
     if (isImplicitSession) {
-      session.endSession();
+      await session.endSession();
     }
 
     var section = response.sections.firstWhere((Section section) =>

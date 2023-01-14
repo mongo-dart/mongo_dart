@@ -1,3 +1,4 @@
+import 'package:bson/bson.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/src/command/session_commands/abort_transaction_command%20copy/abort_transaction_command.dart';
 import 'package:mongo_dart/src/command/session_commands/abort_transaction_command%20copy/abort_transaction_options.dart';
@@ -10,6 +11,7 @@ import '../core/error/mongo_dart_error.dart';
 import '../database/document_types.dart';
 import '../mongo_client.dart';
 import '../server_side/server_session.dart';
+import '../utils/map_keys.dart';
 import 'session_options.dart';
 import 'transaction_info.dart';
 import 'transaction_options.dart';
@@ -87,12 +89,12 @@ class ClientSession {
   /// for reuse (see Server Session Pool).
   /// Once a ClientSession has ended, drivers MUST report an error if
   /// any operations are attempted with that ClientSession.
-  endSession() {
+  Future endSession() async {
     hasEnded = true;
     client.activeSessions.remove(this);
     if (inTransaction) {
       // TODO check which parameters are needed
-      abortTransaction();
+      await abortTransaction();
     }
   }
 
@@ -210,6 +212,21 @@ class ClientSession {
         rawOptions: options);
 
     return command.execute();
+  }
+
+  void prepareCommand(Command command) {
+    serverSession ??= client.serverSessionPool.acquireSession();
+    serverSession!.lastUse = DateTime.now();
+    command[keyLsid] = serverSession!.toMap;
+    if (inTransaction) {
+      // TODO update this after changing BSON package
+      command[keyTxnNumber] = BsonLong(transaction!.transactionNumber.toInt());
+      command[keyAutocommit] = false;
+      if (transaction!.isFirstTransaction) {
+        command[keyStartTransaction] = true;
+        transaction!.state = TransactionState.inProgress;
+      }
+    }
   }
 
 // TODO Execute the commands

@@ -248,6 +248,7 @@ const keySort = 'sort';
 const keySparseIndex = 'sparse';
 const keyStartAfter = 'startAfter';
 const keyStartAtOperationTime = 'startAtOperationTime';
+const keyStartTransaction = 'startTransaction';
 const keyStorageEngine = 'storageEngine';
 const keyStrength = 'strength';
 const keyTags = 'tags';
