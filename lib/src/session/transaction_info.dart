@@ -18,12 +18,12 @@ enum TransactionState {
 /// requires not to have a transaction object, so tha the user
 /// cannot get confused.
 class TransactionInfo {
-  TransactionInfo(this.transactionNumber, {TransactionOptions? options})
+  TransactionInfo({TransactionOptions? options})
       : options = options ?? TransactionOptions();
   TransactionOptions options;
   TransactionState state = TransactionState.none;
   Server? _pinnedServer;
-  Int64 transactionNumber;
+  Int64 transactionNumber = Int64();
 
   bool get isPinned => _pinnedServer != null;
 

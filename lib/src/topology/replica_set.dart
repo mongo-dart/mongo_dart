@@ -9,7 +9,7 @@ class ReplicaSet extends Topology {
   ReplicaSet(super.mongoClient, super.hostsSeedList, {super.detectedServers})
       : super.protected() {
     type = TopologyType.replicaSet;
-    updateServersStatus();
+    //updateServersStatus();
   }
 
   Set<Server> secondaries = <Server>{};

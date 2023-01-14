@@ -127,7 +127,7 @@ class MongoModernMessage extends MongoResponseMessage {
     keyUpdateArgument,
     keyDeleteArgument,
   ];
-  static List<String> globalArgument = <String>[key$Db, keyReadPreference];
+  static List<String> globalArgument = <String>[key$Db, key$ReadPreference];
 
   /// Certain commands support "pulling out" arguments from the command,
   /// and providing them as Payload Type 1, where the identifier is the

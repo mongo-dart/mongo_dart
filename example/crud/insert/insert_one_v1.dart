@@ -85,13 +85,14 @@ void main() async {
   if (!ret.isSuccess) {
     print('Error detected in record insertion');
   }
-  await session.commitTransaction();
+  var commitRes = await session.commitTransaction();
+  print(commitRes);
   await session.endSession();
 
   res = await collection.findOne(where.sortBy('score'));
 
   print('Fetched: "${res?['name']}"');
-  // Tom
+  // Nathan
 
 // *** In Transaction aborted ***
   session = client.startSession();

@@ -98,7 +98,7 @@ class MongoClient {
 
     await discoverTopology.connect();
 
-    topology = discoverTopology.getEffectiveTopology();
+    topology = await discoverTopology.getEffectiveTopology();
   }
 
   // TODO clean the serverSessionPool

@@ -25,7 +25,7 @@ class TransactionOptions {
               client.topology?.primary?.serverStatus ??
                   (throw MongoDartError('No server detected'))),
         if (readConcern != null) keyReadConcern: readConcern!.toMap(),
-        if (readPreference != null) keyReadConcern: readPreference!.toMap(),
+        ...?readPreference?.toMap(),
         if (maxCommitTimeMS != null) keyMaxCommitTimeMS: maxCommitTimeMS
       };
 }

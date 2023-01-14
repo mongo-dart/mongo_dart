@@ -111,6 +111,8 @@ class Server {
     //command[keyLsid] = session.serverSession!.toMap;
     session.prepareCommand(command);
 
+    print(command);
+
     var response = await connection.execute(MongoModernMessage(command));
     if (isImplicitSession) {
       await session.endSession();
@@ -128,7 +130,12 @@ class Server {
     try {
       var helloCommand = HelloCommand(this, username: serverConfig.userName);
       var actualTimeMS = DateTime.now().millisecondsSinceEpoch;
-      result = await helloCommand.execute();
+      try {
+        result = await helloCommand.execute();
+      } catch (error) {
+        print(error);
+        rethrow;
+      }
       lastHelloExecutionMS =
           DateTime.now().millisecondsSinceEpoch - actualTimeMS;
     } on MongoDartError catch (err) {

@@ -1,8 +1,6 @@
 import 'package:bson/bson.dart';
-import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/src/command/session_commands/abort_transaction_command%20copy/abort_transaction_command.dart';
 import 'package:mongo_dart/src/command/session_commands/abort_transaction_command%20copy/abort_transaction_options.dart';
-import 'package:uuid/uuid.dart';
 
 import '../command/base/operation_base.dart';
 import '../command/session_commands/commit_transaction_command/commit_transaction_command.dart';
@@ -20,7 +18,6 @@ import 'transaction_options.dart';
 /// They can only be used by one thread or process at a time.
 /// Drivers MUST NOT attempt to detect simultaneous use by multiple
 ///  threads or processes
-///
 class ClientSession {
   ClientSession(this.client, {SessionOptions? sessionOptions})
       : sessionId = Uuid().v4obj(),
@@ -64,7 +61,6 @@ class ClientSession {
   bool hasEnded = false;
 
   TransactionInfo? transaction;
-  Int64 _lastTransactionNumber = Int64();
 
   bool get isCausalConsistency => sessionOptions.causalConsistency;
   bool get shouldRetryWrite => sessionOptions.retryWrites;
@@ -113,13 +109,6 @@ class ClientSession {
     transaction?.unpinServer();
   }
 
-  /// Increment the transaction number on the internal ServerSession
-  ///
-  /// This helper increments a value stored on the client session that will be
-  /// added to the serverSession's txnNumber upon applying it to a command.
-  /// This is because the serverSession is lazily acquired after a connection is obtained
-  Int64 get newTransactionNumber => ++_lastTransactionNumber;
-
   /// Starts a new transaction with the given options.
   void startTransaction({TransactionOptions? transactionOptions}) {
     TransactionOptions options = transactionOptions ?? TransactionOptions();
@@ -142,7 +131,7 @@ class ClientSession {
         sessionOptions.readPreference ?? client.readPreference;
     options.writeConcern ??= sessionOptions.writeConcern ?? client.writeConcern;
     options.maxCommitTimeMS ??= sessionOptions.defaultMaxCommitTimeMS;
-    transaction = TransactionInfo(newTransactionNumber, options: options)
+    transaction = TransactionInfo(options: options)
       ..state = TransactionState.starting;
   }
 
@@ -179,7 +168,7 @@ class ClientSession {
     var command = AbortTransactionCommand(client, transaction!,
         abortTransactionOptions: abortTransactionOptions, rawOptions: options);
 
-    return command.execute();
+    return command.execute(session: this);
   }
 
   Future<MongoDocument?> commitTransaction(
@@ -211,7 +200,7 @@ class ClientSession {
         commitTransactionOptions: commitTransactionOptions,
         rawOptions: options);
 
-    return command.execute();
+    return command.execute(session: this);
   }
 
   void prepareCommand(Command command) {
@@ -219,13 +208,15 @@ class ClientSession {
     serverSession!.lastUse = DateTime.now();
     command[keyLsid] = serverSession!.toMap;
     if (inTransaction) {
-      // TODO update this after changing BSON package
-      command[keyTxnNumber] = BsonLong(transaction!.transactionNumber.toInt());
-      command[keyAutocommit] = false;
       if (transaction!.isFirstTransaction) {
+        transaction!.transactionNumber =
+            serverSession!.incrementTransactionNumber;
         command[keyStartTransaction] = true;
         transaction!.state = TransactionState.inProgress;
       }
+      // TODO update this after changing BSON package
+      command[keyTxnNumber] = BsonLong(transaction!.transactionNumber.toInt());
+      command[keyAutocommit] = false;
     }
   }
 

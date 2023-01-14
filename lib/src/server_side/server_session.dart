@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:uuid/uuid.dart';
 
@@ -17,6 +18,8 @@ class ServerSession {
         id = id ?? Uuid().v4obj();
   final UuidValue id;
 
+  Int64 _lastTransactionNumber = Int64();
+
   bool isDirty = false;
 
   /// The driver MUST update the value of this property with the current
@@ -26,4 +29,5 @@ class ServerSession {
   DateTime lastUse;
 
   MongoDocument get toMap => {keyId: id};
+  Int64 get incrementTransactionNumber => ++_lastTransactionNumber;
 }

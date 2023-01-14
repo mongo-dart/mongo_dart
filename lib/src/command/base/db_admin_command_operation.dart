@@ -15,9 +15,12 @@ class DbAdminCommandOperation extends OperationBase {
   Command $buildCommand() => command;
 
   @override
-  Future<MongoDocument> execute() async => executeOnServer(client.topology
-          ?.getServer(readPreferenceMode: client.readPreference?.mode) ??
-      (throw MongoDartError('Server not found')));
+  Future<MongoDocument> execute({ClientSession? session}) async =>
+      executeOnServer(
+          client.topology?.getServer(
+                  readPreferenceMode: client.readPreference?.mode) ??
+              (throw MongoDartError('Server not found')),
+          session: session);
 
   @override
   @protected

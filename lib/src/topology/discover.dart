@@ -17,7 +17,7 @@ class Discover extends Topology {
     type = TopologyType.unknown;
   }
 
-  Topology getEffectiveTopology() {
+  Future<Topology> getEffectiveTopology() async {
     Topology topology;
     if (servers.first.isStandalone) {
       topology =
@@ -26,6 +26,7 @@ class Discover extends Topology {
     } else if (servers.first.isReplicaSet) {
       topology =
           ReplicaSet(mongoClient, hostsSeedList, detectedServers: servers);
+      await topology.updateServersStatus();
     } else if (servers.first.isShardedCluster) {
       // Todo
       topology =
