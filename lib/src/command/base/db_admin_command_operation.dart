@@ -29,6 +29,10 @@ class DbAdminCommandOperation extends OperationBase {
     var command = <String, dynamic>{...$buildCommand(), key$Db: 'admin'};
     options.removeWhere((key, value) => command.containsKey(key));
 
+    if (client.serverApi != null) {
+      command.addAll(client.serverApi!.options);
+    }
+
     command.addAll(options);
 
     //var modernMessage = MongoModernMessage(command);

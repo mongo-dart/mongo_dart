@@ -116,8 +116,6 @@ class MongoClient {
   }
 
   // Todo
-  ClientSession startSession({SessionOptions? clientSessionOptions}) {
-    // here also the server session must be assigned
-    return ClientSession(this, sessionOptions: clientSessionOptions);
-  }
+  ClientSession startSession({SessionOptions? clientSessionOptions}) =>
+      ClientSession(this, sessionOptions: clientSessionOptions);
 }

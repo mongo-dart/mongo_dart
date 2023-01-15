@@ -86,7 +86,9 @@ void main() async {
     print('Error detected in record insertion');
   }
   var commitRes = await session.commitTransaction();
-  print(commitRes);
+  if (commitRes?[keyOk] == 0.0) {
+    print('${commitRes?[keyErrmsg]}');
+  }
   await session.endSession();
 
   res = await collection.findOne(where.sortBy('score'));
@@ -100,7 +102,7 @@ void main() async {
   ret = await collection.insertOne(<String, dynamic>{
     '_id': 4,
     'name': 'Anne',
-    'state': 'inctive',
+    'state': 'inactive',
     'rating': 120,
   }, session: session);
 
@@ -109,10 +111,10 @@ void main() async {
   }
   await session.endSession();
 
-  res = await collection.findOne(where.sortBy('_id', descending: true));
+  res = await collection.findOne(where.sortBy('name'));
 
   print('Fetched: "${res?['name']}"');
-  // Nathan
+  // Ezra
 
   await cleanupDatabase();
 }

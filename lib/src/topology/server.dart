@@ -111,8 +111,6 @@ class Server {
     //command[keyLsid] = session.serverSession!.toMap;
     session.prepareCommand(command);
 
-    print(command);
-
     var response = await connection.execute(MongoModernMessage(command));
     if (isImplicitSession) {
       await session.endSession();
