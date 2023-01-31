@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/server_command.dart';
 
@@ -19,6 +20,7 @@ class SimpleCommand extends ServerCommand {
   Topology topology;
 
   @override
+  @nonVirtual
   Future<MongoDocument> execute({ClientSession? session}) async {
     Server? server;
     if (topology.type == TopologyType.standalone) {

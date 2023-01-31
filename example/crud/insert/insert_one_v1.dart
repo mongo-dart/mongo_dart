@@ -34,7 +34,7 @@ void main() async {
   var collection = db.collection(collectionName);
 
   // *** Simple case ***
-  var ret = await collection.insertOne(<String, dynamic>{
+  var (ret,_, _, _) = await collection.insertOne(<String, dynamic>{
     '_id': 1,
     'name': 'Tom',
     'state': 'active',
@@ -53,7 +53,7 @@ void main() async {
 
 // *** In Session ***
   var session = client.startSession();
-  ret = await collection.insertOne(<String, dynamic>{
+  (ret,_, _, _) = await collection.insertOne(<String, dynamic>{
     '_id': 2,
     'name': 'Ezra',
     'state': 'active',
@@ -74,7 +74,7 @@ void main() async {
 // *** In Transaction committed ***
   session = client.startSession();
   session.startTransaction();
-  ret = await collection.insertOne(<String, dynamic>{
+  (ret,_, _, _) = await collection.insertOne(<String, dynamic>{
     '_id': 3,
     'name': 'Nathan',
     'state': 'active',
@@ -99,7 +99,7 @@ void main() async {
 // *** In Transaction aborted ***
   session = client.startSession();
   session.startTransaction();
-  ret = await collection.insertOne(<String, dynamic>{
+  (ret,_, _, _) = await collection.insertOne(<String, dynamic>{
     '_id': 4,
     'name': 'Anne',
     'state': 'inactive',

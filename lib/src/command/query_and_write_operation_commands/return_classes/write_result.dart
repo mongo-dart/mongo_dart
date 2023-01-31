@@ -9,8 +9,8 @@ import 'write_error.dart';
 /// - remove
 /// - save
 class WriteResult extends AbstractWriteResult {
-  dynamic id;
-  Map<String, dynamic>? document;
+  //dynamic id;
+  //Map<String, dynamic>? document;
   WriteError? writeError;
 
   WriteResult.fromMap(

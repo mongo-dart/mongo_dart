@@ -8,7 +8,7 @@ class MongoCollectionOpen extends MongoCollection {
   // Insert one document into this collection
   // Returns a WriteResult object
   @override
-  Future<WriteResult> insertOne(MongoDocument document,
+  Future<InsertOneDocumentRec> insertOne(MongoDocument document,
           {ClientSession? session, InsertOneOptions? insertOneOptions}) async =>
       InsertOneOperationOpen(this, document,
               insertOneOptions: insertOneOptions?.toOneOpen)

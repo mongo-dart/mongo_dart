@@ -69,7 +69,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret =
+        var(ret, _, document, id) =
             await collection.insertOne({'_id': 3, 'name': 'John', 'age': 32});
         expect(ret.ok, 1.0);
         expect(ret.operationSucceeded, isTrue);
@@ -82,15 +82,15 @@ void main() async {
         expect(ret.nModified, 0);
         expect(ret.nMatched, 0);
         expect(ret.nRemoved, 0);
-        expect(ret.id, 3);
-        expect(ret.document?['name'], 'John');
+        expect(id, 3);
+        expect(document['name'], 'John');
       }, skip: cannotRunTests);
 
       test('InsertOne no Id', () async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertOne({'item': 'card', 'qty': 15});
+        var (ret, _, document, id) = await collection.insertOne({'item': 'card', 'qty': 15});
         expect(ret.ok, 1.0);
         expect(ret.operationSucceeded, isTrue);
         expect(ret.hasWriteErrors, isFalse);
@@ -102,19 +102,19 @@ void main() async {
         expect(ret.nModified, 0);
         expect(ret.nMatched, 0);
         expect(ret.nRemoved, 0);
-        expect(ret.id.runtimeType, ObjectId);
-        expect(ret.document?['item'], 'card');
+        expect(id.runtimeType, ObjectId);
+        expect(document['item'], 'card');
       }, skip: cannotRunTests);
 
       test('InsertOne duplicate id', () async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret =
+        var (ret, _, document, id) =
             await collection.insertOne({'_id': 10, 'item': 'card', 'qty': 15});
         expect(ret.ok, 1.0);
         expect(ret.operationSucceeded, isTrue);
-        ret = await collection
+        (ret, _, document, id) = await collection
             .insertOne({'_id': 10, 'item': 'packing peanuts', 'qty': 200});
         expect(ret.ok, 1.0);
         expect(ret.operationSucceeded, isTrue);
@@ -128,8 +128,8 @@ void main() async {
         expect(ret.nModified, 0);
         expect(ret.nMatched, 0);
         expect(ret.nRemoved, 0);
-        expect(ret.id, 10);
-        expect(ret.document?['item'], 'packing peanuts');
+        expect(id, 10);
+        expect(document['item'], 'packing peanuts');
       }, skip: cannotRunTests);
 
       test('InsertOne increase Write Concern', () async {
@@ -138,7 +138,7 @@ void main() async {
 
         // The error is caused by the number of servers (as we have a testing)
         // environment with at most three replica set members).
-        var ret = await collection.insertOne(
+        var (ret , _, document, id)= await collection.insertOne(
             {'item': 'envelopes', 'qty': 100, 'type': 'Self-Sealing'},
             insertOneOptions: InsertOneOptions(
                 writeConcern: WriteConcern(w: W(4), wtimeout: 5000, j: true)));
@@ -165,8 +165,8 @@ void main() async {
         expect(ret.nModified, 0);
         expect(ret.nMatched, 0);
         expect(ret.nRemoved, 0);
-        expect(ret.id.runtimeType, ObjectId);
-        expect(ret.document?['item'], 'envelopes');
+        expect(id.runtimeType, ObjectId);
+        expect(document['item'], 'envelopes');
         expect(ret.isSuccess, isFalse);
         expect(ret.isPartialSuccess, isFalse);
         expect(ret.isSuspendedPartial, isFalse);

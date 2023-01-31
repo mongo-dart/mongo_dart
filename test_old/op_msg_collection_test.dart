@@ -111,13 +111,13 @@ void main() async {
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
-      var writeResult = await collection.insertOne(
+      var (writeResult, _, _, _) = await collection.insertOne(
           {'name': 'Anand', 'phone': '451 3874643', 'status': 'Incomplete'},
           insertOneOptions:
               InsertOneOptions(writeConcern: WriteConcern.majority));
       expect(writeResult.isSuccess, isTrue);
 
-      writeResult = await collection.insertOne(
+      (writeResult , _, _, _)= await collection.insertOne(
           {'name': 'Amanda', 'status': 'Updated'},
           insertOneOptions:
               InsertOneOptions(writeConcern: WriteConcern.majority));

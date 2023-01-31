@@ -15,7 +15,10 @@ linter:
 analyzer:
   errors:
     todo: info
-
+  enable-experiment:
+    - records
+    - patterns
+    
 # analyzer:
 ###   exclude:
 ###     - path/to/excluded/files/**

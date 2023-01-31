@@ -49,7 +49,7 @@ abstract class MongoCollection {
 
   /// Insert one document into this collection
   /// Returns a WriteResult object
-  Future<WriteResult> insertOne(MongoDocument document,
+  Future<InsertOneDocumentRec> insertOne(MongoDocument document,
       {ClientSession? session, InsertOneOptions? insertOneOptions});
 
   /// Insert many document into this collection

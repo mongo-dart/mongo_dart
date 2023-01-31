@@ -54,7 +54,7 @@ void main() async {
   }
   var collection = db.collection(collectionName);
 
-  var ret = await collection.insertOne(
+  var (ret, _, _,_) = await collection.insertOne(
       {'name': 'Anand', 'phone': '451 3874643', 'status': 'Incomplete'},
       insertOneOptions: InsertOneOptions(writeConcern: WriteConcern.majority));
 
@@ -62,7 +62,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  ret = await collection.insertOne({'name': 'Amanda', 'status': 'Updated'},
+  (ret,_, _, _) = await collection.insertOne({'name': 'Amanda', 'status': 'Updated'},
       insertOneOptions: InsertOneOptions(writeConcern: WriteConcern.majority));
 
   if (!ret.isSuccess) {

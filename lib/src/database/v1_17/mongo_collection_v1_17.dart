@@ -9,7 +9,7 @@ class MongoCollectionV117 extends MongoCollection {
   // Insert one document into this collection
   // Returns a WriteResult object
   @override
-  Future<WriteResult> insertOne(MongoDocument document,
+  Future<InsertOneDocumentRec> insertOne(MongoDocument document,
           {ClientSession? session, InsertOneOptions? insertOneOptions}) async =>
       InsertOneOperationV1(this, document,
               insertOneOptions: insertOneOptions?.toOneV1)

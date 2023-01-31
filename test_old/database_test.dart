@@ -756,7 +756,7 @@ Future testUpdateWithUpsert() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  var result = await collection.insertOne({'name': 'a', 'value': 10});
+  var (result, _, _, _) = await collection.insertOne({'name': 'a', 'value': 10});
   expect(result.isSuccess, true);
 
   var results = await collection.find({'name': 'a'}).toList();
@@ -1537,7 +1537,7 @@ Future testFieldLevelUpdateSimple() async {
 
   ObjectId id;
   if (db.server.serverCapabilities.supportsOpMsg) {
-    var resultInsert = await collection.insertOne({'name': 'a', 'value': 10});
+    var (resultInsert, _, _, _) = await collection.insertOne({'name': 'a', 'value': 10});
     expect(resultInsert.nInserted, 1);
   } else {
     var resultInsert = await collection.insert({'name': 'a', 'value': 10});

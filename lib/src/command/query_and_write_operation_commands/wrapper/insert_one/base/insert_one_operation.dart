@@ -15,6 +15,9 @@ import '../../../../../session/client_session.dart';
 import '../open/insert_one_operation_open.dart';
 import '../v1/insert_one_operation_v1.dart';
 
+typedef InsertOneRec = (MongoDocument serverDocument, MongoDocument insertedDocument, dynamic id);
+typedef InsertOneDocumentRec = (WriteResult writeResult, MongoDocument serverDocument, MongoDocument insertedDocument, dynamic id);
+
 abstract class InsertOneOperation extends InsertOperation {
   Map<String, dynamic> document;
 
@@ -45,10 +48,14 @@ abstract class InsertOneOperation extends InsertOperation {
         insertOneOptions: insertOneOptions?.toOneOpen, rawOptions: rawOptions);
   }
 
-  Future<WriteResult> executeDocument({ClientSession? session}) async {
-    var ret = await super.execute(session: session);
-    return WriteResult.fromMap(WriteCommandType.insert, ret)
-      ..id = ids.first
-      ..document = documents.first;
+   Future<InsertOneRec> executeInsertOne({ClientSession? session}) async {
+    var (ret, documents, ids) = await executeInsert(session: session);
+    return (ret, documents.first, ids.first);
+  }
+
+  Future<InsertOneDocumentRec> executeDocument({ClientSession? session}) async {
+    var (ret, document, id) = await executeInsertOne(session: session);
+    return (WriteResult.fromMap(WriteCommandType.insert, ret)
+      , ret, document, id);
   }
 }

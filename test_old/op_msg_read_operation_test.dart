@@ -210,7 +210,7 @@ void main() async {
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);
 
-      var ret = await collection.insertOne(testDoc);
+      var (ret, _, _, _) = await collection.insertOne(testDoc);
       expect(ret.isSuccess, isTrue);
 
       var result = await collection.modernFind(filter: {

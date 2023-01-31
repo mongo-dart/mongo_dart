@@ -392,10 +392,6 @@ abstract class Bulk extends CommandOperation {
   List<Map<int, int>> getBulkInputOrigins();
 
   @override
-  @Deprecated('Use executeBulk instead')
-  Future<MongoDocument> execute({ClientSession? session}) =>
-      throw StateError('Call executeBulk() for bulk operations');
-  @override
   Command $buildCommand() =>
       throw StateError('Call getBulkCommands() for bulk operations');
 

@@ -3,10 +3,13 @@ import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
+import 'package:mongo_dart/src/session/client_session.dart';
 
 import '../open/insert_operation_open.dart';
 import '../v1/insert_operation_v1.dart';
 import 'insert_options.dart';
+
+typedef InsertRec = (MongoDocument serverDocument, List<MongoDocument> insertedDocuments, List ids);
 
 abstract class InsertOperation extends CommandOperation {
   @protected
@@ -57,4 +60,9 @@ abstract class InsertOperation extends CommandOperation {
         keyInsert: collection!.collectionName,
         keyDocuments: documents
       };
+
+  Future<InsertRec> executeInsert({ClientSession? session}) async {
+    var ret = await super.execute(session: session);
+    return (ret, documents, ids);
+  }
 }
