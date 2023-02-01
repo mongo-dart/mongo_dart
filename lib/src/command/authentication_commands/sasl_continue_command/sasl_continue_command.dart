@@ -4,10 +4,7 @@ import 'dart:typed_data';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
 import '../../../core/network/abstract/connection_base.dart';
-import '../../../database/document_types.dart';
 import '../../../database/base/mongo_database.dart';
-import '../../../session/client_session.dart';
-import '../../../topology/server.dart';
 import 'sasl_continue_options.dart';
 
 class SaslContinueCommand extends CommandOperation {
@@ -24,7 +21,7 @@ class SaslContinueCommand extends CommandOperation {
           ...?rawOptions
         });
 
-  @override
+  /* @override
   Future<MongoDocument> executeOnServer(Server server,
       {ClientSession? session}) async {
     var command = $buildCommand();
@@ -32,5 +29,5 @@ class SaslContinueCommand extends CommandOperation {
     command.addAll(options);
 
     return server.executeCommand(command, session: session);
-  }
+  } */
 }

@@ -17,7 +17,7 @@ class MongoCollectionOpen extends MongoCollection {
   /// Insert many document into this collection
   /// Returns a BulkWriteResult object
   @override
-  Future<BulkWriteResult> insertMany(List<MongoDocument> documents,
+  Future<InsertManyDocumentRec> insertMany(List<MongoDocument> documents,
           {ClientSession? session,
           InsertManyOptions? insertManyOptions}) async =>
       InsertManyOperationOpen(this, documents,

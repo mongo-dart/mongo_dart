@@ -19,7 +19,7 @@ void main() async {
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
-  var ret = await collection.insertMany([
+  var (ret ,_,_,_)= await collection.insertMany([
     {
       '_id': 1,
       'member': 'abc123',

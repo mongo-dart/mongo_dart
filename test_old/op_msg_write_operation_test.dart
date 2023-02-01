@@ -179,7 +179,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,documents,ids) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -195,10 +195,10 @@ void main() async {
         expect(ret.nModified, 0);
         expect(ret.nMatched, 0);
         expect(ret.nRemoved, 0);
-        expect(ret.ids?.first, 3);
-        expect(ret.documents?.first['name'], 'John');
-        expect(ret.ids?.last, 7);
-        expect(ret.documents?.last['name'], 'Luis');
+        expect(ids.first, 3);
+        expect(documents.first['name'], 'John');
+        expect(ids.last, 7);
+        expect(documents.last['name'], 'Luis');
       }, skip: cannotRunTests);
 
       test('Too much documents', () async {
@@ -217,7 +217,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -247,7 +247,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -302,7 +302,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -330,7 +330,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -385,7 +385,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -414,7 +414,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -562,7 +562,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -589,7 +589,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -954,7 +954,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [95, 92, 90]
@@ -997,7 +997,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [
@@ -1044,7 +1044,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [
@@ -1309,7 +1309,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [95, 92, 90]
@@ -1347,7 +1347,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [
@@ -1391,7 +1391,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var ret = await collection.insertMany([
+        var (ret,_,_,_) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [

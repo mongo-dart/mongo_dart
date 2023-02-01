@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 import '../../session/client_session.dart';
@@ -52,6 +53,8 @@ class ServerCommand extends OperationBase {
   ///Drivers MUST document the behavior of unacknowledged writes for both
   ///explicit and implicit sessions.
   @override
+  @nonVirtual
+  @protected
   Future<MongoDocument> executeOnServer(Server server,
       {ClientSession? session}) async {
     var command = $buildCommand();

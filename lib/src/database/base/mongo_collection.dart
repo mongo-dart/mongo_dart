@@ -54,7 +54,7 @@ abstract class MongoCollection {
 
   /// Insert many document into this collection
   /// Returns a BulkWriteResult object
-  Future<BulkWriteResult> insertMany(List<MongoDocument> documents,
+  Future<InsertManyDocumentRec> insertMany(List<MongoDocument> documents,
       {ClientSession? session, InsertManyOptions? insertManyOptions});
 
   // ****************************************************

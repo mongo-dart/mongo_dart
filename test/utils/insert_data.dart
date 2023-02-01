@@ -40,8 +40,8 @@ Future<BulkWriteResult> insertOrders(MongoCollection collection) async {
     {'cust_num': 12911, 'item': 'book1', 'status': 'A'},
     {'cust_num': 12345, 'item': 'sample', 'status': 'R'},
   ];
-
-  return await collection.insertMany(toInsert);
+var (bulkWriteResult,_,_,_) = await collection.insertMany(toInsert);
+  return bulkWriteResult;
 }
 
 /// For op_msg
@@ -52,7 +52,8 @@ Future<BulkWriteResult> insertFrenchCafe(MongoCollection collection) async {
     {'_id': 3, 'category': 'cafE', 'status': 'a'}
   ];
 
-  return await collection.insertMany(toInsert);
+  var (bulkWriteResult,_,_,_) =  await collection.insertMany(toInsert);
+  return bulkWriteResult;
 }
 
 /// For op_msg
@@ -108,7 +109,8 @@ Future<BulkWriteResult> insertMembers(MongoCollection collection) async {
     }
   ];
 
-  return collection.insertMany(toInsert);
+  var (bulkWriteResult,_,_,_) =  await collection.insertMany(toInsert);
+  return bulkWriteResult;
 }
 
 Future<BulkWriteResult> insertPeople(MongoCollection collection) async {
@@ -122,8 +124,8 @@ Future<BulkWriteResult> insertPeople(MongoCollection collection) async {
     {'_id': 7, 'name': 'John', 'state': 'idle', 'rating': 72, 'score': 7}
   ];
 
-  return collection.insertMany(toInsert);
-}
+var (bulkWriteResult,_,_,_) =  await collection.insertMany(toInsert);
+  return bulkWriteResult;}
 
 Future<BulkWriteResult> insertManyDocuments(
     MongoCollection collection, int numberOfRecords) async {
@@ -132,5 +134,5 @@ Future<BulkWriteResult> insertManyDocuments(
     toInsert.add({'a': n});
   }
 
-  return collection.insertMany(toInsert);
-}
+var (bulkWriteResult,_,_,_) =  await collection.insertMany(toInsert);
+  return bulkWriteResult;}

@@ -780,7 +780,7 @@ Future testUpdateWithMultiUpdate() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  var result = await collection.insertMany([
+  var (result,_,_,_) = await collection.insertMany([
     {'key': 'a', 'value': 'initial_value1'},
     {'key': 'a', 'value': 'initial_value2'},
     {'key': 'b', 'value': 'initial_value_b'}

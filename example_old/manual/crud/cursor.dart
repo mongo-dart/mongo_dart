@@ -25,7 +25,7 @@ void main() async {
     for (var idx = 0; idx < 1000; idx++) {'key': idx}
   ];
 
-  var ret = await collection.insertMany(documents);
+  var (ret,_,_,_) = await collection.insertMany(documents);
   if (!ret.isSuccess) {
     print('Error detected in record insertion');
   }

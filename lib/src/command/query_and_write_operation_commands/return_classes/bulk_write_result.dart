@@ -8,8 +8,8 @@ import 'upserted_info.dart';
 class BulkWriteResult extends AbstractWriteResult {
   List<UpsertedInfo> upserted = [];
   List<BulkWriteError> writeErrors = [];
-  List? ids;
-  List<Map<String, dynamic>>? documents;
+  //List? ids;
+  //List<Map<String, dynamic>>? documents;
 
   BulkWriteResult.fromMap(
       WriteCommandType writeCommandType, Map<String, dynamic> result)

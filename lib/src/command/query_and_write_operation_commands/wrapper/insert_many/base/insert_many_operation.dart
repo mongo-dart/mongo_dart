@@ -15,6 +15,9 @@ import '../../../../base/operation_base.dart';
 import '../open/insert_many_operation_open.dart';
 import '../v1/insert_many_operation_v1.dart';
 
+typedef InsertManyDocumentRec = (BulkWriteResult bulkWriteResult, 
+MongoDocument serverDocument, List<MongoDocument> insertedDocuments, List ids);
+
 abstract class InsertManyOperation extends InsertOperation {
   @protected
   InsertManyOperation.protected(
@@ -51,9 +54,11 @@ abstract class InsertManyOperation extends InsertOperation {
         rawOptions: rawOptions);
   }
 
-  Future<BulkWriteResult> executeDocument({ClientSession? session}) async =>
-      BulkWriteResult.fromMap(
-          WriteCommandType.insert, await execute(session: session))
-        ..ids = ids
-        ..documents = documents;
+  Future<InsertManyDocumentRec> executeDocument({ClientSession? session}) async {
+    var (serverDocument, documents, ids) = await executeInsert(session: session);
+    return (BulkWriteResult.fromMap(
+          WriteCommandType.insert, serverDocument)
+        /* ..ids = ids
+        ..documents = documents */, serverDocument, documents, ids);
+  }
 }

@@ -487,7 +487,8 @@ abstract class Bulk extends CommandOperation {
     if (ret == null) {
       throw MongoDartError('No response from the server');
     }
-    ret.ids = ids.sublist(0, min<int>(ids.length, ret.nInserted));
+    // TODO Update logic for record
+    //ret.ids = ids.sublist(0, min<int>(ids.length, ret.nInserted));
     return ret;
   }
 

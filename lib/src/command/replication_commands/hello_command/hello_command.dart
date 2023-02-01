@@ -1,7 +1,6 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
-import '../../../core/error/mongo_dart_error.dart';
 import '../../../database/base/mongo_database.dart';
 import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
@@ -47,9 +46,9 @@ class HelloCommand extends ServerCommand {
   Future<Map<String, dynamic>> execute({ClientSession? session}) async =>
       super.executeOnServer(server, session: session);
 
-  @override
+  /*  @override
   @Deprecated('Use execute instead')
   Future<Map<String, dynamic>> executeOnServer(Server server,
           {ClientSession? session}) async =>
-      throw MongoDartError('Do not use this method, use execute instead');
+      throw MongoDartError('Do not use this method, use execute instead'); */
 }

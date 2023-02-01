@@ -25,7 +25,7 @@ void main() async {
   var collection = db.collection(collectionName);
 
   print('Starting inserting data');
-  var ret = await collection.insertMany(zipList);
+  var (ret,_,_,_) = await collection.insertMany(zipList);
 
   print('Creating geospatial index');
   await collection.createIndex(keys: {'loc': '2d'});

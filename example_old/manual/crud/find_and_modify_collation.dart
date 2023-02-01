@@ -19,7 +19,7 @@ void main() async {
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
-  var ret = await collection.insertMany(<Map<String, dynamic>>[
+  var (ret,_,_,_) = await collection.insertMany(<Map<String, dynamic>>[
     {'_id': 1, 'category': 'café', 'status': 'A'},
     {'_id': 2, 'category': 'cafE', 'status': 'a'},
     {'_id': 3, 'category': 'cafe', 'status': 'a'},

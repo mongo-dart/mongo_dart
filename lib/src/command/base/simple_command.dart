@@ -46,9 +46,9 @@ class SimpleCommand extends ServerCommand {
         session: session);
   }
 
-  @override
+  /* @override
   @Deprecated('Use execute instead')
   Future<Map<String, dynamic>> executeOnServer(Server server,
           {ClientSession? session}) async =>
-      throw MongoDartError('Do not use this method, use execute instead');
+      throw MongoDartError('Do not use this method, use execute instead'); */
 }
