@@ -425,7 +425,7 @@ abstract class Bulk extends CommandOperation {
 
       //var modernMessage = MongoModernMessage(command);
       //var ret = await server.executeMessage(modernMessage);
-      var ret = await server.executeCommand(command, session: session);
+      var ret = await server.executeCommand(command, this);
 
       ret[keyCommandType] = command.keys.first;
       if (ret.containsKey(keyWriteErrors)) {

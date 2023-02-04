@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/db_admin_command_operation.dart';
+import '../../../../session/client_session.dart';
 import '../../../../session/transaction_info.dart';
 import '../../../base/operation_base.dart';
 import '../open/commit_transaction_command_open.dart';
@@ -11,7 +12,9 @@ class CommitTransactionCommand extends DbAdminCommandOperation {
   @protected
   CommitTransactionCommand.protected(
       MongoClient client, TransactionInfo transactionInfo,
-      {CommitTransactionOptions? commitTransactionOptions, Options? rawOptions})
+      {super.session,
+      CommitTransactionOptions? commitTransactionOptions,
+      Options? rawOptions})
       : super(client, <String, dynamic>{
           keyCommitTransaction: 1,
           //keyTxnNumber: transactionInfo.transactionNumber,
@@ -24,12 +27,14 @@ class CommitTransactionCommand extends DbAdminCommandOperation {
 
   factory CommitTransactionCommand(
       MongoClient client, TransactionInfo transactionInfo,
-      {CommitTransactionOptions? commitTransactionOptions,
+      {ClientSession? session,
+      CommitTransactionOptions? commitTransactionOptions,
       Options? rawOptions}) {
     if (client.serverApi != null) {
       switch (client.serverApi!.version) {
         case ServerApiVersion.v1:
           return CommitTransactionCommandV1(client, transactionInfo,
+              session: session,
               commitTransactionOptions: commitTransactionOptions?.toV1,
               rawOptions: rawOptions);
         default:
@@ -38,6 +43,7 @@ class CommitTransactionCommand extends DbAdminCommandOperation {
       }
     }
     return CommitTransactionCommandOpen(client, transactionInfo,
+        session: session,
         commitTransactionOptions: commitTransactionOptions?.toOpen,
         rawOptions: rawOptions);
   }

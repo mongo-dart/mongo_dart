@@ -17,7 +17,7 @@ enum Aspect {
 typedef Options = Map<String, dynamic>;
 typedef Command = Map<String, dynamic>;
 
-abstract class OperationBase {
+abstract base class OperationBase {
   Options options;
   final Set<Aspect> _aspects;
 

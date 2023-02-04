@@ -7,7 +7,7 @@ import 'operation_base.dart' show Aspect, Command, OperationBase, Options;
 /// Run a command on a required server
 ///
 /// Basic for all commands
-class ServerCommand extends OperationBase {
+base class ServerCommand extends OperationBase {
   Command command;
 
   ServerCommand(MongoClient mongoClient, this.command,
@@ -64,7 +64,7 @@ class ServerCommand extends OperationBase {
 
     // var modernMessage = MongoModernMessage(command);
     // return server.executeMessage(modernMessage);
-    return server.executeCommand(command, session: session);
+    return server.executeCommand(command, this);
   }
 }
 

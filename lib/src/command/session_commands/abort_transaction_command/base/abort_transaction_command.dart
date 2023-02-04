@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/db_admin_command_operation.dart';
+import '../../../../session/client_session.dart';
 import '../../../../session/transaction_info.dart';
 import '../../../base/operation_base.dart';
 import '../open/abort_transaction_command_open.dart';
@@ -11,7 +12,9 @@ class AbortTransactionCommand extends DbAdminCommandOperation {
   @protected
   AbortTransactionCommand.protected(
       MongoClient client, TransactionInfo transactionInfo,
-      {AbortTransactionOptions? abortTransactionOptions, Options? rawOptions})
+      {super.session,
+      AbortTransactionOptions? abortTransactionOptions,
+      Options? rawOptions})
       : super(client, <String, dynamic>{
           keyAbortTransaction: 1,
           //keyTxnNumber: transactionInfo.transactionNumber,
@@ -24,11 +27,14 @@ class AbortTransactionCommand extends DbAdminCommandOperation {
 
   factory AbortTransactionCommand(
       MongoClient client, TransactionInfo transactionInfo,
-      {AbortTransactionOptions? abortTransactionOptions, Options? rawOptions}) {
+      {ClientSession? session,
+      AbortTransactionOptions? abortTransactionOptions,
+      Options? rawOptions}) {
     if (client.serverApi != null) {
       switch (client.serverApi!.version) {
         case ServerApiVersion.v1:
           return AbortTransactionCommandV1(client, transactionInfo,
+              session: session,
               abortTransactionOptions: abortTransactionOptions?.toV1,
               rawOptions: rawOptions);
         default:
@@ -37,6 +43,7 @@ class AbortTransactionCommand extends DbAdminCommandOperation {
       }
     }
     return AbortTransactionCommandOpen(client, transactionInfo,
+        session: session,
         abortTransactionOptions: abortTransactionOptions?.toOpen,
         rawOptions: rawOptions);
   }

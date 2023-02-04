@@ -11,7 +11,7 @@ class MongoCollectionOpen extends MongoCollection {
   Future<InsertOneDocumentRec> insertOne(MongoDocument document,
           {ClientSession? session, InsertOneOptions? insertOneOptions}) async =>
       InsertOneOperationOpen(this, document,
-              insertOneOptions: insertOneOptions?.toOneOpen)
+              session: session, insertOneOptions: insertOneOptions?.toOneOpen)
           .executeDocument();
 
   /// Insert many document into this collection
@@ -21,6 +21,7 @@ class MongoCollectionOpen extends MongoCollection {
           {ClientSession? session,
           InsertManyOptions? insertManyOptions}) async =>
       InsertManyOperationOpen(this, documents,
+              session: session,
               insertManyOptions: insertManyOptions?.toManyOpen)
           .executeDocument();
 }

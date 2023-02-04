@@ -4,7 +4,8 @@ import 'commit_transaction_options_open.dart';
 
 class CommitTransactionCommandOpen extends CommitTransactionCommand {
   CommitTransactionCommandOpen(super.client, super.transactionInfo,
-      {CommitTransactionOptionsOpen? commitTransactionOptions,
+      {super.session,
+      CommitTransactionOptionsOpen? commitTransactionOptions,
       super.rawOptions})
       : super.protected(commitTransactionOptions: commitTransactionOptions);
 }

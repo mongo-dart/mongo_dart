@@ -23,6 +23,7 @@ class DbAdminCommandOperation extends OperationBase {
       session: session);
 
   @override
+  @nonVirtual
   @protected
   Future<MongoDocument> executeOnServer(Server server,
       {ClientSession? session}) async {
@@ -37,6 +38,6 @@ class DbAdminCommandOperation extends OperationBase {
 
     //var modernMessage = MongoModernMessage(command);
     //return server.executeMessage(modernMessage);
-    return server.executeCommand(command, session: session);
+    return server.executeCommand(command, this);
   }
 }

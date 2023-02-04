@@ -12,7 +12,7 @@ class MongoCollectionV117 extends MongoCollection {
   Future<InsertOneDocumentRec> insertOne(MongoDocument document,
           {ClientSession? session, InsertOneOptions? insertOneOptions}) async =>
       InsertOneOperationV1(this, document,
-              insertOneOptions: insertOneOptions?.toOneV1)
+              session: session, insertOneOptions: insertOneOptions?.toOneV1)
           .executeDocument();
 
   /// Insert many document into this collection
@@ -22,6 +22,6 @@ class MongoCollectionV117 extends MongoCollection {
           {ClientSession? session,
           InsertManyOptions? insertManyOptions}) async =>
       InsertManyOperationV1(this, documents,
-              insertManyOptions: insertManyOptions?.toManyV1)
+              session: session, insertManyOptions: insertManyOptions?.toManyV1)
           .executeDocument();
 }

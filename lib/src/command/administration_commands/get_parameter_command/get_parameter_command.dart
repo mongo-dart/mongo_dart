@@ -4,7 +4,8 @@ import 'get_parameter_options.dart';
 
 class GetParameterCommand extends DbAdminCommandOperation {
   GetParameterCommand(MongoClient client, String parameterName,
-      {GetParameterOptions? getParameterOptions,
+      {super.session,
+      GetParameterOptions? getParameterOptions,
       Map<String, Object>? rawOptions})
       : super(client, <String, dynamic>{
           keyGetParameter: 1,

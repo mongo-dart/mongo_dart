@@ -12,7 +12,6 @@ import '../core/info/server_status.dart';
 import '../core/message/abstract/section.dart';
 import '../core/message/mongo_modern_message.dart';
 import '../core/network/connection_pool.dart';
-import '../session/client_session.dart';
 
 enum ServerState { closed, connected }
 
@@ -96,24 +95,23 @@ class Server {
   }
  */
 
-  Future<MongoDocument> executeCommand(Command command,
-      {ClientSession? session}) async {
+  Future<MongoDocument> executeCommand(
+      Command command, OperationBase operation) async {
     if (state != ServerState.connected) {
       throw MongoDartError('Server is not is not connected. $state');
-    }
-    var isImplicitSession = session == null;
+    } //var isImplicitSession = session == null;
 
     var connection = await connectionPool.getAvailableConnection();
 
-    session ??= ClientSession(mongoClient);
+    //session ??= ClientSession(mongoClient);
     //session.serverSession ??= mongoClient.serverSessionPool.acquireSession();
     //session.serverSession!.lastUse = DateTime.now();
     //command[keyLsid] = session.serverSession!.toMap;
-    session.prepareCommand(command);
+    operation.session.prepareCommand(command);
 
     var response = await connection.execute(MongoModernMessage(command));
-    if (isImplicitSession) {
-      await session.endSession();
+    if (operation.isImplicitSession) {
+      await operation.session.endSession();
     }
 
     var section = response.sections.firstWhere((Section section) =>
