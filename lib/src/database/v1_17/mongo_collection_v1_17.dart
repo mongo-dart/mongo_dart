@@ -13,7 +13,7 @@ class MongoCollectionV117 extends MongoCollection {
           {ClientSession? session, InsertOneOptions? insertOneOptions}) async =>
       InsertOneOperationV1(this, document,
               insertOneOptions: insertOneOptions?.toOneV1)
-          .executeDocument(session: session);
+          .executeDocument();
 
   /// Insert many document into this collection
   /// Returns a BulkWriteResult object
@@ -23,5 +23,5 @@ class MongoCollectionV117 extends MongoCollection {
           InsertManyOptions? insertManyOptions}) async =>
       InsertManyOperationV1(this, documents,
               insertManyOptions: insertManyOptions?.toManyV1)
-          .executeDocument(session: session);
+          .executeDocument();
 }

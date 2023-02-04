@@ -12,7 +12,7 @@ class MongoCollectionOpen extends MongoCollection {
           {ClientSession? session, InsertOneOptions? insertOneOptions}) async =>
       InsertOneOperationOpen(this, document,
               insertOneOptions: insertOneOptions?.toOneOpen)
-          .executeDocument(session: session);
+          .executeDocument();
 
   /// Insert many document into this collection
   /// Returns a BulkWriteResult object
@@ -22,5 +22,5 @@ class MongoCollectionOpen extends MongoCollection {
           InsertManyOptions? insertManyOptions}) async =>
       InsertManyOperationOpen(this, documents,
               insertManyOptions: insertManyOptions?.toManyOpen)
-          .executeDocument(session: session);
+          .executeDocument();
 }

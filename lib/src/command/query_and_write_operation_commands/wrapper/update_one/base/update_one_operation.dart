@@ -18,23 +18,21 @@ abstract class UpdateOneOperation extends UpdateOperation {
   @protected
   UpdateOneOperation.protected(
       MongoCollection collection, UpdateOneStatement updateOneStatement,
-      {UpdateOneOptions? updateOneOptions, Map<String, Object>? rawOptions})
-      : super.protected(
-          collection,
-          [updateOneStatement],
-          ordered: false,
-          updateOptions: updateOneOptions,
-          rawOptions: rawOptions,
-        );
+      {super.session, UpdateOneOptions? updateOneOptions, super.rawOptions})
+      : super.protected(collection, [updateOneStatement],
+            ordered: false, updateOptions: updateOneOptions);
 
   factory UpdateOneOperation(
       MongoCollection collection, UpdateOneStatement updateOneStatement,
-      {UpdateOneOptions? updateOneOptions, Map<String, Object>? rawOptions}) {
+      {ClientSession? session,
+      UpdateOneOptions? updateOneOptions,
+      Map<String, Object>? rawOptions}) {
     if (collection.serverApi != null) {
       switch (collection.serverApi!.version) {
         case ServerApiVersion.v1:
           return UpdateOneOperationV1(
               collection, updateOneStatement.toUpdateOneV1,
+              session: session,
               updateOneOptions: updateOneOptions?.toUpdateOneV1,
               rawOptions: rawOptions);
         default:
@@ -44,10 +42,10 @@ abstract class UpdateOneOperation extends UpdateOperation {
     }
     return UpdateOneOperationOpen(
         collection, updateOneStatement.toUpdateOneOpen,
+        session: session,
         updateOneOptions: updateOneOptions?.toUpdateOneOpen,
         rawOptions: rawOptions);
   }
-  Future<WriteResult> executeDocument({ClientSession? session}) async =>
-      WriteResult.fromMap(
-          WriteCommandType.update, await execute(session: session));
+  Future<WriteResult> executeDocument() async =>
+      WriteResult.fromMap(WriteCommandType.update, await process());
 }

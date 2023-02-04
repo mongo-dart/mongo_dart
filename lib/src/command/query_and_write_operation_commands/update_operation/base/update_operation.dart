@@ -11,6 +11,7 @@ import 'package:mongo_dart/mongo_dart.dart'
         keyUpdate,
         keyUpdates;
 
+import '../../../../session/client_session.dart';
 import '../../../base/command_operation.dart';
 import '../open/update_operation_open.dart';
 import '../v1/update_operation_v1.dart';
@@ -19,6 +20,7 @@ abstract class UpdateOperation extends CommandOperation {
   @protected
   UpdateOperation.protected(MongoCollection collection, this.updates,
       {bool? ordered,
+      required super.session,
       UpdateOptions? updateOptions,
       Map<String, Object>? rawOptions})
       : ordered = ordered ?? true,
@@ -35,6 +37,7 @@ abstract class UpdateOperation extends CommandOperation {
   factory UpdateOperation(
       MongoCollection collection, List<UpdateStatement> updates,
       {bool? ordered,
+      ClientSession? session,
       UpdateOptions? updateOptions,
       Map<String, Object>? rawOptions}) {
     if (collection.serverApi != null) {
@@ -42,6 +45,7 @@ abstract class UpdateOperation extends CommandOperation {
         case ServerApiVersion.v1:
           return UpdateOperationV1(collection, updates,
               ordered: ordered,
+              session: session,
               updateOptions: updateOptions?.toV1,
               rawOptions: rawOptions);
         default:
@@ -51,6 +55,7 @@ abstract class UpdateOperation extends CommandOperation {
     }
     return UpdateOperationOpen(collection, updates,
         ordered: ordered,
+        session: session,
         updateOptions: updateOptions?.toOpen,
         rawOptions: rawOptions);
   }

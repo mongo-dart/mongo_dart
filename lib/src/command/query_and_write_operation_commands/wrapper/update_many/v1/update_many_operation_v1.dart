@@ -6,7 +6,10 @@ import 'update_many_statement_v1.dart';
 class UpdateManyOperationV1 extends UpdateManyOperation {
   UpdateManyOperationV1(
       MongoCollection collection, UpdateManyStatementV1 updateManyStatement,
-      {super.ordered, UpdateManyOptionsV1? updateManyOptions, super.rawOptions})
+      {super.ordered,
+      super.session,
+      UpdateManyOptionsV1? updateManyOptions,
+      super.rawOptions})
       : super.protected(collection, updateManyStatement,
             updateManyOptions: updateManyOptions);
 }

@@ -9,20 +9,17 @@ abstract class UpdateManyOperation extends UpdateOperation {
   @protected
   UpdateManyOperation.protected(
       MongoCollection collection, UpdateManyStatement updateManyStatement,
-      {bool? ordered,
+      {super.ordered,
+      super.session,
       UpdateManyOptions? updateManyOptions,
-      Map<String, Object>? rawOptions})
-      : super.protected(
-          collection,
-          [updateManyStatement],
-          ordered: ordered,
-          updateOptions: updateManyOptions,
-          rawOptions: rawOptions,
-        );
+      super.rawOptions})
+      : super.protected(collection, [updateManyStatement],
+            updateOptions: updateManyOptions);
 
   factory UpdateManyOperation(
       MongoCollection collection, UpdateManyStatement updateManyStatement,
       {bool? ordered,
+      ClientSession? session,
       UpdateManyOptions? updateManyOptions,
       Map<String, Object>? rawOptions}) {
     if (collection.serverApi != null) {
@@ -30,6 +27,7 @@ abstract class UpdateManyOperation extends UpdateOperation {
         case ServerApiVersion.v1:
           return UpdateManyOperationV1(
               collection, updateManyStatement.toUpdateManyV1,
+              session: session,
               ordered: ordered,
               updateManyOptions: updateManyOptions?.toUpdateManyV1,
               rawOptions: rawOptions);
@@ -41,11 +39,11 @@ abstract class UpdateManyOperation extends UpdateOperation {
     return UpdateManyOperationOpen(
         collection, updateManyStatement.toUpdateManyOpen,
         ordered: ordered,
+        session: session,
         updateManyOptions: updateManyOptions?.toUpdateManyOpen,
         rawOptions: rawOptions);
   }
 
-  Future<WriteResult> executeDocument({ClientSession? session}) async =>
-      WriteResult.fromMap(
-          WriteCommandType.update, await execute(session: session));
+  Future<WriteResult> executeDocument() async =>
+      WriteResult.fromMap(WriteCommandType.update, await process());
 }

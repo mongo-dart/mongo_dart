@@ -31,6 +31,7 @@ import '../../base/command_operation.dart';
 class ListCollectionsCommand extends CommandOperation {
   ListCollectionsCommand(MongoDatabase db,
       {this.filter,
+      super.session,
       ListCollectionsOptions? listCollectionsOptions,
       Map<String, Object>? rawOptions})
       : super(db, <String, dynamic>{

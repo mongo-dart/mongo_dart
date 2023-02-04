@@ -18,6 +18,8 @@ analyzer:
   enable-experiment:
     - records
     - patterns
+    - sealed-class
+    - class-modifiers
     
 # analyzer:
 ###   exclude:

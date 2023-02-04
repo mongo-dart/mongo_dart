@@ -69,8 +69,8 @@ class MongoDatabase {
 
   /// Runs a database command
   Future<MongoDocument> runCommand(Command command, {ClientSession? session}) =>
-      CommandOperation(this, command, <String, dynamic>{})
-          .execute(session: session);
+      CommandOperation(this, command, <String, dynamic>{}, session: session)
+          .process();
 
   /// Creates a collection object
   MongoCollection collection(String collectionName) =>
@@ -159,7 +159,7 @@ class MongoDatabase {
   Future<Map<String, dynamic>> getLastError(Server server,
       {ConnectionBase? connection, WriteConcern? writeConcern}) async {
     writeConcern ??= _writeConcern;
-    return GetLastErrorCommand(this, writeConcern: writeConcern).execute();
+    return GetLastErrorCommand(this, writeConcern: writeConcern).process();
   }
 
   @Deprecated('Deprecated since version 4.0.')
@@ -328,8 +328,10 @@ class MongoDatabase {
       DropDatabaseOptions? dropOptions,
       Map<String, Object>? rawOptions}) async {
     var command = DropDatabaseCommand(this,
-        dropDatabaseOptions: dropOptions, rawOptions: rawOptions);
-    return command.execute(session: session);
+        session: session,
+        dropDatabaseOptions: dropOptions,
+        rawOptions: rawOptions);
+    return command.process();
   }
 
   /// This method return the status information on the
@@ -339,8 +341,8 @@ class MongoDatabase {
   Future<Map<String, dynamic>> serverStatus(
       {ClientSession? session, Map<String, Object>? options}) async {
     var operation = ServerStatusCommand(this,
-        serverStatusOptions: ServerStatusOptions.instance);
-    return operation.execute(session: session);
+        session: session, serverStatusOptions: ServerStatusOptions.instance);
+    return operation.process();
   }
 
   /// This method explicitly creates a collection
@@ -351,7 +353,7 @@ class MongoDatabase {
     var command = CreateCollectionCommand(this, name,
         createCollectionOptions: createCollectionOptions,
         rawOptions: rawOptions);
-    return command.execute(session: session);
+    return command.process();
   }
 
   /// This method retuns a cursor to get a list of the collections
@@ -379,7 +381,7 @@ class MongoDatabase {
       Map<String, Object>? rawOptions}) async {
     var command = CreateViewCommand(this, view, source, pipeline,
         createViewOptions: createViewOptions, rawOptions: rawOptions);
-    return command.execute(session: session);
+    return command.process();
   }
 
   /// This method drops a collection
@@ -388,8 +390,8 @@ class MongoDatabase {
       DropOptions? dropOptions,
       Map<String, Object>? rawOptions}) async {
     var command = DropCommand(this, collectionNAme,
-        dropOptions: dropOptions, rawOptions: rawOptions);
-    return command.execute(session: session);
+        session: session, dropOptions: dropOptions, rawOptions: rawOptions);
+    return command.process();
   }
 
   /// Runs a specified admin/diagnostic pipeline which does not require an
@@ -417,7 +419,5 @@ class MongoDatabase {
 
   /// Ping command
   Future<MongoDocument> pingCommand({ClientSession? session}) =>
-      PingCommand(mongoClient.topology ??
-              (throw MongoDartError('Topology not defined')))
-          .execute(session: session);
+      PingCommand(mongoClient).process();
 }

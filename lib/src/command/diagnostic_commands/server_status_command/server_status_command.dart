@@ -1,7 +1,6 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
 import '../../../database/base/mongo_database.dart';
-import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
 import 'server_status_result.dart';
 
@@ -9,7 +8,8 @@ var _command = <String, dynamic>{keyServerStatus: 1};
 
 class ServerStatusCommand extends CommandOperation {
   ServerStatusCommand(MongoDatabase db,
-      {ServerStatusOptions? serverStatusOptions,
+      {super.session,
+      ServerStatusOptions? serverStatusOptions,
       Map<String, Object>? rawOptions})
       : super(
           db,
@@ -17,16 +17,14 @@ class ServerStatusCommand extends CommandOperation {
           <String, dynamic>{...?serverStatusOptions?.options, ...?rawOptions},
         );
 
-  Future<ServerStatusResult> executeDocument(Server server,
-      {ClientSession? session}) async {
-    var result = await super.execute(session: session);
+  Future<ServerStatusResult> executeDocument(Server server) async {
+    var result = await super.process();
     return ServerStatusResult(result);
   }
 
   /// Update basic server info + FeatureCompatibilityVersion
-  Future<void> updateServerStatus(Server server,
-      {ClientSession? session}) async {
-    var result = await super.execute(session: session);
+  Future<void> updateServerStatus(Server server) async {
+    var result = await super.process();
     // On error the ServerStatus class is not initialized
     // check the `isInitialized` flag.
     //

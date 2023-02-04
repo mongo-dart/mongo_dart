@@ -2,7 +2,6 @@ import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
 
 import '../../../database/base/mongo_database.dart';
-import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
 import '../../base/server_command.dart';
 
@@ -23,28 +22,29 @@ class HelloCommand extends ServerCommand {
   HelloCommand(this.server,
       {MongoDatabase? db,
       String? username,
+      super.session,
       HelloOptions? helloOptions,
       Map<String, Object>? rawOptions})
       : super(
+          server.mongoClient,
           {
             ..._command,
             key$Db: db?.databaseName ?? 'admin',
             if (filled(username))
               keySaslSupportedMechs: '${db?.databaseName ?? 'admin'}.$username'
           },
-          <String, dynamic>{...?helloOptions?.options, ...?rawOptions},
+          options: <String, dynamic>{...?helloOptions?.options, ...?rawOptions},
         );
 
   Server server;
 
-  Future<HelloResult> executeDocument({ClientSession? session}) async {
-    var result = await execute(session: session);
+  Future<HelloResult> executeDocument() async {
+    var result = await process();
     return HelloResult(result);
   }
 
   @override
-  Future<Map<String, dynamic>> execute({ClientSession? session}) async =>
-      super.executeOnServer(server, session: session);
+  Future<Map<String, dynamic>> process() async => super.executeOnServer(server);
 
   /*  @override
   @Deprecated('Use execute instead')

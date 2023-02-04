@@ -2,7 +2,6 @@ import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/server_command.dart';
 
-import '../../session/client_session.dart';
 import '../../topology/abstract/topology.dart';
 import '../../topology/server.dart';
 
@@ -10,18 +9,21 @@ import '../../topology/server.dart';
 ///
 /// Designed for system commands where Db/Collection are not needed
 class SimpleCommand extends ServerCommand {
-  SimpleCommand(this.topology, super.command, super.options,
-      {super.aspect, ReadPreference? readPreference})
+  SimpleCommand(super.mongoClient, super.command,
+      {super.options,
+      super.session,
+      super.aspect,
+      ReadPreference? readPreference})
       : super();
 
   /// The ReadPreference Object has prefernce with respect to the options
   /// ReadPrefernce Specs
   ReadPreference? readPreference;
-  Topology topology;
+  //Topology topology;
 
   @override
   @nonVirtual
-  Future<MongoDocument> execute({ClientSession? session}) async {
+  Future<MongoDocument> process() async {
     Server? server;
     if (topology.type == TopologyType.standalone) {
       ReadPreference.removeReadPreferenceFromOptions(options);
@@ -42,8 +44,7 @@ class SimpleCommand extends ServerCommand {
     }
 
     return super.executeOnServer(
-        server ?? (throw MongoDartError('No server detected')),
-        session: session);
+        server ?? (throw MongoDartError('No server detected')));
   }
 
   /* @override

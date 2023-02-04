@@ -129,7 +129,7 @@ class Server {
       var helloCommand = HelloCommand(this, username: serverConfig.userName);
       var actualTimeMS = DateTime.now().millisecondsSinceEpoch;
       try {
-        result = await helloCommand.execute();
+        result = await helloCommand.process();
       } catch (error) {
         print(error);
         rethrow;

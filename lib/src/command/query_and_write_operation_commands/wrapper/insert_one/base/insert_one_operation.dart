@@ -23,7 +23,7 @@ abstract class InsertOneOperation extends InsertOperation {
 
   @protected
   InsertOneOperation.protected(MongoCollection collection, this.document,
-      {InsertOneOptions? insertOneOptions, Options? rawOptions})
+      {super.session,InsertOneOptions? insertOneOptions, Options? rawOptions})
       : super.protected(
           collection,
           [document],
@@ -32,11 +32,11 @@ abstract class InsertOneOperation extends InsertOperation {
         );
 
   factory InsertOneOperation(MongoCollection collection, MongoDocument document,
-      {InsertOneOptions? insertOneOptions, Options? rawOptions}) {
+      {ClientSession? session, InsertOneOptions? insertOneOptions, Options? rawOptions}) {
     if (collection.serverApi != null) {
       switch (collection.serverApi!.version) {
         case ServerApiVersion.v1:
-          return InsertOneOperationV1(collection, document,
+          return InsertOneOperationV1(collection, document,session: session,
               insertOneOptions: insertOneOptions?.toOneV1,
               rawOptions: rawOptions);
         default:
@@ -44,17 +44,17 @@ abstract class InsertOneOperation extends InsertOperation {
               'Stable Api ${collection.serverApi!.version} not managed');
       }
     }
-    return InsertOneOperationOpen(collection, document,
+    return InsertOneOperationOpen(collection, document,session: session,
         insertOneOptions: insertOneOptions?.toOneOpen, rawOptions: rawOptions);
   }
 
-   Future<InsertOneRec> executeInsertOne({ClientSession? session}) async {
-    var (ret, documents, ids) = await executeInsert(session: session);
+   Future<InsertOneRec> executeInsertOne() async {
+    var (ret, documents, ids) = await executeInsert();
     return (ret, documents.first, ids.first);
   }
 
-  Future<InsertOneDocumentRec> executeDocument({ClientSession? session}) async {
-    var (ret, document, id) = await executeInsertOne(session: session);
+  Future<InsertOneDocumentRec> executeDocument() async {
+    var (ret, document, id) = await executeInsertOne( );
     return (WriteResult.fromMap(WriteCommandType.insert, ret)
       , ret, document, id);
   }

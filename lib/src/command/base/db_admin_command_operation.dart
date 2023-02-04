@@ -6,8 +6,9 @@ import '../../topology/server.dart';
 import 'operation_base.dart';
 
 class DbAdminCommandOperation extends OperationBase {
-  DbAdminCommandOperation(this.client, this.command, {Options? options})
-      : super(options);
+  DbAdminCommandOperation(this.client, this.command,
+      {super.session, super.options})
+      : super(client);
 
   MongoClient client;
   Command command;
@@ -15,12 +16,11 @@ class DbAdminCommandOperation extends OperationBase {
   Command $buildCommand() => command;
 
   @override
-  Future<MongoDocument> execute({ClientSession? session}) async =>
-      executeOnServer(
-          client.topology?.getServer(
-                  readPreferenceMode: client.readPreference?.mode) ??
-              (throw MongoDartError('Server not found')),
-          session: session);
+  Future<MongoDocument> process() async => executeOnServer(
+      client.topology
+              ?.getServer(readPreferenceMode: client.readPreference?.mode) ??
+          (throw MongoDartError('Server not found')),
+      session: session);
 
   @override
   @protected

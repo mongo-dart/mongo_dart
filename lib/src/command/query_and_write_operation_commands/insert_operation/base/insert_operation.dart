@@ -3,8 +3,8 @@ import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
-import 'package:mongo_dart/src/session/client_session.dart';
 
+import '../../../../session/client_session.dart';
 import '../open/insert_operation_open.dart';
 import '../v1/insert_operation_v1.dart';
 import 'insert_options.dart';
@@ -14,7 +14,7 @@ typedef InsertRec = (MongoDocument serverDocument, List<MongoDocument> insertedD
 abstract class InsertOperation extends CommandOperation {
   @protected
   InsertOperation.protected(MongoCollection collection, this.documents,
-      {InsertOptions? insertOptions, Options? rawOptions})
+      {super.session,InsertOptions? insertOptions, Options? rawOptions})
       : ids = List.filled(documents.length, null),
         super(
             collection.db,
@@ -37,18 +37,18 @@ abstract class InsertOperation extends CommandOperation {
 
   factory InsertOperation(
       MongoCollection collection, List<MongoDocument> documents,
-      {InsertOptions? insertOptions, Options? rawOptions}) {
+      {ClientSession? session, InsertOptions? insertOptions, Options? rawOptions}) {
     if (collection.serverApi != null) {
       switch (collection.serverApi!.version) {
         case ServerApiVersion.v1:
-          return InsertOperationV1(collection, documents,
+          return InsertOperationV1(collection, documents, session: session,
               insertOptions: insertOptions?.toV1, rawOptions: rawOptions);
         default:
           throw MongoDartError(
               'Stable Api ${collection.serverApi!.version} not managed');
       }
     }
-    return InsertOperationOpen(collection, documents,
+    return InsertOperationOpen(collection, documents,session: session,
         insertOptions: insertOptions?.toOpen, rawOptions: rawOptions);
   }
 
@@ -61,8 +61,10 @@ abstract class InsertOperation extends CommandOperation {
         keyDocuments: documents
       };
 
-  Future<InsertRec> executeInsert({ClientSession? session}) async {
-    var ret = await super.execute(session: session);
+  Future<InsertRec> executeInsert() async {
+    var ret = await super.process( );
     return (ret, documents, ids);
   }
+   
+  
 }

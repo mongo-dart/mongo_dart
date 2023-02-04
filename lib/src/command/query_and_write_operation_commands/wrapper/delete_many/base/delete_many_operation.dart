@@ -11,7 +11,9 @@ abstract class DeleteManyOperation extends DeleteOperation {
   @protected
   DeleteManyOperation.protected(
       MongoCollection collection, DeleteManyStatement deleteRequest,
-      {DeleteManyOptions? deleteManyOptions, Map<String, Object>? rawOptions})
+      {super.session,
+      DeleteManyOptions? deleteManyOptions,
+      Map<String, Object>? rawOptions})
       : super.protected(
           collection,
           [deleteRequest],
@@ -21,12 +23,15 @@ abstract class DeleteManyOperation extends DeleteOperation {
 
   factory DeleteManyOperation(
       MongoCollection collection, DeleteManyStatement deleteManyStatement,
-      {DeleteManyOptions? deleteManyOptions, Map<String, Object>? rawOptions}) {
+      {ClientSession? session,
+      DeleteManyOptions? deleteManyOptions,
+      Map<String, Object>? rawOptions}) {
     if (collection.serverApi != null) {
       switch (collection.serverApi!.version) {
         case ServerApiVersion.v1:
           return DeleteManyOperationV1(
               collection, deleteManyStatement.toDeleteManyV1,
+              session: session,
               deleteManyOptions: deleteManyOptions?.toDeleteManyV1,
               rawOptions: rawOptions);
         default:
@@ -36,12 +41,12 @@ abstract class DeleteManyOperation extends DeleteOperation {
     }
     return DeleteManyOperationOpen(
         collection, deleteManyStatement.toDeleteManyOpen,
+        session: session,
         deleteManyOptions: deleteManyOptions?.toDeleteManyOpen,
         rawOptions: rawOptions);
   }
-  Future<WriteResult> executeDocument(Server server,
-      {ClientSession? session}) async {
-    var ret = await super.execute(session: session);
+  Future<WriteResult> executeDocument(Server server) async {
+    var ret = await super.process();
     return WriteResult.fromMap(WriteCommandType.delete, ret);
   }
 }

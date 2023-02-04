@@ -5,7 +5,7 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrappe
 class DeleteOneOperationOpen extends DeleteOneOperation {
   DeleteOneOperationOpen(
       MongoCollection collection, DeleteOneStatementOpen deleteOneStatement,
-      {DeleteOneOptionsOpen? deleteOneOptions, super.rawOptions})
+      {super.session, DeleteOneOptionsOpen? deleteOneOptions, super.rawOptions})
       : super.protected(collection, deleteOneStatement,
             deleteOneOptions: deleteOneOptions);
 }

@@ -168,7 +168,7 @@ class ClientSession {
     var command = AbortTransactionCommand(client, transaction!,
         abortTransactionOptions: abortTransactionOptions, rawOptions: options);
 
-    return command.execute(session: this);
+    return command.process();
   }
 
   Future<MongoDocument?> commitTransaction(
@@ -200,7 +200,7 @@ class ClientSession {
         commitTransactionOptions: commitTransactionOptions,
         rawOptions: options);
 
-    return command.execute(session: this);
+    return command.process();
   }
 
   void prepareCommand(Command command) {

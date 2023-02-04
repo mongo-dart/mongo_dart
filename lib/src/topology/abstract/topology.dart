@@ -72,7 +72,8 @@ abstract class Topology {
   Future<void> addServersFromSeedList() async {
     for (var element in hostsSeedList) {
       var serverConfig = await parseUri(element, mongoClientOptions);
-      var server = Server(mongoClient, serverConfig, mongoClientOptions);
+      var server = Server(
+          mongoClient, serverConfig, mongoClientOptions.connectionPoolSettings);
       servers.add(server);
       await server.connect();
     }

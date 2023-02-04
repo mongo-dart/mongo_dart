@@ -28,6 +28,7 @@ class AggregateOperation extends CommandOperation {
       MongoDatabase? db,
       bool? explain,
       MongoDocument? cursor,
+      super.session,
       this.hint,
       this.hintDocument,
       AggregateOptions? aggregateOptions,
@@ -109,7 +110,7 @@ class AggregateOperation extends CommandOperation {
 
   Future<AggregateResult> executeDocument(Server server,
       {ClientSession? session}) async {
-    var result = await super.execute(session: session);
+    var result = await super.process();
     return AggregateResult(result);
   }
 }

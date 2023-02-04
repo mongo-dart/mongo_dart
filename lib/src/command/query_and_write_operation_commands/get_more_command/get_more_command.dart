@@ -3,7 +3,6 @@ import 'package:mongo_dart/src/command/base/command_operation.dart';
 import '../../../core/error/mongo_dart_error.dart';
 import '../../../database/base/mongo_database.dart';
 import '../../../database/base/mongo_collection.dart';
-import '../../../session/client_session.dart';
 import 'get_more_options.dart';
 import 'get_more_result.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
@@ -25,6 +24,7 @@ class GetMoreCommand extends CommandOperation {
   GetMoreCommand(MongoCollection? collection, BsonLong cursorId,
       {MongoDatabase? db,
       String? collectionName,
+      super.session,
       GetMoreOptions? getMoreOptions,
       Map<String, Object>? rawOptions})
       : super(
@@ -47,6 +47,6 @@ class GetMoreCommand extends CommandOperation {
     }
   }
 
-  Future<GetMoreResult> executeDocument({ClientSession? session}) async =>
-      GetMoreResult(await execute(session: session));
+  Future<GetMoreResult> executeDocument() async =>
+      GetMoreResult(await process());
 }

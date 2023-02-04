@@ -2,7 +2,6 @@ import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../core/network/abstract/connection_base.dart';
 import '../../../database/base/mongo_database.dart';
 import '../../../database/base/mongo_collection.dart';
 import 'create_index_options.dart';
@@ -25,7 +24,7 @@ class CreateIndexOperation extends CommandOperation {
 
   CreateIndexOperation(MongoDatabase db, MongoCollection collection,
       this.fieldOrSpec, CreateIndexOptions? indexOptions,
-      {ConnectionBase? connection, Map<String, Object>? rawOptions})
+      {super.session, Map<String, Object>? rawOptions})
       : super(db, {},
             <String, dynamic>{...?indexOptions?.options, ...?rawOptions},
             collection: collection, aspect: Aspect.writeOperation) {

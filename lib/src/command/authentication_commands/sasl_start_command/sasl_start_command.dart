@@ -3,14 +3,16 @@ import 'dart:typed_data';
 
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
+import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/core/network/abstract/connection_base.dart';
 
 import '../../../database/base/mongo_database.dart';
 
 class SaslStartCommand extends CommandOperation {
   SaslStartCommand(MongoDatabase db, String mechanism, Uint8List payload,
-      {SaslStartOptions? saslStartOptions,
-      Map<String, Object>? rawOptions,
+      {super.session,
+      SaslStartOptions? saslStartOptions,
+      Options? rawOptions,
       ConnectionBase? connection})
       : super(db, <String, dynamic>{
           keySaslStart: 1,

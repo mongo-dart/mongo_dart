@@ -3,6 +3,6 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrappe
 
 class InsertManyOperationV1 extends InsertManyOperation {
   InsertManyOperationV1(super.collection, super.document,
-      {InsertManyOptionsV1? insertManyOptions, super.rawOptions})
+      {super.session, InsertManyOptionsV1? insertManyOptions, super.rawOptions})
       : super.protected(insertManyOptions: insertManyOptions);
 }

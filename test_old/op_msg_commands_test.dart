@@ -69,7 +69,7 @@ void main() async {
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var command = KillCursorsCommand(collection, [cursor.cursorId]);
-          var result = await command.execute();
+          var result = await command.process();
           expect(result, isNotNull);
           expect(
               (result[keyCursorsKilled] as List).first, cursor.cursorId.value);
@@ -81,7 +81,7 @@ void main() async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
           var command = KillCursorsCommand(collection, [BsonLong(1)]);
-          var result = await command.execute();
+          var result = await command.process();
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
           expect((result[keyCursorsNotFound] as List).first, 1);
@@ -94,7 +94,7 @@ void main() async {
           var collection = db.collection(collectionName);
           var command =
               KillCursorsCommand(collection, [BsonLong(111111111111)]);
-          var result = await command.execute();
+          var result = await command.process();
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
           expect((result[keyCursorsNotFound] as List).first, 111111111111);
@@ -113,7 +113,7 @@ void main() async {
           expect(cursor.state, ModernCursorState.init);
           await cursor.nextObject();
           var command = KillCursorsCommand(collection, [BsonLong(1)]);
-          var result = await command.execute();
+          var result = await command.process();
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
           expect((result[keyCursorsNotFound] as List).first, 1);
@@ -164,7 +164,7 @@ void main() async {
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var command = GetMoreCommand(collection, cursor.cursorId);
-          var result = await command.execute();
+          var result = await command.process();
           expect(result, isNotNull);
           expect(result[keyCursor], isNotNull);
 
@@ -178,7 +178,7 @@ void main() async {
           var collection = db.collection(collectionName);
 
           var command = GetMoreCommand(collection, BsonLong(1));
-          var result = await command.execute();
+          var result = await command.process();
           expect(result, isNotNull);
           expect(result[keyOk], 0.0);
           expect(result[keyCursor], isNull);
@@ -260,7 +260,7 @@ void main() async {
       group('Get All Parameters', () {
         test('Run command', () async {
           var command = GetAllParametersCommand(client);
-          var ret = await command.execute();
+          var ret = await command.process();
           expect(ret[keyOk], 1.0);
           expect(ret[keyLogLevel], 0);
           if (!db.server.serverCapabilities.isShardedCluster) {
@@ -271,7 +271,7 @@ void main() async {
       group('Get Parameter', () {
         test('Run command', () async {
           var command = GetParameterCommand(client, keyLogLevel);
-          var ret = await command.execute();
+          var ret = await command.process();
           expect(ret[keyOk], 1.0);
           expect(ret[keyLogLevel], 0);
         });
@@ -281,7 +281,7 @@ void main() async {
       group('Server Status', () {
         test('Map return', () async {
           var command = ServerStatusCommand(db);
-          var ret = await command.execute();
+          var ret = await command.process();
           expect(ret, isNotNull);
           expect(ret[keyHost], isNotEmpty);
           expect(ret[keyVersion], isNotEmpty);
@@ -293,7 +293,7 @@ void main() async {
             keyPid: 0,
             keyAsserts: 0,
           });
-          var ret = await command.execute();
+          var ret = await command.process();
           expect(ret, isNotNull);
           expect(ret[keyHost], isNotNull);
           expect(ret[keyPid], isNotNull);
@@ -303,14 +303,14 @@ void main() async {
         test('No Metric in ServerStatusOptions', () async {
           var command = ServerStatusCommand(db,
               serverStatusOptions: ServerStatusOptions(metricsExcluded: true));
-          var ret = await command.execute();
+          var ret = await command.process();
           expect(ret, isNotNull);
           expect(ret[keyMetrics], isNull);
         });
 
         test('No Metric in RawOptions', () async {
           var command = ServerStatusCommand(db, rawOptions: {keyMetrics: 0});
-          var ret = await command.execute();
+          var ret = await command.process();
           expect(ret, isNotNull);
           expect(ret[keyMetrics], isNull);
         });
@@ -318,7 +318,7 @@ void main() async {
         test('Only instance values', () async {
           var command = ServerStatusCommand(db,
               serverStatusOptions: ServerStatusOptions.instance);
-          var ret = await command.execute();
+          var ret = await command.process();
           expect(ret, isNotNull);
           expect(ret[keyMetrics], isNull);
         });

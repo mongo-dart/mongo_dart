@@ -1,7 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../../session/client_session.dart';
 import '../../topology/server.dart';
 import 'operation_base.dart' show Aspect, Command, OperationBase, Options;
 
@@ -11,8 +10,9 @@ import 'operation_base.dart' show Aspect, Command, OperationBase, Options;
 class ServerCommand extends OperationBase {
   Command command;
 
-  ServerCommand(this.command, Options options, {Aspect? aspect})
-      : super(options, aspects: aspect);
+  ServerCommand(MongoClient mongoClient, this.command,
+      {super.options, super.session, Aspect? aspect})
+      : super(mongoClient, aspects: aspect);
 
   Command $buildCommand() => command;
 
@@ -31,7 +31,7 @@ class ServerCommand extends OperationBase {
 
   @override
   @Deprecated('Use execute on server instead')
-  Future<Map<String, dynamic>> execute() =>
+  Future<MongoDocument> process() =>
       throw MongoDartError('Use executOnServer() instead');
 
   /// A session ID MUST NOT be used simultaneously by more than one operation.
@@ -55,8 +55,7 @@ class ServerCommand extends OperationBase {
   @override
   @nonVirtual
   @protected
-  Future<MongoDocument> executeOnServer(Server server,
-      {ClientSession? session}) async {
+  Future<MongoDocument> executeOnServer(Server server) async {
     var command = $buildCommand();
 
     processOptions(command);

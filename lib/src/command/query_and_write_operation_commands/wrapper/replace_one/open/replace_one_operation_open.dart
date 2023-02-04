@@ -5,7 +5,9 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrappe
 class ReplaceOneOperationOpen extends ReplaceOneOperation {
   ReplaceOneOperationOpen(
       MongoCollection collection, ReplaceOneStatementOpen replaceOneStatement,
-      {ReplaceOneOptionsOpen? replaceOneOptions, super.rawOptions})
+      {super.session,
+      ReplaceOneOptionsOpen? replaceOneOptions,
+      super.rawOptions})
       : super.protected(collection, replaceOneStatement,
             replaceOneOptions: replaceOneOptions);
 }

@@ -4,6 +4,8 @@ import 'insert_many_options_open.dart';
 
 class InsertManyOperationOpen extends InsertManyOperation {
   InsertManyOperationOpen(super.collection, super.document,
-      {InsertManyOptionsOpen? insertManyOptions, super.rawOptions})
+      {super.session,
+      InsertManyOptionsOpen? insertManyOptions,
+      super.rawOptions})
       : super.protected(insertManyOptions: insertManyOptions);
 }

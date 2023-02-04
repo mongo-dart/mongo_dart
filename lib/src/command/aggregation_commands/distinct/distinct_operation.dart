@@ -13,6 +13,7 @@ import 'distinct_result.dart';
 class DistinctOperation extends CommandOperation {
   DistinctOperation(MongoCollection collection, this.key,
       {this.query,
+      super.session,
       DistinctOptions? distinctOptions,
       Map<String, Object>? rawOptions})
       : super(collection.db, {},
@@ -34,5 +35,5 @@ class DistinctOperation extends CommandOperation {
       };
 
   Future<DistinctResult> executeDocument({ClientSession? session}) async =>
-      DistinctResult(await super.execute(session: session));
+      DistinctResult(await super.process());
 }

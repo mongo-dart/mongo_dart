@@ -6,7 +6,7 @@ import 'replace_one_options_v1.dart';
 class ReplaceOneOperationV1 extends ReplaceOneOperation {
   ReplaceOneOperationV1(
       MongoCollection collection, ReplaceOneStatementV1 replaceOneStatement,
-      {ReplaceOneOptionsV1? replaceOneOptions, super.rawOptions})
+      {super.session, ReplaceOneOptionsV1? replaceOneOptions, super.rawOptions})
       : super.protected(collection, replaceOneStatement,
             replaceOneOptions: replaceOneOptions);
 }

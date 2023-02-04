@@ -10,7 +10,9 @@ abstract class DeleteOneOperation extends DeleteOperation {
   @protected
   DeleteOneOperation.protected(
       MongoCollection collection, DeleteOneStatement deleteRequest,
-      {DeleteOneOptions? deleteOneOptions, Map<String, Object>? rawOptions})
+      {super.session,
+      DeleteOneOptions? deleteOneOptions,
+      Map<String, Object>? rawOptions})
       : super.protected(
           collection,
           [deleteRequest],
@@ -20,12 +22,15 @@ abstract class DeleteOneOperation extends DeleteOperation {
 
   factory DeleteOneOperation(
       MongoCollection collection, DeleteOneStatement deleteOneStatement,
-      {DeleteOneOptions? deleteOneOptions, Map<String, Object>? rawOptions}) {
+      {ClientSession? session,
+      DeleteOneOptions? deleteOneOptions,
+      Map<String, Object>? rawOptions}) {
     if (collection.serverApi != null) {
       switch (collection.serverApi!.version) {
         case ServerApiVersion.v1:
           return DeleteOneOperationV1(
               collection, deleteOneStatement.toDeleteOneV1,
+              session: session,
               deleteOneOptions: deleteOneOptions?.toDeleteOneV1,
               rawOptions: rawOptions);
         default:
@@ -35,10 +40,10 @@ abstract class DeleteOneOperation extends DeleteOperation {
     }
     return DeleteOneOperationOpen(
         collection, deleteOneStatement.toDeleteOneOpen,
+        session: session,
         deleteOneOptions: deleteOneOptions?.toDeleteOneOpen,
         rawOptions: rawOptions);
   }
-  Future<WriteResult> executeDocument({ClientSession? session}) async =>
-      WriteResult.fromMap(
-          WriteCommandType.delete, await execute(session: session));
+  Future<WriteResult> executeDocument() async =>
+      WriteResult.fromMap(WriteCommandType.delete, await process());
 }

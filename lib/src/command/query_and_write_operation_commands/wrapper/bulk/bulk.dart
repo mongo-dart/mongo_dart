@@ -15,7 +15,9 @@ import 'bulk_options.dart';
 
 abstract class Bulk extends CommandOperation {
   Bulk(MongoCollection collection,
-      {BulkOptions? bulkOptions, Map<String, Object>? rawOptions})
+      {super.session,
+      BulkOptions? bulkOptions,
+      Map<String, Object>? rawOptions})
       : super(
             collection.db,
             {},

@@ -9,7 +9,8 @@ import 'sasl_continue_options.dart';
 
 class SaslContinueCommand extends CommandOperation {
   SaslContinueCommand(MongoDatabase db, int conversationId, Uint8List payload,
-      {SaslContinueOptions? saslContinueOptions,
+      {super.session,
+      SaslContinueOptions? saslContinueOptions,
       Map<String, Object>? rawOptions,
       ConnectionBase? connection})
       : super(db, <String, dynamic>{

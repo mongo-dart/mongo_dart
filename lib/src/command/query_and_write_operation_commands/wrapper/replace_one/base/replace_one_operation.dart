@@ -9,7 +9,9 @@ abstract class ReplaceOneOperation extends UpdateOperation {
   @protected
   ReplaceOneOperation.protected(
       MongoCollection collection, ReplaceOneStatement replaceOneStatement,
-      {ReplaceOneOptions? replaceOneOptions, Map<String, Object>? rawOptions})
+      {super.session,
+      ReplaceOneOptions? replaceOneOptions,
+      Map<String, Object>? rawOptions})
       : super.protected(
           collection,
           [replaceOneStatement],
@@ -20,12 +22,15 @@ abstract class ReplaceOneOperation extends UpdateOperation {
 
   factory ReplaceOneOperation(
       MongoCollection collection, ReplaceOneStatement replaceOneStatement,
-      {ReplaceOneOptions? replaceOneOptions, Map<String, Object>? rawOptions}) {
+      {ClientSession? session,
+      ReplaceOneOptions? replaceOneOptions,
+      Map<String, Object>? rawOptions}) {
     if (collection.serverApi != null) {
       switch (collection.serverApi!.version) {
         case ServerApiVersion.v1:
           return ReplaceOneOperationV1(
               collection, replaceOneStatement.toReplaceOneV1,
+              session: session,
               replaceOneOptions: replaceOneOptions?.toReplaceOneV1,
               rawOptions: rawOptions);
         default:
@@ -35,11 +40,11 @@ abstract class ReplaceOneOperation extends UpdateOperation {
     }
     return ReplaceOneOperationOpen(
         collection, replaceOneStatement.toReplaceOneOpen,
+        session: session,
         replaceOneOptions: replaceOneOptions?.toReplaceOneOpen,
         rawOptions: rawOptions);
   }
 
-  Future<WriteResult> executeDocument({ClientSession? session}) async =>
-      WriteResult.fromMap(
-          WriteCommandType.update, await execute(session: session));
+  Future<WriteResult> executeDocument() async =>
+      WriteResult.fromMap(WriteCommandType.update, await process());
 }

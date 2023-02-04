@@ -137,7 +137,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -180,7 +180,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -224,7 +224,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -272,7 +272,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -326,7 +326,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -407,7 +407,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -444,7 +444,7 @@ void main() async {
             ordered: false,
             updateOptions: UpdateOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await updateOperation.execute();
+        var res = await updateOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -475,7 +475,7 @@ void main() async {
             }, collation: CollationOptions('fr', strength: 1))
           ],
         );
-        var res = await updateOperation.execute();
+        var res = await updateOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -518,7 +518,7 @@ void main() async {
             ], multi: true)
           ],
         );
-        var res = await updateOperation.execute();
+        var res = await updateOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -563,7 +563,7 @@ void main() async {
             ], multi: true)
           ],
         );
-        var res = await updateOperation.execute();
+        var res = await updateOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -597,7 +597,7 @@ void main() async {
             }, multi: true)
           ],
         );
-        var res = await updateOperation.execute();
+        var res = await updateOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);
@@ -721,7 +721,7 @@ void main() async {
               'name': 'Central Park Cafe',
               'Borough': 'Manhattan'
             }));
-        var res = await replaceOneOperation.execute();
+        var res = await replaceOneOperation.process();
 
         expect(res, isNotNull);
         expect(res[keyOk], 1.0);

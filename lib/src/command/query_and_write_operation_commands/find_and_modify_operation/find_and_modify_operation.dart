@@ -3,7 +3,6 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
 import '../../../database/base/mongo_collection.dart';
-import '../../../session/client_session.dart';
 import 'find_and_modify_options.dart';
 import '../../base/command_operation.dart';
 import 'find_and_modify_result.dart';
@@ -18,6 +17,7 @@ class FindAndModifyOperation extends CommandOperation {
       this.fields,
       bool? upsert,
       this.arrayFilters,
+      super.session,
       this.hint,
       this.hintDocument,
       FindAndModifyOptions? findAndModifyOptions,
@@ -205,6 +205,6 @@ class FindAndModifyOperation extends CommandOperation {
           keyHint: hintDocument!,
       };
 
-  Future<FindAndModifyResult> executeDocument({ClientSession? session}) async =>
-      FindAndModifyResult(await execute(session: session));
+  Future<FindAndModifyResult> executeDocument() async =>
+      FindAndModifyResult(await process());
 }

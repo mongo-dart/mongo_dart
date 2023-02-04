@@ -76,12 +76,12 @@ abstract class SaslAuthenticator extends Authenticator {
 
     CommandOperation command = SaslStartCommand(
         db.authSourceDb ?? db, mechanism.name, currentStep.bytesToSendToServer,
-        saslStartOptions: SaslStartOptions());
+        saslStartOptions: SaslStartOptions(), session: session);
 
     while (true) {
       Map<String, dynamic> result;
 
-      result = await command.execute(session: session);
+      result = await command.process();
 
       if (result[keyOk] == 0.0) {
         throw MongoDartError(result[keyErrmsg],

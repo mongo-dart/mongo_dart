@@ -22,7 +22,9 @@ import '../../base/command_operation.dart';
 
 class ListIndexesCommand extends CommandOperation {
   ListIndexesCommand(MongoDatabase db, MongoCollection collection,
-      {ListIndexesOptions? listIndexesOptions, Map<String, Object>? rawOptions})
+      {super.session,
+      ListIndexesOptions? listIndexesOptions,
+      Map<String, Object>? rawOptions})
       : super(db, {},
             <String, dynamic>{...?listIndexesOptions?.options, ...?rawOptions},
             collection: collection);

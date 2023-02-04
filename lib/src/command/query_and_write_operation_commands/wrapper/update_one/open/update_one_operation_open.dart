@@ -5,7 +5,7 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrappe
 class UpdateOneOperationOpen extends UpdateOneOperation {
   UpdateOneOperationOpen(
       MongoCollection collection, UpdateOneStatementOpen updateOneStatement,
-      {UpdateOneOptionsOpen? updateOneOptions, super.rawOptions})
+      {super.session, UpdateOneOptionsOpen? updateOneOptions, super.rawOptions})
       : super.protected(collection, updateOneStatement,
             updateOneOptions: updateOneOptions);
 }

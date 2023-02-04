@@ -61,7 +61,8 @@ class ReplicaSet extends Topology {
         }
         var serverConfig =
             await parseUri(Uri.parse('mongodb://$url'), mongoClientOptions);
-        var server = Server(mongoClient, serverConfig, mongoClientOptions);
+        var server = Server(mongoClient, serverConfig,
+            mongoClientOptions.connectionPoolSettings);
         addedServers.add(server);
       }
     }

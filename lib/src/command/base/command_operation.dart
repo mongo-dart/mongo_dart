@@ -3,6 +3,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart'
     show key$Db, keyAuthdb, keyDbName, keyReadPreference, keyWriteConcern;
 
 import '../../core/error/mongo_dart_error.dart';
+import '../../topology/server.dart';
 import '../parameters/read_preference.dart'
     show ReadPreference, resolveReadPreference;
 import '../../database/base/mongo_database.dart';
@@ -11,21 +12,20 @@ import 'operation_base.dart' show Aspect, Command, Options;
 
 class CommandOperation extends SimpleCommand {
   CommandOperation(this.db, Command command, Options options,
-      {this.collection, ReadPreference? readPreference, Aspect? aspect})
-      : super(
-            db.mongoClient.topology ??
-                (throw MongoDartError(
-                    'Topology is required executing a command')),
-            command,
-            options,
-            aspect: aspect,
-            readPreference: readPreference) {
-    //aspect ??= Aspect.noInheritOptions;
-    //defineAspects(aspect);
-  }
+      {this.collection, super.session, super.readPreference, super.aspect})
+      : super(db.mongoClient, command, options: options);
 
   MongoDatabase db;
   MongoCollection? collection;
+
+  /// This method is for exposing a common interface for the user
+  /// Must be overriden from commands
+  Future<dynamic> execute({Server? server}) {
+    if (server == null) {
+      return process();
+    }
+    return executeOnServer(server);
+  }
 
   @override
   void processOptions(Command command) {

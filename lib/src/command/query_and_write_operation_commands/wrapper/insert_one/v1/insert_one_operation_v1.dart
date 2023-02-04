@@ -4,6 +4,6 @@ import 'insert_one_options_v1.dart';
 
 class InsertOneOperationV1 extends InsertOneOperation {
   InsertOneOperationV1(super.collection, super.document,
-      {InsertOneOptionsV1? insertOneOptions, super.rawOptions})
+      {super.session, InsertOneOptionsV1? insertOneOptions, super.rawOptions})
       : super.protected(insertOneOptions: insertOneOptions);
 }

@@ -13,7 +13,8 @@ class DropIndexesCommand extends CommandOperation {
   late Map<String, Object> indexes;
 
   DropIndexesCommand(MongoDatabase db, MongoCollection collection, this.index,
-      {DropIndexesOptions? dropIndexesOptions,
+      {super.session,
+      DropIndexesOptions? dropIndexesOptions,
       ConnectionBase? connection,
       Map<String, Object>? rawOptions})
       : super(

@@ -424,10 +424,11 @@ abstract class MongoCollection {
         partialFilterExpression: partialFilterExpression,
         indexName: name);
 
-    var indexOperation =
-        CreateIndexOperation(db, this, _setKeys(key, keys), indexOptions);
+    var indexOperation = CreateIndexOperation(
+        db, this, _setKeys(key, keys), indexOptions,
+        session: session);
 
-    var res = await indexOperation.execute(session: session);
+    var res = await indexOperation.process();
     if (res[keyOk] == 0.0) {
       // It should be better to create a MongoDartError,
       // but, for compatibility reasons, we throw the received map.
@@ -457,9 +458,11 @@ abstract class MongoCollection {
         DropIndexesOptions(writeConcern: writeConcern, comment: comment);
 
     var command = DropIndexesCommand(db, this, index,
-        dropIndexesOptions: indexOptions, rawOptions: rawOptions);
+        dropIndexesOptions: indexOptions,
+        rawOptions: rawOptions,
+        session: session);
 
-    return command.execute(session: session);
+    return command.process();
   }
 
   Future<WriteResult> deleteOne(selector,
@@ -510,7 +513,7 @@ abstract class MongoCollection {
               hintDocument: hintDocument)
         ],
         updateOptions: UpdateOptions(writeConcern: writeConcern));
-    return updateOperation.execute(session: session);
+    return updateOperation.process();
   }
 
   Future<WriteResult> replaceOne(selector, Map<String, dynamic> update,
@@ -718,7 +721,7 @@ abstract class MongoCollection {
           DistinctOptions? distinctOptions,
           Map<String, Object>? rawOptions}) async =>
       _prepareDistinct(field, query: query, distinctOptions: distinctOptions)
-          .execute(session: session);
+          .process();
 
   /// This method returns a stream that can be read or transformed into
   /// a list with `.toList()`

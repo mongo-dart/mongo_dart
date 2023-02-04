@@ -129,7 +129,8 @@ void main() async {
         });
 
         test('options parm', () async {
-          var options = MongoClientOptions()..maxPoolSize = 5;
+          var options = MongoClientOptions()
+            ..connectionPoolSettings.maxPoolSize = 5;
           client = MongoClient(defaultUri, mongoClientOptions: options);
           var running4_2orGreater = await checkVersion(client);
           expect(running4_2orGreater, isTrue);
@@ -170,7 +171,8 @@ void main() async {
           expect(client.topology?.servers.first.connectionPool.maxPoolSize, 2);
         });
         test('options && URI parms', () async {
-          var options = MongoClientOptions()..maxPoolSize = 2;
+          var options = MongoClientOptions()
+            ..connectionPoolSettings.maxPoolSize = 2;
           client = MongoClient('$defaultUri?maxPoolSize=5',
               mongoClientOptions: options);
           var running4_2orGreater = await checkVersion(client);
@@ -278,7 +280,8 @@ void main() async {
         });
 
         test('One connection - min pool - options', () async {
-          var options = MongoClientOptions()..minPoolSize = 5;
+          var options = MongoClientOptions()
+            ..connectionPoolSettings.minPoolSize = 5;
           client = MongoClient(defaultUri, mongoClientOptions: options);
           var running4_2orGreater = await checkVersion(client);
           expect(running4_2orGreater, isTrue);
@@ -297,7 +300,8 @@ void main() async {
               4);
         });
         test('One connection - min pool - options && URI', () async {
-          var options = MongoClientOptions()..minPoolSize = 5;
+          var options = MongoClientOptions()
+            ..connectionPoolSettings.minPoolSize = 5;
           client = MongoClient('$defaultUri?minPoolSize=4',
               mongoClientOptions: options);
           var running4_2orGreater = await checkVersion(client);
@@ -383,8 +387,8 @@ void main() async {
 
         test('options parm', () async {
           var options = MongoClientOptions()
-            ..maxPoolSize = 5
-            ..minPoolSize = 3;
+            ..connectionPoolSettings.maxPoolSize = 5
+            ..connectionPoolSettings.minPoolSize = 3;
           client = MongoClient(defaultUri, mongoClientOptions: options);
           var running4_2orGreater = await checkVersion(client);
           expect(running4_2orGreater, isTrue);
@@ -428,8 +432,8 @@ void main() async {
         });
         test('options && URI parms', () async {
           var options = MongoClientOptions()
-            ..maxPoolSize = 2
-            ..minPoolSize = 1;
+            ..connectionPoolSettings.maxPoolSize = 2
+            ..connectionPoolSettings.minPoolSize = 1;
           client = MongoClient('$defaultUri?maxPoolSize=5&minPoolSize=2',
               mongoClientOptions: options);
           var running4_2orGreater = await checkVersion(client);
@@ -613,7 +617,8 @@ void main() async {
           expect(client.topology?.servers.first.connectionPool.minPoolSize, 3);
         });
         test('Auto fix min 3', () async {
-          var options = MongoClientOptions()..maxPoolSize = 3;
+          var options = MongoClientOptions()
+            ..connectionPoolSettings.maxPoolSize = 3;
           client = MongoClient('$defaultUri?minPoolSize=4',
               mongoClientOptions: options);
           var running4_2orGreater = await checkVersion(client);
@@ -660,7 +665,8 @@ void main() async {
           expect(client.topology?.servers.first.connectionPool.minPoolSize, 3);
         });
         test('Auto fix min 4', () async {
-          var options = MongoClientOptions()..minPoolSize = 4;
+          var options = MongoClientOptions()
+            ..connectionPoolSettings.minPoolSize = 4;
           client = MongoClient('$defaultUri?maxPoolSize=3',
               mongoClientOptions: options);
           var running4_2orGreater = await checkVersion(client);
@@ -725,8 +731,8 @@ void main() async {
 
         test('options parm', () async {
           var options = MongoClientOptions()
-            ..waitQueueTimeoutMS = 5
-            ..maxPoolSize = 3;
+            ..connectionPoolSettings.waitQueueTimeoutMS = 5
+            ..connectionPoolSettings.maxPoolSize = 3;
           client = MongoClient(defaultUri, mongoClientOptions: options);
           var running4_2orGreater = await checkVersion(client);
           expect(running4_2orGreater, isTrue);
@@ -779,8 +785,8 @@ void main() async {
         });
         test('options && URI parms', () async {
           var options = MongoClientOptions()
-            ..maxPoolSize = 2
-            ..waitQueueTimeoutMS = 5;
+            ..connectionPoolSettings.maxPoolSize = 2
+            ..connectionPoolSettings.waitQueueTimeoutMS = 5;
           client = MongoClient('$defaultUri?maxPoolSize=5&waitQueueTimeoutMS=5',
               mongoClientOptions: options);
           var running4_2orGreater = await checkVersion(client);

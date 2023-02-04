@@ -17,6 +17,7 @@ class FindOperation extends CommandOperation {
       this.hintDocument,
       this.skip,
       this.limit,
+      super.session,
       FindOptions? findOptions,
       Map<String, Object>? rawOptions})
       : super(collection.db, {},
@@ -105,6 +106,6 @@ class FindOperation extends CommandOperation {
       throw MongoDartError('cannot return a FindResult object '
           r'for a coomand request ($cmd collection)');
     }
-    return FindResult(await execute(session: session));
+    return FindResult(await process());
   }
 }

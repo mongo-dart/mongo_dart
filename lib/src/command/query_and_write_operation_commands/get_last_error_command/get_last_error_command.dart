@@ -35,6 +35,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 class GetLastErrorCommand extends CommandOperation {
   GetLastErrorCommand(MongoDatabase db,
       {WriteConcern? writeConcern,
+      super.session,
       GetLastErrorOptions? getLastErrorOptions,
       Map<String, Object>? rawOptions})
       : super(db, <String, dynamic>{
@@ -59,8 +60,8 @@ class GetLastErrorCommand extends CommandOperation {
   }
   // this is needed for compatibility with old command version
   @override
-  Future<Map<String, dynamic>> execute({ClientSession? session}) async {
-    var result = await execute(session: session);
+  Future<Map<String, dynamic>> process({ClientSession? session}) async {
+    var result = await process(session: session);
     if (result.isNotEmpty) {
       var res = result['err'] as String?;
       if (res != null && res.isNotEmpty) {

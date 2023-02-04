@@ -12,8 +12,10 @@ import 'server_api.dart';
 /// @public
 /// @see https://docs.mongodb.com/manual/reference/connection-string
 class MongoClientOptions
-    with
-        ConnectionPoolSettings /*extends BSONSerializeOptions,  SupportedNodeConnectionOptions*/ {
+/*  mixin
+        ConnectionPoolSettings */ /*extends BSONSerializeOptions,  SupportedNodeConnectionOptions*/ {
+  ConnectionPoolSettings connectionPoolSettings = ConnectionPoolSettings();
+
   /// Specifies the name of the replica set, if the mongod is a member of a
   /// replica set.
   String? replicaSet;

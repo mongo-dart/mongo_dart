@@ -7,6 +7,7 @@ class UpdateManyOperationOpen extends UpdateManyOperation {
   UpdateManyOperationOpen(
       MongoCollection collection, UpdateManyStatementOpen updateManyStatement,
       {super.ordered,
+      super.session,
       UpdateManyOptionsOpen? updateManyOptions,
       super.rawOptions})
       : super.protected(collection, updateManyStatement,

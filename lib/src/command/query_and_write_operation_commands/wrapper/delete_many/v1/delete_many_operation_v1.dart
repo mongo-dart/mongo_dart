@@ -6,7 +6,7 @@ import 'delete_many_statement_v1.dart';
 class DeleteManyOperationV1 extends DeleteManyOperation {
   DeleteManyOperationV1(
       MongoCollection collection, DeleteManyStatementV1 deleteManyStatement,
-      {DeleteManyOptionsV1? deleteManyOptions, super.rawOptions})
+      {super.session, DeleteManyOptionsV1? deleteManyOptions, super.rawOptions})
       : super.protected(collection, deleteManyStatement,
             deleteManyOptions: deleteManyOptions);
 }

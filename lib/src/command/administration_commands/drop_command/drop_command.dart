@@ -21,7 +21,7 @@ import 'drop_options.dart';
 ///   (must be manually set)
 class DropCommand extends CommandOperation {
   DropCommand(MongoDatabase db, String collectionName,
-      {DropOptions? dropOptions, Options? rawOptions})
+      {super.session, DropOptions? dropOptions, Options? rawOptions})
       : super(db, <String, dynamic>{
           keyDrop: collectionName,
         }, <String, dynamic>{

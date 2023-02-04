@@ -22,7 +22,7 @@ abstract class InsertManyOperation extends InsertOperation {
   @protected
   InsertManyOperation.protected(
       MongoCollection collection, List<MongoDocument> documents,
-      {InsertManyOptions? insertManyOptions, Options? rawOptions})
+      {super.session,InsertManyOptions? insertManyOptions, Options? rawOptions})
       : super.protected(
           collection,
           documents,
@@ -37,11 +37,11 @@ abstract class InsertManyOperation extends InsertOperation {
 
   factory InsertManyOperation(
       MongoCollection collection, List<MongoDocument> documents,
-      {InsertManyOptions? insertManyOptions, Options? rawOptions}) {
+      {ClientSession? session, InsertManyOptions? insertManyOptions, Options? rawOptions}) {
     if (collection.serverApi != null) {
       switch (collection.serverApi!.version) {
         case ServerApiVersion.v1:
-          return InsertManyOperationV1(collection, documents,
+          return InsertManyOperationV1(collection, documents, session: session,
               insertManyOptions: insertManyOptions?.toManyV1,
               rawOptions: rawOptions);
         default:
@@ -49,13 +49,13 @@ abstract class InsertManyOperation extends InsertOperation {
               'Stable Api ${collection.serverApi!.version} not managed');
       }
     }
-    return InsertManyOperationOpen(collection, documents,
+    return InsertManyOperationOpen(collection, documents,session: session,
         insertManyOptions: insertManyOptions?.toManyOpen,
         rawOptions: rawOptions);
   }
 
-  Future<InsertManyDocumentRec> executeDocument({ClientSession? session}) async {
-    var (serverDocument, documents, ids) = await executeInsert(session: session);
+  Future<InsertManyDocumentRec> executeDocument() async {
+    var (serverDocument, documents, ids) = await executeInsert( );
     return (BulkWriteResult.fromMap(
           WriteCommandType.insert, serverDocument)
         /* ..ids = ids

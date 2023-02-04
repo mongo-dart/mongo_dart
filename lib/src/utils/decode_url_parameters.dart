@@ -69,37 +69,41 @@ Future<ServerConfig> decodeUrlParameters(
       case ConnectionStringOptions.maxPoolSize:
         var intValue = int.tryParse(value);
         if (intValue != null && intValue >= 0) {
-          options.maxPoolSize = intValue;
-          if (options.maxPoolSize != 0 &&
-              options.minPoolSize > options.maxPoolSize) {
-            options.minPoolSize = options.maxPoolSize;
+          options.connectionPoolSettings.maxPoolSize = intValue;
+          if (options.connectionPoolSettings.maxPoolSize != 0 &&
+              options.connectionPoolSettings.minPoolSize >
+                  options.connectionPoolSettings.maxPoolSize) {
+            options.connectionPoolSettings.minPoolSize =
+                options.connectionPoolSettings.maxPoolSize;
           }
         }
         break;
       case ConnectionStringOptions.minPoolSize:
         var intValue = int.tryParse(value);
         if (intValue != null && intValue >= 0) {
-          options.maxPoolSize != 0 && options.maxPoolSize < intValue
-              ? options.minPoolSize = options.maxPoolSize
-              : options.minPoolSize = intValue;
+          options.connectionPoolSettings.maxPoolSize != 0 &&
+                  options.connectionPoolSettings.maxPoolSize < intValue
+              ? options.connectionPoolSettings.minPoolSize =
+                  options.connectionPoolSettings.maxPoolSize
+              : options.connectionPoolSettings.minPoolSize = intValue;
         }
         break;
       case ConnectionStringOptions.maxIdleTimeMS:
         var intValue = int.tryParse(value);
         if (intValue != null && intValue >= 0) {
-          options.maxIdleTimeMS = intValue;
+          options.connectionPoolSettings.maxIdleTimeMS = intValue;
         }
         break;
       case ConnectionStringOptions.waitQueueMultiple:
         var intValue = int.tryParse(value);
         if (intValue != null && intValue >= 0) {
-          options.waitQueueMultiple = intValue;
+          options.connectionPoolSettings.waitQueueMultiple = intValue;
         }
         break;
       case ConnectionStringOptions.waitQueueTimeoutMS:
         var intValue = int.tryParse(value);
         if (intValue != null && intValue >= 0) {
-          options.waitQueueTimeoutMS = intValue;
+          options.connectionPoolSettings.waitQueueTimeoutMS = intValue;
         }
         break;
       case ConnectionStringOptions.readPreference:

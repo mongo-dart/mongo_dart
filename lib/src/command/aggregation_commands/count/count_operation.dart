@@ -16,6 +16,7 @@ class CountOperation extends CommandOperation {
       {this.query,
       this.limit,
       this.skip,
+      super.session,
       this.hint,
       this.hintDocument,
       CountOptions? countOptions,
@@ -58,7 +59,7 @@ class CountOperation extends CommandOperation {
 
   Future<CountResult> executeDocument(Server server,
       {ClientSession? session}) async {
-    var result = await super.execute(session: session);
+    var result = await super.process();
     return CountResult(result);
   }
 }
