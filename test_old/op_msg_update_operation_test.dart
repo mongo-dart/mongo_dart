@@ -1,5 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/utils/query_union.dart';
 import 'package:mongo_dart/src/utils/update_document_check.dart';
 import 'package:test/test.dart';
 
@@ -633,9 +634,9 @@ void main() async {
 
         var updateOneOperation = UpdateOneOperation(
             collection,
-            UpdateOneStatement(<String, Object>{
+            UpdateOneStatement(QueryUnion(<String, Object>{
               'member': 'abc123'
-            }, <String, Map<String, dynamic>>{
+            }), <String, Map<String, dynamic>>{
               r'$set': {'status': 'A'},
               r'$inc': {'points': 1}
             }),
@@ -869,10 +870,10 @@ void main() async {
 
         var updateOneOperation = UpdateOneOperation(
           collection,
-          UpdateOneStatement(<String, Object>{
+          UpdateOneStatement(QueryUnion(<String, Object>{
             'category': 'cafe',
             'status': 'a'
-          }, <String, Map<String, dynamic>>{
+          }), <String, Map<String, dynamic>>{
             r'$set': {'status': 'Updated'},
           }, collation: CollationOptions('fr', strength: 1)),
         );

@@ -11,6 +11,7 @@ import '../../../../core/error/mongo_dart_error.dart';
 import '../../../../database/base/mongo_collection.dart';
 import '../../../../session/client_session.dart';
 import '../../../../topology/server.dart';
+import '../../../../utils/query_union.dart';
 import 'bulk_options.dart';
 
 abstract class Bulk extends CommandOperation {
@@ -246,7 +247,7 @@ abstract class Bulk extends CommandOperation {
   /// }
   void updateOneFromMap(Map<String, Object> docMap, {int? index}) {
     var filterMap = docMap[bulkFilter];
-    if (filterMap is! Map<String, Object>) {
+    if (filterMap is! QueryFilter) {
       throw MongoDartError('The "$bulkFilter" key of the '
           '"$bulkUpdateOne" element '
           '${index == null ? '' : 'at index $index '}must '
@@ -295,7 +296,7 @@ abstract class Bulk extends CommandOperation {
           'contain a Map');
     }
     updateOne(UpdateOneStatement(
-        filterMap, docMap[bulkUpdate] as UpdateDocument,
+        QueryUnion(filterMap), docMap[bulkUpdate] as UpdateDocument,
         upsert: docMap[bulkUpsert] as bool?,
         collation: docMap[bulkCollation] is Map<String, dynamic>
             ? CollationOptions.fromMap(

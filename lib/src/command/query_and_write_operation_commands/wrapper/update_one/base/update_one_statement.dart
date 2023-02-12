@@ -1,18 +1,19 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import '../../../../../utils/query_union.dart';
 import '../../../../../utils/update_document_check.dart';
 import '../open/update_one_statement_open.dart';
 import '../v1/update_one_statement_v1.dart';
 
 abstract class UpdateOneStatement extends UpdateStatement {
   @protected
-  UpdateOneStatement.protected(QueryFilter q, UpdateDocument u,
+  UpdateOneStatement.protected(QueryUnion q, UpdateDocument u,
       {bool? upsert,
       CollationOptions? collation,
       List<dynamic>? arrayFilters,
       String? hint,
       Map<String, Object>? hintDocument})
-      : super.protected(q, u,
+      : super.protected(q.query, u,
             upsert: upsert,
             multi: false,
             collation: collation,
@@ -25,7 +26,7 @@ abstract class UpdateOneStatement extends UpdateStatement {
     }
   }
 
-  factory UpdateOneStatement(QueryFilter q, UpdateDocument u,
+  factory UpdateOneStatement(QueryUnion q, UpdateDocument u,
       {ServerApi? serverApi,
       bool? upsert,
       CollationOptions? collation,
@@ -50,7 +51,7 @@ abstract class UpdateOneStatement extends UpdateStatement {
 
   UpdateOneStatementOpen get toUpdateOneOpen => this is UpdateOneStatementOpen
       ? this as UpdateOneStatementOpen
-      : UpdateOneStatementOpen(q, u as UpdateDocument,
+      : UpdateOneStatementOpen(QueryUnion(q), u as UpdateDocument,
           upsert: upsert,
           collation: collation,
           arrayFilters: arrayFilters,
@@ -59,7 +60,7 @@ abstract class UpdateOneStatement extends UpdateStatement {
 
   UpdateOneStatementV1 get toUpdateOneV1 => this is UpdateOneStatementV1
       ? this as UpdateOneStatementV1
-      : UpdateOneStatementV1(q, u as UpdateDocument,
+      : UpdateOneStatementV1(QueryUnion(q), u as UpdateDocument,
           upsert: upsert,
           collation: collation,
           arrayFilters: arrayFilters,

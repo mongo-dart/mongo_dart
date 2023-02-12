@@ -13,7 +13,7 @@ void main() async {
   await coll.deleteMany({});
   print('Packing data to insert into collection by Bson...');
   for (var n = 0; n < 1000; n++) {
-    await coll.insert({'my_field': n, 'str_field': 'str_$n'});
+    await coll.insertOne({'my_field': n, 'str_field': 'str_$n'});
   }
   print('Done. Now sending it to MongoDb...');
   await coll

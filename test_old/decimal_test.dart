@@ -84,8 +84,8 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        await collection
-            .insert(<String, dynamic>{'value': Decimal.fromInt(3), 'qty': 4});
+        await collection.insertOne(
+            <String, dynamic>{'value': Decimal.fromInt(3), 'qty': 4});
 
         await collection.update(<String, dynamic>{}, <String, dynamic>{
           r'$mul': {'value': Decimal.fromInt(5), 'qty': 5}

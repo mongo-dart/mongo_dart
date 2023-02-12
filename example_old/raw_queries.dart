@@ -12,7 +12,7 @@ void main() async {
   coll = db.collection('simple_data');
   await coll.deleteMany({});
   for (var n = 0; n < 1000; n++) {
-    await coll.insert({'my_field': n, 'str_field': 'str_$n'});
+    await coll.insertOne({'my_field': n, 'str_field': 'str_$n'});
   }
   var val = await coll.findOne({'my_field': 17});
   print('Filtered by my_field=17 $val');

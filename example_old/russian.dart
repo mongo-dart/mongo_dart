@@ -7,7 +7,7 @@ void main() async {
   var db = client.db();
   var collection = db.collection('test-utf8');
   await collection.remove({});
-  await collection.insert({
+  await collection.insertOne({
     'Имя': 'Вадим',
     'Фамилия': 'Цушко',
     'Профессия': 'Брадобрей',

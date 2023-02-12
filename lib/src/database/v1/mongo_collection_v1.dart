@@ -1,3 +1,5 @@
+import 'package:mongo_dart/src/utils/query_union.dart';
+
 import '../../command/command.dart';
 import '../../session/client_session.dart';
 import '../database.dart';
@@ -23,4 +25,25 @@ class MongoCollectionV1 extends MongoCollection {
       InsertManyOperationV1(this, documents,
               session: session, insertManyOptions: insertManyOptions?.toManyV1)
           .executeDocument();
+
+  // Update one document into this collection
+  @override
+  Future<WriteResult> updateOne(q, update,
+      {bool? upsert,
+      WriteConcern? writeConcern,
+      CollationOptions? collation,
+      List<dynamic>? arrayFilters,
+      String? hint,
+      Map<String, Object>? hintDocument}) async {
+    var updateOneOperation = UpdateOneOperation(
+        this,
+        UpdateOneStatement(QueryUnion(q), updateBuilder2Map(update),
+            upsert: upsert,
+            collation: collation,
+            arrayFilters: arrayFilters,
+            hint: hint,
+            hintDocument: hintDocument),
+        updateOneOptions: UpdateOneOptions(writeConcern: writeConcern));
+    return updateOneOperation.executeDocument();
+  }
 }

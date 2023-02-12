@@ -400,7 +400,7 @@ Future testInsertWithObjectId() async {
     'value': 10
   };
   id = objectToSave['_id'];
-  await collection.insert(objectToSave);
+  await collection.insertOne(objectToSave);
 
   var result = await collection.findOne(where.eq('name', 'a'));
   expect(result, isNotNull);
@@ -427,12 +427,12 @@ Future testDistinct() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  await collection.insert({'foo': 1});
-  await collection.insert({'foo': 2});
-  await collection.insert({'foo': 2});
-  await collection.insert({'foo': 3});
-  await collection.insert({'foo': 3});
-  await collection.insert({'foo': 3});
+  await collection.insertOne({'foo': 1});
+  await collection.insertOne({'foo': 2});
+  await collection.insertOne({'foo': 2});
+  await collection.insertOne({'foo': 3});
+  await collection.insertOne({'foo': 3});
+  await collection.insertOne({'foo': 3});
   var result = await collection.distinct('foo');
 
   final values = result['values'] as List;
@@ -1044,9 +1044,9 @@ Future testAuthenticationWithUri() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  await collection.insert({'a': 1});
-  await collection.insert({'a': 2});
-  await collection.insert({'a': 3});
+  await collection.insertOne({'a': 1});
+  await collection.insertOne({'a': 2});
+  await collection.insertOne({'a': 3});
 
   var foundValue = await collection.findOne();
   expect(foundValue, isNotNull);
@@ -1356,7 +1356,7 @@ Future testSafeModeUpdate() async {
   var collection = db.collection(collectionName);
 
   for (var n = 0; n < 6; n++) {
-    await collection.insert({
+    await collection.insertOne({
       'a': n,
       'embedded': {'b': n, 'c': n * 10}
     });
@@ -1540,7 +1540,7 @@ Future testFieldLevelUpdateSimple() async {
     var (resultInsert, _, _, _) = await collection.insertOne({'name': 'a', 'value': 10});
     expect(resultInsert.nInserted, 1);
   } else {
-    var resultInsert = await collection.insert({'name': 'a', 'value': 10});
+    var (_, resultInsert, _,_) = await collection.insertOne({'name': 'a', 'value': 10});
     expect(resultInsert['n'], 0);
   }
 
@@ -1581,7 +1581,7 @@ Future testUpdateOnClosedConnection() async {
 
   await client.close();
   try {
-    await collection.insert({'test': 'test'});
+    await collection.insertOne({'test': 'test'});
   } on MongoDartError catch (e) {
     expect(e.message.endsWith('State.CLOSED'), isTrue);
   }
@@ -1591,7 +1591,7 @@ Future testReopeningDb() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
 
-  await collection.insert({'one': 'test'});
+  await collection.insertOne({'one': 'test'});
   await client.close();
   await client.connect();
   collection = client.db().collection(collectionName);

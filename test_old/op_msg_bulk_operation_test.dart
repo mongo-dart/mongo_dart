@@ -1,6 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
+import 'package:mongo_dart/src/utils/query_union.dart';
 import 'package:test/test.dart';
 
 import '../test/utils/insert_data.dart';
@@ -384,7 +385,7 @@ void main() async {
             ModifierBuilder().set('status', 'd').map as UpdateDocument));
 
         bulk.updateOne(UpdateOneStatement(
-            {'cust_num': 99999, 'item': 'abc123', 'status': 'A'},
+            QueryUnion({'cust_num': 99999, 'item': 'abc123', 'status': 'A'}),
             ModifierBuilder().inc('ordered', 1).map as UpdateDocument));
 
         bulk.replaceOne(ReplaceOneStatement({
@@ -428,7 +429,7 @@ void main() async {
             ModifierBuilder().set('status', 'd').map as UpdateDocument));
 
         bulk.updateOne(UpdateOneStatement(
-            {'cust_num': 99999, 'item': 'abc123', 'status': 'A'},
+            QueryUnion({'cust_num': 99999, 'item': 'abc123', 'status': 'A'}),
             ModifierBuilder().inc('ordered', 1).map as UpdateDocument));
         bulk.replaceOne(ReplaceOneStatement({
           'cust_num': 12345,

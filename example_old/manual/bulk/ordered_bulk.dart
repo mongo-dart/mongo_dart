@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/utils/query_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 
 void main() async {
@@ -76,7 +77,7 @@ void main() async {
       ModifierBuilder().set('status', 'd').map as UpdateDocument));
 
   bulk.updateOne(UpdateOneStatement(
-      {'cust_num': 99999, 'item': 'abc123', 'status': 'A'},
+      QueryUnion({'cust_num': 99999, 'item': 'abc123', 'status': 'A'}),
       ModifierBuilder().inc('ordered', 1).map as UpdateDocument));
 
   bulk.replaceOne(ReplaceOneStatement({

@@ -1,4 +1,3 @@
-import 'package:bson/bson.dart';
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
@@ -57,10 +56,62 @@ abstract class MongoCollection {
   Future<InsertManyDocumentRec> insertMany(List<MongoDocument> documents,
       {ClientSession? session, InsertManyOptions? insertManyOptions});
 
+  // TODO to be completed (document, let)
+  // Update one document into this collection
+  Future<WriteResult> updateOne(q, update,
+      {bool? upsert,
+      WriteConcern? writeConcern,
+      CollationOptions? collation,
+      List<dynamic>? arrayFilters,
+      String? hint,
+      Map<String, Object>? hintDocument});
+
+  // TODO to be ported
+  Future<WriteResult> replaceOne(selector, Map<String, dynamic> update,
+      {bool? upsert,
+      WriteConcern? writeConcern,
+      CollationOptions? collation,
+      String? hint,
+      Map<String, Object>? hintDocument}) async {
+    var replaceOneOperation = ReplaceOneOperation(
+        this,
+        ReplaceOneStatement(selectorBuilder2Map(selector), update,
+            upsert: upsert,
+            collation: collation,
+            hint: hint,
+            hintDocument: hintDocument),
+        replaceOneOptions: ReplaceOneOptions(writeConcern: writeConcern));
+    return replaceOneOperation.executeDocument();
+  }
+
+  // TODO to be ported
+  Future<WriteResult> updateMany(selector, update,
+      {bool? upsert,
+      WriteConcern? writeConcern,
+      CollationOptions? collation,
+      List<dynamic>? arrayFilters,
+      String? hint,
+      Map<String, Object>? hintDocument}) async {
+    var updateManyOperation = UpdateManyOperation(
+        this,
+        UpdateManyStatement(
+            selectorBuilder2Map(selector), updateBuilder2Map(update),
+            upsert: upsert,
+            collation: collation,
+            arrayFilters: arrayFilters,
+            hint: hint,
+            hintDocument: hintDocument),
+        updateManyOptions: UpdateManyOptions(writeConcern: writeConcern));
+    return updateManyOperation.executeDocument();
+  }
+
+  // TODO missing findOneAndUpdate()
+  // TODO mising findOneAndReplace()
+
   // ****************************************************
   // ***********        OLD       ***********************
   // ****************************************************
-
+/* 
   @Deprecated('Since version 4.2. Use insertOne() or replaceOne() instead.')
   Future<Map<String, dynamic>> save(Map<String, dynamic> document,
       {WriteConcern? writeConcern}) {
@@ -81,14 +132,14 @@ abstract class MongoCollection {
       }
       return insert(document, writeConcern: writeConcern);
     }
-  }
-
+  } */
+/* 
   @Deprecated('No More Used')
   Future<Map<String, dynamic>> insertAll(List<Map<String, dynamic>> documents,
       {WriteConcern? writeConcern}) async {
     throw MongoDartError('To be deleted');
-  }
-
+  } */
+/* 
   /// Allows to insert many documents at a time.
   /// This is the legacy version of the insertMany() method
   @Deprecated('No More Used')
@@ -96,7 +147,7 @@ abstract class MongoCollection {
       List<Map<String, dynamic>> documents,
       {WriteConcern? writeConcern}) {
     throw MongoDartError('No More Used');
-  }
+  } */
 
   /// Modifies an existing document or documents in a collection.
   /// The method can modify specific fields of an existing document or
@@ -242,7 +293,7 @@ abstract class MongoCollection {
   Future<Map<String, dynamic>> legacyRemove(selector,
           {WriteConcern? writeConcern}) =>
       db.removeFromCollection(
-          collectionName, _selectorBuilder2Map(selector), writeConcern);
+          collectionName, selectorBuilder2Map(selector), writeConcern);
 
   // **************************************************
   //                   Count
@@ -299,21 +350,21 @@ abstract class MongoCollection {
     throw MongoDartError('No More Used');
   }
 
-  /// Inserts a document into a collection
+/*   /// Inserts a document into a collection
   Future<Map<String, dynamic>> insert(Map<String, dynamic> document,
       {WriteConcern? writeConcern}) async {
     await insertOne(document,
         insertOneOptions: InsertOneOptions(writeConcern: writeConcern));
     // Todo change return type
     return {keyOk: 1.0};
-  }
-
+  } */
+/* 
   /// Old version to be used on MongoDb versions prior to 3.6
   @Deprecated('No More Used')
   Future<Map<String, dynamic>> legacyInsert(Map<String, dynamic> document,
           {WriteConcern? writeConcern}) =>
       insertAll([document], writeConcern: writeConcern);
-
+*/
   /// Analogue of mongodb shell method `db.collection.getIndexes()`
   /// Returns an array that holds a list of documents that identify and describe
   /// the existing indexes on the collection. You must call `getIndexes()`
@@ -339,7 +390,8 @@ abstract class MongoCollection {
     return keys;
   }
 
-  Map<String, dynamic> _selectorBuilder2Map(selector) {
+  @Deprecated('Use QueryUnionInstead')
+  Map<String, dynamic> selectorBuilder2Map(selector) {
     if (selector == null) {
       return <String, dynamic>{};
     }
@@ -350,7 +402,8 @@ abstract class MongoCollection {
     return <String, dynamic>{...?(selector as Map?)};
   }
 
-  Map<String, dynamic> _queryBuilder2Map(Object query) {
+  @Deprecated('Use QueryUnionInstead')
+  Map<String, dynamic> queryBuilder2Map(Object query) {
     if (query is SelectorBuilder) {
       query = query.map['\$query'];
     }
@@ -365,14 +418,14 @@ abstract class MongoCollection {
     return query as Map<String, Object>;
   }
  */
-  Map<String, dynamic>? _fieldsBuilder2Map(fields) {
+  Map<String, dynamic>? fieldsBuilder2Map(fields) {
     if (fields is SelectorBuilder) {
       return fields.paramFields;
     }
     return fields as Map<String, dynamic>?;
   }
 
-  UpdateDocument _updateBuilder2Map(update) {
+  UpdateDocument updateBuilder2Map(update) {
     if (update is ModifierBuilder) {
       update = update.map;
     }
@@ -472,7 +525,7 @@ abstract class MongoCollection {
       Map<String, Object>? hintDocument}) async {
     var deleteOperation = DeleteOneOperation(
         this,
-        DeleteOneStatement(_selectorBuilder2Map(selector),
+        DeleteOneStatement(selectorBuilder2Map(selector),
             collation: collation, hint: hint, hintDocument: hintDocument),
         deleteOneOptions: DeleteOneOptions(writeConcern: writeConcern));
     return deleteOperation.executeDocument();
@@ -485,7 +538,7 @@ abstract class MongoCollection {
       Map<String, Object>? hintDocument}) async {
     var deleteOperation = DeleteManyOperation(
         this,
-        DeleteManyStatement(_selectorBuilder2Map(selector),
+        DeleteManyStatement(selectorBuilder2Map(selector),
             collation: collation, hint: hint, hintDocument: hintDocument),
         deleteManyOptions: DeleteManyOptions(writeConcern: writeConcern));
     return deleteOperation.executeDocument(db.server);
@@ -503,8 +556,8 @@ abstract class MongoCollection {
     var updateOperation = UpdateOperation(
         this,
         [
-          UpdateStatement(_selectorBuilder2Map(selector),
-              update is List ? update : _updateBuilder2Map(update),
+          UpdateStatement(selectorBuilder2Map(selector),
+              update is List ? update : updateBuilder2Map(update),
               upsert: upsert,
               multi: multi,
               collation: collation,
@@ -514,63 +567,6 @@ abstract class MongoCollection {
         ],
         updateOptions: UpdateOptions(writeConcern: writeConcern));
     return updateOperation.process();
-  }
-
-  Future<WriteResult> replaceOne(selector, Map<String, dynamic> update,
-      {bool? upsert,
-      WriteConcern? writeConcern,
-      CollationOptions? collation,
-      String? hint,
-      Map<String, Object>? hintDocument}) async {
-    var replaceOneOperation = ReplaceOneOperation(
-        this,
-        ReplaceOneStatement(_selectorBuilder2Map(selector), update,
-            upsert: upsert,
-            collation: collation,
-            hint: hint,
-            hintDocument: hintDocument),
-        replaceOneOptions: ReplaceOneOptions(writeConcern: writeConcern));
-    return replaceOneOperation.executeDocument();
-  }
-
-  Future<WriteResult> updateOne(selector, update,
-      {bool? upsert,
-      WriteConcern? writeConcern,
-      CollationOptions? collation,
-      List<dynamic>? arrayFilters,
-      String? hint,
-      Map<String, Object>? hintDocument}) async {
-    var updateOneOperation = UpdateOneOperation(
-        this,
-        UpdateOneStatement(
-            _selectorBuilder2Map(selector), _updateBuilder2Map(update),
-            upsert: upsert,
-            collation: collation,
-            arrayFilters: arrayFilters,
-            hint: hint,
-            hintDocument: hintDocument),
-        updateOneOptions: UpdateOneOptions(writeConcern: writeConcern));
-    return updateOneOperation.executeDocument();
-  }
-
-  Future<WriteResult> updateMany(selector, update,
-      {bool? upsert,
-      WriteConcern? writeConcern,
-      CollationOptions? collation,
-      List<dynamic>? arrayFilters,
-      String? hint,
-      Map<String, Object>? hintDocument}) async {
-    var updateManyOperation = UpdateManyOperation(
-        this,
-        UpdateManyStatement(
-            _selectorBuilder2Map(selector), _updateBuilder2Map(update),
-            upsert: upsert,
-            collation: collation,
-            arrayFilters: arrayFilters,
-            hint: hint,
-            hintDocument: hintDocument),
-        updateManyOptions: UpdateManyOptions(writeConcern: writeConcern));
-    return updateManyOperation.executeDocument();
   }
 
   Future<FindAndModifyResult> modernFindAndModify(
@@ -596,14 +592,14 @@ abstract class MongoCollection {
     }
 
     var famOperation = FindAndModifyOperation(this,
-        query: query == null ? null : _queryBuilder2Map(query),
+        query: query == null ? null : queryBuilder2Map(query),
         sort: sortMap,
         remove: remove,
         update: update == null
             ? null
-            : (update is List ? update : _updateBuilder2Map(update)),
+            : (update is List ? update : updateBuilder2Map(update)),
         returnNew: returnNew,
-        fields: _fieldsBuilder2Map(fields),
+        fields: fieldsBuilder2Map(fields),
         upsert: upsert,
         arrayFilters: arrayFilters,
         hint: hint,

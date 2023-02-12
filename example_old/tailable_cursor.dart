@@ -9,11 +9,11 @@ void main() async {
   await client.connect();
   var db = client.db();
   var i = 0;
-  await db.collection('log').insert({'index': i});
+  await db.collection('log').insertOne({'index': i});
   Timer.periodic(Duration(seconds: 10), (Timer t) async {
     i++;
     print('Insert $i');
-    await db.collection('log').insert({'index': i});
+    await db.collection('log').insertOne({'index': i});
     if (i == 10) {
       print('Stop inserting');
       t.cancel();
