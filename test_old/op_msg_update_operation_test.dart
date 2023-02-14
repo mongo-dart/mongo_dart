@@ -1,5 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/base/update_union.dart';
 import 'package:mongo_dart/src/utils/query_union.dart';
 import 'package:mongo_dart/src/utils/update_document_check.dart';
 import 'package:test/test.dart';
@@ -128,12 +129,12 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(<String, Object>{
+              UpdateStatement(QueryUnion(<String, Object>{
                 'member': 'abc123'
-              }, <String, Object>{
+              }), UpdateUnion(<String, Object>{
                 r'$set': {'status': 'A'},
                 r'$inc': {'points': 1}
-              })
+              }))
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -173,10 +174,10 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(<String, Object>{}, <String, Object>{
+              UpdateStatement(QueryUnion(<String, Object>{}), UpdateUnion(<String, Object>{
                 r'$set': {'status': 'A'},
                 r'$inc': {'points': 1}
-              }, multi: true)
+              }), multi: true)
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -217,10 +218,10 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(<String, Object>{}, <String, Object>{
+              UpdateStatement(QueryUnion(<String, Object>{}), UpdateUnion(<String, Object>{
                 'status': 'A',
                 'points': 1
-              }, multi: true)
+              }), multi: true)
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -263,12 +264,12 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(<String, Object>{
+              UpdateStatement(QueryUnion(<String, Object>{
                 'name': 'Central Perk Cafe'
-              }, <String, Object>{
+              }), UpdateUnion(<String, Object>{
                 'name': 'Central Park Cafe',
                 'Borough': 'Manhattan'
-              })
+              }))
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -312,7 +313,7 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(<String, Object>{}, [
+              UpdateStatement(QueryUnion(<String, Object>{}),UpdateUnion( [
                 {
                   r'$set': {
                     'status': 'Modified',
@@ -322,7 +323,7 @@ void main() async {
                 {
                   r'$unset': ['misc1', 'misc2']
                 }
-              ], multi: true)
+              ]), multi: true)
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -362,7 +363,7 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(<String, Object>{}, [
+              UpdateStatement(QueryUnion(<String, Object>{}), UpdateUnion([
                 {
                   r'$set': {
                     'average': {r'$avg': r'$tests'}
@@ -403,7 +404,7 @@ void main() async {
                     }
                   }
                 }
-              ], multi: true)
+              ]), multi: true)
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -427,20 +428,20 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(<String, Object>{
+              UpdateStatement(QueryUnion(<String, Object>{
                 'status': 'P'
-              }, {
+              }),UpdateUnion( {
                 r'$set': {
                   'status': 'D',
                 }
-              }, multi: true),
-              UpdateStatement(<String, Object>{
+              }), multi: true),
+              UpdateStatement(QueryUnion(<String, Object>{
                 '_id': 7
-              }, {
+              }), UpdateUnion({
                 '_id': 7,
                 'name': 'abc123',
                 'status': 'A'
-              }, upsert: true)
+              }), upsert: true)
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -468,12 +469,12 @@ void main() async {
         var updateOperation = UpdateOperation(
           collection,
           [
-            UpdateStatement(<String, Object>{
+            UpdateStatement(QueryUnion(<String, Object>{
               'category': 'cafe',
               'status': 'a'
-            }, <String, Object>{
+            }),UpdateUnion( <String, Object>{
               r'$set': {'status': 'Updated'},
-            }, collation: CollationOptions('fr', strength: 1))
+            }), collation: CollationOptions('fr', strength: 1))
           ],
         );
         var res = await updateOperation.process();
@@ -508,11 +509,11 @@ void main() async {
         var updateOperation = UpdateOperation(
           collection,
           [
-            UpdateStatement(<String, Object>{
+            UpdateStatement(QueryUnion(<String, Object>{
               'grades': {r'$gte': 100}
-            }, <String, Object>{
+            }),UpdateUnion( <String, Object>{
               r'$set': {r'grades.$[element]': 100},
-            }, arrayFilters: [
+            }), arrayFilters: [
               {
                 'element': {r'$gte': 100}
               }
@@ -555,9 +556,9 @@ void main() async {
         var updateOperation = UpdateOperation(
           collection,
           [
-            UpdateStatement(<String, Object>{}, <String, Object>{
+            UpdateStatement(QueryUnion(<String, Object>{}), UpdateUnion(<String, Object>{
               r'$set': {r'grades.$[element].mean': 100},
-            }, arrayFilters: [
+            }), arrayFilters: [
               {
                 'element.grade': {r'$gte': 85}
               }
@@ -588,12 +589,12 @@ void main() async {
         var updateOperation = UpdateOperation(
           collection,
           [
-            UpdateStatement(<String, Object>{
+            UpdateStatement(QueryUnion(<String, Object>{
               'points': {r'$lte': 20},
               'status': 'P'
-            }, <String, Object>{
+            }),UpdateUnion( <String, Object>{
               r'$set': {'misc1': 'Need to activate'},
-            }, hintDocument: <String, Object>{
+            }), hintDocument: <String, Object>{
               'status': 1
             }, multi: true)
           ],
@@ -636,10 +637,10 @@ void main() async {
             collection,
             UpdateOneStatement(QueryUnion(<String, Object>{
               'member': 'abc123'
-            }), <String, Map<String, dynamic>>{
+            }), UpdateUnion(<String, Map<String, dynamic>>{
               r'$set': {'status': 'A'},
               r'$inc': {'points': 1}
-            }),
+            })),
             updateOneOptions: UpdateOneOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateOneOperation.executeDocument();
@@ -678,11 +679,11 @@ void main() async {
         var updateManyOperation = UpdateManyOperation(
             collection,
             UpdateManyStatement(
-                <String, Object>{},
+                QueryUnion(<String, Object>{}),UpdateUnion(
                 <String, Map<String, dynamic>>{
                   r'$set': {'status': 'A'},
                   r'$inc': {'points': 1}
-                }),
+                })),
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var res = await updateManyOperation.executeDocument();
@@ -716,12 +717,12 @@ void main() async {
 
         var replaceOneOperation = ReplaceOneOperation(
             collection,
-            ReplaceOneStatement(<String, Object>{
+            ReplaceOneStatement(QueryUnion(<String, Object>{
               'name': 'Central Perk Cafe'
-            }, <String, Object>{
+            }),UpdateUnion( <String, Object>{
               'name': 'Central Park Cafe',
               'Borough': 'Manhattan'
-            }));
+            })));
         var res = await replaceOneOperation.process();
 
         expect(res, isNotNull);
@@ -759,7 +760,7 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
             collection,
-            UpdateManyStatement(<String, Object>{}, [
+            UpdateManyStatement(QueryUnion(<String, Object>{}),UpdateUnion( [
               {
                 r'$set': {
                   'status': 'Modified',
@@ -769,7 +770,7 @@ void main() async {
               {
                 r'$unset': ['misc1', 'misc2']
               }
-            ]),
+            ])),
             ordered: false,
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
@@ -807,7 +808,7 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
             collection,
-            UpdateManyStatement(<String, Object>{}, [
+            UpdateManyStatement(QueryUnion(<String, Object>{}), UpdateUnion([
               {
                 r'$set': {
                   'average': {r'$avg': r'$tests'}
@@ -848,7 +849,7 @@ void main() async {
                   }
                 }
               }
-            ]),
+            ])),
             ordered: false,
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
@@ -873,9 +874,9 @@ void main() async {
           UpdateOneStatement(QueryUnion(<String, Object>{
             'category': 'cafe',
             'status': 'a'
-          }), <String, Map<String, dynamic>>{
+          }), UpdateUnion(<String, Map<String, dynamic>>{
             r'$set': {'status': 'Updated'},
-          }, collation: CollationOptions('fr', strength: 1)),
+          }), collation: CollationOptions('fr', strength: 1)),
         );
         var res = await updateOneOperation.executeDocument();
 
@@ -908,11 +909,11 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
           collection,
-          UpdateManyStatement(<String, Object>{
+          UpdateManyStatement(QueryUnion(<String, Object>{
             'grades': {r'$gte': 100}
-          }, <String, Map<String, dynamic>>{
+          }),UpdateUnion(<String, Map<String, dynamic>>{
             r'$set': {r'grades.$[element]': 100},
-          }, arrayFilters: [
+          }), arrayFilters: [
             {
               'element': {r'$gte': 100}
             }
@@ -953,11 +954,11 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
           collection,
-          UpdateManyStatement(
-              <String, Object>{},
+          UpdateManyStatement(QueryUnion(
+              <String, Object>{}),UpdateUnion(
               <String, Map<String, dynamic>>{
                 r'$set': {r'grades.$[element].mean': 100},
-              },
+              }),
               arrayFilters: [
                 {
                   'element.grade': {r'$gte': 85}
@@ -987,12 +988,12 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
           collection,
-          UpdateManyStatement(<String, Object>{
+          UpdateManyStatement(QueryUnion(<String, Object>{
             'points': {r'$lte': 20},
             'status': 'P'
-          }, <String, Map<String, dynamic>>{
+          }),UpdateUnion( <String, Map<String, dynamic>>{
             r'$set': {'misc1': 'Need to activate'},
-          }, hintDocument: <String, Object>{
+          }), hintDocument: <String, Object>{
             'status': 1
           }),
         );

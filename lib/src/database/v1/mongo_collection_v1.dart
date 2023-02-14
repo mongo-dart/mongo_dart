@@ -1,6 +1,7 @@
 import 'package:mongo_dart/src/utils/query_union.dart';
 
 import '../../command/command.dart';
+import '../../command/query_and_write_operation_commands/update_operation/base/update_union.dart';
 import '../../session/client_session.dart';
 import '../database.dart';
 
@@ -28,7 +29,7 @@ class MongoCollectionV1 extends MongoCollection {
 
   // Update one document into this collection
   @override
-  Future<WriteResult> updateOne(q, update,
+  Future<WriteResult> updateOne(filter, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -37,7 +38,7 @@ class MongoCollectionV1 extends MongoCollection {
       Map<String, Object>? hintDocument}) async {
     var updateOneOperation = UpdateOneOperation(
         this,
-        UpdateOneStatement(QueryUnion(q), updateBuilder2Map(update),
+        UpdateOneStatement(QueryUnion(filter), UpdateUnion(update),
             upsert: upsert,
             collation: collation,
             arrayFilters: arrayFilters,

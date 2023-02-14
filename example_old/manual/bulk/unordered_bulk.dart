@@ -1,5 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/database.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/base/update_union.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src/utils/query_union.dart';
 
@@ -75,22 +75,17 @@ void main() async {
   ///  }
   ///});
   ///'''
-  bulk.updateMany(UpdateManyStatement(where.eq('status', 'D').map[key$Query],
-      ModifierBuilder().set('status', 'd').map as UpdateDocument));
+  bulk.updateMany(UpdateManyStatement(QueryUnion(where.eq('status', 'D')),
+      UpdateUnion(ModifierBuilder().set('status', 'd'))));
 
   bulk.updateOne(UpdateOneStatement(
       QueryUnion({'cust_num': 99999, 'item': 'abc123', 'status': 'A'}),
-      ModifierBuilder().inc('ordered', 1).map as UpdateDocument));
+      UpdateUnion(ModifierBuilder().inc('ordered', 1))));
 
-  bulk.replaceOne(ReplaceOneStatement({
-    'cust_num': 12345,
-    'item': 'tst24',
-    'status': 'D'
-  }, {
-    'cust_num': 12345,
-    'item': 'tst24',
-    'status': 'Replaced'
-  }, upsert: true));
+  bulk.replaceOne(ReplaceOneStatement(
+      QueryUnion({'cust_num': 12345, 'item': 'tst24', 'status': 'D'}),
+      UpdateUnion({'cust_num': 12345, 'item': 'tst24', 'status': 'Replaced'}),
+      upsert: true));
 
   /// Bulk `executeDocument()` returns an instance of the `BulkWriteResult`
   /// class that is a convenient way of reading the result data.

@@ -1,9 +1,10 @@
 import 'package:mongo_dart/src/command/command.dart';
 
-import '../../../../../database/database.dart';
+import '../../../../../utils/query_union.dart';
+import '../../../update_operation/base/update_union.dart';
 
 class UpdateManyStatementV1 extends UpdateManyStatement {
-  UpdateManyStatementV1(QueryFilter q, Object u,
+  UpdateManyStatementV1(QueryUnion q, UpdateUnion u,
       {super.upsert,
       super.collation,
       super.arrayFilters,

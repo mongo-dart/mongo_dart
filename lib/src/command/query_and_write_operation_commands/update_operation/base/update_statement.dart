@@ -1,19 +1,22 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 
+import '../../../../utils/query_union.dart';
 import '../open/update_statement_open.dart';
 import '../v1/update_statement_v1.dart';
-import 'update_specs.dart';
+import 'update_spec.dart';
+import 'update_union.dart';
 
 class UpdateStatement {
-  UpdateStatement.protected(this.q, Object u,
+  UpdateStatement.protected(QueryUnion q, UpdateUnion u,
       {bool? upsert,
       bool? multi,
       this.collation,
       this.arrayFilters,
       this.hint,
       this.hintDocument})
-      : u = UpdateSpecs(u).documents,
+      : q = q.query,
+        u = u.specs,
         upsert = upsert ?? false,
         multi = multi ?? false {
     if (arrayFilters != null && arrayFilters is! List && arrayFilters is! Map) {
@@ -22,7 +25,7 @@ class UpdateStatement {
     }
   }
 
-  factory UpdateStatement(QueryFilter q, Object u,
+  factory UpdateStatement(QueryUnion q, UpdateUnion u,
       {ServerApi? serverApi,
       bool? upsert,
       bool? multi,
@@ -61,7 +64,7 @@ class UpdateStatement {
   ///   * `$addFields` and its alias `$set`
   ///   * `$project` and its alias `$unset`
   ///   * `$replaceRoot` and its alias `$replaceWith`.
-  List<MongoDocument> u;
+  UpdateSpec u;
 
   /// If true, perform an insert if no documents match the query.
   /// If both upsert and multi are true and no documents match the query,
@@ -163,7 +166,7 @@ class UpdateStatement {
 
   UpdateStatementOpen get toOpen => this is UpdateStatementOpen
       ? this as UpdateStatementOpen
-      : UpdateStatementOpen(q, u,
+      : UpdateStatementOpen(QueryUnion(q), UpdateUnion(u),
           upsert: upsert,
           multi: multi,
           collation: collation,
@@ -173,7 +176,7 @@ class UpdateStatement {
 
   UpdateStatementV1 get toV1 => this is UpdateStatementV1
       ? this as UpdateStatementV1
-      : UpdateStatementV1(q, u,
+      : UpdateStatementV1(QueryUnion(q), UpdateUnion(u),
           upsert: upsert,
           multi: multi,
           collation: collation,
@@ -183,7 +186,7 @@ class UpdateStatement {
 
   Options toMap() => <String, dynamic>{
         keyQ: q,
-        keyU: u,
+        keyU: u.value,
         if (upsert) keyUpsert: upsert,
         if (multi) keyMulti: multi,
         if (collation != null) keyCollation: collation!.options,

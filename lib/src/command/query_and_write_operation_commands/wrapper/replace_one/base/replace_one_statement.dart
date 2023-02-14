@@ -1,13 +1,14 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/utils/update_document_check.dart';
 
+import '../../../../../utils/query_union.dart';
+import '../../../update_operation/base/update_union.dart';
 import '../open/replace_one_statement_open.dart';
 import '../v1/replace_one_statement_v1.dart';
 
 abstract class ReplaceOneStatement extends UpdateStatement {
   @protected
-  ReplaceOneStatement.protected(QueryFilter q, MongoDocument u,
+  ReplaceOneStatement.protected(QueryUnion q, UpdateUnion u,
       {bool? upsert,
       CollationOptions? collation,
       String? hint,
@@ -18,13 +19,13 @@ abstract class ReplaceOneStatement extends UpdateStatement {
             collation: collation,
             hint: hint,
             hintDocument: hintDocument) {
-    if (!isPureDocument(u)) {
+    if (!u.specs.isPureDocument) {
       throw MongoDartError('Invalid document in ReplaceOneStatement. '
           'The document is either null or contains update operators');
     }
   }
 
-  factory ReplaceOneStatement(QueryFilter q, MongoDocument u,
+  factory ReplaceOneStatement(QueryUnion q, UpdateUnion u,
       {ServerApi? serverApi,
       bool? upsert,
       CollationOptions? collation,
@@ -41,11 +42,11 @@ abstract class ReplaceOneStatement extends UpdateStatement {
   ReplaceOneStatementOpen get toReplaceOneOpen =>
       this is ReplaceOneStatementOpen
           ? this as ReplaceOneStatementOpen
-          : ReplaceOneStatementOpen(q, u as MongoDocument,
+          : ReplaceOneStatementOpen(QueryUnion(q), UpdateUnion(u.value),
               upsert: upsert, collation: collation, hint: hint);
 
   ReplaceOneStatementV1 get toReplaceOneV1 => this is ReplaceOneStatementV1
       ? this as ReplaceOneStatementV1
-      : ReplaceOneStatementV1(q, u as MongoDocument,
+      : ReplaceOneStatementV1(QueryUnion(q), UpdateUnion(u.value),
           upsert: upsert, collation: collation, hint: hint);
 }

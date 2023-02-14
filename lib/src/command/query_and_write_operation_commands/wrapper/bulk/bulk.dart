@@ -12,6 +12,7 @@ import '../../../../database/base/mongo_collection.dart';
 import '../../../../session/client_session.dart';
 import '../../../../topology/server.dart';
 import '../../../../utils/query_union.dart';
+import '../../update_operation/base/update_union.dart';
 import 'bulk_options.dart';
 
 abstract class Bulk extends CommandOperation {
@@ -215,8 +216,8 @@ abstract class Bulk extends CommandOperation {
           '${index == null ? '' : 'at index $index '}must '
           'contain a Map');
     }
-    replaceOne(ReplaceOneStatement(
-        filterMap, docMap[bulkReplacement] as Map<String, Object>,
+    replaceOne(ReplaceOneStatement(QueryUnion(filterMap),
+        UpdateUnion(docMap[bulkReplacement] as MongoDocument),
         upsert: docMap[bulkUpsert] as bool?,
         collation: docMap[bulkCollation] is Map<String, dynamic>
             ? CollationOptions.fromMap(
@@ -295,8 +296,8 @@ abstract class Bulk extends CommandOperation {
           '${index == null ? '' : 'at index $index '}must '
           'contain a Map');
     }
-    updateOne(UpdateOneStatement(
-        QueryUnion(filterMap), docMap[bulkUpdate] as UpdateDocument,
+    updateOne(UpdateOneStatement(QueryUnion(filterMap),
+        UpdateUnion(docMap[bulkUpdate] as UpdateDocument),
         upsert: docMap[bulkUpsert] as bool?,
         collation: docMap[bulkCollation] is Map<String, dynamic>
             ? CollationOptions.fromMap(
@@ -373,8 +374,8 @@ abstract class Bulk extends CommandOperation {
           '${index == null ? '' : 'at index $index '}must '
           'contain a Map');
     }
-    updateMany(UpdateManyStatement(
-        filterMap, docMap[bulkUpdate] as UpdateDocument,
+    updateMany(UpdateManyStatement(QueryUnion(filterMap),
+        UpdateUnion(docMap[bulkUpdate] as UpdateDocument),
         upsert: docMap[bulkUpsert] as bool?,
         collation: docMap[bulkCollation] is Map<String, dynamic>
             ? CollationOptions.fromMap(

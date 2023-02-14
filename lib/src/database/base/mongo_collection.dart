@@ -1,8 +1,10 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
+import '../../command/query_and_write_operation_commands/update_operation/base/update_union.dart';
 import '../../session/client_session.dart';
 import '../../utils/parms_utils.dart';
+import '../../utils/query_union.dart';
 import '../modern_cursor.dart';
 
 abstract class MongoCollection {
@@ -58,7 +60,7 @@ abstract class MongoCollection {
 
   // TODO to be completed (document, let)
   // Update one document into this collection
-  Future<WriteResult> updateOne(q, update,
+  Future<WriteResult> updateOne(filter, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -67,7 +69,7 @@ abstract class MongoCollection {
       Map<String, Object>? hintDocument});
 
   // TODO to be ported
-  Future<WriteResult> replaceOne(selector, Map<String, dynamic> update,
+  Future<WriteResult> replaceOne(filter, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -75,7 +77,7 @@ abstract class MongoCollection {
       Map<String, Object>? hintDocument}) async {
     var replaceOneOperation = ReplaceOneOperation(
         this,
-        ReplaceOneStatement(selectorBuilder2Map(selector), update,
+        ReplaceOneStatement(QueryUnion(filter), UpdateUnion(update),
             upsert: upsert,
             collation: collation,
             hint: hint,
@@ -94,8 +96,7 @@ abstract class MongoCollection {
       Map<String, Object>? hintDocument}) async {
     var updateManyOperation = UpdateManyOperation(
         this,
-        UpdateManyStatement(
-            selectorBuilder2Map(selector), updateBuilder2Map(update),
+        UpdateManyStatement(QueryUnion(selector), UpdateUnion(update),
             upsert: upsert,
             collation: collation,
             arrayFilters: arrayFilters,
@@ -556,8 +557,7 @@ abstract class MongoCollection {
     var updateOperation = UpdateOperation(
         this,
         [
-          UpdateStatement(selectorBuilder2Map(selector),
-              update is List ? update : updateBuilder2Map(update),
+          UpdateStatement(QueryUnion(selector), UpdateUnion(update),
               upsert: upsert,
               multi: multi,
               collation: collation,

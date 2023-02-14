@@ -1,10 +1,10 @@
 import 'package:mongo_dart/src/command/command.dart';
 import 'package:mongo_dart/src/utils/query_union.dart';
 
-import '../../../../../database/database.dart';
+import '../../../update_operation/base/update_union.dart';
 
 class UpdateOneStatementV1 extends UpdateOneStatement {
-  UpdateOneStatementV1(QueryUnion q, UpdateDocument u,
+  UpdateOneStatementV1(QueryUnion q, UpdateUnion u,
       {super.upsert,
       super.collation,
       super.arrayFilters,
