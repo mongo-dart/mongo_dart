@@ -5,10 +5,6 @@ import '../../../update_operation/base/update_union.dart';
 
 class UpdateOneStatementV1 extends UpdateOneStatement {
   UpdateOneStatementV1(QueryUnion q, UpdateUnion u,
-      {super.upsert,
-      super.collation,
-      super.arrayFilters,
-      super.hint,
-      super.hintDocument})
+      {super.upsert, super.collation, super.arrayFilters, super.hint})
       : super.protected(q, u);
 }

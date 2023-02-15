@@ -3,6 +3,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../core/error/mongo_dart_error.dart';
 import '../../../database/base/mongo_collection.dart';
+import '../../../utils/hint_union.dart';
 import 'find_and_modify_options.dart';
 import '../../base/command_operation.dart';
 import 'find_and_modify_result.dart';
@@ -19,7 +20,6 @@ class FindAndModifyOperation extends CommandOperation {
       this.arrayFilters,
       super.session,
       this.hint,
-      this.hintDocument,
       FindAndModifyOptions? findAndModifyOptions,
       Map<String, Object>? rawOptions})
       : remove = remove ?? false,
@@ -178,15 +178,14 @@ class FindAndModifyOperation extends CommandOperation {
   List? arrayFilters;
 
   /// Optional. Index specification. Specify either the index name
-  /// as a string (hint field) or the index key pattern (hintDocument field).
+  /// as a string or the index key pattern.
   /// If specified, then the query system will only consider plans
   /// using the hinted index.
   /// **starting in MongoDB 4.2**, with the following exception,
   /// hint is required if the command includes the min and/or max fields;
   /// hint is not required with min and/or max if the filter is an
   /// equality condition on the _id field { _id: <value> }.
-  String? hint;
-  Map<String, Object>? hintDocument;
+  HintUnion? hint;
 
   @override
   Command $buildCommand() => <String, dynamic>{
@@ -199,10 +198,7 @@ class FindAndModifyOperation extends CommandOperation {
         if (fields != null) keyFields: fields!,
         if (upsert) keyUpsert: upsert,
         if (arrayFilters != null) keyArrayFilters: arrayFilters!,
-        if (hint != null)
-          keyHint: hint!
-        else if (hintDocument != null)
-          keyHint: hintDocument!,
+        if (hint != null && !hint!.isNull) keyHint: hint!.value
       };
 
   Future<FindAndModifyResult> executeDocument() async =>

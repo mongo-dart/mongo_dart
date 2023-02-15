@@ -5,6 +5,6 @@ import '../../../update_operation/base/update_union.dart';
 
 class ReplaceOneStatementOpen extends ReplaceOneStatement {
   ReplaceOneStatementOpen(QueryUnion q, UpdateUnion u,
-      {super.upsert, super.collation, super.hint, super.hintDocument})
+      {super.upsert, super.collation, super.hint})
       : super.protected(q, u);
 }

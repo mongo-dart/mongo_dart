@@ -11,6 +11,7 @@ import '../../../../core/error/mongo_dart_error.dart';
 import '../../../../database/base/mongo_collection.dart';
 import '../../../../session/client_session.dart';
 import '../../../../topology/server.dart';
+import '../../../../utils/hint_union.dart';
 import '../../../../utils/query_union.dart';
 import '../../update_operation/base/update_union.dart';
 import 'bulk_options.dart';
@@ -65,8 +66,7 @@ abstract class Bulk extends CommandOperation {
   /// { deleteOne : {
   ///    "filter" : <Map>,
   ///    "collation": <CollationOptions | Map>,
-  ///    "hint": <String>                 // Available starting in 4.2.1
-  ///    "hintDocument": <Map>            // Available starting in 4.2.1
+  ///    "hint": <String | <Map>                 // Available starting in 4.2.1
   ///   }
   /// }
   void deleteOneFromMap(Map<String, Object> docMap, {int? index}) {
@@ -84,26 +84,13 @@ abstract class Bulk extends CommandOperation {
           'contain a CollationOptions element or a Map representation '
           'of a collation');
     }
-    if (docMap[bulkHint] != null && docMap[bulkHint] is! String) {
-      throw MongoDartError('The "$bulkHint" key of the '
-          '"$bulkDeleteOne" element '
-          '${index == null ? '' : 'at index $index '}must '
-          'contain a String');
-    }
-    if (docMap[bulkHintDocument] != null &&
-        docMap[bulkHintDocument] is! Map<String, Object>) {
-      throw MongoDartError('The "$bulkHintDocument" key of the '
-          '"$bulkDeleteOne" element '
-          '${index == null ? '' : 'at index $index '}must '
-          'contain a Map');
-    }
+
     deleteOne(DeleteOneStatement(contentMap,
         collation: docMap[bulkCollation] is Map<String, dynamic>
             ? CollationOptions.fromMap(
                 docMap[bulkCollation] as Map<String, Object>)
             : docMap[bulkCollation] as CollationOptions?,
-        hint: docMap[bulkHint] as String?,
-        hintDocument: docMap[bulkHintDocument] as Map<String, Object>?));
+        hint: HintUnion(docMap[bulkHint])));
   }
 
   /// deleteMany deletes all documents in the collection that match the filter.
@@ -115,8 +102,7 @@ abstract class Bulk extends CommandOperation {
   /// { deleteMany : {
   ///    "filter" : <Map>,
   ///    "collation": <CollationOptions | Map>,
-  ///    "hint": <String>                 // Available starting in 4.2.1
-  ///    "hintDocument": <Map>            // Available starting in 4.2.1
+  ///    "hint": <String> | <Map>                // Available starting in 4.2.1
   ///   }
   /// }
   void deleteManyFromMap(Map<String, Object> docMap, {int? index}) {
@@ -135,25 +121,13 @@ abstract class Bulk extends CommandOperation {
           'contain a CollationOptions element or a Map representation '
           'of a collation');
     }
-    if (docMap[bulkHint] != null && docMap[bulkHint] is! String) {
-      throw MongoDartError('The "$bulkHint" key of the '
-          '"$bulkDeleteMany" element ${index == null ? '' : 'at index $index '}must '
-          'contain a String');
-    }
-    if (docMap[bulkHintDocument] != null &&
-        docMap[bulkHintDocument] is! Map<String, Object>) {
-      throw MongoDartError('The "$bulkHintDocument" key of the '
-          '"$bulkDeleteMany" element '
-          '${index == null ? '' : 'at index $index '}must '
-          'contain a Map');
-    }
+
     deleteMany(DeleteManyStatement(contentMap,
         collation: docMap[bulkCollation] is Map
             ? CollationOptions.fromMap(
                 docMap[bulkCollation] as Map<String, Object>)
             : docMap[bulkCollation] as CollationOptions?,
-        hint: docMap[bulkHint] as String?,
-        hintDocument: docMap[bulkHintDocument] as Map<String, Object>?));
+        hint: HintUnion(docMap[bulkHint])));
   }
 
   /// replaceOne replaces a single document in the collection that matches
@@ -170,8 +144,7 @@ abstract class Bulk extends CommandOperation {
   ///       "replacement" : <Map>,
   ///       "upsert" : <bool>,
   ///       "collation": <CollationOptions | Map>,
-  ///       "hint": <String>                 // Available starting in 4.2.1
-  ///       "hintDocument": <Map>            // Available starting in 4.2.1
+  ///       "hint": <String> | <Map>                // Available starting in 4.2.1
   ///    }
   /// }
   void replaceOneFromMap(Map<String, Object> docMap, {int? index}) {
@@ -203,19 +176,7 @@ abstract class Bulk extends CommandOperation {
           'contain a CollationOptions element or a Map representation '
           'of a collation');
     }
-    if (docMap[bulkHint] != null && docMap[bulkHint] is! String) {
-      throw MongoDartError('The "$bulkHint" key of the '
-          '"$bulkReplaceOne" element '
-          '${index == null ? '' : 'at index $index '}must '
-          'contain a String');
-    }
-    if (docMap[bulkHintDocument] != null &&
-        docMap[bulkHintDocument] is! Map<String, Object>) {
-      throw MongoDartError('The "$bulkHintDocument" key of the '
-          '"$bulkReplaceOne" element '
-          '${index == null ? '' : 'at index $index '}must '
-          'contain a Map');
-    }
+
     replaceOne(ReplaceOneStatement(QueryUnion(filterMap),
         UpdateUnion(docMap[bulkReplacement] as MongoDocument),
         upsert: docMap[bulkUpsert] as bool?,
@@ -223,8 +184,7 @@ abstract class Bulk extends CommandOperation {
             ? CollationOptions.fromMap(
                 docMap[bulkCollation] as Map<String, Object>)
             : docMap[bulkCollation] as CollationOptions?,
-        hint: docMap[bulkHint] as String?,
-        hintDocument: docMap[bulkHintDocument] as Map<String, Object>?));
+        hint: HintUnion(docMap[bulkHint])));
   }
 
   /// updateOne updates a single document in the collection that matches
@@ -242,8 +202,7 @@ abstract class Bulk extends CommandOperation {
   ///       "upsert": <bool>,
   ///       "collation": <CollationOptions | Map>,
   ///       "arrayFilters": [ <filterdocument1>, ... ],
-  ///       "hint": <String>                 // Available starting in 4.2.1
-  ///       "hintDocument": <Map>            // Available starting in 4.2.1
+  ///       "hint": <String> | <Map>          // Available starting in 4.2.1
   ///    }
   /// }
   void updateOneFromMap(Map<String, Object> docMap, {int? index}) {
@@ -283,19 +242,7 @@ abstract class Bulk extends CommandOperation {
           '${index == null ? '' : 'at index $index '}must '
           'contain a List<Map<String, dynamic>> Object');
     }
-    if (docMap[bulkHint] != null && docMap[bulkHint] is! String) {
-      throw MongoDartError('The "$bulkHint" key of the '
-          '"$bulkUpdateOne" element '
-          '${index == null ? '' : 'at index $index '}must '
-          'contain a String');
-    }
-    if (docMap[bulkHintDocument] != null &&
-        docMap[bulkHintDocument] is! Map<String, Object>) {
-      throw MongoDartError('The "$bulkHintDocument" key of the '
-          '"$bulkUpdateOne" element '
-          '${index == null ? '' : 'at index $index '}must '
-          'contain a Map');
-    }
+
     updateOne(UpdateOneStatement(QueryUnion(filterMap),
         UpdateUnion(docMap[bulkUpdate] as UpdateDocument),
         upsert: docMap[bulkUpsert] as bool?,
@@ -304,8 +251,7 @@ abstract class Bulk extends CommandOperation {
                 docMap[bulkCollation] as Map<String, Object>)
             : docMap[bulkCollation] as CollationOptions?,
         arrayFilters: docMap[bulkArrayFilters] as List?,
-        hint: docMap[bulkHint] as String?,
-        hintDocument: docMap[bulkHintDocument] as Map<String, Object>?));
+        hint: HintUnion(docMap[bulkHint])));
   }
 
   /// updateMany updates all documents in the collection that match the filter.
@@ -321,8 +267,7 @@ abstract class Bulk extends CommandOperation {
   ///       "upsert" : <bool>,
   ///       "collation": <CollationOptions | Map>,
   ///       "arrayFilters": [ <filterdocument1>, ... ],
-  ///       "hint": <String>                 // Available starting in 4.2.1
-  ///       "hintDocument": <Map>            // Available starting in 4.2.1
+  ///       "hint": <String> | <Map>         // Available starting in 4.2.1
   ///    }
   /// }
   void updateManyFromMap(Map<String, Object> docMap, {int? index}) {
@@ -361,19 +306,7 @@ abstract class Bulk extends CommandOperation {
           '${index == null ? '' : 'at index $index '}must '
           'contain a List<Map<String, dynamic>> Object');
     }
-    if (docMap[bulkHint] != null && docMap[bulkHint] is! String) {
-      throw MongoDartError('The "$bulkHint" key of the '
-          '"$bulkUpdateMany" element '
-          '${index == null ? '' : 'at index $index '}must '
-          'contain a String');
-    }
-    if (docMap[bulkHintDocument] != null &&
-        docMap[bulkHintDocument] is! Map<String, Object>) {
-      throw MongoDartError('The "$bulkHintDocument" key of the '
-          '"$bulkUpdateMany" element '
-          '${index == null ? '' : 'at index $index '}must '
-          'contain a Map');
-    }
+
     updateMany(UpdateManyStatement(QueryUnion(filterMap),
         UpdateUnion(docMap[bulkUpdate] as UpdateDocument),
         upsert: docMap[bulkUpsert] as bool?,
@@ -382,8 +315,7 @@ abstract class Bulk extends CommandOperation {
                 docMap[bulkCollation] as Map<String, Object>)
             : docMap[bulkCollation] as CollationOptions?,
         arrayFilters: docMap[bulkArrayFilters] as List?,
-        hint: docMap[bulkHint] as String?,
-        hintDocument: docMap[bulkHintDocument] as Map<String, Object>?));
+        hint: HintUnion(docMap[bulkHint])));
   }
 
   void _setCommand(CommandOperation operation) =>

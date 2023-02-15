@@ -4,6 +4,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 import '../../../database/base/mongo_collection.dart';
 import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
+import '../../../utils/hint_union.dart';
 import 'count_options.dart';
 import '../../base/command_operation.dart';
 import 'count_result.dart';
@@ -18,7 +19,6 @@ class CountOperation extends CommandOperation {
       this.skip,
       super.session,
       this.hint,
-      this.hintDocument,
       CountOptions? countOptions,
       Map<String, Object>? rawOptions})
       : super(collection.db, {},
@@ -35,15 +35,14 @@ class CountOperation extends CommandOperation {
   int? skip;
 
   /// Optional. Index specification. Specify either the index name
-  /// as a string (hint field) or the index key pattern (hintDocument field).
+  /// as a string or the index key pattern.
   /// If specified, then the query system will only consider plans
   /// using the hinted index.
   /// **starting in MongoDB 4.2**, with the following exception,
   /// hint is required if the command includes the min and/or max fields;
   /// hint is not required with min and/or max if the filter is an
   /// equality condition on the _id field { _id: <value> }.
-  String? hint;
-  Map<String, Object>? hintDocument;
+  HintUnion? hint;
 
   @override
   Command $buildCommand() => <String, dynamic>{
@@ -51,10 +50,7 @@ class CountOperation extends CommandOperation {
         if (query != null) keyQuery: query!,
         if (limit != null && limit! > 0) keyLimit: limit!,
         if (skip != null && skip! > 0) keySkip: skip!,
-        if (hint != null)
-          keyHint: hint!
-        else if (hintDocument != null)
-          keyHint: hintDocument!,
+        if (hint != null && !hint!.isNull) keyHint: hint!.value,
       };
 
   Future<CountResult> executeDocument(Server server,

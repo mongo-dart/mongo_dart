@@ -2,6 +2,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:decimal/decimal.dart';
+import 'package:mongo_dart/src/utils/hint_union.dart';
 import 'package:test/test.dart';
 
 import '../test/utils/insert_data.dart';
@@ -539,9 +540,9 @@ void main() async {
           DeleteManyStatement({
             'points': {r'$lte': 20},
             'status': 'P'
-          }, hintDocument: {
+          }, hint: HintUnion({
             'status': 1
-          }),
+          })),
         );
         var res = await deleteOperation.executeDocument(db.server);
         expect(res.hasWriteErrors, isFalse);
@@ -706,9 +707,9 @@ void main() async {
         var res = await collection.deleteMany(<String, Object>{
           'points': {r'$lte': 20},
           'status': 'P'
-        }, hintDocument: {
+        }, hint: HintUnion({
           'status': 1
-        });
+        }));
 
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -1106,7 +1107,7 @@ void main() async {
               'status': 'P'
             },
             remove: true,
-            hintDocument: {'status': 1});
+            hint:HintUnion( {'status': 1}));
         var res = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
@@ -1462,7 +1463,7 @@ void main() async {
         var res = await collection.modernFindAndModify(
             query: where.lte('points', 20).eq('status', 'P'),
             remove: true,
-            hintDocument: {'status': 1});
+            hint:HintUnion( {'status': 1}));
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, isNull);

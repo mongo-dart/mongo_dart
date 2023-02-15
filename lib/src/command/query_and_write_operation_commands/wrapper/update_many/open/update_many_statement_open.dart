@@ -5,10 +5,6 @@ import '../../../update_operation/base/update_union.dart';
 
 class UpdateManyStatementOpen extends UpdateManyStatement {
   UpdateManyStatementOpen(QueryUnion q, UpdateUnion u,
-      {super.upsert,
-      super.collation,
-      super.arrayFilters,
-      super.hint,
-      super.hintDocument})
+      {super.upsert, super.collation, super.arrayFilters, super.hint})
       : super.protected(q, u);
 }

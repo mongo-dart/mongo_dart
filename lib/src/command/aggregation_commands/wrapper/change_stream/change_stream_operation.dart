@@ -3,6 +3,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../../database/base/mongo_database.dart';
 import '../../../../database/base/mongo_collection.dart';
+import '../../../../utils/hint_union.dart';
 import 'change_stream_options.dart';
 
 class ChangeStreamOperation extends AggregateOperation {
@@ -10,8 +11,7 @@ class ChangeStreamOperation extends AggregateOperation {
       {MongoCollection? collection,
       MongoDatabase? db,
       int? batchSize,
-      String? hint,
-      Map<String, Object>? hintDocument,
+      HintUnion? hint,
       ChangeStreamOptions? changeStreamOptions,
       Map<String, Object>? rawOptions})
       : super(
@@ -22,7 +22,6 @@ class ChangeStreamOperation extends AggregateOperation {
               ? null
               : <String, dynamic>{keyBatchSize: batchSize},
           hint: hint,
-          hintDocument: hintDocument,
           aggregateOptions: changeStreamOptions,
           rawOptions: rawOptions,
         ) {

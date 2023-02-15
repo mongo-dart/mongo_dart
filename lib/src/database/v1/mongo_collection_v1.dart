@@ -1,3 +1,4 @@
+import 'package:mongo_dart/src/utils/hint_union.dart';
 import 'package:mongo_dart/src/utils/query_union.dart';
 
 import '../../command/command.dart';
@@ -34,17 +35,29 @@ class MongoCollectionV1 extends MongoCollection {
       WriteConcern? writeConcern,
       CollationOptions? collation,
       List<dynamic>? arrayFilters,
-      String? hint,
-      Map<String, Object>? hintDocument}) async {
+      HintUnion? hint}) async {
     var updateOneOperation = UpdateOneOperation(
         this,
         UpdateOneStatement(QueryUnion(filter), UpdateUnion(update),
             upsert: upsert,
             collation: collation,
             arrayFilters: arrayFilters,
-            hint: hint,
-            hintDocument: hintDocument),
+            hint: hint),
         updateOneOptions: UpdateOneOptions(writeConcern: writeConcern));
     return updateOneOperation.executeDocument();
+  }
+
+  @override
+  Future<WriteResult> replaceOne(filter, update,
+      {bool? upsert,
+      WriteConcern? writeConcern,
+      CollationOptions? collation,
+      HintUnion? hint}) async {
+    var replaceOneOperation = ReplaceOneOperation(
+        this,
+        ReplaceOneStatement(QueryUnion(filter), UpdateUnion(update),
+            upsert: upsert, collation: collation, hint: hint),
+        replaceOneOptions: ReplaceOneOptions(writeConcern: writeConcern));
+    return replaceOneOperation.executeDocument();
   }
 }

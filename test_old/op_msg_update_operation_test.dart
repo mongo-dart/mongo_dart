@@ -1,6 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/base/update_union.dart';
+import 'package:mongo_dart/src/utils/hint_union.dart';
 import 'package:mongo_dart/src/utils/query_union.dart';
 import 'package:mongo_dart/src/utils/update_document_check.dart';
 import 'package:test/test.dart';
@@ -594,9 +595,9 @@ void main() async {
               'status': 'P'
             }),UpdateUnion( <String, Object>{
               r'$set': {'misc1': 'Need to activate'},
-            }), hintDocument: <String, Object>{
+            }), hint: HintUnion(<String, Object>{
               'status': 1
-            }, multi: true)
+            }), multi: true)
           ],
         );
         var res = await updateOperation.process();
@@ -993,9 +994,9 @@ void main() async {
             'status': 'P'
           }),UpdateUnion( <String, Map<String, dynamic>>{
             r'$set': {'misc1': 'Need to activate'},
-          }), hintDocument: <String, Object>{
+          }), hint: HintUnion(<String, Object>{
             'status': 1
-          }),
+          })),
         );
         var res = await updateManyOperation.executeDocument();
 
@@ -1401,7 +1402,7 @@ void main() async {
         var res = await collection.modernUpdate(
             where.lte('points', 20).eq('status', 'P'),
             ModifierBuilder().set('misc1', 'Need to activate'),
-            hintDocument: <String, Object>{'status': 1},
+            hint: HintUnion(<String, Object>{'status': 1}),
             multi: true);
 
         expect(res, isNotNull);
@@ -1926,7 +1927,7 @@ void main() async {
         var res = await collection.updateMany(
             where.lte('points', 20).eq('status', 'P'),
             ModifierBuilder().set('misc1', 'Need to activate'),
-            hintDocument: <String, Object>{'status': 1});
+            hint: HintUnion(<String, Object>{'status': 1}));
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);

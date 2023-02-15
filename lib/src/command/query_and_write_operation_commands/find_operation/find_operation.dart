@@ -4,6 +4,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 import '../../../core/error/mongo_dart_error.dart';
 import '../../../database/base/mongo_collection.dart';
 import '../../../session/client_session.dart';
+import '../../../utils/hint_union.dart';
 import 'find_options.dart';
 import '../../base/command_operation.dart';
 import 'find_result.dart';
@@ -14,7 +15,6 @@ class FindOperation extends CommandOperation {
       this.sort,
       this.projection,
       this.hint,
-      this.hintDocument,
       this.skip,
       this.limit,
       super.session,
@@ -52,15 +52,14 @@ class FindOperation extends CommandOperation {
   Map<String, Object>? projection;
 
   /// Optional. Index specification. Specify either the index name
-  /// as a string (hint field) or the index key pattern (hintDocument field).
+  /// as a string or the index key pattern.
   /// If specified, then the query system will only consider plans
   /// using the hinted index.
   /// **starting in MongoDB 4.2**, with the following exception,
   /// hint is required if the command includes the min and/or max fields;
   /// hint is not required with min and/or max if the filter is an
   /// equality condition on the _id field { _id: <value> }.
-  String? hint;
-  Map<String, Object>? hintDocument;
+  HintUnion? hint;
 
   /// Positive integer 	- Optional.
   /// Number of documents to skip. Defaults to 0.
@@ -92,10 +91,7 @@ class FindOperation extends CommandOperation {
       if (filter != null) keyFilter: filter!,
       if (sort != null) keySort: sort!,
       if (projection != null) keyProjection: projection!,
-      if (hint != null)
-        keyHint: hint!
-      else if (hintDocument != null)
-        keyHint: hintDocument!,
+      if (hint != null && !hint!.isNull) keyHint: hint!.value,
       if (skip != null && skip! > 0) keySkip: skip!,
       if (limit != null && limit! > 0) keyLimit: limit!,
     };

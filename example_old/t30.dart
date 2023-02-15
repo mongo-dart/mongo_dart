@@ -1,9 +1,9 @@
 import 't30_1.dart';
 
-class Fin2 extends Fin {
+/* class Fin2 extends Fin {
   Fin2(super.str);
   int? i;
-}
+} */
 /* class Fin3 implements Fin {
   //Fin3(super.str);
 } */
@@ -29,8 +29,8 @@ class Bas2 extends Bas {
 
 void main() {
   var f = Fin('4');
-  var f2 = Fin2('5');
+  //var f2 = Fin2('5');
   //var s = Sel('3');
   var b = Bas('2');
-  print('$f, $f2, $b');
+  print('$f,  $b');
 }

@@ -4,6 +4,7 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
+import 'package:mongo_dart/src/utils/hint_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 
@@ -400,8 +401,7 @@ class MongoDatabase {
   Stream<Map<String, dynamic>> aggregate(List<Map<String, Object>> pipeline,
       {bool? explain,
       Map<String, Object>? cursor,
-      String? hint,
-      Map<String, Object>? hintDocument,
+      HintUnion? hint,
       AggregateOptions? aggregateOptions,
       Map<String, Object>? rawOptions}) {
     return ModernCursor(
@@ -410,7 +410,6 @@ class MongoDatabase {
                 explain: explain,
                 cursor: cursor,
                 hint: hint,
-                hintDocument: hintDocument,
                 aggregateOptions: aggregateOptions,
                 rawOptions: rawOptions),
             server)

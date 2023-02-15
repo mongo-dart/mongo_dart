@@ -16,6 +16,7 @@ import 'package:mongo_dart_query/mongo_aggregation.dart';
 
 import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
+import '../../../utils/hint_union.dart';
 import '../../base/command_operation.dart';
 import 'aggregate_result.dart';
 
@@ -30,7 +31,6 @@ class AggregateOperation extends CommandOperation {
       MongoDocument? cursor,
       super.session,
       this.hint,
-      this.hintDocument,
       AggregateOptions? aggregateOptions,
       Options? rawOptions})
       : cursor = cursor ?? <String, Object>{},
@@ -79,15 +79,14 @@ class AggregateOperation extends CommandOperation {
   MongoDocument cursor;
 
   /// Optional. Index specification. Specify either the index name
-  /// as a string (hint field) or the index key pattern (hintDocument field).
+  /// as a string or the index key pattern.
   /// If specified, then the query system will only consider plans
   /// using the hinted index.
   /// **starting in MongoDB 4.2**, with the following exception,
   /// hint is required if the command includes the min and/or max fields;
   /// hint is not required with min and/or max if the filter is an
   /// equality condition on the _id field { _id: <value> }.
-  String? hint;
-  Map<String, Object>? hintDocument;
+  HintUnion? hint;
 
   @override
   Command $buildCommand() {
@@ -101,10 +100,7 @@ class AggregateOperation extends CommandOperation {
       keyPipeline: pipeline,
       if (explain) keyExplain: explain,
       keyCursor: cursor,
-      if (hint != null)
-        keyHint: hint!
-      else if (hintDocument != null)
-        keyHint: hintDocument!,
+      if (hint != null && !hint!.isNull) keyHint: hint!.value
     };
   }
 

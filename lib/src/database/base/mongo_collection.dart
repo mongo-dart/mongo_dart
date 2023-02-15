@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/utils/hint_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import '../../command/query_and_write_operation_commands/update_operation/base/update_union.dart';
 import '../../session/client_session.dart';
@@ -65,26 +66,15 @@ abstract class MongoCollection {
       WriteConcern? writeConcern,
       CollationOptions? collation,
       List<dynamic>? arrayFilters,
-      String? hint,
-      Map<String, Object>? hintDocument});
+      HintUnion? hint});
 
-  // TODO to be ported
+  // TODO to be completed (document, let)
+  // Replace one document into this collection
   Future<WriteResult> replaceOne(filter, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
-      String? hint,
-      Map<String, Object>? hintDocument}) async {
-    var replaceOneOperation = ReplaceOneOperation(
-        this,
-        ReplaceOneStatement(QueryUnion(filter), UpdateUnion(update),
-            upsert: upsert,
-            collation: collation,
-            hint: hint,
-            hintDocument: hintDocument),
-        replaceOneOptions: ReplaceOneOptions(writeConcern: writeConcern));
-    return replaceOneOperation.executeDocument();
-  }
+      HintUnion? hint});
 
   // TODO to be ported
   Future<WriteResult> updateMany(selector, update,
@@ -92,16 +82,14 @@ abstract class MongoCollection {
       WriteConcern? writeConcern,
       CollationOptions? collation,
       List<dynamic>? arrayFilters,
-      String? hint,
-      Map<String, Object>? hintDocument}) async {
+      HintUnion? hint}) async {
     var updateManyOperation = UpdateManyOperation(
         this,
         UpdateManyStatement(QueryUnion(selector), UpdateUnion(update),
             upsert: upsert,
             collation: collation,
             arrayFilters: arrayFilters,
-            hint: hint,
-            hintDocument: hintDocument),
+            hint: hint),
         updateManyOptions: UpdateManyOptions(writeConcern: writeConcern));
     return updateManyOperation.executeDocument();
   }
@@ -522,12 +510,11 @@ abstract class MongoCollection {
   Future<WriteResult> deleteOne(selector,
       {WriteConcern? writeConcern,
       CollationOptions? collation,
-      String? hint,
-      Map<String, Object>? hintDocument}) async {
+      HintUnion? hint}) async {
     var deleteOperation = DeleteOneOperation(
         this,
         DeleteOneStatement(selectorBuilder2Map(selector),
-            collation: collation, hint: hint, hintDocument: hintDocument),
+            collation: collation, hint: hint),
         deleteOneOptions: DeleteOneOptions(writeConcern: writeConcern));
     return deleteOperation.executeDocument();
   }
@@ -535,12 +522,11 @@ abstract class MongoCollection {
   Future<WriteResult> deleteMany(selector,
       {WriteConcern? writeConcern,
       CollationOptions? collation,
-      String? hint,
-      Map<String, Object>? hintDocument}) async {
+      HintUnion? hint}) async {
     var deleteOperation = DeleteManyOperation(
         this,
         DeleteManyStatement(selectorBuilder2Map(selector),
-            collation: collation, hint: hint, hintDocument: hintDocument),
+            collation: collation, hint: hint),
         deleteManyOptions: DeleteManyOptions(writeConcern: writeConcern));
     return deleteOperation.executeDocument(db.server);
   }
@@ -552,8 +538,7 @@ abstract class MongoCollection {
       WriteConcern? writeConcern,
       CollationOptions? collation,
       List<dynamic>? arrayFilters,
-      String? hint,
-      Map<String, Object>? hintDocument}) async {
+      HintUnion? hint}) async {
     var updateOperation = UpdateOperation(
         this,
         [
@@ -562,8 +547,7 @@ abstract class MongoCollection {
               multi: multi,
               collation: collation,
               arrayFilters: arrayFilters,
-              hint: hint,
-              hintDocument: hintDocument)
+              hint: hint)
         ],
         updateOptions: UpdateOptions(writeConcern: writeConcern));
     return updateOperation.process();
@@ -578,8 +562,7 @@ abstract class MongoCollection {
       fields,
       bool? upsert,
       List? arrayFilters,
-      String? hint,
-      Map<String, Object>? hintDocument,
+      HintUnion? hint,
       FindAndModifyOptions? findAndModifyOptions,
       Map<String, Object>? rawOptions}) async {
     Map<String, Object>? sortMap;
@@ -603,7 +586,6 @@ abstract class MongoCollection {
         upsert: upsert,
         arrayFilters: arrayFilters,
         hint: hint,
-        hintDocument: hintDocument,
         findAndModifyOptions: findAndModifyOptions,
         rawOptions: rawOptions);
     return famOperation.executeDocument();
@@ -615,8 +597,7 @@ abstract class MongoCollection {
       Map<String, dynamic>? filter,
       Map<String, Object>? sort,
       Map<String, Object>? projection,
-      String? hint,
-      Map<String, Object>? hintDocument,
+      HintUnion? hint,
       int? skip,
       int? limit,
       FindOptions? findOptions,
@@ -632,7 +613,6 @@ abstract class MongoCollection {
         sort: sortMap,
         projection: projection ?? selector?.paramFields,
         hint: hint,
-        hintDocument: hintDocument,
         limit: limit ?? selector?.paramLimit,
         skip: skip ??
             (selector != null && selector.paramSkip > 0
@@ -661,8 +641,7 @@ abstract class MongoCollection {
       Map<String, dynamic>? filter,
       Map<String, Object>? sort,
       Map<String, Object>? projection,
-      String? hint,
-      Map<String, Object>? hintDocument,
+      HintUnion? hint,
       int? skip,
       FindOptions? findOptions,
       Map<String, Object>? rawOptions}) async {
@@ -676,7 +655,6 @@ abstract class MongoCollection {
         sort: sortMap,
         projection: projection ?? selector?.paramFields,
         hint: hint,
-        hintDocument: hintDocument,
         limit: 1,
         skip: skip ??
             (selector != null && selector.paramSkip > 0
@@ -729,15 +707,13 @@ abstract class MongoCollection {
   Stream<Map<String, dynamic>> modernAggregate(dynamic pipeline,
           {bool? explain,
           Map<String, Object>? cursor,
-          String? hint,
-          Map<String, Object>? hintDocument,
+          HintUnion? hint,
           AggregateOptions? aggregateOptions,
           Map<String, Object>? rawOptions}) =>
       modernAggregateCursor(pipeline,
               explain: explain,
               cursor: cursor,
               hint: hint,
-              hintDocument: hintDocument,
               aggregateOptions: aggregateOptions,
               rawOptions: rawOptions)
           .stream;
@@ -753,8 +729,7 @@ abstract class MongoCollection {
   ModernCursor modernAggregateCursor(dynamic pipeline,
       {bool? explain,
       Map<String, Object>? cursor,
-      String? hint,
-      Map<String, Object>? hintDocument,
+      HintUnion? hint,
       AggregateOptions? aggregateOptions,
       Map<String, Object>? rawOptions}) {
     return ModernCursor(
@@ -763,7 +738,6 @@ abstract class MongoCollection {
             explain: explain,
             cursor: cursor,
             hint: hint,
-            hintDocument: hintDocument,
             aggregateOptions: aggregateOptions,
             rawOptions: rawOptions),
         db.server);
@@ -771,29 +745,25 @@ abstract class MongoCollection {
 
   Stream watch(Object pipeline,
           {int? batchSize,
-          String? hint,
-          Map<String, Object>? hintDocument,
+          HintUnion? hint,
           ChangeStreamOptions? changeStreamOptions,
           Map<String, Object>? rawOptions}) =>
       watchCursor(pipeline,
               batchSize: batchSize,
               hint: hint,
-              hintDocument: hintDocument,
               changeStreamOptions: changeStreamOptions,
               rawOptions: rawOptions)
           .changeStream;
 
   ModernCursor watchCursor(Object pipeline,
           {int? batchSize,
-          String? hint,
-          Map<String, Object>? hintDocument,
+          HintUnion? hint,
           ChangeStreamOptions? changeStreamOptions,
           Map<String, Object>? rawOptions}) =>
       ModernCursor(
           ChangeStreamOperation(pipeline,
               collection: this,
               hint: hint,
-              hintDocument: hintDocument,
               changeStreamOptions: changeStreamOptions,
               rawOptions: rawOptions),
           db.server);
@@ -867,8 +837,7 @@ abstract class MongoCollection {
       int? limit,
       int? skip,
       CollationOptions? collation,
-      String? hint,
-      Map<String, Object>? hintDocument,
+      HintUnion? hint,
       CountOptions? countOptions,
       Map<String, Object>? rawOptions}) async {
     var countOperation = CountOperation(this,
@@ -877,7 +846,6 @@ abstract class MongoCollection {
         skip: skip,
         limit: limit,
         hint: hint,
-        hintDocument: hintDocument,
         countOptions: countOptions,
         rawOptions: rawOptions);
     return countOperation.executeDocument(db.server);

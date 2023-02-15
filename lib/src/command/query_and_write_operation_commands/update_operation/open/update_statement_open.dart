@@ -6,7 +6,6 @@ class UpdateStatementOpen extends UpdateStatement {
       super.multi,
       super.collation,
       super.arrayFilters,
-      super.hint,
-      super.hintDocument})
+      super.hint})
       : super.protected();
 }

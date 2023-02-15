@@ -1,6 +1,7 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 
+import '../../../../utils/hint_union.dart';
 import '../../../../utils/query_union.dart';
 import '../open/update_statement_open.dart';
 import '../v1/update_statement_v1.dart';
@@ -9,12 +10,7 @@ import 'update_union.dart';
 
 class UpdateStatement {
   UpdateStatement.protected(QueryUnion q, UpdateUnion u,
-      {bool? upsert,
-      bool? multi,
-      this.collation,
-      this.arrayFilters,
-      this.hint,
-      this.hintDocument})
+      {bool? upsert, bool? multi, this.collation, this.arrayFilters, this.hint})
       : q = q.query,
         u = u.specs,
         upsert = upsert ?? false,
@@ -31,24 +27,21 @@ class UpdateStatement {
       bool? multi,
       CollationOptions? collation,
       List? arrayFilters,
-      String? hint,
-      Map<String, Object>? hintDocument}) {
+      HintUnion? hint}) {
     if (serverApi != null && serverApi.version == ServerApiVersion.v1) {
       return UpdateStatementV1(q, u,
           upsert: upsert,
           multi: multi,
           collation: collation,
           arrayFilters: arrayFilters,
-          hint: hint,
-          hintDocument: hintDocument);
+          hint: hint);
     }
     return UpdateStatementOpen(q, u,
         upsert: upsert,
         multi: multi,
         collation: collation,
         arrayFilters: arrayFilters,
-        hint: hint,
-        hintDocument: hintDocument);
+        hint: hint);
   }
 
   /// The query that matches documents to update.
@@ -161,8 +154,7 @@ class UpdateStatement {
   /// We define two fields, if set, one exclude the other.
   ///
   /// New in 4.4
-  String? hint;
-  Map<String, Object>? hintDocument;
+  HintUnion? hint;
 
   UpdateStatementOpen get toOpen => this is UpdateStatementOpen
       ? this as UpdateStatementOpen
@@ -171,8 +163,7 @@ class UpdateStatement {
           multi: multi,
           collation: collation,
           arrayFilters: arrayFilters,
-          hint: hint,
-          hintDocument: hintDocument);
+          hint: hint);
 
   UpdateStatementV1 get toV1 => this is UpdateStatementV1
       ? this as UpdateStatementV1
@@ -181,8 +172,7 @@ class UpdateStatement {
           multi: multi,
           collation: collation,
           arrayFilters: arrayFilters,
-          hint: hint,
-          hintDocument: hintDocument);
+          hint: hint);
 
   Options toMap() => <String, dynamic>{
         keyQ: q,
@@ -191,9 +181,6 @@ class UpdateStatement {
         if (multi) keyMulti: multi,
         if (collation != null) keyCollation: collation!.options,
         if (arrayFilters != null) keyArrayFilters: arrayFilters!,
-        if (hint != null)
-          keyHint: hint!
-        else if (hintDocument != null)
-          keyHint: hintDocument!,
+        if (hint != null && !hint!.isNull) keyHint: hint!.value
       };
 }

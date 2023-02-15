@@ -15,7 +15,7 @@ const bulkUpsert = 'upsert';
 const bulkCollation = 'collation';
 const bulkArrayFilters = 'arrayFilters';
 const bulkHint = 'hint';
-const bulkHintDocument = 'hintDocument';
+//const bulkHintDocument = 'hintDocument';
 const bulkReplacement = 'replacement';
 
 const keyAbortTransaction = 'abortTransaction';
