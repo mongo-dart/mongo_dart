@@ -73,7 +73,7 @@ void main() async {
           var value = values[idx];
           var update = (value['a'] as Decimal) + ra;
           //print(update);
-          await collection.update(<String, dynamic>{
+          await collection.updateOne(<String, dynamic>{
             '_id': value['_id']
           }, <String, dynamic>{
             r'$set': {'r': update}
@@ -87,7 +87,7 @@ void main() async {
         await collection.insertOne(
             <String, dynamic>{'value': Decimal.fromInt(3), 'qty': 4});
 
-        await collection.update(<String, dynamic>{}, <String, dynamic>{
+        await collection.updateOne(<String, dynamic>{}, <String, dynamic>{
           r'$mul': {'value': Decimal.fromInt(5), 'qty': 5}
         });
 
@@ -97,7 +97,7 @@ void main() async {
         expect(values.first['value'], Decimal.fromInt(15));
         expect(values.first['qty'], 20);
 
-        await collection.update(where,
+        await collection.updateOne(where,
             ModifierBuilder().mul('value', Decimal.fromInt(5)).mul('qty', 2));
         values = await collection.find().toList();
 
@@ -117,7 +117,7 @@ void main() async {
           ..inc('value', Decimal.fromInt(2))
           ..inc('qty', 3);
 
-        await collection.update(<String, dynamic>{}, mody.map);
+        await collection.updateOne(<String, dynamic>{}, mody.map);
 
         var values = await collection.find(<String, dynamic>{}).toList();
 

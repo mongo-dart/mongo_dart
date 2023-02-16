@@ -644,7 +644,7 @@ void main() async {
             })),
             updateOneOptions: UpdateOneOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await updateOneOperation.executeDocument();
+        var (res, _) = await updateOneOperation.executeDocument();
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -879,7 +879,7 @@ void main() async {
             r'$set': {'status': 'Updated'},
           }), collation: CollationOptions('fr', strength: 1)),
         );
-        var res = await updateOneOperation.executeDocument();
+        var (res, _) = await updateOneOperation.executeDocument();
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -1033,14 +1033,14 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.modernUpdate(where.eq('member', 'abc123'),
+        var (res, _) = await collection.updateOne(where.eq('member', 'abc123'),
             ModifierBuilder().set('status', 'A').inc('points', 1),
             writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
-        expect(res[keyOk], 1.0);
-        expect(res[keyN], 1);
-        expect(res[keyNModified], 1);
+        expect(res.isSuccess, isTrue);
+        expect(res.nMatched, 1);
+        expect(res.nModified, 1);
 
         var elements =
             await collection.find(where.eq('member', 'abc123')).toList();
@@ -1074,14 +1074,14 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.modernUpdate(where.eq('member', 'abc123'),
+        var (res, _) = await collection.updateOne(where.eq('member', 'abc123'),
             ModifierBuilder().set('status', 'A').inc('points', 1),
             writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
-        expect(res[keyOk], 1.0);
-        expect(res[keyN], 1);
-        expect(res[keyNModified], 1);
+        expect(res.isSuccess, isTrue);
+        expect(res.nMatched, 1);
+        expect(res.nModified, 1);
 
         var elements =
             await collection.find(where.eq('member', 'abc123')).toList();
@@ -1115,15 +1115,14 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.modernUpdate(
+        var res = await collection.updateMany(
             where, ModifierBuilder().set('status', 'A').inc('points', 1),
-            multi: true,
             writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
-        expect(res[keyOk], 1.0);
-        expect(res[keyN], 2);
-        expect(res[keyNModified], 2);
+        expect(res.isSuccess,isTrue);
+        expect(res.nMatched, 2);
+        expect(res.nModified, 2);
 
         var elements = await collection.find(where).toList();
 
@@ -1161,7 +1160,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.modernUpdate(
+        var res = await collection.updateMany(
             null,
             (AggregationPipelineBuilder()
                   ..addStage(SetStage({
@@ -1170,13 +1169,12 @@ void main() async {
                   }))
                   ..addStage(Unset(['misc1', 'misc2'])))
                 .build(),
-            multi: true,
             writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
-        expect(res[keyOk], 1.0);
-        expect(res[keyN], 2);
-        expect(res[keyNModified], 2);
+        expect(res.isSuccess, isTrue);
+        expect(res.nMatched, 2);
+        expect(res.nModified, 2);
 
         var elements = await collection.find(where).toList();
 
@@ -1211,7 +1209,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.modernUpdate(
+        var res = await collection.updateMany(
             null,
             (AggregationPipelineBuilder()
                   ..addStage(SetStage({
@@ -1251,13 +1249,12 @@ void main() async {
                     }
                   })))
                 .build(),
-            multi: true,
             writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
-        expect(res[keyOk], 1.0);
-        expect(res[keyN], 3);
-        expect(res[keyNModified], 3);
+        expect(res.isSuccess, isTrue);
+        expect(res.nMatched, 3);
+        expect(res.nModified, 3);
 
         var elements = await collection.find(where).toList();
 
@@ -1277,15 +1274,15 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.modernUpdate(
+        var (res, _) = await collection.updateOne(
             where.eq('category', 'cafe').eq('status', 'a'),
             ModifierBuilder().set('status', 'Updated'),
             collation: CollationOptions('fr', strength: 1));
 
         expect(res, isNotNull);
-        expect(res[keyOk], 1.0);
-        expect(res[keyN], 1);
-        expect(res[keyNModified], 1);
+        expect(res.isSuccess, 1.0);
+        expect(res.nMatched, 1);
+        expect(res.nModified, 1);
 
         var elements =
             await collection.find(where.eq('status', 'Updated')).toList();
@@ -1317,19 +1314,18 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.modernUpdate(where.gte('grades', 100),
+        var res = await collection.updateMany(where.gte('grades', 100),
             ModifierBuilder().set(r'grades.$[element]', 100),
             arrayFilters: [
               {
                 'element': {r'$gte': 100}
               }
-            ],
-            multi: true);
+            ]);
 
         expect(res, isNotNull);
-        expect(res[keyOk], 1.0);
-        expect(res[keyN], 2);
-        expect(res[keyNModified], 2);
+        expect(res.isSuccess,isTrue);
+        expect(res.nMatched, 2);
+        expect(res.nModified, 2);
 
         var elements = await collection.find(where).toList();
 
@@ -1364,19 +1360,18 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.modernUpdate(
+        var res = await collection.updateMany(
             where, ModifierBuilder().set(r'grades.$[element].mean', 100),
             arrayFilters: [
               {
                 'element.grade': {r'$gte': 85}
               }
-            ],
-            multi: true);
+            ]);
 
         expect(res, isNotNull);
-        expect(res[keyOk], 1.0);
-        expect(res[keyN], 2);
-        expect(res[keyNModified], 2);
+        expect(res.isSuccess, isTrue);
+        expect(res.nMatched, 2);
+        expect(res.nModified, 2);
 
         var elements = await collection.find(where).toList();
 
@@ -1399,16 +1394,15 @@ void main() async {
         await collection.createIndex(keys: {'status': 1});
         await collection.createIndex(key: 'points');
 
-        var res = await collection.modernUpdate(
+        var res = await collection.updateMany(
             where.lte('points', 20).eq('status', 'P'),
             ModifierBuilder().set('misc1', 'Need to activate'),
-            hint: HintUnion(<String, Object>{'status': 1}),
-            multi: true);
+            hint: HintUnion(<String, Object>{'status': 1}));
 
         expect(res, isNotNull);
-        expect(res[keyOk], 1.0);
-        expect(res[keyN], 3);
-        expect(res[keyNModified], 3);
+        expect(res.isSuccess, isTrue);
+        expect(res.nMatched, 3);
+        expect(res.nModified, 3);
 
         var elements = await collection.find(where.eq('status', 'P')).toList();
 
@@ -1445,7 +1439,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateOne(where.eq('member', 'abc123'),
+        var (res, _) = await collection.updateOne(where.eq('member', 'abc123'),
             ModifierBuilder().set('status', 'A').inc('points', 1),
             writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
@@ -1804,7 +1798,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateOne(
+        var (res, _) = await collection.updateOne(
             where.eq('category', 'cafe').eq('status', 'a'),
             ModifierBuilder().set('status', 'Updated'),
             collation: CollationOptions('fr', strength: 1));

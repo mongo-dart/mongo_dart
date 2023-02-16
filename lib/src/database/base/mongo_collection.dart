@@ -2,10 +2,8 @@ import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/utils/hint_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
-import '../../command/query_and_write_operation_commands/update_operation/base/update_union.dart';
 import '../../session/client_session.dart';
 import '../../utils/parms_utils.dart';
-import '../../utils/query_union.dart';
 import '../modern_cursor.dart';
 
 abstract class MongoCollection {
@@ -61,7 +59,7 @@ abstract class MongoCollection {
 
   // TODO to be completed (document, let)
   // Update one document into this collection
-  Future<WriteResult> updateOne(filter, update,
+  Future<UpdateOneDocumentRec> updateOne(filter, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -76,23 +74,14 @@ abstract class MongoCollection {
       CollationOptions? collation,
       HintUnion? hint});
 
-  // TODO to be ported
+  // TODO to be completed (document, let)?
+  // Updates many documents into this collection
   Future<WriteResult> updateMany(selector, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
       List<dynamic>? arrayFilters,
-      HintUnion? hint}) async {
-    var updateManyOperation = UpdateManyOperation(
-        this,
-        UpdateManyStatement(QueryUnion(selector), UpdateUnion(update),
-            upsert: upsert,
-            collation: collation,
-            arrayFilters: arrayFilters,
-            hint: hint),
-        updateManyOptions: UpdateManyOptions(writeConcern: writeConcern));
-    return updateManyOperation.executeDocument();
-  }
+      HintUnion? hint});
 
   // TODO missing findOneAndUpdate()
   // TODO mising findOneAndReplace()
@@ -146,7 +135,7 @@ abstract class MongoCollection {
   /// By default, the `update()` method updates a single document.
   /// Include the option multiUpdate: true to update all documents that match
   /// the query criteria.
-  Future<Map<String, dynamic>> update(selector, document,
+  /* Future<Map<String, dynamic>> update(selector, document,
       {bool upsert = false,
       bool multiUpdate = false,
       WriteConcern? writeConcern}) async {
@@ -154,16 +143,16 @@ abstract class MongoCollection {
         upsert: upsert, multi: multiUpdate, writeConcern: writeConcern);
     // Todo change return type
     return {keyOk: 1.0};
-  }
+  } */
 
   // Old version to be used on MongoDb versions prior to 3.6
-  @Deprecated('No More Used')
+  /*  @Deprecated('No More Used')
   Future<Map<String, dynamic>> legacyUpdate(selector, document,
       {bool upsert = false,
       bool multiUpdate = false,
       WriteConcern? writeConcern}) {
     throw MongoDartError('No More Used');
-  }
+  } */
 
   /// Creates a cursor for a query that can be used to iterate over results
   /// from MongoDB
@@ -530,7 +519,7 @@ abstract class MongoCollection {
         deleteManyOptions: DeleteManyOptions(writeConcern: writeConcern));
     return deleteOperation.executeDocument(db.server);
   }
-
+/* 
   Future<Map<String, dynamic>> modernUpdate(selector, update,
       {ClientSession? session,
       bool? upsert,
@@ -551,7 +540,7 @@ abstract class MongoCollection {
         ],
         updateOptions: UpdateOptions(writeConcern: writeConcern));
     return updateOperation.process();
-  }
+  } */
 
   Future<FindAndModifyResult> modernFindAndModify(
       {query,

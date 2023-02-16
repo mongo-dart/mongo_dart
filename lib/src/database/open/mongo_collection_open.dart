@@ -31,7 +31,7 @@ class MongoCollectionOpen extends MongoCollection {
 
   // Update one document into this collection
   @override
-  Future<WriteResult> updateOne(filter, update,
+  Future<UpdateOneDocumentRec> updateOne(filter, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -60,5 +60,23 @@ class MongoCollectionOpen extends MongoCollection {
             upsert: upsert, collation: collation, hint: hint),
         replaceOneOptions: ReplaceOneOptions(writeConcern: writeConcern));
     return replaceOneOperation.executeDocument();
+  }
+
+  @override
+  Future<WriteResult> updateMany(selector, update,
+      {bool? upsert,
+      WriteConcern? writeConcern,
+      CollationOptions? collation,
+      List<dynamic>? arrayFilters,
+      HintUnion? hint}) async {
+    var updateManyOperation = UpdateManyOperation(
+        this,
+        UpdateManyStatement(QueryUnion(selector), UpdateUnion(update),
+            upsert: upsert,
+            collation: collation,
+            arrayFilters: arrayFilters,
+            hint: hint),
+        updateManyOptions: UpdateManyOptions(writeConcern: writeConcern));
+    return updateManyOperation.executeDocument();
   }
 }

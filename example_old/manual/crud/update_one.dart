@@ -40,7 +40,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.updateOne(where.eq('member', 'abc123'),
+  var (res, _) = await collection.updateOne(where.eq('member', 'abc123'),
       ModifierBuilder().set('status', 'A').inc('points', 1),
       writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 

@@ -767,7 +767,7 @@ Future testUpdateWithUpsert() async {
   var objectUpdate = {
     r'$set': {'value': 20}
   };
-  var resultUpdate = await collection.updateOne({'name': 'a'}, objectUpdate);
+  var (resultUpdate, _) = await collection.updateOne({'name': 'a'}, objectUpdate);
   expect(resultUpdate.isSuccess, true);
   expect(resultUpdate.nModified, 1);
 
@@ -792,7 +792,7 @@ Future testUpdateWithMultiUpdate() async {
   expect(results.first['key'], 'a');
   expect(results.first['value'], 'initial_value1');
 
-  var resultUpd = await collection.updateOne(where.eq('key', 'a'),
+  var (resultUpd, _) = await collection.updateOne(where.eq('key', 'a'),
       modify.set('value', 'value_modified_for_only_one_with_default'));
   expect(resultUpd.isSuccess, true);
   expect(resultUpd.nModified, 1);
@@ -801,7 +801,7 @@ Future testUpdateWithMultiUpdate() async {
       .find({'value': 'value_modified_for_only_one_with_default'}).toList();
   expect(results.length, 1);
 
-  resultUpd = await collection.updateOne(
+  (resultUpd, _)  = await collection.updateOne(
     where.eq('key', 'a'),
     modify.set('value', 'value_modified_for_only_one_with_multiupdate_false'),
   );
@@ -1363,7 +1363,7 @@ Future testSafeModeUpdate() async {
   }
 
   if (db.server.serverCapabilities.supportsOpMsg) {
-    var result = await collection.updateOne({
+    var (result, _)  = await collection.updateOne({
       'a': 200
     }, {
       r'$set': {'a': 100}
@@ -1372,7 +1372,7 @@ Future testSafeModeUpdate() async {
     expect(result.nModified, 0);
     expect(result.nMatched, 0);
 
-    result = await collection.updateOne({
+    (result, _) = await collection.updateOne({
       'a': 3
     }, {
       r'$set': {'a': 100}
@@ -1382,13 +1382,13 @@ Future testSafeModeUpdate() async {
     expect(result.nMatched, 1);
     return;
   }
-  var result = await collection.update({'a': 200}, {'a': 100});
-  expect(result['updatedExisting'], false);
-  expect(result['n'], 0);
+  var (result, _) = await collection.updateOne({'a': 200}, {'a': 100});
+  expect(result.nModified, 0);
+  expect(result.nMatched, 0);
 
-  result = await collection.update({'a': 3}, {'a': 100});
-  expect(result['updatedExisting'], true);
-  expect(result['n'], 1);
+  (result, _) = await collection.updateOne({'a': 3}, {'a': 100});
+  expect(result.nModified, 1);
+  expect(result.nMatched, 1);
 }
 
 Future testFindWithFieldsClause() async {
@@ -1549,14 +1549,14 @@ Future testFieldLevelUpdateSimple() async {
 
   id = result?['_id'] as ObjectId;
   if (db.server.serverCapabilities.supportsOpMsg) {
-    var writeResult =
+    var (writeResult, _) =
         await collection.updateOne(where.id(id), modify.set('name', 'BBB'));
     expect(writeResult.isSuccess, true);
     expect(writeResult.nModified, 1);
   } else {
-    result = await collection.update(where.id(id), modify.set('name', 'BBB'));
-    expect(result['updatedExisting'], true);
-    expect(result['n'], 1);
+    var (res, _) = await collection.updateOne(where.id(id), modify.set('name', 'BBB'));
+    expect(res.nModified, 1);
+    expect(res.nMatched, 1);
   }
 
   result = await collection.findOne(where.id(id));
