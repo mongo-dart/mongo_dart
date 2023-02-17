@@ -37,7 +37,7 @@ class BulkWriteResult extends AbstractWriteResult {
     if (this.writeCommandType != writeCommandType) {
       this.writeCommandType = null;
     }
-    serverResponses.add(result);
+    //serverResponses.add(result);
     if (result[keyOk] == 0.0) {
       ok = result[keyOk] as double;
     }

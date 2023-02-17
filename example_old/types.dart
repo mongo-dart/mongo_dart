@@ -6,7 +6,7 @@ void main() async {
   await client.connect();
   var db = client.db();
   var collection = db.collection('test-types');
-  await collection.remove({});
+  await collection.deleteMany({});
   await collection.insertOne({
     'array': [1, 2, 3],
     'string': 'hello',

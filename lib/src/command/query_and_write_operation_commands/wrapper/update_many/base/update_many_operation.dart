@@ -5,6 +5,8 @@ import '../../../../../session/client_session.dart';
 import '../open/update_many_operation_open.dart';
 import '../v1/update_many_operation_v1.dart';
 
+typedef UpdateManyDocumentRec = (WriteResult writeResult, MongoDocument serverDocument);
+
 abstract class UpdateManyOperation extends UpdateOperation {
   @protected
   UpdateManyOperation.protected(
@@ -44,6 +46,13 @@ abstract class UpdateManyOperation extends UpdateOperation {
         rawOptions: rawOptions);
   }
 
-  Future<WriteResult> executeDocument() async =>
-      WriteResult.fromMap(WriteCommandType.update, await process());
+ 
+
+       Future<MongoDocument> executeUpdateMany() async => process();    
+      
+  Future<UpdateManyDocumentRec> executeDocument() async {
+    var ret= await executeUpdateMany( );
+    return (WriteResult.fromMap(WriteCommandType.update, ret)
+      , ret);
+  }
 }

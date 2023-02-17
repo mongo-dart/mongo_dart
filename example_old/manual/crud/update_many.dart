@@ -41,7 +41,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.updateMany(
+  var (res, _) = await collection.updateMany(
       where, ModifierBuilder().set('status', 'A').inc('points', 1),
       writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 

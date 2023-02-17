@@ -48,7 +48,7 @@ class MongoCollectionV117 extends MongoCollection {
   }
 
   @override
-  Future<WriteResult> replaceOne(filter, update,
+  Future<ReplaceOneDocumentRec> replaceOne(filter, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -62,7 +62,7 @@ class MongoCollectionV117 extends MongoCollection {
   }
 
   @override
-  Future<WriteResult> updateMany(selector, update,
+  Future<UpdateManyDocumentRec> updateMany(selector, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,

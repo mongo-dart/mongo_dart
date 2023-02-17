@@ -9,8 +9,10 @@ abstract class AbstractWriteResult with BasicResult {
   AbstractWriteResult.fromMap(
       WriteCommandType writeCommandType, Map<String, dynamic> result)
       // ignore: prefer_initializing_formals
-      : writeCommandType = writeCommandType,
-        serverResponses = [result] {
+      : writeCommandType =
+            writeCommandType /* ,
+        serverResponses = [result]  */
+  {
     extractBasic(result);
 
     switch (writeCommandType) {
@@ -37,7 +39,7 @@ abstract class AbstractWriteResult with BasicResult {
   }
 
   /// This is the original response from the server;
-  List<Map<String, dynamic>> serverResponses;
+  //List<Map<String, dynamic>> serverResponses;
 
   /// The command that generated this output;
   WriteCommandType? writeCommandType;

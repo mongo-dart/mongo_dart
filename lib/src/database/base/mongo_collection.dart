@@ -68,7 +68,7 @@ abstract class MongoCollection {
 
   // TODO to be completed (document, let)
   // Replace one document into this collection
-  Future<WriteResult> replaceOne(filter, update,
+  Future<ReplaceOneDocumentRec> replaceOne(filter, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -76,7 +76,7 @@ abstract class MongoCollection {
 
   // TODO to be completed (document, let)?
   // Updates many documents into this collection
-  Future<WriteResult> updateMany(selector, update,
+  Future<UpdateManyDocumentRec> updateMany(selector, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -257,21 +257,21 @@ abstract class MongoCollection {
   // **************************************************
 
   /// Removes documents from a collection.
-  Future<Map<String, dynamic>> remove(selector,
+  /* Future<Map<String, dynamic>> remove(selector,
       {WriteConcern? writeConcern}) async {
     var result = await deleteMany(
       selector,
       writeConcern: writeConcern,
     );
     return result.serverResponses.first;
-  }
+  } */
 
   // Old version to be used on MongoDb versions prior to 3.6
-  @Deprecated('No More Used')
+/*   @Deprecated('No More Used')
   Future<Map<String, dynamic>> legacyRemove(selector,
           {WriteConcern? writeConcern}) =>
       db.removeFromCollection(
-          collectionName, selectorBuilder2Map(selector), writeConcern);
+          collectionName, selectorBuilder2Map(selector), writeConcern); */
 
   // **************************************************
   //                   Count

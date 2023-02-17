@@ -145,7 +145,7 @@ class MongoDatabase {
     return result[keyOk] == 1.0;
   }
 
-  Future<Map<String, dynamic>> removeFromCollection(String collectionName,
+  /*  Future<Map<String, dynamic>> removeFromCollection(String collectionName,
       [Map<String, dynamic> selector = const {},
       WriteConcern? writeConcern]) async {
     var collection = this.collection(collectionName);
@@ -154,7 +154,7 @@ class MongoDatabase {
       writeConcern: writeConcern,
     );
     return result.serverResponses.first;
-  }
+  } */
 
   @Deprecated('No More Used')
   Future<Map<String, dynamic>> getLastError(Server server,

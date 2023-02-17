@@ -36,7 +36,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.updateMany(where.gte('grades', 100),
+  var (res, _) = await collection.updateMany(where.gte('grades', 100),
       ModifierBuilder().set(r'grades.$[element]', 100),
       arrayFilters: [
         {

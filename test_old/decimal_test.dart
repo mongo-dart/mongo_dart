@@ -32,7 +32,7 @@ void main() async {
 
   Future insertManyDocuments(
       MongoCollection collection, int numberOfRecords) async {
-    await collection.remove(<String, dynamic>{});
+    await collection.deleteMany(<String, dynamic>{});
     var toInsert = <Map<String, dynamic>>[];
     for (var n = 0; n < numberOfRecords; n++) {
       toInsert.add({'a': Decimal.fromInt(n)});

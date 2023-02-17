@@ -118,7 +118,9 @@ Future testRemove() async {
   var collectionInfos = await db.getCollectionInfos({'name': collectionName});
   expect(collectionInfos, hasLength(1));
 
-  await db.removeFromCollection(collectionName);
+  var coll =  db.collection(collectionName);
+  await coll.deleteMany({});
+  //await db.removeFromCollection(collectionName);
 
   var allCollectionDocuments = await collection.find().toList();
   expect(allCollectionDocuments, isEmpty);
@@ -812,7 +814,7 @@ Future testUpdateWithMultiUpdate() async {
       {'value': 'value_modified_for_only_one_with_multiupdate_false'}).toList();
   expect(results.length, 1);
 
-  resultUpd = await collection.updateMany(
+  (resultUpd,_ )= await collection.updateMany(
       where.eq('key', 'a'), modify.set('value', 'new_value'));
   expect(resultUpd.isSuccess, true);
   expect(resultUpd.nModified, 2);
@@ -1502,7 +1504,7 @@ Future testSimpleQuery() async {
   expect(result2, isNotNull);
   expect(result2?['my_field'], 3);
 
-  await collection.remove(where.id(id));
+  await collection.deleteOne(where.id(id));
   var result3 = await collection.findOne(where.eq('my_field', 3));
   expect(result3, isNull);
 }

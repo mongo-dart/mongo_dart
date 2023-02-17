@@ -40,7 +40,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.updateMany(
+  var (res, _) = await collection.updateMany(
       null,
       (AggregationPipelineBuilder()
             ..addStage(SetStage({

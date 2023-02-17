@@ -6,7 +6,7 @@ void main() async {
   await client.connect();
   var db = client.db();
   var collection = db.collection('test-utf8');
-  await collection.remove({});
+  await collection.deleteMany({});
   await collection.insertOne({
     'Имя': 'Вадим',
     'Фамилия': 'Цушко',

@@ -40,7 +40,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.replaceOne(
+  var (res, _) = await collection.replaceOne(
       where.eq('member', 'abc123'),
       {
         '_id': 1,

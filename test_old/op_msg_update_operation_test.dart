@@ -687,7 +687,7 @@ void main() async {
                 })),
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await updateManyOperation.executeDocument();
+        var (res, _) = await updateManyOperation.executeDocument();
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -775,7 +775,7 @@ void main() async {
             ordered: false,
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await updateManyOperation.executeDocument();
+        var (res, _) = await updateManyOperation.executeDocument();
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -854,7 +854,7 @@ void main() async {
             ordered: false,
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await updateManyOperation.executeDocument();
+        var (res, _) = await updateManyOperation.executeDocument();
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -920,7 +920,7 @@ void main() async {
             }
           ]),
         );
-        var res = await updateManyOperation.executeDocument();
+        var (res, _) = await updateManyOperation.executeDocument();
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -966,7 +966,7 @@ void main() async {
                 }
               ]),
         );
-        var res = await updateManyOperation.executeDocument();
+        var (res, _) = await updateManyOperation.executeDocument();
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -998,7 +998,7 @@ void main() async {
             'status': 1
           })),
         );
-        var res = await updateManyOperation.executeDocument();
+        var (res, _) = await updateManyOperation.executeDocument();
 
         expect(res, isNotNull);
         expect(res.ok, 1.0);
@@ -1115,7 +1115,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateMany(
+        var (res, _) = await collection.updateMany(
             where, ModifierBuilder().set('status', 'A').inc('points', 1),
             writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
@@ -1160,7 +1160,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateMany(
+        var (res, _) = await collection.updateMany(
             null,
             (AggregationPipelineBuilder()
                   ..addStage(SetStage({
@@ -1209,7 +1209,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateMany(
+        var (res, _) = await collection.updateMany(
             null,
             (AggregationPipelineBuilder()
                   ..addStage(SetStage({
@@ -1314,7 +1314,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateMany(where.gte('grades', 100),
+        var (res, _) = await collection.updateMany(where.gte('grades', 100),
             ModifierBuilder().set(r'grades.$[element]', 100),
             arrayFilters: [
               {
@@ -1360,7 +1360,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateMany(
+        var (res, _) = await collection.updateMany(
             where, ModifierBuilder().set(r'grades.$[element].mean', 100),
             arrayFilters: [
               {
@@ -1394,7 +1394,7 @@ void main() async {
         await collection.createIndex(keys: {'status': 1});
         await collection.createIndex(key: 'points');
 
-        var res = await collection.updateMany(
+        var (res, _) = await collection.updateMany(
             where.lte('points', 20).eq('status', 'P'),
             ModifierBuilder().set('misc1', 'Need to activate'),
             hint: HintUnion(<String, Object>{'status': 1}));
@@ -1511,7 +1511,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateMany(
+        var (res, _) = await collection.updateMany(
             where, ModifierBuilder().set('status', 'A').inc('points', 1),
             writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
@@ -1553,7 +1553,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateMany(
+        var (res, _) = await collection.updateMany(
             where,
             {
               'member': 'delete_this',
@@ -1605,7 +1605,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.replaceOne(
+        var (res,_ )= await collection.replaceOne(
             where.eq('name', 'Central Perk Cafe'), <String, Object>{
           'name': 'Central Park Cafe',
           'Borough': 'Manhattan'
@@ -1684,7 +1684,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateMany(
+        var (res, _) = await collection.updateMany(
             null,
             (AggregationPipelineBuilder()
                   ..addStage(SetStage({
@@ -1733,7 +1733,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateMany(
+        var (res, _) = await collection.updateMany(
             null,
             (AggregationPipelineBuilder()
                   ..addStage(SetStage({
@@ -1838,7 +1838,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateMany(where.gte('grades', 100),
+        var (res, _) = await collection.updateMany(where.gte('grades', 100),
             ModifierBuilder().set(r'grades.$[element]', 100),
             arrayFilters: [
               {
@@ -1884,7 +1884,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.updateMany(
+        var (res, _) = await collection.updateMany(
             where, ModifierBuilder().set(r'grades.$[element].mean', 100),
             arrayFilters: [
               {
@@ -1918,7 +1918,7 @@ void main() async {
         await collection.createIndex(keys: {'status': 1});
         await collection.createIndex(key: 'points');
 
-        var res = await collection.updateMany(
+        var (res, _) = await collection.updateMany(
             where.lte('points', 20).eq('status', 'P'),
             ModifierBuilder().set('misc1', 'Need to activate'),
             hint: HintUnion(<String, Object>{'status': 1}));

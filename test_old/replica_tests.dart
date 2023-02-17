@@ -20,7 +20,7 @@ Future testCollectionInfoCursor() async {
   final db = client.db();
 
   newColl = db.collection('new_collecion');
-  await newColl.remove({});
+  await newColl.deleteMany({});
 
   await newColl.insertMany([
     {'a': 1}

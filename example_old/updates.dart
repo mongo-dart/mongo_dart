@@ -7,7 +7,7 @@ void main() async {
   var db = client.db();
   ///// Simple update
   var coll = db.collection('collection-for-save');
-  await coll.remove({});
+  await coll.deleteMany({});
   var toInsert = <Map<String, dynamic>>[
     {'name': 'a', 'value': 10},
     {'name': 'b', 'value': 20},
@@ -29,7 +29,7 @@ void main() async {
 
   /////// Field level update
   coll = db.collection('collection-for-save');
-  await coll.remove({});
+  await coll.deleteMany({});
   toInsert = <Map<String, dynamic>>[
     {'name': 'a', 'value': 10},
     {'name': 'b', 'value': 20},
@@ -46,7 +46,7 @@ void main() async {
   //// Field level increment
 
   coll = db.collection('collection-for-save');
-  await coll.remove({});
+  await coll.deleteMany({});
   toInsert = <Map<String, dynamic>>[
     {'name': 'a', 'value': 10},
     {'name': 'b', 'value': 20},

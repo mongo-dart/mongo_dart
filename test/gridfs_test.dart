@@ -46,8 +46,8 @@ class MockConsumer implements StreamConsumer<List<int>> {
 }
 
 void clearFSCollections(GridFS gridFS) {
-  gridFS.files.remove(<String, dynamic>{});
-  gridFS.chunks.remove(<String, dynamic>{});
+  gridFS.files.deleteMany(<String, dynamic>{});
+  gridFS.chunks.deleteMany(<String, dynamic>{});
 }
 
 Future testSmall() async {

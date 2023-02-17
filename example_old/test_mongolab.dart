@@ -15,7 +15,7 @@ void main() async {
 
   await db.authenticate('test', 'test', db.server);
   var collection = db.collection('testAuthenticationWithUri');
-  await collection.remove({});
+  await collection.deleteMany({});
   await collection.insertOne({'a': 1});
   await collection.insertOne({'a': 2});
   await collection.insertOne({'a': 3});
