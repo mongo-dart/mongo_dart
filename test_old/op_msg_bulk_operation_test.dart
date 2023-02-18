@@ -270,10 +270,10 @@ void main() async {
 
         var bulk = UnorderedBulk(collection,
             writeConcern: WriteConcern(w: primaryAcknowledged));
-        bulk.deleteMany(DeleteManyStatement({'status': 'D'}));
+        bulk.deleteMany(DeleteManyStatement(QueryUnion({'status': 'D'})));
 
         bulk.deleteOne(DeleteOneStatement(
-            {'cust_num': 99999, 'item': 'abc123', 'status': 'A'}));
+            QueryUnion({'cust_num': 99999, 'item': 'abc123', 'status': 'A'})));
 
         var ret = await bulk.executeDocument(db.server);
 
@@ -346,10 +346,10 @@ void main() async {
 
         var bulk = OrderedBulk(collection,
             writeConcern: WriteConcern(w: primaryAcknowledged));
-        bulk.deleteMany(DeleteManyStatement({'status': 'D'}));
+        bulk.deleteMany(DeleteManyStatement(QueryUnion({'status': 'D'})));
 
         bulk.deleteOne(DeleteOneStatement(
-            {'cust_num': 99999, 'item': 'abc123', 'status': 'A'}));
+            QueryUnion({'cust_num': 99999, 'item': 'abc123', 'status': 'A'})));
 
         var ret = await bulk.executeDocument(db.server);
 
@@ -529,13 +529,13 @@ void main() async {
 
         var bulk = OrderedBulk(collection);
         bulk.insertOne({'_id': 2, 'name': 'Stephen', 'age': 54});
-        bulk.deleteOne(DeleteOneStatement({'_id': 2}));
+        bulk.deleteOne(DeleteOneStatement(QueryUnion({'_id': 2})));
         bulk.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42}
         ]);
-        bulk.deleteOne(DeleteOneStatement({'_id': 4}));
+        bulk.deleteOne(DeleteOneStatement(QueryUnion({'_id': 4})));
         bulk.insertOne({'_id': 5, 'name': 'Mandy', 'age': 21});
 
         var ret = await bulk.executeDocument(db.server);
@@ -628,15 +628,15 @@ void main() async {
 
         var bulk = OrderedBulk(collection);
         bulk.insertOne({'_id': 2, 'name': 'Stephen', 'age': 54});
-        bulk.deleteOne(DeleteOneStatement({'_id': 2}));
+        bulk.deleteOne(DeleteOneStatement(QueryUnion({'_id': 2})));
         bulk.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42}
         ]);
-        bulk.deleteMany(DeleteManyStatement({
+        bulk.deleteMany(DeleteManyStatement(QueryUnion({
           'age': {r'$gt': 28}
-        }));
+        })));
         bulk.insertOne({'_id': 5, 'name': 'Mandy', 'age': 21});
 
         var ret = await bulk.executeDocument(db.server);

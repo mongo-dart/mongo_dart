@@ -5,8 +5,6 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrappe
 import '../../../../../session/client_session.dart';
 import '../v1/replace_one_operation_v1.dart';
 
-
-
 typedef ReplaceOneDocumentRec = (WriteResult writeResult, MongoDocument serverDocument);
 
 abstract class ReplaceOneOperation extends UpdateOperation {

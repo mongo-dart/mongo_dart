@@ -2,17 +2,19 @@ import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/hint_union.dart';
+import 'package:mongo_dart/src/utils/query_union.dart';
 
 import '../open/delete_statement_open.dart';
 import '../v1/delete_statement_v1.dart';
 
 abstract class DeleteStatement {
   @protected
-  DeleteStatement.protected(this.filter,
+  DeleteStatement.protected(QueryUnion filter,
       {this.collation, this.hint, int? limit})
-      : limit = limit ?? 1;
+      : filter = filter.query,
+        limit = limit ?? 1;
 
-  factory DeleteStatement(QueryFilter filter,
+  factory DeleteStatement(QueryUnion filter,
       {ServerApi? serverApi,
       CollationOptions? collation,
       HintUnion? hint,
@@ -29,7 +31,7 @@ abstract class DeleteStatement {
   /// collection will match the predicate.
   ///
   /// internal document key is "q"
-  Map<String, dynamic> filter;
+  QueryFilter filter;
 
   /// The number of matching documents to delete.
   /// Specify either a 0 to delete all matching documents or 1 to delete a
@@ -78,12 +80,12 @@ abstract class DeleteStatement {
 
   DeleteStatementOpen get toOpen => this is DeleteStatementOpen
       ? this as DeleteStatementOpen
-      : DeleteStatementOpen(filter,
+      : DeleteStatementOpen(QueryUnion(filter),
           collation: collation, hint: hint, limit: limit);
 
   DeleteStatementV1 get toV1 => this is DeleteStatementV1
       ? this as DeleteStatementV1
-      : DeleteStatementV1(filter,
+      : DeleteStatementV1(QueryUnion(filter),
           collation: collation, hint: hint, limit: limit);
 
   Options toMap() {

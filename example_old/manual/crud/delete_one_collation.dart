@@ -46,7 +46,7 @@ void main() async {
   print('First record category with collation before deletion: '
       '${findResult.first['category']}'); // 'café';
 
-  var res = await collection.deleteOne(
+  var (res, _) = await collection.deleteOne(
       <String, Object>{'category': 'cafe', 'status': 'a'},
       collation: CollationOptions('fr', strength: 1));
 

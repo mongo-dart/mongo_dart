@@ -79,4 +79,30 @@ class MongoCollectionOpen extends MongoCollection {
         updateManyOptions: UpdateManyOptions(writeConcern: writeConcern));
     return updateManyOperation.executeDocument();
   }
+
+  @override
+  Future<DeleteOneDocumentRec> deleteOne(selector,
+      {WriteConcern? writeConcern,
+      CollationOptions? collation,
+      HintUnion? hint}) async {
+    var deleteOperation = DeleteOneOperation(
+        this,
+        DeleteOneStatement(QueryUnion(selector),
+            collation: collation, hint: hint),
+        deleteOneOptions: DeleteOneOptions(writeConcern: writeConcern));
+    return deleteOperation.executeDocument();
+  }
+
+  @override
+  Future<DeleteManyDocumentRec> deleteMany(selector,
+      {WriteConcern? writeConcern,
+      CollationOptions? collation,
+      HintUnion? hint}) async {
+    var deleteOperation = DeleteManyOperation(
+        this,
+        DeleteManyStatement(QueryUnion(selector),
+            collation: collation, hint: hint),
+        deleteManyOptions: DeleteManyOptions(writeConcern: writeConcern));
+    return deleteOperation.executeDocument();
+  }
 }

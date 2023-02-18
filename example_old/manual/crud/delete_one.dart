@@ -26,7 +26,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.deleteOne(<String, Object>{});
+  var (res, _) = await collection.deleteOne(<String, Object>{});
 
   print('Removed documents: ${res.nRemoved}');
 

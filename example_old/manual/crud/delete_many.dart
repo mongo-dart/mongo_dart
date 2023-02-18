@@ -28,7 +28,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.deleteMany(where.lt('age', 40));
+  var (res, _) = await collection.deleteMany(where.lt('age', 40));
 
   print('Removed documents: ${res.nRemoved}'); // 2
 

@@ -86,6 +86,18 @@ abstract class MongoCollection {
   // TODO missing findOneAndUpdate()
   // TODO mising findOneAndReplace()
 
+  // Deletes one document into this collection
+  Future<DeleteOneDocumentRec> deleteOne(selector,
+      {WriteConcern? writeConcern,
+      CollationOptions? collation,
+      HintUnion? hint});
+
+  // Deletes many documents into this collection
+  Future<DeleteManyDocumentRec> deleteMany(selector,
+      {WriteConcern? writeConcern,
+      CollationOptions? collation,
+      HintUnion? hint});
+
   // ****************************************************
   // ***********        OLD       ***********************
   // ****************************************************
@@ -496,29 +508,6 @@ abstract class MongoCollection {
     return command.process();
   }
 
-  Future<WriteResult> deleteOne(selector,
-      {WriteConcern? writeConcern,
-      CollationOptions? collation,
-      HintUnion? hint}) async {
-    var deleteOperation = DeleteOneOperation(
-        this,
-        DeleteOneStatement(selectorBuilder2Map(selector),
-            collation: collation, hint: hint),
-        deleteOneOptions: DeleteOneOptions(writeConcern: writeConcern));
-    return deleteOperation.executeDocument();
-  }
-
-  Future<WriteResult> deleteMany(selector,
-      {WriteConcern? writeConcern,
-      CollationOptions? collation,
-      HintUnion? hint}) async {
-    var deleteOperation = DeleteManyOperation(
-        this,
-        DeleteManyStatement(selectorBuilder2Map(selector),
-            collation: collation, hint: hint),
-        deleteManyOptions: DeleteManyOptions(writeConcern: writeConcern));
-    return deleteOperation.executeDocument(db.server);
-  }
 /* 
   Future<Map<String, dynamic>> modernUpdate(selector, update,
       {ClientSession? session,

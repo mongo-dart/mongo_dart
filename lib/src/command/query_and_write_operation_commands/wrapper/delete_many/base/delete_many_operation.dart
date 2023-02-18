@@ -3,9 +3,10 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/query_and_write_operation_commands/delete_operation/base/delete_operation.dart';
 
 import '../../../../../session/client_session.dart';
-import '../../../../../topology/server.dart';
 import '../open/delete_many_operation_open.dart';
 import '../v1/delete_many_operation_v1.dart';
+
+typedef DeleteManyDocumentRec = (WriteResult writeResult, MongoDocument serverDocument);
 
 abstract class DeleteManyOperation extends DeleteOperation {
   @protected
@@ -45,8 +46,13 @@ abstract class DeleteManyOperation extends DeleteOperation {
         deleteManyOptions: deleteManyOptions?.toDeleteManyOpen,
         rawOptions: rawOptions);
   }
-  Future<WriteResult> executeDocument(Server server) async {
-    var ret = await super.process();
-    return WriteResult.fromMap(WriteCommandType.delete, ret);
+       Future<MongoDocument> executeDeleteMany() async => process();    
+
+  Future<DeleteManyDocumentRec> executeDocument() async {  
+    var ret= await executeDeleteMany( );
+    return ( WriteResult.fromMap(WriteCommandType.delete, ret), ret);
   }
+
+
+ 
 }

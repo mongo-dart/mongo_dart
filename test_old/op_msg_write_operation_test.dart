@@ -3,6 +3,7 @@ import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:decimal/decimal.dart';
 import 'package:mongo_dart/src/utils/hint_union.dart';
+import 'package:mongo_dart/src/utils/query_union.dart';
 import 'package:test/test.dart';
 
 import '../test/utils/insert_data.dart';
@@ -227,8 +228,8 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteOneOperation(collection, DeleteOneStatement({}));
-        var res = await deleteOperation.executeDocument();
+            DeleteOneOperation(collection, DeleteOneStatement(QueryUnion({})));
+        var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -257,8 +258,8 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteOneOperation(collection, DeleteOneStatement({key_id: 7}));
-        var res = await deleteOperation.executeDocument();
+            DeleteOneOperation(collection, DeleteOneStatement(QueryUnion({key_id: 7})));
+        var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -282,8 +283,8 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteOneOperation(collection, DeleteOneStatement({'status': 'D'}));
-        var res = await deleteOperation.executeDocument();
+            DeleteOneOperation(collection, DeleteOneStatement(QueryUnion({'status': 'D'})));
+        var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -311,7 +312,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.deleteOne(<String, Object>{});
+        var (res, _) = await collection.deleteOne(<String, Object>{});
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -339,7 +340,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.deleteOne(<String, Object>{key_id: 7});
+        var (res, _) = await collection.deleteOne(<String, Object>{key_id: 7});
 
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -364,7 +365,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.deleteOne(<String, Object>{'status': 'D'});
+        var (res, _) = await collection.deleteOne(<String, Object>{'status': 'D'});
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -395,8 +396,8 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteManyOperation(collection, DeleteManyStatement({}));
-        var res = await deleteOperation.executeDocument(db.server);
+            DeleteManyOperation(collection, DeleteManyStatement(QueryUnion({})));
+        var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -424,8 +425,8 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation =
-            DeleteManyOperation(collection, DeleteManyStatement({key_id: 7}));
-        var res = await deleteOperation.executeDocument(db.server);
+            DeleteManyOperation(collection, DeleteManyStatement(QueryUnion({key_id: 7})));
+        var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -450,8 +451,8 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation = DeleteManyOperation(
-            collection, DeleteManyStatement({'status': 'D'}));
-        var res = await deleteOperation.executeDocument(db.server);
+            collection, DeleteManyStatement(QueryUnion({'status': 'D'})));
+        var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -475,10 +476,10 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var deleteOperation = DeleteManyOperation(
-            collection, DeleteManyStatement({}),
+            collection, DeleteManyStatement(QueryUnion({})),
             deleteManyOptions: DeleteManyOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
-        var res = await deleteOperation.executeDocument(db.server);
+        var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -503,10 +504,10 @@ void main() async {
 
         var deleteOperation = DeleteManyOperation(
           collection,
-          DeleteManyStatement({'category': 'cafe', 'status': 'a'},
+          DeleteManyStatement(QueryUnion({'category': 'cafe', 'status': 'a'}),
               collation: CollationOptions('fr', strength: 1)),
         );
-        var res = await deleteOperation.executeDocument(db.server);
+        var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -537,14 +538,14 @@ void main() async {
 
         var deleteOperation = DeleteManyOperation(
           collection,
-          DeleteManyStatement({
+          DeleteManyStatement(QueryUnion({
             'points': {r'$lte': 20},
             'status': 'P'
-          }, hint: HintUnion({
+          }), hint: HintUnion({
             'status': 1
           })),
         );
-        var res = await deleteOperation.executeDocument(db.server);
+        var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -571,7 +572,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.deleteMany(<String, Object>{});
+        var (res, _) = await collection.deleteMany(<String, Object>{});
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -598,7 +599,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.deleteMany(<String, Object>{key_id: 7});
+        var (res, _) = await collection.deleteMany(<String, Object>{key_id: 7});
 
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -623,7 +624,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.deleteMany(<String, Object>{'status': 'D'});
+        var (res, _) = await collection.deleteMany(<String, Object>{'status': 'D'});
 
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -647,7 +648,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.deleteMany(<String, Object>{},
+        var (res, _) = await collection.deleteMany(<String, Object>{},
             writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res.hasWriteErrors, isFalse);
@@ -672,7 +673,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var res = await collection.deleteMany(
+        var (res, _) = await collection.deleteMany(
             <String, Object>{'category': 'cafe', 'status': 'a'},
             collation: CollationOptions('fr', strength: 1));
 
@@ -704,7 +705,7 @@ void main() async {
         await collection.createIndex(keys: {'status': 1});
         await collection.createIndex(keys: {'points': 1});
 
-        var res = await collection.deleteMany(<String, Object>{
+        var (res, _) = await collection.deleteMany(<String, Object>{
           'points': {r'$lte': 20},
           'status': 'P'
         }, hint: HintUnion({

@@ -85,7 +85,7 @@ abstract class Bulk extends CommandOperation {
           'of a collation');
     }
 
-    deleteOne(DeleteOneStatement(contentMap,
+    deleteOne(DeleteOneStatement(QueryUnion(contentMap),
         collation: docMap[bulkCollation] is Map<String, dynamic>
             ? CollationOptions.fromMap(
                 docMap[bulkCollation] as Map<String, Object>)
@@ -122,7 +122,7 @@ abstract class Bulk extends CommandOperation {
           'of a collation');
     }
 
-    deleteMany(DeleteManyStatement(contentMap,
+    deleteMany(DeleteManyStatement(QueryUnion(contentMap),
         collation: docMap[bulkCollation] is Map
             ? CollationOptions.fromMap(
                 docMap[bulkCollation] as Map<String, Object>)
