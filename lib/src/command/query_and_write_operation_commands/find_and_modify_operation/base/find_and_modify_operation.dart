@@ -1,15 +1,24 @@
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../core/error/mongo_dart_error.dart';
-import '../../../database/base/mongo_collection.dart';
-import '../../../utils/hint_union.dart';
+import '../../../../core/error/mongo_dart_error.dart';
+import '../../../../database/base/mongo_collection.dart';
+import '../../../../database/document_types.dart';
+import '../../../../server_api_version.dart';
+import '../../../../session/client_session.dart';
+import '../../../../utils/hint_union.dart';
+import '../../../../utils/query_union.dart';
+import '../../update_operation/base/update_union.dart';
+import '../open/find_and_modify_operation_open.dart';
+import '../v1/find_and_modify_operation_v1.dart';
 import 'find_and_modify_options.dart';
-import '../../base/command_operation.dart';
-import 'find_and_modify_result.dart';
+import '../../../base/command_operation.dart';
+import '../../return_classes/find_and_modify_result.dart';
+typedef FindAndModifyDocumentRec = 
+(FindAndModifyResult findAndModifyResult, MongoDocument serverDocument);
 
 class FindAndModifyOperation extends CommandOperation {
-  FindAndModifyOperation(MongoCollection collection,
+  FindAndModifyOperation.protected(MongoCollection collection,
       {this.query,
       this.sort,
       bool? remove,
@@ -21,7 +30,7 @@ class FindAndModifyOperation extends CommandOperation {
       super.session,
       this.hint,
       FindAndModifyOptions? findAndModifyOptions,
-      Map<String, Object>? rawOptions})
+      Options? rawOptions})
       : remove = remove ?? false,
         returnNew = returnNew ?? false,
         upsert = upsert ?? false,
@@ -39,6 +48,45 @@ class FindAndModifyOperation extends CommandOperation {
           'The arrayFilters parameter must be either a List or a Map');
     }
   }
+  
+  factory FindAndModifyOperation(
+      MongoCollection collection,
+      {QueryUnion? query,
+      IndexDocument? sort,
+      bool? remove,
+      UpdateUnion? update,
+      bool? returnNew,
+      ProjectionDocument? fields,
+      bool? upsert,
+      List<ArrayFilter>? arrayFilters,
+      ClientSession? session,
+      HintUnion? hint,
+      FindAndModifyOptions? findAndModifyOptions,
+     Options? rawOptions}) {
+    if (collection.serverApi != null) {
+      switch (collection.serverApi!.version) {
+        case ServerApiVersion.v1:
+          return FindAndModifyOperationV1(
+              collection, query: query,sort: sort, remove:remove,update:update,
+              returnNew: returnNew,fields:fields, upsert: upsert, arrayFilters:arrayFilters,
+
+              session: session,
+              findAndModifyOptions: findAndModifyOptions?.toFindAndModifyV1,
+              rawOptions: rawOptions);
+        default:
+          throw MongoDartError(
+              'Stable Api ${collection.serverApi!.version} not managed');
+      }
+    }
+    return FindAndModifyOperationOpen(
+        collection, query: query,sort: sort, remove:remove,update:update,
+              returnNew: returnNew,fields:fields, upsert: upsert, arrayFilters:arrayFilters,
+
+              session: session,
+              findAndModifyOptions: findAndModifyOptions?.toFindAndModifyOpen,
+              rawOptions: rawOptions);
+  }
+
 
   /// The selection criteria for the modification. The query field employs
   /// the same query selectors as used in the db.collection.find() method.
@@ -49,7 +97,7 @@ class FindAndModifyOperation extends CommandOperation {
   ///
   /// Starting in MongoDB 4.2 (and 4.0.12+, 3.6.14+, and 3.4.23+),
   /// the operation errors if the query argument is not a document.
-  Map<String, dynamic>? query;
+  QueryUnion? query;
 
   /// Determines which document the operation modifies if the query selects
   /// multiple documents. findAndModify modifies the first document
@@ -70,7 +118,7 @@ class FindAndModifyOperation extends CommandOperation {
   /// this is to include the _id field in your sort query.
   ///
   /// See [Sort Stability](https://docs.mongodb.com/manual/reference/method/cursor.sort/#sort-cursor-stable-sorting) for more information.
-  Map<String, Object>? sort;
+  IndexDocument? sort;
 
   /// Must specify either the remove or the update field. Removes the document
   /// specified in the query field. Set this to true to remove the
@@ -92,7 +140,7 @@ class FindAndModifyOperation extends CommandOperation {
   ///   * $replaceRoot and its alias $replaceWith.
   ///
   /// It can be a Map or a List
-  Object? update;
+  UpdateUnion? update;
 
   /// When true, returns the modified document rather than the original.
   /// The findAndModify method ignores the 'new' option for remove operations.
@@ -107,7 +155,7 @@ class FindAndModifyOperation extends CommandOperation {
   ///
   /// Starting in MongoDB 4.2 (and 4.0.12+, 3.6.14+, and 3.4.23+),
   /// the operation errors if the fields argument is not a document.
-  Map<String, dynamic>? fields;
+  ProjectionDocument? fields;
 
   /// Used in conjunction with the update field.
   ///
@@ -175,7 +223,7 @@ class FindAndModifyOperation extends CommandOperation {
   ///
   /// New in version 3.6.
   ///
-  List? arrayFilters;
+  List<ArrayFilter>? arrayFilters;
 
   /// Optional. Index specification. Specify either the index name
   /// as a string or the index key pattern.
@@ -201,6 +249,10 @@ class FindAndModifyOperation extends CommandOperation {
         if (hint != null && !hint!.isNull) keyHint: hint!.value
       };
 
-  Future<FindAndModifyResult> executeDocument() async =>
-      FindAndModifyResult(await process());
+       Future<MongoDocument> executeFindAndModify() async => process();    
+  Future<FindAndModifyDocumentRec> executeDocument() async {
+        var ret= await executeFindAndModify( );
+
+    return (FindAndModifyResult(ret),ret);
+  }
 }

@@ -1,8 +1,45 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../../base/operation_base.dart';
+import '../../../base/operation_base.dart';
+import '../open/find_and_modify_options_open.dart';
+import '../v1/find_and_modify_options_v1.dart';
 
 class FindAndModifyOptions {
+  FindAndModifyOptions.protected(
+      {bool? bypassDocumentValidation,
+      this.writeConcern,
+      this.maxTimeMS,
+      this.collation,
+      this.comment})
+      : bypassDocumentValidation = bypassDocumentValidation ?? false {
+    if (maxTimeMS != null && maxTimeMS! < 1) {
+      throw MongoDartError('MaxTimeMS parameter must be a positive value');
+    }
+  }
+
+  factory FindAndModifyOptions(
+      {ServerApi? serverApi,
+      bool? bypassDocumentValidation,
+      WriteConcern? writeConcern,
+      int? maxTimeMS,
+      CollationOptions? collation,
+      String? comment}) {
+    if (serverApi != null && serverApi.version == ServerApiVersion.v1) {
+      return FindAndModifyOptionsV1(
+          bypassDocumentValidation: bypassDocumentValidation,
+          writeConcern: writeConcern,
+          maxTimeMS: maxTimeMS,
+          collation: collation,
+          comment: comment);
+    }
+    return FindAndModifyOptionsOpen(
+        bypassDocumentValidation: bypassDocumentValidation,
+        writeConcern: writeConcern,
+        maxTimeMS: maxTimeMS,
+        collation: collation,
+        comment: comment);
+  }
+
   /// Enables findAndModify to bypass document validation during the operation.
   /// This lets you update documents that do not meet the validation
   /// requirements.
@@ -61,17 +98,24 @@ class FindAndModifyOptions {
   /// New in version 4.4.
   final String? comment;
 
-  FindAndModifyOptions(
-      {bool? bypassDocumentValidation,
-      this.writeConcern,
-      this.maxTimeMS,
-      this.collation,
-      this.comment})
-      : bypassDocumentValidation = bypassDocumentValidation ?? false {
-    if (maxTimeMS != null && maxTimeMS! < 1) {
-      throw MongoDartError('MaxTimeMS parameter must be a positive value');
-    }
-  }
+  FindAndModifyOptionsOpen get toFindAndModifyOpen =>
+      this is FindAndModifyOptionsOpen
+          ? this as FindAndModifyOptionsOpen
+          : FindAndModifyOptionsOpen(
+              bypassDocumentValidation: bypassDocumentValidation,
+              writeConcern: writeConcern,
+              maxTimeMS: maxTimeMS,
+              collation: collation,
+              comment: comment);
+
+  FindAndModifyOptionsV1 get toFindAndModifyV1 => this is FindAndModifyOptionsV1
+      ? this as FindAndModifyOptionsV1
+      : FindAndModifyOptionsV1(
+          bypassDocumentValidation: bypassDocumentValidation,
+          writeConcern: writeConcern,
+          maxTimeMS: maxTimeMS,
+          collation: collation,
+          comment: comment);
 
   Options getOptions(MongoDatabase db) => <String, dynamic>{
         if (bypassDocumentValidation)

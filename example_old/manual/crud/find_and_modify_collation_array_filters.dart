@@ -37,7 +37,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.modernFindAndModify(
+  var (res, _) = await collection.modernFindAndModify(
       query: where.gte('grades', 100),
       update: ModifierBuilder().set(r'grades.$[element]', 100),
       returnNew: true,

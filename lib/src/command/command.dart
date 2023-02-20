@@ -37,9 +37,9 @@ export 'query_and_write_operation_commands/get_last_error_command/get_last_error
 export 'query_and_write_operation_commands/find_operation/find_operation.dart';
 export 'query_and_write_operation_commands/find_operation/find_options.dart';
 
-export 'query_and_write_operation_commands/find_and_modify_operation/find_and_modify_operation.dart';
-export 'query_and_write_operation_commands/find_and_modify_operation/find_and_modify_options.dart';
-export 'query_and_write_operation_commands/find_and_modify_operation/find_and_modify_result.dart';
+export 'query_and_write_operation_commands/find_and_modify_operation/base/find_and_modify_operation.dart';
+export 'query_and_write_operation_commands/find_and_modify_operation/base/find_and_modify_options.dart';
+export 'query_and_write_operation_commands/return_classes/find_and_modify_result.dart';
 export 'query_and_write_operation_commands/get_more_command/get_more_command.dart';
 export 'query_and_write_operation_commands/get_more_command/get_more_options.dart';
 export 'query_and_write_operation_commands/insert_operation/base/insert_operation.dart';

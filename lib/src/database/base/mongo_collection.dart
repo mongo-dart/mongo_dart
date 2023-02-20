@@ -1,9 +1,11 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/base/update_union.dart';
 import 'package:mongo_dart/src/utils/hint_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import '../../session/client_session.dart';
 import '../../utils/parms_utils.dart';
+import '../../utils/query_union.dart';
 import '../modern_cursor.dart';
 
 abstract class MongoCollection {
@@ -226,7 +228,7 @@ abstract class MongoCollection {
   /// made on the update.
   /// To return the document with the modifications made on the update,
   /// use the returnNew option.
-  Future<Map<String, dynamic>?> findAndModify(
+  Future<MongoDocument?> findAndModify(
       {query,
       sort,
       bool? remove,
@@ -234,7 +236,7 @@ abstract class MongoCollection {
       bool? returnNew,
       fields,
       bool? upsert}) async {
-    var result = await modernFindAndModify(
+    var (result,_) = await modernFindAndModify(
         query: query,
         sort: sort,
         remove: remove,
@@ -531,15 +533,15 @@ abstract class MongoCollection {
     return updateOperation.process();
   } */
 
-  Future<FindAndModifyResult> modernFindAndModify(
+  Future<FindAndModifyDocumentRec> modernFindAndModify(
       {query,
       sort,
       bool? remove,
       update,
       bool? returnNew,
-      fields,
+      ProjectionDocument? fields,
       bool? upsert,
-      List? arrayFilters,
+      List<ArrayFilter>? arrayFilters,
       HintUnion? hint,
       FindAndModifyOptions? findAndModifyOptions,
       Map<String, Object>? rawOptions}) async {
@@ -553,14 +555,12 @@ abstract class MongoCollection {
     }
 
     var famOperation = FindAndModifyOperation(this,
-        query: query == null ? null : queryBuilder2Map(query),
+        query: query == null ? null : QueryUnion(query),
         sort: sortMap,
         remove: remove,
-        update: update == null
-            ? null
-            : (update is List ? update : updateBuilder2Map(update)),
+        update: update == null ? null : UpdateUnion(update),
         returnNew: returnNew,
-        fields: fieldsBuilder2Map(fields),
+        fields: fields,
         upsert: upsert,
         arrayFilters: arrayFilters,
         hint: hint,
