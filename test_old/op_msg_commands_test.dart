@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
@@ -65,14 +66,13 @@ void main() async {
 
           var cursorResult = await cursor.nextObject();
           expect(cursor.state, ModernCursorState.open);
-          expect(cursor.cursorId.value, isPositive);
+          expect(cursor.cursorId.isNegative, isFalse);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var command = KillCursorsCommand(collection, [cursor.cursorId]);
           var result = await command.process();
           expect(result, isNotNull);
-          expect(
-              (result[keyCursorsKilled] as List).first, cursor.cursorId.value);
+          expect((result[keyCursorsKilled] as List).first, cursor.cursorId);
           expect(result[keyCursorsAlive], isEmpty);
           expect(result[keyCursorsUnknown], isEmpty);
           expect(result[keyCursorsNotFound], isEmpty);
@@ -80,7 +80,7 @@ void main() async {
         test('test on small cursor', () async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
-          var command = KillCursorsCommand(collection, [BsonLong(1)]);
+          var command = KillCursorsCommand(collection, [Int64(1)]);
           var result = await command.process();
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
@@ -92,8 +92,7 @@ void main() async {
         test('test on non existing cursor', () async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
-          var command =
-              KillCursorsCommand(collection, [BsonLong(111111111111)]);
+          var command = KillCursorsCommand(collection, [Int64(111111111111)]);
           var result = await command.process();
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
@@ -112,7 +111,7 @@ void main() async {
           var cursor = ModernCursor(FindOperation(collection), db.server);
           expect(cursor.state, ModernCursorState.init);
           await cursor.nextObject();
-          var command = KillCursorsCommand(collection, [BsonLong(1)]);
+          var command = KillCursorsCommand(collection, [Int64(1)]);
           var result = await command.process();
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
@@ -125,7 +124,7 @@ void main() async {
         test('test with return Object on small cursor', () async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
-          var command = KillCursorsCommand(collection, [BsonLong(1)]);
+          var command = KillCursorsCommand(collection, [Int64(1)]);
           var result = await command.executeDocument(db.server);
           expect(result, isNotNull);
           expect(result.success, isTrue);
@@ -137,7 +136,7 @@ void main() async {
         test('test with return Object on non existing cursor', () async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
-          var command = KillCursorsCommand(collection, [BsonLong(-1)]);
+          var command = KillCursorsCommand(collection, [Int64(-1)]);
           var result = await command.executeDocument(db.server);
           expect(result, isNotNull);
           expect(result.success, isTrue);
@@ -160,7 +159,7 @@ void main() async {
 
           var cursorResult = await cursor.nextObject();
           expect(cursor.state, ModernCursorState.open);
-          expect(cursor.cursorId.value, isPositive);
+          expect(cursor.cursorId.isNegative, isFalse);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var command = GetMoreCommand(collection, cursor.cursorId);
@@ -177,7 +176,7 @@ void main() async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
 
-          var command = GetMoreCommand(collection, BsonLong(1));
+          var command = GetMoreCommand(collection, Int64(1));
           var result = await command.process();
           expect(result, isNotNull);
           expect(result[keyOk], 0.0);
@@ -196,7 +195,7 @@ void main() async {
 
           var cursorResult = await cursor.nextObject();
           expect(cursor.state, ModernCursorState.open);
-          expect(cursor.cursorId.value, isPositive);
+          expect(cursor.cursorId.isNegative, isFalse);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var options = GetMoreOptions(batchSize: 10);

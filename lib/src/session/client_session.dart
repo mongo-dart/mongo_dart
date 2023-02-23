@@ -214,8 +214,7 @@ class ClientSession {
         command[keyStartTransaction] = true;
         transaction!.state = TransactionState.inProgress;
       }
-      // TODO update this after changing BSON package
-      command[keyTxnNumber] = BsonLong(transaction!.transactionNumber.toInt());
+      command[keyTxnNumber] = transaction!.transactionNumber;
       command[keyAutocommit] = false;
     }
   }

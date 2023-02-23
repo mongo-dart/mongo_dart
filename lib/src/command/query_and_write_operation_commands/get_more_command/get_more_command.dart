@@ -1,4 +1,4 @@
-import 'package:bson/bson.dart';
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
 import '../../../core/error/mongo_dart_error.dart';
 import '../../../database/base/mongo_database.dart';
@@ -21,7 +21,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 /// * getMoreOptions [GetMoreOptions] - Optional
 ///   - a set of optional values for the command
 class GetMoreCommand extends CommandOperation {
-  GetMoreCommand(MongoCollection? collection, BsonLong cursorId,
+  GetMoreCommand(MongoCollection? collection, Int64 cursorId,
       {MongoDatabase? db,
       String? collectionName,
       super.session,

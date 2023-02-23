@@ -1,4 +1,4 @@
-import 'package:bson/bson.dart';
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
@@ -37,7 +37,7 @@ import 'kill_cursors_result.dart';
 /// it can't use the same lsid for killCursors as was used for a cursor's
 /// find and getMore, so there's no point in using any lsid at all.
 class KillCursorsCommand extends CommandOperation {
-  KillCursorsCommand(MongoCollection collection, List<BsonLong> cursorIds,
+  KillCursorsCommand(MongoCollection collection, List<Int64> cursorIds,
       {MongoDatabase? db,
       super.session,
       KillCursorsOptions? killCursorsOptions,

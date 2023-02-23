@@ -15,8 +15,7 @@ class Payload0 extends Payload {
   Payload0(MongoDocument document) : document = BsonMap(document);
 
   Payload0.fromBuffer(BsonBinary buffer)
-      : document = BsonMap(<String, Object>{})
-          ..unpackValue(buffer /* ..makeByteList() */);
+      : document = BsonMap.fromBuffer(buffer);
 
   @override
   void packValue(BsonBinary buffer) => document.packValue(buffer);
@@ -89,8 +88,7 @@ List<Map<String, Object>> _extractBsonMapList(List<BsonMap> documents) {
 List<BsonMap> _decodeBsonMapList(BsonBinary buffer, int length) {
   var locDocuments = <BsonMap>[];
   while (length > 0) {
-    var map = BsonMap(<String, Object>{});
-    map.unpackValue(buffer);
+    var map = BsonMap.fromBuffer(buffer);
     locDocuments.add(map);
     length -= map.byteLength();
   }

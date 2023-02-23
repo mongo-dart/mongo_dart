@@ -1,5 +1,6 @@
 @Timeout(Duration(seconds: 30))
 
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
@@ -431,14 +432,14 @@ void main() async {
             .process();
 
         var cursor = ModernCursor.fromOpenId(collection,
-            BsonLong((doc[keyCursor] as Map)[keyId] as int), db.server,
+            Int64((doc[keyCursor] as Map)[keyId] as int), db.server,
             tailable: true);
 
         expect(cursor.state, ModernCursorState.open);
 
         var cursorResult = await cursor.nextObject();
         expect(cursor.state, ModernCursorState.open);
-        expect(cursor.cursorId.value, isPositive);
+        expect(cursor.cursorId.isNegative, isFalse);
         expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
 
@@ -482,14 +483,14 @@ void main() async {
             .process();
 
         var cursor = ModernCursor.fromOpenId(collection,
-            BsonLong((doc[keyCursor] as Map)[keyId] as int), db.server,
+            Int64((doc[keyCursor] as Map)[keyId] as int), db.server,
             tailable: true);
 
         expect(cursor.state, ModernCursorState.open);
 
         var cursorResult = await cursor.nextObject();
         expect(cursor.state, ModernCursorState.open);
-        expect(cursor.cursorId.value, isPositive);
+        expect(cursor.cursorId.isNegative, isFalse);
         expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
 
@@ -568,7 +569,7 @@ void main() async {
         var cursorResult = await cursor.nextObject();
         expect(cursorResult, isNull);
         expect(cursor.state, ModernCursorState.open);
-        expect(cursor.cursorId.value, isNonZero);
+        expect(cursor.cursorId.isZero, isFalse);
 
         await cursor.close();
       });
