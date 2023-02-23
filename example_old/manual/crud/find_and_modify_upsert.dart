@@ -32,7 +32,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var (res, _) = await collection.modernFindAndModify(
+  var (res, _) = await collection.findAndModify(
       query: where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
       sort: <String, dynamic>{'rating': 1},
       update: ModifierBuilder().inc('score', 1),

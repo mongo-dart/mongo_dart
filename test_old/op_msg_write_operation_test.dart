@@ -1130,7 +1130,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
             query: where
                 .eq('name', 'Tom')
                 .eq('state', 'active')
@@ -1152,7 +1152,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
             query: where
                 .eq('name', 'Tom')
                 .eq('state', 'active')
@@ -1175,7 +1175,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
             query: where
                 .eq('name', 'Tim')
                 .eq('state', 'active')
@@ -1197,7 +1197,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
             query:
                 where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
             sort: <String, dynamic>{'rating': 1},
@@ -1217,7 +1217,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
             query:
                 where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
             sort: <String, dynamic>{'rating': 1},
@@ -1249,7 +1249,7 @@ void main() async {
           'score': 15
         });
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
             query:
                 where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
             sort: <String, dynamic>{'rating': 1},
@@ -1273,7 +1273,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
             query: where.eq('state', 'active'),
             sort: <String, dynamic>{'rating': 1},
             remove: true);
@@ -1294,7 +1294,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
             query: where.eq('category', 'cafe').eq('status', 'a'),
             sort: <String, dynamic>{'category': 1},
             update: ModifierBuilder().set('status', 'updated'),
@@ -1329,7 +1329,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
             query: where.gte('grades', 100),
             update: ModifierBuilder().set(r'grades.$[element]', 100),
             returnNew: true,
@@ -1371,7 +1371,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
             query: where.eq('_id', 1),
             update: ModifierBuilder().set(r'grades.$[element].mean', 100),
             returnNew: true,
@@ -1419,7 +1419,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
           query: where.eq('_id', 1),
           update: AggregationPipelineBuilder()
               .addStage(AddFields({
@@ -1462,7 +1462,7 @@ void main() async {
         await collection.createIndex(keys: {'status': 1});
         await collection.createIndex(key: 'points');
 
-        var (res, _) = await collection.modernFindAndModify(
+        var (res, _) = await collection.findAndModify(
             query: where.lte('points', 20).eq('status', 'P'),
             remove: true,
             hint:HintUnion( {'status': 1}));

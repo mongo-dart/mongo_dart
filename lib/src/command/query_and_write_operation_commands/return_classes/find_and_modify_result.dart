@@ -5,7 +5,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 
 class FindAndModifyResult with BasicResult, TimingResult {
   FindAndModifyResult(Map<String, dynamic> document)
-      : serverResponse = document {
+      /* : serverResponse = document */ {
     extractBasic(document);
     extractTiming(document);
     value = document[keyValue] as Map<String, dynamic>?;
@@ -14,7 +14,7 @@ class FindAndModifyResult with BasicResult, TimingResult {
   }
 
   /// This is the original response from the server;
-  Map<String, dynamic> serverResponse;
+ // Map<String, dynamic> serverResponse;
 
   /// Contains the command’s returned value.
   /// For remove operations, value contains the removed document if

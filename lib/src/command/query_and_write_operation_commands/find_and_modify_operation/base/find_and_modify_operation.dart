@@ -19,7 +19,7 @@ typedef FindAndModifyDocumentRec =
 
 class FindAndModifyOperation extends CommandOperation {
   FindAndModifyOperation.protected(MongoCollection collection,
-      {this.query,
+      {this.query = const QueryUnion(<String, dynamic>{}),
       this.sort,
       bool? remove,
       this.update,
@@ -51,7 +51,7 @@ class FindAndModifyOperation extends CommandOperation {
   
   factory FindAndModifyOperation(
       MongoCollection collection,
-      {QueryUnion? query,
+      {QueryUnion query = const QueryUnion(<String, dynamic>{}),
       IndexDocument? sort,
       bool? remove,
       UpdateUnion? update,
@@ -97,7 +97,7 @@ class FindAndModifyOperation extends CommandOperation {
   ///
   /// Starting in MongoDB 4.2 (and 4.0.12+, 3.6.14+, and 3.4.23+),
   /// the operation errors if the query argument is not a document.
-  QueryUnion? query;
+  QueryUnion query;
 
   /// Determines which document the operation modifies if the query selects
   /// multiple documents. findAndModify modifies the first document
@@ -238,10 +238,10 @@ class FindAndModifyOperation extends CommandOperation {
   @override
   Command $buildCommand() => <String, dynamic>{
         keyFindAndModify: collection!.collectionName,
-        if (query != null) keyQuery: query!,
+        if (!query.isNull) keyQuery: query,
         if (sort != null) keySort: sort!,
         if (remove) keyRemove: remove,
-        if (update != null) keyUpdate: update!,
+        if (update != null) keyUpdate: update,
         if (returnNew) keyNew: returnNew,
         if (fields != null) keyFields: fields!,
         if (upsert) keyUpsert: upsert,

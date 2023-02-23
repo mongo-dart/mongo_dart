@@ -51,7 +51,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var (res, _) = await collection.modernFindAndModify(
+  var (res, _) = await collection.findAndModify(
     query: where.eq('_id', 1),
     update: AggregationPipelineBuilder()
         .addStage(AddFields({

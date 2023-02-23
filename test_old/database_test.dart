@@ -1430,7 +1430,7 @@ Future testFindAndModify() async {
   result = await collection.findAndModify(
       query: where.eq('name', 'Vadim'),
       update: modify.inc('score', 10),
-      fields: where.fields(['score']).excludeFields(['_id']));
+      fields: where.fields(['score']).excludeFields(['_id']).paramFields);
   expect(result['_id'], isNull);
   expect(result['name'], isNull);
   expect(result['score'], 4);

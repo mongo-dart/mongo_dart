@@ -5,7 +5,7 @@ class FindAndModifyOperationOpen extends FindAndModifyOperation {
       {super.query,
       super.sort,
       super.remove,
-      super.update,
+      required super.update,
       super.returnNew,
       super.fields,
       super.upsert,
