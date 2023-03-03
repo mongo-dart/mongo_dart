@@ -14,7 +14,7 @@ class UpdateManySpecs extends MultiUnionType<UpdateDocument,
     switch (value.runtimeType) {
       case UpdateDocument:
         return <UpdateDocument>[value];
-      case List<UpdateDocument>:
+      case const (List<UpdateDocument>):
         return value;
       case ModifierBuilder:
         return <UpdateDocument>[

@@ -51,9 +51,9 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var (res, _) = await collection.findAndModify(
-    query: where.eq('_id', 1),
-    update: AggregationPipelineBuilder()
+  var (res, _) = await collection.findOneAndUpdate(
+    where.eq('_id', 1),
+   AggregationPipelineBuilder()
         .addStage(AddFields({
           r'total': {r'$sum': r'$grades.grade'},
         }))

@@ -46,7 +46,7 @@ Future testOperationNotInOpenState() async {
   var coll = dbCreate.collection('test-error');
   expect(
       () async =>
-          await coll.findAndModify(query: {'value': 1}, update: {'value': 1}),
+          await coll.findOneAndUpdate( {'value': 1},  {'value': 1}),
       throwsMongoDartError);
 
   client = MongoClient(defaultUri);
@@ -56,7 +56,7 @@ Future testOperationNotInOpenState() async {
   await client.close();
   expect(
       () async =>
-          await coll.findAndModify(query: {'value': 1}, update: {'value': 1}),
+          await coll.findOneAndUpdate( {'value': 1},  {'value': 1}),
       throwsMongoDartError);
 }
 
@@ -1427,50 +1427,51 @@ Future testFindAndModify() async {
     {'name': 'Alice', 'score': 1},
   ]);
 
-  result = await collection.findAndModify(
-      query: where.eq('name', 'Vadim'),
-      update: modify.inc('score', 10),
+  result = await collection.findOneAndUpdate(
+       where.eq('name', 'Vadim'),
+       modify.inc('score', 10),
       fields: where.fields(['score']).excludeFields(['_id']).paramFields);
   expect(result['_id'], isNull);
   expect(result['name'], isNull);
   expect(result['score'], 4);
 
-  result = await collection.findAndModify(
-      query: where.eq('name', 'Daniil'),
-      returnNew: true,
-      update: modify.inc('score', 3));
+  result = await collection.findOneAndUpdate(
+       where.eq('name', 'Daniil'),
+      
+       modify.inc('score', 3),returnNew: true);
   expect(result['_id'], isNotNull);
   expect(result['name'], 'Daniil');
   expect(result['score'], 7);
 
-  result = await collection.findAndModify(
-      query: where.eq('name', 'Nick'), remove: true);
+  result = await collection.findOneAndDelete(
+       where.eq('name', 'Nick'));
   expect(result['_id'], isNotNull);
   expect(result['name'], 'Nick');
   expect(result['score'], 5);
 
-  result = await collection.findAndModify(
-      query: where.eq('name', 'Unknown'), update: modify.inc('score', 3));
+  result = await collection.findOneAndUpdate(
+       where.eq('name', 'Unknown'),  modify.inc('score', 3));
   expect(result, isNull);
 
-  result = await collection.findAndModify(
-      query: where.eq('name', 'Unknown'),
-      returnNew: true,
-      update: modify.inc('score', 3));
+  result = await collection.findOneAndUpdate(
+       where.eq('name', 'Unknown'),
+      
+       modify.inc('score', 3),returnNew: true);
   expect(result, isNull);
 
-  result = await collection.findAndModify(
-      sort: where.sortBy('score'),
-      returnNew: true,
-      update: modify.inc('score', 100));
+  result = await collection.findOneAndUpdate(
+       where.sortBy('score'),
+           modify.inc('score', 100),
+  returnNew: true)
+      ;
   expect(result['name'], 'Alice');
   expect(result['score'], 101);
 
-  result = await collection.findAndModify(
-      query: where.eq('name', 'New Comer'),
+  result = await collection.findOneAndUpdate(
+       where.eq('name', 'New Comer'), modify.inc('score', 100),
       returnNew: true,
-      upsert: true,
-      update: modify.inc('score', 100));
+      upsert: true
+      );
   expect(result['name'], 'New Comer');
   expect(result['score'], 100);
 }

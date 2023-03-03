@@ -32,13 +32,13 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var (res, _) = await collection.findAndModify(
-      query: where
+  var (res, _) = await collection.findOneAndUpdate(
+       where
           .eq('name', 'Tom')
           .eq('state', 'active')
-          .eq('rating', {r'$gt': 10}),
+          .eq('rating', {r'$gt': 10}),ModifierBuilder().inc('score', 1),
       sort: <String, dynamic>{'rating': 1},
-      update: ModifierBuilder().inc('score', 1),
+       
       returnNew: true);
 
   print('Updated document: ${res.lastErrorObject?.updatedExisting}'); // true

@@ -249,10 +249,11 @@ class FindAndModifyOperation extends CommandOperation {
         if (hint != null && !hint!.isNull) keyHint: hint!.value
       };
 
-       Future<MongoDocument> executeFindAndModify() async => process();    
+ /*       Future<MongoDocument> executeFindAndModify() async => process(); 
+
   Future<FindAndModifyDocumentRec> executeDocument() async {
         var ret= await executeFindAndModify( );
 
     return (FindAndModifyResult(ret),ret);
-  }
+  } */
 }

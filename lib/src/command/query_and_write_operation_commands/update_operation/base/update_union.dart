@@ -17,7 +17,7 @@ class UpdateUnion extends MultiUnionType<UpdateDocument, MongoDocument,
         return UpdateSpec(valueOne);
       case MongoDocument:
         return UpdateSpec(valueTwo);
-      case List<UpdateDocument>:
+      case const (List<UpdateDocument>):
         return UpdateSpec(valueThree);
       case ModifierBuilder:
         return UpdateSpec(valueFour!.map);

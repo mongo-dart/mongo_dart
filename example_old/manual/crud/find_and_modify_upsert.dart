@@ -32,10 +32,10 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var (res, _) = await collection.findAndModify(
-      query: where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
-      sort: <String, dynamic>{'rating': 1},
-      update: ModifierBuilder().inc('score', 1),
+  var (res, _) = await collection.findOneAndUpdate(
+       where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
+         ModifierBuilder().inc('score', 1),
+    sort: <String, dynamic>{'rating': 1},
       upsert: true);
   print('Updated document: ${res.lastErrorObject?.updatedExisting}'); // false
   print('Upserted _id -> ${res.lastErrorObject?.upserted}'); // An ObjectId

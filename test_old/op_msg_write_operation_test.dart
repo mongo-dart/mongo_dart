@@ -1,6 +1,9 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/base/update_union.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/find_one_and_delete/base/find_one_and_delete_operation.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/find_one_and_update/base/find_one_and_update_operation.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/find_one_and_update/base/find_one_and_update_options.dart';
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:decimal/decimal.dart';
 import 'package:mongo_dart/src/utils/hint_union.dart';
@@ -738,7 +741,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var famOperation =
-            FindAndModifyOperation(collection, query: QueryUnion(<String, dynamic>{
+            FindOneAndUpdateOperation(collection, query: QueryUnion(<String, dynamic>{
           'name': 'Tom',
           'state': 'active',
           'rating': {r'$gt': 10}
@@ -763,7 +766,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var famOperation = FindAndModifyOperation(collection,
+        var famOperation = FindOneAndUpdateOperation(collection,
             query: QueryUnion(<String, dynamic>{
               'name': 'Tom',
               'state': 'active',
@@ -790,7 +793,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var famOperation = FindAndModifyOperation(collection,
+        var famOperation = FindOneAndUpdateOperation(collection,
             query: QueryUnion(<String, dynamic>{
               'name': 'Tim',
               'state': 'active',
@@ -815,7 +818,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var famOperation = FindAndModifyOperation(collection,
+        var famOperation = FindOneAndUpdateOperation(collection,
             query: QueryUnion(<String, dynamic>{
               'name': 'Gus',
               'state': 'active',
@@ -841,7 +844,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var famOperation = FindAndModifyOperation(collection,
+        var famOperation = FindOneAndUpdateOperation(collection,
             query:QueryUnion( <String, dynamic>{
               'name': 'Gus',
               'state': 'active',
@@ -879,7 +882,7 @@ void main() async {
           'score': 15
         });
 
-        var famOperation = FindAndModifyOperation(collection,
+        var famOperation = FindOneAndUpdateOperation(collection,
             query:QueryUnion( <String, dynamic>{
               'name': 'Gus',
               'state': 'active',
@@ -909,12 +912,12 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var famOperation = FindAndModifyOperation(collection,
-            query: QueryUnion(<String, dynamic>{
+        var famOperation = FindOneAndDeleteOperation(collection,
+             QueryUnion(<String, dynamic>{
               'state': 'active',
             }),
-            sort: <String, Object>{'rating': 1},
-            remove: true);
+            sort: <String, Object>{'rating': 1}
+           );
         var (res, _) = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
@@ -933,7 +936,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var famOperation = FindAndModifyOperation(collection,
+        var famOperation = FindOneAndUpdateOperation(collection,
             query:QueryUnion( <String, dynamic>{
               'category': 'cafe',
               'status': 'a',
@@ -942,7 +945,7 @@ void main() async {
             update:UpdateUnion(<String, dynamic>{
               r'$set': {'status': 'updated'}
             }),
-            findAndModifyOptions: FindAndModifyOptions(
+            findOneAndUpdateOptions: FindOneAndUpdateOptions(
                 collation: CollationOptions('fr', strength: 1)));
         var (res, _) = await famOperation.executeDocument();
 
@@ -974,7 +977,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var famOperation = FindAndModifyOperation(collection,
+        var famOperation = FindOneAndUpdateOperation(collection,
             query:QueryUnion(<String, dynamic>{
               'grades': {r'$gte': 100}
             }),
@@ -1021,7 +1024,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var famOperation = FindAndModifyOperation(collection,
+        var famOperation = FindOneAndUpdateOperation(collection,
             query:QueryUnion(<String, dynamic>{'_id': 1}),
             update: UpdateUnion(<String, dynamic>{
               r'$set': {r'grades.$[element].mean': 100}
@@ -1068,7 +1071,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var famOperation = FindAndModifyOperation(collection,
+        var famOperation = FindOneAndUpdateOperation(collection,
             query: QueryUnion( <String, dynamic>{'_id': 1}),
             update: UpdateUnion([
               <String, dynamic>{
@@ -1103,12 +1106,12 @@ void main() async {
         await collection.createIndex(keys: {'status': 1});
         await collection.createIndex(key: 'points');
 
-        var famOperation = FindAndModifyOperation(collection,
-            query: QueryUnion(<String, dynamic>{
+        var famOperation = FindOneAndDeleteOperation(collection,
+             QueryUnion(<String, dynamic>{
               'points': {r'$lte': 20},
               'status': 'P'
             }),
-            remove: true,
+          
             hint:HintUnion( {'status': 1}));
         var (res, _) = await famOperation.executeDocument();
 
@@ -1130,13 +1133,14 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.findAndModify(
-            query: where
+        var (res, _) = await collection.findOneAndUpdate(
+             where
                 .eq('name', 'Tom')
                 .eq('state', 'active')
                 .eq('rating', {r'$gt': 10}),
-            sort: <String, dynamic>{'rating': 1},
-            update: ModifierBuilder().inc('score', 1));
+            sort: <String, dynamic>{'rating': 1}, 
+             ModifierBuilder().inc('score', 1),
+           );
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -1152,13 +1156,13 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.findAndModify(
-            query: where
+        var (res, _) = await collection.findOneAndUpdate(
+             where
                 .eq('name', 'Tom')
                 .eq('state', 'active')
-                .eq('rating', {r'$gt': 10}),
+                .eq('rating', {r'$gt': 10}),  ModifierBuilder().inc('score', 1),
             sort: <String, dynamic>{'rating': 1},
-            update: ModifierBuilder().inc('score', 1),
+           
             returnNew: true);
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
@@ -1175,13 +1179,13 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.findAndModify(
-            query: where
+        var (res, _) = await collection.findOneAndUpdate(
+             where
                 .eq('name', 'Tim')
                 .eq('state', 'active')
-                .eq('rating', {r'$gt': 10}),
+                .eq('rating', {r'$gt': 10}), ModifierBuilder().inc('score', 1),
             sort: <String, dynamic>{'rating': 1},
-            update: ModifierBuilder().inc('score', 1),
+            
             returnNew: true);
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
@@ -1197,11 +1201,10 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.findAndModify(
-            query:
-                where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
-            sort: <String, dynamic>{'rating': 1},
-            update: ModifierBuilder().inc('score', 1),
+        var (res, _) = await collection.findOneAndUpdate(
+                            where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
+     ModifierBuilder().inc('score', 1),       sort: <String, dynamic>{'rating': 1},
+             
             upsert: true);
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
@@ -1217,11 +1220,11 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.findAndModify(
-            query:
+        var (res, _) = await collection.findOneAndUpdate(
+            
                 where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
-            sort: <String, dynamic>{'rating': 1},
-            update: ModifierBuilder().inc('score', 1),
+     ModifierBuilder().inc('score', 1),        sort: <String, dynamic>{'rating': 1},
+            
             upsert: true,
             returnNew: true);
 
@@ -1249,11 +1252,11 @@ void main() async {
           'score': 15
         });
 
-        var (res, _) = await collection.findAndModify(
-            query:
+        var (res, _) = await collection.findOneAndUpdate(
+            
                 where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
-            sort: <String, dynamic>{'rating': 1},
-            update: ModifierBuilder().inc('score', 1),
+          ModifierBuilder().inc('score', 1),  sort: <String, dynamic>{'rating': 1},
+             
             upsert: true,
             returnNew: true);
 
@@ -1273,10 +1276,10 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.findAndModify(
-            query: where.eq('state', 'active'),
-            sort: <String, dynamic>{'rating': 1},
-            remove: true);
+        var (res, _) = await collection.findOneAndDelete(
+             where.eq('state', 'active'),
+            sort: <String, dynamic>{'rating': 1}
+         );
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, isNull);
@@ -1294,11 +1297,11 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.findAndModify(
-            query: where.eq('category', 'cafe').eq('status', 'a'),
+        var (res, _) = await collection.findOneAndUpdate(
+             where.eq('category', 'cafe').eq('status', 'a'),  ModifierBuilder().set('status', 'updated'),
             sort: <String, dynamic>{'category': 1},
-            update: ModifierBuilder().set('status', 'updated'),
-            findAndModifyOptions: FindAndModifyOptions(
+           
+          findOneAndUpdateOptions: FindOneAndUpdateOptions(
                 collation: CollationOptions('fr', strength: 1)));
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
@@ -1329,9 +1332,9 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.findAndModify(
-            query: where.gte('grades', 100),
-            update: ModifierBuilder().set(r'grades.$[element]', 100),
+        var (res, _) = await collection.findOneAndUpdate(
+             where.gte('grades', 100),
+             ModifierBuilder().set(r'grades.$[element]', 100),
             returnNew: true,
             arrayFilters: [
               {
@@ -1371,9 +1374,9 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.findAndModify(
-            query: where.eq('_id', 1),
-            update: ModifierBuilder().set(r'grades.$[element].mean', 100),
+        var (res, _) = await collection.findOneAndUpdate(
+             where.eq('_id', 1),
+             ModifierBuilder().set(r'grades.$[element].mean', 100),
             returnNew: true,
             arrayFilters: [
               {
@@ -1419,9 +1422,9 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.findAndModify(
-          query: where.eq('_id', 1),
-          update: AggregationPipelineBuilder()
+        var (res, _) = await collection.findOneAndUpdate(
+           where.eq('_id', 1),
+           AggregationPipelineBuilder()
               .addStage(AddFields({
                 r'total': {r'$sum': r'$grades.grade'},
                 r'decimal': {
@@ -1462,9 +1465,9 @@ void main() async {
         await collection.createIndex(keys: {'status': 1});
         await collection.createIndex(key: 'points');
 
-        var (res, _) = await collection.findAndModify(
-            query: where.lte('points', 20).eq('status', 'P'),
-            remove: true,
+        var (res, _) = await collection.findOneAndDelete(
+             where.lte('points', 20).eq('status', 'P'),
+            
             hint:HintUnion( {'status': 1}));
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);

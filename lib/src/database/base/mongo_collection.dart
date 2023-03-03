@@ -3,6 +3,12 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/hint_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
+import '../../command/query_and_write_operation_commands/wrapper/find_one_and_delete/base/find_one_and_delete_operation.dart';
+import '../../command/query_and_write_operation_commands/wrapper/find_one_and_delete/base/find_one_and_delete_options.dart';
+import '../../command/query_and_write_operation_commands/wrapper/find_one_and_replace/base/find_one_and_replace_operation.dart';
+import '../../command/query_and_write_operation_commands/wrapper/find_one_and_replace/base/find_one_and_replace_options.dart';
+import '../../command/query_and_write_operation_commands/wrapper/find_one_and_update/base/find_one_and_update_operation.dart';
+import '../../command/query_and_write_operation_commands/wrapper/find_one_and_update/base/find_one_and_update_options.dart';
 import '../../session/client_session.dart';
 import '../../utils/parms_utils.dart';
 import '../modern_cursor.dart';
@@ -84,9 +90,6 @@ abstract class MongoCollection {
       List<dynamic>? arrayFilters,
       HintUnion? hint});
 
-  // TODO missing findOneAndUpdate()
-  // TODO mising findOneAndReplace()
-
   // Deletes one document into this collection
   Future<DeleteOneDocumentRec> deleteOne(selector,
       {WriteConcern? writeConcern,
@@ -99,17 +102,34 @@ abstract class MongoCollection {
       CollationOptions? collation,
       HintUnion? hint});
 
-  Future<FindAndModifyDocumentRec> findAndModify(
-      {query,
+  Future<FindOneAndDeleteDocumentRec> findOneAndDelete(query,
+      {ProjectionDocument? fields,
       sort,
-      bool? remove,
-      update,
-      bool? returnNew,
-      ProjectionDocument? fields,
-      bool? upsert,
-      List<ArrayFilter>? arrayFilters,
+      ClientSession? session,
       HintUnion? hint,
-      FindAndModifyOptions? findAndModifyOptions,
+      FindOneAndDeleteOptions? findOneAndDeleteOptions,
+      Options? rawOptions});
+
+  Future<FindOneAndReplaceDocumentRec> findOneAndReplace(
+      query, MongoDocument replacement,
+      {ProjectionDocument? fields,
+      sort,
+      bool? upsert,
+      bool? returnNew,
+      ClientSession? session,
+      HintUnion? hint,
+      FindOneAndReplaceOptions? findOneAndReplaceOptions,
+      Options? rawOptions});
+
+  Future<FindOneAndUpdateDocumentRec> findOneAndUpdate(query, update,
+      {ProjectionDocument? fields,
+      sort,
+      bool? upsert,
+      bool? returnNew,
+      List<ArrayFilter>? arrayFilters,
+      ClientSession? session,
+      HintUnion? hint,
+      FindOneAndUpdateOptions? findOneAndUpdateOptions,
       Options? rawOptions});
 
   // ****************************************************

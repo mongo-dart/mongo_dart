@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrapper/find_one_and_update/base/find_one_and_update_options.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 
 const dbName = 'mongo-dart-example';
@@ -28,12 +29,12 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var (res, _) = await collection.findAndModify(
-      query: where.eq('category', 'cafe').eq('status', 'a'),
-      sort: <String, dynamic>{'category': 1},
-      update: ModifierBuilder().set('status', 'updated'),
-      findAndModifyOptions:
-          FindAndModifyOptions(collation: CollationOptions('fr', strength: 1)));
+  var (res, _) = await collection.findOneAndUpdate(
+       where.eq('category', 'cafe').eq('status', 'a'),
+     
+       ModifierBuilder().set('status', 'updated'),
+   sort: <String, dynamic>{'category': 1},    findOneAndUpdateOptions:
+          FindOneAndUpdateOptions(collation: CollationOptions('fr', strength: 1)));
 
   print('Updated document: ${res.lastErrorObject?.updatedExisting}'); // true
 
