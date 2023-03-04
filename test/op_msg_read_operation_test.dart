@@ -1,5 +1,6 @@
 @Timeout(Duration(seconds: 30))
 
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
 import 'package:mongo_dart/src/database/commands/aggregation_commands/count/count_operation.dart';
@@ -464,14 +465,14 @@ void main() async {
             .execute();
 
         var cursor = ModernCursor.fromOpenId(
-            collection, BsonLong((doc[keyCursor] as Map)[keyId] as int),
+            collection, ((doc[keyCursor] as Map)[keyId] as Int64),
             tailable: true);
 
         expect(cursor.state, State.open);
 
         var cursorResult = await cursor.nextObject();
         expect(cursor.state, State.open);
-        expect(cursor.cursorId.value, isPositive);
+        expect(cursor.cursorId.isNegative, isFalse);
         expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
 
@@ -518,14 +519,14 @@ void main() async {
             .execute();
 
         var cursor = ModernCursor.fromOpenId(
-            collection, BsonLong((doc[keyCursor] as Map)[keyId] as int),
+            collection, ((doc[keyCursor] as Map)[keyId] as Int64),
             tailable: true);
 
         expect(cursor.state, State.open);
 
         var cursorResult = await cursor.nextObject();
         expect(cursor.state, State.open);
-        expect(cursor.cursorId.value, isPositive);
+        expect(cursor.cursorId.isNegative, isFalse);
         expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
 
@@ -607,7 +608,7 @@ void main() async {
         var cursorResult = await cursor.nextObject();
         expect(cursorResult, isNull);
         expect(cursor.state, State.open);
-        expect(cursor.cursorId.value, isNonZero);
+        expect(cursor.cursorId.isNegative, isFalse);
 
         await cursor.close();
       });
@@ -939,7 +940,7 @@ db.runCommand(
             collection: collection, cursor: {'batchSize': 3});
         var v = await aggregateOperation.execute();
         final cursor = v[keyCursor] as Map;
-        expect(cursor['id'], const TypeMatcher<int>());
+        expect(cursor['id'], const TypeMatcher<Int64>());
         final firstBatch = cursor[keyFirstBatch] as List;
         expect(firstBatch.length, 3);
         expect(firstBatch.first[key_id], 'Age of Steam');

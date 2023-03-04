@@ -379,6 +379,7 @@ class Db {
     }
     if (unfilled(databaseName)) {
       databaseName = 'test';
+      authSourceDb ??= Db._authDb('admin');
     }
 
     return serverConfig;

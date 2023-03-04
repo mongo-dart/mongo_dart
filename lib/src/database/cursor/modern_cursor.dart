@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/kill_cursors_command/kill_cursors_command.dart';
 import 'package:mongo_dart/src/database/commands/aggregation_commands/aggregate/return_classes/change_event.dart';
@@ -115,7 +116,7 @@ class ModernCursor {
   }
 
   State state = State.init;
-  BsonLong cursorId = BsonLong(0);
+  Int64 cursorId = Int64.ZERO; //BsonLong(0);
   late Db db;
   Queue<Map<String, Object?>> items = Queue<Map<String, Object?>>();
   DbCollection? collection;
@@ -235,7 +236,7 @@ class ModernCursor {
       result = await operation!.execute();
       state = State.open;
     } else if (state == State.open) {
-      if (cursorId.data == 0) {
+      if (cursorId == Int64.ZERO) {
         await _serverSideCursorClose();
         return null;
       }
@@ -257,8 +258,9 @@ class ModernCursor {
           errorCodeName: result[keyCodeName] as String?);
     }
     var cursorMap = result[keyCursor] as Map<String, dynamic>?;
-    cursorId =
-        cursorMap == null ? BsonLong(0) : BsonLong(cursorMap[keyId] ?? 0);
+    cursorId = cursorMap == null
+        ? Int64.ZERO
+        : ((cursorMap[keyId] as Int64?) ?? Int64.ZERO);
     // The result map returns last records while setting cursorId to zero.
     extractCursorData(result);
     // batch size for "first batch" was 0, no data returned.
@@ -269,7 +271,7 @@ class ModernCursor {
     if (items.isNotEmpty) {
       return _getNextItem();
     }
-    if (cursorId.data == 0) {
+    if (cursorId == Int64.ZERO) {
       await _serverSideCursorClose();
       return null;
     }
@@ -289,10 +291,10 @@ class ModernCursor {
   Future<void> close() async {
     ////_log.finer("Closing cursor, cursorId = $cursorId");
     state = State.closed;
-    if (cursorId.value != 0 && collection != null) {
+    if (cursorId != Int64.ZERO && collection != null) {
       var command = KillCursorsCommand(collection!, [cursorId], db: db);
       await command.execute();
-      cursorId = BsonLong(0);
+      cursorId = Int64.ZERO;
     }
     return;
   }

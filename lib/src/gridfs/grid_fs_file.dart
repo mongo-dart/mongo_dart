@@ -16,12 +16,13 @@ abstract class GridFSFile {
     this.data = data ?? {};
   }
 
-  Future<Map<String, dynamic>> save() {
+  Future<Map<String, dynamic>> save() async {
     //if (fs == null) {
     //  throw MongoDartError('Need fs');
     //}
     var tempData = data;
-    return fs.files.insert(tempData);
+    var writeResult = await fs.files.insertOne(tempData);
+    return writeResult.serverResponses.first;
   }
 
   Future<bool> validate() {

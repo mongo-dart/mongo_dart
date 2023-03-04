@@ -1,3 +1,5 @@
+@Timeout(Duration(seconds: 100))
+
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/create_command/create_command.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/create_command/create_options.dart';
@@ -27,11 +29,11 @@ void main() async {
     await db.open();
   }
 
-  Future insertManyDocuments(
-      DbCollection collection, int numberOfRecords) async {
+  Future insertManyDocuments(DbCollection collection, int numberOfRecords,
+      {int initialRecord = 0}) async {
     var toInsert = <Map<String, dynamic>>[];
     for (var n = 0; n < numberOfRecords; n++) {
-      toInsert.add({'a': n});
+      toInsert.add({'a': n + initialRecord});
     }
 
     await collection.insertAll(toInsert);
@@ -72,7 +74,9 @@ void main() async {
       if (cannotRunTests) {
         return;
       }
-      var collectionName = getRandomCollectionName();
+      var collectionName = 'capped-collection';
+      usedCollectionNames.add(collectionName);
+
       var resultMap = await CreateCommand(db, collectionName,
               createOptions:
                   CreateOptions(capped: true, size: 5242880, max: 5000))
@@ -80,7 +84,14 @@ void main() async {
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
-      await insertManyDocuments(collection, 10000);
+      await insertManyDocuments(collection, 1000);
+      await insertManyDocuments(collection, 1000, initialRecord: 1000);
+      await insertManyDocuments(collection, 1000, initialRecord: 2000);
+      await insertManyDocuments(collection, 1000, initialRecord: 3000);
+      await insertManyDocuments(collection, 1000, initialRecord: 4000);
+      await insertManyDocuments(collection, 1000, initialRecord: 5000);
+      await insertManyDocuments(collection, 1000, initialRecord: 6000);
+
       var result = await collection.modernFind().toList();
 
       expect(result.length, 5000);

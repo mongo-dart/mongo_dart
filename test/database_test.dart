@@ -1,6 +1,7 @@
 @Timeout(Duration(minutes: 10))
 library database_tests;
 
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
@@ -888,7 +889,7 @@ Future testLimitWithSortByAndSkip() async {
     counter = await modernCursor.stream.length;
     expect(counter, 10);
     expect(modernCursor.state, State.closed);
-    expect(modernCursor.cursorId.value, 0);
+    expect(modernCursor.cursorId, Int64.ZERO);
     return;
   }
 
@@ -927,7 +928,7 @@ Future testLimit() async {
     await modernCursor.stream.forEach((e) => counter++);
     expect(counter, 10);
     expect(modernCursor.state, State.closed);
-    expect(modernCursor.cursorId.value, 0);
+    expect(modernCursor.cursorId, Int64.ZERO);
     return;
   }
 
@@ -977,7 +978,7 @@ Future testCursorClosing() async {
 
     var cursorResult = await modernCursor.nextObject();
     expect(modernCursor.state, State.open);
-    expect(modernCursor.cursorId.value, isPositive);
+    expect(modernCursor.cursorId.isNegative, isFalse);
     expect(cursorResult, isNotNull);
     if (cursorResult == null) {
       return;
@@ -987,7 +988,7 @@ Future testCursorClosing() async {
 
     await modernCursor.close();
     expect(modernCursor.state, State.closed);
-    expect(modernCursor.cursorId.value, 0);
+    expect(modernCursor.cursorId, Int64.ZERO);
 
     var result = await collection.findOne();
     expect(result, isNotNull);
@@ -1086,7 +1087,7 @@ Future testCursorWithOpenServerCursor() async {
     await modernCursor.nextObject();
     await modernCursor.nextObject();
     expect(modernCursor.state, State.open);
-    expect(modernCursor.cursorId.value, isPositive);
+    expect(modernCursor.cursorId.isNegative, isFalse);
 
     return;
   }
@@ -1121,7 +1122,7 @@ Future testCursorGetMore() async {
 
     count = await modernCursor.stream.length;
     expect(count, 1000);
-    expect(modernCursor.cursorId.value, 0);
+    expect(modernCursor.cursorId, Int64.ZERO);
     expect(modernCursor.state, State.closed);
     return;
   }

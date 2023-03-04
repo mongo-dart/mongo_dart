@@ -7,7 +7,9 @@ library mongo_dart;
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert' show base64;
-import 'dart:io'
+import 'dart:math';
+import 'dart:typed_data';
+import 'package:universal_io/io.dart'
     show
         File,
         FileMode,
@@ -16,8 +18,7 @@ import 'dart:io'
         SecurityContext,
         Socket,
         TlsException;
-import 'dart:math';
-import 'dart:typed_data';
+
 import 'package:bson/bson.dart';
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/src/auth/scram_sha256_authenticator.dart';

@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/get_parameter_command/get_parameter_command.dart';
@@ -76,14 +77,13 @@ void main() async {
 
           var cursorResult = await cursor.nextObject();
           expect(cursor.state, State.open);
-          expect(cursor.cursorId.value, isPositive);
+          expect(cursor.cursorId.isNegative, isFalse);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var command = KillCursorsCommand(collection, [cursor.cursorId]);
           var result = await command.execute();
           expect(result, isNotNull);
-          expect(
-              (result[keyCursorsKilled] as List).first, cursor.cursorId.value);
+          expect((result[keyCursorsKilled] as List).first, cursor.cursorId);
           expect(result[keyCursorsAlive], isEmpty);
           expect(result[keyCursorsUnknown], isEmpty);
           expect(result[keyCursorsNotFound], isEmpty);
@@ -94,11 +94,11 @@ void main() async {
           }
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
-          var command = KillCursorsCommand(collection, [BsonLong(1)]);
+          var command = KillCursorsCommand(collection, [Int64(1)]);
           var result = await command.execute();
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
-          expect((result[keyCursorsNotFound] as List).first, 1);
+          expect((result[keyCursorsNotFound] as List).first, Int64.ONE);
           expect(result[keyCursorsAlive], isEmpty);
           expect(result[keyCursorsUnknown], isEmpty);
           expect(result[keyCursorsKilled], isEmpty);
@@ -109,12 +109,12 @@ void main() async {
           }
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
-          var command =
-              KillCursorsCommand(collection, [BsonLong(111111111111)]);
+          var command = KillCursorsCommand(collection, [Int64(111111111111)]);
           var result = await command.execute();
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
-          expect((result[keyCursorsNotFound] as List).first, 111111111111);
+          expect(
+              (result[keyCursorsNotFound] as List).first, Int64(111111111111));
           expect(result[keyCursorsAlive], isEmpty);
           expect(result[keyCursorsUnknown], isEmpty);
           expect(result[keyCursorsKilled], isEmpty);
@@ -132,11 +132,11 @@ void main() async {
           var cursor = ModernCursor(FindOperation(collection));
           expect(cursor.state, State.init);
           await cursor.nextObject();
-          var command = KillCursorsCommand(collection, [BsonLong(1)]);
+          var command = KillCursorsCommand(collection, [Int64(1)]);
           var result = await command.execute();
           expect(result, isNotNull);
           expect(result[keyOk], 1.0);
-          expect((result[keyCursorsNotFound] as List).first, 1);
+          expect((result[keyCursorsNotFound] as List).first, Int64.ONE);
           expect(result[keyCursorsAlive], isEmpty);
           expect(result[keyCursorsUnknown], isEmpty);
           expect(result[keyCursorsKilled], isEmpty);
@@ -148,11 +148,11 @@ void main() async {
           }
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
-          var command = KillCursorsCommand(collection, [BsonLong(1)]);
+          var command = KillCursorsCommand(collection, [Int64(1)]);
           var result = await command.executeDocument();
           expect(result, isNotNull);
           expect(result.success, isTrue);
-          expect(result.cursorsNotFound?.first, 1);
+          expect(result.cursorsNotFound?.first, Int64.ONE);
           expect(result.cursorsAlive, isNull);
           expect(result.cursorsUnknown, isNull);
           expect(result.cursorsKilled, isNull);
@@ -163,11 +163,11 @@ void main() async {
           }
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
-          var command = KillCursorsCommand(collection, [BsonLong(-1)]);
+          var command = KillCursorsCommand(collection, [Int64(-1)]);
           var result = await command.executeDocument();
           expect(result, isNotNull);
           expect(result.success, isTrue);
-          expect(result.cursorsNotFound?.first, -1);
+          expect(result.cursorsNotFound?.first, Int64(-1));
           expect(result.cursorsAlive, isNull);
           expect(result.cursorsUnknown, isNull);
           expect(result.cursorsKilled, isNull);
@@ -189,7 +189,7 @@ void main() async {
 
           var cursorResult = await cursor.nextObject();
           expect(cursor.state, State.open);
-          expect(cursor.cursorId.value, isPositive);
+          expect(cursor.cursorId.isNegative, isFalse);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var command = GetMoreCommand(collection, cursor.cursorId);
@@ -209,7 +209,7 @@ void main() async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
 
-          var command = GetMoreCommand(collection, BsonLong(1));
+          var command = GetMoreCommand(collection, Int64(1));
           var result = await command.execute();
           expect(result, isNotNull);
           expect(result[keyOk], 0.0);
@@ -231,7 +231,7 @@ void main() async {
 
           var cursorResult = await cursor.nextObject();
           expect(cursor.state, State.open);
-          expect(cursor.cursorId.value, isPositive);
+          expect(cursor.cursorId.isNegative, isFalse);
           expect(cursorResult?['a'], 0);
           expect(cursorResult, isNotNull);
           var options = GetMoreOptions(batchSize: 10);

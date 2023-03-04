@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/utils/mongo_db_namespace.dart';
 
@@ -16,7 +17,7 @@ import 'package:mongo_dart/src/database/utils/mongo_db_namespace.dart';
 /// only the getMore commands run when a queried shard or shards are
 /// unavailable include the partialResultsReturned flag in the output.
 class CursorResult {
-  late int id;
+  late Int64 id;
   MongoDBNamespace? ns;
 
   /// alternative container for documents:
@@ -34,7 +35,7 @@ class CursorResult {
     if (document[keyId] == null) {
       throw MongoDartError('Missing cursor Id');
     }
-    id = document[keyId] as int;
+    id = document[keyId] as Int64;
     // on errors "ns is not returned"
     if (document[keyNs] != null) {
       ns = MongoDBNamespace.fromString(document[keyNs] as String);

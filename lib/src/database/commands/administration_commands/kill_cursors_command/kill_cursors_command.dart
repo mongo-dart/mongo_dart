@@ -1,4 +1,4 @@
-import 'package:bson/bson.dart';
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart'
     show Db, DbCollection, MongoDartError;
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
@@ -26,7 +26,7 @@ import 'kill_cursors_result.dart';
 /// * killCursorsOptions [KillCursorsOptions] - Optional
 ///   - a set of optional values for the command
 class KillCursorsCommand extends CommandOperation {
-  KillCursorsCommand(DbCollection collection, List<BsonLong> cursorIds,
+  KillCursorsCommand(DbCollection collection, List<Int64> cursorIds,
       {Db? db,
       KillCursorsOptions? killCursorsOptions,
       Map<String, Object>? rawOptions})

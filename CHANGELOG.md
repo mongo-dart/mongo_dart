@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.0-1.0.dev
+
+- Fixed an issue on GridFs `save()` method using MongoDb 6.0
+- Possible **breaking change**. The cursorId has been changed from type BsonLong to type Int64. In general all BsonLong fields received from the server now are received as Int64 instead of int (see Bson package)
+- authSourceDb defaulted to 'admin' in case neither the default Db nor the authSourceDb has been specified
+- added ***experimental*** support for web apps. Try it at your own risk ...
+
 ## 0.8.2
 
 - Fixed a regression bug using MongoDb-CR authMethod

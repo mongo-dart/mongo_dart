@@ -43,8 +43,7 @@ class MongoReplyMessage extends MongoResponseMessage {
     documents = List<Map<String, dynamic>>.filled(
         numberReturned, const <String, dynamic>{});
     for (var n = 0; n < numberReturned; n++) {
-      var doc = BsonMap(<String, dynamic>{});
-      doc.unpackValue(buffer);
+      var doc = BsonMap.fromBuffer(buffer);
       documents![n] = doc.value;
     }
     return this;

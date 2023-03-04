@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/src/database/commands/mixin/basic_result.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
@@ -71,18 +72,18 @@ class ServerStatusResult with BasicResult {
   String? process;
 
   /// The process id number.
-  int? pid;
+  Int64? pid;
 
   /// The number of seconds that the current MongoDB process has been active.
   int? uptime;
 
   /// The number of milliseconds that the current MongoDB process has
   /// been active.
-  int? uptimeMillis;
+  Int64? uptimeMillis;
 
   /// The uptime in seconds as calculated from MongoDB’s internal
   /// course-grained time keeping system.
-  int? uptimeEstimate;
+  Int64? uptimeEstimate;
 
   /// The ISODate representing the current time, according to the server,
   /// in UTC.
@@ -1420,14 +1421,14 @@ class ServerStatusResult with BasicResult {
     advisoryHostFQDNs = document[keyAdvisoryHostFQDNs] as List<String>?;
     version = document[keyVersion] as String?;
     process = document[keyProcess] as String?;
-    pid = document[keyPid] as int?;
+    pid = document[keyPid] as Int64?;
     if (document[keyUptime] is double) {
       uptime = (document[keyUptime] as double).toInt();
     } else {
       uptime = document[keyUptime] as int?;
     }
-    uptimeMillis = document[keyUptimeMillis] as int?;
-    uptimeEstimate = document[keyUptimeEstimate] as int?;
+    uptimeMillis = document[keyUptimeMillis] as Int64?;
+    uptimeEstimate = document[keyUptimeEstimate] as Int64?;
     localTime = document[keyLocalTime] as DateTime?;
   }
 }
