@@ -1,4 +1,7 @@
+@Timeout(Duration(minutes: 10))
 library all_tests;
+
+import 'package:test/test.dart';
 
 import 'database_test.dart' as database;
 import 'gridfs_test.dart' as gridfs;
