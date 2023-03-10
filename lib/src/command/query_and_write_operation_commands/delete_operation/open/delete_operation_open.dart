@@ -1,6 +1,6 @@
 import '../base/delete_operation.dart';
 
-class DeleteOperationOpen extends DeleteOperation {
+base class DeleteOperationOpen extends DeleteOperation {
   DeleteOperationOpen(super.collection, super.deleteRequests,
       {super.session, super.deleteOptions, super.rawOptions})
       : super.protected();

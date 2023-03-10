@@ -15,9 +15,12 @@ import '../../../../../session/client_session.dart';
 import '../open/update_one_operation_open.dart';
 import '../v1/update_one_operation_v1.dart';
 
-typedef UpdateOneDocumentRec = (WriteResult writeResult, MongoDocument serverDocument);
+typedef UpdateOneDocumentRec = (
+  WriteResult writeResult,
+  MongoDocument serverDocument
+);
 
-abstract class UpdateOneOperation extends UpdateOperation {
+abstract base class UpdateOneOperation extends UpdateOperation {
   @protected
   UpdateOneOperation.protected(
       MongoCollection collection, UpdateOneStatement updateOneStatement,
@@ -50,13 +53,12 @@ abstract class UpdateOneOperation extends UpdateOperation {
         rawOptions: rawOptions);
   }
 
- /*  Future<WriteResult> executeDocument() async =>
+  /*  Future<WriteResult> executeDocument() async =>
       WriteResult.fromMap(WriteCommandType.update, await process()); */
-  Future<MongoDocument> executeUpdateOne() async => process();    
-      
+  Future<MongoDocument> executeUpdateOne() async => process();
+
   Future<UpdateOneDocumentRec> executeDocument() async {
-    var ret= await executeUpdateOne( );
-    return (WriteResult.fromMap(WriteCommandType.update, ret)
-      , ret);
+    var ret = await executeUpdateOne();
+    return (WriteResult.fromMap(WriteCommandType.update, ret), ret);
   }
 }

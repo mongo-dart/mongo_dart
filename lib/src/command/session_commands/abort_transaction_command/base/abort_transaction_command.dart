@@ -8,7 +8,7 @@ import '../open/abort_transaction_command_open.dart';
 import '../v1/abort_transaction_command_v1.dart';
 import 'abort_transaction_options.dart';
 
-class AbortTransactionCommand extends DbAdminCommandOperation {
+base class AbortTransactionCommand extends DbAdminCommandOperation {
   @protected
   AbortTransactionCommand.protected(
       MongoClient client, TransactionInfo transactionInfo,

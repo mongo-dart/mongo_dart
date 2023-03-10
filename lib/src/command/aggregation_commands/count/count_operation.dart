@@ -12,7 +12,7 @@ import 'count_result.dart';
 /// Collection is the collection on which the operation is performed
 /// In case of admin/diagnostic pipeline which does not require an underlying
 /// collection, the db parameter must be passed instead.
-class CountOperation extends CommandOperation {
+base class CountOperation extends CommandOperation {
   CountOperation(MongoCollection collection,
       {this.query,
       this.limit,

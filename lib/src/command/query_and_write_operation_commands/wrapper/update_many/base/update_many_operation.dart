@@ -5,9 +5,12 @@ import '../../../../../session/client_session.dart';
 import '../open/update_many_operation_open.dart';
 import '../v1/update_many_operation_v1.dart';
 
-typedef UpdateManyDocumentRec = (WriteResult writeResult, MongoDocument serverDocument);
+typedef UpdateManyDocumentRec = (
+  WriteResult writeResult,
+  MongoDocument serverDocument
+);
 
-abstract class UpdateManyOperation extends UpdateOperation {
+abstract base class UpdateManyOperation extends UpdateOperation {
   @protected
   UpdateManyOperation.protected(
       MongoCollection collection, UpdateManyStatement updateManyStatement,
@@ -46,13 +49,10 @@ abstract class UpdateManyOperation extends UpdateOperation {
         rawOptions: rawOptions);
   }
 
- 
+  Future<MongoDocument> executeUpdateMany() async => process();
 
-       Future<MongoDocument> executeUpdateMany() async => process();    
-      
   Future<UpdateManyDocumentRec> executeDocument() async {
-    var ret= await executeUpdateMany( );
-    return (WriteResult.fromMap(WriteCommandType.update, ret)
-      , ret);
+    var ret = await executeUpdateMany();
+    return (WriteResult.fromMap(WriteCommandType.update, ret), ret);
   }
 }

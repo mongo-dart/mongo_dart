@@ -16,7 +16,7 @@ import '../../../../utils/query_union.dart';
 import '../../update_operation/base/update_union.dart';
 import 'bulk_options.dart';
 
-abstract class Bulk extends CommandOperation {
+abstract base class Bulk extends CommandOperation {
   Bulk(MongoCollection collection,
       {super.session,
       BulkOptions? bulkOptions,

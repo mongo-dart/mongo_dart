@@ -20,7 +20,7 @@ import '../../base/command_operation.dart';
 ///   An alternative way to listIndexesOptions to specify command options
 ///   (must be manually set)
 
-class ListIndexesCommand extends CommandOperation {
+base class ListIndexesCommand extends CommandOperation {
   ListIndexesCommand(MongoDatabase db, MongoCollection collection,
       {super.session,
       ListIndexesOptions? listIndexesOptions,

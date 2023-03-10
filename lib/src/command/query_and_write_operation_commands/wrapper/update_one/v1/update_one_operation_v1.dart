@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrappe
 
 import 'update_one_options_v1.dart';
 
-class UpdateOneOperationV1 extends UpdateOneOperation {
+base class UpdateOneOperationV1 extends UpdateOneOperation {
   UpdateOneOperationV1(
       MongoCollection collection, UpdateOneStatementV1 updateOneStatement,
       {super.session, UpdateOneOptionsV1? updateOneOptions, super.rawOptions})

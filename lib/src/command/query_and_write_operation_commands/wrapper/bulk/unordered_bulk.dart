@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/command/base/operation_base.dart';
 
 import 'bulk_options.dart';
 
-class UnorderedBulk extends Bulk {
+base class UnorderedBulk extends Bulk {
   UnorderedBulk(MongoCollection collection,
       {WriteConcern? writeConcern,
       Map<String, Object>? rawOptions,

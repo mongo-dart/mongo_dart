@@ -9,7 +9,7 @@ import '../open/delete_operation_open.dart';
 import '../v1/delete_operation_v1.dart';
 import 'delete_options.dart';
 
-abstract class DeleteOperation extends CommandOperation {
+abstract base class DeleteOperation extends CommandOperation {
   @protected
   DeleteOperation.protected(MongoCollection collection, this.deleteRequests,
       {super.session,

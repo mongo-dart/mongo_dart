@@ -10,7 +10,7 @@ import 'distinct_result.dart';
 /// Collection is the collection on which the operation is performed
 /// In case of admin/diagnostic pipeline which does not require an underlying
 /// collection, the db parameter must be passed instead.
-class DistinctOperation extends CommandOperation {
+base class DistinctOperation extends CommandOperation {
   DistinctOperation(MongoCollection collection, this.key,
       {this.query,
       super.session,

@@ -6,7 +6,7 @@ import 'server_status_result.dart';
 
 var _command = <String, dynamic>{keyServerStatus: 1};
 
-class ServerStatusCommand extends CommandOperation {
+base class ServerStatusCommand extends CommandOperation {
   ServerStatusCommand(MongoDatabase db,
       {super.session,
       ServerStatusOptions? serverStatusOptions,

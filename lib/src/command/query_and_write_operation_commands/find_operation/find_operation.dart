@@ -9,7 +9,7 @@ import 'find_options.dart';
 import '../../base/command_operation.dart';
 import 'find_result.dart';
 
-class FindOperation extends CommandOperation {
+base class FindOperation extends CommandOperation {
   FindOperation(MongoCollection collection,
       {this.filter,
       this.sort,

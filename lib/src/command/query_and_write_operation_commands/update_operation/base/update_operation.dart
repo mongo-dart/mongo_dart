@@ -16,7 +16,7 @@ import '../../../base/command_operation.dart';
 import '../open/update_operation_open.dart';
 import '../v1/update_operation_v1.dart';
 
-abstract class UpdateOperation extends CommandOperation {
+abstract base class UpdateOperation extends CommandOperation {
   @protected
   UpdateOperation.protected(MongoCollection collection, this.updates,
       {bool? ordered,

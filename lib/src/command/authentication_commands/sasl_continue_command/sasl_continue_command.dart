@@ -7,7 +7,7 @@ import '../../../core/network/abstract/connection_base.dart';
 import '../../../database/base/mongo_database.dart';
 import 'sasl_continue_options.dart';
 
-class SaslContinueCommand extends CommandOperation {
+base class SaslContinueCommand extends CommandOperation {
   SaslContinueCommand(MongoDatabase db, int conversationId, Uint8List payload,
       {super.session,
       SaslContinueOptions? saslContinueOptions,

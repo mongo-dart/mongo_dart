@@ -5,9 +5,12 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrappe
 import '../../../../../session/client_session.dart';
 import '../v1/replace_one_operation_v1.dart';
 
-typedef ReplaceOneDocumentRec = (WriteResult writeResult, MongoDocument serverDocument);
+typedef ReplaceOneDocumentRec = (
+  WriteResult writeResult,
+  MongoDocument serverDocument
+);
 
-abstract class ReplaceOneOperation extends UpdateOperation {
+abstract base class ReplaceOneOperation extends UpdateOperation {
   @protected
   ReplaceOneOperation.protected(
       MongoCollection collection, ReplaceOneStatement replaceOneStatement,
@@ -46,12 +49,11 @@ abstract class ReplaceOneOperation extends UpdateOperation {
         replaceOneOptions: replaceOneOptions?.toReplaceOneOpen,
         rawOptions: rawOptions);
   }
-       Future<MongoDocument> executeReplaceOne() async => process();    
+  Future<MongoDocument> executeReplaceOne() async => process();
 
   Future<ReplaceOneDocumentRec> executeDocument() async {
-        var ret= await executeReplaceOne( );
+    var ret = await executeReplaceOne();
 
     return (WriteResult.fromMap(WriteCommandType.update, ret), ret);
-  }   
- 
+  }
 }

@@ -8,7 +8,7 @@ import '../open/commit_transaction_command_open.dart';
 import '../v1/commit_transaction_command_v1.dart';
 import 'commit_transaction_options.dart';
 
-class CommitTransactionCommand extends DbAdminCommandOperation {
+base class CommitTransactionCommand extends DbAdminCommandOperation {
   @protected
   CommitTransactionCommand.protected(
       MongoClient client, TransactionInfo transactionInfo,

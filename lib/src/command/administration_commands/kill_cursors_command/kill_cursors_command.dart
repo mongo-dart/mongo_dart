@@ -36,7 +36,7 @@ import 'kill_cursors_result.dart';
 /// kill cursors that aren't exhausted and closed. Due to GC semantics,
 /// it can't use the same lsid for killCursors as was used for a cursor's
 /// find and getMore, so there's no point in using any lsid at all.
-class KillCursorsCommand extends CommandOperation {
+base class KillCursorsCommand extends CommandOperation {
   KillCursorsCommand(MongoCollection collection, List<Int64> cursorIds,
       {MongoDatabase? db,
       super.session,

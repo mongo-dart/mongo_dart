@@ -11,7 +11,7 @@ import 't30_1.dart';
   //Fin4(super.str);
 } */
 
-class Bas2 extends Bas {
+base class Bas2 extends Bas {
   Bas2(super.str);
 }
 

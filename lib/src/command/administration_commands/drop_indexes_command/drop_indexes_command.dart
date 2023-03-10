@@ -8,7 +8,7 @@ import '../../../database/base/mongo_database.dart';
 import '../../../database/base/mongo_collection.dart';
 import 'drop_indexes_options.dart';
 
-class DropIndexesCommand extends CommandOperation {
+base class DropIndexesCommand extends CommandOperation {
   Object index;
   late Map<String, Object> indexes;
 

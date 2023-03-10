@@ -6,9 +6,12 @@ import '../../../../../session/client_session.dart';
 import '../open/delete_many_operation_open.dart';
 import '../v1/delete_many_operation_v1.dart';
 
-typedef DeleteManyDocumentRec = (WriteResult writeResult, MongoDocument serverDocument);
+typedef DeleteManyDocumentRec = (
+  WriteResult writeResult,
+  MongoDocument serverDocument
+);
 
-abstract class DeleteManyOperation extends DeleteOperation {
+abstract base class DeleteManyOperation extends DeleteOperation {
   @protected
   DeleteManyOperation.protected(
       MongoCollection collection, DeleteManyStatement deleteRequest,
@@ -46,13 +49,10 @@ abstract class DeleteManyOperation extends DeleteOperation {
         deleteManyOptions: deleteManyOptions?.toDeleteManyOpen,
         rawOptions: rawOptions);
   }
-       Future<MongoDocument> executeDeleteMany() async => process();    
+  Future<MongoDocument> executeDeleteMany() async => process();
 
-  Future<DeleteManyDocumentRec> executeDocument() async {  
-    var ret= await executeDeleteMany( );
-    return ( WriteResult.fromMap(WriteCommandType.delete, ret), ret);
+  Future<DeleteManyDocumentRec> executeDocument() async {
+    var ret = await executeDeleteMany();
+    return (WriteResult.fromMap(WriteCommandType.delete, ret), ret);
   }
-
-
- 
 }

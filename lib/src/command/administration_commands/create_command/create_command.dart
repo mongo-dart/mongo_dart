@@ -26,7 +26,7 @@ import 'create_options.dart';
 /// - rawOption [Map]
 ///   An alternative way to creteOptions to specify command options
 ///   (must be manually set)
-class CreateCommand extends CommandOperation {
+base class CreateCommand extends CommandOperation {
   CreateCommand(MongoDatabase db, String name,
       {super.session,
       CreateOptions? createOptions,

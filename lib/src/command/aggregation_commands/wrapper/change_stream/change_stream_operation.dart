@@ -6,7 +6,7 @@ import '../../../../database/base/mongo_collection.dart';
 import '../../../../utils/hint_union.dart';
 import 'change_stream_options.dart';
 
-class ChangeStreamOperation extends AggregateOperation {
+base class ChangeStreamOperation extends AggregateOperation {
   ChangeStreamOperation(Object pipeline,
       {MongoCollection? collection,
       MongoDatabase? db,

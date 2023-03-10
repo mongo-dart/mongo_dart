@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrappe
 
 import 'delete_one_options_v1.dart';
 
-class DeleteOneOperationV1 extends DeleteOneOperation {
+base class DeleteOneOperationV1 extends DeleteOneOperation {
   DeleteOneOperationV1(
       MongoCollection collection, DeleteOneStatementV1 deleteOneStatement,
       {super.session, DeleteOneOptionsV1? deleteOneOptions, super.rawOptions})

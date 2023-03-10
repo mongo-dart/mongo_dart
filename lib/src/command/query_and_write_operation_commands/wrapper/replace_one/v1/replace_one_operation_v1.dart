@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/wrappe
 
 import 'replace_one_options_v1.dart';
 
-class ReplaceOneOperationV1 extends ReplaceOneOperation {
+base class ReplaceOneOperationV1 extends ReplaceOneOperation {
   ReplaceOneOperationV1(
       MongoCollection collection, ReplaceOneStatementV1 replaceOneStatement,
       {super.session, ReplaceOneOptionsV1? replaceOneOptions, super.rawOptions})

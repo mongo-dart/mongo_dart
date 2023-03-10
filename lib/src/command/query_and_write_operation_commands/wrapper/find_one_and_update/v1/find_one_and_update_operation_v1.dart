@@ -3,7 +3,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import '../base/find_one_and_update_operation.dart';
 import 'find_one_and_update_options_v1.dart';
 
-class FindOneAndUpdateOperationV1 extends FindOneAndUpdateOperation {
+base class FindOneAndUpdateOperationV1 extends FindOneAndUpdateOperation {
   FindOneAndUpdateOperationV1(MongoCollection collection,
       {super.query,
       super.update,

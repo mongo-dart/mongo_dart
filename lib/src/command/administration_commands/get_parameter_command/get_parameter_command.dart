@@ -2,7 +2,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/db_admin_command_operation.dart';
 import 'get_parameter_options.dart';
 
-class GetParameterCommand extends DbAdminCommandOperation {
+base class GetParameterCommand extends DbAdminCommandOperation {
   GetParameterCommand(MongoClient client, String parameterName,
       {super.session,
       GetParameterOptions? getParameterOptions,

@@ -9,12 +9,16 @@ import '../open/insert_operation_open.dart';
 import '../v1/insert_operation_v1.dart';
 import 'insert_options.dart';
 
-typedef InsertRec = (MongoDocument serverDocument, List<MongoDocument> insertedDocuments, List ids);
+typedef InsertRec = (
+  MongoDocument serverDocument,
+  List<MongoDocument> insertedDocuments,
+  List ids
+);
 
-abstract class InsertOperation extends CommandOperation {
+abstract base class InsertOperation extends CommandOperation {
   @protected
   InsertOperation.protected(MongoCollection collection, this.documents,
-      {super.session,InsertOptions? insertOptions, Options? rawOptions})
+      {super.session, InsertOptions? insertOptions, Options? rawOptions})
       : ids = List.filled(documents.length, null),
         super(
             collection.db,
@@ -37,19 +41,25 @@ abstract class InsertOperation extends CommandOperation {
 
   factory InsertOperation(
       MongoCollection collection, List<MongoDocument> documents,
-      {ClientSession? session, InsertOptions? insertOptions, Options? rawOptions}) {
+      {ClientSession? session,
+      InsertOptions? insertOptions,
+      Options? rawOptions}) {
     if (collection.serverApi != null) {
       switch (collection.serverApi!.version) {
         case ServerApiVersion.v1:
-          return InsertOperationV1(collection, documents, session: session,
-              insertOptions: insertOptions?.toV1, rawOptions: rawOptions);
+          return InsertOperationV1(collection, documents,
+              session: session,
+              insertOptions: insertOptions?.toV1,
+              rawOptions: rawOptions);
         default:
           throw MongoDartError(
               'Stable Api ${collection.serverApi!.version} not managed');
       }
     }
-    return InsertOperationOpen(collection, documents,session: session,
-        insertOptions: insertOptions?.toOpen, rawOptions: rawOptions);
+    return InsertOperationOpen(collection, documents,
+        session: session,
+        insertOptions: insertOptions?.toOpen,
+        rawOptions: rawOptions);
   }
 
   List<MongoDocument> documents;
@@ -62,9 +72,7 @@ abstract class InsertOperation extends CommandOperation {
       };
 
   Future<InsertRec> executeInsert() async {
-    var ret = await super.process( );
+    var ret = await super.process();
     return (ret, documents, ids);
   }
-   
-  
 }

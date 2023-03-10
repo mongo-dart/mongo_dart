@@ -5,7 +5,7 @@ import '../../session/client_session.dart';
 import '../../topology/server.dart';
 import 'operation_base.dart';
 
-class DbAdminCommandOperation extends OperationBase {
+base class DbAdminCommandOperation extends OperationBase {
   DbAdminCommandOperation(this.client, this.command,
       {super.session, super.options})
       : super(client);

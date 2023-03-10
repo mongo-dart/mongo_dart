@@ -18,7 +18,7 @@ const Set keysToOmit = <String>{
   'session'
 };
 
-class CreateIndexOperation extends CommandOperation {
+base class CreateIndexOperation extends CommandOperation {
   Object fieldOrSpec;
   late Map<String, Object> indexes;
 

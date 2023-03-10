@@ -1,6 +1,6 @@
 import '../base/find_and_modify_operation.dart';
 
-class FindAndModifyOperationOpen extends FindAndModifyOperation {
+base class FindAndModifyOperationOpen extends FindAndModifyOperation {
   FindAndModifyOperationOpen(super.collection,
       {super.query,
       super.sort,

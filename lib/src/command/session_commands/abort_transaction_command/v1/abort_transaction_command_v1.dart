@@ -2,7 +2,7 @@ import 'package:mongo_dart/src/command/session_commands/abort_transaction_comman
 
 import 'abort_transaction_options_v1.dart';
 
-class AbortTransactionCommandV1 extends AbortTransactionCommand {
+base class AbortTransactionCommandV1 extends AbortTransactionCommand {
   AbortTransactionCommandV1(super.client, super.transactionInfo,
       {super.session,
       AbortTransactionOptionsV1? abortTransactionOptions,

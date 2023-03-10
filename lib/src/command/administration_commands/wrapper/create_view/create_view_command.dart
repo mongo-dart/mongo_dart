@@ -51,7 +51,7 @@ import 'create_view_options.dart';
 /// - rawOption [Map]
 ///   An alternative way to creteViewOptions to specify command options
 ///   (must be manually set)
-class CreateViewCommand extends CreateCommand {
+base class CreateViewCommand extends CreateCommand {
   CreateViewCommand(MongoDatabase db, String view, String source, List pipeline,
       {CreateViewOptions? createViewOptions, Map<String, Object>? rawOptions})
       : super(db, view,

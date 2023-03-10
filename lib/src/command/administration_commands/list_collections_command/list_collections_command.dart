@@ -28,7 +28,7 @@ import '../../base/command_operation.dart';
 ///   An alternative way to listCollectionsOptions to specify command options
 ///   (must be manually set)
 
-class ListCollectionsCommand extends CommandOperation {
+base class ListCollectionsCommand extends CommandOperation {
   ListCollectionsCommand(MongoDatabase db,
       {this.filter,
       super.session,

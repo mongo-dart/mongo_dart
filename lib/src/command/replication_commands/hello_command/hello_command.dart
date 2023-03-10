@@ -18,7 +18,7 @@ var _command = <String, dynamic>{keyHello: 1};
 ///
 /// `db.runCommand( { hello: 1, saslSupportedMechs: "<db.username>",
 /// comment: <String> } )`
-class HelloCommand extends ServerCommand {
+base class HelloCommand extends ServerCommand {
   HelloCommand(this.server,
       {MongoDatabase? db,
       String? username,

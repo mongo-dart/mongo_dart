@@ -14,10 +14,13 @@ import '../v1/find_and_modify_operation_v1.dart';
 import 'find_and_modify_options.dart';
 import '../../../base/command_operation.dart';
 import '../../return_classes/find_and_modify_result.dart';
-typedef FindAndModifyDocumentRec = 
-(FindAndModifyResult findAndModifyResult, MongoDocument serverDocument);
 
-class FindAndModifyOperation extends CommandOperation {
+typedef FindAndModifyDocumentRec = (
+  FindAndModifyResult findAndModifyResult,
+  MongoDocument serverDocument
+);
+
+base class FindAndModifyOperation extends CommandOperation {
   FindAndModifyOperation.protected(MongoCollection collection,
       {this.query = const QueryUnion(<String, dynamic>{}),
       this.sort,
@@ -48,9 +51,8 @@ class FindAndModifyOperation extends CommandOperation {
           'The arrayFilters parameter must be either a List or a Map');
     }
   }
-  
-  factory FindAndModifyOperation(
-      MongoCollection collection,
+
+  factory FindAndModifyOperation(MongoCollection collection,
       {QueryUnion query = const QueryUnion(<String, dynamic>{}),
       IndexDocument? sort,
       bool? remove,
@@ -62,14 +64,19 @@ class FindAndModifyOperation extends CommandOperation {
       ClientSession? session,
       HintUnion? hint,
       FindAndModifyOptions? findAndModifyOptions,
-     Options? rawOptions}) {
+      Options? rawOptions}) {
     if (collection.serverApi != null) {
       switch (collection.serverApi!.version) {
         case ServerApiVersion.v1:
-          return FindAndModifyOperationV1(
-              collection, query: query,sort: sort, remove:remove,update:update,
-              returnNew: returnNew,fields:fields, upsert: upsert, arrayFilters:arrayFilters,
-
+          return FindAndModifyOperationV1(collection,
+              query: query,
+              sort: sort,
+              remove: remove,
+              update: update,
+              returnNew: returnNew,
+              fields: fields,
+              upsert: upsert,
+              arrayFilters: arrayFilters,
               session: session,
               findAndModifyOptions: findAndModifyOptions?.toFindAndModifyV1,
               rawOptions: rawOptions);
@@ -78,15 +85,19 @@ class FindAndModifyOperation extends CommandOperation {
               'Stable Api ${collection.serverApi!.version} not managed');
       }
     }
-    return FindAndModifyOperationOpen(
-        collection, query: query,sort: sort, remove:remove,update:update,
-              returnNew: returnNew,fields:fields, upsert: upsert, arrayFilters:arrayFilters,
-
-              session: session,
-              findAndModifyOptions: findAndModifyOptions?.toFindAndModifyOpen,
-              rawOptions: rawOptions);
+    return FindAndModifyOperationOpen(collection,
+        query: query,
+        sort: sort,
+        remove: remove,
+        update: update,
+        returnNew: returnNew,
+        fields: fields,
+        upsert: upsert,
+        arrayFilters: arrayFilters,
+        session: session,
+        findAndModifyOptions: findAndModifyOptions?.toFindAndModifyOpen,
+        rawOptions: rawOptions);
   }
-
 
   /// The selection criteria for the modification. The query field employs
   /// the same query selectors as used in the db.collection.find() method.
@@ -249,7 +260,7 @@ class FindAndModifyOperation extends CommandOperation {
         if (hint != null && !hint!.isNull) keyHint: hint!.value
       };
 
- /*       Future<MongoDocument> executeFindAndModify() async => process(); 
+  /*       Future<MongoDocument> executeFindAndModify() async => process(); 
 
   Future<FindAndModifyDocumentRec> executeDocument() async {
         var ret= await executeFindAndModify( );

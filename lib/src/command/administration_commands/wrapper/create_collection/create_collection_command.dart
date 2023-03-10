@@ -36,7 +36,7 @@ import 'create_collection_options.dart';
 /// - rawOption [Map]
 ///   An alternative way to creteCollectionOptions to specify command options
 ///   (must be manually set)
-class CreateCollectionCommand extends CreateCommand {
+base class CreateCollectionCommand extends CreateCommand {
   CreateCollectionCommand(MongoDatabase db, String name,
       {CreateCollectionOptions? createCollectionOptions,
       Map<String, Object>? rawOptions})

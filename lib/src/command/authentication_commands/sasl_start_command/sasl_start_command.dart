@@ -8,7 +8,7 @@ import 'package:mongo_dart/src/core/network/abstract/connection_base.dart';
 
 import '../../../database/base/mongo_database.dart';
 
-class SaslStartCommand extends CommandOperation {
+base class SaslStartCommand extends CommandOperation {
   SaslStartCommand(MongoDatabase db, String mechanism, Uint8List payload,
       {super.session,
       SaslStartOptions? saslStartOptions,

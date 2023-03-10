@@ -4,7 +4,7 @@ import 'package:mongo_dart/src/command/base/operation_base.dart';
 
 import 'bulk_options.dart';
 
-class OrderedBulk extends Bulk {
+base class OrderedBulk extends Bulk {
   OrderedBulk(MongoCollection collection,
       {WriteConcern? writeConcern,
       Map<String, Object>? rawOptions,

@@ -23,7 +23,7 @@ import 'aggregate_result.dart';
 /// Collection is the collection on which the operation is performed
 /// In case of admin/diagnostic pipeline which does not require an underlying
 /// collection, the db parameter must be passed instead.
-class AggregateOperation extends CommandOperation {
+base class AggregateOperation extends CommandOperation {
   AggregateOperation(Object pipeline,
       {MongoCollection? collection,
       MongoDatabase? db,

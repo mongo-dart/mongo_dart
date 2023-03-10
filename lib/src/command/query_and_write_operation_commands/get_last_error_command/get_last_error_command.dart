@@ -32,7 +32,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 ///     indefinitely.
 /// * getLastErrorOptions [GetLastErrorOptions] - Optional
 ///   - a set of optional values for the command
-class GetLastErrorCommand extends CommandOperation {
+base class GetLastErrorCommand extends CommandOperation {
   GetLastErrorCommand(MongoDatabase db,
       {WriteConcern? writeConcern,
       super.session,

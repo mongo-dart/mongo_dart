@@ -8,7 +8,7 @@ import '../../topology/server.dart';
 /// Run a simple command
 ///
 /// Designed for system commands where Db/Collection are not needed
-class SimpleCommand extends ServerCommand {
+base class SimpleCommand extends ServerCommand {
   SimpleCommand(super.mongoClient, super.command,
       {super.options,
       super.session,

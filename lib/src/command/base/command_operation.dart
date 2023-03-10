@@ -10,7 +10,7 @@ import '../../database/base/mongo_database.dart';
 import '../../database/base/mongo_collection.dart';
 import 'operation_base.dart' show Aspect, Command, Options;
 
-class CommandOperation extends SimpleCommand {
+base class CommandOperation extends SimpleCommand {
   CommandOperation(this.db, Command command, Options options,
       {this.collection, super.session, super.readPreference, super.aspect})
       : super(db.mongoClient, command, options: options);

@@ -20,7 +20,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 ///   -	The cursor id of the original find or aggregate operations.
 /// * getMoreOptions [GetMoreOptions] - Optional
 ///   - a set of optional values for the command
-class GetMoreCommand extends CommandOperation {
+base class GetMoreCommand extends CommandOperation {
   GetMoreCommand(MongoCollection? collection, Int64 cursorId,
       {MongoDatabase? db,
       String? collectionName,

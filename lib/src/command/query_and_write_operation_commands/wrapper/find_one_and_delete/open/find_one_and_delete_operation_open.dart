@@ -1,7 +1,7 @@
 import '../base/find_one_and_delete_operation.dart';
 import 'find_one_and_delete_options_open.dart';
 
-class FindOneAndDeleteOperationOpen extends FindOneAndDeleteOperation {
+base class FindOneAndDeleteOperationOpen extends FindOneAndDeleteOperation {
   FindOneAndDeleteOperationOpen(super.collection, super.query,
       {super.fields,
       super.sort,
