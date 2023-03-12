@@ -16,9 +16,8 @@ class GridFS {
 
   // T O D O (tsander): Ensure index.
 
-  Stream<Map<String, dynamic>> getFileList(SelectorBuilder selectorBuilder) {
-    return files.find(selectorBuilder.sortBy('filename', descending: true));
-  }
+  Stream<Map<String, dynamic>> getFileList(SelectorBuilder selectorBuilder) =>
+      files.find(selectorBuilder.sortBy('filename', descending: true));
 
   Future<GridOut?> findOne(selector) async {
     //var completer = Completer<GridOut>();
@@ -43,4 +42,16 @@ class GridFS {
 
   GridIn createFile(Stream<List<int>> input, String filename) =>
       GridIn._(this, filename, input);
+
+  /// **Beware!** This method removes all the documents in this bucket
+  Future<void> clearBucket() async {
+    await files.deleteMany(<String, dynamic>{});
+    await chunks.deleteMany(<String, dynamic>{});
+  }
+
+  /// **Beware!** This method drops this bucket
+  Future<void> dropBucket() async {
+    await files.drop();
+    await chunks.drop();
+  }
 }

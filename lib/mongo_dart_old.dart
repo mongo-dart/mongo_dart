@@ -5,9 +5,10 @@
 library mongo_dart;
 
 import 'dart:async';
-import 'dart:io' show File, FileMode, IOSink;
+import 'dart:io' show File, FileMode, IOSink, Platform;
 import 'dart:typed_data';
 import 'package:bson/bson.dart';
+import 'package:mongo_dart/src/extensions/file_ext.dart';
 
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 
@@ -17,6 +18,7 @@ import 'src/database/base/mongo_database.dart';
 import 'src/database/base/mongo_collection.dart';
 
 import 'src/core/message/abstract/mongo_message.dart';
+import 'package:path/path.dart' as p;
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_aggregation.dart';
