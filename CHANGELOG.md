@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.1
+
+- Added a `delete()` method to `GridOut` class
+- Added a `toFile()` method to `GridOut` class (allows to write safely on disk - adds a `(n)` suffix if the file already exists)
+- Added a `clearBucket()` method to class `GridFs`
+- Added a `dropBucket()` mehthod to class `GridFs`
+- Fixed an issue on `GridFsFile` `numChunks()` method
+
 ## 0.9.0
 
 - Fixed an issue on GridFs `save()` method using MongoDb 6.0

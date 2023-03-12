@@ -47,7 +47,7 @@ abstract class GridFSFile {
     return completer.future;
   }
 
-  int numChunks() => (length?.toDouble() ?? 0.0 / (chunkSize)).ceil().toInt();
+  int numChunks() => ((length ?? 0.0) / chunkSize).ceil();
 
   List<String> get aliases => extraData['aliases'] as List<String>;
 
