@@ -680,9 +680,7 @@ class DbCollection {
     Map<String, Object>? sortMap;
     if (sort is Map) {
       sortMap = <String, Object>{...sort};
-    } else if (sortMap == null &&
-        sort is SelectorBuilder &&
-        sort.map[keyOrderby] != null) {
+    } else if (sort is SelectorBuilder && sort.map[keyOrderby] != null) {
       sortMap = <String, Object>{...sort.map[keyOrderby]};
     }
 

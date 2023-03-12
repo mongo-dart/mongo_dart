@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:path/path.dart';
 
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';

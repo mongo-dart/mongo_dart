@@ -39,7 +39,7 @@ Future<void> main() async {
 
     test('Change File Name Only - two tries', () async {
       var changedFile = await file.copy(file.newPathByName('chgf2'));
-      var newFile = await changedFile.changeFileNameOnly('test2');
+      await changedFile.changeFileNameOnly('test2');
       changedFile = await file.copy(file.newPathByName('chgf2'));
       var newFile2 = await changedFile.changeFileNameOnly('test2');
       var name = newFile2.name;
