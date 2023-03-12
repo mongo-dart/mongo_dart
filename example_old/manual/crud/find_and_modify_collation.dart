@@ -20,7 +20,7 @@ void main() async {
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
-  var (ret,_,_,_) = await collection.insertMany(<Map<String, dynamic>>[
+  var (ret, _, _, _) = await collection.insertMany(<Map<String, dynamic>>[
     {'_id': 1, 'category': 'café', 'status': 'A'},
     {'_id': 2, 'category': 'cafE', 'status': 'a'},
     {'_id': 3, 'category': 'cafe', 'status': 'a'},
@@ -30,11 +30,11 @@ void main() async {
   }
 
   var (res, _) = await collection.findOneAndUpdate(
-       where.eq('category', 'cafe').eq('status', 'a'),
-     
-       ModifierBuilder().set('status', 'updated'),
-   sort: <String, dynamic>{'category': 1},    findOneAndUpdateOptions:
-          FindOneAndUpdateOptions(collation: CollationOptions('fr', strength: 1)));
+      where.eq('category', 'cafe').eq('status', 'a'),
+      ModifierBuilder().set('status', 'updated'),
+      sort: <String, dynamic>{'category': 1},
+      findOneAndUpdateOptions: FindOneAndUpdateOptions(
+          collation: CollationOptions('fr', strength: 1)));
 
   print('Updated document: ${res.lastErrorObject?.updatedExisting}'); // true
 

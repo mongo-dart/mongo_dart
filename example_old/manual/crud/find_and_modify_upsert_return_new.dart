@@ -18,7 +18,7 @@ void main() async {
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
-  var (ret,_,_,_) = await collection.insertMany(<Map<String, dynamic>>[
+  var (ret, _, _, _) = await collection.insertMany(<Map<String, dynamic>>[
     {'_id': 1, 'name': 'Tom', 'state': 'active', 'rating': 100, 'score': 5},
     {'_id': 2, 'name': 'William', 'state': 'busy', 'rating': 80, 'score': 4},
     {'_id': 3, 'name': 'Liz', 'state': 'on hold', 'rating': 70, 'score': 8},
@@ -33,9 +33,9 @@ void main() async {
   }
 
   var (res, _) = await collection.findOneAndUpdate(
-       where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
-       ModifierBuilder().inc('score', 1),
-     sort: <String, dynamic>{'rating': 1},
+      where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
+      ModifierBuilder().inc('score', 1),
+      sort: <String, dynamic>{'rating': 1},
       upsert: true,
       returnNew: true);
   print('Updated document: ${res.lastErrorObject?.updatedExisting}'); // false

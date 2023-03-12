@@ -19,7 +19,7 @@ void main() async {
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
-  var (ret,_,_,_) = await collection.insertMany([
+  var (ret, _, _, _) = await collection.insertMany([
     {
       '_id': 1,
       'grades': [95, 92, 90]
@@ -37,9 +37,8 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var (res, _) = await collection.findOneAndUpdate(
-       where.gte('grades', 100),
-       ModifierBuilder().set(r'grades.$[element]', 100),
+  var (res, _) = await collection.findOneAndUpdate(where.gte('grades', 100),
+      ModifierBuilder().set(r'grades.$[element]', 100),
       returnNew: true,
       arrayFilters: [
         {

@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
+import 'package:mongo_dart/src/utils/query_union.dart';
 import 'package:test/test.dart';
 
 const dbName = 'test-mongo-dart';
@@ -60,7 +61,8 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = ModernCursor(FindOperation(collection), db.server);
+          var cursor = ModernCursor(
+              FindOperation(collection, QueryUnion({})), db.server);
 
           expect(cursor.state, ModernCursorState.init);
 
@@ -108,7 +110,8 @@ void main() async {
           var collectionName = getRandomCollectionName();
           var collection = db.collection(collectionName);
           await insertManyDocuments(collection, 10000);
-          var cursor = ModernCursor(FindOperation(collection), db.server);
+          var cursor = ModernCursor(
+              FindOperation(collection, QueryUnion({})), db.server);
           expect(cursor.state, ModernCursorState.init);
           await cursor.nextObject();
           var command = KillCursorsCommand(collection, [Int64(1)]);
@@ -153,7 +156,8 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = ModernCursor(FindOperation(collection), db.server);
+          var cursor = ModernCursor(
+              FindOperation(collection, QueryUnion({})), db.server);
 
           expect(cursor.state, ModernCursorState.init);
 
@@ -189,7 +193,8 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = ModernCursor(FindOperation(collection), db.server);
+          var cursor = ModernCursor(
+              FindOperation(collection, QueryUnion({})), db.server);
 
           expect(cursor.state, ModernCursorState.init);
 
@@ -224,7 +229,8 @@ void main() async {
           await insertManyDocuments(collection, 10000);
 
           var cursor = ModernCursor(
-              FindOperation(collection, findOptions: FindOptions(batchSize: 1)),
+              FindOperation(collection, QueryUnion({}),
+                  findOptions: FindOptions(batchSize: 1)),
               db.server);
           await cursor.nextObject();
           var options = GetMoreOptions(batchSize: 10001);
@@ -243,7 +249,8 @@ void main() async {
 
           await insertManyDocuments(collection, 10000);
 
-          var cursor = ModernCursor(FindOperation(collection), db.server);
+          var cursor = ModernCursor(
+              FindOperation(collection, QueryUnion({})), db.server);
           await cursor.nextObject();
 
           var command = GetMoreCommand(collection, cursor.cursorId);

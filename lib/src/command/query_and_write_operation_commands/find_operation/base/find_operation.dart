@@ -1,25 +1,28 @@
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
-import '../../../core/error/mongo_dart_error.dart';
-import '../../../database/base/mongo_collection.dart';
-import '../../../session/client_session.dart';
-import '../../../utils/hint_union.dart';
+import '../../../../core/error/mongo_dart_error.dart';
+import '../../../../database/database.dart';
+import '../../../../server_api_version.dart';
+import '../../../../session/client_session.dart';
+import '../../../../utils/hint_union.dart';
+import '../../../../utils/query_union.dart';
+import '../open/find_operation_open.dart';
+import '../v1/find_operation_v1.dart';
 import 'find_options.dart';
-import '../../base/command_operation.dart';
-import 'find_result.dart';
+import '../../../base/command_operation.dart';
+import '../find_result.dart';
 
 base class FindOperation extends CommandOperation {
-  FindOperation(MongoCollection collection,
-      {this.filter,
-      this.sort,
+  FindOperation.protected(MongoCollection collection, this.filter,
+      {this.sort,
       this.projection,
       this.hint,
       this.skip,
       this.limit,
       super.session,
       FindOptions? findOptions,
-      Map<String, Object>? rawOptions})
+      Options? rawOptions})
       : super(collection.db, {},
             <String, dynamic>{...?findOptions?.options, ...?rawOptions},
             collection: collection, aspect: Aspect.readOperation) {
@@ -33,12 +36,52 @@ base class FindOperation extends CommandOperation {
     limit ??= 0;
   }
 
+  factory FindOperation(
+    MongoCollection collection,
+    QueryUnion filter, {
+    IndexDocument? sort,
+    ProjectionDocument? projection,
+    HintUnion? hint,
+    int? skip,
+    int? limit,
+    ClientSession? session,
+    FindOptions? findOptions,
+    Options? rawOptions,
+  }) {
+    if (collection.serverApi != null) {
+      switch (collection.serverApi!.version) {
+        case ServerApiVersion.v1:
+          return FindOperationV1(collection, filter,
+              sort: sort,
+              projection: projection,
+              hint: hint,
+              skip: skip,
+              limit: limit,
+              session: session,
+              findOptions: findOptions?.toV1,
+              rawOptions: rawOptions);
+        default:
+          throw MongoDartError(
+              'Stable Api ${collection.serverApi!.version} not managed');
+      }
+    }
+    return FindOperationOpen(collection, filter,
+        sort: sort,
+        projection: projection,
+        hint: hint,
+        skip: skip,
+        limit: limit,
+        session: session,
+        findOptions: findOptions?.toOpen,
+        rawOptions: rawOptions);
+  }
+
   /// Optional. The query predicate. If unspecified, then all documents in the
   /// collection will match the predicate.
-  Map<String, dynamic>? filter;
+  QueryUnion filter;
 
   /// Optional. The sort specification for the ordering of the results.
-  Map<String, Object>? sort;
+  IndexDocument? sort;
 
   /// Optional. The projection specification to determine which fields
   /// to include in the returned documents.
@@ -49,7 +92,7 @@ base class FindOperation extends CommandOperation {
   /// * $elemMatch
   /// * $slice
   /// * $meta
-  Map<String, Object>? projection;
+  ProjectionDocument? projection;
 
   /// Optional. Index specification. Specify either the index name
   /// as a string or the index key pattern.
@@ -79,16 +122,16 @@ base class FindOperation extends CommandOperation {
   @override
   Command $buildCommand() {
     if (collection!.collectionName == r'$cmd' &&
-        filter != null &&
+        !filter.isNull &&
         limit != null &&
         limit! == 1) {
       return <String, dynamic>{
-        for (var key in filter!.keys) key: filter![key] ?? ''
+        for (var key in filter.query.keys) key: filter.query[key] ?? ''
       };
     }
     return <String, dynamic>{
       keyFind: collection!.collectionName,
-      if (filter != null) keyFilter: filter!,
+      if (!filter.isNull) keyFilter: filter.query,
       if (sort != null) keySort: sort!,
       if (projection != null) keyProjection: projection!,
       if (hint != null && !hint!.isNull) keyHint: hint!.value,

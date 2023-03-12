@@ -106,7 +106,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -130,12 +130,12 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(QueryUnion(<String, Object>{
-                'member': 'abc123'
-              }), UpdateUnion(<String, Object>{
-                r'$set': {'status': 'A'},
-                r'$inc': {'points': 1}
-              }))
+              UpdateStatement(
+                  QueryUnion(<String, Object>{'member': 'abc123'}),
+                  UpdateUnion(<String, Object>{
+                    r'$set': {'status': 'A'},
+                    r'$inc': {'points': 1}
+                  }))
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -151,7 +151,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -175,10 +175,13 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(QueryUnion(<String, Object>{}), UpdateUnion(<String, Object>{
-                r'$set': {'status': 'A'},
-                r'$inc': {'points': 1}
-              }), multi: true)
+              UpdateStatement(
+                  QueryUnion(<String, Object>{}),
+                  UpdateUnion(<String, Object>{
+                    r'$set': {'status': 'A'},
+                    r'$inc': {'points': 1}
+                  }),
+                  multi: true)
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -195,7 +198,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret ,_,_,_)= await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -219,10 +222,9 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(QueryUnion(<String, Object>{}), UpdateUnion(<String, Object>{
-                'status': 'A',
-                'points': 1
-              }), multi: true)
+              UpdateStatement(QueryUnion(<String, Object>{}),
+                  UpdateUnion(<String, Object>{'status': 'A', 'points': 1}),
+                  multi: true)
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -244,7 +246,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 1, 'name': 'Central Perk Cafe', 'Borough': 'Manhattan'},
           {
             '_id': 2,
@@ -265,12 +267,12 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(QueryUnion(<String, Object>{
-                'name': 'Central Perk Cafe'
-              }), UpdateUnion(<String, Object>{
-                'name': 'Central Park Cafe',
-                'Borough': 'Manhattan'
-              }))
+              UpdateStatement(
+                  QueryUnion(<String, Object>{'name': 'Central Perk Cafe'}),
+                  UpdateUnion(<String, Object>{
+                    'name': 'Central Park Cafe',
+                    'Borough': 'Manhattan'
+                  }))
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -290,7 +292,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -314,17 +316,20 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(QueryUnion(<String, Object>{}),UpdateUnion( [
-                {
-                  r'$set': {
-                    'status': 'Modified',
-                    'comments': [r'$misc1', r'$misc2']
-                  }
-                },
-                {
-                  r'$unset': ['misc1', 'misc2']
-                }
-              ]), multi: true)
+              UpdateStatement(
+                  QueryUnion(<String, Object>{}),
+                  UpdateUnion([
+                    {
+                      r'$set': {
+                        'status': 'Modified',
+                        'comments': [r'$misc1', r'$misc2']
+                      }
+                    },
+                    {
+                      r'$unset': ['misc1', 'misc2']
+                    }
+                  ]),
+                  multi: true)
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -344,7 +349,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'tests': [95, 92, 90]
@@ -364,48 +369,51 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(QueryUnion(<String, Object>{}), UpdateUnion([
-                {
-                  r'$set': {
-                    'average': {r'$avg': r'$tests'}
-                  }
-                },
-                {
-                  r'$set': {
-                    'grade': {
-                      r'$switch': {
-                        'branches': [
-                          {
-                            'case': {
-                              r'$gte': [r'$average', 90]
-                            },
-                            'then': 'A'
-                          },
-                          {
-                            'case': {
-                              r'$gte': [r'$average', 80]
-                            },
-                            'then': 'B'
-                          },
-                          {
-                            'case': {
-                              r'$gte': [r'$average', 70]
-                            },
-                            'then': 'C'
-                          },
-                          {
-                            'case': {
-                              r'$gte': [r'$average', 60]
-                            },
-                            'then': 'D'
+              UpdateStatement(
+                  QueryUnion(<String, Object>{}),
+                  UpdateUnion([
+                    {
+                      r'$set': {
+                        'average': {r'$avg': r'$tests'}
+                      }
+                    },
+                    {
+                      r'$set': {
+                        'grade': {
+                          r'$switch': {
+                            'branches': [
+                              {
+                                'case': {
+                                  r'$gte': [r'$average', 90]
+                                },
+                                'then': 'A'
+                              },
+                              {
+                                'case': {
+                                  r'$gte': [r'$average', 80]
+                                },
+                                'then': 'B'
+                              },
+                              {
+                                'case': {
+                                  r'$gte': [r'$average', 70]
+                                },
+                                'then': 'C'
+                              },
+                              {
+                                'case': {
+                                  r'$gte': [r'$average', 60]
+                                },
+                                'then': 'D'
+                              }
+                            ],
+                            'default': 'F'
                           }
-                        ],
-                        'default': 'F'
+                        }
                       }
                     }
-                  }
-                }
-              ]), multi: true)
+                  ]),
+                  multi: true)
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -429,20 +437,17 @@ void main() async {
         var updateOperation = UpdateOperation(
             collection,
             [
-              UpdateStatement(QueryUnion(<String, Object>{
-                'status': 'P'
-              }),UpdateUnion( {
-                r'$set': {
-                  'status': 'D',
-                }
-              }), multi: true),
-              UpdateStatement(QueryUnion(<String, Object>{
-                '_id': 7
-              }), UpdateUnion({
-                '_id': 7,
-                'name': 'abc123',
-                'status': 'A'
-              }), upsert: true)
+              UpdateStatement(
+                  QueryUnion(<String, Object>{'status': 'P'}),
+                  UpdateUnion({
+                    r'$set': {
+                      'status': 'D',
+                    }
+                  }),
+                  multi: true),
+              UpdateStatement(QueryUnion(<String, Object>{'_id': 7}),
+                  UpdateUnion({'_id': 7, 'name': 'abc123', 'status': 'A'}),
+                  upsert: true)
             ],
             ordered: false,
             updateOptions: UpdateOptions(
@@ -470,12 +475,12 @@ void main() async {
         var updateOperation = UpdateOperation(
           collection,
           [
-            UpdateStatement(QueryUnion(<String, Object>{
-              'category': 'cafe',
-              'status': 'a'
-            }),UpdateUnion( <String, Object>{
-              r'$set': {'status': 'Updated'},
-            }), collation: CollationOptions('fr', strength: 1))
+            UpdateStatement(
+                QueryUnion(<String, Object>{'category': 'cafe', 'status': 'a'}),
+                UpdateUnion(<String, Object>{
+                  r'$set': {'status': 'Updated'},
+                }),
+                collation: CollationOptions('fr', strength: 1))
           ],
         );
         var res = await updateOperation.process();
@@ -490,7 +495,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [95, 92, 90]
@@ -510,15 +515,19 @@ void main() async {
         var updateOperation = UpdateOperation(
           collection,
           [
-            UpdateStatement(QueryUnion(<String, Object>{
-              'grades': {r'$gte': 100}
-            }),UpdateUnion( <String, Object>{
-              r'$set': {r'grades.$[element]': 100},
-            }), arrayFilters: [
-              {
-                'element': {r'$gte': 100}
-              }
-            ], multi: true)
+            UpdateStatement(
+                QueryUnion(<String, Object>{
+                  'grades': {r'$gte': 100}
+                }),
+                UpdateUnion(<String, Object>{
+                  r'$set': {r'grades.$[element]': 100},
+                }),
+                arrayFilters: [
+                  {
+                    'element': {r'$gte': 100}
+                  }
+                ],
+                multi: true)
           ],
         );
         var res = await updateOperation.process();
@@ -533,7 +542,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [
@@ -557,13 +566,17 @@ void main() async {
         var updateOperation = UpdateOperation(
           collection,
           [
-            UpdateStatement(QueryUnion(<String, Object>{}), UpdateUnion(<String, Object>{
-              r'$set': {r'grades.$[element].mean': 100},
-            }), arrayFilters: [
-              {
-                'element.grade': {r'$gte': 85}
-              }
-            ], multi: true)
+            UpdateStatement(
+                QueryUnion(<String, Object>{}),
+                UpdateUnion(<String, Object>{
+                  r'$set': {r'grades.$[element].mean': 100},
+                }),
+                arrayFilters: [
+                  {
+                    'element.grade': {r'$gte': 85}
+                  }
+                ],
+                multi: true)
           ],
         );
         var res = await updateOperation.process();
@@ -590,14 +603,16 @@ void main() async {
         var updateOperation = UpdateOperation(
           collection,
           [
-            UpdateStatement(QueryUnion(<String, Object>{
-              'points': {r'$lte': 20},
-              'status': 'P'
-            }),UpdateUnion( <String, Object>{
-              r'$set': {'misc1': 'Need to activate'},
-            }), hint: HintUnion(<String, Object>{
-              'status': 1
-            }), multi: true)
+            UpdateStatement(
+                QueryUnion(<String, Object>{
+                  'points': {r'$lte': 20},
+                  'status': 'P'
+                }),
+                UpdateUnion(<String, Object>{
+                  r'$set': {'misc1': 'Need to activate'},
+                }),
+                hint: HintUnion(<String, Object>{'status': 1}),
+                multi: true)
           ],
         );
         var res = await updateOperation.process();
@@ -613,7 +628,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -636,12 +651,12 @@ void main() async {
 
         var updateOneOperation = UpdateOneOperation(
             collection,
-            UpdateOneStatement(QueryUnion(<String, Object>{
-              'member': 'abc123'
-            }), UpdateUnion(<String, Map<String, dynamic>>{
-              r'$set': {'status': 'A'},
-              r'$inc': {'points': 1}
-            })),
+            UpdateOneStatement(
+                QueryUnion(<String, Object>{'member': 'abc123'}),
+                UpdateUnion(<String, Map<String, dynamic>>{
+                  r'$set': {'status': 'A'},
+                  r'$inc': {'points': 1}
+                })),
             updateOneOptions: UpdateOneOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
         var (res, _) = await updateOneOperation.executeDocument();
@@ -656,7 +671,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -680,8 +695,8 @@ void main() async {
         var updateManyOperation = UpdateManyOperation(
             collection,
             UpdateManyStatement(
-                QueryUnion(<String, Object>{}),UpdateUnion(
-                <String, Map<String, dynamic>>{
+                QueryUnion(<String, Object>{}),
+                UpdateUnion(<String, Map<String, dynamic>>{
                   r'$set': {'status': 'A'},
                   r'$inc': {'points': 1}
                 })),
@@ -698,7 +713,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 1, 'name': 'Central Perk Cafe', 'Borough': 'Manhattan'},
           {
             '_id': 2,
@@ -718,12 +733,12 @@ void main() async {
 
         var replaceOneOperation = ReplaceOneOperation(
             collection,
-            ReplaceOneStatement(QueryUnion(<String, Object>{
-              'name': 'Central Perk Cafe'
-            }),UpdateUnion( <String, Object>{
-              'name': 'Central Park Cafe',
-              'Borough': 'Manhattan'
-            })));
+            ReplaceOneStatement(
+                QueryUnion(<String, Object>{'name': 'Central Perk Cafe'}),
+                UpdateUnion(<String, Object>{
+                  'name': 'Central Park Cafe',
+                  'Borough': 'Manhattan'
+                })));
         var res = await replaceOneOperation.process();
 
         expect(res, isNotNull);
@@ -738,7 +753,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -761,17 +776,19 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
             collection,
-            UpdateManyStatement(QueryUnion(<String, Object>{}),UpdateUnion( [
-              {
-                r'$set': {
-                  'status': 'Modified',
-                  'comments': [r'$misc1', r'$misc2']
-                }
-              },
-              {
-                r'$unset': ['misc1', 'misc2']
-              }
-            ])),
+            UpdateManyStatement(
+                QueryUnion(<String, Object>{}),
+                UpdateUnion([
+                  {
+                    r'$set': {
+                      'status': 'Modified',
+                      'comments': [r'$misc1', r'$misc2']
+                    }
+                  },
+                  {
+                    r'$unset': ['misc1', 'misc2']
+                  }
+                ])),
             ordered: false,
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
@@ -790,7 +807,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'tests': [95, 92, 90]
@@ -809,48 +826,50 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
             collection,
-            UpdateManyStatement(QueryUnion(<String, Object>{}), UpdateUnion([
-              {
-                r'$set': {
-                  'average': {r'$avg': r'$tests'}
-                }
-              },
-              {
-                r'$set': {
-                  'grade': {
-                    r'$switch': {
-                      'branches': [
-                        {
-                          'case': {
-                            r'$gte': [r'$average', 90]
-                          },
-                          'then': 'A'
-                        },
-                        {
-                          'case': {
-                            r'$gte': [r'$average', 80]
-                          },
-                          'then': 'B'
-                        },
-                        {
-                          'case': {
-                            r'$gte': [r'$average', 70]
-                          },
-                          'then': 'C'
-                        },
-                        {
-                          'case': {
-                            r'$gte': [r'$average', 60]
-                          },
-                          'then': 'D'
+            UpdateManyStatement(
+                QueryUnion(<String, Object>{}),
+                UpdateUnion([
+                  {
+                    r'$set': {
+                      'average': {r'$avg': r'$tests'}
+                    }
+                  },
+                  {
+                    r'$set': {
+                      'grade': {
+                        r'$switch': {
+                          'branches': [
+                            {
+                              'case': {
+                                r'$gte': [r'$average', 90]
+                              },
+                              'then': 'A'
+                            },
+                            {
+                              'case': {
+                                r'$gte': [r'$average', 80]
+                              },
+                              'then': 'B'
+                            },
+                            {
+                              'case': {
+                                r'$gte': [r'$average', 70]
+                              },
+                              'then': 'C'
+                            },
+                            {
+                              'case': {
+                                r'$gte': [r'$average', 60]
+                              },
+                              'then': 'D'
+                            }
+                          ],
+                          'default': 'F'
                         }
-                      ],
-                      'default': 'F'
+                      }
                     }
                   }
-                }
-              }
-            ])),
+                ])),
             ordered: false,
             updateManyOptions: UpdateManyOptions(
                 writeConcern: WriteConcern(w: wMajority, wtimeout: 5000)));
@@ -872,12 +891,12 @@ void main() async {
 
         var updateOneOperation = UpdateOneOperation(
           collection,
-          UpdateOneStatement(QueryUnion(<String, Object>{
-            'category': 'cafe',
-            'status': 'a'
-          }), UpdateUnion(<String, Map<String, dynamic>>{
-            r'$set': {'status': 'Updated'},
-          }), collation: CollationOptions('fr', strength: 1)),
+          UpdateOneStatement(
+              QueryUnion(<String, Object>{'category': 'cafe', 'status': 'a'}),
+              UpdateUnion(<String, Map<String, dynamic>>{
+                r'$set': {'status': 'Updated'},
+              }),
+              collation: CollationOptions('fr', strength: 1)),
         );
         var (res, _) = await updateOneOperation.executeDocument();
 
@@ -891,7 +910,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [95, 92, 90]
@@ -910,15 +929,18 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
           collection,
-          UpdateManyStatement(QueryUnion(<String, Object>{
-            'grades': {r'$gte': 100}
-          }),UpdateUnion(<String, Map<String, dynamic>>{
-            r'$set': {r'grades.$[element]': 100},
-          }), arrayFilters: [
-            {
-              'element': {r'$gte': 100}
-            }
-          ]),
+          UpdateManyStatement(
+              QueryUnion(<String, Object>{
+                'grades': {r'$gte': 100}
+              }),
+              UpdateUnion(<String, Map<String, dynamic>>{
+                r'$set': {r'grades.$[element]': 100},
+              }),
+              arrayFilters: [
+                {
+                  'element': {r'$gte': 100}
+                }
+              ]),
         );
         var (res, _) = await updateManyOperation.executeDocument();
 
@@ -932,7 +954,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [
@@ -955,9 +977,9 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
           collection,
-          UpdateManyStatement(QueryUnion(
-              <String, Object>{}),UpdateUnion(
-              <String, Map<String, dynamic>>{
+          UpdateManyStatement(
+              QueryUnion(<String, Object>{}),
+              UpdateUnion(<String, Map<String, dynamic>>{
                 r'$set': {r'grades.$[element].mean': 100},
               }),
               arrayFilters: [
@@ -989,14 +1011,15 @@ void main() async {
 
         var updateManyOperation = UpdateManyOperation(
           collection,
-          UpdateManyStatement(QueryUnion(<String, Object>{
-            'points': {r'$lte': 20},
-            'status': 'P'
-          }),UpdateUnion( <String, Map<String, dynamic>>{
-            r'$set': {'misc1': 'Need to activate'},
-          }), hint: HintUnion(<String, Object>{
-            'status': 1
-          })),
+          UpdateManyStatement(
+              QueryUnion(<String, Object>{
+                'points': {r'$lte': 20},
+                'status': 'P'
+              }),
+              UpdateUnion(<String, Map<String, dynamic>>{
+                r'$set': {'misc1': 'Need to activate'},
+              }),
+              hint: HintUnion(<String, Object>{'status': 1})),
         );
         var (res, _) = await updateManyOperation.executeDocument();
 
@@ -1012,7 +1035,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -1053,7 +1076,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -1094,7 +1117,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -1120,7 +1143,7 @@ void main() async {
             writeConcern: WriteConcern(w: wMajority, wtimeout: 5000));
 
         expect(res, isNotNull);
-        expect(res.isSuccess,isTrue);
+        expect(res.isSuccess, isTrue);
         expect(res.nMatched, 2);
         expect(res.nModified, 2);
 
@@ -1139,7 +1162,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -1192,7 +1215,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'tests': [95, 92, 90]
@@ -1297,7 +1320,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [95, 92, 90]
@@ -1323,7 +1346,7 @@ void main() async {
             ]);
 
         expect(res, isNotNull);
-        expect(res.isSuccess,isTrue);
+        expect(res.isSuccess, isTrue);
         expect(res.nMatched, 2);
         expect(res.nModified, 2);
 
@@ -1339,7 +1362,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [
@@ -1418,7 +1441,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -1459,7 +1482,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 1, 'name': 'Central Perk Cafe', 'Borough': 'Manhattan'},
           {
             '_id': 2,
@@ -1490,7 +1513,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -1532,7 +1555,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -1587,7 +1610,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 1, 'name': 'Central Perk Cafe', 'Borough': 'Manhattan'},
           {
             '_id': 2,
@@ -1605,7 +1628,7 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res,_ )= await collection.replaceOne(
+        var (res, _) = await collection.replaceOne(
             where.eq('name', 'Central Perk Cafe'), <String, Object>{
           'name': 'Central Park Cafe',
           'Borough': 'Manhattan'
@@ -1631,7 +1654,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 1, 'name': 'Central Perk Cafe', 'Borough': 'Manhattan'},
           {
             '_id': 2,
@@ -1663,7 +1686,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'member': 'abc123',
@@ -1716,7 +1739,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'tests': [95, 92, 90]
@@ -1821,7 +1844,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [95, 92, 90]
@@ -1863,7 +1886,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [

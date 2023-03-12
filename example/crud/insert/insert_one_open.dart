@@ -30,7 +30,7 @@ void main() async {
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
-  var (ret,_, _, _) = await collection.insertOne(<String, dynamic>{
+  var (ret, _, _, _) = await collection.insertOne(<String, dynamic>{
     '_id': 1,
     'name': 'Tom',
     'state': 'active',

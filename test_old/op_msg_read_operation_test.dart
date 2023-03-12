@@ -5,6 +5,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:decimal/decimal.dart';
+import 'package:mongo_dart/src/utils/query_union.dart';
 import 'package:test/test.dart';
 
 import '../test/utils/insert_data.dart';
@@ -334,7 +335,8 @@ void main() async {
       expect(ret.isSuccess, isTrue);
 
       var result = [];
-      var cursor = ModernCursor(FindOperation(collection), db.server);
+      var cursor =
+          ModernCursor(FindOperation(collection, QueryUnion({})), db.server);
       await for (var element in cursor.stream) {
         result.add(element);
       }
@@ -349,7 +351,8 @@ void main() async {
       expect(ret.isSuccess, isTrue);
 
       var result = [];
-      var cursor = ModernCursor(FindOperation(collection), db.server);
+      var cursor =
+          ModernCursor(FindOperation(collection, QueryUnion({})), db.server);
       try {
         await for (var element in cursor.changeStream) {
           result.add(element);
@@ -388,7 +391,8 @@ void main() async {
 
         await insertManyDocuments(collection, 120);
 
-        var cursor = ModernCursor(FindOperation(collection), db.server);
+        var cursor =
+            ModernCursor(FindOperation(collection, QueryUnion({})), db.server);
 
         expect(cursor.state, ModernCursorState.init);
 
@@ -427,12 +431,12 @@ void main() async {
         var collection = db.collection(collectionName);
 
         await insertManyDocuments(collection, 110);
-        var doc = await FindOperation(collection,
+        var doc = await FindOperation(collection, QueryUnion({}),
                 findOptions: FindOptions(tailable: true))
             .process();
 
-        var cursor = ModernCursor.fromOpenId(collection,
-            Int64((doc[keyCursor] as Map)[keyId] as int), db.server,
+        var cursor = ModernCursor.fromOpenId(
+            collection, Int64((doc[keyCursor] as Map)[keyId] as int), db.server,
             tailable: true);
 
         expect(cursor.state, ModernCursorState.open);
@@ -478,12 +482,12 @@ void main() async {
         var collection = db.collection(collectionName);
 
         await insertManyDocuments(collection, 110);
-        var doc = await FindOperation(collection,
+        var doc = await FindOperation(collection, QueryUnion({}),
                 findOptions: FindOptions(tailable: true, awaitData: true))
             .process();
 
-        var cursor = ModernCursor.fromOpenId(collection,
-            Int64((doc[keyCursor] as Map)[keyId] as int), db.server,
+        var cursor = ModernCursor.fromOpenId(
+            collection, Int64((doc[keyCursor] as Map)[keyId] as int), db.server,
             tailable: true);
 
         expect(cursor.state, ModernCursorState.open);
@@ -538,7 +542,8 @@ void main() async {
         var collection = db.collection(collectionName);
 
         var cursor = ModernCursor(
-            FindOperation(collection, findOptions: FindOptions(tailable: true)),
+            FindOperation(collection, QueryUnion({}),
+                findOptions: FindOptions(tailable: true)),
             db.server);
         expect(cursor.state, ModernCursorState.init);
 
@@ -560,8 +565,8 @@ void main() async {
           {'test': 4, 'state': 'A'}
         ]);
         var cursor = ModernCursor(
-            FindOperation(collection,
-                filter: <String, Object>{'state': 'C'},
+            FindOperation(
+                collection, QueryUnion(<String, Object>{'state': 'C'}),
                 findOptions: FindOptions(tailable: true)),
             db.server);
         expect(cursor.state, ModernCursorState.init);

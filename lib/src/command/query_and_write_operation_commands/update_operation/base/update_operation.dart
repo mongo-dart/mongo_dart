@@ -20,7 +20,7 @@ abstract base class UpdateOperation extends CommandOperation {
   @protected
   UpdateOperation.protected(MongoCollection collection, this.updates,
       {bool? ordered,
-      required super.session,
+      super.session,
       UpdateOptions? updateOptions,
       Map<String, Object>? rawOptions})
       : ordered = ordered ?? true,

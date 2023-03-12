@@ -29,7 +29,7 @@ void main() async {
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
-  var (ret,_,_,_) = await collection.insertMany([
+  var (ret, _, _, _) = await collection.insertMany([
     {
       '_id': 1,
       'grades': [
@@ -53,7 +53,7 @@ void main() async {
 
   var (res, _) = await collection.findOneAndUpdate(
     where.eq('_id', 1),
-   AggregationPipelineBuilder()
+    AggregationPipelineBuilder()
         .addStage(AddFields({
           r'total': {r'$sum': r'$grades.grade'},
         }))

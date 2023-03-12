@@ -65,8 +65,8 @@ class GridIn extends GridFSFile {
     contentTemp.setAll(0, contentToDigest);
     contentTemp.setAll(actualLength, writeBuffer);
     contentToDigest = contentTemp; */
- // TODO update this
-    var (_, retValue,_,_) = await fs.chunks.insertOne(chunk);
+    // TODO update this
+    var (_, retValue, _, _) = await fs.chunks.insertOne(chunk);
     return retValue;
   }
 

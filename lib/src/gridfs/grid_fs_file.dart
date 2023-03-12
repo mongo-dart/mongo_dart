@@ -22,7 +22,7 @@ abstract class GridFSFile {
     //}
     var tempData = data;
     // TODO update this
-    var (_, retValue,_,_) = await fs.files.insertOne(tempData);
+    var (_, retValue, _, _) = await fs.files.insertOne(tempData);
     return retValue;
   }
 

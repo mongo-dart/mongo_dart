@@ -75,7 +75,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var(ret, _, document, id) =
+        var (ret, _, document, id) =
             await collection.insertOne({'_id': 3, 'name': 'John', 'age': 32});
         expect(ret.ok, 1.0);
         expect(ret.operationSucceeded, isTrue);
@@ -96,7 +96,8 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret, _, document, id) = await collection.insertOne({'item': 'card', 'qty': 15});
+        var (ret, _, document, id) =
+            await collection.insertOne({'item': 'card', 'qty': 15});
         expect(ret.ok, 1.0);
         expect(ret.operationSucceeded, isTrue);
         expect(ret.hasWriteErrors, isFalse);
@@ -144,7 +145,7 @@ void main() async {
 
         // The error is caused by the number of servers (as we have a testing)
         // environment with at most three replica set members).
-        var (ret , _, document, id)= await collection.insertOne(
+        var (ret, _, document, id) = await collection.insertOne(
             {'item': 'envelopes', 'qty': 100, 'type': 'Self-Sealing'},
             insertOneOptions: InsertOneOptions(
                 writeConcern: WriteConcern(w: W(4), wtimeout: 5000, j: true)));
@@ -185,7 +186,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,documents,ids) = await collection.insertMany([
+        var (ret, _, documents, ids) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -223,7 +224,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -253,7 +254,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -261,8 +262,8 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var deleteOperation =
-            DeleteOneOperation(collection, DeleteOneStatement(QueryUnion({key_id: 7})));
+        var deleteOperation = DeleteOneOperation(
+            collection, DeleteOneStatement(QueryUnion({key_id: 7})));
         var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -286,8 +287,8 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var deleteOperation =
-            DeleteOneOperation(collection, DeleteOneStatement(QueryUnion({'status': 'D'})));
+        var deleteOperation = DeleteOneOperation(
+            collection, DeleteOneStatement(QueryUnion({'status': 'D'})));
         var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -308,7 +309,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -336,7 +337,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -369,7 +370,8 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.deleteOne(<String, Object>{'status': 'D'});
+        var (res, _) =
+            await collection.deleteOne(<String, Object>{'status': 'D'});
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
         expect(res.nInserted, 0);
@@ -391,7 +393,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -399,8 +401,8 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var deleteOperation =
-            DeleteManyOperation(collection, DeleteManyStatement(QueryUnion({})));
+        var deleteOperation = DeleteManyOperation(
+            collection, DeleteManyStatement(QueryUnion({})));
         var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -420,7 +422,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -428,8 +430,8 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var deleteOperation =
-            DeleteManyOperation(collection, DeleteManyStatement(QueryUnion({key_id: 7})));
+        var deleteOperation = DeleteManyOperation(
+            collection, DeleteManyStatement(QueryUnion({key_id: 7})));
         var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -542,12 +544,12 @@ void main() async {
 
         var deleteOperation = DeleteManyOperation(
           collection,
-          DeleteManyStatement(QueryUnion({
-            'points': {r'$lte': 20},
-            'status': 'P'
-          }), hint: HintUnion({
-            'status': 1
-          })),
+          DeleteManyStatement(
+              QueryUnion({
+                'points': {r'$lte': 20},
+                'status': 'P'
+              }),
+              hint: HintUnion({'status': 1})),
         );
         var (res, _) = await deleteOperation.executeDocument();
         expect(res.hasWriteErrors, isFalse);
@@ -568,7 +570,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -595,7 +597,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {'_id': 3, 'name': 'John', 'age': 32},
           {'_id': 4, 'name': 'Mira', 'age': 27},
           {'_id': 7, 'name': 'Luis', 'age': 42},
@@ -628,7 +630,8 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.deleteMany(<String, Object>{'status': 'D'});
+        var (res, _) =
+            await collection.deleteMany(<String, Object>{'status': 'D'});
 
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -712,9 +715,7 @@ void main() async {
         var (res, _) = await collection.deleteMany(<String, Object>{
           'points': {r'$lte': 20},
           'status': 'P'
-        }, hint: HintUnion({
-          'status': 1
-        }));
+        }, hint: HintUnion({'status': 1}));
 
         expect(res.hasWriteErrors, isFalse);
         expect(res.hasWriteConcernError, isFalse);
@@ -740,16 +741,16 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var famOperation =
-            FindOneAndUpdateOperation(collection, query: QueryUnion(<String, dynamic>{
-          'name': 'Tom',
-          'state': 'active',
-          'rating': {r'$gt': 10}
-        }), sort: <String, Object>{
-          'rating': 1
-        }, update: UpdateUnion(<String, dynamic>{
-          r'$inc': {'score': 1}
-        }));
+        var famOperation = FindOneAndUpdateOperation(collection,
+            query: QueryUnion(<String, dynamic>{
+              'name': 'Tom',
+              'state': 'active',
+              'rating': {r'$gt': 10}
+            }),
+            sort: <String, Object>{'rating': 1},
+            update: UpdateUnion(<String, dynamic>{
+              r'$inc': {'score': 1}
+            }));
         var (res, _) = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
@@ -800,7 +801,7 @@ void main() async {
               'rating': {r'$gt': 10}
             }),
             sort: <String, Object>{'rating': 1},
-            update:UpdateUnion( <String, dynamic>{
+            update: UpdateUnion(<String, dynamic>{
               r'$inc': {'score': 1}
             }),
             returnNew: true);
@@ -845,13 +846,13 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var famOperation = FindOneAndUpdateOperation(collection,
-            query:QueryUnion( <String, dynamic>{
+            query: QueryUnion(<String, dynamic>{
               'name': 'Gus',
               'state': 'active',
               'rating': 100
             }),
             sort: <String, Object>{'rating': 1},
-            update:UpdateUnion( <String, dynamic>{
+            update: UpdateUnion(<String, dynamic>{
               r'$inc': {'score': 1}
             }),
             upsert: true,
@@ -883,7 +884,7 @@ void main() async {
         });
 
         var famOperation = FindOneAndUpdateOperation(collection,
-            query:QueryUnion( <String, dynamic>{
+            query: QueryUnion(<String, dynamic>{
               'name': 'Gus',
               'state': 'active',
               'rating': 100
@@ -912,12 +913,12 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var famOperation = FindOneAndDeleteOperation(collection,
-             QueryUnion(<String, dynamic>{
+        var famOperation = FindOneAndDeleteOperation(
+            collection,
+            QueryUnion(<String, dynamic>{
               'state': 'active',
             }),
-            sort: <String, Object>{'rating': 1}
-           );
+            sort: <String, Object>{'rating': 1});
         var (res, _) = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
@@ -937,12 +938,12 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var famOperation = FindOneAndUpdateOperation(collection,
-            query:QueryUnion( <String, dynamic>{
+            query: QueryUnion(<String, dynamic>{
               'category': 'cafe',
               'status': 'a',
             }),
             sort: <String, Object>{'category': 1},
-            update:UpdateUnion(<String, dynamic>{
+            update: UpdateUnion(<String, dynamic>{
               r'$set': {'status': 'updated'}
             }),
             findOneAndUpdateOptions: FindOneAndUpdateOptions(
@@ -960,7 +961,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [95, 92, 90]
@@ -978,7 +979,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var famOperation = FindOneAndUpdateOperation(collection,
-            query:QueryUnion(<String, dynamic>{
+            query: QueryUnion(<String, dynamic>{
               'grades': {r'$gte': 100}
             }),
             update: UpdateUnion(<String, dynamic>{
@@ -1003,7 +1004,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [
@@ -1025,7 +1026,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var famOperation = FindOneAndUpdateOperation(collection,
-            query:QueryUnion(<String, dynamic>{'_id': 1}),
+            query: QueryUnion(<String, dynamic>{'_id': 1}),
             update: UpdateUnion(<String, dynamic>{
               r'$set': {r'grades.$[element].mean': 100}
             }),
@@ -1050,7 +1051,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [
@@ -1072,7 +1073,7 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var famOperation = FindOneAndUpdateOperation(collection,
-            query: QueryUnion( <String, dynamic>{'_id': 1}),
+            query: QueryUnion(<String, dynamic>{'_id': 1}),
             update: UpdateUnion([
               <String, dynamic>{
                 r'$addFields': {
@@ -1106,13 +1107,13 @@ void main() async {
         await collection.createIndex(keys: {'status': 1});
         await collection.createIndex(key: 'points');
 
-        var famOperation = FindOneAndDeleteOperation(collection,
-             QueryUnion(<String, dynamic>{
+        var famOperation = FindOneAndDeleteOperation(
+            collection,
+            QueryUnion(<String, dynamic>{
               'points': {r'$lte': 20},
               'status': 'P'
             }),
-          
-            hint:HintUnion( {'status': 1}));
+            hint: HintUnion({'status': 1}));
         var (res, _) = await famOperation.executeDocument();
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
@@ -1134,13 +1135,13 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var (res, _) = await collection.findOneAndUpdate(
-             where
-                .eq('name', 'Tom')
-                .eq('state', 'active')
-                .eq('rating', {r'$gt': 10}),
-            sort: <String, dynamic>{'rating': 1}, 
-             ModifierBuilder().inc('score', 1),
-           );
+          where
+              .eq('name', 'Tom')
+              .eq('state', 'active')
+              .eq('rating', {r'$gt': 10}),
+          sort: <String, dynamic>{'rating': 1},
+          ModifierBuilder().inc('score', 1),
+        );
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
         expect(res.lastErrorObject?.n, 1);
@@ -1157,12 +1158,12 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var (res, _) = await collection.findOneAndUpdate(
-             where
+            where
                 .eq('name', 'Tom')
                 .eq('state', 'active')
-                .eq('rating', {r'$gt': 10}),  ModifierBuilder().inc('score', 1),
+                .eq('rating', {r'$gt': 10}),
+            ModifierBuilder().inc('score', 1),
             sort: <String, dynamic>{'rating': 1},
-           
             returnNew: true);
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
@@ -1180,12 +1181,12 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var (res, _) = await collection.findOneAndUpdate(
-             where
+            where
                 .eq('name', 'Tim')
                 .eq('state', 'active')
-                .eq('rating', {r'$gt': 10}), ModifierBuilder().inc('score', 1),
+                .eq('rating', {r'$gt': 10}),
+            ModifierBuilder().inc('score', 1),
             sort: <String, dynamic>{'rating': 1},
-            
             returnNew: true);
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
@@ -1202,9 +1203,9 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var (res, _) = await collection.findOneAndUpdate(
-                            where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
-     ModifierBuilder().inc('score', 1),       sort: <String, dynamic>{'rating': 1},
-             
+            where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
+            ModifierBuilder().inc('score', 1),
+            sort: <String, dynamic>{'rating': 1},
             upsert: true);
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
@@ -1221,10 +1222,9 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var (res, _) = await collection.findOneAndUpdate(
-            
-                where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
-     ModifierBuilder().inc('score', 1),        sort: <String, dynamic>{'rating': 1},
-            
+            where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
+            ModifierBuilder().inc('score', 1),
+            sort: <String, dynamic>{'rating': 1},
             upsert: true,
             returnNew: true);
 
@@ -1253,10 +1253,9 @@ void main() async {
         });
 
         var (res, _) = await collection.findOneAndUpdate(
-            
-                where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
-          ModifierBuilder().inc('score', 1),  sort: <String, dynamic>{'rating': 1},
-             
+            where.eq('name', 'Gus').eq('state', 'active').eq('rating', 100),
+            ModifierBuilder().inc('score', 1),
+            sort: <String, dynamic>{'rating': 1},
             upsert: true,
             returnNew: true);
 
@@ -1277,9 +1276,8 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var (res, _) = await collection.findOneAndDelete(
-             where.eq('state', 'active'),
-            sort: <String, dynamic>{'rating': 1}
-         );
+            where.eq('state', 'active'),
+            sort: <String, dynamic>{'rating': 1});
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, isNull);
@@ -1298,10 +1296,10 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var (res, _) = await collection.findOneAndUpdate(
-             where.eq('category', 'cafe').eq('status', 'a'),  ModifierBuilder().set('status', 'updated'),
+            where.eq('category', 'cafe').eq('status', 'a'),
+            ModifierBuilder().set('status', 'updated'),
             sort: <String, dynamic>{'category': 1},
-           
-          findOneAndUpdateOptions: FindOneAndUpdateOptions(
+            findOneAndUpdateOptions: FindOneAndUpdateOptions(
                 collation: CollationOptions('fr', strength: 1)));
 
         expect(res.lastErrorObject?.updatedExisting, isTrue);
@@ -1315,7 +1313,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [95, 92, 90]
@@ -1333,8 +1331,8 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var (res, _) = await collection.findOneAndUpdate(
-             where.gte('grades', 100),
-             ModifierBuilder().set(r'grades.$[element]', 100),
+            where.gte('grades', 100),
+            ModifierBuilder().set(r'grades.$[element]', 100),
             returnNew: true,
             arrayFilters: [
               {
@@ -1353,7 +1351,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [
@@ -1374,9 +1372,8 @@ void main() async {
         expect(ret.ok, 1.0);
         expect(ret.isSuccess, isTrue);
 
-        var (res, _) = await collection.findOneAndUpdate(
-             where.eq('_id', 1),
-             ModifierBuilder().set(r'grades.$[element].mean', 100),
+        var (res, _) = await collection.findOneAndUpdate(where.eq('_id', 1),
+            ModifierBuilder().set(r'grades.$[element].mean', 100),
             returnNew: true,
             arrayFilters: [
               {
@@ -1397,7 +1394,7 @@ void main() async {
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
-        var (ret,_,_,_) = await collection.insertMany([
+        var (ret, _, _, _) = await collection.insertMany([
           {
             '_id': 1,
             'grades': [
@@ -1423,8 +1420,8 @@ void main() async {
         expect(ret.isSuccess, isTrue);
 
         var (res, _) = await collection.findOneAndUpdate(
-           where.eq('_id', 1),
-           AggregationPipelineBuilder()
+          where.eq('_id', 1),
+          AggregationPipelineBuilder()
               .addStage(AddFields({
                 r'total': {r'$sum': r'$grades.grade'},
                 r'decimal': {
@@ -1466,9 +1463,8 @@ void main() async {
         await collection.createIndex(key: 'points');
 
         var (res, _) = await collection.findOneAndDelete(
-             where.lte('points', 20).eq('status', 'P'),
-            
-            hint:HintUnion( {'status': 1}));
+            where.lte('points', 20).eq('status', 'P'),
+            hint: HintUnion({'status': 1}));
 
         expect(res.lastErrorObject?.updatedExisting, isFalse);
         expect(res.lastErrorObject?.upserted, isNull);

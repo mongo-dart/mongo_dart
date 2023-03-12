@@ -117,7 +117,7 @@ void main() async {
               InsertOneOptions(writeConcern: WriteConcern.majority));
       expect(writeResult.isSuccess, isTrue);
 
-      (writeResult , _, _, _)= await collection.insertOne(
+      (writeResult, _, _, _) = await collection.insertOne(
           {'name': 'Amanda', 'status': 'Updated'},
           insertOneOptions:
               InsertOneOptions(writeConcern: WriteConcern.majority));

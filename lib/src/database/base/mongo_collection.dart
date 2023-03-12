@@ -2,6 +2,7 @@ import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 import 'package:mongo_dart/src/utils/hint_union.dart';
+import 'package:mongo_dart/src/utils/query_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import '../../command/query_and_write_operation_commands/wrapper/find_one_and_delete/base/find_one_and_delete_operation.dart';
 import '../../command/query_and_write_operation_commands/wrapper/find_one_and_delete/base/find_one_and_delete_options.dart';
@@ -581,9 +582,7 @@ abstract class MongoCollection {
       sortMap = <String, Object>{...selector!.map[keyOrderby]};
     }
 
-    var operation = FindOperation(this,
-        filter:
-            filter ?? (selector?.map == null ? null : selector!.map[key$Query]),
+    var operation = FindOperation(this, QueryUnion(filter),
         sort: sortMap,
         projection: projection ?? selector?.paramFields,
         hint: hint,
@@ -623,9 +622,7 @@ abstract class MongoCollection {
     if (sortMap == null && selector?.map[keyOrderby] != null) {
       sortMap = <String, Object>{...selector!.map[keyOrderby]};
     }
-    var operation = FindOperation(this,
-        filter:
-            filter ?? (selector?.map == null ? null : selector!.map[key$Query]),
+    var operation = FindOperation(this, QueryUnion(filter),
         sort: sortMap,
         projection: projection ?? selector?.paramFields,
         hint: hint,

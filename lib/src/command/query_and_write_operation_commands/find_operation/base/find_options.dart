@@ -1,7 +1,93 @@
+import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 
-class FindOptions {
+import '../open/find_options_open.dart';
+import '../v1/find_options_v1.dart';
+
+abstract class FindOptions {
+  @protected
+  FindOptions.protected(
+      {this.batchSize,
+      this.singleBatch = false,
+      this.comment,
+      this.maxTimeMS,
+      this.readConcern,
+      this.max,
+      this.min,
+      this.returnKey = false,
+      this.showRecordId = false,
+      this.tailable = false,
+      this.oplogReplay = false,
+      this.noCursorTimeout = false,
+      this.awaitData = false,
+      this.allowPartialResult = false,
+      this.collation,
+      this.allowDiskUse = false}) {
+    if (batchSize != null && batchSize! < 0) {
+      throw MongoDartError('Batch size parameter must be a non negative value');
+    }
+    if (maxTimeMS != null && maxTimeMS! < 1) {
+      throw MongoDartError('MaxTimeMS parameter must be a positive value');
+    }
+  }
+
+  factory FindOptions(
+      {ServerApi? serverApi,
+      int? batchSize,
+      bool singleBatch = false,
+      String? comment,
+      int? maxTimeMS,
+      ReadConcern? readConcern,
+      Map<String, Object>? max,
+      Map<String, Object>? min,
+      bool returnKey = false,
+      bool showRecordId = false,
+      bool tailable = false,
+      bool oplogReplay = false,
+      bool noCursorTimeout = false,
+      bool awaitData = false,
+      bool allowPartialResult = false,
+      CollationOptions? collation,
+      bool allowDiskUse = false}) {
+    if (serverApi != null && serverApi.version == ServerApiVersion.v1) {
+      return FindOptionsV1(
+          batchSize: batchSize,
+          singleBatch: singleBatch,
+          comment: comment,
+          maxTimeMS: maxTimeMS,
+          readConcern: readConcern,
+          max: max,
+          min: min,
+          returnKey: returnKey,
+          showRecordId: showRecordId,
+          tailable: tailable,
+          oplogReplay: oplogReplay,
+          noCursorTimeout: noCursorTimeout,
+          awaitData: awaitData,
+          allowPartialResult: allowPartialResult,
+          collation: collation,
+          allowDiskUse: allowDiskUse);
+    }
+    return FindOptionsOpen(
+        batchSize: batchSize,
+        singleBatch: singleBatch,
+        comment: comment,
+        maxTimeMS: maxTimeMS,
+        readConcern: readConcern,
+        max: max,
+        min: min,
+        returnKey: returnKey,
+        showRecordId: showRecordId,
+        tailable: tailable,
+        oplogReplay: oplogReplay,
+        noCursorTimeout: noCursorTimeout,
+        awaitData: awaitData,
+        allowPartialResult: allowPartialResult,
+        collation: collation,
+        allowDiskUse: allowDiskUse);
+  }
+
   /// The number of documents to return in the first batch. Defaults to **101**.
   /// A batchSize of 0 means that the cursor will be established,
   /// but no documents will be returned in the first batch.
@@ -125,30 +211,45 @@ class FindOptions {
   /// @Since(4.4)
   final bool allowDiskUse;
 
-  FindOptions(
-      {this.batchSize,
-      this.singleBatch = false,
-      this.comment,
-      this.maxTimeMS,
-      this.readConcern,
-      this.max,
-      this.min,
-      this.returnKey = false,
-      this.showRecordId = false,
-      this.tailable = false,
-      this.oplogReplay = false,
-      this.noCursorTimeout = false,
-      this.awaitData = false,
-      this.allowPartialResult = false,
-      this.collation,
-      this.allowDiskUse = false}) {
-    if (batchSize != null && batchSize! < 0) {
-      throw MongoDartError('Batch size parameter must be a non negative value');
-    }
-    if (maxTimeMS != null && maxTimeMS! < 1) {
-      throw MongoDartError('MaxTimeMS parameter must be a positive value');
-    }
-  }
+  FindOptionsOpen get toOpen => this is FindOptionsOpen
+      ? this as FindOptionsOpen
+      : FindOptionsOpen(
+          batchSize: batchSize,
+          singleBatch: singleBatch,
+          comment: comment,
+          maxTimeMS: maxTimeMS,
+          readConcern: readConcern,
+          max: max,
+          min: min,
+          returnKey: returnKey,
+          showRecordId: showRecordId,
+          tailable: tailable,
+          oplogReplay: oplogReplay,
+          noCursorTimeout: noCursorTimeout,
+          awaitData: awaitData,
+          allowPartialResult: allowPartialResult,
+          collation: collation,
+          allowDiskUse: allowDiskUse);
+
+  FindOptionsV1 get toV1 => this is FindOptionsV1
+      ? this as FindOptionsV1
+      : FindOptionsV1(
+          batchSize: batchSize,
+          singleBatch: singleBatch,
+          comment: comment,
+          maxTimeMS: maxTimeMS,
+          readConcern: readConcern,
+          max: max,
+          min: min,
+          returnKey: returnKey,
+          showRecordId: showRecordId,
+          tailable: tailable,
+          oplogReplay: oplogReplay,
+          noCursorTimeout: noCursorTimeout,
+          awaitData: awaitData,
+          allowPartialResult: allowPartialResult,
+          collation: collation,
+          allowDiskUse: allowDiskUse);
 
   Options get options => <String, dynamic>{
         if (batchSize != null) keyBatchSize: batchSize!,

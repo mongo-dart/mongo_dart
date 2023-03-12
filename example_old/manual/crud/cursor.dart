@@ -1,7 +1,9 @@
 // Example Tested on release 0.7.0
 import 'package:mongo_dart/mongo_dart_old.dart';
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/find_operation/base/find_options.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
+import 'package:mongo_dart/src/utils/query_union.dart';
 
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
@@ -25,7 +27,7 @@ void main() async {
     for (var idx = 0; idx < 1000; idx++) {'key': idx}
   ];
 
-  var (ret,_,_,_) = await collection.insertMany(documents);
+  var (ret, _, _, _) = await collection.insertMany(documents);
   if (!ret.isSuccess) {
     print('Error detected in record insertion');
   }
@@ -61,10 +63,11 @@ void main() async {
   /// and the susequent `getMore` command, otherwise it is transparent in
   /// the nextObject() call.
   var cursor = ModernCursor(
-      FindOperation(collection,
-          filter: {
+      FindOperation(
+          collection,
+          QueryUnion({
             'key': {r'$gte': 0}
-          },
+          }),
           findOptions: FindOptions(batchSize: 100)),
       db.server,
       batchSize: 150);

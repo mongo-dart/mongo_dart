@@ -34,8 +34,8 @@ export 'diagnostic_commands/server_status_command/server_status_command.dart';
 
 export 'diagnostic_commands/server_status_command/server_status_options.dart';
 export 'query_and_write_operation_commands/get_last_error_command/get_last_error_command.dart';
-export 'query_and_write_operation_commands/find_operation/find_operation.dart';
-export 'query_and_write_operation_commands/find_operation/find_options.dart';
+export 'query_and_write_operation_commands/find_operation/base/find_operation.dart';
+export 'query_and_write_operation_commands/find_operation/base/find_options.dart';
 
 export 'query_and_write_operation_commands/find_and_modify_operation/base/find_and_modify_operation.dart';
 export 'query_and_write_operation_commands/find_and_modify_operation/base/find_and_modify_options.dart';

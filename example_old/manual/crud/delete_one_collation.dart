@@ -1,5 +1,5 @@
-import 'package:mongo_dart/mongo_dart_old.dart'
-    show CollationOptions, FindOptions, where;
+import 'package:mongo_dart/mongo_dart_old.dart' show CollationOptions, where;
+import 'package:mongo_dart/src/command/query_and_write_operation_commands/find_operation/base/find_options.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 
 const dbName = 'mongo-dart-example';
@@ -20,7 +20,7 @@ void main() async {
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
-  var (ret,_,_,_) = await collection.insertMany(<Map<String, dynamic>>[
+  var (ret, _, _, _) = await collection.insertMany(<Map<String, dynamic>>[
     {'_id': 1, 'category': 'café', 'status': 'A'},
     {'_id': 2, 'category': 'cafE', 'status': 'a'},
     {'_id': 3, 'category': 'cafe', 'status': 'a'},

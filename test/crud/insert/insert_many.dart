@@ -18,7 +18,7 @@ Future insertManyDocumentsWithoutIdRaw(
     'writeConcern': {'w': "majority", 'wtimeout': 5000}
   });
 
-  var (_, serverResponse,_,_) = await collection.insertMany([
+  var (_, serverResponse, _, _) = await collection.insertMany([
     {'_id': 2, 'user': "ijk123", 'status': "A"},
     {'_id': 3, 'user': "xyz123", 'status': "P"},
     {'_id': 4, 'user': "mop123", 'status': "P"}

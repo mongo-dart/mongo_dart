@@ -18,7 +18,7 @@ void main() async {
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
-  var (ret,_,_,_) = await collection.insertMany(<Map<String, dynamic>>[
+  var (ret, _, _, _) = await collection.insertMany(<Map<String, dynamic>>[
     {'_id': 1, 'name': 'Tom', 'state': 'active', 'rating': 100, 'score': 5},
     {'_id': 2, 'name': 'William', 'state': 'busy', 'rating': 80, 'score': 4},
     {'_id': 3, 'name': 'Liz', 'state': 'on hold', 'rating': 70, 'score': 8},
@@ -32,8 +32,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var (res, _) = await collection.findOneAndDelete(
-       where.eq('state', 'active'),
+  var (res, _) = await collection.findOneAndDelete(where.eq('state', 'active'),
       sort: <String, dynamic>{'rating': 1});
 
   print('Updated document: ${res.lastErrorObject?.updatedExisting}'); // false

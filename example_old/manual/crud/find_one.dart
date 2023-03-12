@@ -19,7 +19,7 @@ void main() async {
   await db.dropCollection(collectionName);
   var collection = db.collection(collectionName);
 
-  var (ret,_,_,_) = await collection.insertMany(<Map<String, dynamic>>[
+  var (ret, _, _, _) = await collection.insertMany(<Map<String, dynamic>>[
     {
       '_id': 1,
       'name': 'Tom',

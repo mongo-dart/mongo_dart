@@ -24,7 +24,7 @@ void main() async {
   var collection = db.collection(collectionName);
   var collection2 = db.collection(collection2Name);
 
-  var (ret,_,_,_) = await collection.insertMany([
+  var (ret, _, _, _) = await collection.insertMany([
     {'_id': 1, 'supplier': "Aardvark and Sons", 'state': "Texas"},
     {'_id': 2, 'supplier': "Bears Run Amok.", 'state': "Colorado"},
     {'_id': 3, 'supplier': "Squid Mark Inc. ", 'state': "Rhode Island"},
@@ -32,7 +32,7 @@ void main() async {
   if (!ret.isSuccess) {
     print('Error detected in record insertion');
   }
-  (ret,_,_,_) = await collection2.insertMany([
+  (ret, _, _, _) = await collection2.insertMany([
     {'_id': 1, 'warehouse': "A", 'region': "West", 'state': "California"},
     {'_id': 2, 'warehouse': "B", 'region': "Central", 'state': "Colorado"},
     {'_id': 3, 'warehouse': "C", 'region': "East", 'state': "Florida"},
