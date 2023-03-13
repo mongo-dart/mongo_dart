@@ -228,7 +228,7 @@ class ModernCursor {
         collection!.collectionName == r'$cmd' &&
         operation is FindOperation &&
         (operation! as FindOperation).limit == 1) {
-      return operation!.process();
+      return (operation! as FindOperation).execute();
     }
 
     var justPrepareCursor = false;
@@ -238,7 +238,11 @@ class ModernCursor {
           operation!.options[keyBatchSize] == 0) {
         justPrepareCursor = true;
       }
-      result = await operation!.process();
+      if (operation is CommandOperation) {
+        result = await (operation! as CommandOperation).execute();
+      } else {
+        result = await (operation! as DbAdminCommandOperation).execute();
+      }
       state = ModernCursorState.open;
     } else if (state == ModernCursorState.open) {
       if (cursorId == Int64.ZERO) {

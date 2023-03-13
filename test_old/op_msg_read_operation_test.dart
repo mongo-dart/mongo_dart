@@ -227,8 +227,8 @@ void main() async {
       expect(result.first['pontosGastronomicos'].first['id'],
           '208a3f93-9fcb-4db7-ac44-bb11b86a2d31');
 
-      var resultOne = await collection.modernFindOne(
-          selector: where.eq(
+      var resultOne = await collection.findOne(
+          where.eq(
               'pontosGastronomicos.id', '208a3f93-9fcb-4db7-ac44-bb11b86a2d31'),
           projection: {
             '_id': 0,
@@ -241,7 +241,7 @@ void main() async {
       expect(result.first['pontosGastronomicos'].first['id'],
           resultOne?['pontosGastronomicos'].first['id']);
 
-      resultOne = await collection.modernFindOne(filter: {
+      resultOne = await collection.findOne({
         'pontosGastronomicos': {
           r'$elemMatch': {'id': '208a3f93-9fcb-4db7-ac44-bb11b86a2d31'}
         }

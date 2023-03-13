@@ -21,7 +21,7 @@ void main() async {
     'where': BsonCode('this.x == 3'),
     'null': null
   });
-  var v = await collection.findOne();
+  var v = await collection.findOne({});
   print(v);
   await client.close();
 }

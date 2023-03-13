@@ -13,7 +13,7 @@ void main() async {
     'Профессия': 'Брадобрей',
     'Шаблон': BsonRegexp('^.adim\$')
   });
-  var v = await collection.findOne();
+  var v = await collection.findOne({});
   print(
       'Utf8 encoding demonstration. I18 strings may be used not only as values but also as keys');
   print(v);

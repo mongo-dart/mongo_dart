@@ -920,7 +920,7 @@ Future testCursorClosing() async {
   //expect(modernCursor.state, State.closed);
   expect(modernCursor.cursorId, Int64.ZERO);
 
-  var result = await collection.findOne();
+  var result = await collection.findOne({});
   expect(result, isNotNull);
 }
 
@@ -1054,7 +1054,7 @@ Future testAuthenticationWithUri() async {
   await collection.insertOne({'a': 2});
   await collection.insertOne({'a': 3});
 
-  var foundValue = await collection.findOne();
+  var foundValue = await collection.findOne({});
   expect(foundValue, isNotNull);
   if (foundValue == null) {
     return;
@@ -1598,7 +1598,7 @@ Future testReopeningDb() async {
   await client.connect();
   collection = client.db().collection(collectionName);
 
-  var result = await collection.findOne();
+  var result = await collection.findOne({});
 
   expect(result, isNotNull);
 }
@@ -1609,7 +1609,7 @@ Future testDbNotOpen() async {
 
   await client.close();
   expect(
-      () async => collection.findOne(),
+      () async => collection.findOne({}),
       throwsA((MongoDartError e) =>
           e.message == 'Client is in the wrong state: State.CLOSED'));
 }
@@ -1620,13 +1620,13 @@ Future testDbOpenWhileStateIsOpening() {
   var client = MongoClient(defaultUri);
   return Future.sync(() {
     client.connect().then((_) {
-      return client.db().collection(collectionName).findOne();
+      return client.db().collection(collectionName).findOne({});
     }).then((res) {
       expect(res, isNull);
       client.close();
     });
     client.connect().then((_) {
-      return client.db().collection(collectionName).findOne();
+      return client.db().collection(collectionName).findOne({});
     }).then((res) {
       expect(res, isNull);
     }).catchError((e) {
@@ -1657,14 +1657,14 @@ Future testFindOneWhileStateIsOpening() async {
   return Future.sync(() async {
     // ignore: unawaited_futures
     client.connect().then((_) {
-      return client.db().collection(collectionName).findOne();
+      return client.db().collection(collectionName).findOne({});
     }).then((res) {
       expect(res, isNull);
       client.close();
     });
 
     try {
-      await client.db().collection(collectionName).findOne();
+      await client.db().collection(collectionName).findOne({});
     } catch (e) {
       expect(e is MongoDartError, isTrue);
       //expect(db.state == State.opening, isTrue);

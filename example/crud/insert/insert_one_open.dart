@@ -42,7 +42,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.findOne();
+  var res = await collection.findOne({});
 
   print('Fetched: "${res?['name']}"');
   // Tom

@@ -1,6 +1,5 @@
 // Example Tested on release 0.7.0
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/command/query_and_write_operation_commands/find_operation/base/find_options.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:mongo_dart/src/utils/query_union.dart';

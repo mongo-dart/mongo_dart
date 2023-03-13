@@ -1,13 +1,8 @@
+import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/simple_command.dart';
-import 'package:mongo_dart/src/utils/map_keys.dart'
-    show key$Db, keyAuthdb, keyDbName, keyReadPreference, keyWriteConcern;
 
-import '../../core/error/mongo_dart_error.dart';
 import '../../topology/server.dart';
-import '../parameters/read_preference.dart'
-    show ReadPreference, resolveReadPreference;
-import '../../database/base/mongo_database.dart';
-import '../../database/base/mongo_collection.dart';
+
 import 'operation_base.dart' show Aspect, Command, Options;
 
 base class CommandOperation extends SimpleCommand {
@@ -20,7 +15,7 @@ base class CommandOperation extends SimpleCommand {
 
   /// This method is for exposing a common interface for the user
   /// Must be overriden from commands
-  Future<dynamic> execute({Server? server}) {
+  Future<MongoDocument> execute({Server? server}) {
     if (server == null) {
       return process();
     }

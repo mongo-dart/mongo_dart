@@ -155,13 +155,13 @@ class MongoDatabase {
     );
     return result.serverResponses.first;
   } */
-
+/* 
   @Deprecated('No More Used')
   Future<Map<String, dynamic>> getLastError(Server server,
       {ConnectionBase? connection, WriteConcern? writeConcern}) async {
     writeConcern ??= _writeConcern;
     return GetLastErrorCommand(this, writeConcern: writeConcern).process();
-  }
+  } */
 
   @Deprecated('Deprecated since version 4.0.')
   Future<Map<String, dynamic>> getNonce({ConnectionBase? connection}) {

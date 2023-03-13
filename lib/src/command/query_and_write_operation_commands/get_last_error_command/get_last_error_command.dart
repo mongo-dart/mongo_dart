@@ -1,4 +1,4 @@
-import 'package:mongo_dart/src/command/parameters/write_concern.dart';
+/* import 'package:mongo_dart/src/command/parameters/write_concern.dart';
 import 'package:mongo_dart/src/command/base/command_operation.dart';
 import '../../../database/base/mongo_database.dart';
 import '../../../session/client_session.dart';
@@ -71,3 +71,4 @@ base class GetLastErrorCommand extends CommandOperation {
     return result;
   }
 }
+ */

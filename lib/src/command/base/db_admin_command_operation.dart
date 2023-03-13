@@ -22,6 +22,15 @@ base class DbAdminCommandOperation extends OperationBase {
           (throw MongoDartError('Server not found')),
       session: session);
 
+  /// This method is for exposing a common interface for the user
+  /// Must be overriden from commands
+  Future<MongoDocument> execute({Server? server}) {
+    if (server == null) {
+      return process();
+    }
+    return executeOnServer(server);
+  }
+
   @override
   @nonVirtual
   @protected

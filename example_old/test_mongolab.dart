@@ -19,6 +19,6 @@ void main() async {
   await collection.insertOne({'a': 1});
   await collection.insertOne({'a': 2});
   await collection.insertOne({'a': 3});
-  await collection.findOne();
+  await collection.findOne({});
   await client.close();
 }

@@ -13,6 +13,8 @@ import 'find_options.dart';
 import '../../../base/command_operation.dart';
 import '../find_result.dart';
 
+typedef FindDocumentRec = (FindResult findResult, MongoDocument serverDocument);
+
 base class FindOperation extends CommandOperation {
   FindOperation.protected(MongoCollection collection, this.filter,
       {this.sort,
@@ -140,11 +142,12 @@ base class FindOperation extends CommandOperation {
     };
   }
 
-  Future<FindResult> executeDocument({ClientSession? session}) async {
+  Future<FindDocumentRec> executeDocument({ClientSession? session}) async {
     if (collection!.collectionName == r'$cmd') {
       throw MongoDartError('cannot return a FindResult object '
           r'for a coomand request ($cmd collection)');
     }
-    return FindResult(await process());
+    var ret = await execute();
+    return (FindResult(ret), ret);
   }
 }

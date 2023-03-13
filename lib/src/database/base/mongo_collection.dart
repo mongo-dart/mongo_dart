@@ -133,6 +133,26 @@ abstract class MongoCollection {
       FindOneAndUpdateOptions? findOneAndUpdateOptions,
       Options? rawOptions});
 
+  /// Returns one document that satisfies the specified query criteria on
+  /// the collection or view. If multiple documents satisfy the query,
+  /// this method returns the first document according to the sort order
+  /// or the natural order of sort parameter is not specified.
+  /// In capped collections, natural order is the same as insertion order.
+  /// If no document satisfies the query, the method returns null.
+  ///
+  /// In MongoDb this method only allows the filter and the projection
+  /// parameters.
+  /// This version has more parameters, and it is essentially a wrapper
+  /// araound the find method with a fixed limit set to 1 that returns
+  /// a document instead of a stream.
+  Future<Map<String, dynamic>?> findOne(dynamic selector,
+      {Map<String, Object>? sort,
+      Map<String, Object>? projection,
+      HintUnion? hint,
+      int? skip,
+      FindOptions? findOptions,
+      Map<String, Object>? rawOptions});
+
   // ****************************************************
   // ***********        OLD       ***********************
   // ****************************************************
@@ -234,7 +254,7 @@ abstract class MongoCollection {
   /// Returns one document that satisfies the specified query criteria on the
   /// collection or view. If multiple documents satisfy the query,
   /// this method returns the first document.
-  Future<Map<String, dynamic>?> findOne([selector]) {
+  /*  Future<Map<String, dynamic>?> findOne([selector]) {
     if (selector is SelectorBuilder) {
       return modernFindOne(selector: selector);
     } else if (selector is Map<String, dynamic>) {
@@ -244,13 +264,13 @@ abstract class MongoCollection {
     }
     throw MongoDartError('The selector parameter should be either a '
         'SelectorBuilder or a Map<String, dynamic>');
-  }
+  } */
 
   // Old version to be used on MongoDb versions prior to 3.6
-  @Deprecated('No More Used')
+  /*  @Deprecated('No More Used')
   Future<Map<String, dynamic>?> legacyFindOne([selector]) {
     throw MongoDartError('No More Used');
-  }
+  } */
 
   // **************************************************
   //              Find and Modify
@@ -609,7 +629,7 @@ abstract class MongoCollection {
   /// This version has more parameters, and it is essentially a wrapper
   /// araound the find method with a fixed limit set to 1 that returns
   /// a document instead of a stream.
-  Future<Map<String, dynamic>?> modernFindOne(
+  /*  Future<Map<String, dynamic>?> modernFindOne(
       {SelectorBuilder? selector,
       Map<String, dynamic>? filter,
       Map<String, Object>? sort,
@@ -635,7 +655,7 @@ abstract class MongoCollection {
         rawOptions: rawOptions);
 
     return ModernCursor(operation, db.server).nextObject();
-  }
+  } */
 
   /// Utility method for preparing a DistinctOperation
   DistinctOperation _prepareDistinct(String field,

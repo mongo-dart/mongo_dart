@@ -14,6 +14,7 @@ import '../../session/client_session.dart';
 import '../../utils/map_keys.dart';
 import '../../utils/query_union.dart';
 import '../database.dart';
+import '../modern_cursor.dart';
 
 /// Collection clss for Stavle Api V1 and release greater or equal to 6.0
 class MongoCollectionV117 extends MongoCollection {
@@ -212,5 +213,44 @@ class MongoCollectionV117 extends MongoCollection {
         findOneAndUpdateOptions: findOneAndUpdateOptions,
         rawOptions: rawOptions);
     return famOperation.executeDocument();
+  }
+
+  /// Returns one document that satisfies the specified query criteria on
+  /// the collection or view. If multiple documents satisfy the query,
+  /// this method returns the first document according to the sort order
+  /// or the natural order of sort parameter is not specified.
+  /// In capped collections, natural order is the same as insertion order.
+  /// If no document satisfies the query, the method returns null.
+  ///
+  /// In MongoDb this method only allows the filter and the projection
+  /// parameters.
+  /// This version has more parameters, and it is essentially a wrapper
+  /// araound the find method with a fixed limit set to 1 that returns
+  /// a document instead of a stream.
+  @override
+  Future<Map<String, dynamic>?> findOne(dynamic selector,
+      {Map<String, Object>? sort,
+      Map<String, Object>? projection,
+      HintUnion? hint,
+      int? skip,
+      FindOptions? findOptions,
+      Map<String, Object>? rawOptions}) async {
+    var sortMap = sort;
+    if (sortMap == null && selector?.map[keyOrderby] != null) {
+      sortMap = <String, Object>{...selector!.map[keyOrderby]};
+    }
+    var operation = FindOperation(this, QueryUnion(selector),
+        sort: sortMap,
+        projection: projection ?? selector?.paramFields,
+        hint: hint,
+        limit: 1,
+        skip: skip ??
+            (selector != null && selector.paramSkip > 0
+                ? selector.paramSkip
+                : null),
+        findOptions: findOptions,
+        rawOptions: rawOptions);
+
+    return ModernCursor(operation, db.server).nextObject();
   }
 }
