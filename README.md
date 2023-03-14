@@ -7,8 +7,8 @@
 Server-side driver library for MongoDb implemented in pure Dart. Server side means all packages using dart:io, dart:html are not accepted.
 
 **NOTE**
-Starting from this version of mongo_dart, we will on support rleases starting from MongoDb 4.2.
-All APIs hav been revisited to reflect the last versions of the commands.
+Starting from release 6.0 of MongDb the old messages structure has been removed (almost completely). This means that some commands cannot be annymore executed. As per compatibility reasons with (very) old releases we are returning in some wrappers (like `insert` method) the result of this commands (in detail `getLastError` command), to let your programs work you should use instead the OP_MSG version. In general this methods are prefixed with `modern`, but this is not the case for all.
+For example, instead of `insert`, you should use `insertOne`, and instead of `update` you should use `updateOne` or `updateMany`.
 
 ## Apis
 
@@ -63,7 +63,7 @@ provided by [mongo_dart_query](https://github.com/mongo-dart/mongo_dart_query.gi
   await collection.find({'name': 'Tom', 'rating': {r'$gt': 10}}).toList();
 ```
 
-[Example for fluent ....](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/find_fluent.dart) - [Example for standard ....](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/find.dart)
+[Example for fluent ....](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/find_fluent.dart) - [Example for standard ....](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/find.dart)
 
 ```dart
   await coll
@@ -88,7 +88,7 @@ Method `findOne` take the same parameter and returns `Future` of just one map (m
   val = await coll.findOne(where.eq("my_field", 17).fields(['str_field','my_field']));
 ```
 
-[Example....](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/find_one.dart)
+[Example....](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/find_one.dart)
 
 Take notice in these samples that unlike mongo shell such parameters as projection (`fields`) and `skip`
 are passed as part of regular query through query builder.
@@ -107,7 +107,7 @@ Use `insertMany` to insert some documents if you have mongoDb ver 3.6 or greater
   ]);
 ```
 
-([Example....](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/insert_many.dart))
+([Example....](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/insert_many.dart))
 
 or `insertAll` otherwise
 
@@ -126,7 +126,7 @@ Use `insertOne` to insert only one documents if you have mongoDb ver 3.6 or grea
   await usersCollection.insertOne({'login': 'jdoe', 'name': 'John Doe', 'email': 'john@doe.com'});
 ```
 
-([Example....](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/insert_one.dart))
+([Example....](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/insert_one.dart))
 
 or `insert` otherwise
 
@@ -146,7 +146,7 @@ You can update the whole document with method `replaceOne` if you have mongoDb v
   await coll.replaceOne({"name": "c"}, v1);
 ```
 
-([Example....](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/replace_one.dart))
+([Example....](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/replace_one.dart))
 
 or `save` otherwise
 
@@ -164,7 +164,7 @@ You can perform field level updates on one document only with method `updateOne`
   coll.updateOne(where.eq('name', 'Daniel Robinson'), modify.set('age', 31));
 ```
 
-([Example....](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/update_one.dart))
+([Example....](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/update_one.dart))
 
 or `update` with MongoDb versions prior to 3.6
 
@@ -180,7 +180,7 @@ You can perform field level updates on multiple documents only with method `upda
   coll.updateMany(where.eq('name', 'Daniel Robinson'), modify.set('age', 31));
 ```
 
-([Example....](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/update_many.dart))
+([Example....](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/update_many.dart))
 
 or `update` and multiUpdate parameter with MongoDb versions prior to 3.6
 
@@ -198,7 +198,7 @@ You can delete one document only with method `deleteOne` if you have mongoDb ver
   await coll.deleteOne({"name": "Karl"});
 ```
 
-([Example....](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/delete_one.dart))
+([Example....](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/delete_one.dart))
 
 no specific method otherwise. You could use `remove` using a filter that selected only one document (best on "_id" field)
 
@@ -214,7 +214,7 @@ You can delete many documents in one time with method `deleteMany` if you have m
   await coll.deleteMany({"name": "Karl"});
 ```
 
-([Example....](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/delete_many.dart))
+([Example....](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/delete_many.dart))
 
 or `remove` with MongoDb versions prior to 3.6
 
@@ -224,7 +224,7 @@ or `remove` with MongoDb versions prior to 3.6
 
 ## Simple app
 
-[Simple app](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/generic/zips.dart) based on [JSON ZIPS dataset](https://media.mongodb.org/zips.json)
+[Simple app](https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/generic/zips.dart) based on [JSON ZIPS dataset](https://media.mongodb.org/zips.json)
 
 ### Building aggregation queries
 
@@ -350,26 +350,26 @@ Last but not least, some commands:
 
 - [Status](https://github.com/mongo-dart/mongo_dart/projects/1)
 
-- [Recent change notes](https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/CHANGELOG.md)
+- [Recent change notes](https://github.com/mongo-dart/mongo_dart/blob/main/CHANGELOG.md)
 
-- Additional [examples](https://github.com/mongo-dart/mongo_dart/tree/rel-0-8/example) and [tests](https://github.com/mongo-dart/mongo_dart/tree/rel-0-8/test)
+- Additional [examples](https://github.com/mongo-dart/mongo_dart/tree/main/example) and [tests](https://github.com/mongo-dart/mongo_dart/tree/main/test)
 
-[1]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/doc/manual/crud/delete.md#deleteOne
-[2]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/doc/manual/crud/delete.md#deleteMany
-[3]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/delete_one.dart
-[4]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/delete_one_collation.dart "With collation"
-[5]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/delete_many.dart
-[6]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/doc/manual/crud/update.md#updateOne
-[7]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/update_one.dart
-[8]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/doc/manual/crud/update.md#updateMany
-[9]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/crud/update_many.dart
-[10]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/doc/manual/crud/update.md#modernUpdate
-[11]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/doc/manual/aggregate/watch.md
-[12]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/doc/manual/bulk/bulk.md
-[13]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/bulk/ordered_collection_helper.dart
-[14]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/bulk/unordered_collection_helper.dart
-[15]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/bulk/ordered_bulk.dart
-[16]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/bulk/unordered_bulk.dart
-[17]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/watch/watch_on_collection.dart
-[18]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/example/manual/watch/watch_on_collection_insert.dart
-[19]: https://github.com/mongo-dart/mongo_dart/blob/rel-0-8/doc/manual/connection/simple_connection_no_auth.md
+[1]: https://github.com/mongo-dart/mongo_dart/blob/main/doc/manual/crud/delete.md#deleteOne
+[2]: https://github.com/mongo-dart/mongo_dart/blob/main/doc/manual/crud/delete.md#deleteMany
+[3]: https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/delete_one.dart
+[4]: https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/delete_one_collation.dart "With collation"
+[5]: https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/delete_many.dart
+[6]: https://github.com/mongo-dart/mongo_dart/blob/main/doc/manual/crud/update.md#updateOne
+[7]: https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/update_one.dart
+[8]: https://github.com/mongo-dart/mongo_dart/blob/main/doc/manual/crud/update.md#updateMany
+[9]: https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/crud/update_many.dart
+[10]: https://github.com/mongo-dart/mongo_dart/blob/main/doc/manual/crud/update.md#modernUpdate
+[11]: https://github.com/mongo-dart/mongo_dart/blob/main/doc/manual/aggregate/watch.md
+[12]: https://github.com/mongo-dart/mongo_dart/blob/main/doc/manual/bulk/bulk.md
+[13]: https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/bulk/ordered_collection_helper.dart
+[14]: https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/bulk/unordered_collection_helper.dart
+[15]: https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/bulk/ordered_bulk.dart
+[16]: https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/bulk/unordered_bulk.dart
+[17]: https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/watch/watch_on_collection.dart
+[18]: https://github.com/mongo-dart/mongo_dart/blob/main/example/manual/watch/watch_on_collection_insert.dart
+[19]: https://github.com/mongo-dart/mongo_dart/blob/main/doc/manual/connection/simple_connection_no_auth.md
