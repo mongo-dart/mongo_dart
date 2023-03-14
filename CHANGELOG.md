@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.2
+
+- Added extra data parameter to GridIn class
+
 ## 0.9.1
 
 - Added a `delete()` method to `GridOut` class
