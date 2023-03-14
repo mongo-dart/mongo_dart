@@ -40,8 +40,9 @@ class GridFS {
   Future<GridOut?> getFile(String fileName) async =>
       findOne(where.eq('filename', fileName));
 
-  GridIn createFile(Stream<List<int>> input, String filename) =>
-      GridIn._(this, filename, input);
+  GridIn createFile(Stream<List<int>> input, String filename,
+          [Map<String, dynamic>? extraFields]) =>
+      GridIn._(this, filename, input, extraFields);
 
   /// **Beware!** This method removes all the documents in this bucket
   Future<void> clearBucket() async {

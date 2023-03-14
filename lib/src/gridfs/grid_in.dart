@@ -11,8 +11,8 @@ class GridIn extends GridFSFile {
 
   /// Used for MD5 calculation, now deprecated
   //Uint8List contentToDigest = Uint8List(0);
-  GridIn._(GridFS fs, String filename, Stream<List<int>> inputStream)
-      : super(fs) {
+  GridIn._(GridFS fs, String filename, Stream<List<int>> inputStream, [Map<String, dynamic>? extraFields])
+      : super(fs, extraFields) {
     id = ObjectId();
     input = ChunkHandler(chunkSize).transformer.bind(inputStream);
     uploadDate = DateTime.now();
