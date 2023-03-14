@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/src/database/commands/mixin/basic_result.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
@@ -6,7 +7,7 @@ class KillCursorsResult with BasicResult {
     extractBasic(document);
     var docs = document[keyCursorsKilled] as List?;
     if (docs != null && docs.isNotEmpty) {
-      cursorsKilled = <int>[];
+      cursorsKilled = <Int64>[];
       for (var cursorKilled in docs) {
         cursorsKilled!.add(cursorKilled);
       }
@@ -14,7 +15,7 @@ class KillCursorsResult with BasicResult {
 
     docs = document[keyCursorsNotFound] as List?;
     if (docs != null && docs.isNotEmpty) {
-      cursorsNotFound = <int>[];
+      cursorsNotFound = <Int64>[];
       for (var cursorNotFound in docs) {
         cursorsNotFound!.add(cursorNotFound);
       }
@@ -22,7 +23,7 @@ class KillCursorsResult with BasicResult {
 
     docs = document[keyCursorsAlive] as List?;
     if (docs != null && docs.isNotEmpty) {
-      cursorsAlive = <int>[];
+      cursorsAlive = <Int64>[];
       for (var cursorAlive in docs) {
         cursorsAlive!.add(cursorAlive);
       }
@@ -30,15 +31,15 @@ class KillCursorsResult with BasicResult {
 
     docs = document[keyCursorsUnknown] as List?;
     if (docs != null && docs.isNotEmpty) {
-      cursorsUnknown = <int>[];
+      cursorsUnknown = <Int64>[];
       for (var cursorUnknown in docs) {
         cursorsUnknown!.add(cursorUnknown);
       }
     }
   }
 
-  List<int>? cursorsKilled;
-  List<int>? cursorsNotFound;
-  List<int>? cursorsAlive;
-  List<int>? cursorsUnknown;
+  List<Int64>? cursorsKilled;
+  List<Int64>? cursorsNotFound;
+  List<Int64>? cursorsAlive;
+  List<Int64>? cursorsUnknown;
 }

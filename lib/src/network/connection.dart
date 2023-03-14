@@ -63,8 +63,12 @@ class ServerCapabilities {
     } else if (maxWireVersion > 6) {
       // approximated
       fcv = '4.0';
-    } else {
+    } else if (maxWireVersion > 5) {
       fcv = '3.6';
+    } else if (maxWireVersion > 4) {
+      fcv = '3.4';
+    } else {
+      fcv = '3.2';
     }
   }
 
@@ -104,10 +108,15 @@ class ServerCapabilities {
       fcv = '4.4';
     } else if (maxWireVersion >= 8) {
       fcv = '4.2';
-    } else if (maxWireVersion >= 7) {
+    } else if (maxWireVersion > 6) {
+      // approximated
       fcv = '4.0';
-    } else {
+    } else if (maxWireVersion > 5) {
       fcv = '3.6';
+    } else if (maxWireVersion > 4) {
+      fcv = '3.4';
+    } else {
+      fcv = '3.2';
     }
   }
 }

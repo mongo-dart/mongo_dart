@@ -1,6 +1,7 @@
 @Timeout(Duration(minutes: 10))
 library database_tests;
 
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
@@ -326,7 +327,11 @@ Future testSaveWithIntegerId() async {
   expect(result, isNotNull);
 
   result['value'] = 2;
-  await collection.replaceOne({'_id': 3}, result);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    await collection.replaceOne({'_id': 3}, result);
+  } else {
+    await collection.legacyUpdate({'_id': 3}, result);
+  }
 
   result = await collection.findOne({'_id': 3}) ?? <String, dynamic>{};
   expect(result, isNotNull);
@@ -339,7 +344,11 @@ Future testSaveWithIntegerId() async {
   expect(result['value'], 2);
 
   final notThere = {'_id': 5, 'name': 'd', 'value': 50};
-  await collection.insertOne(notThere);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    await collection.insertOne(notThere);
+  } else {
+    await collection.insert(notThere);
+  }
   result = await collection.findOne(where.eq('_id', 5)) ?? <String, dynamic>{};
   expect(result, isNotNull);
 
@@ -374,7 +383,11 @@ Future testSaveWithObjectId() async {
   expect(result['value'], 30);
 
   result['value'] = 1;
-  await collection.replaceOne({'_id': result['_id']}, result);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    await collection.replaceOne({'_id': result['_id']}, result);
+  } else {
+    await collection.update({'_id': result['_id']}, result);
+  }
   result = await collection.findOne({'_id': id});
   expect(result, isNotNull);
   if (result == null) {
@@ -406,15 +419,17 @@ Future testInsertWithObjectId() async {
 }
 
 Future testCount() async {
-  var collectionName = getRandomCollectionName();
-  var collection = db.collection(collectionName);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var collectionName = getRandomCollectionName();
+    var collection = db.collection(collectionName);
 
-  await insertManyDocuments(collection, 167);
+    await insertManyDocuments(collection, 167);
 
-  //var result = await collection.legacyCount();
-  var result = await collection.modernCount();
+    //var result = await collection.legacyCount();
+    var result = await collection.modernCount();
 
-  expect(result.count, 167);
+    expect(result.count, 167);
+  }
 }
 
 Future testDistinct() async {
@@ -746,9 +761,13 @@ Future testSkip() async {
 Future testUpdateWithUpsert() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
-
-  var result = await collection.insertOne({'name': 'a', 'value': 10});
-  expect(result.isSuccess, true);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var result = await collection.insertOne({'name': 'a', 'value': 10});
+    expect(result.isSuccess, true);
+  } else {
+    var result = await collection.insert({'name': 'a', 'value': 10});
+    expect(result, containsPair("ok", 1.0));
+  }
 
   var results = await collection.find({'name': 'a'}).toList();
   expect(results.length, 1);
@@ -758,9 +777,14 @@ Future testUpdateWithUpsert() async {
   var objectUpdate = {
     r'$set': {'value': 20}
   };
-  var resultUpdate = await collection.updateOne({'name': 'a'}, objectUpdate);
-  expect(resultUpdate.isSuccess, true);
-  expect(resultUpdate.nModified, 1);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var resultUpdate = await collection.updateOne({'name': 'a'}, objectUpdate);
+    expect(resultUpdate.isSuccess, true);
+    expect(resultUpdate.nModified, 1);
+  } else {
+    var resultUpdate = await collection.update({'name': 'a'}, objectUpdate);
+    expect(resultUpdate, containsPair("ok", 1.0));
+  }
 
   results = await collection.find({'name': 'a'}).toList();
   expect(results.length, 1);
@@ -770,43 +794,71 @@ Future testUpdateWithUpsert() async {
 Future testUpdateWithMultiUpdate() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
-
-  var result = await collection.insertMany([
-    {'key': 'a', 'value': 'initial_value1'},
-    {'key': 'a', 'value': 'initial_value2'},
-    {'key': 'b', 'value': 'initial_value_b'}
-  ]);
-  expect(result.isSuccess, true);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var result = await collection.insertMany([
+      {'key': 'a', 'value': 'initial_value1'},
+      {'key': 'a', 'value': 'initial_value2'},
+      {'key': 'b', 'value': 'initial_value_b'}
+    ]);
+    expect(result.isSuccess, true);
+  } else {
+    var result = await collection.insertAll([
+      {'key': 'a', 'value': 'initial_value1'},
+      {'key': 'a', 'value': 'initial_value2'},
+      {'key': 'b', 'value': 'initial_value_b'}
+    ]);
+    expect(result, containsPair("ok", 1.0));
+  }
 
   var results = await collection.find({'key': 'a'}).toList();
   expect(results.length, 2);
   expect(results.first['key'], 'a');
   expect(results.first['value'], 'initial_value1');
 
-  var resultUpd = await collection.updateOne(where.eq('key', 'a'),
-      modify.set('value', 'value_modified_for_only_one_with_default'));
-  expect(resultUpd.isSuccess, true);
-  expect(resultUpd.nModified, 1);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var resultUpd = await collection.updateOne(where.eq('key', 'a'),
+        modify.set('value', 'value_modified_for_only_one_with_default'));
+    expect(resultUpd.isSuccess, true);
+    expect(resultUpd.nModified, 1);
+  } else {
+    var resultUpd = await collection.update(where.eq('key', 'a'),
+        modify.set('value', 'value_modified_for_only_one_with_default'));
+    expect(resultUpd, containsPair("ok", 1.0));
+  }
 
   results = await collection
       .find({'value': 'value_modified_for_only_one_with_default'}).toList();
   expect(results.length, 1);
-
-  resultUpd = await collection.updateOne(
-    where.eq('key', 'a'),
-    modify.set('value', 'value_modified_for_only_one_with_multiupdate_false'),
-  );
-  expect(resultUpd.isSuccess, true);
-  expect(resultUpd.nModified, 1);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var resultUpd = await collection.updateOne(
+      where.eq('key', 'a'),
+      modify.set('value', 'value_modified_for_only_one_with_multiupdate_false'),
+    );
+    expect(resultUpd.isSuccess, true);
+    expect(resultUpd.nModified, 1);
+  } else {
+    var resultUpd = await collection.update(
+      where.eq('key', 'a'),
+      modify.set('value', 'value_modified_for_only_one_with_multiupdate_false'),
+    );
+    expect(resultUpd, containsPair("ok", 1.0));
+  }
 
   results = await collection.find(
       {'value': 'value_modified_for_only_one_with_multiupdate_false'}).toList();
   expect(results.length, 1);
 
-  resultUpd = await collection.updateMany(
-      where.eq('key', 'a'), modify.set('value', 'new_value'));
-  expect(resultUpd.isSuccess, true);
-  expect(resultUpd.nModified, 2);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var resultUpd = await collection.updateMany(
+        where.eq('key', 'a'), modify.set('value', 'new_value'));
+    expect(resultUpd.isSuccess, true);
+    expect(resultUpd.nModified, 2);
+  } else {
+    var resultUpd = await collection.update(
+        where.eq('key', 'a'), modify.set('value', 'new_value'),
+        multiUpdate: true);
+    expect(resultUpd, containsPair("ok", 1.0));
+  }
 
   results = await collection.find({'value': 'new_value'}).toList();
   expect(results.length, 2);
@@ -837,7 +889,7 @@ Future testLimitWithSortByAndSkip() async {
     counter = await modernCursor.stream.length;
     expect(counter, 10);
     expect(modernCursor.state, State.closed);
-    expect(modernCursor.cursorId.value, 0);
+    expect(modernCursor.cursorId, Int64.ZERO);
     return;
   }
 
@@ -876,7 +928,7 @@ Future testLimit() async {
     await modernCursor.stream.forEach((e) => counter++);
     expect(counter, 10);
     expect(modernCursor.state, State.closed);
-    expect(modernCursor.cursorId.value, 0);
+    expect(modernCursor.cursorId, Int64.ZERO);
     return;
   }
 
@@ -926,7 +978,7 @@ Future testCursorClosing() async {
 
     var cursorResult = await modernCursor.nextObject();
     expect(modernCursor.state, State.open);
-    expect(modernCursor.cursorId.value, isPositive);
+    expect(modernCursor.cursorId.isNegative, isFalse);
     expect(cursorResult, isNotNull);
     if (cursorResult == null) {
       return;
@@ -936,7 +988,7 @@ Future testCursorClosing() async {
 
     await modernCursor.close();
     expect(modernCursor.state, State.closed);
-    expect(modernCursor.cursorId.value, 0);
+    expect(modernCursor.cursorId, Int64.ZERO);
 
     var result = await collection.findOne();
     expect(result, isNotNull);
@@ -982,13 +1034,13 @@ Future testNextObject() async {
 Future testNextObjectToEnd() async {
   var collectionName = getRandomCollectionName();
   var collection = db.collection(collectionName);
-  await collection.insertMany([
-    {'a': 1},
-    {'a': 2},
-    {'a': 3}
-  ]);
-
   if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    await collection.insertMany([
+      {'a': 1},
+      {'a': 2},
+      {'a': 3}
+    ]);
+
     var modernCursor = ModernCursor(FindOperation(collection, limit: 10));
 
     var result = await modernCursor.nextObject();
@@ -1002,7 +1054,11 @@ Future testNextObjectToEnd() async {
 
     return;
   }
-
+  await collection.insertAll([
+    {'a': 1},
+    {'a': 2},
+    {'a': 3}
+  ]);
   Cursor cursor;
 
   cursor = Cursor(db, collection, where.limit(10));
@@ -1031,7 +1087,7 @@ Future testCursorWithOpenServerCursor() async {
     await modernCursor.nextObject();
     await modernCursor.nextObject();
     expect(modernCursor.state, State.open);
-    expect(modernCursor.cursorId.value, isPositive);
+    expect(modernCursor.cursorId.isNegative, isFalse);
 
     return;
   }
@@ -1066,7 +1122,7 @@ Future testCursorGetMore() async {
 
     count = await modernCursor.stream.length;
     expect(count, 1000);
-    expect(modernCursor.cursorId.value, 0);
+    expect(modernCursor.cursorId, Int64.ZERO);
     expect(modernCursor.state, State.closed);
     return;
   }
@@ -1343,75 +1399,80 @@ Future testIndexCreationErrorHandling() async {
 }
 
 Future testTextIndex() async {
-  var collectionName = getRandomCollectionName();
-  var collection = db.collection(collectionName);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var collectionName = getRandomCollectionName();
+    var collection = db.collection(collectionName);
 
-  var toInsert = <Map<String, dynamic>>[];
-  for (var n = 0; n < 6; n++) {
-    toInsert.add({
-      'a': n,
-      'embedded': {'b': n, 'c': n * 10}
-    });
+    var toInsert = <Map<String, dynamic>>[];
+    for (var n = 0; n < 6; n++) {
+      toInsert.add({
+        'a': n,
+        'embedded': {'b': n, 'c': n * 10}
+      });
+    }
+    await collection.insertAll([
+      {'_id': 1, 'name': 'Java Hut', 'description': 'Coffee and cakes'},
+      {'_id': 2, 'name': 'Burger Buns', 'description': 'Gourmet hamburgers'},
+      {'_id': 3, 'name': 'Coffee Shop', 'description': 'Just coffee'},
+      {
+        '_id': 4,
+        'name': 'Clothes Clothes Clothes',
+        'description': 'Discount clothing'
+      },
+      {'_id': 5, 'name': 'Java Shopping', 'description': 'Indonesian goods'}
+    ]);
+
+    var res = await collection
+        .createIndex(keys: {'name': 'text', 'description': 'text'});
+    expect(res['ok'], 1.0);
+
+    var result = await collection.find({
+      r'$text': {r'$search': 'java coffee shop'}
+    }).toList();
+    expect(result.length, 3);
+    expect(result.every((element) {
+      return (element['_id'] as num).remainder(2) == 1;
+    }), isTrue);
   }
-  await collection.insertAll([
-    {'_id': 1, 'name': 'Java Hut', 'description': 'Coffee and cakes'},
-    {'_id': 2, 'name': 'Burger Buns', 'description': 'Gourmet hamburgers'},
-    {'_id': 3, 'name': 'Coffee Shop', 'description': 'Just coffee'},
-    {
-      '_id': 4,
-      'name': 'Clothes Clothes Clothes',
-      'description': 'Discount clothing'
-    },
-    {'_id': 5, 'name': 'Java Shopping', 'description': 'Indonesian goods'}
-  ]);
-
-  var res = await collection
-      .createIndex(keys: {'name': 'text', 'description': 'text'});
-  expect(res['ok'], 1.0);
-
-  var result = await collection.find({
-    r'$text': {r'$search': 'java coffee shop'}
-  }).toList();
-  expect(result.length, 3);
-  expect(result.every((element) {
-    return (element['_id'] as num).remainder(2) == 1;
-  }), isTrue);
 }
 
 Future testTtlIndex() async {
-  var collectionName = getRandomCollectionName();
-  var collection = db.collection(collectionName);
+  if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+    var collectionName = getRandomCollectionName();
+    var collection = db.collection(collectionName);
 
-  // Here the CreateIndexOptions is set to null, but you can pass other
-  // parameters if needed
-  var indexOperation = CreateIndexOperation(db, collection, 'closingDate', null,
-      rawOptions: {'expireAfterSeconds': 1});
-  var res = await indexOperation.execute();
-  expect(res['ok'], 1.0);
+    // Here the CreateIndexOptions is set to null, but you can pass other
+    // parameters if needed
+    var indexOperation = CreateIndexOperation(
+        db, collection, 'closingDate', null,
+        rawOptions: {'expireAfterSeconds': 1});
+    var res = await indexOperation.execute();
+    expect(res['ok'], 1.0);
 
-  await collection.insertAll([
-    {
-      '_id': 1,
-      'name': 'Java Hut',
-      'description': 'Coffee and cakes',
-      'closingDate': DateTime(2000)
-    },
-    {'_id': 2, 'name': 'Burger Buns', 'description': 'Gourmet hamburgers'},
-    {'_id': 3, 'name': 'Coffee Shop', 'description': 'Just coffee'},
-    {
-      '_id': 4,
-      'name': 'Clothes Clothes Clothes',
-      'description': 'Discount clothing'
-    },
-    {'_id': 5, 'name': 'Java Shopping', 'description': 'Indonesian goods'}
-  ]);
+    await collection.insertAll([
+      {
+        '_id': 1,
+        'name': 'Java Hut',
+        'description': 'Coffee and cakes',
+        'closingDate': DateTime(2000)
+      },
+      {'_id': 2, 'name': 'Burger Buns', 'description': 'Gourmet hamburgers'},
+      {'_id': 3, 'name': 'Coffee Shop', 'description': 'Just coffee'},
+      {
+        '_id': 4,
+        'name': 'Clothes Clothes Clothes',
+        'description': 'Discount clothing'
+      },
+      {'_id': 5, 'name': 'Java Shopping', 'description': 'Indonesian goods'}
+    ]);
 
-  // The cleanup on the server runs every 60 seconds, plus the time to build
-  // the index, plus a little extra...
-  await Future.delayed(Duration(seconds: 90));
+    // The cleanup on the server runs every 60 seconds, plus the time to build
+    // the index, plus a little extra...
+    await Future.delayed(Duration(seconds: 90));
 
-  var elements = await collection.find().toList();
-  expect(elements.length, 4);
+    var elements = await collection.find().toList();
+    expect(elements.length, 4);
+  }
 }
 
 Future testDropIndexCreationOnCollection() async {

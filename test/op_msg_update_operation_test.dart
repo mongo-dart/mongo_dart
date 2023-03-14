@@ -66,7 +66,7 @@ void main() async {
   });
 
   group('Update Operations', () {
-    //var cannotRunTests = false;
+    var cannotRunTests = false;
     //var running4_4orGreater = false;
     var running4_2orGreater = false;
     var running4_2 = false;
@@ -77,7 +77,7 @@ void main() async {
     setUp(() async {
       await initializeDatabase();
       if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
-        //cannotRunTests = true;
+        cannotRunTests = true;
       }
       var serverFcv = db.masterConnection.serverCapabilities.fcv;
       if (serverFcv?.compareTo('4.4') != -1) {
@@ -100,6 +100,9 @@ void main() async {
 
     group('Update', () {
       test('Update specific fields on one document', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -145,6 +148,9 @@ void main() async {
         expect(res[keyNModified], 1);
       });
       test('Update specific fields on multiple documents', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -189,6 +195,9 @@ void main() async {
       });
 
       test('Update document on multiple documents - error', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -238,6 +247,9 @@ void main() async {
       });
 
       test('Replace one document', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -281,6 +293,9 @@ void main() async {
       });
 
       test('Update with Aggregation Pipeline', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -335,6 +350,9 @@ void main() async {
       });
 
       test('Update with Aggregation Pipeline - 2', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -416,6 +434,9 @@ void main() async {
       });
 
       test('Bulk Update', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -457,6 +478,9 @@ void main() async {
       });
 
       test('Specify collation', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -484,6 +508,9 @@ void main() async {
       });
       test('Array filters - Update elements Match arrayFilters Criteria',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -527,6 +554,9 @@ void main() async {
       });
       test('Array filters - Update Specific Elements of an Array of Documents',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -571,6 +601,9 @@ void main() async {
         expect(res[keyNModified], 2);
       });
       test('Specify hint', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -607,6 +640,9 @@ void main() async {
     });
     group('Update - wrapper', () {
       test('Update specific fields on one document', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -650,6 +686,9 @@ void main() async {
       });
 
       test('Update specific fields on multiple documents', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -690,6 +729,9 @@ void main() async {
         expect(res.nModified, 2);
       });
       test('Replace one document', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -727,6 +769,9 @@ void main() async {
         expect(res[keyNModified], 1);
       });
       test('Update with Aggregation Pipeline', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -779,6 +824,9 @@ void main() async {
       });
 
       test('Update with Aggregation Pipeline - 2', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -858,6 +906,9 @@ void main() async {
       });
 
       test('Specify collation', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -883,6 +934,9 @@ void main() async {
       });
       test('Array filters - Update elements Match arrayFilters Criteria',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -924,6 +978,9 @@ void main() async {
       });
       test('Array filters - Update Specific Elements of an Array of Documents',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1001,6 +1058,9 @@ void main() async {
 
     group('Update - Modern Collection helper', () {
       test('Update specific fields on one document', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1042,6 +1102,9 @@ void main() async {
         expect(elements.first['points'], 1);
       });
       test('Update specific fields on one document', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1083,6 +1146,9 @@ void main() async {
         expect(elements.first['points'], 1);
       });
       test('Update specific fields on multiple documents', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1126,6 +1192,9 @@ void main() async {
         expect(elements.last['points'], 60);
       });
       test('Update with Aggregation Pipeline', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -1180,6 +1249,9 @@ void main() async {
       });
 
       test('Update with Aggregation Pipeline - 2', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -1262,6 +1334,9 @@ void main() async {
       });
 
       test('Specify collation', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1289,6 +1364,9 @@ void main() async {
       });
       test('Array filters - Update elements Match arrayFilters Criteria',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1332,6 +1410,9 @@ void main() async {
       });
       test('Array filters - Update Specific Elements of an Array of Documents',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1378,6 +1459,9 @@ void main() async {
         expect(elements.last['grades'].first['mean'], 100);
       });
       test('Specify hint', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -1413,6 +1497,9 @@ void main() async {
     group('Update - Collection helpers updateOne, updateMany and replaceOne',
         () {
       test(' Update specific fields on one document', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1454,6 +1541,9 @@ void main() async {
         expect(elements.first['points'], 1);
       });
       test('Update one document - error', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1485,6 +1575,9 @@ void main() async {
       });
 
       test('Update specific fields on multiple documents', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1527,6 +1620,9 @@ void main() async {
         expect(elements.last['points'], 60);
       });
       test('Set new document on multiple documents - error', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1582,6 +1678,9 @@ void main() async {
       });
 
       test('Replace one document', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1626,6 +1725,9 @@ void main() async {
       });
 
       test('Replace one - document with update operators - error', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1655,6 +1757,9 @@ void main() async {
       });
 
       test('Update with Aggregation Pipeline', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -1708,6 +1813,9 @@ void main() async {
       });
 
       test('Update with Aggregation Pipeline - 2', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -1789,6 +1897,9 @@ void main() async {
       });
 
       test('Specify collation', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1816,6 +1927,9 @@ void main() async {
       });
       test('Array filters - Update elements Match arrayFilters Criteria',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1858,6 +1972,9 @@ void main() async {
       });
       test('Array filters - Update Specific Elements of an Array of Documents',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1903,6 +2020,9 @@ void main() async {
         expect(elements.last['grades'].first['mean'], 100);
       });
       test('Specify hint', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }

@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 /// Selection of status values not expected to change during the same connection
@@ -12,7 +13,7 @@ class ServerStatus {
   String? storageEngineName;
   bool isJournaled = false;
   bool isPersistent = true;
-  int? pid;
+  Int64? pid;
 
   /// If the cluster is a replica set, here we have the list of the hosts
   List<String>? replicaHosts;

@@ -379,6 +379,7 @@ class Db {
     }
     if (unfilled(databaseName)) {
       databaseName = 'test';
+      authSourceDb ??= Db._authDb('admin');
     }
 
     return serverConfig;
@@ -592,12 +593,13 @@ class Db {
 
   @Deprecated('Deprecated since version 4.0.')
   Future<Map<String, dynamic>> getNonce({Connection? connection}) {
-    if (masterConnection.serverCapabilities.fcv != null &&
-        masterConnection.serverCapabilities.fcv!.compareTo('6.0') >= 0) {
+    var locConnection = connection ?? masterConnection;
+    if (locConnection.serverCapabilities.fcv != null &&
+        locConnection.serverCapabilities.fcv!.compareTo('6.0') >= 0) {
       throw MongoDartError('getnonce command not managed in this version');
     }
     return executeDbCommand(DbCommand.createGetNonceCommand(this),
-        connection: connection);
+        connection: locConnection);
   }
 
   Future<Map<String, dynamic>> getBuildInfo({Connection? connection}) {

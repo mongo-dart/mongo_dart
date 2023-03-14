@@ -1,5 +1,6 @@
 @Timeout(Duration(seconds: 30))
 
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
 import 'package:mongo_dart/src/database/commands/aggregation_commands/count/count_operation.dart';
@@ -199,6 +200,9 @@ void main() async {
     });
 
     test('Simple read', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);
 
@@ -210,6 +214,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Simple read - extract sub-document', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);
 
@@ -284,6 +291,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test(r'Select with $where', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);
 
@@ -298,6 +308,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test(r'Select with $where - possible injection', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);
 
@@ -315,6 +328,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Simple read - using stream', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);
 
@@ -329,6 +345,9 @@ void main() async {
       expect(result.length, 10000);
     }, skip: cannotRunTests);
     test('Simple read - using stream from cursor', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);
 
@@ -344,6 +363,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Simple read error- using wrong stream from cursor', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);
 
@@ -366,6 +388,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Simple read from capped collection', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var resultMap = await db.createCollection(collectionName,
           createCollectionOptions:
@@ -381,6 +406,9 @@ void main() async {
 
     group('Normal Cursor', () {
       test('Simple read from capped collection', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var resultMap = await db.createCollection(collectionName,
             createCollectionOptions: CreateCollectionOptions(
@@ -421,6 +449,9 @@ void main() async {
 
     group('Tailable Cursor', () {
       test('Simple read from capped collection', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var resultMap = await db.createCollection(collectionName,
             createCollectionOptions: CreateCollectionOptions(
@@ -434,14 +465,14 @@ void main() async {
             .execute();
 
         var cursor = ModernCursor.fromOpenId(
-            collection, BsonLong((doc[keyCursor] as Map)[keyId] as int),
+            collection, ((doc[keyCursor] as Map)[keyId] as Int64),
             tailable: true);
 
         expect(cursor.state, State.open);
 
         var cursorResult = await cursor.nextObject();
         expect(cursor.state, State.open);
-        expect(cursor.cursorId.value, isPositive);
+        expect(cursor.cursorId.isNegative, isFalse);
         expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
 
@@ -472,6 +503,9 @@ void main() async {
         expect(cursor.state, State.closed);
       });
       test('Simple read from capped collection with awaitData', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var resultMap = await db.createCollection(collectionName,
             createCollectionOptions: CreateCollectionOptions(
@@ -485,14 +519,14 @@ void main() async {
             .execute();
 
         var cursor = ModernCursor.fromOpenId(
-            collection, BsonLong((doc[keyCursor] as Map)[keyId] as int),
+            collection, ((doc[keyCursor] as Map)[keyId] as Int64),
             tailable: true);
 
         expect(cursor.state, State.open);
 
         var cursorResult = await cursor.nextObject();
         expect(cursor.state, State.open);
-        expect(cursor.cursorId.value, isPositive);
+        expect(cursor.cursorId.isNegative, isFalse);
         expect(cursorResult?['a'], 101);
         expect(cursorResult, isNotNull);
 
@@ -532,6 +566,9 @@ void main() async {
       // Reading with a tailable cursor on a capped collection
       // automatically closes the cursor if the result of the selection is empty
       test('Read from empty collection', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var resultMap = await db.createCollection(collectionName,
             createCollectionOptions: CreateCollectionOptions(
@@ -547,6 +584,9 @@ void main() async {
       });
 
       test('Read from empty selection', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var resultMap = await db.createCollection(collectionName,
             createCollectionOptions: CreateCollectionOptions(
@@ -568,7 +608,7 @@ void main() async {
         var cursorResult = await cursor.nextObject();
         expect(cursorResult, isNull);
         expect(cursor.state, State.open);
-        expect(cursor.cursorId.value, isNonZero);
+        expect(cursor.cursorId.isNegative, isFalse);
 
         await cursor.close();
       });
@@ -589,6 +629,9 @@ void main() async {
     });
 
     test('Simple Aggregate', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);
 
@@ -610,6 +653,9 @@ void main() async {
 
     group('admin/diagnostic pipeline', () {
       test('currentOp', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var stream = db.aggregate([
           {
             r'$currentOp': {'allUsers': true, 'idleConnections': true}
@@ -661,6 +707,9 @@ void main() async {
       });
 
       test('listLocalSessions', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var result = db.aggregate([
           {
             r'$listLocalSessions': {'allUsers': true}
@@ -677,6 +726,9 @@ void main() async {
 
     group('Normal Cursor', () {
       test('Aggregate', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -784,6 +836,9 @@ db.runCommand(
       });
 
       test('Aggregate With Cursor Batch Size', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -885,7 +940,7 @@ db.runCommand(
             collection: collection, cursor: {'batchSize': 3});
         var v = await aggregateOperation.execute();
         final cursor = v[keyCursor] as Map;
-        expect(cursor['id'], const TypeMatcher<int>());
+        expect(cursor['id'], const TypeMatcher<Int64>());
         final firstBatch = cursor[keyFirstBatch] as List;
         expect(firstBatch.length, 3);
         expect(firstBatch.first[key_id], 'Age of Steam');
@@ -893,6 +948,9 @@ db.runCommand(
       });
 
       test('Aggregate To Stream', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1030,6 +1088,9 @@ db.runCommand(
     });
 
     test('Simple change from collection with changeStream', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       /*   var resultMap = await db.createCollection(collectionName,
           createCollectionOptions:
@@ -1102,6 +1163,9 @@ db.runCommand(
     }, skip: cannotRunTests);
 
     test('Change with match from collection with changeStream', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);
       await insertManyDocuments(collection, 3);
@@ -1175,6 +1239,9 @@ db.runCommand(
     }, skip: cannotRunTests);
 
     test('Change with match from collection.watch()', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var collection = db.collection(collectionName);
       await insertManyDocuments(collection, 3);
@@ -1256,6 +1323,9 @@ db.runCommand(
 
     group('Command', () {
       test('All documents - Map result', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1273,6 +1343,9 @@ db.runCommand(
         expect(result[keyN], 3);
       }, skip: cannotRunTests);
       test('All documents - Class result', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1290,6 +1363,9 @@ db.runCommand(
         expect(result.count, 3);
       }, skip: cannotRunTests);
       test('Selected documents - Class result', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1308,6 +1384,9 @@ db.runCommand(
         expect(result.count, 2);
       }, skip: cannotRunTests);
       test('Skip documents and majority read concern - Class result', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1363,6 +1442,9 @@ db.runCommand(
 
     group('Command', () {
       test('Return Distinct Values for a Field - Map result', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1405,6 +1487,9 @@ db.runCommand(
       }, skip: cannotRunTests);
 
       test('Return Distinct Values for a Field - Class result', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1448,6 +1533,9 @@ db.runCommand(
 
       test('Return Distinct Values for an Embedded Field - Class result',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1491,6 +1579,9 @@ db.runCommand(
 
       test('Return Distinct Values for an Array Field - Class result',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1540,6 +1631,9 @@ db.runCommand(
       test(
           'Selection with Distinct Values for an Embedded Field - Class result',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1581,6 +1675,9 @@ db.runCommand(
         expect(result.values.last, '333');
       }, skip: cannotRunTests);
       test('Specify a collation - Class result', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1607,6 +1704,9 @@ db.runCommand(
 
     group('Collection helper', () {
       test('Return Distinct Values for a Field - Map result', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1647,6 +1747,9 @@ db.runCommand(
       }, skip: cannotRunTests);
 
       test('Return Distinct Values for a Field - Class result', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1688,6 +1791,9 @@ db.runCommand(
 
       test('Return Distinct Values for an Embedded Field - Class result',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1729,6 +1835,9 @@ db.runCommand(
 
       test('Return Distinct Values for an Array Field - Class result',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1778,6 +1887,9 @@ db.runCommand(
       test(
           'Selection with Distinct Values for an Embedded Field - Class result',
           () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1818,6 +1930,9 @@ db.runCommand(
         expect(result.values.last, '333');
       }, skip: cannotRunTests);
       test('Specify a collation - Class result', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 

@@ -7,17 +7,19 @@ library mongo_dart;
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert' show base64;
+import 'dart:math';
+import 'dart:typed_data';
 import 'dart:io'
     show
         File,
         FileMode,
         IOSink,
+        Platform,
         SecureSocket,
         SecurityContext,
         Socket,
         TlsException;
-import 'dart:math';
-import 'dart:typed_data';
+
 import 'package:bson/bson.dart';
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/src/auth/scram_sha256_authenticator.dart';
@@ -37,6 +39,7 @@ import 'package:mongo_dart/src/database/utils/dns_lookup.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 import 'package:mongo_dart/src/database/utils/parms_utils.dart';
 import 'package:mongo_dart/src/database/utils/split_hosts.dart';
+import 'package:mongo_dart/src/extensions/file_ext.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:pool/pool.dart';
 import 'package:mongo_dart/src/auth/auth.dart'
@@ -65,6 +68,7 @@ import 'src/database/commands/aggregation_commands/count/count_options.dart';
 import 'src/database/commands/aggregation_commands/count/count_result.dart';
 import 'src/database/commands/base/command_operation.dart';
 import 'src/database/commands/diagnostic_commands/ping_command/ping_command.dart';
+import 'package:path/path.dart' as p;
 
 export 'package:bson/bson.dart';
 export 'package:mongo_dart_query/mongo_aggregation.dart';

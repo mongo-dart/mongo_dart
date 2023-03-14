@@ -29,8 +29,13 @@ void main() async {
   }
 
   group('Commands', () {
+    var cannotRunTests = false;
+
     setUp(() async {
       await initializeDatabase();
+      if (!db.masterConnection.serverCapabilities.supportsOpMsg) {
+        cannotRunTests = true;
+      }
     });
 
     tearDown(() async {
@@ -44,6 +49,9 @@ void main() async {
     });
     group('Uuid:', () {
       test('read Uuid', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -58,6 +66,9 @@ void main() async {
       });
 
       test('update Uuid', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -76,6 +87,9 @@ void main() async {
       });
 
       test('replace Uuid', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
         var uuid = Uuid().v4obj();
@@ -95,6 +109,9 @@ void main() async {
       });
 
       test('delete Uuid', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
         var uuid = Uuid().v4obj();

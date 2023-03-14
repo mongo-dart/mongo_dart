@@ -64,6 +64,9 @@ void main() async {
 
     group('Insert One', () {
       test('InsertOne', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -85,6 +88,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('InsertOne no Id', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -105,6 +111,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('InsertOne duplicate id', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -131,6 +140,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('InsertOne increase Write Concern', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -173,6 +185,9 @@ void main() async {
 
     group('Insert Many', () {
       test('InsertMany', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -199,6 +214,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('Too much documents', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -211,6 +229,9 @@ void main() async {
 
     group('Delete One', () {
       test('DeleteOne - first', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -241,6 +262,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteOne - selected', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -270,6 +294,9 @@ void main() async {
         expect(findResult.last['name'], 'Mira');
       }, skip: cannotRunTests);
       test('DeleteOne - orders', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -296,6 +323,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteOne - first - collection helper', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -324,6 +354,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteOne - selected - collection helper', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -353,6 +386,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteOne - orders - collection helper', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -379,6 +415,9 @@ void main() async {
 
     group('Delete Many', () {
       test('DeleteMany - all', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -408,6 +447,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteMany - selected', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -438,6 +480,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteMany - orders', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -463,6 +508,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteMany - all orders', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -490,6 +538,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteMany - collation', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -518,6 +569,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteMany - hint', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (cannotRunTests || !running4_4orGreater) {
           return;
         }
@@ -556,6 +610,9 @@ void main() async {
       });
 
       test('DeleteMany - all - collection helper', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -583,6 +640,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteMany - selected - collection helper', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -612,6 +672,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteMany - orders - collection helper', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -636,6 +699,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteMany - all orders - collection helper ', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -661,6 +727,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteMany - collation - collection helper', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -687,6 +756,9 @@ void main() async {
       }, skip: cannotRunTests);
 
       test('DeleteMany - hint - collection helper', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (cannotRunTests || !running4_4orGreater) {
           return;
         }
@@ -724,6 +796,9 @@ void main() async {
 
     group('Find and Modify', () {
       test('Update and Return', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -750,6 +825,9 @@ void main() async {
         expect(res.value?['score'], 5);
       });
       test('Update and Return new', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -777,6 +855,9 @@ void main() async {
         expect(res.value?['score'], 6);
       });
       test('No update', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -802,6 +883,9 @@ void main() async {
         expect(res.value, isNull);
       });
       test('Upsert true', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -828,6 +912,9 @@ void main() async {
         expect(res.value, isNull);
       });
       test('Upsert true - returnNew true', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -859,6 +946,9 @@ void main() async {
       });
 
       test('Upsert true ignored - returnNew true', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -896,6 +986,9 @@ void main() async {
       });
 
       test('Remove', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -920,6 +1013,9 @@ void main() async {
         expect(res.value?['_id'], 4);
       });
       test('Collation', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -948,6 +1044,9 @@ void main() async {
       });
 
       test('Array Filters', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -991,6 +1090,9 @@ void main() async {
       });
 
       test('Array Filters on a specific element', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1035,6 +1137,9 @@ void main() async {
         expect(res.value?['_id'], 1);
       });
       test('Aggregation Pipeline', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -1084,6 +1189,9 @@ void main() async {
       });
 
       test('Specify Hint', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_4orGreater) {
           return;
         }
@@ -1117,6 +1225,9 @@ void main() async {
     });
     group('Find and Modify - Collection Helper', () {
       test('Update and Return', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1139,6 +1250,9 @@ void main() async {
         expect(res.value?['score'], 5);
       });
       test('Update and Return new', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1162,6 +1276,9 @@ void main() async {
         expect(res.value?['score'], 6);
       });
       test('No update', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1184,6 +1301,9 @@ void main() async {
       });
 
       test('Upsert true', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1204,6 +1324,9 @@ void main() async {
         expect(res.value, isNull);
       });
       test('Upsert true - returnNew true', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1229,6 +1352,9 @@ void main() async {
       });
 
       test('Upsert true ignored - returnNew true', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1260,6 +1386,9 @@ void main() async {
       });
 
       test('Remove', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1281,6 +1410,9 @@ void main() async {
         expect(res.value?['_id'], 4);
       });
       test('Collation', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1303,6 +1435,9 @@ void main() async {
       });
 
       test('Array Filters', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1341,6 +1476,9 @@ void main() async {
       });
 
       test('Array Filters on a specific element', () async {
+        if (cannotRunTests) {
+          return;
+        }
         var collectionName = getRandomCollectionName();
         var collection = db.collection(collectionName);
 
@@ -1382,6 +1520,9 @@ void main() async {
         expect(res.value?['_id'], 1);
       });
       test('Aggregation Pipeline', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_2orGreater) {
           return;
         }
@@ -1443,6 +1584,9 @@ void main() async {
       });
 
       test('Specify Hint', () async {
+        if (cannotRunTests) {
+          return;
+        }
         if (!running4_4orGreater) {
           return;
         }

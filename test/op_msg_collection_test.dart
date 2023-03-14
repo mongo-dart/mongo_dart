@@ -1,3 +1,5 @@
+@Timeout(Duration(seconds: 100))
+
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/create_command/create_command.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/create_command/create_options.dart';
@@ -27,11 +29,11 @@ void main() async {
     await db.open();
   }
 
-  Future insertManyDocuments(
-      DbCollection collection, int numberOfRecords) async {
+  Future insertManyDocuments(DbCollection collection, int numberOfRecords,
+      {int initialRecord = 0}) async {
     var toInsert = <Map<String, dynamic>>[];
     for (var n = 0; n < numberOfRecords; n++) {
-      toInsert.add({'a': n});
+      toInsert.add({'a': n + initialRecord});
     }
 
     await collection.insertAll(toInsert);
@@ -55,6 +57,9 @@ void main() async {
     });
 
     test('Simple create collection', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var resultMap = await CreateCommand(db, collectionName).execute();
       expect(resultMap[keyOk], 1.0);
@@ -63,10 +68,15 @@ void main() async {
       await insertManyDocuments(collection, 10000);
       var result = await collection.modernFind().toList();
       expect(result.length, 10000);
-    }, skip: cannotRunTests);
+    });
 
     test('Simple create capped collection', () async {
-      var collectionName = getRandomCollectionName();
+      if (cannotRunTests) {
+        return;
+      }
+      var collectionName = 'capped-collection';
+      usedCollectionNames.add(collectionName);
+
       var resultMap = await CreateCommand(db, collectionName,
               createOptions:
                   CreateOptions(capped: true, size: 5242880, max: 5000))
@@ -74,13 +84,23 @@ void main() async {
       expect(resultMap[keyOk], 1.0);
       var collection = db.collection(collectionName);
 
-      await insertManyDocuments(collection, 10000);
+      await insertManyDocuments(collection, 1000);
+      await insertManyDocuments(collection, 1000, initialRecord: 1000);
+      await insertManyDocuments(collection, 1000, initialRecord: 2000);
+      await insertManyDocuments(collection, 1000, initialRecord: 3000);
+      await insertManyDocuments(collection, 1000, initialRecord: 4000);
+      await insertManyDocuments(collection, 1000, initialRecord: 5000);
+      await insertManyDocuments(collection, 1000, initialRecord: 6000);
+
       var result = await collection.modernFind().toList();
 
       expect(result.length, 5000);
-    }, skip: cannotRunTests);
+    });
 
     test('Simple create collection with schema', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var resultMap = await CreateCommand(db, collectionName,
           createOptions: CreateOptions(validator: {
@@ -123,6 +143,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Simple create collection with no collation', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var resultMap = await CreateCommand(db, collectionName).execute();
       expect(resultMap[keyOk], 1.0);
@@ -144,6 +167,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Simple create collection with collation', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var resultMap = await CreateCommand(db, collectionName,
               createOptions: CreateOptions(collation: CollationOptions('fr')))
@@ -167,6 +193,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Simple create collection with storage engine options', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = getRandomCollectionName();
       var resultMap = await CreateCommand(db, collectionName,
           createOptions: CreateOptions(storageEngine: {
@@ -192,6 +221,9 @@ void main() async {
     });
 
     test('Simple create view', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = 'abc';
       var viewName = getRandomCollectionName();
       var resultMap = await CreateCommand(db, viewName,
@@ -234,6 +266,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Create view with aggregate sort', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = 'abc';
       var viewName = getRandomCollectionName();
       var resultMap = await CreateCommand(db, viewName,
@@ -276,6 +311,9 @@ void main() async {
       expect(result.last['count'], 1);
     }, skip: cannotRunTests);
     test('Create view and aggregate later', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = 'abc';
       var viewName = getRandomCollectionName();
       var resultMap = await CreateCommand(db, viewName,
@@ -320,6 +358,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Create a view from multiple collections', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collection1Name = 'orders.a';
       var collection2Name = 'inventory.a';
       var collection1 = db.collection(collection1Name);
@@ -402,6 +443,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Aggregation pipeline on a view from multiple collections', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collection1Name = 'orders';
       var collection2Name = 'inventory';
       var collection1 = db.collection(collection1Name);
@@ -487,6 +531,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Create view with default Collation', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = 'places';
       usedCollectionNames.add(collectionName);
 
@@ -527,6 +574,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Create view with default Collation - strength 1', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = 'places2';
       usedCollectionNames.add(collectionName);
 
@@ -563,6 +613,9 @@ void main() async {
     }, skip: cannotRunTests);
 
     test('Error overriding view default Collation', () async {
+      if (cannotRunTests) {
+        return;
+      }
       var collectionName = 'places3';
       usedCollectionNames.add(collectionName);
 

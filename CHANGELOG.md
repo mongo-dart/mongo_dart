@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.9.2
+
+- Added extra data parameter to GridIn class
+
+## 0.9.1
+
+- Added a `delete()` method to `GridOut` class
+- Added a `toFile()` method to `GridOut` class (allows to write safely on disk - adds a `(n)` suffix if the file already exists)
+- Added a `clearBucket()` method to class `GridFs`
+- Added a `dropBucket()` mehthod to class `GridFs`
+- Fixed an issue on `GridFsFile` `numChunks()` method
+
+## 0.9.0
+
+- Fixed an issue on GridFs `save()` method using MongoDb 6.0
+- Possible **breaking change**. The cursorId has been changed from type BsonLong to type Int64. In general all BsonLong fields received from the server now are received as Int64 instead of int (see Bson package)
+- authSourceDb defaulted to 'admin' in case neither the default Db nor the authSourceDb has been specified
+
+## 0.8.2
+
+- Fixed a regression bug using MongoDb-CR authMethod
+
+## 0.8.1
+
+- Fixed bug preventing pre 3.6 releases to work with mongo_dart
+
 ## 0.8.0
 
 - inherited fro Bson: Moving to the most recent version of the `Rational` class, a **Breaking change** had been introduced. We have decided to substitute the `Rational` class with the `Decimal` one, because the latter, that it is a wrapper around the former, contains more user friendly methods. You can always get a `Rational` instance, if needed, calling the `toRational()` method of the`Decimal` class.
