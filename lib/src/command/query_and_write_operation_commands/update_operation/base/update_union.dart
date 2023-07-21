@@ -5,27 +5,40 @@ import 'package:mongo_dart/src/utils/union_type.dart';
 
 class UpdateUnion extends MultiUnionType<UpdateDocument, MongoDocument,
     List<UpdateDocument>, ModifierBuilder, AggregationPipelineBuilder> {
-  UpdateUnion(super.value) {
+  UpdateUnion(value) : super(transformValue(value)) {
     if (isNull) {
+      print(value.runtimeType);
       throw MongoDartError('The update Union cannpt be null');
     }
   }
 
-  UpdateSpec get specs {
-    switch (value.runtimeType) {
-      case UpdateDocument:
-        return UpdateSpec(valueOne);
-      case MongoDocument:
-        return UpdateSpec(valueTwo);
-      case const (List<UpdateDocument>):
-        return UpdateSpec(valueThree);
-      case ModifierBuilder:
-        return UpdateSpec(valueFour!.map);
-      case AggregationPipelineBuilder:
-        return UpdateSpec(valueFive!.build());
-      default:
-        throw MongoDartError(
-            'Unexpected value type ${value.runtimeType} in UpdateSpecs');
+  static dynamic transformValue(value) {
+    if (value is List) {
+      if (value is List<UpdateDocument>) {
+        return value;
+      }
+      List<UpdateDocument> lud = <UpdateDocument>[
+        for (var element in value) element as UpdateDocument
+      ];
+      return lud;
     }
+    return value;
+  }
+
+  UpdateSpec get specs {
+    if (value is UpdateDocument) {
+      return UpdateSpec(valueOne);
+    } else if (value is MongoDocument) {
+      return UpdateSpec(valueTwo);
+    } else if (value is List<UpdateDocument>) {
+      return UpdateSpec(valueThree);
+    } else if (value is ModifierBuilder) {
+      return UpdateSpec(valueFour!.map);
+    } else if (value is AggregationPipelineBuilder) {
+      return UpdateSpec(valueFive!.build());
+    }
+
+    throw MongoDartError(
+        'Unexpected value type ${value.runtimeType} in UpdateSpecs');
   }
 }

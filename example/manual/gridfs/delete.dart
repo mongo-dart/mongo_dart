@@ -62,9 +62,11 @@ void main() async {
   ];
 
   // Set small chunks
+  // This is normally don't needed. The default chunkSize is fine.
+  // But we want to split are small data set into more than one chunks
   GridFS.defaultChunkSize = 9;
 
-  // assures at least 3 chunks
+  // assures at least 3 chunks (for our tine test data set)
   var target = GridFS.defaultChunkSize * 3;
   var data = <int>[];
   while (data.length < target) {

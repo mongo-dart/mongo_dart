@@ -14,7 +14,7 @@ dependencies:
   collection: ^1.15.0
   path: ^1.8.0
   pool: ^1.5.0
-  basic_utils: ^5.2.0
+  basic_utils: ^5.2.0 
   decimal: ^2.2.0
   uuid: ^3.0.0
   sasl_scram: ^0.1.0

@@ -249,10 +249,11 @@ base class FindAndModifyOperation extends CommandOperation {
   @override
   Command $buildCommand() => <String, dynamic>{
         keyFindAndModify: collection!.collectionName,
-        if (!query.isNull) keyQuery: query,
+        if (!query.isNull) keyQuery: query.value,
         if (sort != null) keySort: sort!,
         if (remove) keyRemove: remove,
-        if (update != null) keyUpdate: update,
+        if (update != null && !update!.isNull && !update!.specs.isNull)
+          keyUpdate: update!.specs.value,
         if (returnNew) keyNew: returnNew,
         if (fields != null) keyFields: fields!,
         if (upsert) keyUpsert: upsert,

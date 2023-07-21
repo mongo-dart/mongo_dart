@@ -267,7 +267,7 @@ class ModernCursor {
           errorCodeName: result[keyCodeName] as String?);
     }
     var cursorMap = result[keyCursor] as Map<String, dynamic>?;
-    cursorId = cursorMap == null ? Int64.ZERO : Int64(cursorMap[keyId] ?? 0);
+    cursorId = cursorMap?[keyId] ?? Int64.ZERO;
     // The result map returns last records while setting cursorId to zero.
     extractCursorData(result);
     // batch size for "first batch" was 0, no data returned.
