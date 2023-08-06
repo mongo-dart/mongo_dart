@@ -46,7 +46,8 @@ void main() async {
 
   print('Modified documents: ${res.nModified}'); // 1
 
-  var findResult = await collection.find(where.eq('member', 'abc123')).toList();
+  var findResult =
+      await collection.findOriginal(where.eq('member', 'abc123')).toList();
 
   print('Modified element status: '
       '"${findResult.first['status']}"'); // 'A';

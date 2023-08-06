@@ -4,7 +4,7 @@ import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
-import 'package:mongo_dart/src/utils/hint_union.dart';
+import 'package:mongo_dart/src/unions/hint_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 

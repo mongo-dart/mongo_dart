@@ -16,7 +16,7 @@ import 'package:mongo_dart_query/mongo_aggregation.dart';
 
 import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
-import '../../../utils/hint_union.dart';
+import '../../../unions/hint_union.dart';
 import '../../base/command_operation.dart';
 import 'aggregate_result.dart';
 

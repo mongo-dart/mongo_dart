@@ -2,8 +2,8 @@ import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 import '../../../../../session/client_session.dart';
-import '../../../../../utils/hint_union.dart';
-import '../../../../../utils/query_union.dart';
+import '../../../../../unions/hint_union.dart';
+import '../../../../../unions/query_union.dart';
 import '../../../../base/operation_base.dart';
 import '../open/find_one_and_delete_operation_open.dart';
 import '../v1/find_one_and_delete_operation_v1.dart';

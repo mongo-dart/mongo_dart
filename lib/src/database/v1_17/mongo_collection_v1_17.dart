@@ -1,4 +1,4 @@
-import 'package:mongo_dart/src/utils/hint_union.dart';
+import 'package:mongo_dart/src/unions/hint_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 
 import '../../command/base/operation_base.dart';
@@ -11,8 +11,10 @@ import '../../command/query_and_write_operation_commands/wrapper/find_one_and_re
 import '../../command/query_and_write_operation_commands/wrapper/find_one_and_update/base/find_one_and_update_operation.dart';
 import '../../command/query_and_write_operation_commands/wrapper/find_one_and_update/base/find_one_and_update_options.dart';
 import '../../session/client_session.dart';
+import '../../unions/projection_union.dart';
+import '../../unions/sort_union.dart';
 import '../../utils/map_keys.dart';
-import '../../utils/query_union.dart';
+import '../../unions/query_union.dart';
 import '../database.dart';
 import '../modern_cursor.dart';
 
@@ -228,29 +230,55 @@ class MongoCollectionV117 extends MongoCollection {
   /// araound the find method with a fixed limit set to 1 that returns
   /// a document instead of a stream.
   @override
-  Future<Map<String, dynamic>?> findOne(dynamic selector,
-      {Map<String, Object>? sort,
-      Map<String, Object>? projection,
-      HintUnion? hint,
+  Future<Map<String, dynamic>?> findOne(dynamic filter,
+      {dynamic projection,
+      dynamic sort,
       int? skip,
+      dynamic hint,
       FindOptions? findOptions,
-      Map<String, Object>? rawOptions}) async {
-    var sortMap = sort;
-    if (sortMap == null && selector?.map[keyOrderby] != null) {
-      sortMap = <String, Object>{...selector!.map[keyOrderby]};
-    }
-    var operation = FindOperation(this, QueryUnion(selector),
-        sort: sortMap,
-        projection: projection ?? selector?.paramFields,
-        hint: hint,
+      MongoDocument? rawOptions}) async {
+    var uFilter = (filter is QueryUnion) ? filter : QueryUnion(filter);
+    var uProjection = ProjectionUnion(projection);
+    var uSort = SortUnion(sort);
+    var uHint = HintUnion(hint);
+
+    var operation = FindOperation(this, uFilter,
+        sort: uSort,
+        projection: uProjection,
+        hint: uHint,
+        skip: skip,
         limit: 1,
-        skip: skip ??
-            (selector != null && selector.paramSkip > 0
-                ? selector.paramSkip
-                : null),
         findOptions: findOptions,
         rawOptions: rawOptions);
 
     return ModernCursor(operation, db.server).nextObject();
+  }
+
+  /// Selects documents in a collection or view and returns a stream
+  /// of the selected documents.  @override
+  @override
+  Stream<Map<String, dynamic>> find(dynamic filter,
+      {dynamic projection,
+      dynamic sort,
+      int? skip,
+      int? limit,
+      dynamic hint,
+      FindOptions? findOptions,
+      MongoDocument? rawOptions}) {
+    var uFilter = (filter is QueryUnion) ? filter : QueryUnion(filter);
+    var uProjection = ProjectionUnion(projection);
+    var uSort = SortUnion(sort);
+    var uHint = HintUnion(hint);
+
+    var operation = FindOperation(this, uFilter,
+        sort: uSort,
+        projection: uProjection,
+        hint: uHint,
+        limit: limit,
+        skip: skip,
+        findOptions: findOptions,
+        rawOptions: rawOptions);
+
+    return ModernCursor(operation, db.server).stream;
   }
 }

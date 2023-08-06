@@ -11,8 +11,8 @@ import '../../../../core/error/mongo_dart_error.dart';
 import '../../../../database/base/mongo_collection.dart';
 import '../../../../session/client_session.dart';
 import '../../../../topology/server.dart';
-import '../../../../utils/hint_union.dart';
-import '../../../../utils/query_union.dart';
+import '../../../../unions/hint_union.dart';
+import '../../../../unions/query_union.dart';
 import '../../update_operation/base/update_union.dart';
 import 'bulk_options.dart';
 

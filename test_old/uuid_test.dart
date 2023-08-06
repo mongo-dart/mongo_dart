@@ -55,7 +55,8 @@ void main() async {
         var uuid = Uuid().v4obj();
         await collection.insertOne({'uuid': uuid, 'null': null});
 
-        var values = await collection.find(where.eq('uuid', uuid)).toList();
+        var values =
+            await collection.findOriginal(where.eq('uuid', uuid)).toList();
 
         expect(values.length, 1);
         expect(values.first['uuid'], uuid);
@@ -72,7 +73,7 @@ void main() async {
         await collection.updateOne(
             where.eq('null', null), ModifierBuilder().set('newField', 12));
 
-        var values = await collection.find().toList();
+        var values = await collection.findOriginal().toList();
 
         expect(values.length, 1);
         expect(values.first['uuid'], uuid);
@@ -91,7 +92,7 @@ void main() async {
             where.eq('notNull', 0), {'uuid': uuidNew, 'notNull': 0},
             upsert: true);
 
-        var values = await collection.find().toList();
+        var values = await collection.findOriginal().toList();
 
         expect(values.length, 2);
         expect(values.first['uuid'], uuid);
@@ -107,7 +108,7 @@ void main() async {
 
         await collection.deleteOne(where.eq('uuid', uuid));
 
-        var values = await collection.find().toList();
+        var values = await collection.findOriginal().toList();
 
         expect(values.isEmpty, isTrue);
       });

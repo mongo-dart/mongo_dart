@@ -33,8 +33,9 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res =
-      await collection.find(where.eq('name', 'Tom').gt('rating', 10)).toList();
+  var res = await collection
+      .findOriginal(where.eq('name', 'Tom').gt('rating', 10))
+      .toList();
 
   print('First document fetched: ${res.first['name']} - ${res.first['state']}');
   // Tom - active

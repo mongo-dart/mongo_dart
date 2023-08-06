@@ -1,8 +1,8 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/base/operation_base.dart';
 
-import '../../../../utils/hint_union.dart';
-import '../../../../utils/query_union.dart';
+import '../../../../unions/hint_union.dart';
+import '../../../../unions/query_union.dart';
 import '../open/update_statement_open.dart';
 import '../v1/update_statement_v1.dart';
 import 'update_spec.dart';

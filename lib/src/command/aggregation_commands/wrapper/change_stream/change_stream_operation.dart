@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../../database/base/mongo_database.dart';
 import '../../../../database/base/mongo_collection.dart';
-import '../../../../utils/hint_union.dart';
+import '../../../../unions/hint_union.dart';
 import 'change_stream_options.dart';
 
 base class ChangeStreamOperation extends AggregateOperation {

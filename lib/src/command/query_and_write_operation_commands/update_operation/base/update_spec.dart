@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../../../../utils/union_type.dart';
+import '../../../../unions/base/union_type.dart';
 
 class UpdateSpec extends UnionType<MongoDocument, List<UpdateDocument>> {
   UpdateSpec(super.value) {

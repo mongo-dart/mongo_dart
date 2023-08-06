@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/command/query_and_write_operation_commands/update_operation/base/update_union.dart';
-import 'package:mongo_dart/src/utils/query_union.dart';
+import 'package:mongo_dart/src/unions/query_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 
 void main() async {

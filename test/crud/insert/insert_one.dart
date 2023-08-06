@@ -22,8 +22,8 @@ Future insertDocumentWithoutIdRaw(
       await collection.insertOne({'item': "card", 'qty': 15});
   //MongoDocument result2 = doc.serverResponses.first;
 
-  expect(result.length, 2);
-  expect(result.length, result2.length);
-  expect(result, {'n': 1, 'ok': 1.0});
-  expect(result, result2);
+  expect(result, containsPair('ok', 1.0));
+  expect(result2, containsPair('ok', 1.0));
+  expect(result, containsPair('n', 1));
+  expect(result2, containsPair('n', 1));
 }

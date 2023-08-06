@@ -17,7 +17,7 @@ class GridFS {
   // T O D O (tsander): Ensure index.
 
   Stream<Map<String, dynamic>> getFileList(SelectorBuilder selectorBuilder) =>
-      files.find(selectorBuilder.sortBy('filename', descending: true));
+      files.findOriginal(selectorBuilder.sortBy('filename', descending: true));
 
   Future<GridOut?> findOne(selector) async {
     //var completer = Completer<GridOut>();

@@ -82,7 +82,7 @@ void main() async {
           await client.connect();
           final db = client.db();
 
-          await db.collection('test').find().toList();
+          await db.collection('test').findOriginal().toList();
           await client.close();
         }
       });
@@ -96,7 +96,7 @@ void main() async {
           final db = client.db();
 
           expect(db.server.isAuthenticated, isTrue);
-          await db.collection('test').find().toList();
+          await db.collection('test').findOriginal().toList();
           await client.close();
         }
       });
@@ -109,7 +109,7 @@ void main() async {
           var db = client.db();
 
           expect(db.server.isAuthenticated, isTrue);
-          await db.collection('test').find().toList();
+          await db.collection('test').findOriginal().toList();
           await client.close();
           client = MongoClient(
               '$mongoDbUri2?authMechanism=${ScramSha256Authenticator.name}');
@@ -117,7 +117,7 @@ void main() async {
           db = client.db();
 
           expect(db.server.isAuthenticated, isTrue);
-          await db.collection('test').find().toList();
+          await db.collection('test').findOriginal().toList();
           await client.close();
         }
       });

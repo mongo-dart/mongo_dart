@@ -1,4 +1,4 @@
-import 'package:mongo_dart/src/utils/union_type.dart';
+import 'package:mongo_dart/src/unions/base/union_type.dart';
 
 const W wMajority = W('majority');
 const W primaryAcknowledged = W(1);

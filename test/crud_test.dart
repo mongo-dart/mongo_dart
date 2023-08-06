@@ -11,6 +11,9 @@ part 'crud/insert/insert_many.dart';
 
 part 'crud/insert/insert.dart';
 
+part 'crud/find/find.dart';
+part 'crud/find/find_simple.dart';
+
 const dbName = 'test-mongo-dart-crud';
 const dbAddress = '127.0.0.1';
 
@@ -36,4 +39,5 @@ Future cleanupDatabase(MongoClient client) async {
 
 void main() async {
   await insertTest();
+  await findTest();
 }

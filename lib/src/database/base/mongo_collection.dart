@@ -1,9 +1,17 @@
 import 'package:meta/meta.dart';
-import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/mongo_dart.dart'
+    hide
+        QueryFilter,
+        ProjectionDocument,
+        MongoDocument,
+        ArrayFilter,
+        UpdateDocument;
 import 'package:mongo_dart/src/command/base/operation_base.dart';
-import 'package:mongo_dart/src/utils/hint_union.dart';
-import 'package:mongo_dart/src/utils/query_union.dart';
+import 'package:mongo_dart/src/unions/hint_union.dart';
+import 'package:mongo_dart/src/unions/query_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
+import 'package:mongo_dart/src/unions/projection_union.dart';
+import 'package:mongo_dart_query/mongo_query.dart';
 import '../../command/query_and_write_operation_commands/wrapper/find_one_and_delete/base/find_one_and_delete_operation.dart';
 import '../../command/query_and_write_operation_commands/wrapper/find_one_and_delete/base/find_one_and_delete_options.dart';
 import '../../command/query_and_write_operation_commands/wrapper/find_one_and_replace/base/find_one_and_replace_operation.dart';
@@ -11,6 +19,7 @@ import '../../command/query_and_write_operation_commands/wrapper/find_one_and_re
 import '../../command/query_and_write_operation_commands/wrapper/find_one_and_update/base/find_one_and_update_operation.dart';
 import '../../command/query_and_write_operation_commands/wrapper/find_one_and_update/base/find_one_and_update_options.dart';
 import '../../session/client_session.dart';
+import '../../unions/sort_union.dart';
 import '../../utils/parms_utils.dart';
 import '../modern_cursor.dart';
 
@@ -145,13 +154,34 @@ abstract class MongoCollection {
   /// This version has more parameters, and it is essentially a wrapper
   /// araound the find method with a fixed limit set to 1 that returns
   /// a document instead of a stream.
-  Future<Map<String, dynamic>?> findOne(dynamic selector,
-      {Map<String, Object>? sort,
-      Map<String, Object>? projection,
-      HintUnion? hint,
+  Future<Map<String, dynamic>?> findOne(dynamic filter,
+      {dynamic projection,
+      dynamic sort,
       int? skip,
+      dynamic hint,
       FindOptions? findOptions,
-      Map<String, Object>? rawOptions});
+      MongoDocument? rawOptions});
+
+  /// Behaves like the find method, but allows to define a global
+  /// query object containing all the specifications for the query
+  Stream<Map<String, dynamic>> findQuery([QueryExpression? query]) {
+    return find(query?.filter,
+        projection: query?.fields,
+        sort: query?.sortExp,
+        skip: query?.getSkip(),
+        limit: query?.getLimit());
+  }
+
+  /// Selects documents in a collection or view and returns a stream
+  /// of the selected documents.
+  Stream<Map<String, dynamic>> find(dynamic filter,
+      {dynamic projection,
+      dynamic sort,
+      int? skip,
+      int? limit,
+      dynamic hint,
+      FindOptions? findOptions,
+      MongoDocument? rawOptions});
 
   // ****************************************************
   // ***********        OLD       ***********************
@@ -230,10 +260,11 @@ abstract class MongoCollection {
   ///     find({'last_name': 'Smith'})
   /// Here our selector will match every document where the last_name attribute
   /// is 'Smith.'
-  Stream<Map<String, dynamic>> find([selector]) {
+  @Deprecated('Use find() instead')
+  Stream<MongoDocument> findOriginal([selector]) {
     if (selector is SelectorBuilder) {
       return modernFind(selector: selector);
-    } else if (selector is Map<String, dynamic>) {
+    } else if (selector is MongoDocument) {
       return modernFind(filter: selector);
     } else if (selector == null) {
       return modernFind();
@@ -242,14 +273,14 @@ abstract class MongoCollection {
         'SelectorBuilder or a Map<String, dynamic>');
   }
 
-  @Deprecated('No More Used')
+  /*  @Deprecated('No More Used')
   // Old version to be used on MongoDb versions prior to 3.6
   Stream<Map<String, dynamic>> legacyFind([selector]) =>
-      throw MongoDartError('No More Used');
+      throw MongoDartError('No More Used'); */
 
   // Old version to be used on MongoDb versions prior to 3.6
-  @Deprecated('No More Used')
-  ModernCursor createCursor([selector]) => throw MongoDartError('No More Used');
+  /* @Deprecated('No More Used')
+  ModernCursor createCursor([selector]) => throw MongoDartError('No More Used'); */
 
   /// Returns one document that satisfies the specified query criteria on the
   /// collection or view. If multiple documents satisfy the query,
@@ -587,11 +618,12 @@ abstract class MongoCollection {
   } */
 
   // Find operation with the new OP_MSG (starting from release 3.6)
+  @Deprecated('Use find instead')
   Stream<Map<String, dynamic>> modernFind(
       {SelectorBuilder? selector,
-      Map<String, dynamic>? filter,
+      QueryFilter? filter,
       Map<String, Object>? sort,
-      Map<String, Object>? projection,
+      ProjectionDocument? projection,
       HintUnion? hint,
       int? skip,
       int? limit,
@@ -603,8 +635,8 @@ abstract class MongoCollection {
     }
 
     var operation = FindOperation(this, QueryUnion(filter),
-        sort: sortMap,
-        projection: projection ?? selector?.paramFields,
+        sort: SortUnion(sortMap),
+        projection: ProjectionUnion(projection ?? selector?.paramFields),
         hint: hint,
         limit: limit ?? selector?.paramLimit,
         skip: skip ??

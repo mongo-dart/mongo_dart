@@ -4,7 +4,7 @@ import 'package:mongo_dart/src/utils/map_keys.dart';
 import '../../../database/base/mongo_collection.dart';
 import '../../../session/client_session.dart';
 import '../../../topology/server.dart';
-import '../../../utils/hint_union.dart';
+import '../../../unions/hint_union.dart';
 import 'count_options.dart';
 import '../../base/command_operation.dart';
 import 'count_result.dart';

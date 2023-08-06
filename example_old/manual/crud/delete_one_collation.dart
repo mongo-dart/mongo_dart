@@ -52,7 +52,7 @@ void main() async {
 
   print('Removed documents: ${res.nRemoved}');
 
-  findResult = await collection.find().toList();
+  findResult = await collection.findOriginal().toList();
 
   print('First record category after deletion with collation: '
       '${findResult.first['category']}'); // 'cafE';

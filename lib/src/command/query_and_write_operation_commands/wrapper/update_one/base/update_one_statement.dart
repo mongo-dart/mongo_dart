@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/src/utils/hint_union.dart';
-import '../../../../../utils/query_union.dart';
+import 'package:mongo_dart/src/unions/hint_union.dart';
+import '../../../../../unions/query_union.dart';
 import '../../../update_operation/base/update_union.dart';
 import '../open/update_one_statement_open.dart';
 import '../v1/update_one_statement_v1.dart';

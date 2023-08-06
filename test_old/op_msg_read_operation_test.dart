@@ -5,7 +5,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:decimal/decimal.dart';
-import 'package:mongo_dart/src/utils/query_union.dart';
+import 'package:mongo_dart/src/unions/query_union.dart';
 import 'package:test/test.dart';
 
 import '../test/utils/insert_data.dart';

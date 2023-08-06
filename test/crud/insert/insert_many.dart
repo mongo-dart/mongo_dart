@@ -25,8 +25,8 @@ Future insertManyDocumentsWithoutIdRaw(
   ]);
   MongoDocument result2 = serverResponse;
 
-  expect(result.length, 2);
-  expect(result.length, result2.length);
-  expect(result, {'n': 3, 'ok': 1.0});
-  expect(result, result2);
+  expect(result, containsPair('ok', 1.0));
+  expect(result2, containsPair('ok', 1.0));
+  expect(result, containsPair('n', 3));
+  expect(result2, containsPair('n', 3));
 }

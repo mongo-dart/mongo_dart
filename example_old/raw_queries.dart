@@ -30,7 +30,7 @@ void main() async {
   print('Filtered by _id=$id: $val. There more no such a doc');
   print(
       "Filtered by {'str_field': {'\$regex': new BsonRegexp('^str_(5|7|8)17\$')}");
-  await coll.find({
+  await coll.findOriginal({
     'str_field': {'\$regex': BsonRegexp('^str_(5|7|8)17\$')}
   }).forEach((v) => print(v));
   await client.close();

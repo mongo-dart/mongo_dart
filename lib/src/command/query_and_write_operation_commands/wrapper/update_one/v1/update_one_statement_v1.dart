@@ -1,5 +1,5 @@
 import 'package:mongo_dart/src/command/command.dart';
-import 'package:mongo_dart/src/utils/query_union.dart';
+import 'package:mongo_dart/src/unions/query_union.dart';
 
 import '../../../update_operation/base/update_union.dart';
 

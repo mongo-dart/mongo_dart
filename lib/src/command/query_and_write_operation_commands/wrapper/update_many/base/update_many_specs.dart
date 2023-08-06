@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/utils/union_type.dart';
+import 'package:mongo_dart/src/unions/base/union_type.dart';
 
 class UpdateManySpecs extends MultiUnionType<UpdateDocument,
     List<UpdateDocument>, ModifierBuilder, AggregationPipelineBuilder, Never> {

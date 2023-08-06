@@ -17,7 +17,7 @@ void main() async {
   }
   print('Done. Now sending it to MongoDb...');
   await coll
-      .find(where.gt('my_field', 995).sortBy('my_field'))
+      .findOriginal(where.gt('my_field', 995).sortBy('my_field'))
       .forEach((v) => print(v));
   var val = await coll.findOne(where.eq('my_field', 17));
   print('Filtered by my_field=17 $val');
@@ -36,7 +36,7 @@ void main() async {
   val = await coll.findOne(where.id(id));
   print('Filtered by _id=$id: $val. There more no such a doc');
   await coll
-      .find(where
+      .findOriginal(where
           .gt('my_field', 995)
           .or(where.lt('my_field', 10))
           .and(where.match('str_field', '99')))
@@ -44,19 +44,19 @@ void main() async {
   print(
       "Filtered by (my_field gt 995 or my_field lt 10) and str_field like '99' ");
   await coll
-      .find(where
+      .findOriginal(where
           .inRange('my_field', 700, 703, minInclude: false)
           .sortBy('my_field'))
       .forEach((v) => print(v));
   print('Filtered by my_field gt 700, lte 703');
   await coll
-      .find(where
+      .findOriginal(where
           .inRange('my_field', 700, 703, minInclude: false)
           .sortBy('my_field'))
       .forEach((v) => print(v));
   print("Filtered by str_field match '^str_(5|7|8)17\$'");
   await coll
-      .find(where
+      .findOriginal(where
           .match('str_field', 'str_(5|7|8)17\$')
           .sortBy('str_field', descending: true)
           .sortBy('my_field'))
@@ -70,7 +70,7 @@ void main() async {
   print(
       'Now where clause with jscript code: where("this.my_field % 100 == 35")');
   await coll
-      .find(where.jsQuery('this.my_field % 100 == 35'))
+      .findOriginal(where.jsQuery('this.my_field % 100 == 35'))
       .forEach((v) => print(v));
   var count = await coll.count(where.gt('my_field', 995));
   print('Count of records with my_field > 995: $count');

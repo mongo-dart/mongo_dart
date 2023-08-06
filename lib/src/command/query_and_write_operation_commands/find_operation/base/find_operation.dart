@@ -1,12 +1,14 @@
 import 'package:mongo_dart/src/command/base/operation_base.dart';
+import 'package:mongo_dart/src/unions/projection_union.dart';
+import 'package:mongo_dart/src/unions/sort_union.dart';
 import 'package:mongo_dart/src/utils/map_keys.dart';
 
 import '../../../../core/error/mongo_dart_error.dart';
 import '../../../../database/database.dart';
 import '../../../../server_api_version.dart';
 import '../../../../session/client_session.dart';
-import '../../../../utils/hint_union.dart';
-import '../../../../utils/query_union.dart';
+import '../../../../unions/hint_union.dart';
+import '../../../../unions/query_union.dart';
 import '../open/find_operation_open.dart';
 import '../v1/find_operation_v1.dart';
 import 'find_options.dart';
@@ -41,8 +43,8 @@ base class FindOperation extends CommandOperation {
   factory FindOperation(
     MongoCollection collection,
     QueryUnion filter, {
-    IndexDocument? sort,
-    ProjectionDocument? projection,
+    SortUnion? sort,
+    ProjectionUnion? projection,
     HintUnion? hint,
     int? skip,
     int? limit,
@@ -83,7 +85,7 @@ base class FindOperation extends CommandOperation {
   QueryUnion filter;
 
   /// Optional. The sort specification for the ordering of the results.
-  IndexDocument? sort;
+  SortUnion? sort;
 
   /// Optional. The projection specification to determine which fields
   /// to include in the returned documents.
@@ -94,7 +96,7 @@ base class FindOperation extends CommandOperation {
   /// * $elemMatch
   /// * $slice
   /// * $meta
-  ProjectionDocument? projection;
+  ProjectionUnion? projection;
 
   /// Optional. Index specification. Specify either the index name
   /// as a string or the index key pattern.
@@ -135,7 +137,7 @@ base class FindOperation extends CommandOperation {
       keyFind: collection!.collectionName,
       if (!filter.isNull) keyFilter: filter.query,
       if (sort != null) keySort: sort!,
-      if (projection != null) keyProjection: projection!,
+      if (projection != null && !projection!.isNull) keyProjection: projection,
       if (hint != null && !hint!.isNull) keyHint: hint!.value,
       if (skip != null && skip! > 0) keySkip: skip!,
       if (limit != null && limit! > 0) keyLimit: limit!,
