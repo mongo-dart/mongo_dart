@@ -9,6 +9,7 @@ import 'package:decimal/decimal.dart';
 import 'package:mongo_dart/src/unions/hint_union.dart';
 import 'package:mongo_dart/src/unions/query_union.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 import '../test/utils/insert_data.dart';
 
@@ -245,7 +246,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 1);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 2);
         expect(findResult.first['name'], 'Mira');
       }, skip: cannotRunTests);
@@ -275,7 +276,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 1);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 2);
         expect(findResult.last['name'], 'Mira');
       }, skip: cannotRunTests);
@@ -300,8 +301,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 1);
 
-        var findResult =
-            await collection.findOriginal({'status': 'D'}).toList();
+        var findResult = await collection.find({'status': 'D'}).toList();
         expect(findResult.length, 12);
         expect(findResult.first['item'], 'tst24');
       }, skip: cannotRunTests);
@@ -329,7 +329,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 1);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 2);
         expect(findResult.first['name'], 'Mira');
       }, skip: cannotRunTests);
@@ -358,7 +358,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 1);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 2);
         expect(findResult.last['name'], 'Mira');
       }, skip: cannotRunTests);
@@ -383,8 +383,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 1);
 
-        var findResult =
-            await collection.findOriginal({'status': 'D'}).toList();
+        var findResult = await collection.find({'status': 'D'}).toList();
         expect(findResult.length, 12);
         expect(findResult.first['item'], 'tst24');
       }, skip: cannotRunTests);
@@ -416,7 +415,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 3);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 0);
       }, skip: cannotRunTests);
 
@@ -445,7 +444,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 1);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 2);
         expect(findResult.last['name'], 'Mira');
       }, skip: cannotRunTests);
@@ -471,8 +470,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 13);
 
-        var findResult =
-            await collection.findOriginal({'status': 'D'}).toList();
+        var findResult = await collection.find({'status': 'D'}).toList();
         expect(findResult.length, 0);
       }, skip: cannotRunTests);
 
@@ -499,8 +497,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 35);
 
-        var findResult =
-            await collection.findOriginal(<String, Object>{}).toList();
+        var findResult = await collection.find(<String, Object>{}).toList();
         expect(findResult.length, 0);
       }, skip: cannotRunTests);
 
@@ -528,7 +525,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 3);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 0);
       }, skip: cannotRunTests);
 
@@ -566,7 +563,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 3);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 3);
       });
 
@@ -593,7 +590,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 3);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 0);
       }, skip: cannotRunTests);
 
@@ -621,7 +618,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 1);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 2);
         expect(findResult.last['name'], 'Mira');
       }, skip: cannotRunTests);
@@ -647,8 +644,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 13);
 
-        var findResult =
-            await collection.findOriginal({'status': 'D'}).toList();
+        var findResult = await collection.find({'status': 'D'}).toList();
         expect(findResult.length, 0);
       }, skip: cannotRunTests);
 
@@ -673,8 +669,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 35);
 
-        var findResult =
-            await collection.findOriginal(<String, Object>{}).toList();
+        var findResult = await collection.find(<String, Object>{}).toList();
         expect(findResult.length, 0);
       }, skip: cannotRunTests);
 
@@ -700,7 +695,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 3);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 0);
       }, skip: cannotRunTests);
 
@@ -733,7 +728,7 @@ void main() async {
         expect(res.nMatched, 0);
         expect(res.nRemoved, 3);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 3);
       });
     });

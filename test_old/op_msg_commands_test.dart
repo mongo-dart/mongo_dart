@@ -1,9 +1,9 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/mongo_dart_old.dart';
 import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:mongo_dart/src/unions/query_union.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';

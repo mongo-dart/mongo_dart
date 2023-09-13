@@ -13,6 +13,7 @@ import 'package:mongo_dart/src/unions/query_union.dart';
 import 'package:mongo_dart/src/unions/sort_union.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 import '../test/utils/matcher/mongo_dart_error_matcher.dart';
 
@@ -121,7 +122,7 @@ Future testRemove() async {
   await coll.deleteMany({});
   //await db.removeFromCollection(collectionName);
 
-  var allCollectionDocuments = await collection.findOriginal().toList();
+  var allCollectionDocuments = await collection.find({}).toList();
   expect(allCollectionDocuments, isEmpty);
 }
 
@@ -209,7 +210,7 @@ Future testEachOnEmptyCollection() async {
   var count = 0;
   var sum = 0;
 
-  await for (var document in collection.findOriginal()) {
+  await for (var document in collection.find({})) {
     sum += document['a'] as int;
     count++;
   }
@@ -230,7 +231,7 @@ Future testFindEachWithThenClause() async {
     {'name': 'Nick', 'score': 5}
   ]);
 
-  await for (var document in collection.findOriginal()) {
+  await for (var document in collection.find({})) {
     sum += document['score'] as int;
     count++;
   }
@@ -256,7 +257,7 @@ Future testDateTime() async {
   ]);
 
   var result = await collection
-      .findOriginal(where.lt('posted_on', DateTime.utc(2013, 1, 5)))
+      .find(where.lt('posted_on', DateTime.utc(2013, 1, 5)))
       .toList();
 
   expect(result.length, 4);
@@ -274,7 +275,7 @@ void testFindEach() async {
     {'name': 'Nick', 'score': 5}
   ]);
 
-  await for (var document in collection.findOriginal()) {
+  await for (var document in collection.find({})) {
     count++;
     sum += document['score'] as int;
   }
@@ -295,7 +296,7 @@ Future testFindStream() async {
     {'name': 'Nick', 'score': 5}
   ]);
 
-  await for (var document in collection.findOriginal()) {
+  await for (var document in collection.find({})) {
     count++;
     sum += document['score'] as int;
   }
@@ -761,7 +762,7 @@ Future testUpdateWithUpsert() async {
       await collection.insertOne({'name': 'a', 'value': 10});
   expect(result.isSuccess, true);
 
-  var results = await collection.findOriginal({'name': 'a'}).toList();
+  var results = await collection.find({'name': 'a'}).toList();
   expect(results.length, 1);
   expect(results.first['name'], 'a');
   expect(results.first['value'], 10);
@@ -774,7 +775,7 @@ Future testUpdateWithUpsert() async {
   expect(resultUpdate.isSuccess, true);
   expect(resultUpdate.nModified, 1);
 
-  results = await collection.findOriginal({'name': 'a'}).toList();
+  results = await collection.find({'name': 'a'}).toList();
   expect(results.length, 1);
   expect(results.first['value'], 20);
 }
@@ -790,7 +791,7 @@ Future testUpdateWithMultiUpdate() async {
   ]);
   expect(result.isSuccess, true);
 
-  var results = await collection.findOriginal({'key': 'a'}).toList();
+  var results = await collection.find({'key': 'a'}).toList();
   expect(results.length, 2);
   expect(results.first['key'], 'a');
   expect(results.first['value'], 'initial_value1');
@@ -800,8 +801,8 @@ Future testUpdateWithMultiUpdate() async {
   expect(resultUpd.isSuccess, true);
   expect(resultUpd.nModified, 1);
 
-  results = await collection.findOriginal(
-      {'value': 'value_modified_for_only_one_with_default'}).toList();
+  results = await collection
+      .find({'value': 'value_modified_for_only_one_with_default'}).toList();
   expect(results.length, 1);
 
   (resultUpd, _) = await collection.updateOne(
@@ -811,7 +812,7 @@ Future testUpdateWithMultiUpdate() async {
   expect(resultUpd.isSuccess, true);
   expect(resultUpd.nModified, 1);
 
-  results = await collection.findOriginal(
+  results = await collection.find(
       {'value': 'value_modified_for_only_one_with_multiupdate_false'}).toList();
   expect(results.length, 1);
 
@@ -820,10 +821,10 @@ Future testUpdateWithMultiUpdate() async {
   expect(resultUpd.isSuccess, true);
   expect(resultUpd.nModified, 2);
 
-  results = await collection.findOriginal({'value': 'new_value'}).toList();
+  results = await collection.find({'value': 'new_value'}).toList();
   expect(results.length, 2);
 
-  results = await collection.findOriginal({'key': 'b'}).toList();
+  results = await collection.find({'key': 'b'}).toList();
   expect(results.length, 1);
   expect(results.first['value'], 'initial_value_b');
 }
@@ -1279,7 +1280,7 @@ Future testTextIndex() async {
       .createIndex(keys: {'name': 'text', 'description': 'text'});
   expect(res['ok'], 1.0);
 
-  var result = await collection.findOriginal({
+  var result = await collection.find({
     r'$text': {r'$search': 'java coffee shop'}
   }).toList();
   expect(result.length, 3);
@@ -1320,7 +1321,7 @@ Future testTtlIndex() async {
   // the index, plus a little extra...
   await Future.delayed(Duration(seconds: 90));
 
-  var elements = await collection.findOriginal().toList();
+  var elements = await collection.find({}).toList();
   expect(elements.length, 4);
 }
 
@@ -1484,7 +1485,7 @@ Future testSimpleQuery() async {
   await collection.insertMany(toInsert);
 
   var result = await collection
-      .findOriginal(where.gt('my_field', 5).sortBy('my_field'))
+      .find(where.gt('my_field', 5).sortBy('my_field'))
       .toList();
   expect(result.length, 4);
   expect(result[0]['my_field'], 6);
@@ -1519,7 +1520,7 @@ Future testCompoundQuery() async {
   await collection.insertMany(toInsert);
 
   var result = await collection
-      .findOriginal(where.gt('my_field', 8).or(where.lt('my_field', 2)))
+      .find(where.gt('my_field', 8).or(where.lt('my_field', 2)))
       .toList();
   expect(result.length, 3);
 
@@ -1573,7 +1574,7 @@ Future testQueryOnClosedConnection() async {
 
   await client.close();
   expect(
-      () async => collection.findOriginal().toList(),
+      () async => collection.find({}).toList(),
       throwsA((MongoDartError e) =>
           e.message == 'Db is in the wrong state: State.CLOSED'));
 }

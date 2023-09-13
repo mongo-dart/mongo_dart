@@ -7,7 +7,7 @@ void main() async {
 //  Db db = new Db(mongoDbUri, 'test scram sha1');
 //
 //  await db.open();
-//  print(await db.collection('test').find().toList());
+//  print(await db.collection('test').find({}).toList());
 //  await db.close();
   var client = MongoClient('mongodb://ds031477.mongolab.com:31477/dart');
   await client.connect();

@@ -5,7 +5,7 @@ import 'base/union_type.dart';
 class SortUnion extends UnionType<IndexDocument, SortExpression> {
   const SortUnion(super.value);
 
-  IndexDocument get projection {
+  IndexDocument get sort {
     if (isNull) {
       return emptyIndexDocument;
     }

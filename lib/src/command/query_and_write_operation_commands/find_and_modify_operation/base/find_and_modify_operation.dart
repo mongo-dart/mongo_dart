@@ -100,7 +100,7 @@ base class FindAndModifyOperation extends CommandOperation {
   }
 
   /// The selection criteria for the modification. The query field employs
-  /// the same query selectors as used in the db.collection.find() method.
+  /// the same query selectors as used in the db.collection.find({}) method.
   /// Although the query may match multiple documents,
   /// findAndModify will only select one document to modify.
   ///

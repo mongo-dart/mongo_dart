@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-1.0.dev
+
+New version
+
 ## 0.8.0
 
 - inherited fro Bson: Moving to the most recent version of the `Rational` class, a **Breaking change** had been introduced. We have decided to substitute the `Rational` class with the `Decimal` one, because the latter, that it is a wrapper around the former, contains more user friendly methods. You can always get a `Rational` instance, if needed, calling the `toRational()` method of the`Decimal` class.
@@ -291,7 +295,7 @@ Resolves [#73](https://github.com/mongo-dart/mongo_dart/issues/73).
 
 - Breaking change: DbCollection `find` method now returns `Stream<Map>` instead of Cursor.
   Cursor have had compatible with `Stream<Map>` `toList` and `forEach` quite some time already, so in case you used these methods only,
-  you should be covered. On the other hand if you used `find().stream` to get a stream it is not valid anymore. In that case you
+  you should be covered. On the other hand if you used `find({}).stream` to get a stream it is not valid anymore. In that case you
   should change your code to plain `find()`
 - Breaking change: This version use upgraded version of `bson`. `ObjectId.toJson` now converts `ObjectId` to simple hex string representation.
   Earlier it was something like `ObjectId('a29d3ae24...aa')` New behaviour would be more useful when you serialize `bson` map to json be default

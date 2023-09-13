@@ -1,4 +1,5 @@
-import 'package:bson/bson.dart' show BsonBinary, BsonCString, BsonMap;
+import 'package:bson/bson.dart'
+    show BsonBinary, BsonCString, BsonMap, bsonSerialization;
 import 'package:mongo_dart/src/database/document_types.dart';
 
 abstract class Payload {
@@ -12,7 +13,8 @@ abstract class Payload {
 class Payload0 extends Payload {
   BsonMap document;
 
-  Payload0(MongoDocument document) : document = BsonMap(document);
+  Payload0(MongoDocument document)
+      : document = BsonMap(document, bsonSerialization);
 
   Payload0.fromBuffer(BsonBinary buffer)
       : document = BsonMap.fromBuffer(buffer);
@@ -21,10 +23,10 @@ class Payload0 extends Payload {
   void packValue(BsonBinary buffer) => document.packValue(buffer);
 
   @override
-  int get byteLength => document.byteLength();
+  int get byteLength => document.byteLength;
 
   @override
-  Map<String, dynamic> get content => document.data;
+  Map<String, dynamic> get content => document.value;
 }
 
 class Payload1 extends Payload {
@@ -40,17 +42,17 @@ class Payload1 extends Payload {
       : _length = (buffer /* ..makeByteList() */).readInt32(),
         identifier = BsonCString(buffer.readCString()) {
     _documents =
-        _decodeBsonMapList(buffer, _length! - 4 - identifier.byteLength());
+        _decodeBsonMapList(buffer, _length! - 4 - identifier.byteLength);
   }
 
   @override
   int get byteLength => _length ??=
-      4 /* sequence length */ + identifier.byteLength() + documentsByteLength;
+      4 /* sequence length */ + identifier.byteLength + documentsByteLength;
 
   int get documentsByteLength {
     var len = 0;
     for (var doc in _documents) {
-      len += doc.byteLength();
+      len += doc.byteLength;
     }
     return len;
   }
@@ -72,7 +74,7 @@ class Payload1 extends Payload {
 List<BsonMap> _createBsonMapList(List<Map<String, dynamic>> documents) {
   var locDocuments = <BsonMap>[];
   for (var document in documents) {
-    locDocuments.add(BsonMap(document));
+    locDocuments.add(BsonMap(document, bsonSerialization));
   }
   return locDocuments;
 }
@@ -80,7 +82,7 @@ List<BsonMap> _createBsonMapList(List<Map<String, dynamic>> documents) {
 List<Map<String, Object>> _extractBsonMapList(List<BsonMap> documents) {
   var locDocuments = <Map<String, Object>>[];
   for (var document in documents) {
-    locDocuments.add(document.data as Map<String, Object>);
+    locDocuments.add(document.value as Map<String, Object>);
   }
   return locDocuments;
 }
@@ -90,7 +92,7 @@ List<BsonMap> _decodeBsonMapList(BsonBinary buffer, int length) {
   while (length > 0) {
     var map = BsonMap.fromBuffer(buffer);
     locDocuments.add(map);
-    length -= map.byteLength();
+    length -= map.byteLength;
   }
 
   return locDocuments;

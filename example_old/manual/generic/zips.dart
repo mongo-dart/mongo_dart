@@ -37,7 +37,7 @@ void main() async {
 ******************** Zips for state NY, with population between 14000 and 16000,
 ******************** reverse ordered by population''');
   await collection
-      .findOriginal(where
+      .find(where
           .eq('state', 'NY')
           .inRange('pop', 14000, 16000)
           .sortBy('pop', descending: true))
@@ -48,7 +48,7 @@ void main() async {
     displayZip(batesville);
     print('******************** Find 10 ZIP closest to BATESVILLE');
     await collection
-        .findOriginal(where.near('loc', batesville['loc']).limit(10))
+        .find(where.near('loc', batesville['loc']).limit(10))
         .forEach(displayZip);
   }
 

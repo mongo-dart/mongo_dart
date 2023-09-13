@@ -1,10 +1,14 @@
 @Timeout(Duration(minutes: 10))
 library crud_test;
 
-import 'package:mongo_dart/mongo_dart.dart';
+import 'package:bson/bson.dart';
+import 'package:mongo_dart/mongo_dart.dart' hide MongoDocument;
+import 'package:mongo_dart_query/mongo_query.dart';
 import 'dart:async';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
+
+import 'utils/insert_bio_db.dart';
 
 part 'crud/insert/insert_one.dart';
 part 'crud/insert/insert_many.dart';
@@ -13,6 +17,7 @@ part 'crud/insert/insert.dart';
 
 part 'crud/find/find.dart';
 part 'crud/find/find_simple.dart';
+part 'crud/find/find_default.dart';
 
 const dbName = 'test-mongo-dart-crud';
 const dbAddress = '127.0.0.1';

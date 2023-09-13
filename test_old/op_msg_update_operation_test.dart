@@ -5,6 +5,7 @@ import 'package:mongo_dart/src/unions/hint_union.dart';
 import 'package:mongo_dart/src/unions/query_union.dart';
 import 'package:mongo_dart/src/utils/update_document_check.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 import '../test/utils/insert_data.dart';
 
@@ -1065,9 +1066,8 @@ void main() async {
         expect(res.nMatched, 1);
         expect(res.nModified, 1);
 
-        var elements = await collection
-            .findOriginal(where.eq('member', 'abc123'))
-            .toList();
+        var elements =
+            await collection.find(where.eq('member', 'abc123')).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.first['status'], 'A');
@@ -1107,9 +1107,8 @@ void main() async {
         expect(res.nMatched, 1);
         expect(res.nModified, 1);
 
-        var elements = await collection
-            .findOriginal(where.eq('member', 'abc123'))
-            .toList();
+        var elements =
+            await collection.find(where.eq('member', 'abc123')).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.first['status'], 'A');
@@ -1149,7 +1148,7 @@ void main() async {
         expect(res.nMatched, 2);
         expect(res.nModified, 2);
 
-        var elements = await collection.findOriginal(where).toList();
+        var elements = await collection.find(where).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.first['status'], 'A');
@@ -1201,7 +1200,7 @@ void main() async {
         expect(res.nMatched, 2);
         expect(res.nModified, 2);
 
-        var elements = await collection.findOriginal(where).toList();
+        var elements = await collection.find(where).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.first['status'], 'Modified');
@@ -1281,7 +1280,7 @@ void main() async {
         expect(res.nMatched, 3);
         expect(res.nModified, 3);
 
-        var elements = await collection.findOriginal(where).toList();
+        var elements = await collection.find(where).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.length, 3);
@@ -1309,9 +1308,8 @@ void main() async {
         expect(res.nMatched, 1);
         expect(res.nModified, 1);
 
-        var elements = await collection
-            .findOriginal(where.eq('status', 'Updated'))
-            .toList();
+        var elements =
+            await collection.find(where.eq('status', 'Updated')).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.length, 1);
@@ -1353,7 +1351,7 @@ void main() async {
         expect(res.nMatched, 2);
         expect(res.nModified, 2);
 
-        var elements = await collection.findOriginal(where).toList();
+        var elements = await collection.find(where).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.length, 3);
@@ -1399,7 +1397,7 @@ void main() async {
         expect(res.nMatched, 2);
         expect(res.nModified, 2);
 
-        var elements = await collection.findOriginal(where).toList();
+        var elements = await collection.find(where).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.length, 2);
@@ -1430,8 +1428,7 @@ void main() async {
         expect(res.nMatched, 3);
         expect(res.nModified, 3);
 
-        var elements =
-            await collection.findOriginal(where.eq('status', 'P')).toList();
+        var elements = await collection.find(where.eq('status', 'P')).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.length, 3);
@@ -1475,9 +1472,8 @@ void main() async {
         expect(res.nMatched, 1);
         expect(res.nMatched, 1);
 
-        var elements = await collection
-            .findOriginal(where.eq('member', 'abc123'))
-            .toList();
+        var elements =
+            await collection.find(where.eq('member', 'abc123')).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.first['status'], 'A');
@@ -1548,7 +1544,7 @@ void main() async {
         expect(res.nMatched, 2);
         expect(res.nModified, 2);
 
-        var elements = await collection.findOriginal(where).toList();
+        var elements = await collection.find(where).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.first['status'], 'A');
@@ -1602,7 +1598,7 @@ void main() async {
           expect(res.writeError?.code, 9);
         }
 
-        var elements = await collection.findOriginal(where).toList();
+        var elements = await collection.find(where).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.first['status'], 'A');
@@ -1645,7 +1641,7 @@ void main() async {
         expect(res.nModified, 1);
 
         var elements = await collection
-            .findOriginal(where.eq('name', 'Central Park Cafe'))
+            .find(where.eq('name', 'Central Park Cafe'))
             .toList();
 
         expect(elements, isNotEmpty);
@@ -1728,7 +1724,7 @@ void main() async {
         expect(res.nMatched, 2);
         expect(res.nModified, 2);
 
-        var elements = await collection.findOriginal(where).toList();
+        var elements = await collection.find(where).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.first['status'], 'Modified');
@@ -1808,7 +1804,7 @@ void main() async {
         expect(res.nMatched, 3);
         expect(res.nModified, 3);
 
-        var elements = await collection.findOriginal(where).toList();
+        var elements = await collection.find(where).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.length, 3);
@@ -1836,9 +1832,8 @@ void main() async {
         expect(res.nMatched, 1);
         expect(res.nModified, 1);
 
-        var elements = await collection
-            .findOriginal(where.eq('status', 'Updated'))
-            .toList();
+        var elements =
+            await collection.find(where.eq('status', 'Updated')).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.length, 1);
@@ -1880,7 +1875,7 @@ void main() async {
         expect(res.nMatched, 2);
         expect(res.nModified, 2);
 
-        var elements = await collection.findOriginal(where).toList();
+        var elements = await collection.find(where).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.length, 3);
@@ -1926,7 +1921,7 @@ void main() async {
         expect(res.nMatched, 2);
         expect(res.nModified, 2);
 
-        var elements = await collection.findOriginal(where).toList();
+        var elements = await collection.find(where).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.length, 2);
@@ -1957,8 +1952,7 @@ void main() async {
         expect(res.nMatched, 3);
         expect(res.nModified, 3);
 
-        var elements =
-            await collection.findOriginal(where.eq('status', 'P')).toList();
+        var elements = await collection.find(where.eq('status', 'P')).toList();
 
         expect(elements, isNotEmpty);
         expect(elements.length, 3);

@@ -254,13 +254,13 @@ abstract class MongoCollection {
   /// Creates a cursor for a query that can be used to iterate over results
   /// from MongoDB
   /// ##[selector]
-  /// parameter represents query to locate objects. If omitted as in `find()`
+  /// parameter represents query to locate objects. If omitted as in `find({})`
   /// then query matches all documents in colleciton.
   /// Here's a more selective example:
   ///     find({'last_name': 'Smith'})
   /// Here our selector will match every document where the last_name attribute
   /// is 'Smith.'
-  @Deprecated('Use find() instead')
+  @Deprecated('Use find({}) instead')
   Stream<MongoDocument> findOriginal([selector]) {
     if (selector is SelectorBuilder) {
       return modernFind(selector: selector);

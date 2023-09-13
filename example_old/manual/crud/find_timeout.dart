@@ -33,7 +33,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.modernFind(filter: {
+  var res = await collection.find({
     'rating': {r'$gt': 60}
   }, sort: {
     'state': 1,

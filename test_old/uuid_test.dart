@@ -1,9 +1,9 @@
 @Timeout(Duration(seconds: 100))
 
-import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:mongo_dart/src/database/base/mongo_database.dart';
-import 'package:mongo_dart/src/mongo_client.dart';
+import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart_query/mongo_dart_query.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 const dbName = 'test';
 const dbAddress = '127.0.0.1';
@@ -55,8 +55,7 @@ void main() async {
         var uuid = Uuid().v4obj();
         await collection.insertOne({'uuid': uuid, 'null': null});
 
-        var values =
-            await collection.findOriginal(where.eq('uuid', uuid)).toList();
+        var values = await collection.find(where.eq('uuid', uuid)).toList();
 
         expect(values.length, 1);
         expect(values.first['uuid'], uuid);
@@ -73,7 +72,7 @@ void main() async {
         await collection.updateOne(
             where.eq('null', null), ModifierBuilder().set('newField', 12));
 
-        var values = await collection.findOriginal().toList();
+        var values = await collection.find({}).toList();
 
         expect(values.length, 1);
         expect(values.first['uuid'], uuid);
@@ -92,7 +91,7 @@ void main() async {
             where.eq('notNull', 0), {'uuid': uuidNew, 'notNull': 0},
             upsert: true);
 
-        var values = await collection.findOriginal().toList();
+        var values = await collection.find({}).toList();
 
         expect(values.length, 2);
         expect(values.first['uuid'], uuid);
@@ -108,7 +107,7 @@ void main() async {
 
         await collection.deleteOne(where.eq('uuid', uuid));
 
-        var values = await collection.findOriginal().toList();
+        var values = await collection.find({}).toList();
 
         expect(values.isEmpty, isTrue);
       });

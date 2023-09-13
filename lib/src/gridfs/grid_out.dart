@@ -41,9 +41,8 @@ class GridOut extends GridFSFile {
           mode: FileMode.writeOnlyAppend, flush: true);
     }
 
-    var chunkList = await fs.chunks
-        .findOriginal(where.eq('files_id', id).sortBy('n'))
-        .toList();
+    var chunkList =
+        await fs.chunks.find(where.eq('files_id', id).sortBy('n')).toList();
     for (var chunk in chunkList) {
       await addToFile(chunk);
     }
@@ -63,7 +62,7 @@ class GridOut extends GridFSFile {
     }
 
     fs.chunks
-        .findOriginal(where.eq('files_id', id).sortBy('n'))
+        .find(where.eq('files_id', id).sortBy('n'))
         .forEach(addToSink)
         .then((_) => completer.complete(length));
     return completer.future;

@@ -73,7 +73,7 @@ void main() async {
   }
 
   var res = await collection
-      .findOriginal(where.eq(
+      .find(where.eq(
           'employers', ObjectId.fromHexString('624f96b5210112050e875698')))
       .toList();
   print('Number of documents fetched: ${res.length}'); // 1

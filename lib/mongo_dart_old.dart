@@ -11,6 +11,7 @@ import 'package:bson/bson.dart';
 import 'package:mongo_dart/src/extensions/file_ext.dart';
 
 import 'package:mongo_dart_query/mongo_dart_query.dart';
+import 'package:uuid/uuid.dart';
 
 import 'src/core/error/mongo_dart_error.dart';
 

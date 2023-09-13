@@ -31,7 +31,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.findOriginal({
+  var res = await collection.find({
     'name': 'Tom',
     'rating': {r'$gt': 10}
   }).toList();

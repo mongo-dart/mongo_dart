@@ -34,13 +34,13 @@ void main() async {
   ]);
   await db.ensureIndex('authors',
       name: 'meta', keys: {'_id': 1, 'name': 1, 'age': 1});
-  await collection.findOriginal().forEach((v) {
+  await collection.find({}).forEach((v) {
     print(v);
     authors[v['name'].toString()] = v;
   });
   print('====================================================================');
   print('>> Authors ordered by age ascending');
-  await collection.findOriginal(where.sortBy('age')).forEach(
+  await collection.find(where.sortBy('age')).forEach(
       (auth) => print("[${auth['name']}]:[${auth['email']}]:[${auth['age']}]"));
   print('====================================================================');
   print('>> Adding Users');
@@ -50,15 +50,14 @@ void main() async {
     {'login': 'lsmith', 'name': 'Lucy Smith', 'email': 'lucy@smith.com'}
   ]);
   await db.ensureIndex('users', keys: {'login': -1});
-  await usersCollection.findOriginal().forEach((user) {
+  await usersCollection.find({}).forEach((user) {
     users[user['login'].toString()] = user;
     print(user);
   });
   print('====================================================================');
   print('>> Users ordered by login descending');
-  await usersCollection
-      .findOriginal(where.sortBy('login', descending: true))
-      .forEach((user) =>
+  await usersCollection.find(where.sortBy('login', descending: true)).forEach(
+      (user) =>
           print("[${user['login']}]:[${user['name']}]:[${user['email']}]"));
   print('====================================================================');
   print('>> Adding articles');
@@ -80,9 +79,7 @@ void main() async {
   ]);
   print('====================================================================');
   print('>> Articles ordered by title ascending');
-  await articlesCollection
-      .findOriginal(where.sortBy('title'))
-      .forEach((article) {
+  await articlesCollection.find(where.sortBy('title')).forEach((article) {
     print("[${article['title']}]:[${article['body']}]:"
         "[${article['author_id'].toHexString()}]");
   });

@@ -34,23 +34,19 @@ class MongoQueryMessage extends MongoMessage {
     if (collectionFullName != null) {
       collFullName = BsonCString(collectionFullName);
     }
-    _query = BsonMap(query);
+    _query = BsonMap(query, bsonSerialization);
     if (fields != null) {
-      _fields = BsonMap(fields);
+      _fields = BsonMap(fields, bsonSerialization);
     }
     opcode = MongoMessage.query;
   }
 
   @override
   int get messageLength {
-    var result = 16 +
-        4 +
-        (collFullName?.byteLength() ?? 0) +
-        4 +
-        4 +
-        _query.byteLength();
+    var result =
+        16 + 4 + (collFullName?.byteLength ?? 0) + 4 + 4 + _query.byteLength;
     if (_fields != null) {
-      result += _fields!.byteLength();
+      result += _fields!.byteLength;
     }
     return result;
   }

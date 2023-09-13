@@ -30,15 +30,14 @@ void main() async {
   }
 
   var findResult = await collection
-      .modernFind(selector: where.eq('category', 'cafe').eq('status', 'a'))
+      .find(where.eq('category', 'cafe').eq('status', 'a'))
       .toList();
 
   print('First record category without collation before deletion: '
       '${findResult.first['category']}'); // 'cafe';
 
   findResult = await collection
-      .modernFind(
-          selector: where.eq('category', 'cafe').eq('status', 'a'),
+      .find(where.eq('category', 'cafe').eq('status', 'a'),
           findOptions:
               FindOptions(collation: CollationOptions('fr', strength: 1)))
       .toList();
@@ -52,7 +51,7 @@ void main() async {
 
   print('Removed documents: ${res.nRemoved}');
 
-  findResult = await collection.findOriginal().toList();
+  findResult = await collection.find({}).toList();
 
   print('First record category after deletion with collation: '
       '${findResult.first['category']}'); // 'cafE';

@@ -246,7 +246,7 @@ class MongoCollectionV1 extends MongoCollection {
         sort: uSort,
         projection: uProjection,
         hint: uHint,
-        skip: skip,
+        skip: skip != null && skip > 0 ? skip : null,
         limit: 1,
         findOptions: findOptions,
         rawOptions: rawOptions);
@@ -266,16 +266,18 @@ class MongoCollectionV1 extends MongoCollection {
       FindOptions? findOptions,
       MongoDocument? rawOptions}) {
     var uFilter = (filter is QueryUnion) ? filter : QueryUnion(filter);
-    var uProjection = ProjectionUnion(projection);
-    var uSort = SortUnion(sort);
-    var uHint = HintUnion(hint);
+    var uProjection = (projection is ProjectionUnion)
+        ? projection
+        : ProjectionUnion(projection);
+    var uSort = (sort is SortUnion) ? sort : SortUnion(sort);
+    var uHint = (hint is HintUnion) ? hint : HintUnion(hint);
 
     var operation = FindOperation(this, uFilter,
         sort: uSort,
         projection: uProjection,
         hint: uHint,
-        limit: limit,
-        skip: skip,
+        limit: limit != null && limit > 0 ? limit : null,
+        skip: skip != null && skip > 0 ? skip : null,
         findOptions: findOptions,
         rawOptions: rawOptions);
 

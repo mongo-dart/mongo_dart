@@ -6,6 +6,7 @@ import 'package:mongo_dart/src/database/base/mongo_database.dart';
 import 'package:mongo_dart/src/database/base/mongo_collection.dart';
 import 'package:mongo_dart/src/mongo_client.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 const dbName = 'test';
 const dbAddress = '127.0.0.1';
@@ -62,8 +63,7 @@ void main() async {
 
         await insertManyDocuments(collection, 10000);
 
-        var values =
-            await collection.findOriginal(<String, dynamic>{}).toList();
+        var values = await collection.find(<String, dynamic>{}).toList();
 
         expect(values.length, 10000);
 
@@ -92,7 +92,7 @@ void main() async {
           r'$mul': {'value': Decimal.fromInt(5), 'qty': 5}
         });
 
-        var values = await collection.findOriginal().toList();
+        var values = await collection.find({}).toList();
 
         expect(values.length, 1);
         expect(values.first['value'], Decimal.fromInt(15));
@@ -100,7 +100,7 @@ void main() async {
 
         await collection.updateOne(where,
             ModifierBuilder().mul('value', Decimal.fromInt(5)).mul('qty', 2));
-        values = await collection.findOriginal().toList();
+        values = await collection.find({}).toList();
 
         expect(values.length, 1);
         expect(values.first['value'], Decimal.fromInt(75));
@@ -120,8 +120,7 @@ void main() async {
 
         await collection.updateOne(<String, dynamic>{}, mody.map);
 
-        var values =
-            await collection.findOriginal(<String, dynamic>{}).toList();
+        var values = await collection.find(<String, dynamic>{}).toList();
 
         expect(values.length, 1);
 

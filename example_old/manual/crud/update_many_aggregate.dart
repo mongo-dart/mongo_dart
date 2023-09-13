@@ -53,7 +53,7 @@ void main() async {
 
   print('Modified documents: ${res.nModified}'); // 2
 
-  var findResult = await collection.findOriginal().toList();
+  var findResult = await collection.find({}).toList();
 
   print('Last record status: ${findResult.last['status']}'); // 'Modified';
 

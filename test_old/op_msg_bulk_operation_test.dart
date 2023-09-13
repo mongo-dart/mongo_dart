@@ -4,6 +4,7 @@ import 'package:mongo_dart/src/command/query_and_write_operation_commands/update
 import 'package:mongo_dart/src/core/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/unions/query_union.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 import '../test/utils/insert_data.dart';
 
@@ -555,7 +556,7 @@ void main() async {
         //expect(ret.ids.first, 2);
         //expect(ret.documents.first['name'], 'Stephen');
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 3);
         expect(findResult.first['name'], 'John');
         expect(findResult.last['name'], 'Mandy');
@@ -616,7 +617,7 @@ void main() async {
         //expect(ret.ids.first, 2);
         //expect(ret.documents.first['name'], 'Stephen');
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 2);
         expect(findResult.first['name'], 'Mira');
         expect(findResult.last['name'], 'Mandy');
@@ -656,7 +657,7 @@ void main() async {
         //expect(ret.ids.first, 2);
         //expect(ret.documents.first['name'], 'Stephen');
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 2);
         expect(findResult.first['name'], 'Mira');
         expect(findResult.last['name'], 'Mandy');
@@ -730,7 +731,7 @@ void main() async {
         //expect(ret.ids?[0], 4);
         expect(ret.upserted, isEmpty);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 4);
         expect(findResult.first['char'], 'Eldon');
         expect(findResult[1]['char'], 'Tanys');
@@ -809,7 +810,7 @@ void main() async {
         expect(ret.writeErrors.first.index, 1);
         expect(ret.writeErrors.first.operationInputIndex, 1);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 4);
         expect(findResult.first['char'], 'Brisbane');
         expect(findResult[1]['char'], 'Eldon');
@@ -890,7 +891,7 @@ void main() async {
         //expect(ret.ids?.first, 1);
         expect(ret.upserted, isEmpty);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 4);
         expect(findResult.first['char'], 'Eldon');
         expect(findResult[1]['char'], 'Tanys');
@@ -947,7 +948,7 @@ void main() async {
         //expect(ret.ids?.first, 1);
         expect(ret.upserted, isEmpty);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 4);
         expect(findResult.first['char'], 'Eldon');
         expect(findResult[1]['char'], 'Tanys');
@@ -1031,7 +1032,7 @@ void main() async {
         expect(ret.writeErrors.first.index, 0);
         expect(ret.writeErrors.first.operationInputIndex, 5);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 4);
         expect(findResult.first['char'], 'Eldon');
         expect(findResult[1]['char'], 'Tanys');
@@ -1109,7 +1110,7 @@ void main() async {
         expect(ret.writeErrors.first.index, 1);
         expect(ret.writeErrors.first.operationInputIndex, 1);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 3);
         expect(findResult.first['char'], 'Eldon');
         expect(findResult[1]['char'], 'Tanys');
@@ -1193,7 +1194,7 @@ void main() async {
         expect(ret.writeErrors.first.index, 2);
         expect(ret.writeErrors.first.operationInputIndex, 5);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 4);
         expect(findResult.first['char'], 'Eldon');
         expect(findResult[1]['char'], 'Tanys');
@@ -1270,7 +1271,7 @@ void main() async {
         //expect(ret.ids?[0], 4);
         expect(ret.upserted, isEmpty);
 
-        var findResult = await collection.findOriginal().toList();
+        var findResult = await collection.find({}).toList();
         expect(findResult.length, 3);
         expect(findResult.first['char'], 'Eldon');
         expect(findResult[1]['char'], 'Tanys');
@@ -1357,7 +1358,7 @@ void main() async {
           //expect(ret.ids?.length, 1);
           //expect(ret.ids?[0], 5);
           expect(ret.upserted, isEmpty);
-          var findResult = await collection.findOriginal().toList();
+          var findResult = await collection.find({}).toList();
           expect(findResult.length, 4);
           expect(findResult.first['char'], 'hobgoblin');
           expect(findResult[1]['char'], 'ogre');
@@ -1438,7 +1439,7 @@ void main() async {
           //expect(ret.ids?.length, 1);
           //expect(ret.ids?[0], 5);
           expect(ret.upserted, isEmpty);
-          var findResult = await collection.findOriginal().toList();
+          var findResult = await collection.find({}).toList();
           expect(findResult.length, 4);
           expect(findResult.first['char'], 'hobgoblin');
           expect(findResult[1]['char'], 'ogre');

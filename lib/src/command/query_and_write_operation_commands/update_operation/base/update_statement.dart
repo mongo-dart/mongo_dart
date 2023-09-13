@@ -45,7 +45,7 @@ class UpdateStatement {
   }
 
   /// The query that matches documents to update.
-  /// Use the same query selectors as used in the find() method.
+  /// Use the same query selectors as used in the find({}) method.
   QueryFilter q;
 
   /// The modifications to apply.

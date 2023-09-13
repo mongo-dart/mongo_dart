@@ -12,9 +12,7 @@ class MongoGetMoreMessage extends MongoMessage {
   }
 
   @override
-  int get messageLength {
-    return 16 + 4 + _collectionFullName.byteLength() + 4 + 8;
-  }
+  int get messageLength => 16 + 4 + _collectionFullName.byteLength + 4 + 8;
 
   @override
   BsonBinary serialize() {

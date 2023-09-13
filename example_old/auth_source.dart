@@ -6,6 +6,6 @@ void main() async {
   await client.connect();
   var db = client.db();
   var collection = db.collection('test');
-  print(await collection.findOriginal().toList());
+  print(await collection.find({}).toList());
   await client.close();
 }

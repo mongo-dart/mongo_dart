@@ -4,6 +4,7 @@ import 'package:mongo_dart/src/command/administration_commands/create_command/cr
 import 'package:mongo_dart/src/command/administration_commands/create_command/create_options.dart';
 import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
@@ -64,7 +65,7 @@ void main() async {
       var collection = db.collection(collectionName);
 
       await insertManyDocuments(collection, 10000);
-      var result = await collection.modernFind().toList();
+      var result = await collection.find({}).toList();
       expect(result.length, 10000);
     }, skip: cannotRunTests);
 
@@ -78,7 +79,7 @@ void main() async {
       var collection = db.collection(collectionName);
 
       await insertManyDocuments(collection, 10000);
-      var result = await collection.modernFind().toList();
+      var result = await collection.find({}).toList();
 
       expect(result.length, 5000);
     }, skip: cannotRunTests);
@@ -137,9 +138,8 @@ void main() async {
       await collection.insertOne({'_id': 2, 'category': 'cafe'});
       await collection.insertOne({'_id': 3, 'category': 'cafE'});
 
-      var result = await collection
-          .modernFind(selector: SelectorBuilder()..sortBy('category'))
-          .toList();
+      var result =
+          await collection.find(SelectorBuilder()..sortBy('category')).toList();
 
       expect(result, isNotNull);
       expect(result, isNotEmpty);
@@ -160,9 +160,8 @@ void main() async {
       await collection.insertOne({'_id': 2, 'category': 'cafe'});
       await collection.insertOne({'_id': 3, 'category': 'cafE'});
 
-      var result = await collection
-          .modernFind(selector: SelectorBuilder()..sortBy('category'))
-          .toList();
+      var result =
+          await collection.find(SelectorBuilder()..sortBy('category')).toList();
 
       expect(result, isNotNull);
       expect(result, isNotEmpty);
@@ -231,7 +230,7 @@ void main() async {
         'department': 'A'
       });
 
-      var result = await view.modernFind().toList();
+      var result = await view.find({}).toList();
       expect(result.first['department'], 'A');
       expect(result.first['management'], 3);
       expect(result[1]['department'], 'B');
@@ -274,7 +273,7 @@ void main() async {
         'department': 'A'
       });
 
-      var result = await view.modernFind().toList();
+      var result = await view.find({}).toList();
       expect(result.first['_id'], 'A');
       expect(result.first['count'], 2);
       expect(result.last['_id'], 'B');
@@ -391,7 +390,7 @@ void main() async {
 
       var view = db.collection(viewName);
 
-      var result = await view.modernFind().toList();
+      var result = await view.find({}).toList();
 
       expect(result.length, 5);
 
@@ -523,8 +522,8 @@ void main() async {
       var view = db.collection(viewName);
 
       var result = await view
-          .modernFind(
-            selector: SelectorBuilder().sortBy('category'),
+          .find(
+            SelectorBuilder().sortBy('category'),
           )
           .toList();
       expect(result[1]['category'], 'cafe');
@@ -601,8 +600,7 @@ void main() async {
 
       try {
         await view
-            .modernFind(
-                selector: SelectorBuilder().sortBy('category'),
+            .find(SelectorBuilder().sortBy('category'),
                 findOptions:
                     FindOptions(collation: CollationOptions('fr', strength: 1)))
             .toList();

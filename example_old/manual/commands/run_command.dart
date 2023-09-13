@@ -33,7 +33,7 @@ void main() async {
   print(result); // {ok: 1.0};
 
   try {
-    await db.collection(r'$cmd').modernFind(filter: {'ping': 1}).toList();
+    await db.collection(r'$cmd').find({'ping': 1}).toList();
   } catch (error) {
     print(
         error); // "MongoDart Error: Invalid collection name specified 'mongo-dart-example.$cmd'";

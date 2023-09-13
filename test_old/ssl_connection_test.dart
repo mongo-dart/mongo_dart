@@ -186,7 +186,7 @@ void main() {
       await client.connect();
       final db = client.db();
 
-      await db.collection('test').findOriginal().toList();
+      await db.collection('test').find({}).toList();
       await client.close();
     });
 
@@ -200,7 +200,7 @@ void main() {
       await client.connect();
       final db = client.db();
 
-      await db.collection('test').findOriginal().toList();
+      await db.collection('test').find({}).toList();
       await client.close();
     });
 
@@ -219,7 +219,7 @@ void main() {
       await client.connect();
       final db = client.db();
 
-      await db.collection('test').findOriginal().toList();
+      await db.collection('test').find({}).toList();
       await client.close();
     });
     test('Tls as query parm plus secure parameter', () async {
@@ -233,7 +233,7 @@ void main() {
       await client.connect();
       final db = client.db();
 
-      await db.collection('test').findOriginal().toList();
+      await db.collection('test').find({}).toList();
       await client.close();
     });
   }, skip: 'Requires manual connection string adjustment before run');

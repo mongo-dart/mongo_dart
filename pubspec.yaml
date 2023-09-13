@@ -5,12 +5,15 @@ homepage: https://github.com/mongo-dart/mongo_dart
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
+publish_to: none
 
 dependencies:
-  bson: ^4.0.0
+  bson: #^5.0.0-1.0.dev
+    path: ../bson
   crypto: ^3.0.0
   logging: ^1.0.0
-  mongo_dart_query: ^4.0.2-1.0.dev
+  mongo_dart_query: #^4.0.2
+    path: ../mongo_dart_query
   collection: ^1.15.0
   path: ^1.8.0
   pool: ^1.5.0

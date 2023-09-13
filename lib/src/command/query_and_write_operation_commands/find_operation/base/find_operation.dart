@@ -90,7 +90,7 @@ base class FindOperation extends CommandOperation {
   /// Optional. The projection specification to determine which fields
   /// to include in the returned documents.
   /// *See Projection and Projection Operators.*
-  /// find() operations on views do not support the following projection
+  /// find({}) operations on views do not support the following projection
   /// operators:
   /// * $
   /// * $elemMatch
@@ -136,8 +136,9 @@ base class FindOperation extends CommandOperation {
     return <String, dynamic>{
       keyFind: collection!.collectionName,
       if (!filter.isNull) keyFilter: filter.query,
-      if (sort != null) keySort: sort!,
-      if (projection != null && !projection!.isNull) keyProjection: projection,
+      if (sort != null && !sort!.isNull) keySort: sort!.sort,
+      if (projection != null && !projection!.isNull)
+        keyProjection: projection!.projection,
       if (hint != null && !hint!.isNull) keyHint: hint!.value,
       if (skip != null && skip! > 0) keySkip: skip!,
       if (limit != null && limit! > 0) keyLimit: limit!,

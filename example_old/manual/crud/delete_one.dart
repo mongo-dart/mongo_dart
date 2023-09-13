@@ -30,7 +30,7 @@ void main() async {
 
   print('Removed documents: ${res.nRemoved}');
 
-  var findResult = await collection.findOriginal().toList();
+  var findResult = await collection.find({}).toList();
 
   print('First record name: ${findResult.first['name']}'); // 'Mira';
 

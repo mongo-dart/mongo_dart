@@ -32,7 +32,7 @@ void main() async {
     print('Error detected in record insertion');
   }
 
-  var res = await collection.findOriginal().toList();
+  var res = await collection.find({}).toList();
 
   print('Inserted ${res.length} elements');
   // 7

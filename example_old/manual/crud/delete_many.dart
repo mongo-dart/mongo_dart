@@ -32,7 +32,7 @@ void main() async {
 
   print('Removed documents: ${res.nRemoved}'); // 2
 
-  var findResult = await collection.findOriginal().toList();
+  var findResult = await collection.find({}).toList();
 
   print('First record name: ${findResult.first['name']}'); // 'Luis';
 

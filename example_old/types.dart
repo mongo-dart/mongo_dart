@@ -18,7 +18,7 @@ void main() async {
     'float': 33.3333,
     'regexp': BsonRegexp('.?dim'),
     'boolean': true,
-    'where': BsonCode('this.x == 3'),
+    'where': BsonCode(JsCode('this.x == 3')),
     'null': null
   });
   var v = await collection.findOne({});

@@ -1,6 +1,6 @@
-import 'package:bson/bson.dart';
 import 'package:mongo_dart/src/command/session_commands/abort_transaction_command/base/abort_transaction_command.dart';
 import 'package:mongo_dart/src/command/session_commands/abort_transaction_command/base/abort_transaction_options.dart';
+import 'package:uuid/uuid.dart';
 
 import '../command/base/operation_base.dart';
 import '../command/session_commands/commit_transaction_command/base/commit_transaction_command.dart';

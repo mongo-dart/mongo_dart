@@ -7,6 +7,7 @@ import 'package:mongo_dart/src/database/modern_cursor.dart';
 import 'package:decimal/decimal.dart';
 import 'package:mongo_dart/src/unions/query_union.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 import '../test/utils/insert_data.dart';
 
@@ -204,7 +205,7 @@ void main() async {
       var ret = await insertManyDocuments(collection, 10000);
       expect(ret.isSuccess, isTrue);
 
-      var result = await collection.modernFind().toList();
+      var result = await collection.find({}).toList();
       expect(result.length, 10000);
     }, skip: cannotRunTests);
 
@@ -215,7 +216,7 @@ void main() async {
       var (ret, _, _, _) = await collection.insertOne(testDoc);
       expect(ret.isSuccess, isTrue);
 
-      var result = await collection.modernFind(filter: {
+      var result = await collection.find({
         'pontosGastronomicos.id': '208a3f93-9fcb-4db7-ac44-bb11b86a2d31'
       }, projection: {
         '_id': 0,
@@ -289,7 +290,7 @@ void main() async {
       var ret = await insertManyDocuments(collection, 10000);
       expect(ret.isSuccess, isTrue);
 
-      var result = await collection.modernFind(filter: {
+      var result = await collection.find({
         r'$where': 'function() { '
             ' return (this.a < 100) }'
       }).toList();
@@ -306,9 +307,8 @@ void main() async {
       // instead of 100
       var fromUser = '1 || "" == "" ';
 
-      var result = await collection.modernFind(filter: {
-        r'$where': 'function() { return (this.a < $fromUser) }'
-      }).toList();
+      var result = await collection.find(
+          {r'$where': 'function() { return (this.a < $fromUser) }'}).toList();
 
       expect(result.length, 10000);
     }, skip: cannotRunTests);
@@ -321,7 +321,7 @@ void main() async {
       expect(ret.isSuccess, isTrue);
 
       var result = [];
-      var stream = collection.modernFind();
+      var stream = collection.find({});
       await for (var element in stream) {
         result.add(element);
       }
@@ -375,7 +375,7 @@ void main() async {
       var collection = db.collection(collectionName);
 
       await insertManyDocuments(collection, 10000);
-      var result = await collection.modernFind().toList();
+      var result = await collection.find({}).toList();
 
       expect(result.length, 5000);
     }, skip: cannotRunTests);

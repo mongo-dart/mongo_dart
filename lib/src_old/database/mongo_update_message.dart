@@ -11,11 +11,11 @@ class MongoUpdateMessage extends MongoMessage {
   MongoUpdateMessage(String collectionFullName, Map<String, dynamic> selector,
       document, this.flags)
       : _collectionFullName = BsonCString(collectionFullName),
-        _selector = BsonMap(selector) {
+        _selector = BsonMap(selector, bsonSerialization) {
     if (document is ModifierBuilder) {
       document = document.map;
     }
-    _document = BsonMap(document as Map<String, dynamic>);
+    _document = BsonMap(document as Map<String, dynamic>, bsonSerialization);
     opcode = MongoMessage.update;
   }
 
@@ -23,10 +23,10 @@ class MongoUpdateMessage extends MongoMessage {
   int get messageLength {
     return 16 +
         4 +
-        _collectionFullName.byteLength() +
+        _collectionFullName.byteLength +
         4 +
-        _selector.byteLength() +
-        _document.byteLength();
+        _selector.byteLength +
+        _document.byteLength;
   }
 
   @override
