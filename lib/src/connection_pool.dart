@@ -30,9 +30,9 @@ class ConnectionPool {
   /// Connects to the database, using an existent connection, only creating a new one if
   /// the number of active connections is less than [maxConnections].
   Future<Db> connect() {
-    return _pool.withResource(() async {
+    return _pool.withResource<Db>(() async {
       var i = _index;
-      if (_index >= maxConnections) _index = 0;
+      if (++_index >= maxConnections) _index = 0;
 
       if (i < _connections.length) {
         return _connections[i];

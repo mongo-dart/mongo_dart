@@ -2,7 +2,7 @@
 
 ## 0.9.3
 
-- ToDo
+- Fix on ConnectionPool
 
 ## 0.9.2
 
