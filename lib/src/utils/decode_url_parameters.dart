@@ -1,7 +1,7 @@
+import 'dart:io';
 import 'dart:typed_data' show Uint8List;
 
 import 'package:mongo_dart/mongo_dart_old.dart';
-import 'package:universal_io/io.dart' show File;
 
 import '../settings/connection_string_options.dart';
 import '../core/auth/select_authentication_mechanism.dart';

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:meta/meta.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/core/network/abstract/connection_events.dart';
@@ -6,7 +7,6 @@ import 'package:mongo_dart/src/core/network/connection.dart';
 
 import 'package:mongo_dart/src/core/network/secure_connection.dart';
 import 'package:mongo_dart/src/utils/generic_error.dart';
-import 'package:universal_io/io.dart';
 import 'package:logging/logging.dart';
 
 import '../../../utils/events.dart';
