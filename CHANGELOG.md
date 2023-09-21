@@ -3,6 +3,7 @@
 ## 0.9.3
 
 - Fix on ConnectionPool
+- Test for SetWindowFields (inherited from mongo_dart_query)
 
 ## 0.9.2
 
