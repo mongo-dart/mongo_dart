@@ -34,9 +34,9 @@ class MongoQueryMessage extends MongoMessage {
     if (collectionFullName != null) {
       collFullName = BsonCString(collectionFullName);
     }
-    _query = BsonMap(query, bsonSerialization);
+    _query = BsonMap(query);
     if (fields != null) {
-      _fields = BsonMap(fields, bsonSerialization);
+      _fields = BsonMap(fields);
     }
     opcode = MongoMessage.query;
   }

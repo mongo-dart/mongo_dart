@@ -1,5 +1,4 @@
-import 'package:bson/bson.dart'
-    show BsonBinary, BsonCString, BsonMap, bsonSerialization;
+import 'package:bson/bson.dart' show BsonBinary, BsonCString, BsonMap;
 import 'package:mongo_dart/src/database/document_types.dart';
 
 abstract class Payload {
@@ -13,8 +12,7 @@ abstract class Payload {
 class Payload0 extends Payload {
   BsonMap document;
 
-  Payload0(MongoDocument document)
-      : document = BsonMap(document, bsonSerialization);
+  Payload0(MongoDocument document) : document = BsonMap(document);
 
   Payload0.fromBuffer(BsonBinary buffer)
       : document = BsonMap.fromBuffer(buffer);
@@ -75,7 +73,7 @@ class Payload1 extends Payload {
 List<BsonMap> _createBsonMapList(List<Map<String, dynamic>> documents) {
   var locDocuments = <BsonMap>[];
   for (var document in documents) {
-    locDocuments.add(BsonMap(document, bsonSerialization));
+    locDocuments.add(BsonMap(document));
   }
   return locDocuments;
 }

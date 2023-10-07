@@ -10,7 +10,7 @@ class MongoInsertMessage extends MongoMessage {
       : _collectionFullName = BsonCString(collectionFullName),
         _documents = <BsonMap>[] {
     for (var document in documents) {
-      _documents.add(BsonMap(document, bsonSerialization));
+      _documents.add(BsonMap(document));
     }
     opcode = MongoMessage.insert;
   }
