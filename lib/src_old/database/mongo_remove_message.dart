@@ -14,7 +14,11 @@ class MongoRemoveMessage extends MongoMessage {
 
   @override
   int get messageLength {
-    return 16 + 4 + _collectionFullName.byteLength + 4 + _selector.byteLength;
+    return 16 +
+        4 +
+        _collectionFullName.totalByteLength +
+        4 +
+        _selector.totalByteLength;
   }
 
   @override

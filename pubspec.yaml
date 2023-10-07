@@ -19,7 +19,7 @@ dependencies:
   pool: ^1.5.0
   basic_utils: ^5.2.0 
   decimal: ^2.2.0
-  uuid: ^3.0.0
+  uuid: ^4.1.0
   sasl_scram: ^0.1.0
   vy_string_utils: ^0.4.0
   meta: ^1.8.0

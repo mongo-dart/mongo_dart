@@ -23,10 +23,10 @@ class MongoUpdateMessage extends MongoMessage {
   int get messageLength {
     return 16 +
         4 +
-        _collectionFullName.byteLength +
+        _collectionFullName.totalByteLength +
         4 +
-        _selector.byteLength +
-        _document.byteLength;
+        _selector.totalByteLength +
+        _document.totalByteLength;
   }
 
   @override

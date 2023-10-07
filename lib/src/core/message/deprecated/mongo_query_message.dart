@@ -43,10 +43,14 @@ class MongoQueryMessage extends MongoMessage {
 
   @override
   int get messageLength {
-    var result =
-        16 + 4 + (collFullName?.byteLength ?? 0) + 4 + 4 + _query.byteLength;
+    var result = 16 +
+        4 +
+        (collFullName?.totalByteLength ?? 0) +
+        4 +
+        4 +
+        _query.totalByteLength;
     if (_fields != null) {
-      result += _fields!.byteLength;
+      result += _fields!.totalByteLength;
     }
     return result;
   }
