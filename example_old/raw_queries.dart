@@ -28,10 +28,9 @@ void main() async {
   await coll.deleteOne({'_id': id});
   val = await coll.findOne({'_id': id});
   print('Filtered by _id=$id: $val. There more no such a doc');
-  print(
-      "Filtered by {'str_field': {'\$regex': new BsonRegexp('^str_(5|7|8)17\$')}");
+  print("Filtered by {'str_field': {'\$regex': RegExp('^str_(5|7|8)17\$')}");
   await coll.find({
-    'str_field': {'\$regex': BsonRegexp('^str_(5|7|8)17\$')}
+    'str_field': {'\$regex': RegExp('^str_(5|7|8)17\$')}
   }).forEach((v) => print(v));
   await client.close();
 }

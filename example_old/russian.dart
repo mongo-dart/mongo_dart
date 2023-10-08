@@ -11,7 +11,7 @@ void main() async {
     'Имя': 'Вадим',
     'Фамилия': 'Цушко',
     'Профессия': 'Брадобрей',
-    'Шаблон': BsonRegexp('^.adim\$')
+    'Шаблон': RegExp('^.adim\$')
   });
   var v = await collection.findOne({});
   print(

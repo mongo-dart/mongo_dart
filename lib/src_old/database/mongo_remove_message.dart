@@ -1,5 +1,5 @@
 part of mongo_dart;
-
+/* 
 class MongoRemoveMessage extends MongoMessage {
   final BsonCString _collectionFullName;
   int flags;
@@ -37,3 +37,4 @@ class MongoRemoveMessage extends MongoMessage {
   String toString() => 'MongoRemoveMessage($requestId, '
       '${_collectionFullName.value}, ${_selector.value})';
 }
+ */

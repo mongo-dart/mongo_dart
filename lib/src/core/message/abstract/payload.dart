@@ -1,4 +1,8 @@
-import 'package:bson/bson.dart' show BsonBinary, BsonCString, BsonMap;
+import 'package:bson/bson.dart' show BsonBinary;
+// ignore: implementation_imports
+import 'package:bson/src/types/bson_map.dart';
+// ignore: implementation_imports
+import 'package:bson/src/types/bson_string.dart';
 import 'package:mongo_dart/src/database/document_types.dart';
 
 abstract class Payload {

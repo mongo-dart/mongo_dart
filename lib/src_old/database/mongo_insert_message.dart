@@ -1,5 +1,5 @@
 part of mongo_dart;
-
+/* 
 class MongoInsertMessage extends MongoMessage {
   final BsonCString _collectionFullName;
   int flags;
@@ -48,3 +48,4 @@ class MongoInsertMessage extends MongoMessage {
         '${_collectionFullName.value}, ${_documents.length} documents)';
   }
 }
+ */

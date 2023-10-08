@@ -1,4 +1,6 @@
 import 'package:bson/bson.dart';
+// ignore: implementation_imports
+import 'package:bson/src/types/bson_map.dart';
 
 import '../abstract/mongo_message.dart';
 import '../abstract/mongo_response_message.dart';

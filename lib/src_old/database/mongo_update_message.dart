@@ -1,5 +1,5 @@
 part of mongo_dart;
-
+/* 
 class MongoUpdateMessage extends MongoMessage {
   final BsonCString _collectionFullName;
   int flags;
@@ -46,3 +46,4 @@ class MongoUpdateMessage extends MongoMessage {
   String toString() => 'MongoUpdateMessage($requestId, '
       '${_collectionFullName.value}, ${_selector.value}, ${_document.value})';
 }
+ */

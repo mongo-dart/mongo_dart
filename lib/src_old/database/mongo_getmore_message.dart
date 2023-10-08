@@ -1,5 +1,5 @@
 part of mongo_dart;
-
+/* 
 class MongoGetMoreMessage extends MongoMessage {
   final BsonCString _collectionFullName;
   int cursorId;
@@ -30,3 +30,4 @@ class MongoGetMoreMessage extends MongoMessage {
   String toString() => 'MongoGetMoreMessage($requestId, '
       '${_collectionFullName.value}, $cursorId)';
 }
+ */
