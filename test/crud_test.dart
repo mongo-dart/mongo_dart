@@ -4,6 +4,8 @@ library crud_test;
 import 'package:bson/bson.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide MongoDocument;
 import 'package:mongo_dart_query/mongo_query.dart';
+import 'package:mongo_dart_query/src/base/operator_expression.dart';
+import 'package:mongo_dart_query/src/base/value_expression.dart';
 import 'dart:async';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';

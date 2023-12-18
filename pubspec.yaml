@@ -8,8 +8,7 @@ environment:
 publish_to: none
 
 dependencies:
-  bson: #^5.0.0-1.0.dev
-    path: ../bson
+  bson: ^5.0.0
   crypto: ^3.0.0
   logging: ^1.0.0
   mongo_dart_query: #^4.0.2
