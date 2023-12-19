@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.4
+
+- Example for admin command
+
 ## 0.9.3
 
 - Fix on ConnectionPool
