@@ -3,6 +3,7 @@
 ## 0.9.4
 
 - Example for admin command
+- Fix for listDatabases() method for new releases
 
 ## 0.9.3
 

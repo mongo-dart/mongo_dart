@@ -67,6 +67,7 @@ import 'src/database/commands/aggregation_commands/count/count_operation.dart';
 import 'src/database/commands/aggregation_commands/count/count_options.dart';
 import 'src/database/commands/aggregation_commands/count/count_result.dart';
 import 'src/database/commands/base/command_operation.dart';
+import 'src/database/commands/base/db_admin_command_operation.dart';
 import 'src/database/commands/diagnostic_commands/ping_command/ping_command.dart';
 import 'package:path/path.dart' as p;
 

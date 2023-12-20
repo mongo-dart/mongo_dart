@@ -623,8 +623,14 @@ class Db {
 
   /// Analogue to shell's `show dbs`. Helper for `listDatabases` mongodb command.
   Future<List> listDatabases() async {
-    var commandResult = await executeDbCommand(
-        DbCommand.createQueryAdminCommand({'listDatabases': 1}));
+    Map<String, dynamic> commandResult;
+    if (masterConnection.serverCapabilities.supportsOpMsg) {
+      commandResult =
+          await DbAdminCommandOperation(this, {'listDatabases': 1}).execute();
+    } else {
+      commandResult = await executeDbCommand(
+          DbCommand.createQueryAdminCommand({'listDatabases': 1}));
+    }
 
     var result = [];
 
