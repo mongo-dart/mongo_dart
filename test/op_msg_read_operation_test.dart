@@ -11,6 +11,7 @@ import 'package:mongo_dart/src/database/commands/query_and_write_operation_comma
 import 'package:mongo_dart/src/database/commands/parameters/read_concern.dart';
 import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 import 'utils/insert_cake_sales_db.dart';
 import 'utils/insert_data.dart';

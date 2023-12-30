@@ -281,7 +281,7 @@ class MongoModernMessage extends MongoResponseMessage {
 
     if (buffer.byteArray.lengthInBytes != super.messageLength) {
       throw MongoDartError('The length of the buffer received '
-          '(${buffer.byteLength()} bytes) is not what expected '
+          '(${buffer.totalByteLength} bytes) is not what expected '
           '(${super.messageLength} bytes)');
     }
     while (buffer.offset < super.messageLength) {

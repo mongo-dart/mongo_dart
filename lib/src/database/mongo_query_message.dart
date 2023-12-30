@@ -1,6 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 
-part of mongo_dart;
+part of '../../mongo_dart.dart';
 
 class MongoQueryMessage extends MongoMessage {
   static final OPTS_NONE = 0;
@@ -41,12 +41,12 @@ class MongoQueryMessage extends MongoMessage {
   int get messageLength {
     var result = 16 +
         4 +
-        (_collectionFullName?.byteLength() ?? 0) +
+        (_collectionFullName?.totalByteLength ?? 0) +
         4 +
         4 +
-        _query.byteLength();
+        _query.totalByteLength;
     if (_fields != null) {
-      result += _fields!.byteLength();
+      result += _fields!.totalByteLength;
     }
     return result;
   }

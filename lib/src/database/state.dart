@@ -1,4 +1,4 @@
-part of mongo_dart;
+part of '../../mongo_dart.dart';
 
 class State {
   final String _value;

@@ -4,6 +4,7 @@ import 'package:mongo_dart/src/database/commands/query_and_write_operation_comma
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/update_operation/update_statement.dart';
 import 'package:mongo_dart/src/database/utils/update_document_check.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 import 'utils/insert_data.dart';
 

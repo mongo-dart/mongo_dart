@@ -1,31 +1,24 @@
-import 'package:mongo_dart/mongo_dart.dart' show Db, DbCollection;
 import 'package:mongo_dart/src/database/commands/aggregation_commands/aggregate/aggregate_operation.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 import 'change_stream_options.dart';
 
 class ChangeStreamOperation extends AggregateOperation {
-  ChangeStreamOperation(Object pipeline,
-      {DbCollection? collection,
-      Db? db,
+  ChangeStreamOperation(super.pipeline,
+      {super.collection,
+      super.db,
       int? batchSize,
-      String? hint,
-      Map<String, Object>? hintDocument,
+      super.hint,
+      super.hintDocument,
       ChangeStreamOptions? changeStreamOptions,
-      Map<String, Object>? rawOptions})
+      super.rawOptions})
       : super(
-          pipeline,
-          collection: collection,
-          db: db,
           cursor: batchSize == null
               ? null
               : <String, Object>{keyBatchSize: batchSize},
-          hint: hint,
-          hintDocument: hintDocument,
           aggregateOptions: changeStreamOptions,
-          rawOptions: rawOptions,
         ) {
-    this.pipeline.insert(0, <String, Object>{
+    pipeline.insert(0, <String, Object>{
       if (changeStreamOptions == null)
         aggregateChangeStream: <String, Object>{}
       else

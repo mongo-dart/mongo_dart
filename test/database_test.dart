@@ -9,6 +9,7 @@ import 'package:mongo_dart/src/database/commands/diagnostic_commands/ping_comman
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
 import 'dart:async';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';
@@ -1654,7 +1655,7 @@ Future testSimpleQuery() async {
   }
   expect(result1['my_field'], 3);
   id = result1['_id'] as ObjectId;
-  expect(id.toHexString(), id.$oid);
+  expect(id.oid, id.oid);
 
   var result2 = await collection.findOne(where.id(id));
   expect(result2, isNotNull);

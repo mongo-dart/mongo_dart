@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:uuid/uuid.dart';
 
 const dbName = 'mongo-dart-example';
 const dbAddress = '127.0.0.1';
@@ -28,7 +29,7 @@ void main() async {
       'state': 'active',
       'rating': 100,
       'score': 5,
-      'userId': UuidValue('025456da-9e39-4e7c-b1f7-0f5a5e1cb212')
+      'userId': UuidValue.fromString('025456da-9e39-4e7c-b1f7-0f5a5e1cb212')
     },
     {
       '_id': 2,

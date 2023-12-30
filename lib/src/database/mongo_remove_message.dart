@@ -1,4 +1,4 @@
-part of mongo_dart;
+part of '../../mongo_dart.dart';
 
 class MongoRemoveMessage extends MongoMessage {
   final BsonCString _collectionFullName;
@@ -16,9 +16,9 @@ class MongoRemoveMessage extends MongoMessage {
   int get messageLength {
     return 16 +
         4 +
-        _collectionFullName.byteLength() +
+        _collectionFullName.totalByteLength +
         4 +
-        _selector.byteLength();
+        _selector.totalByteLength;
   }
 
   @override

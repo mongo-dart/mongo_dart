@@ -1,4 +1,4 @@
-part of mongo_dart;
+part of '../../mongo_dart.dart';
 
 abstract class GridFSFile {
   GridFS fs;

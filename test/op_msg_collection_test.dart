@@ -5,6 +5,7 @@ import 'package:mongo_dart/src/database/commands/administration_commands/create_
 import 'package:mongo_dart/src/database/commands/administration_commands/create_command/create_options.dart';
 import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 const dbName = 'test-mongo-dart';
 const dbAddress = '127.0.0.1';

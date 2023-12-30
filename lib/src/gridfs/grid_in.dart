@@ -1,4 +1,4 @@
-part of mongo_dart;
+part of '../../mongo_dart.dart';
 
 class GridIn extends GridFSFile {
   late Stream<Uint8List> input;

@@ -1,4 +1,4 @@
-part of mongo_dart;
+part of '../mongo_dart.dart';
 
 /// A function that produces an instance of [Db], whether synchronously or asynchronously.
 ///

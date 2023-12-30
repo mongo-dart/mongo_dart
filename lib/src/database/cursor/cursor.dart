@@ -1,4 +1,4 @@
-part of mongo_dart;
+part of '../../../mongo_dart.dart';
 
 typedef MonadicBlock = void Function(Map<String, dynamic> value);
 
@@ -178,8 +178,7 @@ class Cursor {
 }
 
 class CommandCursor extends Cursor {
-  CommandCursor(Db db, DbCollection? collection, selectorBuilderOrMap)
-      : super(db, collection, selectorBuilderOrMap);
+  CommandCursor(super.db, super.collection, super.selectorBuilderOrMap);
   bool firstBatch = true;
   @override
   MongoQueryMessage generateQueryMessage() {

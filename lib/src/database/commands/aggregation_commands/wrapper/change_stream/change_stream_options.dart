@@ -11,24 +11,10 @@ class ChangeStreamOptions extends AggregateOptions {
       this.fullDocument,
       this.maxAwaitTimeMS,
       this.startAtOperationTime,
-      bool bypassDocumentValidation = false,
-      bool allowDiskUse = false,
-      CollationOptions? collation,
-      String? comment})
-      : super(
-            allowDiskUse: allowDiskUse,
-            // It make sense to pass a timeout for an operation that never ends?
-            //maxTimeMS: maxTimeMS,
-            bypassDocumentValidation: bypassDocumentValidation,
-            // This is not a watch parameters (shell command).
-            // I assumed that all operations are made on the primary
-            // so it is not needed
-            // readConcern: readConcern
-            collation: collation,
-            // write concern is only for stages $out and $merge that
-            // are not allowed in a change stream
-            //writeConcern: writeConcern,
-            comment: comment);
+      super.bypassDocumentValidation,
+      super.allowDiskUse,
+      super.collation,
+      super.comment});
 
   /// Directs watch to attempt resuming notifications starting after the
   /// operation specified in the resume token.

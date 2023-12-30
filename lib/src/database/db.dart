@@ -1,4 +1,4 @@
-part of mongo_dart;
+part of '../../mongo_dart.dart';
 
 /// [WriteConcern] control the acknowledgment of write operations with various paramaters.
 class WriteConcern {

@@ -1,7 +1,7 @@
-part of mongo_dart;
+part of '../../mongo_dart.dart';
 
 class GridOut extends GridFSFile {
-  GridOut(GridFS fs, [Map<String, dynamic>? data]) : super(fs, data);
+  GridOut(super.fs, [super.data]);
 
   Future writeToFilename(String filename) => writeToFile(File(filename));
 

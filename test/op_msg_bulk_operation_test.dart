@@ -2,6 +2,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
 import 'package:mongo_dart/src/database/commands/query_and_write_operation_commands/return_classes/abstract_write_result.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 import 'utils/insert_data.dart';
 

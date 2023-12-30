@@ -53,7 +53,7 @@ Future testCreatePayload1FromDocument() async {
   ];
   var payload1 = Payload1('documents', data);
 
-  expect(payload1.identifier.byteLength(), 10);
+  expect(payload1.identifier.totalByteLength, 10);
   expect(payload1.documentsByteLength, 114);
   expect(payload1.byteLength, 128);
   var check = BsonBinary.fromHexString(
@@ -82,7 +82,7 @@ Future testCreatePayload1FromBuffer() async {
   buffer.offset = 0;
   var payload = Payload1.fromBuffer(buffer);
 
-  expect(payload.identifier.byteLength(), 10);
+  expect(payload.identifier.totalByteLength, 10);
   expect(payload.documentsByteLength, 114);
   expect(payload.byteLength, 128);
 
@@ -141,7 +141,7 @@ Future testCreateSectionType1FromDocument() async {
   };
   var section = Section(MongoModernMessage.documentsPayloadType, data);
 
-  expect((section.payload as Payload1).identifier.byteLength(), 10);
+  expect((section.payload as Payload1).identifier.totalByteLength, 10);
   expect((section.payload as Payload1).documentsByteLength, 114);
   expect(section.byteLength, 129);
   var check = BsonBinary.fromHexString(
@@ -172,7 +172,7 @@ Future testCreateSectionType1FromBuffer() async {
   buffer.offset = 0;
   var section = Section.fromBuffer(buffer);
 
-  expect((section.payload as Payload1).identifier.byteLength(), 10);
+  expect((section.payload as Payload1).identifier.totalByteLength, 10);
   expect((section.payload as Payload1).documentsByteLength, 114);
   expect(section.byteLength, 129);
 
@@ -220,7 +220,7 @@ Future testCreateModernMessageFromDocument() async {
   expect(unknownSectionNumber, 0);
 
   expect(message.messageLength, 1595);
-  expect(message.serialize().byteLength(), 1600);
+  expect(message.serialize().totalByteLength, 1600);
   expect(message.sections.first.byteLength, 90);
   expect(message.sections.last.byteLength, 255);
 }

@@ -14,9 +14,9 @@ void main() async {
     'binary': BsonBinary.from([0x23, 0x24, 0x25]),
     'int': 42,
     'float': 33.3333,
-    'regexp': BsonRegexp('.?dim'),
+    'regexp': RegExp('.?dim'),
     'boolean': true,
-    'where': BsonCode('this.x == 3'),
+    'where': JsCode('this.x == 3'),
     'null': null
   });
   var v = await collection.findOne();

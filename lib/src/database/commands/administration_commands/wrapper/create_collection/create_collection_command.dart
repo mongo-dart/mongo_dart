@@ -37,9 +37,7 @@ import 'create_collection_options.dart';
 ///   An alternative way to creteCollectionOptions to specify command options
 ///   (must be manually set)
 class CreateCollectionCommand extends CreateCommand {
-  CreateCollectionCommand(Db db, String name,
-      {CreateCollectionOptions? createCollectionOptions,
-      Map<String, Object>? rawOptions})
-      : super(db, name,
-            createOptions: createCollectionOptions, rawOptions: rawOptions);
+  CreateCollectionCommand(super.db, super.name,
+      {CreateCollectionOptions? createCollectionOptions, super.rawOptions})
+      : super(createOptions: createCollectionOptions);
 }

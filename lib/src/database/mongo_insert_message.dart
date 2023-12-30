@@ -1,4 +1,4 @@
-part of mongo_dart;
+part of '../../mongo_dart.dart';
 
 class MongoInsertMessage extends MongoMessage {
   final BsonCString _collectionFullName;
@@ -19,9 +19,9 @@ class MongoInsertMessage extends MongoMessage {
   int get messageLength {
     var docsSize = 0;
     for (var doc in _documents) {
-      docsSize += doc.byteLength();
+      docsSize += doc.totalByteLength;
     }
-    var result = 16 + 4 + _collectionFullName.byteLength() + docsSize;
+    var result = 16 + 4 + _collectionFullName.totalByteLength + docsSize;
     return result;
   }
 

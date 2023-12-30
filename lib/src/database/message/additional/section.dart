@@ -40,8 +40,7 @@ class SectionType0 extends Section {
   SectionType0.fromDocument(int payloadType, Map<String, Object> document)
       : super._(payloadType, Payload0(document));
 
-  SectionType0(int payloadType, Payload0 payload)
-      : super._(payloadType, payload);
+  SectionType0(super.payloadType, Payload0 super.payload) : super._();
 }
 
 class SectionType1 extends Section {
@@ -61,8 +60,7 @@ class SectionType1 extends Section {
     return SectionType1(payloadType, Payload1(identifier, documents));
   }
 
-  SectionType1(int payloadType, Payload1 payload)
-      : super._(payloadType, payload);
+  SectionType1(super.payloadType, Payload1 super.payload) : super._();
 }
 
 /* void _arrangeBuffer(BsonBinary buffer) {

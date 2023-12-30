@@ -3,11 +3,11 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'bulk_options.dart';
 
 class OrderedBulk extends Bulk {
-  OrderedBulk(DbCollection collection,
+  OrderedBulk(super.collection,
       {WriteConcern? writeConcern,
       Map<String, Object>? rawOptions,
       bool? bypassDocumentValidation})
-      : super(collection,
+      : super(
             bulkOptions: BulkOptions(
                 writeConcern: writeConcern,
                 ordered: true,

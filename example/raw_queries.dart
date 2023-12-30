@@ -28,7 +28,7 @@ void main() async {
   print(
       "Filtered by {'str_field': {'\$regex': new BsonRegexp('^str_(5|7|8)17\$')}");
   await coll.find({
-    'str_field': {'\$regex': BsonRegexp('^str_(5|7|8)17\$')}
+    'str_field': {'\$regex': RegExp('^str_(5|7|8)17\$')}
   }).forEach((v) => print(v));
   await db.close();
 }
