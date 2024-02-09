@@ -10,4 +10,6 @@ packages
 *.json
 .packages
 .dart_tool/
-.vscode/
+
+# Excludes Files
+!.vscode/*.json
