@@ -1,9 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import 'dart:io' show Platform;
 
-String mongoDbUri = Platform.environment['MONGODB_URI'] ?? '';
-String host = Platform.environment['MONGO_DART_DRIVER_HOST'] ?? '127.0.0.1';
-String port = Platform.environment['MONGO_DART_DRIVER_PORT'] ?? '27017';
+const String mongoDbUri = String.fromEnvironment('MONGODB_URI');
 
 Future<void> init() async {
   // var db = Db('mongodb://$host:$port/mongo_dart-blog');

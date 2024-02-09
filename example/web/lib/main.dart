@@ -46,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
         isInitialized = true;
       });
     } catch (e) {
+      debugPrint('Error initializing DB: $e');
       setState(() {
         isLoading = false;
         isInitialized = false;
