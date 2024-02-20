@@ -13,3 +13,6 @@ packages
 
 # Excludes Files
 !.vscode/*.json
+
+# PEM/X509-cert
+*.pem
