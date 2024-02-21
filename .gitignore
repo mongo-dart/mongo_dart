@@ -10,9 +10,11 @@ packages
 *.json
 .packages
 .dart_tool/
+example/web/pubspec.lock
 
 # Excludes Files
 !.vscode/*.json
 
 # PEM/X509-cert
 *.pem
+
