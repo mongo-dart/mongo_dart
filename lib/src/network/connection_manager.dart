@@ -90,12 +90,12 @@ class ConnectionManager {
         db._authenticationScheme = AuthenticationScheme.MONGODB_CR;
       }
     }
-    if (connection.serverConfig.userName == null) {
+    if (connection.serverConfig.isAuthenticated) {
       _log.fine(() => '$db: ${connection.serverConfig.hostUrl} connected');
     } else {
       try {
-        await db.authenticate(connection.serverConfig.userName!,
-            connection.serverConfig.password ?? '',
+        await db.authenticate(connection.serverConfig.userName,
+            connection.serverConfig.password,
             connection: connection);
         _log.fine(() => '$db: ${connection.serverConfig.hostUrl} connected');
       } catch (e) {
