@@ -283,17 +283,33 @@ class Db {
 
   List<String> get uriList => _uriList.toList();
 
-  Future<ServerConfig> _parseUri(String uriString,
-      {bool? isSecure,
-      bool? tlsAllowInvalidCertificates,
-      String? tlsCAFile,
-      String? tlsCertificateKeyFile,
-      String? tlsCertificateKeyFilePassword}) async {
+  Future<ServerConfig> _parseUri(
+    String uriString, {
+    bool? isSecure,
+    bool? tlsAllowInvalidCertificates,
+    String? tlsCAFile,
+    Uint8List? tlsCAFileBytes,
+    String? tlsCertificateKeyFile,
+    Uint8List? tlsCertificateKeyFileBytes,
+    String? tlsCertificateKeyFilePassword,
+  }) async {
+    assert(
+        tlsCAFile.isNullOrBlank && tlsCAFileBytes.isNotNullOrEmpty ||
+            tlsCAFile.isNotNullOrBlank && tlsCAFileBytes.isNullOrEmpty,
+        'Cannot set both tlsCAFile and tlsCAFileBytes! Please select one of them!');
+    assert(
+        tlsCertificateKeyFile.isNullOrBlank &&
+                tlsCertificateKeyFileBytes.isNotNullOrEmpty ||
+            tlsCertificateKeyFile.isNotNullOrBlank &&
+                tlsCertificateKeyFileBytes.isNullOrEmpty,
+        'Cannot set both tlsCertificateKeyFile and tlsCertificateKeyFileBytes! Please select one of them!');
+
     isSecure ??= false;
     tlsAllowInvalidCertificates ??= false;
     if (tlsAllowInvalidCertificates ||
         tlsCAFile != null ||
-        tlsCertificateKeyFile != null) {
+        tlsCertificateKeyFile != null ||
+        tlsCertificateKeyFileBytes != null) {
       isSecure = true;
     }
     var uri = Uri.parse(uriString);
@@ -337,16 +353,23 @@ class Db {
     });
 
     Uint8List? tlsCAFileContent;
-    if (tlsCAFile != null) {
-      tlsCAFileContent = await File(tlsCAFile!).readAsBytes();
+    if (tlsCAFile.isNotNullOrBlank) {
+      tlsCAFileContent = await XFile(tlsCAFile!).readAsBytes();
+    }
+    if (tlsCAFileBytes.isNotNullOrEmpty) {
+      tlsCAFileContent = tlsCAFileBytes;
     }
     Uint8List? tlsCertificateKeyFileContent;
-    if (tlsCertificateKeyFile != null) {
+    if (tlsCertificateKeyFile.isNotNullOrBlank) {
       tlsCertificateKeyFileContent =
-          await File(tlsCertificateKeyFile!).readAsBytes();
+          await XFile(tlsCertificateKeyFile!).readAsBytes();
     }
-    if (tlsCertificateKeyFilePassword != null &&
-        tlsCertificateKeyFile == null) {
+    if (tlsCertificateKeyFileBytes.isNotNullOrEmpty) {
+      tlsCertificateKeyFileContent = tlsCertificateKeyFileBytes;
+    }
+    if (tlsCertificateKeyFilePassword.isNotNullOrBlank &&
+        (tlsCertificateKeyFile.isNullOrBlank ||
+            tlsCertificateKeyFileBytes.isNullOrEmpty)) {
       throw MongoDartError('Missing tlsCertificateKeyFile parameter');
     }
 
@@ -457,28 +480,46 @@ class Db {
     return section.payload.content;
   }
 
-  Future open(
-      {WriteConcern writeConcern = WriteConcern.acknowledged,
-      bool secure = false,
-      bool tlsAllowInvalidCertificates = false,
-      String? tlsCAFile,
-      String? tlsCertificateKeyFile,
-      String? tlsCertificateKeyFilePassword}) async {
+  Future open({
+    WriteConcern writeConcern = WriteConcern.acknowledged,
+    bool secure = false,
+    bool tlsAllowInvalidCertificates = false,
+    String? tlsCAFile,
+    Uint8List? tlsCAFileBytes,
+    String? tlsCertificateKeyFile,
+    Uint8List? tlsCertificateKeyFileBytes,
+    String? tlsCertificateKeyFilePassword,
+  }) async {
     if (state == State.opening) {
       throw MongoDartError('Attempt to open db in state $state');
     }
+
+    assert(
+        tlsCAFile.isNullOrBlank && tlsCAFileBytes.isNotNullOrEmpty ||
+            tlsCAFile.isNotNullOrBlank && tlsCAFileBytes.isNullOrEmpty,
+        'Cannot set both tlsCAFile and tlsCAFileBytes! Please select one of them!');
+    assert(
+        tlsCertificateKeyFile.isNullOrBlank &&
+                tlsCertificateKeyFileBytes.isNotNullOrEmpty ||
+            tlsCertificateKeyFile.isNotNullOrBlank &&
+                tlsCertificateKeyFileBytes.isNullOrEmpty,
+        'Cannot set both tlsCertificateKeyFile and tlsCertificateKeyFileBytes! Please select one of them!');
 
     state = State.opening;
     _writeConcern = writeConcern;
     _connectionManager = ConnectionManager(this);
 
     for (var uri in _uriList) {
-      _connectionManager!.addConnection(await _parseUri(uri,
-          isSecure: secure,
-          tlsAllowInvalidCertificates: tlsAllowInvalidCertificates,
-          tlsCAFile: tlsCAFile,
-          tlsCertificateKeyFile: tlsCertificateKeyFile,
-          tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword));
+      _connectionManager!.addConnection(await _parseUri(
+        uri,
+        isSecure: secure,
+        tlsAllowInvalidCertificates: tlsAllowInvalidCertificates,
+        tlsCAFile: tlsCAFile,
+        tlsCAFileBytes: tlsCAFileBytes,
+        tlsCertificateKeyFile: tlsCertificateKeyFile,
+        tlsCertificateKeyFileBytes: tlsCertificateKeyFileBytes,
+        tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword,
+      ));
     }
     try {
       await _connectionManager!.open(writeConcern);

@@ -25,8 +25,11 @@ import 'package:bson/bson.dart';
 import 'package:bson/src/types/bson_map.dart';
 // ignore: implementation_imports
 import 'package:bson/src/types/bson_string.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/src/auth/mongodb_x509_authenticator.dart';
+import 'package:mongo_dart/src/extensions/byte_ext.dart';
+import 'package:mongo_dart/src/extensions/string_ext.dart';
 import 'package:uuid/uuid.dart';
 import 'package:mongo_dart/src/auth/scram_sha256_authenticator.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
