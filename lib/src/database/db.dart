@@ -392,6 +392,8 @@ class Db {
       _authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
     } else if (authenticationSchemeName == MongoDbCRAuthenticator.name) {
       _authenticationScheme = AuthenticationScheme.MONGODB_CR;
+    } else if (authenticationSchemeName == MongoDbX509Authenticator.name) {
+      _authenticationScheme = AuthenticationScheme.X509;
     } else {
       throw MongoDartError('Provided authentication scheme is '
           'not supported : $authenticationSchemeName');
@@ -727,7 +729,7 @@ class Db {
         .toList();
   }
 
-  Future<bool> authenticate(String userName, String password,
+  Future<bool> authenticate(String? userName, String? password,
       {Connection? connection}) async {
     var credential = UsernamePasswordCredential()
       ..username = userName
