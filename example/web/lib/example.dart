@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 const String mongoDbUri = String.fromEnvironment('MONGODB_URI');
@@ -8,7 +9,10 @@ Future<void> init() async {
   var db = await Db.create(mongoDbUri);
   var authors = <String, Map>{};
   var users = <String, Map>{};
-  await db.open();
+  await db.open(
+    secure: true,
+    tlsCertificateKeyFileBytes: (await rootBundle.load('assets/X509-cert-4703913136876562903.pem')).buffer.asUint8List(),
+  );
   await db.drop();
   print('====================================================================');
   print('>> Adding Authors');

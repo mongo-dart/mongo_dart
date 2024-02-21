@@ -18,3 +18,4 @@ example/web/pubspec.lock
 # PEM/X509-cert
 *.pem
 
+example/web/pubspec.lock
