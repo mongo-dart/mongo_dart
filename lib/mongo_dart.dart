@@ -11,9 +11,6 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:io'
     show
-        File,
-        FileMode,
-        IOSink,
         Platform,
         SecureSocket,
         SecurityContext,
