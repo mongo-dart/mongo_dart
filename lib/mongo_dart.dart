@@ -9,13 +9,6 @@ import 'dart:collection';
 import 'dart:convert' show base64;
 import 'dart:math';
 import 'dart:typed_data';
-import 'dart:io'
-    show
-        Platform,
-        SecureSocket,
-        SecurityContext,
-        Socket,
-        TlsException;
 
 import 'package:bson/bson.dart';
 // ignore: implementation_imports
@@ -27,6 +20,7 @@ import 'package:logging/logging.dart';
 import 'package:mongo_dart/src/auth/mongodb_x509_authenticator.dart';
 import 'package:mongo_dart/src/extensions/byte_ext.dart';
 import 'package:mongo_dart/src/extensions/string_ext.dart';
+import 'package:universal_io/io.dart';
 import 'package:uuid/uuid.dart';
 import 'package:mongo_dart/src/auth/scram_sha256_authenticator.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';

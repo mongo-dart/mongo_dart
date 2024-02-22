@@ -1,10 +1,10 @@
 // ignore_for_file: invalid_use_of_visible_for_testing_member
 
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:cross_file/cross_file.dart';
 import 'package:mongo_dart/src/extensions/byte_ext.dart';
 import 'package:path/path.dart' as p;
+import 'package:universal_io/io.dart';
 
 class XFileMode {
   /// The mode for opening a file only for reading.
