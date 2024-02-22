@@ -293,16 +293,22 @@ class Db {
     Uint8List? tlsCertificateKeyFileBytes,
     String? tlsCertificateKeyFilePassword,
   }) async {
-    assert(
-        tlsCAFile.isNullOrBlank && tlsCAFileBytes.isNotNullOrEmpty ||
-            tlsCAFile.isNotNullOrBlank && tlsCAFileBytes.isNullOrEmpty,
-        'Cannot set both tlsCAFile and tlsCAFileBytes! Please select one of them!');
-    assert(
-        tlsCertificateKeyFile.isNullOrBlank &&
-                tlsCertificateKeyFileBytes.isNotNullOrEmpty ||
-            tlsCertificateKeyFile.isNotNullOrBlank &&
-                tlsCertificateKeyFileBytes.isNullOrEmpty,
-        'Cannot set both tlsCertificateKeyFile and tlsCertificateKeyFileBytes! Please select one of them!');
+    if (tlsCAFile.isNotNullOrBlank || tlsCAFileBytes.isNotNullOrEmpty) {
+      assert(
+          tlsCAFile.isNullOrBlank && tlsCAFileBytes.isNotNullOrEmpty ||
+              tlsCAFile.isNotNullOrBlank && tlsCAFileBytes.isNullOrEmpty,
+          'Cannot set both tlsCAFile and tlsCAFileBytes! Please select one of them!');
+    }
+
+    if (tlsCertificateKeyFile.isNotNullOrBlank ||
+        tlsCertificateKeyFileBytes.isNotNullOrEmpty) {
+      assert(
+          tlsCertificateKeyFile.isNullOrBlank &&
+                  tlsCertificateKeyFileBytes.isNotNullOrEmpty ||
+              tlsCertificateKeyFile.isNotNullOrBlank &&
+                  tlsCertificateKeyFileBytes.isNullOrEmpty,
+          'Cannot set both tlsCertificateKeyFile and tlsCertificateKeyFileBytes! Please select one of them!');
+    }
 
     isSecure ??= false;
     tlsAllowInvalidCertificates ??= false;
@@ -494,16 +500,22 @@ class Db {
       throw MongoDartError('Attempt to open db in state $state');
     }
 
-    assert(
-        tlsCAFile.isNullOrBlank && tlsCAFileBytes.isNotNullOrEmpty ||
-            tlsCAFile.isNotNullOrBlank && tlsCAFileBytes.isNullOrEmpty,
-        'Cannot set both tlsCAFile and tlsCAFileBytes! Please select one of them!');
-    assert(
-        tlsCertificateKeyFile.isNullOrBlank &&
-                tlsCertificateKeyFileBytes.isNotNullOrEmpty ||
-            tlsCertificateKeyFile.isNotNullOrBlank &&
-                tlsCertificateKeyFileBytes.isNullOrEmpty,
-        'Cannot set both tlsCertificateKeyFile and tlsCertificateKeyFileBytes! Please select one of them!');
+    if (tlsCAFile.isNotNullOrBlank || tlsCAFileBytes.isNotNullOrEmpty) {
+      assert(
+          tlsCAFile.isNullOrBlank && tlsCAFileBytes.isNotNullOrEmpty ||
+              tlsCAFile.isNotNullOrBlank && tlsCAFileBytes.isNullOrEmpty,
+          'Cannot set both tlsCAFile and tlsCAFileBytes! Please select one of them!');
+    }
+
+    if (tlsCertificateKeyFile.isNotNullOrBlank ||
+        tlsCertificateKeyFileBytes.isNotNullOrEmpty) {
+      assert(
+          tlsCertificateKeyFile.isNullOrBlank &&
+                  tlsCertificateKeyFileBytes.isNotNullOrEmpty ||
+              tlsCertificateKeyFile.isNotNullOrBlank &&
+                  tlsCertificateKeyFileBytes.isNullOrEmpty,
+          'Cannot set both tlsCertificateKeyFile and tlsCertificateKeyFileBytes! Please select one of them!');
+    }
 
     state = State.opening;
     _writeConcern = writeConcern;
