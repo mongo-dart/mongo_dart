@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:mongo_dart/mongo_dart.dart';
 
@@ -87,7 +87,8 @@ void main() async {
 
   var gridOut = await gridFS.findOne(where.eq('_id', input.id));
   var consumer = MockConsumer();
-  var out = IOSink(consumer);
+  var out = StreamController<Uint8List>();
+  await out.addStream(Stream.value(Uint8List.fromList(consumer.data)));
   await gridOut?.writeTo(out);
 
   await gridOut?.delete();
