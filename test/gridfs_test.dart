@@ -1,5 +1,7 @@
 library gridfs_tests;
 
+import 'dart:typed_data';
+
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:io';
 import 'dart:async';
@@ -131,7 +133,8 @@ Future<List<int>> getInitialState(GridFS gridFS) async {
 Future testInOut(List<int> data, GridFS gridFS,
     [Map<String, dynamic>? extraData]) async {
   var consumer = MockConsumer();
-  var out = IOSink(consumer);
+  var out = StreamController<Uint8List>();
+  await out.addStream(Stream.value(Uint8List.fromList(consumer.data)));
   await getInitialState(gridFS);
   var inputStream = Stream.fromIterable([data]);
   var input = gridFS.createFile(inputStream, 'test');
