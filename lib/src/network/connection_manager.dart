@@ -22,7 +22,7 @@ class ConnectionManager {
 
   Future _connect(Connection connection) async {
     await connection.connect();
-    var result = <String, Object?>{keyOk: 0.0};
+    var result = <String, dynamic>{keyOk: 0.0};
     // As I couldn't set-up a pre 3.6 environment, I check not only for
     // a {ok: 0.0} but also for any other error
     try {
@@ -55,7 +55,7 @@ class ConnectionManager {
       if (connection._closed) {
         connection._closed = false;
         await connection.connect();
-        result = <String, Object?>{keyOk: 0.0};
+        result = <String, dynamic>{keyOk: 0.0};
       }
       var isMasterCommand = DbCommand.createIsMasterCommand(db);
       var replyMessage = await connection.query(isMasterCommand);
@@ -90,12 +90,14 @@ class ConnectionManager {
         db._authenticationScheme = AuthenticationScheme.MONGODB_CR;
       }
     }
-    if (connection.serverConfig.isAuthenticated) {
+    if (connection.serverConfig.userName == null ||
+        (db._authenticationScheme == AuthenticationScheme.X509 &&
+            connection.serverConfig.isAuthenticated)) {
       _log.fine(() => '$db: ${connection.serverConfig.hostUrl} connected');
     } else {
       try {
-        await db.authenticate(connection.serverConfig.userName,
-            connection.serverConfig.password,
+        await db.authenticate(
+            connection.serverConfig.userName, connection.serverConfig.password,
             connection: connection);
         _log.fine(() => '$db: ${connection.serverConfig.hostUrl} connected');
       } catch (e) {

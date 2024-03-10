@@ -21,12 +21,12 @@ abstract class Bulk extends CommandOperation {
             collection: collection,
             aspect: Aspect.writeOperation);
 
-  var overallInsertDocuments = <Map<String, Object?>>[];
+  var overallInsertDocuments = <Map<String, dynamic>>[];
   var ids = [];
   var operationInputIndex = 0;
 
   /// Inserts a single document into the collection.
-  void insertOne(Map<String, Object?> document) {
+  void insertOne(Map<String, dynamic> document) {
     document[key_id] ??= ObjectId();
     ids.add(document[key_id]);
     overallInsertDocuments.add(document);
@@ -34,11 +34,11 @@ abstract class Bulk extends CommandOperation {
   }
 
   /// Inserts nultiple documents into the collection.
-  void insertMany(List<Map<String, Object?>> documents) {
-    var documentsNew = <Map<String, Object?>>[];
+  void insertMany(List<Map<String, dynamic>> documents) {
+    var documentsNew = <Map<String, dynamic>>[];
     for (var document in documents) {
       document[key_id] ??= ObjectId();
-      documentsNew.add(<String, Object?>{...document});
+      documentsNew.add(<String, dynamic>{...document});
       ids.add(document[key_id]);
       overallInsertDocuments.add(document);
     }
@@ -391,8 +391,8 @@ abstract class Bulk extends CommandOperation {
   Map<String, Object> $buildCommand() =>
       throw StateError('Call getBulkCommands() for bulk operations');
 
-  Future<List<Map<String, Object?>>> executeBulk() async {
-    var retList = <Map<String, Object?>>[];
+  Future<List<Map<String, dynamic>>> executeBulk() async {
+    var retList = <Map<String, dynamic>>[];
     var isOrdered = options[keyOrdered] as bool? ?? true;
     final db = this.db;
     if (db.state != State.open) {

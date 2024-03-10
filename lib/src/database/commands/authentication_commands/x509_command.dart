@@ -1,28 +1,18 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
 import 'package:mongo_dart/src/database/message/additional/section.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
 
-class SaslStartCommand extends CommandOperation {
-  SaslStartCommand(Db db, String mechanism, Uint8List payload,
-      {SaslStartOptions? saslStartOptions,
-      Map<String, Object>? rawOptions,
-      Connection? connection})
-      : super(
-            db, <String, Object>{...?saslStartOptions?.options, ...?rawOptions},
+class X509Command extends CommandOperation {
+  X509Command(Db db, String mechanism, String? username,
+      {Map<String, Object>? rawOptions, Connection? connection})
+      : super(db, <String, Object>{...?rawOptions},
             command: <String, Object>{
-              keySaslStart: 1,
+              keyAuthenticate: 1,
               keyMechanism: mechanism,
-              keyPayload: base64.encode(payload)
+              if (username != null && username.isNotEmpty) keyUser: username
             },
             connection: connection);
-
-  /*  @override
-  Future<Map<String, dynamic>> execute({bool skipStateCheck = false}) async =>
-      super.execute(skipStateCheck: true); */
 
   @override
   Future<Map<String, dynamic>> execute({bool skipStateCheck = false}) async {

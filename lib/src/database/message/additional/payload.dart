@@ -9,7 +9,7 @@ abstract class Payload {
 
   int get byteLength;
 
-  Map<String, Object?> get content;
+  Map<String, dynamic> get content;
 }
 
 class Payload0 extends Payload {
@@ -27,7 +27,7 @@ class Payload0 extends Payload {
   int get byteLength => document.totalByteLength;
 
   @override
-  Map<String, Object?> get content => document.value;
+  Map<String, dynamic> get content => document.value;
 }
 
 class Payload1 extends Payload {
@@ -35,7 +35,7 @@ class Payload1 extends Payload {
   final BsonCString identifier;
   late List<BsonMap> _documents;
 
-  Payload1(String identifier, List<Map<String, Object?>> documents)
+  Payload1(String identifier, List<Map<String, dynamic>> documents)
       : identifier = BsonCString(identifier),
         _documents = _createBsonMapList(documents);
 
@@ -73,7 +73,7 @@ class Payload1 extends Payload {
       {identifier.data: _extractBsonMapList(_documents)};
 }
 
-List<BsonMap> _createBsonMapList(List<Map<String, Object?>> documents) {
+List<BsonMap> _createBsonMapList(List<Map<String, dynamic>> documents) {
   var locDocuments = <BsonMap>[];
   for (var document in documents) {
     locDocuments.add(BsonMap(document));

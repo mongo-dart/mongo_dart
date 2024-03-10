@@ -32,7 +32,7 @@ class FindOperation extends CommandOperation {
 
   /// Optional. The query predicate. If unspecified, then all documents in the
   /// collection will match the predicate.
-  Map<String, Object?>? filter;
+  Map<String, dynamic>? filter;
 
   /// Optional. The sort specification for the ordering of the results.
   Map<String, Object>? sort;

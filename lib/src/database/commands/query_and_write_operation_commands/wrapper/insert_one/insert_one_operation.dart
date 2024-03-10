@@ -6,7 +6,7 @@ import 'package:mongo_dart/src/database/commands/query_and_write_operation_comma
 import 'insert_one_options.dart';
 
 class InsertOneOperation extends InsertOperation {
-  Map<String, Object?> document;
+  Map<String, dynamic> document;
 
   InsertOneOperation(DbCollection collection, this.document,
       {InsertOneOptions? insertOneOptions, Map<String, Object>? rawOptions})

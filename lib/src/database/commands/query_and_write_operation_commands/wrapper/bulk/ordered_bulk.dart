@@ -60,9 +60,9 @@ class OrderedBulk extends Bulk {
     var lastCommandKey = commands.last.keys.first;
     if (commandKey == lastCommandKey) {
       var commandValue =
-          command.values.toList()[1] as List<Map<String, Object?>>;
+          command.values.toList()[1] as List<Map<String, dynamic>>;
       var lastCommandValues =
-          commands.last.values.toList()[1] as List<Map<String, Object?>>;
+          commands.last.values.toList()[1] as List<Map<String, dynamic>>;
       commandsOrigin.last[lastCommandValues.length] = operationInputIndex++;
       lastCommandValues.addAll(commandValue);
     } else {

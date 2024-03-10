@@ -18,7 +18,7 @@ class UpdateStatement {
 
   /// The query that matches documents to update.
   /// Use the same query selectors as used in the find() method.
-  Map<String, Object?> q;
+  Map<String, dynamic> q;
 
   /// The modifications to apply.
   ///

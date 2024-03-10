@@ -32,7 +32,7 @@ cat mongodb-test-ia.crt mongodb-test-ca.crt  > test-ca.pem
 
 I have created a [small bash script](script/authority-certificate.sh) (linux only), to make the work easier. I guess it should be easy to move it to other systems.
 Before running it you have to update the default values where required.
-While running it will ask you some values, set them at you like.
+While running it will ask you some values, set them as you like.
 Finally (if required) it will ask you the password for crypting the main key (+ retype for confirmation) and also one for crypting the intermediate key (+ confirmation).
 The script generates the openssl configuration file, runs the openssl commands, if required crypts the keys with the standard method or with gpg (check if it is installed on you system) and finally does some clean-up.
 You can run it this way: ./authority-certificate.sh your-ca-name
@@ -53,7 +53,7 @@ Provided that all files are in PEM format (that one that has a '----- Begin ....
 
 - .key files -> Are files in PEM format containing the private key. They can be password protected or gpg encrypted (in this last case you have to decrypt them before using)
 - .csr files -> Are files in PEM format containing the certificate request. As they are of no use in or case, I delete them after that the public certificate have been created.
-- .crt files -> Are files in PEM format containing the public key. Those endind with -full-chain.crt contains a list of certificates in importance order (from less to more important). In our case the your-ca-name-full-chain.crt file will contain two certificates: your-ca-name-ia.crt + your-ca-name-ca.crt strictly in this order. Inverting the order of the certificates causes strange and incomprehensible errors when trying to connect. The mongo db tutorial call these as .pem.
+- .crt files -> Are files in PEM format containing the public key. Those ending with -full-chain.crt contains a list of certificates in importance order (from less to more important). In our case the your-ca-name-full-chain.crt file will contain two certificates: your-ca-name-ia.crt + your-ca-name-ca.crt strictly in this order. Inverting the order of the certificates causes strange and incomprehensible errors when trying to connect. The mongo db tutorial call these as .pem.
 - .pem files -> Are files in PEM format containing a public and a private key. Normally they are concatenated in this order, and this works. I have never tried to change the order, but I cannot guarantee that it would work.
 
 I explicitly specify "PEM" format because there is also another kind of format, the "DER" one. I didn't use it, so I cannot give you more details on it, with the exception that I'm sure that you can convert the two formats back and forth.

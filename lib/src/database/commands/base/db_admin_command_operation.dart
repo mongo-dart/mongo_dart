@@ -15,7 +15,7 @@ class DbAdminCommandOperation extends OperationBase {
   Map<String, Object> $buildCommand() => command;
 
   @override
-  Future<Map<String, Object?>> execute() async {
+  Future<Map<String, dynamic>> execute() async {
     final db = this.db;
     var command = <String, Object>{
       ...$buildCommand(),

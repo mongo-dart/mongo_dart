@@ -23,7 +23,7 @@ class CountOperation extends CommandOperation {
             collection: collection, aspect: Aspect.readOperation);
 
   /// A query that selects which documents to count in the collection or view.
-  Map<String, Object?>? query;
+  Map<String, dynamic>? query;
 
   /// The maximum number of matching documents to return.
   int? limit;

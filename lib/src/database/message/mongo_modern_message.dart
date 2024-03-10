@@ -226,7 +226,7 @@ class MongoModernMessage extends MongoResponseMessage {
           'The first entry ("${keys.first}") of the document is not a command name');
     }
     var argumentName = commandArgument[indexOfCommandName];
-    var data = doc[argumentName] as List<Map<String, Object?>>?;
+    var data = doc[argumentName] as List<Map<String, dynamic>>?;
     if (data == null) {
       throw MongoDartError('The command ${keys.first} requires an element with '
           'key $argumentName');
@@ -239,7 +239,7 @@ class MongoModernMessage extends MongoResponseMessage {
           'is greater than the max allowed ($maxWriteBatchSize)');
     }
 
-    List<Map<String, Object?>> sectionList;
+    List<Map<String, dynamic>> sectionList;
     while (totalElements > 0) {
       if (totalElements > maxDocumentsPerPayload1) {
         sectionList = data.sublist(0, maxDocumentsPerPayload1);

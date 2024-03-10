@@ -56,7 +56,7 @@ Theoretically the process should be:
 - concatenate the crt and key files into a pem file (.pem);
 
 Here the critical files are the .key and the .pem as they contains the private key, so set all required file permissions.
-Normally the .key is not required for eveyday use, so you can crypt it and guard it in a safe place.
+Normally the .key is not required for everyday use, so you can crypt it and guard it in a safe place.
 The .pem file, on the opposite, is needed for the connecting to the server, so we have to mantain it uncrypted. You could eventually set a password on your pem certificate.
 
 This said, and considering that _we_ are the CA authority, we can generate the keys for the clients on the same computer and then guard them safely. We will only need to send to the client the client.pem file (it should already have the your-ca-name-full-chain.crt) in a safe way (scp).

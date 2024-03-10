@@ -431,7 +431,7 @@ class Db {
     connection.execute(message, writeConcern == WriteConcern.ERRORS_IGNORED);
   }
 
-  Future<Map<String, Object?>> executeModernMessage(MongoModernMessage message,
+  Future<Map<String, dynamic>> executeModernMessage(MongoModernMessage message,
       {Connection? connection, bool skipStateCheck = false}) async {
     if (skipStateCheck) {
       if (!_masterConnectionVerifiedAnyState.serverCapabilities.supportsOpMsg) {
@@ -900,7 +900,7 @@ class Db {
   // ***********************************************************
 
   /// This method drops the current DB
-  Future<Map<String, Object?>> modernDropDatabase(
+  Future<Map<String, dynamic>> modernDropDatabase(
       {DropDatabaseOptions? dropOptions,
       Map<String, Object>? rawOptions}) async {
     var command = DropDatabaseCommand(this,
@@ -912,7 +912,7 @@ class Db {
   /// connection.
   ///
   /// Only works from version 3.6
-  Future<Map<String, Object?>> serverStatus(
+  Future<Map<String, dynamic>> serverStatus(
       {Map<String, Object>? options}) async {
     if (!masterConnection.serverCapabilities.supportsOpMsg) {
       return <String, Object>{};
@@ -923,7 +923,7 @@ class Db {
   }
 
   /// This method explicitly creates a collection
-  Future<Map<String, Object?>> createCollection(String name,
+  Future<Map<String, dynamic>> createCollection(String name,
       {CreateCollectionOptions? createCollectionOptions,
       Map<String, Object>? rawOptions}) async {
     var command = CreateCollectionCommand(this, name,
@@ -937,7 +937,7 @@ class Db {
   ///
   Stream<Map<String, dynamic>> modernListCollections(
       {SelectorBuilder? selector,
-      Map<String, Object?>? filter,
+      Map<String, dynamic>? filter,
       ListCollectionsOptions? findOptions,
       Map<String, Object>? rawOptions}) {
     var command = ListCollectionsCommand(this,
@@ -950,7 +950,7 @@ class Db {
   }
 
   /// This method creates a view
-  Future<Map<String, Object?>> createView(
+  Future<Map<String, dynamic>> createView(
       String view, String source, List pipeline,
       {CreateViewOptions? createViewOptions,
       Map<String, Object>? rawOptions}) async {
@@ -960,7 +960,7 @@ class Db {
   }
 
   /// This method drops a collection
-  Future<Map<String, Object?>> modernDrop(String collectionNAme,
+  Future<Map<String, dynamic>> modernDrop(String collectionNAme,
       {DropOptions? dropOptions, Map<String, Object>? rawOptions}) async {
     var command = DropCommand(this, collectionNAme,
         dropOptions: dropOptions, rawOptions: rawOptions);
@@ -993,9 +993,9 @@ class Db {
   }
 
   /// Runs a command
-  Future<Map<String, Object?>> runCommand(Map<String, Object>? command) =>
+  Future<Map<String, dynamic>> runCommand(Map<String, Object>? command) =>
       CommandOperation(this, <String, Object>{}, command: command).execute();
 
   /// Ping command
-  Future<Map<String, Object?>> pingCommand() => PingCommand(this).execute();
+  Future<Map<String, dynamic>> pingCommand() => PingCommand(this).execute();
 }

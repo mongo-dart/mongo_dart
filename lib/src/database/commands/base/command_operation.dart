@@ -38,7 +38,7 @@ class CommandOperation extends OperationBase {
       ? throw MongoDartError('Command not specified')
       : command!;
 
-  void processOptions(Map<String, Object?> command) {
+  void processOptions(Map<String, dynamic> command) {
     // Get the db name we are executing against
     final dbName = (options[keyDbName] as String?) ??
         ((options[keyAuthdb] as String?) ?? db.databaseName);
@@ -73,7 +73,7 @@ class CommandOperation extends OperationBase {
   }
 
   @override
-  Future<Map<String, Object?>> execute({bool skipStateCheck = false}) async {
+  Future<Map<String, dynamic>> execute({bool skipStateCheck = false}) async {
     final db = this.db;
     if (!skipStateCheck && db.state != State.open) {
       throw MongoDartError('Db is in the wrong state: ${db.state}');

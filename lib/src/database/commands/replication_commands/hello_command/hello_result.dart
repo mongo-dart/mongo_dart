@@ -20,7 +20,7 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 /// replica set members and to discover additional members of a replica set.
 
 class HelloResult with BasicResult {
-  HelloResult(Map<String, Object?> document)
+  HelloResult(Map<String, dynamic> document)
       : isWritablePrimary = document[keyIsWritablePrimary] as bool? ?? false,
         maxBsonObjectSize =
             document[keyMaxBsonObjectSize] as int? ?? 16 * 1024 * 1024,

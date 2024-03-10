@@ -23,7 +23,7 @@ mixin TimingResult {
   DateTime? operationTime;
   $ClusterTime? $clusterTime;
 
-  void extractTiming(Map<String, Object?> document) {
+  void extractTiming(Map<String, dynamic> document) {
     //document ??= <String, Object>{};
     var opTime = document[keyOperationTime];
     if (opTime is Timestamp) {
@@ -43,11 +43,11 @@ class Signature {
   BsonBinary? hash;
   int? keyId;
 
-  Signature(Map<String, Object?> document) {
+  Signature(Map<String, dynamic> document) {
     _extract(document);
   }
 
-  void _extract(Map<String, Object?> document) {
+  void _extract(Map<String, dynamic> document) {
     //document ??= <String, Object>{};
     keyId = document[keyKeyId] as int?;
     hash = document[keyHash] as BsonBinary?;
@@ -65,11 +65,11 @@ class $ClusterTime {
   DateTime? clusterTime;
   Signature? signature;
 
-  $ClusterTime(Map<String, Object?> document) {
+  $ClusterTime(Map<String, dynamic> document) {
     _extract(document);
   }
 
-  void _extract(Map<String, Object?> document) {
+  void _extract(Map<String, dynamic> document) {
     //document ??= <String, Object>{};
     clusterTime = document[keyClusterTime] as DateTime?;
     signature = Signature(document);

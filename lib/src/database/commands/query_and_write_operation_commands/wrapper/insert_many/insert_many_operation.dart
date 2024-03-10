@@ -7,7 +7,7 @@ import 'insert_many_options.dart';
 
 class InsertManyOperation extends InsertOperation {
   InsertManyOperation(
-      DbCollection collection, List<Map<String, Object?>> documents,
+      DbCollection collection, List<Map<String, dynamic>> documents,
       {InsertManyOptions? insertManyOptions, Map<String, Object>? rawOptions})
       : super(
           collection,

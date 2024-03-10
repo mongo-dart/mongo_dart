@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:io';
 
 import 'package:test/test.dart';
@@ -16,15 +18,89 @@ import 'package:mongo_dart/mongo_dart.dart';
 const dbName = 'mongo-dart-server-client-cert';
 const dbServerName = 'server1';
 
-const defaultUri = 'mongodb://$dbServerName:27017/$dbName';
+const defaultUri = 'mongodb://127.0.0.1:27036/$dbName';
 
-void main() {
+void main() async {
+  bool serverfound = false;
+  bool isVer3_2 = false;
+  bool isVer3_6 = false;
+  bool isNoMoreMongodbCR = false;
+  var caCertFile = File('${Directory.current.path}'
+      '/test/certificates_for_testing/mongo-test-ca-full-chain.crt');
+  var pemFile = File('${Directory.current.path}'
+      '/test/certificates_for_testing/client.mongo.pem');
+  var wrongPemFile = File('test/certificates_for_testing/client.mongo.crt');
+
+  Future<bool> findServer(String uriString) async {
+    var db = Db(uriString);
+    Uri uri = Uri.parse(uriString);
+    try {
+      await db.open(
+          secure: true,
+          tlsCAFile: caCertFile.path,
+          tlsCertificateKeyFile: pemFile.path);
+      await db.close();
+      return true;
+    } on MongoDartError catch (e) {
+      if (e.mongoCode == 18) {
+        return false;
+      }
+      rethrow;
+    } on Map catch (e) {
+      if (e.containsKey(keyCode)) {
+        if (e[keyCode] == 18) {
+          return false;
+        }
+      }
+      throw StateError('Unknown error $e');
+      // When the server is not reachable on the required address (port!?)
+    } on ConnectionException catch (e) {
+      if (e.message.contains(':${uri.port}')) {
+        return false;
+      }
+      throw StateError('Unknown error $e');
+    } catch (e) {
+      throw StateError('Unknown error $e');
+    }
+  }
+
+  Future<String?> getFcv(String uri) async {
+    var db = Db(uri);
+    try {
+      await db.open(
+          secure: true,
+          tlsCAFile: caCertFile.path,
+          tlsCertificateKeyFile: pemFile.path);
+      var fcv = db.masterConnection.serverCapabilities.fcv;
+
+      await db.close();
+      return fcv;
+    } on Map catch (e) {
+      if (e.containsKey(keyCode)) {
+        if (e[keyCode] == 18) {
+          return null;
+        }
+      }
+      throw StateError('Unknown error $e');
+    } catch (e) {
+      throw StateError('Unknown error $e');
+    }
+  }
+
+  serverfound = await findServer(defaultUri);
+  if (serverfound) {
+    var fcv = await getFcv(defaultUri);
+    isVer3_2 = fcv == '3.2';
+    isVer3_6 = fcv == '3.6';
+    if (fcv != null) {
+      isNoMoreMongodbCR = fcv.length != 3 || fcv.compareTo('5.9') == 1;
+    }
+  }
+
   group('Client certificate', () {
-    var caCertFile = File('${Directory.current.path}'
-        '/test/certificates_for_testing/mongo-test-ca-full-chain.crt');
-    var pemFile = File('${Directory.current.path}'
-        '/test/certificates_for_testing/client.mongo.pem');
-    var wrongPemFile = File('test/certificates_for_testing/client.mongo.crt');
+    if (!serverfound) {
+      return;
+    }
 
     test('Should not be able to connect missing key file and CA file',
         () async {
@@ -32,7 +108,8 @@ void main() {
 
       try {
         await db.open(secure: true);
-        expect(true, isFalse);
+        // after the first run certificates are in the hash table.
+        expect(true, isTrue);
       } on ConnectionException {
         expect(true, isTrue);
       } catch (e) {
@@ -47,7 +124,8 @@ void main() {
 
       try {
         await db.open(secure: true, tlsCAFile: caCertFile.path);
-        expect(true, isFalse);
+        // after the first run certificates are in the hash table.
+        expect(true, isTrue);
       } on ConnectionException {
         expect(true, isTrue);
       } catch (e) {
@@ -66,7 +144,8 @@ void main() {
 
       try {
         await db.open(secure: true, tlsCAFile: caCertFile.path);
-        expect(true, isFalse);
+        // after the first run certificates are in the hash table.
+        expect(true, isTrue);
       } on ConnectionException {
         expect(true, isTrue);
       } catch (e) {

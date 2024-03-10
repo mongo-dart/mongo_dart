@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/database/commands/query_and_write_operation_comma
 import 'package:mongo_dart/src/database/utils/update_document_check.dart';
 
 class UpdateOneStatement extends UpdateStatement {
-  UpdateOneStatement(Map<String, Object?> q, Object u,
+  UpdateOneStatement(Map<String, dynamic> q, Object u,
       {bool? upsert,
       CollationOptions? collation,
       List<dynamic>? arrayFilters,

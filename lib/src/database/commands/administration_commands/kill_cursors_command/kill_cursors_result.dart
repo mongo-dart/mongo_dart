@@ -3,7 +3,7 @@ import 'package:mongo_dart/src/database/commands/mixin/basic_result.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 class KillCursorsResult with BasicResult {
-  KillCursorsResult(Map<String, Object?> document) {
+  KillCursorsResult(Map<String, dynamic> document) {
     extractBasic(document);
     var docs = document[keyCursorsKilled] as List?;
     if (docs != null && docs.isNotEmpty) {

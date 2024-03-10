@@ -118,7 +118,7 @@ class ModernCursor {
   State state = State.init;
   Int64 cursorId = Int64.ZERO; //BsonLong(0);
   late Db db;
-  Queue<Map<String, Object?>> items = Queue<Map<String, Object?>>();
+  Queue<Map<String, dynamic>> items = Queue<Map<String, dynamic>>();
   DbCollection? collection;
   bool tailable = false;
   bool awaitData = false;
@@ -163,14 +163,14 @@ class ModernCursor {
   /// Default value is 100 ms
   int tailableRetryInterval = 100;
 
-  Map<String, Object?>? _getNextItem() => items.removeFirst();
+  Map<String, dynamic>? _getNextItem() => items.removeFirst();
 
-  void extractCursorData(Map<String, Object?> operationReturnMap) {
+  void extractCursorData(Map<String, dynamic> operationReturnMap) {
     if (operationReturnMap[keyCursor] == null) {
       throw MongoDartError('The operation type ${operation.runtimeType} '
           'does not return a cursor');
     }
-    var cursorMap = operationReturnMap[keyCursor] as Map<String, Object?>?;
+    var cursorMap = operationReturnMap[keyCursor] as Map<String, dynamic>?;
     if (cursorMap == null) {
       throw MongoDartError('No cursor returned');
     }
@@ -180,14 +180,14 @@ class ModernCursor {
       nsParts.removeAt(0);
       collectionName = nsParts.join('.');
     }
-    List<Map<String, Object?>> documents;
+    List<Map<String, dynamic>> documents;
     if (cursorMap[keyNextBatch] != null && cursorMap[keyNextBatch] is List) {
-      documents = <Map<String, Object?>>[...cursorMap[keyNextBatch] as List];
+      documents = <Map<String, dynamic>>[...cursorMap[keyNextBatch] as List];
     } else if (cursorMap[keyFirstBatch] != null &&
         cursorMap[keyFirstBatch] is List) {
-      documents = <Map<String, Object?>>[...cursorMap[keyFirstBatch] as List];
+      documents = <Map<String, dynamic>>[...cursorMap[keyFirstBatch] as List];
     } else {
-      documents = <Map<String, Object?>>[];
+      documents = <Map<String, dynamic>>[];
     }
 
     for (var doc in documents) {
@@ -209,13 +209,13 @@ class ModernCursor {
   /// await nextObject();
   /// await close();
   /// ```
-  Future<Map<String, Object?>?> onlyFirst() async {
+  Future<Map<String, dynamic>?> onlyFirst() async {
     var ret = await nextObject();
     await close();
     return ret;
   }
 
-  Future<Map<String, Object?>?> nextObject() async {
+  Future<Map<String, dynamic>?> nextObject() async {
     if (items.isNotEmpty) {
       return _getNextItem();
     }
@@ -227,7 +227,7 @@ class ModernCursor {
     }
 
     var justPrepareCursor = false;
-    Map<String, Object?>? result;
+    Map<String, dynamic>? result;
     if (state == State.init && operation != null) {
       if (operation!.options[keyBatchSize] != null &&
           operation!.options[keyBatchSize] == 0) {
@@ -299,9 +299,9 @@ class ModernCursor {
     return;
   }
 
-  Stream<Map<String, Object?>> get stream {
+  Stream<Map<String, dynamic>> get stream {
     var paused = true;
-    var controller = StreamController<Map<String, Object?>>();
+    var controller = StreamController<Map<String, dynamic>>();
 
     Future<void> readNext() async {
       try {

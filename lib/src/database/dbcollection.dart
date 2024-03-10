@@ -257,7 +257,7 @@ class DbCollection {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       var result = await modernCount(
           selector: selector is SelectorBuilder ? selector : null,
-          filter: selector is Map<String, Object?> ? selector : null);
+          filter: selector is Map<String, dynamic> ? selector : null);
       return result.count;
     }
     return legacyCount(selector);
@@ -705,7 +705,7 @@ class DbCollection {
   // Find operation with the new OP_MSG (starting from release 3.6)
   Stream<Map<String, dynamic>> modernFind(
       {SelectorBuilder? selector,
-      Map<String, Object?>? filter,
+      Map<String, dynamic>? filter,
       Map<String, Object>? sort,
       Map<String, Object>? projection,
       String? hint,
@@ -755,7 +755,7 @@ class DbCollection {
   /// a document instead of a stream.
   Future<Map<String, dynamic>?> modernFindOne(
       {SelectorBuilder? selector,
-      Map<String, Object?>? filter,
+      Map<String, dynamic>? filter,
       Map<String, Object>? sort,
       Map<String, Object>? projection,
       String? hint,
@@ -812,7 +812,7 @@ class DbCollection {
   /// Executes a Distinct command on this collection.
   /// Retuns a Map like received from the server.
   /// Used for compatibility with the legacy method
-  Future<Map<String, Object?>> modernDistinctMap(String field,
+  Future<Map<String, dynamic>> modernDistinctMap(String field,
           {query,
           DistinctOptions? distinctOptions,
           Map<String, Object>? rawOptions}) async =>
@@ -927,7 +927,7 @@ class DbCollection {
                 '"$bulkInsertOne" element at index $index must '
                 'contain a Map');
           }
-          bulk.insertOne(docMap[bulkDocument] as Map<String, Object?>);
+          bulk.insertOne(docMap[bulkDocument] as Map<String, dynamic>);
 
           break;
         case bulkInsertMany:
@@ -936,7 +936,7 @@ class DbCollection {
                 '"$bulkInsertMany" element at index $index must '
                 'contain a List of Maps');
           }
-          bulk.insertMany(docMap[bulkDocuments] as List<Map<String, Object?>>);
+          bulk.insertMany(docMap[bulkDocuments] as List<Map<String, dynamic>>);
           break;
         case bulkUpdateOne:
           bulk.updateOneFromMap(docMap, index: index);
@@ -963,7 +963,7 @@ class DbCollection {
 
   Future<CountResult> modernCount(
       {SelectorBuilder? selector,
-      Map<String, Object?>? filter,
+      Map<String, dynamic>? filter,
       int? limit,
       int? skip,
       CollationOptions? collation,

@@ -8,7 +8,7 @@ abstract class GridFSFile {
   int? length;
   int chunkSize = GridFS.defaultChunkSize;
   DateTime? uploadDate;
-  Map<String, Object?> extraData = <String, Object?>{};
+  Map<String, dynamic> extraData = <String, dynamic>{};
   //StringBuffer fullContent;
   String? md5;
 

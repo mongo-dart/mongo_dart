@@ -26,7 +26,7 @@ class InsertOperation extends CommandOperation {
       ids[idx] = documents[idx][key_id];
     }
   }
-  List<Map<String, Object?>> documents;
+  List<Map<String, dynamic>> documents;
   List ids;
 
   @override

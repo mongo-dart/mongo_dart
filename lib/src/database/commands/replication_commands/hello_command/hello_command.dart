@@ -37,7 +37,7 @@ class HelloCommand extends CommandOperation {
   }
 
   @override
-  Future<Map<String, Object?>> execute({bool skipStateCheck = false}) async {
+  Future<Map<String, dynamic>> execute({bool skipStateCheck = false}) async {
     final db = this.db;
 
     var command = $buildCommand();

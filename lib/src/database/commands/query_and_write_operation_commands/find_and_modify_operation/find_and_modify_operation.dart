@@ -46,7 +46,7 @@ class FindAndModifyOperation extends CommandOperation {
   ///
   /// Starting in MongoDB 4.2 (and 4.0.12+, 3.6.14+, and 3.4.23+),
   /// the operation errors if the query argument is not a document.
-  Map<String, Object?>? query;
+  Map<String, dynamic>? query;
 
   /// Determines which document the operation modifies if the query selects
   /// multiple documents. findAndModify modifies the first document
