@@ -26,7 +26,6 @@ import 'package:bson/src/types/bson_map.dart';
 // ignore: implementation_imports
 import 'package:bson/src/types/bson_string.dart';
 import 'package:logging/logging.dart';
-import 'package:mongo_dart/src/auth/mongodb_x509_authenticator.dart';
 import 'package:uuid/uuid.dart';
 import 'package:mongo_dart/src/auth/scram_sha256_authenticator.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';
@@ -59,6 +58,7 @@ import 'package:mongo_dart/src/auth/mongodb_cr_authenticator.dart'
 import 'package:sasl_scram/sasl_scram.dart' show UsernamePasswordCredential;
 import 'package:vy_string_utils/vy_string_utils.dart';
 
+import 'src/auth/x509_authenticator.dart';
 import 'src/database/commands/administration_commands/drop_command/drop_command.dart';
 import 'src/database/commands/administration_commands/drop_command/drop_options.dart';
 import 'src/database/commands/administration_commands/drop_database_command/drop_database_command.dart';

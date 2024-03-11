@@ -392,8 +392,9 @@ class Db {
       _authenticationScheme = AuthenticationScheme.SCRAM_SHA_256;
     } else if (authenticationSchemeName == MongoDbCRAuthenticator.name) {
       _authenticationScheme = AuthenticationScheme.MONGODB_CR;
-    } else if (authenticationSchemeName == MongoDbX509Authenticator.name) {
+    } else if (authenticationSchemeName == X509Authenticator.name) {
       _authenticationScheme = AuthenticationScheme.X509;
+      authSourceDb = Db._authDb(r'$external');
     } else {
       throw MongoDartError('Provided authentication scheme is '
           'not supported : $authenticationSchemeName');

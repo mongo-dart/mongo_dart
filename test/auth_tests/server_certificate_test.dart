@@ -5,8 +5,6 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-import '../utils/test_database.dart';
-
 // Run server1 with these parameters:
 // mongod --port 27032  --dbpath <your-data-path> --oplogSize 128
 //  --tlsMode requireTLS --tlsCertificateKeyFile

@@ -90,9 +90,8 @@ class ConnectionManager {
         db._authenticationScheme = AuthenticationScheme.MONGODB_CR;
       }
     }
-    if (connection.serverConfig.userName == null ||
-        (db._authenticationScheme == AuthenticationScheme.X509 &&
-            connection.serverConfig.isAuthenticated)) {
+    if (connection.serverConfig.userName == null &&
+        db._authenticationScheme != AuthenticationScheme.X509) {
       _log.fine(() => '$db: ${connection.serverConfig.hostUrl} connected');
     } else {
       try {

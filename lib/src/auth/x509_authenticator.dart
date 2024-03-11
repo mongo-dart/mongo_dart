@@ -28,9 +28,11 @@ class X509Authenticator extends Authenticator {
     return legacyAuthenticate(connection);
   }
 
-  Future<void> legacyAuthenticate(Connection connection) async {
+  Future legacyAuthenticate(Connection connection) async {
     var command = createMongoDbX509AuthenticationCommand(db, username);
-    await db.executeDbCommand(command, connection: connection);
+    return db
+        .executeDbCommand(command, connection: connection)
+        .then((res) => res['ok'] == 1);
   }
 
   static DbCommand createMongoDbX509AuthenticationCommand(
@@ -42,7 +44,7 @@ class X509Authenticator extends Authenticator {
     };
 
     return DbCommand(db.authSourceDb ?? db, DbCommand.SYSTEM_COMMAND_COLLECTION,
-        MongoQueryMessage.OPTS_NONE, 0, 0, command, null);
+        MongoQueryMessage.OPTS_NONE, 0, 1, command, null);
   }
 
   Future<void> modernAuthenticate(Connection connection) async {
