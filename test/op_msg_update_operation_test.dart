@@ -8,7 +8,7 @@ import 'package:uuid/uuid.dart';
 
 import 'utils/insert_data.dart';
 
-const dbName = 'test-mongo-dart';
+const dbName = 'test-mongo-dart-update';
 const dbAddress = '127.0.0.1';
 
 const defaultUri = 'mongodb://$dbAddress:27017/$dbName';

@@ -1,12 +1,17 @@
 # Changelog
 
+## 0.10.1
+
+- X509 Authentication
+- LegacyUuid class. It allows to manage Binary Subtype 3 Bson types (Uuid Old). The class holds the value in the storing format, some helpers are available for converting back an forth this value based on the known algorithms: java Legacy, C# legacy and Python.
+
 ## 0.10.0
 
 Updated Bson, Mongo_dart_query and Uuid dependencies, this leads to a series of ***Breaking changes***.
 Please, see the respective github pages for details, here a recap of the most noticeable:
 
 - BSON classes are mainly used for internal use. See the Bson github site for more details
-  - BsonRegexp now it is not normally needed, use RegExp instead.
+  - BsonRegexp now it is normally not needed, use RegExp instead.
   - BsonNull is not needed, you can use null directly.
   - A new JsCode class has been created, it is no more needed the use of BsonCode.
   - a DbRef class has been created. The old version was storing DbPointer and DbRef the same way. Now they are separated as in Bson specification. If you have old data, please consider this change.

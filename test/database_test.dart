@@ -158,6 +158,7 @@ Future testGetNonce() async {
       db.masterConnection.serverCapabilities.fcv!.compareTo('6.0') >= 0) {
     return;
   }
+  // ignore: deprecated_member_use_from_same_package
   var result = await db.getNonce();
   expect(result['ok'], 1);
 }

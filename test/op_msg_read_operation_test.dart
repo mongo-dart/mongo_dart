@@ -16,7 +16,7 @@ import 'package:uuid/uuid.dart';
 import 'utils/insert_cake_sales_db.dart';
 import 'utils/insert_data.dart';
 
-const dbName = 'test-mongo-dart';
+const dbName = 'test-mongo-dart-read';
 const dbAddress = '127.0.0.1';
 
 const defaultUri = 'mongodb://$dbAddress:27017/$dbName';

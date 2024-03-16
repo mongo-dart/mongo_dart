@@ -1,4 +1,6 @@
 //part of mongo_dart;
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:mongo_dart/mongo_dart.dart'
     show Connection, Db, DbCommand, MongoQueryMessage;

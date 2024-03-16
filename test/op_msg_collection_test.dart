@@ -7,7 +7,7 @@ import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
-const dbName = 'test-mongo-dart';
+const dbName = 'test-mongo-dart-msg';
 const dbAddress = '127.0.0.1';
 
 const defaultUri = 'mongodb://$dbAddress:27017/$dbName';
