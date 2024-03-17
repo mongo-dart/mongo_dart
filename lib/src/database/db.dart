@@ -730,14 +730,32 @@ class Db {
         .toList();
   }
 
+  /// Method for authentication with X509 certificate.
+  /// In the conection parameters you have not to set
+  /// X509 if you want to use this delayed auth function.
+  Future<bool> authenticateX509({Connection? connection}) async =>
+      authenticate(null, null,
+          connection: connection,
+          authScheme: AuthenticationScheme.X509,
+          authDb: r'$external');
+
   Future<bool> authenticate(String? userName, String? password,
-      {Connection? connection}) async {
+      {Connection? connection,
+      AuthenticationScheme? authScheme,
+      String? authDb}) async {
     var credential = UsernamePasswordCredential()
       ..username = userName
       ..password = password;
 
     (connection ?? masterConnection).serverConfig.userName ??= userName;
     (connection ?? masterConnection).serverConfig.password ??= password;
+
+    if (authScheme != null) {
+      _authenticationScheme = authScheme;
+    }
+    if (authDb != null) {
+      authSourceDb = Db._authDb(authDb);
+    }
 
     if (_authenticationScheme == null) {
       throw MongoDartError('Authentication scheme not specified');

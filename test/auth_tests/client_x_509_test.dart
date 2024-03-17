@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
+import '../utils/throw_utils.dart';
+
 // Run server1 with these parameters:
 // mongod --port 27038  --dbpath <your-data-path> --oplogSize 128
 //  --tlsMode requireTLS --tlsCertificateKeyFile
@@ -15,6 +17,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 const dbName = 'mongodb-auth';
 const defaultUri =
     'mongodb://127.0.0.1:27038/$dbName?authMechanism=MONGODB-X509';
+const lateAuthUri = 'mongodb://127.0.0.1:27038/$dbName';
 
 void main() async {
   bool serverfound = false;
@@ -194,13 +197,16 @@ void main() async {
       await db.close();
     });
     test('Connect & Authenticate - Simple find()', () async {
-      var db = Db(defaultUri);
+      var db = Db(lateAuthUri);
 
       await db.open(
           secure: true,
           tlsCAFile: caCertFile.path,
           tlsCertificateKeyFile: pemFile.path);
-      await db.collection('test').find().toList();
+      var collection = db.collection('test');
+      expect(() => collection.find().toList(), throwsMongoDartError);
+      await db.authenticateX509();
+      await collection.find().toList();
       expect(db.masterConnection.isAuthenticated, isTrue);
       await db.close();
     });
