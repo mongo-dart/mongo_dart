@@ -112,4 +112,4 @@ or
 
 If the key was password protected you must add also the `tlsCertificateKeyFilePassword` parameter, either in the connection string or as a `db.open()` parameter.
 
-[Prev doc.](tls_connection_no_auth_self_signed_certificate.md)
+[Prev doc.](tls_connection_no_auth_self_signed_certificate.md) - [Next doc.](x509_authentication.md)

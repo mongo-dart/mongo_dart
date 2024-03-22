@@ -2016,6 +2016,7 @@ db.runCommand(
             countOptions: CountOptions(
                 readConcern: ReadConcern(ReadConcernLevel.majority)));
 
+        await Future.delayed(Duration(seconds: 3));
         var result = await operation.executeDocument();
 
         expect(result.ok, 1.0);
