@@ -871,7 +871,7 @@ class DbCollection {
         rawOptions: rawOptions));
   }
 
-  Stream watch(Object pipeline,
+  Stream<ChangeEvent> watch(Object pipeline,
           {int? batchSize,
           String? hint,
           Map<String, Object>? hintDocument,
