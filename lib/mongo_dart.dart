@@ -69,6 +69,7 @@ import 'src/database/commands/administration_commands/list_collections_command/l
 import 'src/database/commands/administration_commands/list_collections_command/list_collections_options.dart';
 import 'src/database/commands/administration_commands/listt_indexes_command/list_indexes_command.dart';
 import 'src/database/commands/administration_commands/listt_indexes_command/list_indexes_options.dart';
+import 'src/database/commands/aggregation_commands/aggregate/return_classes/change_event.dart';
 import 'src/database/commands/aggregation_commands/count/count_operation.dart';
 import 'src/database/commands/aggregation_commands/count/count_options.dart';
 import 'src/database/commands/aggregation_commands/count/count_result.dart';
