@@ -48,6 +48,13 @@ class ChangeEvent {
   /// the original update operation and the full document lookup.
   Map<String, dynamic>? fullDocument;
 
+  /// The document key of the document created or modified by the insert,
+  /// replace, delete, update operations (i.e. CRUD operations).
+  ///
+  /// This is useful in case of a delete operation and avoid to parse
+  /// serverResponse documentKey object directly.
+  Map<String, dynamic>? documentKey;
+
   /// The namespace (database and or collection) affected by the event.
   MongoDBNamespace? ns;
 
@@ -67,6 +74,7 @@ class ChangeEvent {
     }
     operationType = streamData[keyOperationType] as String?;
     fullDocument = streamData[keyFullDocument] as Map<String, dynamic>?;
+    documentKey = streamData[keyDocumentKey] as Map<String, dynamic>?;
     if (streamData[keyNs] != null) {
       ns = MongoDBNamespace.fromMap(
           <String, Object>{...streamData[keyNs] as Map});
