@@ -75,6 +75,7 @@ const keyDeletes = 'deletes';
 const keyDeleteArgument = 'deletes';
 const keyDistinct = 'distinct';
 const keyDocuments = 'documents';
+const keyDocumentKey = 'documentKey';
 const keyDrop = 'drop';
 const keyDropDatabase = 'dropDatabase';
 const keyDropDuplicatedEntries = 'dropDups';
