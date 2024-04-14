@@ -63,7 +63,8 @@ void main() async {
   /// As the stream does not end until it is closed, do not use .toList()
   /// or you will wait indefinitely
   var controller = stream.listen((changeEvent) {
-    Map fullDocument = changeEvent.fullDocument;
+    Map<String, dynamic> fullDocument =
+        changeEvent.fullDocument ?? <String, dynamic>{};
 
     print('Detected change for "custId" '
         '${fullDocument['custId']}: "${fullDocument['name']}"');

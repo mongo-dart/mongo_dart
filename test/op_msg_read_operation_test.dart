@@ -1878,7 +1878,8 @@ db.runCommand(
 
       var aResult = 3;
       var controller = stream.listen((changeEvent) {
-        Map fullDocument = changeEvent.fullDocument;
+        Map<String, dynamic> fullDocument =
+            changeEvent.fullDocument ?? <String, dynamic>{};
 
         expect(fullDocument['a'], aResult++);
 
