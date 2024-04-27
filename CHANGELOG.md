@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.2
+
+- Change event improvements see [Pull Request #373](https://github.com/mongo-dart/mongo_dart/pull/373)
+
 ## 0.10.1
 
 - X509 Authentication
