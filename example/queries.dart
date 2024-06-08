@@ -40,6 +40,24 @@ void main() async {
       .forEach((v) => print(v));
   print(
       "Filtered by (my_field gt 995 or my_field lt 10) and str_field like '99' ");
+  print('---');
+  await coll
+      .find(where
+          .gt('my_field', 995)
+          .or(where.lt('my_field', 10))
+          .and(where.match('str_field', 'Str', caseInsensitive: false)))
+      .forEach((v) => print(v));
+  print(
+      "Filtered by (my_field gt 995 or my_field lt 10) and str_field like 'Str' caseInsensitive false");
+  print('---');
+  await coll
+      .find(where
+          .gt('my_field', 995)
+          .or(where.lt('my_field', 10))
+          .and(where.match('str_field', 'Str', caseInsensitive: true)))
+      .forEach((v) => print(v));
+  print(
+      "Filtered by (my_field gt 995 or my_field lt 10) and str_field like 'Str' caseInsensitive true");
   await coll
       .find(where
           .inRange('my_field', 700, 703, minInclude: false)

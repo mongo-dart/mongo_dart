@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.3
+
+- Fixed case insensitive flag in match operator (it was true instead of false and viceversa)
+
 ## 0.10.2
 
 - Change event improvements see [Pull Request #373](https://github.com/mongo-dart/mongo_dart/pull/373)

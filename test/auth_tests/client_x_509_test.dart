@@ -178,6 +178,10 @@ void main() async {
           secure: true,
           tlsCAFile: caCertFile.path,
           tlsCertificateKeyFile: pemFile.path);
+
+      var collection = db.collection('test');
+      expect(db.masterConnection.isAuthenticated, isTrue);
+      await collection.find().toList();
       await db.close();
     });
 
@@ -196,7 +200,7 @@ void main() async {
           tlsCertificateKeyFile: pemFile.path);
       await db.close();
     });
-    test('Connect & Authenticate - Simple find()', () async {
+    test('Connect & Authenticate - Simple find() - error', () async {
       var db = Db(lateAuthUri);
 
       await db.open(
@@ -205,6 +209,15 @@ void main() async {
           tlsCertificateKeyFile: pemFile.path);
       var collection = db.collection('test');
       expect(() => collection.find().toList(), throwsMongoDartError);
+    });
+    test('Connect & Authenticate - Simple find()', () async {
+      var db = Db(lateAuthUri);
+
+      await db.open(
+          secure: true,
+          tlsCAFile: caCertFile.path,
+          tlsCertificateKeyFile: pemFile.path);
+      var collection = db.collection('test');
       await db.authenticateX509();
       await collection.find().toList();
       expect(db.masterConnection.isAuthenticated, isTrue);
