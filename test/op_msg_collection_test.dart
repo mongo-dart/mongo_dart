@@ -1,4 +1,5 @@
 @Timeout(Duration(seconds: 100))
+library;
 
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/administration_commands/create_command/create_command.dart';

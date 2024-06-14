@@ -1,4 +1,6 @@
 @Timeout(Duration(seconds: 400))
+library;
+
 import 'package:basic_utils/basic_utils.dart' show DnsUtils, RRecordType;
 import 'package:mongo_dart/src/database/utils/dns_lookup.dart';
 import 'package:test/test.dart';
