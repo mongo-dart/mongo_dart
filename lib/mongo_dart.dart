@@ -9,7 +9,7 @@ import 'dart:collection';
 import 'dart:convert' show base64;
 import 'dart:math';
 import 'dart:typed_data';
-import 'dart:io'
+import 'package:universal_io/io.dart'
     show
         File,
         FileMode,

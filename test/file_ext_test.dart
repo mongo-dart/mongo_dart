@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:universal_io/io.dart';
 
 import 'package:mongo_dart/src/extensions/file_ext.dart';
 import 'package:path/path.dart';

@@ -1,7 +1,7 @@
 library gridfs_tests;
 
 import 'package:mongo_dart/mongo_dart.dart';
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'dart:async';
 import 'package:test/test.dart';
 import 'package:path/path.dart' as path;

@@ -20,6 +20,7 @@ dependencies:
   uuid: ^4.0.0
   sasl_scram: ^0.1.0
   vy_string_utils: ^0.4.0
+  universal_io: ^2.2.2
     
 dev_dependencies:
   test: ^1.16.4

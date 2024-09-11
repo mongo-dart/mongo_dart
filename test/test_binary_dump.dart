@@ -1,7 +1,7 @@
 library database_tests;
 
 import 'package:mongo_dart/mongo_dart.dart';
-import 'dart:io';
+import 'package:universal_io/io.dart';
 
 void main() {
   var raf = File(r'c:\projects\mongo_dart\debug_data1.bin').openSync();
