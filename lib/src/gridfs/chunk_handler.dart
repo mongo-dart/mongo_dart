@@ -1,12 +1,15 @@
 part of '../../mongo_dart.dart';
 
 class ChunkHandler {
-  int chunkSize;
-  Uint8List chunkData;
+  late Int32 chunkSize;
+  late Uint8List chunkData;
+  Int32 defaultChunkSize = Int32(1024 * 256);
   int chunkDataLoaded = 0;
 
-  ChunkHandler([this.chunkSize = 1024 * 256])
-      : chunkData = Uint8List(chunkSize);
+  ChunkHandler([Int32? chunkSizeNumber]) {
+    chunkSize = chunkSizeNumber ?? defaultChunkSize;
+    chunkData = Uint8List(chunkSize.toInt());
+  }
 
   void _handle(List<int> data, EventSink<Uint8List> sink, bool isClosing) {
     if (isClosing) {
@@ -16,23 +19,25 @@ class ChunkHandler {
       sink.add(chunkData.sublist(0, chunkDataLoaded));
       return;
     }
-    if (chunkDataLoaded + data.length >= chunkSize) {
+    if (chunkDataLoaded + data.length >= chunkSize.toInt()) {
       var remainingData = data.length;
-      var fillingBytes = chunkSize - chunkDataLoaded;
+      var fillingBytes = chunkSize.toInt() - chunkDataLoaded;
       var startIndex = 0;
       var endIndex = fillingBytes;
       while (fillingBytes > 0) {
         chunkData.setAll(chunkDataLoaded, data.sublist(startIndex, endIndex));
-        if (chunkDataLoaded + fillingBytes < chunkSize) {
+        if (chunkDataLoaded + fillingBytes < chunkSize.toInt()) {
           chunkDataLoaded = fillingBytes;
           break;
         }
         sink.add(chunkData);
-        chunkData = Uint8List(chunkSize);
+        chunkData = Uint8List(chunkSize.toInt());
         chunkDataLoaded = 0;
         startIndex = endIndex;
         remainingData -= fillingBytes;
-        fillingBytes = remainingData > chunkSize ? chunkSize : remainingData;
+        fillingBytes = remainingData > chunkSize.toInt()
+            ? chunkSize.toInt()
+            : remainingData;
         endIndex += fillingBytes;
       }
     } else {

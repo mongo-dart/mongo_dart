@@ -2,7 +2,7 @@
 /// As most of IO in Dart, mongo_dart is totally async -using Futures and Streams.
 /// .
 
-library mongo_dart;
+library;
 
 import 'dart:async';
 import 'dart:collection';
@@ -25,6 +25,7 @@ import 'package:bson/bson.dart';
 import 'package:bson/src/types/bson_map.dart';
 // ignore: implementation_imports
 import 'package:bson/src/types/bson_string.dart';
+import 'package:fixnum/fixnum.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 import 'package:mongo_dart/src/auth/scram_sha256_authenticator.dart';

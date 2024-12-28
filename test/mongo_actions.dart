@@ -1,4 +1,4 @@
-library mongo_actions;
+library;
 
 import 'dart:convert' show utf8;
 import 'dart:io';

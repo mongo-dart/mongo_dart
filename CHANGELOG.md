@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.4
+
+- Removed Library names (Lint)
+- Updated Dependencies
+- Changes to Grid Fs to fix problem with files bigger than 2GB (Issue [#385](https://github.com/mongo-dart/mongo_dart/issues/385))
+  1) Changed length in GridFSFile from int? to Int64
+  2) Changed chunkSize in GridFSFile from int to Int32
+  3) Changed GridFS.defaultChunkSize from int to Int32
+  4) Removed Validate() method from GridFSFile (MD5 no more managed)
+
 ## 0.10.3
 
 - Fixed case insensitive flag in match operator (it was true instead of false and viceversa)

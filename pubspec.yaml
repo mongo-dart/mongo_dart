@@ -16,14 +16,14 @@ dependencies:
   path: ^1.8.0
   pool: ^1.5.0
   basic_utils: ^5.2.0
-  decimal: ^2.2.0
+  decimal: ^3.1.0
   uuid: ^4.0.0
   sasl_scram: ^0.1.0
   vy_string_utils: ^0.4.0
     
 dev_dependencies:
   test: ^1.16.4
-  lints: ^4.0.0
+  lints: ^5.1.0
 
 false_secrets:
  - /test/certificates_for_testing/*.key

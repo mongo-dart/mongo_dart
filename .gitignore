@@ -11,3 +11,6 @@ packages
 .packages
 .dart_tool/
 .vscode/
+test/gridfs_testbigdata_in.txt
+test/gridfs_testbigdata_out.txt
+

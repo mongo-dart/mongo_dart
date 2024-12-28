@@ -1,5 +1,5 @@
 @Timeout(Duration(minutes: 10))
-library all_tests;
+library;
 
 import 'package:test/test.dart';
 

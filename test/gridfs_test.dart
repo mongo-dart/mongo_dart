@@ -1,5 +1,7 @@
-library gridfs_tests;
+@Timeout(Duration(minutes: 25))
+library;
 
+import 'package:fixnum/fixnum.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:io';
 import 'dart:async';
@@ -75,6 +77,31 @@ Future testBig() {
 
   var target = GridFS.defaultChunkSize * 3;
   var data = <int>[];
+  while (data.length < target.toInt()) {
+    data.addAll(smallData);
+  }
+  var gridFS = GridFS(db, collectionName);
+  clearFSCollections(gridFS);
+  return testInOut(data, gridFS);
+}
+
+Future testVeryBig() {
+  var collectionName = getRandomCollectionName();
+  var smallData = <int>[
+    0x00,
+    0x01,
+    0x10,
+    0x11,
+    0x7e,
+    0x7f,
+    0x80,
+    0x81,
+    0xfe,
+    0xff
+  ];
+
+  var target = int.parse('1073741824');
+  var data = <int>[];
   while (data.length < target) {
     data.addAll(smallData);
   }
@@ -98,11 +125,11 @@ Future tesSomeChunks() async {
     0xff
   ];
 
-  GridFS.defaultChunkSize = 9;
+  GridFS.defaultChunkSize = Int32(9);
   var target = GridFS.defaultChunkSize * 3;
 
   var data = <int>[];
-  while (data.length < target) {
+  while (data.length < target.toInt()) {
     data.addAll(smallData);
   }
 
@@ -146,7 +173,7 @@ Future testInOut(List<int> data, GridFS gridFS,
   expect(GridFS.defaultChunkSize, gridOut?.chunkSize,
       reason: 'Chunk size not the same.');
   expect('test', gridOut?.filename, reason: 'Filename not equal');
-  expect(input.extraData, gridOut?.extraData);
+  expect(gridOut?.extraData, input.extraData);
   await gridOut?.writeTo(out);
   expect(consumer.data, orderedEquals(data));
 }
@@ -154,7 +181,7 @@ Future testInOut(List<int> data, GridFS gridFS,
 Future testChunkTransformerOneChunk() {
   return Stream.fromIterable([
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-  ]).transform(ChunkHandler(3).transformer).toList().then((chunkedList) {
+  ]).transform(ChunkHandler(Int32(3)).transformer).toList().then((chunkedList) {
     expect(chunkedList[0], orderedEquals([1, 2, 3]));
     expect(chunkedList[1], orderedEquals([4, 5, 6]));
     expect(chunkedList[2], orderedEquals([7, 8, 9]));
@@ -168,7 +195,7 @@ Future testChunkTransformerSeveralChunks() {
     [5],
     [6, 7],
     [8, 9, 10, 11]
-  ]).transform(ChunkHandler(3).transformer).toList().then((chunkedList) {
+  ]).transform(ChunkHandler(Int32(3)).transformer).toList().then((chunkedList) {
     expect(chunkedList[0], orderedEquals([1, 2, 3]));
     expect(chunkedList[1], orderedEquals([4, 5, 6]));
     expect(chunkedList[2], orderedEquals([7, 8, 9]));
@@ -182,7 +209,7 @@ Future testChunkTransformerSeveralChunks2() {
     [5, 6],
     [7],
     [8, 9, 10, 11]
-  ]).transform(ChunkHandler(3).transformer).toList().then((chunkedList) {
+  ]).transform(ChunkHandler(Int32(3)).transformer).toList().then((chunkedList) {
     expect(chunkedList[0], orderedEquals([1, 2, 3]));
     expect(chunkedList[1], orderedEquals([4, 5, 6]));
     expect(chunkedList[2], orderedEquals([7, 8, 9]));
@@ -192,7 +219,7 @@ Future testChunkTransformerSeveralChunks2() {
 
 Future testFileToGridFSToFile() async {
   var collectionName = getRandomCollectionName();
-  GridFS.defaultChunkSize = 30;
+  GridFS.defaultChunkSize = Int32(30);
   GridIn input;
   var dir = path.join(path.current, 'test');
 
@@ -210,6 +237,35 @@ Future testFileToGridFSToFile() async {
 
   List<int> dataIn = File('$dir/gridfs_testdata_in.txt').readAsBytesSync();
   List<int> dataOut = File('$dir/gridfs_testdata_out.txt').readAsBytesSync();
+
+  expect(dataOut, orderedEquals(dataIn));
+}
+
+/// Before running this test create a file bigger than 2GB called
+/// "gridfs_testbigdata_in.txt"
+Future testBigFileToGridFSToFile() async {
+  var collectionName = getRandomCollectionName();
+  GridFS.defaultChunkSize = Int32(1024 * 1024);
+  GridIn input;
+  var dir = path.join(path.current, 'test');
+
+  Future<void> inputOutput(GridFS gridFS, Stream<List<int>> inputStream) async {
+    input = gridFS.createFile(inputStream, 'test2');
+    await input.save();
+
+    gridFS = GridFS(db, collectionName);
+    var gridOut = await gridFS.getFile('test2');
+    await gridOut?.writeToFilename('$dir/gridfs_testbigdata_out.txt');
+  }
+
+  var inputStream = File('$dir/gridfs_testbigdata_in.txt').openRead();
+
+  var gridFS = GridFS(db, collectionName);
+  clearFSCollections(gridFS);
+  await inputOutput(gridFS, inputStream);
+
+  List<int> dataIn = File('$dir/gridfs_testbigdata_in.txt').readAsBytesSync();
+  List<int> dataOut = File('$dir/gridfs_testbigdata_out.txt').readAsBytesSync();
 
   expect(dataOut, orderedEquals(dataIn));
 }
@@ -255,11 +311,13 @@ void main() {
         testChunkTransformerSeveralChunks2);
   });
   group('GridFS tests:', () {
-    setUp(() => GridFS.defaultChunkSize = 256 * 1024);
+    setUp(() => GridFS.defaultChunkSize = Int32(256 * 1024));
     test('testSmall', testSmall);
     test('tesSomeChunks', tesSomeChunks);
     test('testBig', testBig);
+    test('testVeryBig', testVeryBig, skip: "You need a lot of memory fo this!");
     test('testFileToGridFSToFile', testFileToGridFSToFile);
+    test('testBigFileToGridFSToFile', testBigFileToGridFSToFile);
     test('testExtraData', testExtraData);
   });
 

@@ -5,11 +5,10 @@ abstract class GridFSFile {
   dynamic id;
   String? filename;
   String? contentType;
-  int? length;
-  int chunkSize = GridFS.defaultChunkSize;
+  Int64 length = Int64();
+  Int32 chunkSize = GridFS.defaultChunkSize;
   DateTime? uploadDate;
   Map<String, dynamic> extraData = <String, dynamic>{};
-  //StringBuffer fullContent;
   String? md5;
 
   GridFSFile(this.fs, [Map<String, dynamic>? data]) {
@@ -25,7 +24,7 @@ abstract class GridFSFile {
     return writeResult.serverResponses.first;
   }
 
-  Future<bool> validate() {
+/*   Future<bool> validate() {
     //if (fs == null) {
     //  throw MongoDartError('no fs');
     //}
@@ -45,9 +44,9 @@ abstract class GridFSFile {
       }
     });
     return completer.future;
-  }
+  } */
 
-  int numChunks() => ((length ?? 0.0) / chunkSize).ceil();
+  int numChunks() => (length ~/ chunkSize).toInt();
 
   List<String> get aliases => extraData['aliases'] as List<String>;
 
@@ -79,12 +78,29 @@ abstract class GridFSFile {
     id = extraData.remove('_id');
     filename = extraData.remove('filename')?.toString();
     contentType = extraData.remove('contentType')?.toString();
-    length = extraData.remove('length') as int?;
-    chunkSize =
-        extraData.remove('chunkSize') as int? ?? GridFS.defaultChunkSize;
+    var mapLength = extraData.remove('length');
+    if (mapLength is Int64) {
+      length = mapLength;
+    } else if (mapLength is Int32) {
+      length = mapLength.toInt64();
+    } else if (mapLength is int) {
+      length = Int64(mapLength);
+    } else {
+      length = Int64();
+    }
+    //length = extraData.remove('length') as int?;
+    var mapChunk = extraData.remove('chunkSize');
+    if (mapChunk is Int64) {
+      chunkSize = mapChunk.toInt32();
+    } else if (mapChunk is Int32) {
+      chunkSize = mapChunk;
+    } else if (mapChunk is int) {
+      chunkSize = Int32(mapChunk);
+    } else {
+      chunkSize = GridFS.defaultChunkSize;
+    }
+    // chunkSize = extraData.remove('chunkSize') as int? ?? GridFS.defaultChunkSize;
     uploadDate = extraData.remove('uploadDate') as DateTime?;
     md5 = extraData.remove('md5')?.toString();
   }
-
-  //void setGridFS(GridFS fs) => this.fs = fs;
 }

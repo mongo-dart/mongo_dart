@@ -1,4 +1,4 @@
-library packet_converter_test;
+library;
 
 import 'package:test/test.dart';
 import 'package:mongo_dart/mongo_dart.dart';

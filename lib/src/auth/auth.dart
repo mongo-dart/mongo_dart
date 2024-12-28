@@ -24,6 +24,7 @@ abstract class Authenticator {
         return ScramSha256Authenticator(credentials, db);
       case AuthenticationScheme.X509:
         return X509Authenticator(credentials.username, db);
+      // ignore: unreachable_switch_default
       default:
         throw MongoDartError("Authenticator wasn't specified");
     }
