@@ -44,7 +44,6 @@ export 'query_and_write_operation_commands/find_and_modify_operation/find_and_mo
 export 'query_and_write_operation_commands/find_and_modify_operation/find_and_modify_result.dart';
 
 export 'replication_commands/hello_command/hello_command.dart';
-export 'replication_commands/hello_command/hello_options.dart';
 export 'replication_commands/hello_command/hello_result.dart';
 
 export 'parameters/collation_options.dart';

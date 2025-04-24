@@ -27,7 +27,9 @@ class ConnectionManager {
     // a {ok: 0.0} but also for any other error
     try {
       var helloCommand = HelloCommand(db,
-          username: connection.serverConfig.userName, connection: connection);
+          username: connection.serverConfig.userName,
+          clientMetadata: connection.serverConfig.clientMetadata,
+          connection: connection);
       result = await helloCommand.execute(skipStateCheck: true);
     } catch (error) {
       //Do nothing

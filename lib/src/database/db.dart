@@ -191,6 +191,7 @@ class _UriParameters {
   static const tlsCAFile = 'tlsCAFile';
   static const tlsCertificateKeyFile = 'tlsCertificateKeyFile';
   static const tlsCertificateKeyFilePassword = 'tlsCertificateKeyFilePassword';
+  static const appName = 'appname';
 }
 
 class Db {
@@ -297,6 +298,7 @@ class Db {
       isSecure = true;
     }
     var uri = Uri.parse(uriString);
+    var appName = 'mongodb_dart application';
 
     if (uri.scheme != 'mongodb') {
       throw MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
@@ -334,6 +336,9 @@ class Db {
           value.isNotEmpty) {
         tlsCertificateKeyFilePassword = value;
       }
+      if (queryParam == _UriParameters.appName && value.isNotEmpty) {
+        appName = value;
+      }
     });
 
     Uint8List? tlsCAFileContent;
@@ -350,6 +355,7 @@ class Db {
       throw MongoDartError('Missing tlsCertificateKeyFile parameter');
     }
 
+    var clientMetadata = ClientMetadata(ApplicationMetadata(appName));
     var serverConfig = ServerConfig(
         host: uri.host,
         port: uri.port,
@@ -357,7 +363,8 @@ class Db {
         tlsAllowInvalidCertificates: tlsAllowInvalidCertificates,
         tlsCAFileContent: tlsCAFileContent,
         tlsCertificateKeyFileContent: tlsCertificateKeyFileContent,
-        tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword);
+        tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword,
+        clientMetadata: clientMetadata);
 
     if (serverConfig.port == 0) {
       serverConfig.port = mongoDefaultPort;
