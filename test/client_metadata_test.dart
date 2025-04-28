@@ -13,24 +13,27 @@ void main() async {
       var application = ApplicationMetadata('mongo_dart app');
       var clientMetadata = ClientMetadata(application);
       var options = clientMetadata.options;
+      var client = options[keyClient] as Map<String, Object>;
 
       test('it returns an application name', () {
-        expect((options[keyApplication] as ApplicationMetadata).name,
+        expect((client[keyApplication] as Map<String, Object>)[keyName],
             'mongo_dart app');
       });
 
       test('it returns driver information', () {
-        expect((options[keyDriver] as DriverMetadata).name, mongoDartName);
         expect(
-            (options[keyDriver] as DriverMetadata).version, mongoDartVersion);
+            (client[keyDriver] as Map<String, Object>)[keyName], mongoDartName);
+        expect((client[keyDriver] as Map<String, Object>)[keyVersion],
+            mongoDartVersion);
       });
 
       test('it returns os information', () {
-        expect((options[keyOs] as OsMetadata).type, Platform.operatingSystem);
+        expect((client[keyOs] as Map<String, Object>)[keyType],
+            Platform.operatingSystem);
       });
 
       test('it returns platform imformation', () {
-        expect((options[keyPlatform] as String), 'dart ${Platform.version}');
+        expect(client[keyPlatform], 'dart ${Platform.version}');
       });
     });
   });
