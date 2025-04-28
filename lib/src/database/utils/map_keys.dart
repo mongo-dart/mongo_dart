@@ -45,6 +45,7 @@ const keyBypassDocumentValidation = 'bypassDocumentValidation';
 const keyCapped = 'capped';
 const keyCaseFirst = 'caseFirst';
 const keyCaseLevel = 'caseLevel';
+const keyClient = 'client';
 const keyClusterTime = 'clusterTime';
 const keyCode = 'code';
 const keyCodeName = 'codeName';

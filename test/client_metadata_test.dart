@@ -51,7 +51,6 @@ void main() async {
 
       test('it truncates the string to 128 bytes', () {
         expect(application.name.length, 128);
-        expect(application.name, endsWith('...'));
       });
     });
   });

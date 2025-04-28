@@ -13,10 +13,12 @@ class ClientMetadata {
   ClientMetadata(this.application);
 
   Map<String, Object> get options => <String, Object>{
-        keyDriver: driver,
-        keyOs: os,
-        keyPlatform: platform,
-        keyApplication: application,
+        keyClient: {
+          keyDriver: driver.asMap(),
+          keyOs: os.asMap(),
+          keyPlatform: platform,
+          keyApplication: application.asMap(),
+        }
       };
 }
 
@@ -24,17 +26,25 @@ class ClientMetadata {
 class DriverMetadata {
   final String name = mongoDartName;
   final String version = mongoDartVersion;
+
+  Map<String, Object> asMap() {
+    return <String, Object>{keyName: name, keyVersion: version};
+  }
 }
 
 /// Information about the operating system.
 class OsMetadata {
   final String type = Platform.operatingSystem;
-  // We cannot get these 3 without some I/O
+  // We cannot get these 3 without some I/O, so they are always left out.
   final String? name;
   final String? architecture;
   final String? version;
 
   OsMetadata({this.name, this.architecture, this.version});
+
+  Map<String, Object> asMap() {
+    return <String, Object>{keyType: type};
+  }
 }
 
 /// Application information, only a descriptive name.
@@ -42,5 +52,9 @@ class ApplicationMetadata {
   final String name;
 
   ApplicationMetadata(String name)
-      : name = name.length > 128 ? '${name.substring(0, 125)}...' : name;
+      : name = name.length > 128 ? name.substring(0, 128) : name;
+
+  Map<String, Object> asMap() {
+    return <String, Object>{keyName: name};
+  }
 }
