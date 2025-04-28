@@ -8,7 +8,7 @@ class ClientMetadata {
   final DriverMetadata driver = DriverMetadata();
   final OsMetadata os = OsMetadata();
   final String platform = 'dart ${Platform.version}';
-  final ApplicationMetadata? application;
+  final ApplicationMetadata application;
 
   ClientMetadata(this.application);
 
@@ -16,6 +16,7 @@ class ClientMetadata {
         keyDriver: driver,
         keyOs: os,
         keyPlatform: platform,
+        keyApplication: application,
       };
 }
 
@@ -41,5 +42,5 @@ class ApplicationMetadata {
   final String name;
 
   ApplicationMetadata(String name)
-      : name = name.length > 128 ? '${name.substring(0, 124)}...' : name;
+      : name = name.length > 128 ? '${name.substring(0, 125)}...' : name;
 }
