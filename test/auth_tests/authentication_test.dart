@@ -42,6 +42,7 @@ const dbAddress = '127.0.0.1';
 
 const mongoDbUri = 'mongodb://test:test@$dbAddress:27031/$dbName';
 const mongoDbUri2 = 'mongodb://unicode:übelkübel@$dbAddress:27031/$dbName';
+const mongoDbUri3 = 'mongodb://special:1234AbcD##@$dbAddress:27031/$dbName';
 
 void main() async {
   Future<String?> getFcv(String uri) async {
@@ -85,7 +86,7 @@ void main() async {
 
     group('General Test', () {
       if (!serverRequiresAuth) {
-        return;
+        //return;
       }
 
       test('Should be able to connect and authenticate', () async {
@@ -142,6 +143,28 @@ void main() async {
 
           db =
               Db('$mongoDbUri2?authMechanism=${ScramSha256Authenticator.name}');
+
+          await db.open();
+          expect(db.masterConnection.isAuthenticated, isTrue);
+          await db.collection('test').find().toList();
+          await db.close();
+        }
+      });
+
+      test(
+          'Should be able to connect and authenticate special with scram sha256',
+          () async {
+        if (serverRequiresAuth && !isVer3_6 && !isVer3_2) {
+          var db =
+              Db('$mongoDbUri?authMechanism=${ScramSha256Authenticator.name}');
+
+          await db.open();
+          expect(db.masterConnection.isAuthenticated, isTrue);
+          await db.collection('test').find().toList();
+          await db.close();
+
+          db =
+              Db('$mongoDbUri3?authMechanism=${ScramSha256Authenticator.name}');
 
           await db.open();
           expect(db.masterConnection.isAuthenticated, isTrue);
