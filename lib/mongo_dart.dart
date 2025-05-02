@@ -27,6 +27,7 @@ import 'package:bson/src/types/bson_map.dart';
 import 'package:bson/src/types/bson_string.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:logging/logging.dart';
+import 'package:mongo_dart/src/database/commands/replication_commands/hello_command/client_metadata.dart';
 import 'package:uuid/uuid.dart';
 import 'package:mongo_dart/src/auth/scram_sha256_authenticator.dart';
 import 'package:mongo_dart/src/database/cursor/modern_cursor.dart';

@@ -1,5 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/base/command_operation.dart';
+import 'package:mongo_dart/src/database/commands/replication_commands/hello_command/client_metadata.dart';
 import 'package:mongo_dart/src/database/message/additional/section.dart';
 import 'package:mongo_dart/src/database/message/mongo_modern_message.dart';
 import 'package:vy_string_utils/vy_string_utils.dart';
@@ -20,10 +21,10 @@ var _command = <String, Object>{keyHello: 1};
 class HelloCommand extends CommandOperation {
   HelloCommand(Db db,
       {String? username,
-      HelloOptions? helloOptions,
+      ClientMetadata? clientMetadata,
       Map<String, Object>? rawOptions,
       Connection? connection})
-      : super(db, <String, Object>{...?helloOptions?.options, ...?rawOptions},
+      : super(db, <String, Object>{...?clientMetadata?.options, ...?rawOptions},
             command: {
               ..._command,
               if (filled(username))
