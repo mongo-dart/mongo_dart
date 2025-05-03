@@ -1,0 +1,53 @@
+Action to do for creating test certificates.
+
+- Copy scripts in a Linux folder.
+- Make them executable (ex.  chmod u+x authority-certificate.sh)
+- run the authority script ./authority-certificate.sh mongo-test
+  * Answer No (1) for crypt
+  * Answer IT for country
+  * Enter (".") for state.
+  * Enter (".") for locality
+  * Answer mongo-dart for Organization
+  * Answer dev for unit name
+  * Enter (blank) for common name
+The data is asked two times.
+at the end we should see:
+***
+   - Create the intermediate certificate .crt.
+Certificate request self-signature ok
+subject=C = IT, O = mongo-dart, OU = dev
+***
+The system creates the cert folder, and inside the following files:
+\cert\mongo-test-ia.key
+\cert\mongo-test-ca.crt
+\cert\mongo-test-ca.key
+\cert\mongo-test-ca-full-chain.crt
+\cert\mongo-test-ia.crt
+
+move to the cert folder (cd cert)
+- run the server script for  5 servers (server1 server2, etc.)
+  ../server-certificate.sh mongo-test 127.0.0.1 server1
+  * Answer No (1) for crypt
+  * Answer IT for country
+  * Enter (".") for state.
+  * Enter (".") for locality
+  * Answer mongo-dart for Organization
+  * Answer dev for unit name
+  * Enter (blank) for common name
+
+ now we create the client certificate.
+ from inside the cert folder run the following command:
+ ../client-certificate.sh mongo-test mongo 
+  * Answer No (1) for crypt
+  * Answer IT for country
+  * Enter (".") for state.
+  * Enter (".") for locality
+  * Answer mongo-dart for Organization
+  * Answer client for unit name
+  * Answer test for unit name
+
+As a result we will see:
+Certificate request self-signature ok
+subject=C = IT, O = mongo-dart, OU = client, CN = test
+
+  

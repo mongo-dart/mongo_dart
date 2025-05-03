@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.5
+
+- Added Cliente Metadata
+- Removed Hello Options class from Hello Command  (Comment parm)
+
 ## 0.10.4
 
 - Removed Library names (Lint)
