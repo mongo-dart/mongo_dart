@@ -7,8 +7,9 @@ class ConnectionManager {
   final replyCompleters = <int, Completer<MongoResponseMessage>>{};
   final sendQueue = Queue<MongoMessage>();
   Connection? _masterConnection;
+  final Function? onConnectionClosed;
 
-  ConnectionManager(this.db);
+  ConnectionManager(this.db, {this.onConnectionClosed});
 
   Connection? get masterConnection => _masterConnection;
 
