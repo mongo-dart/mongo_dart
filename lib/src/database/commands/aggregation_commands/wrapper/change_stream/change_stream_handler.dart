@@ -8,7 +8,7 @@ class ChangeStreamHandler {
       sink.add(ChangeEvent.fromMap(streamData));
 
   void handleDone(EventSink<ChangeEvent> sink) => sink.close();
-  void handleError(error, stacktrace, sink) => sink.addError(error);
+  void handleError(dynamic error, stacktrace, sink) => sink.addError(error);
 
   StreamTransformer<Map<String, dynamic>, ChangeEvent> get transformer =>
       StreamTransformer<Map<String, dynamic>, ChangeEvent>.fromHandlers(

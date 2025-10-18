@@ -543,7 +543,7 @@ class Db {
     //return result.future;
   }
 
-  bool documentIsNotAnError(firstRepliedDocument) =>
+  bool documentIsNotAnError(dynamic firstRepliedDocument) =>
       firstRepliedDocument['ok'] == 1.0 && firstRepliedDocument['err'] == null;
 
   Future<bool> dropCollection(String collectionName) async {

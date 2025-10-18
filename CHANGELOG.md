@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.6
+
+- Lint fixes
+
 ## 0.10.5
 
 - Added Cliente Metadata

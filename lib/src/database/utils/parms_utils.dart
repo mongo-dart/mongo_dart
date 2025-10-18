@@ -1,6 +1,6 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-Map<String, dynamic> extractfilterMap(filter) {
+Map<String, dynamic> extractfilterMap(dynamic filter) {
   if (filter == null) {
     return <String, dynamic>{};
   }
