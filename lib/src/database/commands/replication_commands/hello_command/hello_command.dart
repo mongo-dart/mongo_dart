@@ -24,7 +24,14 @@ class HelloCommand extends CommandOperation {
       ClientMetadata? clientMetadata,
       Map<String, Object>? rawOptions,
       Connection? connection})
-      : super(db, <String, Object>{...?clientMetadata?.options, ...?rawOptions},
+      : super(
+            db,
+            <String, Object>{
+              ...?clientMetadata?.options,
+              ...?rawOptions,
+              if (connection?.serverConfig.loadBalanced == true)
+                keyLoadBalanced: true
+            },
             command: {
               ..._command,
               if (filled(username))

@@ -68,7 +68,10 @@ class HelloResult with BasicResult {
     me = document[keyMe] as String?;
     electionId = document[keyElectionId] as ObjectId?;
     lastWrite = document[keyLastWrite] as Map?;
+    serviceId = document[keyServiceId] as ObjectId?;
   }
+
+  bool get isLoadBalanced => serviceId != null;
 
   // ***** INSTANCE INFORMATION ******
   /// A boolean value that reports when this node is writable.
@@ -249,4 +252,8 @@ class HelloResult with BasicResult {
   /// For details on the ok status field, the operationTime field, and the
   /// $clusterTime field, see Command Response.
   Map? lastWrite;
+
+  /// A Service Identifier when theserver is in Load Balancing Mode.
+  /// Null oterwise.
+  ObjectId? serviceId;
 }

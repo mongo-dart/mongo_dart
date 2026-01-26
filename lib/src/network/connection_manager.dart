@@ -36,6 +36,10 @@ class ConnectionManager {
     }
     if (result[keyOk] == 1.0) {
       var resultDoc = HelloResult(result);
+      if (connection.serverConfig.loadBalanced == true &&
+          !resultDoc.isLoadBalanced) {
+        throw MongoDartError('The server is not in Load Balanced mode');
+      }
       var master = resultDoc.isWritablePrimary;
       connection.isMaster = master;
       if (master) {

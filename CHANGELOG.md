@@ -3,6 +3,8 @@
 ## 0.10.6
 
 - Lint fixes
+- Refreshed dependencies
+- Fixed issue with ObjectId generation (inherited from BSON package)
 
 ## 0.10.5
 

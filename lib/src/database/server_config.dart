@@ -14,6 +14,7 @@ class ServerConfig {
 
   bool isAuthenticated = false;
   ClientMetadata? clientMetadata;
+  bool loadBalanced;
 
   ServerConfig(
       {this.host = '127.0.0.1',
@@ -23,7 +24,8 @@ class ServerConfig {
       this.tlsCAFileContent,
       this.tlsCertificateKeyFileContent,
       this.tlsCertificateKeyFilePassword,
-      this.clientMetadata})
+      this.clientMetadata,
+      this.loadBalanced = false})
       : isSecure = isSecure ?? false,
         tlsAllowInvalidCertificates = tlsAllowInvalidCertificates ?? false;
   String get hostUrl => '$host:${port.toString()}';
