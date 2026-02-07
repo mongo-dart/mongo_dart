@@ -2,11 +2,13 @@ part of '../../mongo_dart.dart';
 
 const noSecureRequestError = 'The socket connection has been reset by peer.'
     '\nPossible causes:'
-    '\n- Trying to connect to an ssl/tls encrypted database without specifiyng'
+    '\n- Trying to connect to an ssl/tls encrypted database without specifying'
     '\n  either the query parm tls=true '
     'or the secure=true parameter in db.open()'
     '\n- The server requires a key certificate from the client, '
     'but no certificate has been sent'
+    '\n- Connecting to Atlas, when you have concurrent request. '
+    'Try to use the connection parameter "safeAtlas=true"'
     '\n- Others';
 
 class ServerCapabilities {
@@ -128,6 +130,10 @@ class Connection {
   ServerConfig serverConfig;
   Socket? socket;
   final Set _pendingQueries = <int>{};
+  final Map<int, MongoModernMessage> _delayedQueries =
+      <int, MongoModernMessage>{};
+  final Map<int, Completer<MongoModernMessage>> _delayedCompleters =
+      <int, Completer<MongoModernMessage>>{};
 
   Map<int, Completer<MongoResponseMessage>> get _replyCompleters =>
       _manager.replyCompleters;
@@ -176,8 +182,8 @@ class Connection {
       } else {
         locSocket = await Socket.connect(serverConfig.host, serverConfig.port);
       }
-    } on TlsException catch (e) {
-      if (e.osError?.message
+    } on TlsException catch (err) {
+      if (err.osError?.message
               .contains('CERT_ALREADY_IN_HASH_TABLE(x509_lu.c:356)') ??
           false) {
         _caCertificateAlreadyInHash = true;
@@ -206,10 +212,10 @@ class Connection {
     _repliesSubscription = socket!
         .transform<MongoResponseMessage>(MongoMessageHandler().transformer)
         .listen(_receiveReply,
-            onError: (e, st) async {
-              _log.severe('Socket error $e $st');
+            onError: (err, st) async {
+              _log.severe('Socket error $err $st');
               if (!_closed) {
-                await _closeSocketOnError(socketError: e);
+                await _closeSocketOnError(socketError: err);
               }
             },
             cancelOnError: true,
@@ -283,29 +289,66 @@ class Connection {
   Future<MongoModernMessage> executeModernMessage(
       MongoModernMessage modernMessage) {
     var completer = Completer<MongoModernMessage>();
+    if (_closed) {
+      completer.completeError(const ConnectionException(
+          'Invalid state: Connection already closed.'));
+    } else {
+      if (serverConfig.safeAtlas == true && _pendingQueries.isNotEmpty) {
+        _delayedQueries.addAll({modernMessage.requestId: modernMessage});
+        _delayedCompleters.addAll({modernMessage.requestId: completer});
+      } else {
+        _executeMessage(completer, modernMessage);
+        /*
+      if (!_closed) {
+        _replyCompleters[modernMessage.requestId] = completer;
+        _pendingQueries.add(modernMessage.requestId);
+        _log.fine(() => 'Message $modernMessage');
+        _sendQueue.addLast(modernMessage);
+        _sendBuffer();
+      } else {
+        completer.completeError(const ConnectionException(
+            'Invalid state: Connection already closed.'));
+      }*/
+      }
+    }
+
+    return completer.future;
+  }
+
+  void _executeMessage(Completer<MongoResponseMessage> completer,
+      MongoModernMessage modernMessage) {
     if (!_closed) {
       _replyCompleters[modernMessage.requestId] = completer;
       _pendingQueries.add(modernMessage.requestId);
       _log.fine(() => 'Message $modernMessage');
       _sendQueue.addLast(modernMessage);
       _sendBuffer();
-    } else {
-      completer.completeError(const ConnectionException(
-          'Invalid state: Connection already closed.'));
     }
-    return completer.future;
   }
 
   void _receiveReply(MongoResponseMessage reply) {
     _log.fine(() => reply.toString());
     var completer = _replyCompleters.remove(reply.responseTo);
     _pendingQueries.remove(reply.responseTo);
+    var pendingQueriesExist = _pendingQueries.isNotEmpty;
     if (completer != null) {
       _log.fine(() => 'Completing $reply');
       completer.complete(reply);
     } else {
       if (!_closed) {
         _log.info(() => 'Unexpected respondTo: ${reply.responseTo} $reply');
+      }
+    }
+    if (serverConfig.safeAtlas &&
+        !pendingQueriesExist &&
+        _delayedQueries.isNotEmpty) {
+      var id = _delayedQueries.keys.first;
+      MongoModernMessage? delayedMessage = _delayedQueries.remove(id);
+      Completer<MongoModernMessage>? delayedCompleter =
+          _delayedCompleters.remove(id);
+
+      if (delayedCompleter != null && delayedMessage != null) {
+        _executeMessage(delayedCompleter, delayedMessage);
       }
     }
   }

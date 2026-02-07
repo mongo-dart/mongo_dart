@@ -193,6 +193,7 @@ class _UriParameters {
   static const tlsCertificateKeyFilePassword = 'tlsCertificateKeyFilePassword';
   static const appName = 'appname';
   static const loadBalanced = 'loadBalanced';
+  static const safeAtlas = 'safeAtlas';
 }
 
 class Db {
@@ -301,6 +302,7 @@ class Db {
     var uri = Uri.parse(uriString);
     var appName = 'mongodb_dart application';
     var loadBalanced = false;
+    var safeAtlas = false;
 
     if (uri.scheme != 'mongodb') {
       throw MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
@@ -344,6 +346,9 @@ class Db {
       if (queryParam == _UriParameters.loadBalanced && value == 'true') {
         loadBalanced = true;
       }
+      if (queryParam == _UriParameters.safeAtlas && value == 'true') {
+        safeAtlas = true;
+      }
     });
 
     Uint8List? tlsCAFileContent;
@@ -370,7 +375,8 @@ class Db {
         tlsCertificateKeyFileContent: tlsCertificateKeyFileContent,
         tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword,
         clientMetadata: clientMetadata,
-        loadBalanced: loadBalanced);
+        loadBalanced: loadBalanced,
+        safeAtlas: safeAtlas);
 
     if (serverConfig.port == 0) {
       serverConfig.port = mongoDefaultPort;
