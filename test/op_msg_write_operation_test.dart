@@ -986,6 +986,59 @@ void main() async {
         expect(res.value?['score'], 16);
       });
 
+      // Regression tests for non-ObjectId _id types (issue #399)
+      test('Upsert with String _id', () async {
+        if (cannotRunTests) {
+          return;
+        }
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var stringId = uuid.v4();
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              '_id': stringId,
+            },
+            update: <String, dynamic>{
+              r'$set': {'name': 'StringIdDoc', 'value': 1}
+            },
+            upsert: true,
+            returnNew: true);
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, stringId);
+        expect(res.lastErrorObject?.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value?['_id'], stringId);
+        expect(res.value?['name'], 'StringIdDoc');
+      });
+      test('Upsert with int _id', () async {
+        if (cannotRunTests) {
+          return;
+        }
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var famOperation = FindAndModifyOperation(collection,
+            query: <String, dynamic>{
+              '_id': 42,
+            },
+            update: <String, dynamic>{
+              r'$set': {'name': 'IntIdDoc', 'value': 1}
+            },
+            upsert: true,
+            returnNew: true);
+        var res = await famOperation.executeDocument();
+
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, 42);
+        expect(res.lastErrorObject?.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value?['_id'], 42);
+        expect(res.value?['name'], 'IntIdDoc');
+      });
+
       test('Remove', () async {
         if (cannotRunTests) {
           return;
@@ -1384,6 +1437,49 @@ void main() async {
         expect(res.value, isNotNull);
         expect(res.value?['name'], 'Gus');
         expect(res.value?['score'], 16);
+      });
+
+      // Regression tests for non-ObjectId _id types (issue #399)
+      test('Upsert with String _id', () async {
+        if (cannotRunTests) {
+          return;
+        }
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var stringId = uuid.v4();
+        var res = await collection.modernFindAndModify(
+            query: where.eq('_id', stringId),
+            update: ModifierBuilder().set('name', 'StringIdDoc').set('value', 1),
+            upsert: true,
+            returnNew: true);
+
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, stringId);
+        expect(res.lastErrorObject?.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value?['_id'], stringId);
+        expect(res.value?['name'], 'StringIdDoc');
+      });
+      test('Upsert with int _id', () async {
+        if (cannotRunTests) {
+          return;
+        }
+        var collectionName = getRandomCollectionName();
+        var collection = db.collection(collectionName);
+
+        var res = await collection.modernFindAndModify(
+            query: where.eq('_id', 99),
+            update: ModifierBuilder().set('name', 'IntIdDoc').set('value', 1),
+            upsert: true,
+            returnNew: true);
+
+        expect(res.lastErrorObject?.updatedExisting, isFalse);
+        expect(res.lastErrorObject?.upserted, 99);
+        expect(res.lastErrorObject?.n, 1);
+        expect(res.value, isNotNull);
+        expect(res.value?['_id'], 99);
+        expect(res.value?['name'], 'IntIdDoc');
       });
 
       test('Remove', () async {
