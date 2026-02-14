@@ -1450,7 +1450,8 @@ void main() async {
         var stringId = uuid.v4();
         var res = await collection.modernFindAndModify(
             query: where.eq('_id', stringId),
-            update: ModifierBuilder().set('name', 'StringIdDoc').set('value', 1),
+            update:
+                ModifierBuilder().set('name', 'StringIdDoc').set('value', 1),
             upsert: true,
             returnNew: true);
 
