@@ -94,6 +94,9 @@ class CommandOperation extends OperationBase {
 
     if (readPreference != null) {
       connection ??= db.connectionForReadPreference(readPreference!);
+      if (readPreference!.slaveOk) {
+        command['\$$keyReadPreference'] = readPreference!.toMap();
+      }
     }
 
     var modernMessage = MongoModernMessage(command);
