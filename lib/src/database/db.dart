@@ -284,6 +284,23 @@ class Db {
   Connection get masterConnection => _masterConnectionVerified;
   Connection get masterConnectionAnyState => _masterConnectionVerifiedAnyState;
 
+  Connection? connectionForReadPreference(ReadPreference readPreference) {
+    final manager = _connectionManager;
+    switch (readPreference.mode) {
+      case ReadPreferenceMode.primary:
+        return _masterConnectionVerifiedAnyState;
+      case ReadPreferenceMode.primaryPreferred:
+        return manager?.getMasterConnectionIfAvailable() ??
+            manager?.getSecondaryConnection();
+      case ReadPreferenceMode.secondary:
+        return manager?.getSecondaryConnection();
+      case ReadPreferenceMode.secondaryPreferred:
+      case ReadPreferenceMode.nearest:
+        return manager?.getSecondaryConnection() ??
+            manager?.getMasterConnectionIfAvailable();
+    }
+  }
+
   List<String> get uriList => _uriList.toList();
 
   Future<ServerConfig> _parseUri(String uriString,

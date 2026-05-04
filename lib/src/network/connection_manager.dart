@@ -7,6 +7,7 @@ class ConnectionManager {
   final replyCompleters = <int, Completer<MongoResponseMessage>>{};
   final sendQueue = Queue<MongoMessage>();
   Connection? _masterConnection;
+  int _secondaryRoundRobinIndex = 0;
 
   ConnectionManager(this.db);
 
@@ -206,5 +207,31 @@ class ConnectionManager {
       _masterConnection = null;
     }
     return _connectionPool.remove(connection.serverConfig.hostUrl);
+  }
+
+  Connection? getMasterConnectionIfAvailable() {
+    final master = _masterConnection;
+    if (master != null && master.connected) {
+      return master;
+    }
+    return null;
+  }
+
+  Connection? getSecondaryConnection() {
+    var secondaryCount = 0;
+    for (final c in _connectionPool.values) {
+      if (!c.isMaster && c.connected) secondaryCount++;
+    }
+    if (secondaryCount == 0) return null;
+    final targetIndex = _secondaryRoundRobinIndex % secondaryCount;
+    _secondaryRoundRobinIndex = (targetIndex + 1) % secondaryCount;
+    var seen = 0;
+    for (final c in _connectionPool.values) {
+      if (!c.isMaster && c.connected) {
+        if (seen == targetIndex) return c;
+        seen++;
+      }
+    }
+    return null;
   }
 }
