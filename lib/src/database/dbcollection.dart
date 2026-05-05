@@ -3,7 +3,7 @@ part of '../../mongo_dart.dart';
 class DbCollection {
   Db db;
   String collectionName;
-  ReadPreference readPreference = ReadPreference.primary;
+  ReadPreference? readPreference;
 
   DbCollection(this.db, this.collectionName);
 
@@ -292,6 +292,14 @@ class DbCollection {
   /// Old version to be used on MongoDb versions prior to 3.6
   Future<Map<String, dynamic>> aggregate(List pipeline,
       {bool allowDiskUse = false, Map<String, Object>? cursor}) {
+    if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+      return AggregateOperation(
+        pipeline,
+        collection: this,
+        cursor: cursor,
+        aggregateOptions: AggregateOptions(allowDiskUse: allowDiskUse),
+      ).execute();
+    }
     var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline,
         allowDiskUse: allowDiskUse, cursor: cursor);
     return db.executeDbCommand(cmd);

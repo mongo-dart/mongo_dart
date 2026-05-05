@@ -173,7 +173,8 @@ ReadPreference? resolveReadPreference(
 
   if (inheritReadPreference) {
     if (parent is DbCollection) {
-      inheritedReadPreference = parent.readPreference;
+      inheritedReadPreference =
+          parent.readPreference ?? parent.db.readPreference;
     } else if (parent is Db) {
       inheritedReadPreference = parent.readPreference;
     } //Todo MongoClient class not yet Implemented
