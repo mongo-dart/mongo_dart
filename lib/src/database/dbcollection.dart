@@ -131,18 +131,15 @@ class DbCollection {
   /// collection or view. If multiple documents satisfy the query,
   /// this method returns the first document.
   Future<Map<String, dynamic>?> findOne([dynamic selector]) {
-    if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
-      if (selector is SelectorBuilder) {
-        return modernFindOne(selector: selector);
-      } else if (selector is Map<String, dynamic>) {
-        return modernFindOne(filter: selector);
-      } else if (selector == null) {
-        return modernFindOne();
-      }
-      throw MongoDartError('The selector parameter should be either a '
-          'SelectorBuilder or a Map<String, dynamic>');
+    if (selector is SelectorBuilder) {
+      return modernFindOne(selector: selector);
+    } else if (selector is Map<String, dynamic>) {
+      return modernFindOne(filter: selector);
+    } else if (selector == null) {
+      return modernFindOne();
     }
-    return legacyFindOne(selector);
+    throw MongoDartError('The selector parameter should be either a '
+        'SelectorBuilder or a Map<String, dynamic>');
   }
 
   // Old version to be used on MongoDb versions prior to 3.6
