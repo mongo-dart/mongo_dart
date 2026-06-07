@@ -91,15 +91,19 @@ class ModernCursor {
   /// or other read operation has been executed, without generating
   /// an explicit cursor. This way, for getting the extra documents,
   /// we may need a cursor.
-  ModernCursor.fromOpenId(DbCollection collection, this.cursorId,
-      {bool? tailable,
-      bool? awaitData,
-      bool? isChangeStream,
-      bool? checksumPresent,
-      bool? moreToCome,
-      bool? exhaustAllowed})
-      // ignore: prefer_initializing_formals
-      : collection = collection,
+  ModernCursor.fromOpenId(
+    DbCollection collection,
+    this.operation,
+    this.cursorId, {
+    bool? tailable,
+    bool? awaitData,
+    bool? isChangeStream,
+    bool? checksumPresent,
+    bool? moreToCome,
+    bool? exhaustAllowed,
+  })  
+  // ignore: prefer_initializing_formals
+  : collection = collection,
         collectionName = collection.collectionName,
         tailable = tailable ?? false,
         awaitData = awaitData ?? false,
@@ -156,7 +160,7 @@ class ModernCursor {
 
   /// The operation to be executed.
   /// It must be an operation that returns a cursorId, like find, getMore, etc.
-  OperationBase? operation;
+  OperationBase operation;
 
   /// Specify the milliseconds between getMore on tailable cursor,
   /// only applicable when awaitData isn't set.
@@ -222,28 +226,32 @@ class ModernCursor {
     if (collection != null &&
         collection!.collectionName == r'$cmd' &&
         operation is FindOperation &&
-        (operation! as FindOperation).limit == 1) {
-      return operation!.execute();
+        (operation as FindOperation).limit == 1) {
+      return operation.execute();
     }
 
     var justPrepareCursor = false;
     Map<String, dynamic>? result;
-    if (state == State.init && operation != null) {
-      if (operation!.options[keyBatchSize] != null &&
-          operation!.options[keyBatchSize] == 0) {
+    if (state == State.init) {
+      if (operation.options[keyBatchSize] != null &&
+          operation.options[keyBatchSize] == 0) {
         justPrepareCursor = true;
       }
-      result = await operation!.execute();
+      result = await operation.execute();
       state = State.open;
     } else if (state == State.open) {
       if (cursorId == Int64.ZERO) {
         await _serverSideCursorClose();
         return null;
       }
-      var command = GetMoreCommand(collection, cursorId,
-          db: db,
-          collectionName: collectionName,
-          getMoreOptions: GetMoreOptions(batchSize: _batchSize));
+      var command = GetMoreCommand(
+        collection,
+        cursorId,
+        db: db,
+        collectionName: collectionName,
+        getMoreOptions: GetMoreOptions(batchSize: _batchSize),
+        connection: operation.connection,
+      );
       result = await command.execute();
     }
     if (result == null) {

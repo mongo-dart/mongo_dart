@@ -3,7 +3,7 @@ part of '../../mongo_dart.dart';
 class DbCollection {
   Db db;
   String collectionName;
-  ReadPreference readPreference = ReadPreference.primary;
+  ReadPreference? readPreference;
 
   DbCollection(this.db, this.collectionName);
 
@@ -131,18 +131,15 @@ class DbCollection {
   /// collection or view. If multiple documents satisfy the query,
   /// this method returns the first document.
   Future<Map<String, dynamic>?> findOne([dynamic selector]) {
-    if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
-      if (selector is SelectorBuilder) {
-        return modernFindOne(selector: selector);
-      } else if (selector is Map<String, dynamic>) {
-        return modernFindOne(filter: selector);
-      } else if (selector == null) {
-        return modernFindOne();
-      }
-      throw MongoDartError('The selector parameter should be either a '
-          'SelectorBuilder or a Map<String, dynamic>');
+    if (selector is SelectorBuilder) {
+      return modernFindOne(selector: selector);
+    } else if (selector is Map<String, dynamic>) {
+      return modernFindOne(filter: selector);
+    } else if (selector == null) {
+      return modernFindOne();
     }
-    return legacyFindOne(selector);
+    throw MongoDartError('The selector parameter should be either a '
+        'SelectorBuilder or a Map<String, dynamic>');
   }
 
   // Old version to be used on MongoDb versions prior to 3.6
@@ -292,6 +289,14 @@ class DbCollection {
   /// Old version to be used on MongoDb versions prior to 3.6
   Future<Map<String, dynamic>> aggregate(List pipeline,
       {bool allowDiskUse = false, Map<String, Object>? cursor}) {
+    if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+      return AggregateOperation(
+        pipeline,
+        collection: this,
+        cursor: cursor,
+        aggregateOptions: AggregateOptions(allowDiskUse: allowDiskUse),
+      ).execute();
+    }
     var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline,
         allowDiskUse: allowDiskUse, cursor: cursor);
     return db.executeDbCommand(cmd);

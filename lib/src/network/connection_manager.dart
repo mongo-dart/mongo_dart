@@ -207,4 +207,23 @@ class ConnectionManager {
     }
     return _connectionPool.remove(connection.serverConfig.hostUrl);
   }
+
+  Connection? getMasterConnectionIfAvailable() {
+    final master = _masterConnection;
+    if (master != null && master.connected) {
+      return master;
+    }
+    return null;
+  }
+
+  Connection? getSecondaryConnection() {
+    final secondaries = _connectionPool.values
+        .where((c) => !c.isMaster && c.connected)
+        .toList()
+      ..shuffle();
+    if (secondaries.isEmpty) {
+      return null;
+    }
+    return secondaries.first;
+  }
 }

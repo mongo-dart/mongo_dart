@@ -464,13 +464,18 @@ void main() async {
         var collection = db.collection(collectionName);
 
         await insertManyDocuments(collection, 110);
-        var doc = await FindOperation(collection,
-                findOptions: FindOptions(tailable: true))
-            .execute();
+        var findOperation = FindOperation(
+          collection,
+          findOptions: FindOptions(tailable: true),
+        );
+        var doc = await findOperation.execute();
 
         var cursor = ModernCursor.fromOpenId(
-            collection, ((doc[keyCursor] as Map)[keyId] as Int64),
-            tailable: true);
+          collection,
+          findOperation,
+          ((doc[keyCursor] as Map)[keyId] as Int64),
+          tailable: true,
+        );
 
         expect(cursor.state, State.open);
 
@@ -518,13 +523,18 @@ void main() async {
         var collection = db.collection(collectionName);
 
         await insertManyDocuments(collection, 110);
-        var doc = await FindOperation(collection,
-                findOptions: FindOptions(tailable: true, awaitData: true))
-            .execute();
+        var findOperation = FindOperation(
+          collection,
+          findOptions: FindOptions(tailable: true, awaitData: true),
+        );
+        var doc = await findOperation.execute();
 
         var cursor = ModernCursor.fromOpenId(
-            collection, ((doc[keyCursor] as Map)[keyId] as Int64),
-            tailable: true);
+          collection,
+          findOperation,
+          ((doc[keyCursor] as Map)[keyId] as Int64),
+          tailable: true,
+        );
 
         expect(cursor.state, State.open);
 
