@@ -192,7 +192,7 @@ class Connection {
       _closed = true;
       connected = false;
       var ex = ConnectionException(
-          'Could not connect to ${serverConfig.hostUrl}\n- $e');
+          'Could not connect to ${serverConfig.hostUrl}\n- $err');
       throw ex;
     } catch (e) {
       _closed = true;
