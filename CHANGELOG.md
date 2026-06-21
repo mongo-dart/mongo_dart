@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.9
+
+- Add read preference to command operation for replica set (#401)
+- Fix: error variable in connection exception message (#403)
+
 ## 0.10.8
 
 - Fixed issue on supporting non ObjectId keys in FindAndModify, PR 400
