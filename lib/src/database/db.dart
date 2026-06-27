@@ -170,11 +170,11 @@ class WriteConcern {
       if (j) {
         ret[keyJ] = j;
       }
-      if (!j) {
+      if (!j && fsync) {
         if (serverStatus.isJournaled) {
-          ret[keyJ] = fsync;
+          ret[keyJ] = true;
         } else {
-          ret[keyFsync] = fsync;
+          ret[keyFsync] = true;
         }
       }
     }
