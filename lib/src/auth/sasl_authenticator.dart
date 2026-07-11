@@ -7,6 +7,7 @@ import 'package:sasl_scram/sasl_scram.dart'
     show SaslMechanism, UsernamePasswordCredential;
 import 'package:mongo_dart/mongo_dart.dart'
     show
+    BsonBinary,
         Connection,
         Db,
         DbCommand,
@@ -19,6 +20,14 @@ import 'package:mongo_dart/mongo_dart.dart'
         keyErrmsg,
         keyOk;
 import 'package:mongo_dart/src/auth/auth.dart';
+
+List<int> _decodePayload(dynamic payload) {
+  if (payload is BsonBinary) {
+    return payload.byteList;
+  }
+
+  return base64.decode(payload.toString());
+}
 
 abstract class SaslAuthenticator extends Authenticator {
   SaslAuthenticator(this.mechanism, this.db) : super();
@@ -51,8 +60,7 @@ abstract class SaslAuthenticator extends Authenticator {
       }
 
       var payload = result['payload'];
-
-      var payloadAsBytes = base64.decode(payload.toString());
+      var payloadAsBytes = _decodePayload(payload);
 
       if (mechanism.name == ScramSha1Authenticator.name) {
         currentStep = currentStep.transition(payloadAsBytes,
@@ -95,8 +103,7 @@ abstract class SaslAuthenticator extends Authenticator {
       }
 
       var payload = result['payload'];
-
-      var payloadAsBytes = base64.decode(payload.toString());
+      var payloadAsBytes = _decodePayload(payload);
 
       if (mechanism.name == ScramSha1Authenticator.name) {
         currentStep = currentStep.transition(payloadAsBytes,
