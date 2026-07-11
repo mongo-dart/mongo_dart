@@ -217,6 +217,7 @@ class Connection {
               if (!_closed) {
                 await _closeSocketOnError(socketError: err);
               }
+              _manager.onConnectionClosed?.call();
             },
             cancelOnError: true,
             // onDone is not called in any case after onData or OnError,
@@ -229,6 +230,7 @@ class Connection {
               if (!_closed) {
                 await _closeSocketOnError(socketError: noSecureRequestError);
               }
+              _manager.onConnectionClosed?.call();
             });
     connected = true;
     return true;
