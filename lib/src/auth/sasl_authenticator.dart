@@ -7,7 +7,7 @@ import 'package:sasl_scram/sasl_scram.dart'
     show SaslMechanism, UsernamePasswordCredential;
 import 'package:mongo_dart/mongo_dart.dart'
     show
-    BsonBinary,
+        BsonBinary,
         Connection,
         Db,
         DbCommand,

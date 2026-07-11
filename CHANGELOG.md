@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.10
+
+- Firestore Mongo compatibility: handle BSON SASL payloads and avoid fsync when disabled (#404)
+
 ## 0.10.9
 
 - Add read preference to command operation for replica set (#401)
