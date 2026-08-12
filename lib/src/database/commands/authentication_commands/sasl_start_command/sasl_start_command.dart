@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:mongo_dart/mongo_dart.dart';
@@ -16,7 +15,7 @@ class SaslStartCommand extends CommandOperation {
             command: <String, Object>{
               keySaslStart: 1,
               keyMechanism: mechanism,
-              keyPayload: base64.encode(payload)
+              keyPayload: BsonBinary.from(payload)
             },
             connection: connection);
 
