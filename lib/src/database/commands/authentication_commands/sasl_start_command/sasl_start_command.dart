@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:mongo_dart/mongo_dart.dart';
@@ -16,7 +15,12 @@ class SaslStartCommand extends CommandOperation {
             command: <String, Object>{
               keySaslStart: 1,
               keyMechanism: mechanism,
-              keyPayload: base64.encode(payload)
+              // The SASL payload is BinData in the wire protocol. mongod also
+              // accepts a base64 string, but a strict implementation does not:
+              // Azure Cosmos DB for MongoDB (vCore) answers `Failed to parse:
+              // error at key: "payload": unexpected element type: String,
+              // expected: Binary` and authentication can never complete.
+              keyPayload: BsonBinary.from(payload)
             },
             connection: connection);
 
