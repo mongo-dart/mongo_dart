@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Azure Cosmos DB for MongoDB (vCore) compatibility: send the SASL payload as BinData rather
+  than as a base64 string, and accept a numeric `hello.localTime`
+
 ## 0.10.10
 
 - Firestore Mongo compatibility: handle BSON SASL payloads and avoid fsync when disabled (#404)

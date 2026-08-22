@@ -19,6 +19,27 @@ import 'package:mongo_dart/src/database/utils/map_keys.dart';
 /// MongoDB drivers and clients use hello to determine the state of the
 /// replica set members and to discover additional members of a replica set.
 
+/// `localTime` is a BSON UTCDateTime on mongod, but some Mongo-compatible
+/// services send it as a count of milliseconds instead — Azure Cosmos DB for
+/// MongoDB (vCore) is one. The cast used to be unconditional and non-nullable,
+/// so the handshake threw `type 'Int64' is not a subtype of type 'DateTime'`
+/// before a single command could run, with no connection option to avoid it.
+DateTime _localTime(dynamic value) {
+  if (value is DateTime) {
+    return value;
+  }
+  if (value is int) {
+    return DateTime.fromMillisecondsSinceEpoch(value, isUtc: true);
+  }
+  // Int64 and anything else that can state its integer value.
+  try {
+    return DateTime.fromMillisecondsSinceEpoch(value.toInt() as int,
+        isUtc: true);
+  } catch (_) {
+    return DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+  }
+}
+
 class HelloResult with BasicResult {
   HelloResult(Map<String, dynamic> document)
       : isWritablePrimary = document[keyIsWritablePrimary] as bool? ?? false,
@@ -27,7 +48,7 @@ class HelloResult with BasicResult {
         maxMessageSizeBytes =
             document[keyMaxMessageSizeBytes] as int? ?? 48000000,
         maxWriteBatchSize = document[keyMaxWriteBatchSize] as int? ?? 100000,
-        localTime = document[keyLocalTime] as DateTime,
+        localTime = _localTime(document[keyLocalTime]),
         logicalSessionTimeoutMinutes =
             document[keyLogicalSessionTimeoutMinutes] as int,
         minWireVersion = document[keyMinWireVersion] as int,
