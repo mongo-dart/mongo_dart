@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Fix: `Connection.connect()` rethrew inside an unawaited `Future.catchError`
+  handler (`locSocket.done.catchError`), so any socket closure not already
+  caught elsewhere (e.g. the OS killing the connection while an app is
+  backgrounded/asleep) surfaced as a genuinely unhandled async error with no
+  way for consumers to catch it - no reference to that Future is exposed
+  anywhere. The real cleanup for a closed/errored socket already happens via
+  `_repliesSubscription`'s `onError`/`onDone` handlers a few lines below,
+  which properly call `_closeSocketOnError()`; this handler's only actual
+  purpose was the log line, so the `throw` is removed and the logging kept.
+
 ## 0.10.10
 
 - Firestore Mongo compatibility: handle BSON SASL payloads and avoid fsync when disabled (#404)
