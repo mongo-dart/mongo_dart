@@ -163,7 +163,8 @@ class ReadPreference {
 /// preference, used for determining the inherited read preference.
 /// @param {Object} options The options passed into the method, potentially containing a read preference
 /// @returns {(ReadPreference|null)} The resolved read preference
-ReadPreference? resolveReadPreference(parent, Map<String, Object> options,
+ReadPreference? resolveReadPreference(
+    dynamic parent, Map<String, Object> options,
     {bool? inheritReadPreference = true}) {
   //options ??= <String, Object>{};
   inheritReadPreference ??= true;
@@ -172,7 +173,8 @@ ReadPreference? resolveReadPreference(parent, Map<String, Object> options,
 
   if (inheritReadPreference) {
     if (parent is DbCollection) {
-      inheritedReadPreference = parent.readPreference;
+      inheritedReadPreference =
+          parent.readPreference ?? parent.db.readPreference;
     } else if (parent is Db) {
       inheritedReadPreference = parent.readPreference;
     } //Todo MongoClient class not yet Implemented

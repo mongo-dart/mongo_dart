@@ -37,6 +37,10 @@ class ConnectionManager {
     }
     if (result[keyOk] == 1.0) {
       var resultDoc = HelloResult(result);
+      if (connection.serverConfig.loadBalanced == true &&
+          !resultDoc.isLoadBalanced) {
+        throw MongoDartError('The server is not in Load Balanced mode');
+      }
       var master = resultDoc.isWritablePrimary;
       connection.isMaster = master;
       if (master) {
@@ -203,5 +207,24 @@ class ConnectionManager {
       _masterConnection = null;
     }
     return _connectionPool.remove(connection.serverConfig.hostUrl);
+  }
+
+  Connection? getMasterConnectionIfAvailable() {
+    final master = _masterConnection;
+    if (master != null && master.connected) {
+      return master;
+    }
+    return null;
+  }
+
+  Connection? getSecondaryConnection() {
+    final secondaries = _connectionPool.values
+        .where((c) => !c.isMaster && c.connected)
+        .toList()
+      ..shuffle();
+    if (secondaries.isEmpty) {
+      return null;
+    }
+    return secondaries.first;
   }
 }

@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.10.10
+
+- Firestore Mongo compatibility: handle BSON SASL payloads and avoid fsync when disabled (#404)
+
+## 0.10.9
+
+- Add read preference to command operation for replica set (#401)
+- Fix: error variable in connection exception message (#403)
+
+## 0.10.8
+
+- Fixed issue on supporting non ObjectId keys in FindAndModify, PR 400
+
+## 0.10.7
+
+- Added a new connection string parameters.This new parameter is used in case that your connection to Atlas is continuosly closed. It often happens when you have a free or flex cluster and some conncurrent requests. In this case the connection is closed by the server without any specific reason. To avoid this, if you add the "&safeAtlas=true" parameter to the connection string, the driver will serialize the concurrent request, avoiding the disconnection issue. It is obviously a shortcut, but at least it allows you to work.
+
+## 0.10.6
+
+- Lint fixes
+- Refreshed dependencies
+- Fixed issue with ObjectId generation (inherited from BSON package)
+
 ## 0.10.5
 
 - Added Cliente Metadata

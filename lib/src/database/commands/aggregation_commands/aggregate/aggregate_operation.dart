@@ -89,6 +89,8 @@ class AggregateOperation extends CommandOperation {
         keyHint: hint!
       else if (hintDocument != null)
         keyHint: hintDocument!,
+      if (readPreference != null)
+        r'$keyReadPreference': readPreference!.mode.name,
     };
   }
 

@@ -170,11 +170,11 @@ class WriteConcern {
       if (j) {
         ret[keyJ] = j;
       }
-      if (!j) {
+      if (!j && fsync) {
         if (serverStatus.isJournaled) {
-          ret[keyJ] = fsync;
+          ret[keyJ] = true;
         } else {
-          ret[keyFsync] = fsync;
+          ret[keyFsync] = true;
         }
       }
     }
@@ -192,6 +192,8 @@ class _UriParameters {
   static const tlsCertificateKeyFile = 'tlsCertificateKeyFile';
   static const tlsCertificateKeyFilePassword = 'tlsCertificateKeyFilePassword';
   static const appName = 'appname';
+  static const loadBalanced = 'loadBalanced';
+  static const safeAtlas = 'safeAtlas';
 }
 
 class Db {
@@ -282,6 +284,23 @@ class Db {
   Connection get masterConnection => _masterConnectionVerified;
   Connection get masterConnectionAnyState => _masterConnectionVerifiedAnyState;
 
+  Connection? connectionForReadPreference(ReadPreference readPreference) {
+    final manager = _connectionManager;
+    switch (readPreference.mode) {
+      case ReadPreferenceMode.primary:
+        return _masterConnectionVerifiedAnyState;
+      case ReadPreferenceMode.primaryPreferred:
+        return manager?.getMasterConnectionIfAvailable() ??
+            manager?.getSecondaryConnection();
+      case ReadPreferenceMode.secondary:
+        return manager?.getSecondaryConnection();
+      case ReadPreferenceMode.secondaryPreferred:
+      case ReadPreferenceMode.nearest:
+        return manager?.getSecondaryConnection() ??
+            manager?.getMasterConnectionIfAvailable();
+    }
+  }
+
   List<String> get uriList => _uriList.toList();
 
   Future<ServerConfig> _parseUri(String uriString,
@@ -299,6 +318,8 @@ class Db {
     }
     var uri = Uri.parse(uriString);
     var appName = 'mongodb_dart application';
+    var loadBalanced = false;
+    var safeAtlas = false;
 
     if (uri.scheme != 'mongodb') {
       throw MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
@@ -339,6 +360,12 @@ class Db {
       if (queryParam == _UriParameters.appName && value.isNotEmpty) {
         appName = value;
       }
+      if (queryParam == _UriParameters.loadBalanced && value == 'true') {
+        loadBalanced = true;
+      }
+      if (queryParam == _UriParameters.safeAtlas && value == 'true') {
+        safeAtlas = true;
+      }
     });
 
     Uint8List? tlsCAFileContent;
@@ -364,7 +391,9 @@ class Db {
         tlsCAFileContent: tlsCAFileContent,
         tlsCertificateKeyFileContent: tlsCertificateKeyFileContent,
         tlsCertificateKeyFilePassword: tlsCertificateKeyFilePassword,
-        clientMetadata: clientMetadata);
+        clientMetadata: clientMetadata,
+        loadBalanced: loadBalanced,
+        safeAtlas: safeAtlas);
 
     if (serverConfig.port == 0) {
       serverConfig.port = mongoDefaultPort;
@@ -545,7 +574,7 @@ class Db {
     //return result.future;
   }
 
-  bool documentIsNotAnError(firstRepliedDocument) =>
+  bool documentIsNotAnError(dynamic firstRepliedDocument) =>
       firstRepliedDocument['ok'] == 1.0 && firstRepliedDocument['err'] == null;
 
   Future<bool> dropCollection(String collectionName) async {

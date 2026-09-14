@@ -34,7 +34,7 @@ class OperationBase {
   Future<Map<String, dynamic>> execute() async => throw UnsupportedError(
       '"execute" must be implemented for OperationBase subclasses');
 
-  static Set<Aspect> defineAspects(aspects) {
+  static Set<Aspect> defineAspects(dynamic aspects) {
     if (aspects is Aspect) {
       return {aspects};
     } else if (aspects is List<Aspect>) {

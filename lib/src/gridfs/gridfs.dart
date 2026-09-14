@@ -19,7 +19,7 @@ class GridFS {
   Stream<Map<String, dynamic>> getFileList(SelectorBuilder selectorBuilder) =>
       files.find(selectorBuilder.sortBy('filename', descending: true));
 
-  Future<GridOut?> findOne(selector) async {
+  Future<GridOut?> findOne(dynamic selector) async {
     //var completer = Completer<GridOut>();
     var file = await files.findOne(selector); //.then((file) {
 

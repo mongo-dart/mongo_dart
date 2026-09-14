@@ -3,7 +3,7 @@ part of '../../mongo_dart.dart';
 class DbCollection {
   Db db;
   String collectionName;
-  ReadPreference readPreference = ReadPreference.primary;
+  ReadPreference? readPreference;
 
   DbCollection(this.db, this.collectionName);
 
@@ -62,7 +62,7 @@ class DbCollection {
   /// By default, the `update()` method updates a single document.
   /// Include the option multiUpdate: true to update all documents that match
   /// the query criteria.
-  Future<Map<String, dynamic>> update(selector, document,
+  Future<Map<String, dynamic>> update(dynamic selector, document,
       {bool upsert = false,
       bool multiUpdate = false,
       WriteConcern? writeConcern}) async {
@@ -76,7 +76,7 @@ class DbCollection {
   }
 
   // Old version to be used on MongoDb versions prior to 3.6
-  Future<Map<String, dynamic>> legacyUpdate(selector, document,
+  Future<Map<String, dynamic>> legacyUpdate(dynamic selector, document,
       {bool upsert = false,
       bool multiUpdate = false,
       WriteConcern? writeConcern}) {
@@ -105,7 +105,7 @@ class DbCollection {
   ///     find({'last_name': 'Smith'})
   /// Here our selector will match every document where the last_name attribute
   /// is 'Smith.'
-  Stream<Map<String, dynamic>> find([selector]) {
+  Stream<Map<String, dynamic>> find([dynamic selector]) {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       if (selector is SelectorBuilder) {
         return modernFind(selector: selector);
@@ -121,32 +121,29 @@ class DbCollection {
   }
 
   // Old version to be used on MongoDb versions prior to 3.6
-  Stream<Map<String, dynamic>> legacyFind([selector]) =>
+  Stream<Map<String, dynamic>> legacyFind([dynamic selector]) =>
       Cursor(db, this, selector).stream;
 
   // Old version to be used on MongoDb versions prior to 3.6
-  Cursor createCursor([selector]) => Cursor(db, this, selector);
+  Cursor createCursor([dynamic selector]) => Cursor(db, this, selector);
 
   /// Returns one document that satisfies the specified query criteria on the
   /// collection or view. If multiple documents satisfy the query,
   /// this method returns the first document.
-  Future<Map<String, dynamic>?> findOne([selector]) {
-    if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
-      if (selector is SelectorBuilder) {
-        return modernFindOne(selector: selector);
-      } else if (selector is Map<String, dynamic>) {
-        return modernFindOne(filter: selector);
-      } else if (selector == null) {
-        return modernFindOne();
-      }
-      throw MongoDartError('The selector parameter should be either a '
-          'SelectorBuilder or a Map<String, dynamic>');
+  Future<Map<String, dynamic>?> findOne([dynamic selector]) {
+    if (selector is SelectorBuilder) {
+      return modernFindOne(selector: selector);
+    } else if (selector is Map<String, dynamic>) {
+      return modernFindOne(filter: selector);
+    } else if (selector == null) {
+      return modernFindOne();
     }
-    return legacyFindOne(selector);
+    throw MongoDartError('The selector parameter should be either a '
+        'SelectorBuilder or a Map<String, dynamic>');
   }
 
   // Old version to be used on MongoDb versions prior to 3.6
-  Future<Map<String, dynamic>?> legacyFindOne([selector]) {
+  Future<Map<String, dynamic>?> legacyFindOne([dynamic selector]) {
     var cursor = Cursor(db, this, selector);
     var result = cursor.nextObject();
     cursor.close();
@@ -163,7 +160,7 @@ class DbCollection {
   /// To return the document with the modifications made on the update,
   /// use the returnNew option.
   Future<Map<String, dynamic>?> findAndModify(
-      {query,
+      {dynamic query,
       sort,
       bool? remove,
       update,
@@ -194,7 +191,7 @@ class DbCollection {
 
   // Old version to be used on MongoDb versions prior to 3.6
   Future<Map<String, dynamic>?> legacyFindAndModify(
-      {query,
+      {dynamic query,
       sort,
       bool? remove,
       update,
@@ -231,7 +228,7 @@ class DbCollection {
   // **************************************************
 
   /// Removes documents from a collection.
-  Future<Map<String, dynamic>> remove(selector,
+  Future<Map<String, dynamic>> remove(dynamic selector,
       {WriteConcern? writeConcern}) async {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       var result = await deleteMany(
@@ -244,7 +241,7 @@ class DbCollection {
   }
 
   // Old version to be used on MongoDb versions prior to 3.6
-  Future<Map<String, dynamic>> legacyRemove(selector,
+  Future<Map<String, dynamic>> legacyRemove(dynamic selector,
           {WriteConcern? writeConcern}) =>
       db.removeFromCollection(
           collectionName, _selectorBuilder2Map(selector), writeConcern);
@@ -253,7 +250,7 @@ class DbCollection {
   //                   Count
   // **************************************************
 
-  Future<int> count([selector]) async {
+  Future<int> count([dynamic selector]) async {
     if (db._masterConnectionVerified.serverCapabilities.supportsOpMsg) {
       var result = await modernCount(
           selector: selector is SelectorBuilder ? selector : null,
@@ -264,7 +261,7 @@ class DbCollection {
   }
 
   // Todo - missing modern version
-  Future<int> legacyCount([selector]) {
+  Future<int> legacyCount([dynamic selector]) {
     return db
         .executeDbCommand(DbCommand.createCountCommand(
             db, collectionName, _selectorBuilder2Map(selector)))
@@ -292,6 +289,14 @@ class DbCollection {
   /// Old version to be used on MongoDb versions prior to 3.6
   Future<Map<String, dynamic>> aggregate(List pipeline,
       {bool allowDiskUse = false, Map<String, Object>? cursor}) {
+    if (db.masterConnection.serverCapabilities.supportsOpMsg) {
+      return AggregateOperation(
+        pipeline,
+        collection: this,
+        cursor: cursor,
+        aggregateOptions: AggregateOptions(allowDiskUse: allowDiskUse),
+      ).execute();
+    }
     var cmd = DbCommand.createAggregateCommand(db, collectionName, pipeline,
         allowDiskUse: allowDiskUse, cursor: cursor);
     return db.executeDbCommand(cmd);
@@ -372,7 +377,7 @@ class DbCollection {
     return keys;
   }
 
-  Map<String, dynamic> _selectorBuilder2Map(selector) {
+  Map<String, dynamic> _selectorBuilder2Map(dynamic selector) {
     if (selector == null) {
       return <String, dynamic>{};
     }
@@ -390,21 +395,21 @@ class DbCollection {
     return query as Map<String, dynamic>;
   }
 
-  Map<String, Object> _sortBuilder2Map(query) {
+  Map<String, Object> _sortBuilder2Map(dynamic query) {
     if (query is SelectorBuilder) {
       query = <String, Object>{...?query.map['orderby']};
     }
     return query as Map<String, Object>;
   }
 
-  Map<String, dynamic>? _fieldsBuilder2Map(fields) {
+  Map<String, dynamic>? _fieldsBuilder2Map(dynamic fields) {
     if (fields is SelectorBuilder) {
       return fields.paramFields;
     }
     return fields as Map<String, dynamic>?;
   }
 
-  Map<String, dynamic> _updateBuilder2Map(update) {
+  Map<String, dynamic> _updateBuilder2Map(dynamic update) {
     if (update is ModifierBuilder) {
       update = update.map;
     }
@@ -553,7 +558,7 @@ class DbCollection {
     });
   }
 
-  Future<WriteResult> deleteOne(selector,
+  Future<WriteResult> deleteOne(dynamic selector,
       {WriteConcern? writeConcern,
       CollationOptions? collation,
       String? hint,
@@ -566,7 +571,7 @@ class DbCollection {
     return deleteOperation.executeDocument();
   }
 
-  Future<WriteResult> deleteMany(selector,
+  Future<WriteResult> deleteMany(dynamic selector,
       {WriteConcern? writeConcern,
       CollationOptions? collation,
       String? hint,
@@ -579,7 +584,7 @@ class DbCollection {
     return deleteOperation.executeDocument();
   }
 
-  Future<Map<String, dynamic>> modernUpdate(selector, update,
+  Future<Map<String, dynamic>> modernUpdate(dynamic selector, update,
       {bool? upsert,
       bool? multi,
       WriteConcern? writeConcern,
@@ -603,7 +608,7 @@ class DbCollection {
     return updateOperation.execute();
   }
 
-  Future<WriteResult> replaceOne(selector, Map<String, dynamic> update,
+  Future<WriteResult> replaceOne(dynamic selector, Map<String, dynamic> update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -620,7 +625,7 @@ class DbCollection {
     return replaceOneOperation.executeDocument();
   }
 
-  Future<WriteResult> updateOne(selector, update,
+  Future<WriteResult> updateOne(dynamic selector, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -640,7 +645,7 @@ class DbCollection {
     return updateOneOperation.executeDocument();
   }
 
-  Future<WriteResult> updateMany(selector, update,
+  Future<WriteResult> updateMany(dynamic selector, update,
       {bool? upsert,
       WriteConcern? writeConcern,
       CollationOptions? collation,
@@ -661,7 +666,7 @@ class DbCollection {
   }
 
   Future<FindAndModifyResult> modernFindAndModify(
-      {query,
+      {dynamic query,
       sort,
       bool? remove,
       update,

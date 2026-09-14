@@ -95,6 +95,8 @@ class FindOperation extends CommandOperation {
         keyHint: hintDocument!,
       if (skip != null && skip! > 0) keySkip: skip!,
       if (limit != null && limit! > 0) keyLimit: limit!,
+      if (readPreference != null)
+        r'$keyReadPreference': readPreference!.mode.name,
     };
   }
 

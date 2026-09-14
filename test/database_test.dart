@@ -1815,6 +1815,7 @@ Future testFindOneWhileStateIsOpening() async {
     // ignore: unawaited_futures
     db.open().then((_) {
       return db.collection(collectionName).findOne();
+      // ignore: unawaited_futures
     }).then((res) {
       expect(res, isNull);
       db.close();
