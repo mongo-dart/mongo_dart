@@ -29,7 +29,7 @@ class HelloResult with BasicResult {
         maxWriteBatchSize = document[keyMaxWriteBatchSize] as int? ?? 100000,
         localTime = document[keyLocalTime] as DateTime,
         logicalSessionTimeoutMinutes =
-            document[keyLogicalSessionTimeoutMinutes] as int,
+            document[keyLogicalSessionTimeoutMinutes] as int?,
         minWireVersion = document[keyMinWireVersion] as int,
         maxWireVersion = document[keyMaxWireVersion] as int,
         readOnly = document[keyReadOnly] as bool? ?? false {
@@ -108,7 +108,10 @@ class HelloResult with BasicResult {
   /// from the client or been refreshed with refreshSessions within this
   ///  threshold are cleared from the cache. State associated with an expired
   /// session may be cleaned up by the server at any time.
-  int logicalSessionTimeoutMinutes;
+  ///
+  /// Null when the server does not support sessions and leaves the field
+  /// out of its reply, as Amazon DocumentDB 3.6 does.
+  int? logicalSessionTimeoutMinutes;
 
   /// An identifier for the mongod/mongos instance's outgoing
   /// connection to the client.

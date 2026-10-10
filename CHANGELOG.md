@@ -15,6 +15,7 @@
 ## 0.10.10
 
 - Firestore Mongo compatibility: handle BSON SASL payloads and avoid fsync when disabled (#404)
+- Accept a hello reply without `logicalSessionTimeoutMinutes`, which servers without session support (such as Amazon DocumentDB 3.6) leave out
 
 ## 0.10.9
 
