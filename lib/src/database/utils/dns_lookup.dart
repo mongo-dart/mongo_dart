@@ -17,14 +17,9 @@ Future<List<String>> decodeDnsSeedlist(Uri dnsSeedlistUri) async {
   }
   var records =
       await DnsUtils.lookupRecord(dnsSeedlistUri.host, RRecordType.TXT);
-  if (records == null) {
-    throw MongoDartError('It is impossible to contact the DNS server'
-        ' or the host "${dnsSeedlistUri.host}" is not correct.');
-  }
-  if (records.isEmpty) {
-    throw MongoDartError('DNS data is not correct (missing TXT detail)');
-  }
-  var additionalParms = records.first.data.replaceAll('"', '');
+  var additionalParms = (records == null || records.isEmpty)
+      ? ''
+      : records.first.data.replaceAll('"', '');
   records = await DnsUtils.lookupRecord(
       '_mongodb._tcp.${dnsSeedlistUri.host}', RRecordType.SRV);
   if (records == null) {

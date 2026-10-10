@@ -1,5 +1,6 @@
 import 'package:bson/bson.dart';
 import 'package:mongo_dart/src/database/commands/mixin/basic_result.dart';
+import 'package:mongo_dart/src/database/utils/bson_time.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 /// Class representing the output of the Hello command
@@ -27,7 +28,8 @@ class HelloResult with BasicResult {
         maxMessageSizeBytes =
             document[keyMaxMessageSizeBytes] as int? ?? 48000000,
         maxWriteBatchSize = document[keyMaxWriteBatchSize] as int? ?? 100000,
-        localTime = document[keyLocalTime] as DateTime,
+        localTime = dateTimeFromBsonValue(document[keyLocalTime]) ??
+            DateTime.now().toUtc(),
         logicalSessionTimeoutMinutes =
             document[keyLogicalSessionTimeoutMinutes] as int?,
         minWireVersion = document[keyMinWireVersion] as int,
@@ -101,6 +103,9 @@ class HelloResult with BasicResult {
   int maxWriteBatchSize;
 
   /// Returns the local server time in UTC.
+  ///
+  /// Falls back to the current UTC time if the server does not provide a
+  /// localTime value or if it couldn't be parsed.
   DateTime localTime;
 
   /// The time in minutes that a session remains active after its most

@@ -1,4 +1,5 @@
 import 'package:bson/bson.dart';
+import 'package:mongo_dart/src/database/utils/bson_time.dart';
 import 'package:mongo_dart/src/database/utils/map_keys.dart';
 
 /// Basic communication from a MongoDb server
@@ -25,13 +26,7 @@ mixin TimingResult {
 
   void extractTiming(Map<String, dynamic> document) {
     //document ??= <String, Object>{};
-    var opTime = document[keyOperationTime];
-    if (opTime is Timestamp) {
-      operationTime =
-          DateTime.fromMillisecondsSinceEpoch(opTime.seconds * 1000);
-    } else if (opTime is DateTime) {
-      operationTime = opTime;
-    }
+    operationTime = dateTimeFromBsonValue(document[keyOperationTime]);
 
     $clusterTime = $ClusterTime(document);
   }
@@ -71,7 +66,7 @@ class $ClusterTime {
 
   void _extract(Map<String, dynamic> document) {
     //document ??= <String, Object>{};
-    clusterTime = document[keyClusterTime] as DateTime?;
+    clusterTime = dateTimeFromBsonValue(document[keyClusterTime]);
     signature = Signature(document);
   }
 }
