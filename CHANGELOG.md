@@ -1,7 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.10.10
 
+- Firestore Mongo compatibility: handle BSON SASL payloads and avoid fsync when disabled (#404)
+- Accept a hello reply without `logicalSessionTimeoutMinutes`, which servers without session support (such as Amazon DocumentDB 3.6) leave out (#408)
 - Fix: `Connection.connect()` rethrew inside an unawaited `Future.catchError`
   handler (`locSocket.done.catchError`), so any socket closure not already
   caught elsewhere (e.g. the OS killing the connection while an app is
@@ -10,12 +12,23 @@
   anywhere. The real cleanup for a closed/errored socket already happens via
   `_repliesSubscription`'s `onError`/`onDone` handlers a few lines below,
   which properly call `_closeSocketOnError()`; this handler's only actual
-  purpose was the log line, so the `throw` is removed and the logging kept.
+  purpose was the log line, so the `throw` is removed and the logging kept. (#407)
 
-## 0.10.10
-
-- Firestore Mongo compatibility: handle BSON SASL payloads and avoid fsync when disabled (#404)
-- Accept a hello reply without `logicalSessionTimeoutMinutes`, which servers without session support (such as Amazon DocumentDB 3.6) leave out
+- Fixes connection and authentication failures against Azure DocumentDB.
+ While integrating mongo_dart against an Azure DocumentDB cluster, three separate wire-protocol incompatibilities surfaced during connection setup, DNS-based seedlist discovery, and SASL authentication. None of them are Azure-specific hacks — two are outright spec violations in the driver, and the third is a defensive parsing fix for a field that other servers may also encode differently.
+ Changes
+    Add a shared dateTimeFromBsonValue() helper and use it in HelloResult.localTime, TimingResult.operationTime and $ClusterTime.clusterTime instead of a hard as DateTime cast, so Int64/Timestamp values are tolerated instead of throwing.
+    decodeDnsSeedlist() no longer throws when a mongodb+srv:// host has no TXT record — the TXT record is optional per the DNS seedlist discovery spec, only the SRV record is mandatory.
+    SaslStartCommand/SaslContinueCommand now send payload as BsonBinary instead of a base64-encoded string, matching the Auth spec's payload: BinData(...) examples.
+  Why
+    hello/timing parsing: Azure DocumentDB returns hello.localTime (and related timing fields) as Int64 instead of a BSON UTC datetime. The previous hard cast (document[keyLocalTime] as DateTime) crashed with type 'Int64' is not a subtype of type 'DateTime' during Db.open().
+    DNS seedlist discovery: Azure DocumentDB clusters publish a valid _mongodb._tcp.<cluster> SRV record but no TXT record. decodeDnsSeedlist() treated a missing/empty TXT lookup as a hard error (DNS data is not correct (missing TXT detail)), even though the Initial DNS Seedlist Discovery spec explicitly says "If available, a TXT record provides default connection string options" — i.e. it's optional.
+    SASL payload type: the Auth spec shows payload: BinData(...) for every mechanism's saslStart/saslContinue example. mongo_dart sent it as a base64 String instead; real MongoDB servers tolerate this, but Azure DocumentDB rejects it with Failed to parse: error at key: "payload": unexpected element type: String, expected: Binary.
+Validation
+    Added unit tests (test/bson_time_test.dart) covering dateTimeFromBsonValue(), HelloResult.localTime and TimingResult.extractTiming() with Int64 values.
+    dart analyze and dart test pass clean.
+    Reproduced and fixed end-to-end against a real Azure DocumentDB cluster (mongodb+srv://...global.mongocluster.cosmos.azure.com, tls=true, authMechanism=SCRAM-SHA-256): connection, auth and a find() all succeed after this patch.
+    Re-verified against a local, standard MongoDB instance (SCRAM-SHA-256 auth) to confirm no regression for non-Azure deployments. (#405)
 
 ## 0.10.9
 
