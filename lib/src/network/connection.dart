@@ -205,7 +205,6 @@ class Connection {
     // ignore: unawaited_futures
     locSocket.done.catchError((error) {
       _log.info('Socket error $error');
-      throw ConnectionException('Socket error: $error');
     });
     socket = locSocket;
 
